@@ -751,6 +751,19 @@ function renderStats(tab) {
         </div>
         <div style="font-size:13px;color:var(--text-muted)">${t.predTitle||''}</div>
       </div>`).join('')}</div>`;
+  } else if (tab === 'keepers') {
+    if (window._liveTopKeepers && window._liveTopKeepers.length > 0) {
+      el.innerHTML = `<div style="margin-bottom:16px;color:#4caf50;font-size:13px">🟢 即時更新資料</div>
+        <div class="scorers-list">${window._liveTopKeepers.map((p,i) => `
+          <div class="scorer-card">
+            <div class="scorer-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div>
+            <div class="scorer-flag"></div>
+            <div class="scorer-info"><div class="scorer-name">${p.name}</div><div class="scorer-sub">${p.nationality} · ${p.team}</div></div>
+            <div class="scorer-goals">${p.saves ?? 0} <span>撲救</span></div>
+          </div>`).join('')}</div>`;
+    } else {
+      el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">賽事開始後更新</div>';
+    }
   } else {
     el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">賽事開始後更新</div>';
   }
@@ -906,6 +919,12 @@ function applyLiveData() {
         if (data.topAssists && data.topAssists.length > 0) {
           window._liveTopAssists = data.topAssists;
           if (activeTab && activeTab.dataset.stats === 'assists') renderStats('assists');
+        }
+
+        // 門將榜
+        if (data.topKeepers && data.topKeepers.length > 0) {
+          window._liveTopKeepers = data.topKeepers;
+          if (activeTab && activeTab.dataset.stats === 'keepers') renderStats('keepers');
         }
       }
     });

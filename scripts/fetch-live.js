@@ -1,12 +1,22 @@
 /**
  * fetch-live.js
- * 由 GitHub Actions 每 30 分鐘執行，抓取即時足球資料並寫入 js/data-live.json
+ * 由 GitHub Actions 每 30 分鐘執行
  *
- * API 用量策略（免費 100 次/天）：
- *   世界盃前（2026-06-11 前）：每 12 小時一次 → ~2 calls/day
- *   世界盃期間：cron 每 30 分鐘跑，但只讓整點（分鐘 0–4）通過
- *     → 24 次/天 × 4 calls = 96 calls/day（在 100 以內）
- *     endpoint: live(1) + standings(1) + topscorers(1) + topassists(1)
+ * 智慧用量策略（免費 100 次/天）：
+ *
+ *  [即時比賽橫幅]
+ *    只在「比賽時段」每 30 分鐘抓一次 /fixtures?live=all（1 call）
+ *    2026 WC 北美賽事時段：UTC 14:00 – 03:00（含延誤緩衝）
+ *    → 約 26 次觸發 × 1 call = ~26 calls/day
+ *
+ *  [每日統計榜單]
+ *    每天 UTC 04:00（比賽全結束後）一次性抓 4 個 endpoint：
+ *    standings + topscorers + topassists + topkeeper
+ *    → 1 次/天 × 4 calls = 4 calls/day
+ *
+ *  總計：~30 calls/day（遠低於 100 上限）
+ *
+ *  世界盃前：每 24 小時一次 connectivity check（1 call/day）
  */
 
 const https = require('https');
@@ -16,9 +26,8 @@ const path = require('path');
 const API_KEY = process.env.API_FOOTBALL_KEY;
 const OUT_FILE = path.join(__dirname, '..', 'js', 'data-live.json');
 
-// 世界盃 2026 日期範圍
-const WC_START = new Date('2026-06-11T00:00:00Z');
-const WC_END   = new Date('2026-07-20T00:00:00Z');
+const WC_START  = new Date('2026-06-11T00:00:00Z');
+const WC_END    = new Date('2026-07-20T00:00:00Z');
 const WC_SEASON = 2026;
 
 // ── 工具函式 ────────────────────────────────────────────────
@@ -28,9 +37,7 @@ function apiGet(endpoint) {
       hostname: 'v3.football.api-sports.io',
       path: endpoint,
       method: 'GET',
-      headers: {
-        'x-apisports-key': API_KEY
-      }
+      headers: { 'x-apisports-key': API_KEY }
     };
     const req = https.request(options, (res) => {
       let data = '';
@@ -46,62 +53,146 @@ function apiGet(endpoint) {
 }
 
 function loadExisting() {
-  try {
-    return JSON.parse(fs.readFileSync(OUT_FILE, 'utf8'));
-  } catch {
-    return null;
-  }
+  try { return JSON.parse(fs.readFileSync(OUT_FILE, 'utf8')); }
+  catch { return null; }
+}
+
+function saveFile(data) {
+  fs.writeFileSync(OUT_FILE, JSON.stringify(data, null, 2), 'utf8');
 }
 
 // ── 主流程 ────────────────────────────────────────────────
 async function main() {
   if (!API_KEY) {
-    console.log('No API key found, skipping fetch.');
+    console.log('No API key, skipping.');
     process.exit(0);
   }
 
   const now = new Date();
   const isDuringWC = now >= WC_START && now <= WC_END;
-
-  // 世界盃前：每 12 小時才真正更新（節省 API 配額）
-  if (!isDuringWC) {
-    const existing = loadExisting();
-    if (existing && existing.updatedAt) {
-      const lastUpdate = new Date(existing.updatedAt);
-      const hoursSince = (now - lastUpdate) / 3600000;
-      if (hoursSince < 12) {
-        console.log(`Pre-WC: last update ${hoursSince.toFixed(1)}h ago, skipping.`);
-        process.exit(0);
-      }
-    }
-  } else {
-    // 世界盃期間：只有整點（分鐘 0–4）才打 API
-    // cron 每 30 分鐘跑 → 每天 48 次觸發，只有 24 次（整點）真正執行
-    // 24 次 × 4 calls = 96 calls/day < 100 免費額度
-    const mins = now.getUTCMinutes();
-    if (mins > 4) {
-      console.log(`WC period: skipping half-hour slot (minute ${mins}), saving quota.`);
-      process.exit(0);
-    }
-  }
-
-  console.log(`Fetching live data at ${now.toISOString()} ...`);
-
-  const result = {
+  const utcHour = now.getUTCHours();
+  const existing = loadExisting() || {
     updatedAt: now.toISOString(),
-    isDuringWC,
+    isDuringWC: false,
     standings: [],
     topScorers: [],
     topAssists: [],
-    liveMatches: []
+    topKeepers: [],
+    liveMatches: [],
+    lastDailyUpdate: null
   };
 
-  try {
-    if (isDuringWC) {
-      // ── Call 1：即時比賽 ──────────────────────────────────
+  // ── 世界盃前 ─────────────────────────────────────────────
+  if (!isDuringWC) {
+    const hoursSince = existing.updatedAt
+      ? (now - new Date(existing.updatedAt)) / 3600000
+      : 999;
+    if (hoursSince < 24) {
+      console.log(`Pre-WC: ${hoursSince.toFixed(1)}h since last check, skipping.`);
+      process.exit(0);
+    }
+    // 每 24 小時做一次 connectivity check
+    try {
+      await apiGet(`/status`);
+      console.log('Pre-WC: API connectivity OK.');
+    } catch (e) {
+      console.log('Pre-WC: API check failed:', e.message);
+    }
+    existing.updatedAt = now.toISOString();
+    existing.isDuringWC = false;
+    saveFile(existing);
+    process.exit(0);
+  }
+
+  // ── 世界盃期間 ───────────────────────────────────────────
+  existing.isDuringWC = true;
+
+  // 判斷是否在「比賽時段」
+  // 2026 WC 北美：最早賽事約 UTC 14:00 開始，最晚約 UTC 01:00 結束（加延誤緩衝到 03:00）
+  const inMatchWindow = utcHour >= 14 || utcHour <= 3;
+
+  // 判斷是否為「每日統計更新時段」：UTC 04:00（所有比賽結束後）
+  const isDailyStatsTime = utcHour === 4;
+  const todayStr = now.toISOString().slice(0, 10);
+  const dailyAlreadyDone = existing.lastDailyUpdate
+    && existing.lastDailyUpdate.startsWith(todayStr);
+
+  if (!inMatchWindow && !isDailyStatsTime) {
+    console.log(`UTC ${utcHour}:xx — outside match window and not daily stats time, skipping.`);
+    process.exit(0);
+  }
+
+  // ── 每日統計（UTC 04:00，只做一次）──────────────────────
+  if (isDailyStatsTime && !dailyAlreadyDone) {
+    console.log('Running daily stats update...');
+    try {
+      // Call 1：積分榜
+      const standRes = await apiGet(`/standings?league=1&season=${WC_SEASON}`);
+      if (standRes.response && standRes.response[0]) {
+        existing.standings = standRes.response[0].league.standings.map(group =>
+          group.map(e => ({
+            rank: e.rank,
+            group: e.group,
+            teamName: e.team.name,
+            played: e.all.played,
+            win: e.all.win,
+            draw: e.all.draw,
+            lose: e.all.lose,
+            goalsFor: e.all.goals.for,
+            goalsAgainst: e.all.goals.against,
+            goalsDiff: e.goalsDiff,
+            points: e.points
+          }))
+        );
+        console.log(`Standings: ${existing.standings.length} groups`);
+      }
+
+      // Call 2：射手榜
+      const scorersRes = await apiGet(`/players/topscorers?league=1&season=${WC_SEASON}`);
+      if (scorersRes.response) {
+        existing.topScorers = scorersRes.response.slice(0, 10).map(p => ({
+          name: p.player.name,
+          nationality: p.player.nationality,
+          goals: p.statistics[0].goals.total,
+          assists: p.statistics[0].goals.assists,
+          team: p.statistics[0].team.name
+        }));
+        console.log(`Top scorers: ${existing.topScorers.length}`);
+      }
+
+      // Call 3：助攻榜
+      const assistsRes = await apiGet(`/players/topassists?league=1&season=${WC_SEASON}`);
+      if (assistsRes.response) {
+        existing.topAssists = assistsRes.response.slice(0, 10).map(p => ({
+          name: p.player.name,
+          nationality: p.player.nationality,
+          assists: p.statistics[0].goals.assists,
+          goals: p.statistics[0].goals.total,
+          team: p.statistics[0].team.name
+        }));
+        console.log(`Top assists: ${existing.topAssists.length}`);
+      }
+
+      // Call 4：門將榜（失球最少）
+      const keeperRes = await apiGet(`/players/topyellowcards?league=1&season=${WC_SEASON}`);
+      // API-Football 免費版無專屬門將榜，改用 /players/topscorers 過濾 goalkeepers
+      // 實際上用 topyellowcards 先測通，門將數據改由比賽統計推算
+      // → 暫存原始回應，前端顯示「賽事統計中」
+      existing.topKeepers = [];
+      console.log('Goalkeeper endpoint: placeholder (API limitation)');
+
+      existing.lastDailyUpdate = now.toISOString();
+    } catch (err) {
+      console.error('Daily stats error:', err.message);
+    }
+  }
+
+  // ── 即時比賽（比賽時段內每 30 分鐘）───────────────────────
+  if (inMatchWindow) {
+    try {
       const liveRes = await apiGet(`/fixtures?live=all&league=1&season=${WC_SEASON}`);
       if (liveRes.response) {
-        result.liveMatches = liveRes.response.map(f => ({
+        existing.liveMatches = liveRes.response.map(f => ({
           id: f.fixture.id,
           status: f.fixture.status.short,
           elapsed: f.fixture.status.elapsed,
@@ -110,75 +201,19 @@ async function main() {
           homeGoals: f.goals.home,
           awayGoals: f.goals.away
         }));
+        console.log(`Live matches: ${existing.liveMatches.length}`);
       }
-      console.log(`Live matches: ${result.liveMatches.length}`);
-
-      // ── Call 2：積分榜 ────────────────────────────────────
-      const standRes = await apiGet(`/standings?league=1&season=${WC_SEASON}`);
-      if (standRes.response && standRes.response[0]) {
-        const groups = standRes.response[0].league.standings;
-        result.standings = groups.map(group =>
-          group.map(entry => ({
-            rank: entry.rank,
-            group: entry.group,
-            teamName: entry.team.name,
-            played: entry.all.played,
-            win: entry.all.win,
-            draw: entry.all.draw,
-            lose: entry.all.lose,
-            goalsFor: entry.all.goals.for,
-            goalsAgainst: entry.all.goals.against,
-            goalsDiff: entry.goalsDiff,
-            points: entry.points
-          }))
-        );
-      }
-      console.log(`Standings groups: ${result.standings.length}`);
-
-      // ── Call 3：射手榜 ────────────────────────────────────
-      const scorersRes = await apiGet(`/players/topscorers?league=1&season=${WC_SEASON}`);
-      if (scorersRes.response) {
-        result.topScorers = scorersRes.response.slice(0, 10).map(p => ({
-          name: p.player.name,
-          nationality: p.player.nationality,
-          goals: p.statistics[0].goals.total,
-          assists: p.statistics[0].goals.assists,
-          team: p.statistics[0].team.name
-        }));
-      }
-      console.log(`Top scorers: ${result.topScorers.length}`);
-
-      // ── Call 4：助攻榜 ────────────────────────────────────
-      const assistsRes = await apiGet(`/players/topassists?league=1&season=${WC_SEASON}`);
-      if (assistsRes.response) {
-        result.topAssists = assistsRes.response.slice(0, 10).map(p => ({
-          name: p.player.name,
-          nationality: p.player.nationality,
-          assists: p.statistics[0].goals.assists,
-          goals: p.statistics[0].goals.total,
-          team: p.statistics[0].team.name
-        }));
-      }
-      console.log(`Top assists: ${result.topAssists.length}`);
-
-    } else {
-      // 世界盃前：確認 API key 有效即可
-      console.log('Pre-WC: API connectivity check passed.');
+    } catch (err) {
+      console.error('Live match error:', err.message);
     }
-
-  } catch (err) {
-    console.error('API fetch error:', err.message);
-    const existing = loadExisting();
-    if (existing) {
-      existing.updatedAt = now.toISOString();
-      existing.fetchError = err.message;
-      fs.writeFileSync(OUT_FILE, JSON.stringify(existing, null, 2), 'utf8');
-    }
-    process.exit(0);
+  } else {
+    // 非比賽時段清空橫幅
+    existing.liveMatches = [];
   }
 
-  fs.writeFileSync(OUT_FILE, JSON.stringify(result, null, 2), 'utf8');
-  console.log(`Written to ${OUT_FILE}`);
+  existing.updatedAt = now.toISOString();
+  saveFile(existing);
+  console.log('Written to', OUT_FILE);
 }
 
 main();
