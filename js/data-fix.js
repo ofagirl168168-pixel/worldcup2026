@@ -285,4 +285,6 @@ window.addEventListener('load', () => {
   renderFocus();
   // 預先渲染AI預測
   renderPredictions();
+  // 載入即時資料（GitHub Actions 定期更新）
+  applyLiveData();
 });

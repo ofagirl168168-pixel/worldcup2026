@@ -674,6 +674,19 @@ function renderStats(tab) {
   } else if (tab === 'scorers' || tab === 'assists') {
     const label = tab === 'scorers' ? '射手榜' : '助攻榜';
     const unit  = tab === 'scorers' ? '球' : '助攻';
+    // 世界盃期間有即時資料時使用真實射手榜
+    const liveScorers = (tab === 'scorers') ? (window._liveTopScorers || null) : null;
+    if (liveScorers && liveScorers.length > 0) {
+      el.innerHTML = `<div style="margin-bottom:16px;color:#4caf50;font-size:13px">🟢 即時更新資料</div>
+        <div class="scorers-list">${liveScorers.map((p,i) => `
+          <div class="scorer-card">
+            <div class="scorer-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div>
+            <div class="scorer-flag"></div>
+            <div class="scorer-info"><div class="scorer-name">${p.name}</div><div class="scorer-sub">${p.nationality} · ${p.team}</div></div>
+            <div class="scorer-goals">${p.goals} <span>球</span></div>
+          </div>`).join('')}</div>`;
+      return;
+    }
     const placeholder = [
       {flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',name:'Harry Kane',sub:'英格蘭 · 拜仁慕尼黑',val:0},
       {flag:'🇧🇷',name:'Vinicius Jr.',sub:'巴西 · 皇家馬德里',val:0},
@@ -797,4 +810,64 @@ function openTeamModal(code) {
       <div style="font-size:13px;color:var(--text-secondary)">${t.predDesc||''}</div>
     </div>`;
   document.getElementById('team-modal').classList.add('open');
+}
+
+// ── 即時資料整合 ────────────────────────────────────────────
+// 載入 GitHub Actions 定期更新的 data-live.json，將真實比賽資料覆蓋到畫面上
+function applyLiveData() {
+  fetch('js/data-live.json?t=' + Date.now())
+    .then(r => r.ok ? r.json() : null)
+    .catch(() => null)
+    .then(data => {
+      if (!data) return;
+
+      // 顯示「最後更新」時間戳記
+      const ts = new Date(data.updatedAt);
+      const tsStr = ts.toLocaleString('zh-TW', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
+      const existing = document.getElementById('live-update-badge');
+      const badge = existing || document.createElement('div');
+      badge.id = 'live-update-badge';
+      badge.style.cssText = 'position:fixed;bottom:16px;right:16px;background:rgba(0,0,0,0.75);color:#aaa;font-size:11px;padding:6px 10px;border-radius:20px;z-index:9999;pointer-events:none';
+      badge.textContent = '資料更新：' + tsStr;
+      if (!existing) document.body.appendChild(badge);
+
+      // 世界盃期間：更新即時比賽橫幅
+      if (data.isDuringWC && data.liveMatches && data.liveMatches.length > 0) {
+        let banner = document.getElementById('live-matches-banner');
+        if (!banner) {
+          banner = document.createElement('div');
+          banner.id = 'live-matches-banner';
+          banner.style.cssText = 'background:linear-gradient(90deg,#b71c1c,#d32f2f);color:#fff;padding:10px 20px;text-align:center;font-size:13px;font-weight:600;letter-spacing:.5px;position:sticky;top:64px;z-index:100';
+          const header = document.getElementById('main-header');
+          if (header) header.insertAdjacentElement('afterend', banner);
+        }
+        const liveText = data.liveMatches.map(m =>
+          `🔴 ${m.homeTeam} ${m.homeGoals ?? '-'} : ${m.awayGoals ?? '-'} ${m.awayTeam}${m.elapsed ? ' ('+m.elapsed+"')" : ''}`
+        ).join('　　');
+        banner.textContent = liveText;
+      } else {
+        const banner = document.getElementById('live-matches-banner');
+        if (banner) banner.remove();
+      }
+
+      // 世界盃期間：更新射手榜（scorers tab）
+      if (data.isDuringWC && data.topScorers && data.topScorers.length > 0) {
+        // 當使用者切到射手榜時重新渲染
+        window._liveTopScorers = data.topScorers;
+        // 若目前已在射手榜 tab，立刻刷新
+        const activeTab = document.querySelector('.stats-tab.active');
+        if (activeTab && activeTab.dataset.stats === 'scorers') {
+          renderStats('scorers');
+        }
+      }
+
+      // 世界盃期間：用真實比賽結果更新 standings（簡易版）
+      if (data.isDuringWC && data.fixtureResults && data.fixtureResults.length > 0) {
+        window._liveResults = data.fixtureResults;
+        const activeTab = document.querySelector('.stats-tab.active');
+        if (activeTab && activeTab.dataset.stats === 'standings') {
+          renderStats('standings');
+        }
+      }
+    });
 }

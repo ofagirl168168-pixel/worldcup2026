@@ -1,0 +1,33 @@
+name: 更新即時足球資料
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # 每 30 分鐘執行一次
+  workflow_dispatch:           # 允許手動觸發
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch live data
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: node scripts/fetch-live.js
+
+      - name: Commit and push if changed
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add js/data-live.json
+          git diff --staged --quiet || (git commit -m "chore: live data $(date -u '+%Y-%m-%d %H:%M UTC')" && git push)
