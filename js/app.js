@@ -881,25 +881,7 @@ function applyLiveData() {
       badge.textContent = '資料更新：' + tsStr;
       if (!existing) document.body.appendChild(badge);
 
-      // 世界盃期間：更新即時比賽橫幅
-      if (data.isDuringWC && data.liveMatches && data.liveMatches.length > 0) {
-        let banner = document.getElementById('live-matches-banner');
-        if (!banner) {
-          banner = document.createElement('div');
-          banner.id = 'live-matches-banner';
-          banner.style.cssText = 'background:linear-gradient(90deg,#b71c1c,#d32f2f);color:#fff;padding:10px 20px;text-align:center;font-size:13px;font-weight:600;letter-spacing:.5px;position:sticky;top:64px;z-index:100';
-          const header = document.getElementById('main-header');
-          if (header) header.insertAdjacentElement('afterend', banner);
-        }
-        const liveText = data.liveMatches.map(m =>
-          `🔴 ${m.homeTeam} ${m.homeGoals ?? '-'} : ${m.awayGoals ?? '-'} ${m.awayTeam}${m.elapsed ? ' ('+m.elapsed+"')" : ''}`
-        ).join('　　');
-        banner.textContent = liveText;
-      } else {
-        const banner = document.getElementById('live-matches-banner');
-        if (banner) banner.remove();
-      }
-
+      // 即時比賽橫幅改由 ESPN ticker 負責，此處不再處理
       if (data.isDuringWC) {
         const activeTab = document.querySelector('.stats-tab.active');
 
@@ -928,4 +910,83 @@ function applyLiveData() {
         }
       }
     });
+}
+
+// ── ESPN 即時比分 ticker ─────────────────────────────────────
+// 直接從瀏覽器呼叫 ESPN 公開 API，無需 key，每 60 秒更新一次
+// 比賽進行中：頁面頂端顯示即時比分橫幅；無比賽時自動隱藏
+const _ESPN_URL = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+
+function _isMatchWindow() {
+  const h = new Date().getUTCHours();
+  return h >= 14 || h <= 5;   // 北美 WC 賽事時段（UTC）
+}
+
+function _updateLiveBanner(matches) {
+  let banner = document.getElementById('live-matches-banner');
+  if (!matches || matches.length === 0) {
+    if (banner) banner.remove();
+    return;
+  }
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'live-matches-banner';
+    banner.style.cssText = [
+      'background:linear-gradient(90deg,#b71c1c,#d32f2f)',
+      'color:#fff',
+      'padding:10px 20px',
+      'text-align:center',
+      'font-size:13px',
+      'font-weight:600',
+      'letter-spacing:.5px',
+      'position:sticky',
+      'top:64px',
+      'z-index:100',
+      'overflow:hidden',
+      'white-space:nowrap',
+      'text-overflow:ellipsis'
+    ].join(';');
+    const header = document.getElementById('main-header');
+    if (header) header.insertAdjacentElement('afterend', banner);
+  }
+  banner.textContent = matches.map(m =>
+    `🔴 ${m.home} ${m.homeScore} : ${m.awayScore} ${m.away}  ${m.clock}`
+  ).join('　　　');
+}
+
+function _fetchESPN() {
+  if (!_isMatchWindow()) return;
+  fetch(_ESPN_URL)
+    .then(r => r.ok ? r.json() : null)
+    .catch(() => null)
+    .then(data => {
+      if (!data || !data.events) { _updateLiveBanner([]); return; }
+      const live = data.events
+        .filter(e => e.status.type.state === 'in')
+        .map(e => {
+          const comp = e.competitions[0];
+          const home = comp.competitors.find(c => c.homeAway === 'home');
+          const away = comp.competitors.find(c => c.homeAway === 'away');
+          return {
+            home: home?.team.shortDisplayName || home?.team.displayName || '?',
+            away: away?.team.shortDisplayName || away?.team.displayName || '?',
+            homeScore: home?.score ?? '-',
+            awayScore: away?.score ?? '-',
+            clock: e.status.type.shortDetail || ''
+          };
+        });
+      _updateLiveBanner(live);
+
+      // 即時更新數據頁的積分榜（若 ESPN 有完賽資料可補充）
+      const finished = data.events.filter(e => e.status.type.state === 'post');
+      if (finished.length > 0) {
+        const badge = document.getElementById('live-update-badge');
+        if (badge) badge.textContent = '比分已更新：' + new Date().toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'});
+      }
+    });
+}
+
+function initLiveScoreTicker() {
+  _fetchESPN();                                    // 頁面載入立刻抓一次
+  setInterval(_fetchESPN, 60 * 1000);             // 之後每 60 秒
 }

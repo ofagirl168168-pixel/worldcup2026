@@ -285,6 +285,8 @@ window.addEventListener('load', () => {
   renderFocus();
   // 預先渲染AI預測
   renderPredictions();
-  // 載入即時資料（GitHub Actions 定期更新）
+  // 載入 GitHub Actions 統計資料（積分榜、射手榜等）
   applyLiveData();
+  // 啟動 ESPN 即時比分 ticker（每 60 秒，比賽進行中才顯示）
+  initLiveScoreTicker();
 });
