@@ -251,8 +251,9 @@ function openPredModal(id) {
 
   const p   = calcPred(ht, at);
   const pts = generateAnalysis(ht, at, p);
-  const hForm = (ht.recentForm||['W','D','W','W','D']);
-  const aForm = (at.recentForm||['W','D','W','W','D']);
+  // 有賽中資料時用實際 WC 戰績，否則用靜態近期表現
+  const hForm = p.hWC ? p.hWC.recentForm : (ht.recentForm||['W','D','W','W','D']);
+  const aForm = p.aWC ? p.aWC.recentForm : (at.recentForm||['W','D','W','W','D']);
   const formDots = f => f.map(r=>`<span class="form-dot ${r}" style="width:24px;height:24px;font-size:11px">${r}</span>`).join('');
   const playerList = (t) => (t.keyPlayers||[]).slice(0,3).map(pl=>
     `<div class="modal-player-row">
@@ -366,15 +367,30 @@ function openPredModal(id) {
     </div>
 
     <!-- 近期狀態 -->
-    <div class="modal-section-title">📈 近期狀態（最近5場）</div>
+    <div class="modal-section-title">📈 ${p.wcFormAdj ? '本屆賽中表現（已更新預測）' : '近期狀態（最近5場）'}</div>
+    ${p.wcFormAdj ? `<div style="margin-bottom:10px;padding:8px 12px;background:rgba(76,175,80,0.1);border-radius:8px;border-left:3px solid #4caf50;font-size:12px;color:#4caf50">
+      ⚡ 預測已根據本屆世界盃實際賽果動態調整
+    </div>` : ''}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-size:20px">${ht.flag}</span>${formDots(hForm)}
-        <span style="font-size:12px;color:var(--text-muted)">${formScore(hForm)}分</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+          <span style="font-size:20px">${ht.flag}</span>${formDots(hForm)}
+          <span style="font-size:12px;color:var(--text-muted)">${formScore(hForm)}分</span>
+        </div>
+        ${p.hWC ? `<div style="font-size:11px;color:var(--text-muted)">
+          ${p.hWC.played}場：${p.hWC.win}勝${p.hWC.draw}平${p.hWC.lose}負
+          · 進${p.hWC.gf}失${p.hWC.ga}（場均進球 ${p.hWC.gfPerGame}）
+        </div>` : ''}
       </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-size:20px">${at.flag}</span>${formDots(aForm)}
-        <span style="font-size:12px;color:var(--text-muted)">${formScore(aForm)}分</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+          <span style="font-size:20px">${at.flag}</span>${formDots(aForm)}
+          <span style="font-size:12px;color:var(--text-muted)">${formScore(aForm)}分</span>
+        </div>
+        ${p.aWC ? `<div style="font-size:11px;color:var(--text-muted)">
+          ${p.aWC.played}場：${p.aWC.win}勝${p.aWC.draw}平${p.aWC.lose}負
+          · 進${p.aWC.gf}失${p.aWC.ga}（場均進球 ${p.aWC.gfPerGame}）
+        </div>` : ''}
       </div>
     </div>
 
@@ -408,20 +424,90 @@ function formScore(form) {
   return (form||['W','D','W','D','W']).reduce((s,r)=>s+(r==='W'?3:r==='D'?1:0),0);
 }
 
+// ── 賽中狀態表（由 _liveStandings 建立，世界盃期間自動更新）─────
+// 結構：{ 'teamName': { played, win, draw, lose, gf, ga, gd, pts, formFactor } }
+// formFactor > 1 = 超越預期；< 1 = 低於預期；= 1 = 符合預期（賽前）
+let _wcFormMap = {};
+
+function buildTournamentForm() {
+  if (!window._liveStandings || !window._liveStandings.length) return;
+
+  // 建立 teamName → teamCode 映射
+  const nameToCode = {};
+  Object.entries(TEAMS).forEach(([code, t]) => {
+    nameToCode[t.name]   = code;
+    nameToCode[t.nameCN] = code;
+  });
+
+  _wcFormMap = {};
+  window._liveStandings.forEach(group => {
+    group.forEach(entry => {
+      if (!entry.played) return; // 還沒踢過，不計入
+      const code = nameToCode[entry.teamName];
+      if (!code) return;
+
+      // 積分率：實際積分 / 理論最高積分（全勝）
+      const ptRate = entry.points / (entry.played * 3);
+      // 場均得失球差
+      const gdPerGame = entry.goalsDiff / entry.played;
+      // 進球率（場均進球）
+      const gfPerGame = entry.goalsFor / entry.played;
+
+      // formFactor：0.75 ~ 1.35
+      // ptRate 0=全敗→0.75, 0.33=全平→1.0, 1.0=全勝→1.35
+      // gdPerGame 加成：每場均差 +1 → +0.06
+      const formFactor = Math.max(0.75, Math.min(1.35,
+        0.75 + ptRate * 0.6 + gdPerGame * 0.06
+      ));
+
+      // 把近期表現轉換為 recentForm 陣列（給 formScore 用）
+      const syntheticForm = [];
+      for (let i = 0; i < entry.win;  i++) syntheticForm.push('W');
+      for (let i = 0; i < entry.draw; i++) syntheticForm.push('D');
+      for (let i = 0; i < entry.lose; i++) syntheticForm.push('L');
+      // 最多取最近 5 場（後面的是最新的）
+      const recentForm = syntheticForm.slice(-5);
+
+      _wcFormMap[code] = {
+        played: entry.played,
+        win: entry.win, draw: entry.draw, lose: entry.lose,
+        gf: entry.goalsFor, ga: entry.goalsAgainst,
+        gd: entry.goalsDiff, pts: entry.points,
+        formFactor,
+        recentForm,
+        gfPerGame: gfPerGame.toFixed(2)
+      };
+    });
+  });
+}
+
 function calcPred(ht, at) {
   const ha = ht.radar, aa = at.radar;
 
   // 用球隊名稱產生確定性種子，確保同場比賽永遠顯示相同預測
   const seed = Array.from(ht.nameCN+at.nameCN).reduce((s,c)=>s+c.charCodeAt(0),0) % 97;
 
-  // 進攻效率 vs 對方防守 (考量防守壓制)
-  const homeXG = ((ha.attack/100)*2.4) * (1 - aa.defense/220) * (1 + (ha.speed-70)*0.003) * (1 + (formScore(ht.recentForm)-9)*0.04);
-  const awayXG = ((aa.attack/100)*2.0) * (1 - ha.defense/220) * (1 + (aa.speed-70)*0.003) * (1 + (formScore(at.recentForm)-9)*0.04);
+  // 取得賽中狀態（有則用實際，無則用靜態）
+  const hWC = _wcFormMap[ht.code] || null;
+  const aWC = _wcFormMap[at.code] || null;
+  const wcFormAdj = !!(hWC || aWC); // 是否有賽中資料
+
+  const hForm = hWC ? hWC.recentForm : (ht.recentForm || ['W','D','W','D','W']);
+  const aForm = aWC ? aWC.recentForm : (at.recentForm || ['W','D','W','D','W']);
+
+  // 進攻效率 vs 對方防守
+  const homeXG = ((ha.attack/100)*2.4) * (1 - aa.defense/220) * (1 + (ha.speed-70)*0.003) * (1 + (formScore(hForm)-9)*0.04);
+  const awayXG = ((aa.attack/100)*2.0) * (1 - ha.defense/220) * (1 + (aa.speed-70)*0.003) * (1 + (formScore(aForm)-9)*0.04);
 
   // 中場優勢調整
   const midAdv = (ha.midfield - aa.midfield) * 0.004;
-  const hXG = Math.max(0.2, Math.min(3.5, homeXG + midAdv));
-  const aXG = Math.max(0.2, Math.min(3.0, awayXG - midAdv));
+  let hXG = Math.max(0.2, Math.min(3.5, homeXG + midAdv));
+  let aXG = Math.max(0.2, Math.min(3.0, awayXG - midAdv));
+
+  // ── 賽中狀態修正（世界盃期間）────────────────────────────
+  // 用 formFactor 直接縮放 xG：狀態好的隊進球力提升，差的降低
+  if (hWC) hXG = Math.max(0.2, Math.min(3.8, hXG * hWC.formFactor));
+  if (aWC) aXG = Math.max(0.2, Math.min(3.3, aXG * aWC.formFactor));
 
   // 勝負平機率（依xG差距）
   const xgDiff = hXG - aXG;
@@ -444,34 +530,23 @@ function calcPred(ht, at) {
   const outcome = hw > aw && hw > d ? 'home' : aw > hw && aw > d ? 'away' : 'draw';
 
   // ── 比分換算 ──
-  // 放大係數依「優勢程度」而定：越強的熱門 → 比分差越大
-  // 接近平衡的賽事維持保守（1-0、2-1），大懸殊賽事允許 3-0、4-1
   const rankGap = Math.abs(ht.fifaRank - at.fifaRank);
   const winnerHw = outcome === 'home' ? hw : outcome === 'away' ? aw : d;
   const scoreMult = winnerHw >= 70 ? 1.45 : winnerHw >= 62 ? 1.25 : winnerHw >= 55 ? 1.08 : 1.0;
-  // 排名懸殊額外加成（50+ 差距才觸發，避免中等差距過度放大）
   const mismatchBonus = rankGap >= 55 ? 0.7 : rankGap >= 40 ? 0.45 : 0;
   const hScoreXG = hXG * scoreMult + (outcome === 'home' ? mismatchBonus : 0);
   const aScoreXG = aXG * scoreMult + (outcome === 'away' ? mismatchBonus : 0);
 
-  // 種子決定用 floor / round / ceil
   const hMode = seed % 3;
   const aMode = (seed + 5) % 3;
   let hGoals = Math.max(0, hMode===0 ? Math.floor(hScoreXG) : hMode===2 ? Math.ceil(hScoreXG) : Math.round(hScoreXG));
   let aGoals = Math.max(0, aMode===0 ? Math.floor(aScoreXG) : aMode===2 ? Math.ceil(aScoreXG) : Math.round(aScoreXG));
 
-  // 強制結果一致
   if (outcome === 'home') {
-    if (hGoals <= aGoals) {
-      aGoals = Math.max(0, hGoals - 1);
-      if (hGoals === 0) hGoals = 1;
-    }
+    if (hGoals <= aGoals) { aGoals = Math.max(0, hGoals - 1); if (hGoals === 0) hGoals = 1; }
   } else if (outcome === 'away') {
-    if (aGoals <= hGoals) {
-      hGoals = Math.max(0, aGoals - 1);
-      if (aGoals === 0) aGoals = 1;
-    }
-  } else { // draw：平局用放大後的平均值
+    if (aGoals <= hGoals) { hGoals = Math.max(0, aGoals - 1); if (aGoals === 0) aGoals = 1; }
+  } else {
     const eq = Math.round((hScoreXG + aScoreXG) / 2);
     hGoals = eq; aGoals = eq;
   }
@@ -485,7 +560,9 @@ function calcPred(ht, at) {
     hw, d, aw,
     score:`${hGoals}-${aGoals}`,
     hXG: hXG.toFixed(1), aXG: aXG.toFixed(1),
-    conf, confLabel, seed
+    conf, confLabel, seed,
+    wcFormAdj,          // 是否套用賽中狀態
+    hWC, aWC            // 各隊賽中資料（供 modal 顯示）
   };
 }
 
@@ -888,6 +965,7 @@ function applyLiveData() {
         // 積分榜
         if (data.standings && data.standings.length > 0) {
           window._liveStandings = data.standings;
+          buildTournamentForm(); // 同步更新賽中狀態係數
           if (activeTab && activeTab.dataset.stats === 'standings') renderStats('standings');
         }
 
