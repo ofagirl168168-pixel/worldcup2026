@@ -1,0 +1,19 @@
+# Claude Code 設定
+.claude/
+
+# 系統檔
+.DS_Store
+Thumbs.db
+
+# 編輯器設定
+.vscode/
+*.suo
+*.user
+
+# 環境變數（API key 絕對不能上傳）
+.env
+.env.local
+*.env
+
+# Node（之後加 GitHub Actions 會用到）
+node_modules/

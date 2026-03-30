@@ -1,0 +1,292 @@
+/* =============================================
+   BASE.CSS — 變數 / 重置 / 字型 / 導覽列 / Hero
+   ============================================= */
+
+/* ---------- CSS 變數 ---------- */
+:root {
+  --bg-primary:    #07091a;
+  --bg-secondary:  #0f1328;
+  --bg-card:       rgba(255,255,255,0.05);
+  --bg-card-hover: rgba(255,255,255,0.09);
+  --border:        rgba(255,255,255,0.10);
+  --border-accent: rgba(240,192,64,0.40);
+
+  --gold:    #f0c040;
+  --gold-dk: #c89a20;
+  --red:     #e53935;
+  --red-dk:  #b71c1c;
+  --blue:    #1e88e5;
+  --green:   #43a047;
+
+  --text-primary:   #f0f0f0;
+  --text-secondary: #90a4ae;
+  --text-muted:     #546e7a;
+
+  --header-h: 68px;
+  --radius:   14px;
+  --radius-sm: 8px;
+  --shadow:   0 8px 32px rgba(0,0,0,0.45);
+  --transition: 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ---------- 重置 ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+img { max-width: 100%; display: block; }
+ul { list-style: none; }
+
+/* ---------- 捲軸 ---------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dk); border-radius: 3px; }
+
+/* ---------- 粒子背景 ---------- */
+#particles-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(240,192,64,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 80%, rgba(30,136,229,0.07) 0%, transparent 60%),
+    var(--bg-primary);
+  pointer-events: none;
+}
+
+/* ---------- 導覽列 ---------- */
+#main-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: rgba(7,9,26,0.85);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+}
+.header-inner {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; align-items: center; gap: 20px;
+  padding: 0 24px; height: var(--header-h);
+}
+.logo {
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; flex-shrink: 0;
+}
+.logo-icon { font-size: 28px; filter: drop-shadow(0 0 8px rgba(240,192,64,0.6)); }
+.logo-title { display: block; font-size: 14px; font-weight: 700; color: var(--gold); line-height: 1; }
+.logo-sub   { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+.main-nav {
+  display: flex; gap: 4px; margin-left: auto;
+}
+.nav-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  color: var(--text-secondary); font-size: 12px; font-weight: 500;
+  transition: var(--transition);
+  position: relative;
+}
+.nav-btn i { font-size: 16px; }
+.nav-btn:hover { color: var(--text-primary); background: var(--bg-card); }
+.nav-btn.active { color: var(--gold); }
+.nav-btn.active::after {
+  content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 2px; background: var(--gold); border-radius: 2px;
+}
+
+.hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  padding: 8px; margin-left: auto;
+}
+.hamburger span {
+  display: block; width: 24px; height: 2px;
+  background: var(--text-primary); border-radius: 2px;
+  transition: var(--transition);
+}
+
+.mobile-nav {
+  display: none; padding: 8px 16px 12px;
+  border-top: 1px solid var(--border);
+}
+.mobile-nav .nav-btn { flex-direction: row; gap: 10px; width: 100%; padding: 12px 16px; }
+
+/* ---------- 主內容區 ---------- */
+#main-content { padding-top: var(--header-h); position: relative; z-index: 1; }
+.page-section { display: none; min-height: 100vh; }
+.page-section.active { display: block; }
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative; min-height: 92vh;
+  display: flex; flex-direction: column; justify-content: center;
+  overflow: hidden;
+  background:
+    linear-gradient(160deg, rgba(240,192,64,0.08) 0%, transparent 40%),
+    linear-gradient(220deg, rgba(229,57,53,0.06) 0%, transparent 40%),
+    var(--bg-primary);
+}
+.hero-bg-overlay {
+  position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(255,255,255,0.015) 60px, rgba(255,255,255,0.015) 61px),
+    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,0.015) 60px, rgba(255,255,255,0.015) 61px);
+}
+.hero-content {
+  position: relative; z-index: 1;
+  max-width: 1000px; margin: 0 auto;
+  padding: 60px 24px 40px; text-align: center;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 18px; border-radius: 999px;
+  border: 1px solid var(--border-accent);
+  background: rgba(240,192,64,0.08);
+  color: var(--gold); font-size: 12px; font-weight: 700;
+  letter-spacing: 2px; margin-bottom: 28px;
+}
+.hero-title {
+  font-size: clamp(42px, 8vw, 88px);
+  font-weight: 900; line-height: 1.05;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+.hero-highlight {
+  background: linear-gradient(90deg, var(--gold), #ff8c42);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-desc {
+  font-size: 16px; color: var(--text-secondary);
+  max-width: 600px; margin: 0 auto 36px; line-height: 1.7;
+}
+
+/* 倒計時 */
+.countdown-container {
+  margin-bottom: 36px;
+}
+.countdown-label {
+  font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; letter-spacing: 1px;
+}
+.countdown-blocks {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.countdown-block {
+  display: flex; flex-direction: column; align-items: center;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 20px; min-width: 80px;
+  backdrop-filter: blur(8px);
+}
+.countdown-num {
+  font-size: 42px; font-weight: 900; color: var(--gold);
+  line-height: 1; font-variant-numeric: tabular-nums;
+}
+.countdown-unit { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+.countdown-sep { font-size: 32px; font-weight: 900; color: var(--gold-dk); margin-bottom: 16px; }
+.countdown-date {
+  margin-top: 14px; font-size: 13px; color: var(--text-muted);
+}
+
+/* Hero 按鈕 */
+.hero-actions { display: flex; gap: 16px; justify-content: center; margin-bottom: 0; }
+.btn-primary {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 32px; border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--gold), #e0a020);
+  color: #07091a; font-weight: 700; font-size: 15px;
+  transition: var(--transition);
+  box-shadow: 0 4px 24px rgba(240,192,64,0.35);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(240,192,64,0.5); }
+.btn-secondary {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 32px; border-radius: var(--radius);
+  border: 1px solid var(--border-accent);
+  background: rgba(240,192,64,0.08);
+  color: var(--gold); font-weight: 700; font-size: 15px;
+  transition: var(--transition);
+}
+.btn-secondary:hover { background: rgba(240,192,64,0.16); transform: translateY(-2px); }
+
+/* Hero 統計 */
+.hero-stats {
+  position: relative; z-index: 1;
+  display: flex; justify-content: center; gap: 0;
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+}
+.hero-stat {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 24px 40px;
+  border-right: 1px solid var(--border);
+}
+.hero-stat:last-child { border-right: none; }
+.hero-stat-num { font-size: 36px; font-weight: 900; color: var(--gold); }
+.hero-stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+/* ---------- 頁面內 Hero ---------- */
+.page-hero {
+  text-align: center; padding: 60px 24px 40px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(240,192,64,0.05) 0%, transparent 100%);
+}
+.page-hero h1 { font-size: 36px; font-weight: 900; margin-bottom: 10px; }
+.page-hero h1 i { color: var(--gold); margin-right: 12px; }
+.page-hero p { color: var(--text-secondary); font-size: 15px; }
+
+/* ---------- 通用 Section ---------- */
+.home-section {
+  max-width: 1400px; margin: 0 auto;
+  padding: 40px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.section-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.section-header h2 {
+  font-size: 22px; font-weight: 800;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-header h2 i { color: var(--gold); }
+.section-badge {
+  padding: 3px 12px; border-radius: 999px;
+  background: rgba(240,192,64,0.12); border: 1px solid var(--border-accent);
+  color: var(--gold); font-size: 12px; font-weight: 600;
+}
+.link-btn {
+  margin-left: auto; color: var(--gold); font-size: 14px; font-weight: 600;
+  transition: var(--transition);
+}
+.link-btn:hover { text-decoration: underline; }
+
+/* ---------- 頁腳 ---------- */
+.main-footer {
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,0.3);
+  padding: 32px 24px;
+}
+.footer-inner {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; flex-wrap: wrap; gap: 20px;
+  align-items: center; justify-content: space-between;
+}
+.footer-logo { display: flex; align-items: center; gap: 14px; font-size: 24px; }
+.footer-title { font-size: 14px; font-weight: 700; color: var(--gold); }
+.footer-sub   { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.footer-info  { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); text-align: right; }
+
+/* ---------- RWD ---------- */
+@media (max-width: 768px) {
+  .main-nav { display: none; }
+  .hamburger { display: flex; }
+  .mobile-nav.open { display: flex; flex-direction: column; }
+  .hero-stats { flex-wrap: wrap; }
+  .hero-stat { padding: 16px 20px; flex: 1 1 40%; }
+  .countdown-block { min-width: 62px; padding: 10px 14px; }
+  .countdown-num { font-size: 30px; }
+  .hero-actions { flex-direction: column; align-items: center; }
+  .footer-info { text-align: left; }
+}

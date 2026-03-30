@@ -1,0 +1,187 @@
+/* =============================================
+   ANIMATIONS.CSS — 所有動畫與過場效果
+   ============================================= */
+
+/* ---------- 頁面切換動畫 ---------- */
+.page-section {
+  animation: none;
+}
+.page-section.active {
+  animation: fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 卡片出現動畫（stagger） ---------- */
+.champion-card,
+.upcoming-card,
+.team-card,
+.focus-article-card,
+.death-card {
+  animation: cardReveal 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.champion-card:nth-child(1) { animation-delay: 0.05s; }
+.champion-card:nth-child(2) { animation-delay: 0.10s; }
+.champion-card:nth-child(3) { animation-delay: 0.15s; }
+.champion-card:nth-child(4) { animation-delay: 0.20s; }
+.champion-card:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------- Hero 進場動畫 ---------- */
+.hero-badge   { animation: fadeSlideIn 0.6s 0.1s both; }
+.hero-title   { animation: fadeSlideIn 0.6s 0.2s both; }
+.hero-desc    { animation: fadeSlideIn 0.6s 0.3s both; }
+.countdown-container { animation: fadeSlideIn 0.6s 0.4s both; }
+.hero-actions { animation: fadeSlideIn 0.6s 0.5s both; }
+.hero-stats   { animation: fadeSlideIn 0.6s 0.6s both; }
+
+/* ---------- 倒計時數字跳動 ---------- */
+.countdown-num {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.countdown-num.tick {
+  animation: numTick 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes numTick {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); color: #fff; }
+  100% { transform: scale(1); }
+}
+
+/* ---------- 金色光暈脈衝（冠軍卡第一名） ---------- */
+.champion-card:nth-child(1) {
+  animation: cardReveal 0.5s 0.05s both, goldPulse 3s 1s ease-in-out infinite;
+}
+@keyframes goldPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(240,192,64,0); }
+  50%       { box-shadow: 0 0 28px 4px rgba(240,192,64,0.18); }
+}
+
+/* ---------- Logo 圖示旋轉 ---------- */
+.logo-icon {
+  display: inline-block;
+  animation: ballSpin 8s linear infinite;
+}
+@keyframes ballSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ---------- Nav 活躍指示線延伸 ---------- */
+.nav-btn.active::after {
+  animation: lineGrow 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes lineGrow {
+  from { width: 0; opacity: 0; }
+  to   { width: 20px; opacity: 1; }
+}
+
+/* ---------- 機率條動畫 ---------- */
+.prob-bar-win, .prob-bar-draw, .prob-bar-lose,
+.prob-track-win, .prob-track-draw, .prob-track-lose {
+  animation: barGrow 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation-delay: 0.3s;
+  transform-origin: left center;
+}
+@keyframes barGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ---------- 死亡指數進度條 ---------- */
+.death-bar-fill {
+  animation: barGrow 1s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+  transform-origin: left center;
+}
+
+/* ---------- 彈窗出現動畫 ---------- */
+.modal-overlay.open .modal-box,
+.article-modal-overlay.open .article-modal-box {
+  animation: modalIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(-24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------- 骨架屏 Loading ---------- */
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.05) 25%,
+    rgba(255,255,255,0.10) 50%,
+    rgba(255,255,255,0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---------- Scroll 出現（JS 控制 class） ---------- */
+.reveal {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1; transform: translateY(0);
+}
+
+/* ---------- 漂浮粒子 ---------- */
+.particle {
+  position: fixed; border-radius: 50%;
+  pointer-events: none; z-index: 0;
+  background: radial-gradient(circle, rgba(240,192,64,0.5), transparent 70%);
+  animation: floatParticle linear infinite;
+}
+@keyframes floatParticle {
+  0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.3; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+
+/* ---------- 匹配卡懸浮發光 ---------- */
+.match-card:hover {
+  box-shadow: 0 8px 32px rgba(240,192,64,0.10);
+}
+.featured-pred-card:hover {
+  box-shadow: 0 16px 48px rgba(240,192,64,0.14);
+}
+
+/* ---------- 按鈕點擊波紋 ---------- */
+.btn-primary:active  { transform: scale(0.97); }
+.btn-secondary:active { transform: scale(0.97); }
+.filter-tab:active   { transform: scale(0.95); }
+
+/* ---------- 頁面切換淡出 ---------- */
+.page-section.leaving {
+  animation: fadeOut 0.2s ease both;
+  pointer-events: none;
+}
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+
+/* ---------- 積分表行高亮 ---------- */
+.standings-table tr {
+  transition: background 0.2s ease;
+}
+
+/* ---------- 數字計數動畫（JS觸發） ---------- */
+.count-up {
+  transition: all 0.5s ease;
+}
+
+/* ---------- 讀取更多箭頭動畫 ---------- */
+.read-more { transition: var(--transition); display: inline-flex; align-items: center; gap: 4px; }
+.read-more::after { content: '→'; transition: transform 0.2s ease; }
+.focus-article-card:hover .read-more::after { transform: translateX(4px); }

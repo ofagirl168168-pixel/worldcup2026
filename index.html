@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026 FIFA 世界盃 — 預測分析平台</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+
+  <!-- ========== 粒子背景 ========== -->
+  <div id="particles-bg"></div>
+
+  <!-- ========== 導覽列 ========== -->
+  <header id="main-header">
+    <div class="header-inner">
+      <!-- Logo -->
+      <div class="logo" onclick="showSection('home')">
+        <span class="logo-icon">⚽</span>
+        <div class="logo-text">
+          <span class="logo-title">FIFA 世界盃 2026</span>
+          <span class="logo-sub">預測分析平台</span>
+        </div>
+      </div>
+
+      <!-- 桌機導覽 -->
+      <nav class="main-nav">
+        <button class="nav-btn active" data-section="home">
+          <i class="fas fa-home"></i>
+          <span>首頁</span>
+        </button>
+        <button class="nav-btn" data-section="schedule">
+          <i class="fas fa-calendar-alt"></i>
+          <span>賽程</span>
+        </button>
+        <button class="nav-btn" data-section="predictions">
+          <i class="fas fa-robot"></i>
+          <span>AI預測</span>
+        </button>
+        <button class="nav-btn" data-section="teams">
+          <i class="fas fa-shield-halved"></i>
+          <span>球隊</span>
+        </button>
+        <button class="nav-btn" data-section="stats">
+          <i class="fas fa-chart-bar"></i>
+          <span>數據</span>
+        </button>
+        <button class="nav-btn" data-section="focus">
+          <i class="fas fa-newspaper"></i>
+          <span>每周焦點</span>
+        </button>
+      </nav>
+
+      <!-- 手機漢堡選單 -->
+      <button class="hamburger" id="hamburger-btn">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- 手機展開選單 -->
+    <nav class="mobile-nav" id="mobile-nav">
+      <button class="nav-btn active" data-section="home"><i class="fas fa-home"></i> 首頁</button>
+      <button class="nav-btn" data-section="schedule"><i class="fas fa-calendar-alt"></i> 賽程</button>
+      <button class="nav-btn" data-section="predictions"><i class="fas fa-robot"></i> AI預測</button>
+      <button class="nav-btn" data-section="teams"><i class="fas fa-shield-halved"></i> 球隊</button>
+      <button class="nav-btn" data-section="stats"><i class="fas fa-chart-bar"></i> 數據</button>
+      <button class="nav-btn" data-section="focus"><i class="fas fa-newspaper"></i> 每周焦點</button>
+    </nav>
+  </header>
+
+  <!-- ========== 主內容 ========== -->
+  <main id="main-content">
+
+    <!-- ===== 首頁 ===== -->
+    <section id="section-home" class="page-section active">
+
+      <!-- Hero 英雄區塊 -->
+      <div class="hero">
+        <div class="hero-bg-overlay"></div>
+        <div class="hero-content">
+          <div class="hero-badge">🏆 2026 FIFA WORLD CUP</div>
+          <h1 class="hero-title">世界盃<br /><span class="hero-highlight">預測分析平台</span></h1>
+          <p class="hero-desc">結合AI數據分析與專家洞察，帶你深入解讀2026美加墨世界盃每一場賽事</p>
+
+          <!-- 倒計時 -->
+          <div class="countdown-container">
+            <div class="countdown-label">距離開幕還有</div>
+            <div class="countdown-blocks">
+              <div class="countdown-block">
+                <span class="countdown-num" id="cd-days">00</span>
+                <span class="countdown-unit">天</span>
+              </div>
+              <div class="countdown-sep">:</div>
+              <div class="countdown-block">
+                <span class="countdown-num" id="cd-hours">00</span>
+                <span class="countdown-unit">時</span>
+              </div>
+              <div class="countdown-sep">:</div>
+              <div class="countdown-block">
+                <span class="countdown-num" id="cd-mins">00</span>
+                <span class="countdown-unit">分</span>
+              </div>
+              <div class="countdown-sep">:</div>
+              <div class="countdown-block">
+                <span class="countdown-num" id="cd-secs">00</span>
+                <span class="countdown-unit">秒</span>
+              </div>
+            </div>
+            <div class="countdown-date">2026年6月11日 開幕 · 美國 / 加拿大 / 墨西哥</div>
+          </div>
+
+          <div class="hero-actions">
+            <button class="btn-primary" onclick="showSection('schedule')">
+              <i class="fas fa-calendar-alt"></i> 查看賽程
+            </button>
+            <button class="btn-secondary" onclick="showSection('predictions')">
+              <i class="fas fa-robot"></i> AI預測
+            </button>
+          </div>
+        </div>
+
+        <!-- 快速統計 -->
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-num">48</span>
+            <span class="hero-stat-label">參賽球隊</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-num">104</span>
+            <span class="hero-stat-label">場比賽</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-num">16</span>
+            <span class="hero-stat-label">比賽場館</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-num">39</span>
+            <span class="hero-stat-label">比賽天數</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 冠軍預測 Top 5 -->
+      <div class="home-section">
+        <div class="section-header">
+          <h2><i class="fas fa-trophy"></i> 奪冠熱門預測</h2>
+          <span class="section-badge">AI分析</span>
+        </div>
+        <div id="champion-cards" class="champion-grid"></div>
+      </div>
+
+      <!-- 近期賽事 -->
+      <div class="home-section">
+        <div class="section-header">
+          <h2><i class="fas fa-fire"></i> 即將開賽</h2>
+          <button class="link-btn" onclick="showSection('schedule')">查看全部賽程 →</button>
+        </div>
+        <div id="upcoming-matches" class="upcoming-grid"></div>
+      </div>
+
+      <!-- 分組死亡指數 -->
+      <div class="home-section">
+        <div class="section-header">
+          <h2><i class="fas fa-skull"></i> 分組死亡指數</h2>
+          <span class="section-badge">激烈程度排行</span>
+        </div>
+        <div id="death-groups" class="death-grid"></div>
+      </div>
+
+      <!-- 本屆看點 -->
+      <div class="home-section">
+        <div class="section-header">
+          <h2><i class="fas fa-star"></i> 本屆十大看點</h2>
+        </div>
+        <div id="highlights-grid" class="highlights-grid"></div>
+      </div>
+
+    </section>
+
+    <!-- ===== 賽程 ===== -->
+    <section id="section-schedule" class="page-section">
+      <div class="page-hero">
+        <h1><i class="fas fa-calendar-alt"></i> 完整賽程</h1>
+        <p>所有時間均為 <strong>台灣時間（UTC+8）</strong></p>
+      </div>
+
+      <!-- 篩選器 -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>賽事階段</label>
+          <div class="filter-tabs" id="phase-filter">
+            <button class="filter-tab active" data-phase="all">全部</button>
+            <button class="filter-tab" data-phase="group">小組賽</button>
+            <button class="filter-tab" data-phase="r32">32強</button>
+            <button class="filter-tab" data-phase="r16">16強</button>
+            <button class="filter-tab" data-phase="qf">八強</button>
+            <button class="filter-tab" data-phase="sf">四強</button>
+            <button class="filter-tab" data-phase="final">決賽</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <label>小組篩選</label>
+          <div class="filter-tabs" id="group-filter">
+            <button class="filter-tab active" data-group="all">全部</button>
+            <button class="filter-tab" data-group="A">A組</button>
+            <button class="filter-tab" data-group="B">B組</button>
+            <button class="filter-tab" data-group="C">C組</button>
+            <button class="filter-tab" data-group="D">D組</button>
+            <button class="filter-tab" data-group="E">E組</button>
+            <button class="filter-tab" data-group="F">F組</button>
+            <button class="filter-tab" data-group="G">G組</button>
+            <button class="filter-tab" data-group="H">H組</button>
+            <button class="filter-tab" data-group="I">I組</button>
+            <button class="filter-tab" data-group="J">J組</button>
+            <button class="filter-tab" data-group="K">K組</button>
+            <button class="filter-tab" data-group="L">L組</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 賽程列表 -->
+      <div id="schedule-list" class="schedule-list"></div>
+    </section>
+
+    <!-- ===== AI 預測 ===== -->
+    <section id="section-predictions" class="page-section">
+      <div class="page-hero">
+        <h1><i class="fas fa-robot"></i> AI 賽事預測</h1>
+        <p>結合歷史數據、近期狀態與戰術分析，提供每場賽事深度預測</p>
+      </div>
+
+      <!-- 預測精準度標示 -->
+      <div class="ai-banner">
+        <div class="ai-banner-inner">
+          <i class="fas fa-brain"></i>
+          <span>本預測模型綜合FIFA排名、近5場表現、歷史交手、球員狀態與戰術對比進行分析</span>
+          <span class="ai-tag">分析師 + AI 雙重驗證</span>
+        </div>
+      </div>
+
+      <!-- 精選預測 -->
+      <div class="home-section">
+        <div class="section-header">
+          <h2><i class="fas fa-fire"></i> 精選重點賽事預測</h2>
+        </div>
+        <div id="featured-predictions" class="featured-predictions-grid"></div>
+      </div>
+
+      <!-- 全部預測列表 -->
+      <div class="home-section">
+        <div class="section-header">
+          <h2><i class="fas fa-list"></i> 全部賽事預測</h2>
+          <div class="filter-tabs" id="pred-filter">
+            <button class="filter-tab active" data-pred="all">全部</button>
+            <button class="filter-tab" data-pred="high">高信心</button>
+            <button class="filter-tab" data-pred="upset">冷門預測</button>
+          </div>
+        </div>
+        <div id="predictions-list" class="predictions-list"></div>
+      </div>
+    </section>
+
+    <!-- ===== 球隊介紹 ===== -->
+    <section id="section-teams" class="page-section">
+      <div class="page-hero">
+        <h1><i class="fas fa-shield-halved"></i> 48支球隊介紹</h1>
+        <p>2026世界盃全體參賽球隊完整分析</p>
+      </div>
+
+      <!-- 搜尋與篩選 -->
+      <div class="team-filter-bar">
+        <input type="text" id="team-search" placeholder="🔍  搜尋球隊名稱..." class="team-search-input" />
+        <div class="filter-tabs" id="conf-filter">
+          <button class="filter-tab active" data-conf="all">全部</button>
+          <button class="filter-tab" data-conf="UEFA">歐洲</button>
+          <button class="filter-tab" data-conf="CONMEBOL">南美</button>
+          <button class="filter-tab" data-conf="CAF">非洲</button>
+          <button class="filter-tab" data-conf="AFC">亞洲</button>
+          <button class="filter-tab" data-conf="CONCACAF">北中美</button>
+          <button class="filter-tab" data-conf="OFC">大洋洲</button>
+        </div>
+      </div>
+
+      <!-- 球隊卡片網格 -->
+      <div id="teams-grid" class="teams-grid"></div>
+
+    </section>
+
+    <!-- ===== 數據排行 ===== -->
+    <section id="section-stats" class="page-section">
+      <div class="page-hero">
+        <h1><i class="fas fa-chart-bar"></i> 數據排行榜</h1>
+        <p>小組積分、射手榜、各項數據統計</p>
+      </div>
+
+      <!-- 統計 Tab -->
+      <div class="stats-tabs">
+        <button class="stats-tab active" data-stats="standings">小組積分榜</button>
+        <button class="stats-tab" data-stats="scorers">射手榜</button>
+        <button class="stats-tab" data-stats="assists">助攻榜</button>
+        <button class="stats-tab" data-stats="keepers">門將數據</button>
+        <button class="stats-tab" data-stats="rankings">FIFA排名</button>
+      </div>
+
+      <div id="stats-content" class="stats-content"></div>
+    </section>
+
+    <!-- ===== 每周焦點 ===== -->
+    <section id="section-focus" class="page-section">
+      <div class="page-hero">
+        <h1><i class="fas fa-newspaper"></i> 每周焦點</h1>
+        <p>深度分析，帶你看懂世界盃每一個精彩故事</p>
+      </div>
+
+      <!-- 精選文章 -->
+      <div id="focus-featured" class="focus-featured"></div>
+
+      <!-- 文章列表 -->
+      <div id="focus-articles" class="focus-articles-grid"></div>
+    </section>
+
+  </main>
+
+  <!-- ========== 全域比賽預測彈窗（放在 main 外，避免被 section display:none 隱藏）========== -->
+  <div id="team-modal" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- ========== 頁腳 ========== -->
+  <footer class="main-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <span>⚽</span>
+        <div>
+          <div class="footer-title">FIFA 世界盃 2026 預測分析平台</div>
+          <div class="footer-sub">預測僅供參考，本平台不涉及任何博彩活動</div>
+        </div>
+      </div>
+      <div class="footer-info">
+        <span>🇺🇸 美國 &nbsp;·&nbsp; 🇨🇦 加拿大 &nbsp;·&nbsp; 🇲🇽 墨西哥</span>
+        <span>2026年6月11日 — 7月19日</span>
+        <span>所有時間以台灣時間（UTC+8）顯示</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS 載入順序：data → app -->
+  <script src="js/data-teams.js"></script>
+  <script src="js/data-matches.js"></script>
+  <script src="js/data-articles.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/data-fix.js"></script>
+</body>
+</html>
