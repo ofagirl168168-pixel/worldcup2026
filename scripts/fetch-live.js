@@ -6,15 +6,17 @@
  *
  *  [即時比賽橫幅]
  *    只在「比賽時段」每 30 分鐘抓一次 /fixtures?live=all（1 call）
- *    2026 WC 北美賽事時段：UTC 14:00 – 03:00（含延誤緩衝）
- *    → 約 26 次觸發 × 1 call = ~26 calls/day
+ *    2026 WC 北美時段（夏令）：UTC 14:00 – 05:00
+ *      最早開賽 UTC 14:00（東部 10:00）
+ *      最晚結束 UTC 05:00（太平洋 19:00 開賽 + 2h + 緩衝）
+ *    → 約 32 次觸發 × 1 call = ~32 calls/day
  *
  *  [每日統計榜單]
- *    每天 UTC 04:00（比賽全結束後）一次性抓 4 個 endpoint：
+ *    每天 UTC 06:00（確保所有比賽含延長賽都結束後）一次性抓 4 個 endpoint：
  *    standings + topscorers + topassists + topkeeper
  *    → 1 次/天 × 4 calls = 4 calls/day
  *
- *  總計：~30 calls/day（遠低於 100 上限）
+ *  總計：~36 calls/day（遠低於 100 上限）
  *
  *  世界盃前：每 24 小時一次 connectivity check（1 call/day）
  */
@@ -108,11 +110,14 @@ async function main() {
   existing.isDuringWC = true;
 
   // 判斷是否在「比賽時段」
-  // 2026 WC 北美：最早賽事約 UTC 14:00 開始，最晚約 UTC 01:00 結束（加延誤緩衝到 03:00）
-  const inMatchWindow = utcHour >= 14 || utcHour <= 3;
+  // 2026 WC 北美時區（夏令）：
+  //   最早開賽 UTC 14:00（東部 10:00）
+  //   最晚開賽 UTC 02:00（太平洋 19:00），比賽結束約 UTC 04:00–05:00
+  //   → 保守設定到 UTC 05:00
+  const inMatchWindow = utcHour >= 14 || utcHour <= 5;
 
-  // 判斷是否為「每日統計更新時段」：UTC 04:00（所有比賽結束後）
-  const isDailyStatsTime = utcHour === 4;
+  // 判斷是否為「每日統計更新時段」：UTC 06:00（確保所有比賽含延長賽都結束）
+  const isDailyStatsTime = utcHour === 6;
   const todayStr = now.toISOString().slice(0, 10);
   const dailyAlreadyDone = existing.lastDailyUpdate
     && existing.lastDailyUpdate.startsWith(todayStr);
