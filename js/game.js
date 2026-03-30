@@ -94,6 +94,136 @@ function recordDailyAnswer(optIdx) {
   return state;
 }
 
+// ── 導覽列紅點徽章 ────────────────────────────────────────
+function updateArenaBadge() {
+  const today      = new Date().toISOString().slice(0,10);
+  const dailyDone  = (load(GK.daily)?.history?.[today] !== undefined);
+  const champDone  = !!load(GK.champion);
+  const groupsDone = Object.keys(load(GK.groups)||{}).length === 12;
+  const teamDone   = !!load(GK.team);
+  const undone     = [dailyDone, champDone, groupsDone, teamDone].filter(v => !v).length;
+
+  document.querySelectorAll('[data-section="arena"]').forEach(btn => {
+    let badge = btn.querySelector('.arena-nav-badge');
+    if (undone === 0) {
+      if (badge) badge.remove();
+      return;
+    }
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'arena-nav-badge';
+      btn.style.position = 'relative';
+      btn.appendChild(badge);
+    }
+    badge.textContent = undone;
+  });
+}
+
+// ── 首頁今日挑戰卡 ────────────────────────────────────────
+function renderHomeDailyChallenge() {
+  const el = document.getElementById('home-daily-section');
+  if (!el) return;
+
+  const today      = new Date().toISOString().slice(0,10);
+  const state      = getDailyState();
+  const dailyDone  = state.history[today] !== undefined;
+  const champDone  = !!load(GK.champion);
+  const groupsDone = Object.keys(load(GK.groups)||{}).length === 12;
+  const teamDone   = !!load(GK.team);
+  const { q, opts } = getTodayQuestion();
+  const chosen     = state.history[today];
+
+  const pendingItems = [];
+  if (!champDone)  pendingItems.push({ icon:'🏆', label:'冠軍預測', action:"openChampionPick()" });
+  if (!groupsDone) pendingItems.push({ icon:'📋', label:'分組賽預測', action:"openGroupPicks()" });
+  if (!teamDone)   pendingItems.push({ icon:'⚽', label:'選擇支持球隊', action:"openTeamSupport()" });
+
+  el.innerHTML = `
+    <div class="section-header">
+      <h2><i class="fas fa-gamepad"></i> 今日競技場挑戰</h2>
+      <button class="link-btn" onclick="showSection('arena');renderArena()">進入競技場 →</button>
+    </div>
+
+    <!-- 今日一題 -->
+    <div class="home-daily-card">
+      <div class="home-daily-header">
+        <span class="home-daily-tag">❓ 每日一題</span>
+        <span class="home-daily-streak">🔥 連勝 ${state.streak} 天</span>
+      </div>
+      <div class="home-daily-q">${q}</div>
+      <div class="home-daily-opts">
+        ${opts.map((o, i) => `
+          <button class="home-daily-opt ${dailyDone && chosen===i ? 'selected' : ''} ${dailyDone && chosen!==i ? 'dimmed' : ''}"
+            onclick="${dailyDone ? '' : `submitDailyPickHome(${i})`}"
+            ${dailyDone ? 'disabled' : ''}>
+            <span class="home-daily-letter">${'ABCD'[i]}</span>${o}
+          </button>`).join('')}
+      </div>
+      ${dailyDone ? `<div class="home-daily-done">✅ 今日已完成！明天繼續保持 🔥</div>` : ''}
+    </div>
+
+    ${pendingItems.length > 0 ? `
+    <!-- 待完成任務 -->
+    <div class="home-pending-tasks">
+      <div style="font-size:12px;color:var(--text-muted);font-weight:600;letter-spacing:1px;margin-bottom:10px">還有 ${pendingItems.length} 項未完成</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${pendingItems.map(item => `
+          <button class="home-pending-btn" onclick="${item.action}">
+            ${item.icon} ${item.label}
+          </button>`).join('')}
+      </div>
+    </div>` : '<div class="home-pending-tasks" style="color:#4caf50;font-size:13px;font-weight:600">🎉 所有挑戰已完成，開賽時見！</div>'}`;
+}
+
+function submitDailyPickHome(idx) {
+  recordDailyAnswer(idx);
+  renderHomeDailyChallenge();
+  updateArenaBadge();
+  // 同步更新競技場頁面（若已渲染）
+  const arenaEl = document.getElementById('section-arena');
+  if (arenaEl && arenaEl.innerHTML.trim()) renderArena();
+}
+
+// ── 首次進站提示（每 7 天出現一次）──────────────────────────
+function showArenaWelcomeIfNeeded() {
+  const KEY = 'wc26_welcome_shown';
+  const last = localStorage.getItem(KEY);
+  const now  = Date.now();
+  if (last && now - parseInt(last) < 7 * 86400000) return; // 7 天內不重複
+  localStorage.setItem(KEY, String(now));
+
+  const champDone  = !!load(GK.champion);
+  const dailyState = getDailyState();
+  if (champDone && dailyState.streak > 0) return; // 已深度參與，不打擾
+
+  setTimeout(() => {
+    const overlay = document.createElement('div');
+    overlay.id = 'arena-welcome-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px';
+    overlay.innerHTML = `
+      <div style="background:var(--bg-card);border-radius:20px;padding:32px 28px;max-width:380px;width:100%;text-align:center;border:1px solid var(--border)">
+        <div style="font-size:48px;margin-bottom:12px">🏆</div>
+        <div style="font-size:20px;font-weight:900;margin-bottom:8px">歡迎來到世界盃預測競技場</div>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:24px">
+          現在就開始預測冠軍、填寫分組賽結果<br>
+          每天答題累積連勝天數<br>
+          <strong style="color:var(--gold)">6月11日開賽，一起見證你的預測！</strong>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn-primary" onclick="document.getElementById('arena-welcome-overlay').remove();showSection('arena');renderArena()">
+            <i class="fas fa-gamepad"></i> 前往競技場
+          </button>
+          <button onclick="document.getElementById('arena-welcome-overlay').remove()"
+            style="background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;padding:8px">
+            稍後再說
+          </button>
+        </div>
+      </div>`;
+    overlay.addEventListener('click', e => { if (e.target===overlay) overlay.remove(); });
+    document.body.appendChild(overlay);
+  }, 3000); // 頁面載入 3 秒後出現
+}
+
 // ── 競技場主頁面 ──────────────────────────────────────────
 function renderArena() {
   const el = document.getElementById('section-arena');

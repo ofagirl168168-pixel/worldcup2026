@@ -602,6 +602,76 @@
 .article-modal-body ul { margin: 0 0 14px 16px; list-style: disc; }
 .article-modal-body ul li { margin-bottom: 8px; }
 
+/* ========== 競技場導覽紅點 ========== */
+.arena-nav-badge {
+  position: absolute; top: 2px; right: 2px;
+  background: #e53935; color: #fff;
+  font-size: 10px; font-weight: 800;
+  min-width: 16px; height: 16px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 4px; line-height: 1; pointer-events: none;
+}
+
+/* ========== 首頁今日挑戰 ========== */
+.home-daily-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 22px 24px; margin-bottom: 14px;
+}
+.home-daily-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px;
+}
+.home-daily-tag {
+  font-size: 12px; font-weight: 700; color: var(--gold);
+  letter-spacing: .5px;
+}
+.home-daily-streak { font-size: 12px; color: var(--text-muted); }
+.home-daily-q {
+  font-size: 16px; font-weight: 700; line-height: 1.5;
+  margin-bottom: 14px; color: var(--text-primary);
+}
+.home-daily-opts {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.home-daily-opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--bg-secondary);
+  font-size: 13px; color: var(--text-primary);
+  cursor: pointer; transition: var(--transition); text-align: left;
+}
+.home-daily-opt:hover:not(:disabled):not(.dimmed) {
+  border-color: var(--gold); background: rgba(240,192,64,0.07);
+}
+.home-daily-opt.selected {
+  border-color: #4caf50; background: rgba(76,175,80,0.1);
+  color: #4caf50; font-weight: 700;
+}
+.home-daily-opt.dimmed  { opacity: 0.35; }
+.home-daily-letter {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+}
+.home-daily-opt.selected .home-daily-letter { background:#4caf50; color:#fff; }
+.home-daily-done {
+  margin-top: 12px; padding: 8px 12px;
+  background: rgba(76,175,80,0.08); border-radius: 8px;
+  font-size: 12px; color: #4caf50; text-align: center;
+}
+.home-pending-tasks {
+  background: rgba(240,192,64,0.05); border: 1px solid rgba(240,192,64,0.2);
+  border-radius: 12px; padding: 14px 18px;
+}
+.home-pending-btn {
+  padding: 8px 16px; border-radius: 999px;
+  border: 1px solid var(--gold); background: rgba(240,192,64,0.08);
+  color: var(--gold); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: var(--transition);
+}
+.home-pending-btn:hover { background: rgba(240,192,64,0.18); }
+
 /* ========== 競技場 Arena ========== */
 .arena-dashboard {
   display: grid; grid-template-columns: repeat(4, 1fr);
@@ -723,4 +793,5 @@
   .arena-dashboard { grid-template-columns: repeat(2, 1fr); }
   .arena-grid { grid-template-columns: 1fr; }
   .champ-team-list { grid-template-columns: repeat(auto-fill, minmax(100px,1fr)); }
+  .home-daily-opts { grid-template-columns: 1fr; }
 }

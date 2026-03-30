@@ -289,6 +289,9 @@ window.addEventListener('load', () => {
   applyLiveData();
   // 啟動 ESPN 即時比分 ticker（每 60 秒，比賽進行中才顯示）
   initLiveScoreTicker();
-  // 預先渲染競技場
+  // 競技場：預先渲染 + 主動推送
   renderArena();
+  renderHomeDailyChallenge();  // 首頁嵌入今日一題
+  updateArenaBadge();          // 導覽列紅點
+  showArenaWelcomeIfNeeded();  // 首次進站提示
 });
