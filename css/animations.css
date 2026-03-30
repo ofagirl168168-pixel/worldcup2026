@@ -185,3 +185,44 @@
 .read-more { transition: var(--transition); display: inline-flex; align-items: center; gap: 4px; }
 .read-more::after { content: '→'; transition: transform 0.2s ease; }
 .focus-article-card:hover .read-more::after { transform: translateX(4px); }
+
+/* ========== 競技場 Arena 動畫 ========== */
+@keyframes arenaGlow {
+  0%,100% { box-shadow: 0 0 20px rgba(240,192,64,0.3), 0 0 40px rgba(240,192,64,0.1); }
+  50%      { box-shadow: 0 0 30px rgba(240,192,64,0.5), 0 0 60px rgba(240,192,64,0.2); }
+}
+@keyframes neonPulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+@keyframes streakFire {
+  0%,100% { text-shadow: 0 0 10px #ff6d00, 0 0 20px #ff6d00; }
+  50%      { text-shadow: 0 0 20px #ff9800, 0 0 40px #ff6d00, 0 0 60px #e53935; }
+}
+@keyframes badgePulse {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.2); }
+}
+@keyframes cardShine {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+@keyframes arenaReveal {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes progressFill {
+  from { width: 0; }
+}
+@keyframes floatUp {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes rainbowBorder {
+  0%   { border-color: #f0c040; }
+  25%  { border-color: #4caf50; }
+  50%  { border-color: #2196f3; }
+  75%  { border-color: #e91e63; }
+  100% { border-color: #f0c040; }
+}
+.arena-nav-badge { animation: badgePulse 1.5s ease-in-out infinite; }

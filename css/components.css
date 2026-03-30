@@ -604,182 +604,349 @@
 
 /* ========== 競技場導覽紅點 ========== */
 .arena-nav-badge {
-  position: absolute; top: 2px; right: 2px;
-  background: #e53935; color: #fff;
-  font-size: 10px; font-weight: 800;
-  min-width: 16px; height: 16px; border-radius: 999px;
+  position: absolute; top: 0; right: 0;
+  background: linear-gradient(135deg,#e53935,#ff6d00);
+  color: #fff; font-size: 10px; font-weight: 900;
+  min-width: 17px; height: 17px; border-radius: 999px;
   display: flex; align-items: center; justify-content: center;
   padding: 0 4px; line-height: 1; pointer-events: none;
+  box-shadow: 0 0 8px rgba(229,57,53,0.7);
 }
 
 /* ========== 首頁今日挑戰 ========== */
 .home-daily-card {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 16px; padding: 22px 24px; margin-bottom: 14px;
+  background: linear-gradient(135deg, rgba(240,192,64,0.08) 0%, rgba(255,109,0,0.05) 100%);
+  border: 1px solid rgba(240,192,64,0.3);
+  border-radius: 20px; padding: 24px 26px; margin-bottom: 14px;
+  position: relative; overflow: hidden;
+}
+.home-daily-card::before {
+  content: ''; position: absolute; top: -40%; right: -10%;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(240,192,64,0.12) 0%, transparent 70%);
+  pointer-events: none;
 }
 .home-daily-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 .home-daily-tag {
-  font-size: 12px; font-weight: 700; color: var(--gold);
-  letter-spacing: .5px;
+  font-size: 11px; font-weight: 800; color: var(--gold);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  background: rgba(240,192,64,0.12); padding: 4px 10px;
+  border-radius: 999px; border: 1px solid rgba(240,192,64,0.3);
 }
-.home-daily-streak { font-size: 12px; color: var(--text-muted); }
+.home-daily-streak {
+  font-size: 13px; font-weight: 800; color: #ff6d00;
+  animation: streakFire 2s ease-in-out infinite;
+}
 .home-daily-q {
-  font-size: 16px; font-weight: 700; line-height: 1.5;
-  margin-bottom: 14px; color: var(--text-primary);
+  font-size: 17px; font-weight: 800; line-height: 1.5;
+  margin-bottom: 16px; color: var(--text-primary);
 }
-.home-daily-opts {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-}
+.home-daily-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .home-daily-opt {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 12px; border-radius: 10px;
-  border: 1px solid var(--border); background: var(--bg-secondary);
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
   font-size: 13px; color: var(--text-primary);
-  cursor: pointer; transition: var(--transition); text-align: left;
+  cursor: pointer; transition: all 0.25s ease; text-align: left;
 }
 .home-daily-opt:hover:not(:disabled):not(.dimmed) {
-  border-color: var(--gold); background: rgba(240,192,64,0.07);
+  border-color: var(--gold); background: rgba(240,192,64,0.1);
+  transform: translateY(-1px);
 }
 .home-daily-opt.selected {
-  border-color: #4caf50; background: rgba(76,175,80,0.1);
+  border-color: #4caf50; background: rgba(76,175,80,0.12);
   color: #4caf50; font-weight: 700;
+  box-shadow: 0 0 12px rgba(76,175,80,0.2);
 }
 .home-daily-opt.dimmed  { opacity: 0.35; }
 .home-daily-letter {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: rgba(255,255,255,0.08);
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; flex-shrink: 0;
+  font-size: 11px; font-weight: 800; flex-shrink: 0;
 }
-.home-daily-opt.selected .home-daily-letter { background:#4caf50; color:#fff; }
+.home-daily-opt.selected .home-daily-letter { background: #4caf50; color: #fff; }
 .home-daily-done {
-  margin-top: 12px; padding: 8px 12px;
-  background: rgba(76,175,80,0.08); border-radius: 8px;
-  font-size: 12px; color: #4caf50; text-align: center;
+  margin-top: 14px; padding: 10px 14px;
+  background: rgba(76,175,80,0.1); border-radius: 10px;
+  border: 1px solid rgba(76,175,80,0.2);
+  font-size: 13px; color: #4caf50; text-align: center; font-weight: 600;
 }
 .home-pending-tasks {
-  background: rgba(240,192,64,0.05); border: 1px solid rgba(240,192,64,0.2);
-  border-radius: 12px; padding: 14px 18px;
+  background: rgba(240,192,64,0.04);
+  border: 1px solid rgba(240,192,64,0.15);
+  border-radius: 14px; padding: 14px 18px;
 }
 .home-pending-btn {
-  padding: 8px 16px; border-radius: 999px;
-  border: 1px solid var(--gold); background: rgba(240,192,64,0.08);
-  color: var(--gold); font-size: 13px; font-weight: 600;
-  cursor: pointer; transition: var(--transition);
+  padding: 8px 18px; border-radius: 999px;
+  border: 1px solid rgba(240,192,64,0.4);
+  background: rgba(240,192,64,0.08);
+  color: var(--gold); font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s ease;
 }
-.home-pending-btn:hover { background: rgba(240,192,64,0.18); }
+.home-pending-btn:hover {
+  background: rgba(240,192,64,0.2);
+  box-shadow: 0 0 12px rgba(240,192,64,0.25);
+  transform: translateY(-1px);
+}
 
 /* ========== 競技場 Arena ========== */
+
+/* 英雄區 */
+.arena-hero {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg,#0d1b2a 0%,#1a1a2e 40%,#16213e 100%);
+  padding: 48px 24px 36px; text-align: center; margin-bottom: 32px;
+}
+.arena-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(240,192,64,0.15) 0%, transparent 65%);
+  pointer-events: none;
+}
+.arena-hero-title {
+  font-size: 36px; font-weight: 900; letter-spacing: 2px;
+  background: linear-gradient(135deg,#f0c040,#ff9800,#f0c040);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 8px;
+  text-shadow: none;
+}
+.arena-hero-sub {
+  font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 24px;
+}
+.arena-xp-bar-wrap {
+  max-width: 400px; margin: 0 auto;
+}
+.arena-xp-label {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: rgba(255,255,255,0.4);
+  margin-bottom: 6px; font-weight: 600; letter-spacing: .5px;
+}
+.arena-xp-track {
+  height: 8px; background: rgba(255,255,255,0.08);
+  border-radius: 999px; overflow: hidden;
+}
+.arena-xp-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg,#f0c040,#ff9800);
+  box-shadow: 0 0 12px rgba(240,192,64,0.6);
+  animation: progressFill 1s cubic-bezier(0.4,0,0.2,1) both;
+  animation-delay: 0.3s;
+}
+
+/* 統計儀表板 */
 .arena-dashboard {
   display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 16px; max-width: 900px; margin: 0 auto 32px; padding: 0 24px;
+  gap: 14px; max-width: 960px; margin: 0 auto 32px; padding: 0 24px;
 }
 .arena-stat-card {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 14px; padding: 20px 12px;
-  text-align: center;
+  background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 20px 14px; text-align: center;
+  transition: all 0.3s ease; position: relative; overflow: hidden;
 }
-.arena-stat-icon { font-size: 24px; margin-bottom: 6px; }
-.arena-stat-num  { font-size: 28px; font-weight: 900; color: var(--gold); }
-.arena-stat-label{ font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.arena-stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--arena-accent, #f0c040), transparent);
+}
+.arena-stat-card:hover { transform: translateY(-3px); border-color: rgba(240,192,64,0.3); }
+.arena-stat-icon { font-size: 26px; margin-bottom: 8px; animation: floatUp 3s ease-in-out infinite; }
+.arena-stat-num  {
+  font-size: 30px; font-weight: 900; color: var(--gold);
+  text-shadow: 0 0 20px rgba(240,192,64,0.4);
+}
+.arena-stat-label{ font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 5px; font-weight: 600; letter-spacing: .5px; }
 
+/* 功能卡片 */
 .arena-grid {
   display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: 20px; max-width: 900px; margin: 0 auto; padding: 0 24px 40px;
+  gap: 20px; max-width: 960px; margin: 0 auto; padding: 0 24px 48px;
 }
 .arena-card {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 16px; padding: 24px 20px;
-  cursor: pointer; transition: var(--transition);
+  border-radius: 20px; padding: 28px 24px;
+  cursor: pointer; transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
   position: relative; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.07);
+  animation: arenaReveal 0.5s both;
 }
-.arena-card:hover { border-color: var(--gold-dk); transform: translateY(-2px); }
-.arena-card.done  { border-color: rgba(76,175,80,0.4); background: rgba(76,175,80,0.04); }
-.arena-card.urgent{ border-color: var(--gold); background: rgba(240,192,64,0.05); }
-.arena-card-badge {
-  font-size: 11px; font-weight: 700; letter-spacing: .5px;
-  color: var(--text-muted); margin-bottom: 14px;
-}
-.arena-card.done .arena-card-badge   { color: #4caf50; }
-.arena-card.urgent .arena-card-badge { color: var(--gold); }
-.arena-card-icon  { font-size: 36px; margin-bottom: 10px; }
-.arena-card-title { font-size: 17px; font-weight: 800; margin-bottom: 8px; }
-.arena-card-desc  { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
-.arena-card-streak{ font-size: 13px; color: var(--gold); margin-top: 10px; font-weight: 700; }
-.arena-lock-hint  { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+.arena-card:nth-child(1) { animation-delay: 0.05s; background: linear-gradient(145deg,#1a1a2e,#16213e); --card-glow: rgba(255,109,0,0.4); }
+.arena-card:nth-child(2) { animation-delay: 0.10s; background: linear-gradient(145deg,#1a1a1a,#2d2200); --card-glow: rgba(240,192,64,0.4); }
+.arena-card:nth-child(3) { animation-delay: 0.15s; background: linear-gradient(145deg,#0a1628,#0d2137); --card-glow: rgba(33,150,243,0.4); }
+.arena-card:nth-child(4) { animation-delay: 0.20s; background: linear-gradient(145deg,#1a0a1a,#2d0d2d); --card-glow: rgba(233,30,99,0.4); }
 
-/* 每日一題 */
+/* 卡片閃光掃過效果 */
+.arena-card::before {
+  content: ''; position: absolute;
+  top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  transition: none;
+}
+.arena-card:hover::before { animation: cardShine 0.6s ease forwards; }
+.arena-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px var(--card-glow, rgba(240,192,64,0.3));
+  border-color: rgba(255,255,255,0.15);
+}
+.arena-card.done {
+  border-color: rgba(76,175,80,0.25);
+}
+.arena-card.done::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #4caf50, transparent);
+}
+.arena-card.urgent::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #ff9800, transparent);
+  animation: neonPulse 1.5s ease-in-out infinite;
+}
+
+.arena-card-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; padding: 4px 10px; border-radius: 999px;
+  margin-bottom: 16px;
+  background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.arena-card.done .arena-card-badge {
+  background: rgba(76,175,80,0.12); color: #4caf50;
+  border-color: rgba(76,175,80,0.3);
+}
+.arena-card.urgent .arena-card-badge {
+  background: rgba(255,152,0,0.12); color: #ff9800;
+  border-color: rgba(255,152,0,0.3);
+}
+.arena-card-icon {
+  font-size: 44px; margin-bottom: 12px; display: block;
+  animation: floatUp 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px var(--card-glow, rgba(240,192,64,0.5)));
+}
+.arena-card:nth-child(1) .arena-card-icon { animation-delay: 0s; }
+.arena-card:nth-child(2) .arena-card-icon { animation-delay: 0.5s; }
+.arena-card:nth-child(3) .arena-card-icon { animation-delay: 1s; }
+.arena-card:nth-child(4) .arena-card-icon { animation-delay: 1.5s; }
+.arena-card-title {
+  font-size: 19px; font-weight: 900; margin-bottom: 8px;
+  letter-spacing: .5px;
+}
+.arena-card-desc  { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+.arena-card-streak{
+  font-size: 14px; font-weight: 800; margin-top: 12px;
+  color: #ff9800; animation: streakFire 2s ease-in-out infinite;
+}
+.arena-card-footer {
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.arena-card-cta {
+  font-size: 12px; font-weight: 700; color: var(--gold);
+  letter-spacing: .5px;
+}
+.arena-lock-hint { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 8px; }
+
+/* ── Modal 內部遊戲元素 ── */
 .daily-opts { display: flex; flex-direction: column; gap: 10px; }
 .daily-opt {
-  display: flex; align-items: center; gap: 12px;
-  padding: 13px 16px; border-radius: 12px;
-  border: 1px solid var(--border); background: var(--bg-card);
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
   text-align: left; font-size: 14px; color: var(--text-primary);
-  transition: var(--transition); cursor: pointer;
+  transition: all 0.2s ease; cursor: pointer;
 }
-.daily-opt:hover:not(.dimmed)  { border-color: var(--gold); background: rgba(240,192,64,0.07); }
-.daily-opt.selected { border-color: #4caf50; background: rgba(76,175,80,0.1); color: #4caf50; font-weight: 700; }
-.daily-opt.dimmed   { opacity: 0.4; }
+.daily-opt:hover:not(.dimmed) {
+  border-color: rgba(240,192,64,0.5);
+  background: rgba(240,192,64,0.07);
+  transform: translateX(4px);
+}
+.daily-opt.selected {
+  border-color: #4caf50; background: rgba(76,175,80,0.1);
+  color: #4caf50; font-weight: 700;
+  box-shadow: 0 0 16px rgba(76,175,80,0.2);
+}
+.daily-opt.dimmed { opacity: 0.3; }
 .daily-opt-letter {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: rgba(255,255,255,0.08); display: flex;
-  align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; flex-shrink: 0;
+  width: 30px; height: 30px; border-radius: 8px;
+  background: rgba(255,255,255,0.07);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 900; flex-shrink: 0;
+  transition: all 0.2s;
 }
 .daily-opt.selected .daily-opt-letter { background: #4caf50; color: #fff; }
 
 /* 冠軍預測 */
 .champ-section-label {
-  font-size: 13px; font-weight: 700; color: var(--gold);
-  margin-bottom: 8px; letter-spacing: .5px;
+  font-size: 12px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 10px; padding: 6px 12px;
+  background: rgba(240,192,64,0.08); border-radius: 8px;
+  display: inline-block;
 }
 .champ-team-list {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px; max-height: 200px; overflow-y: auto;
-  padding: 4px 2px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px; max-height: 190px; overflow-y: auto; padding: 4px 2px;
 }
 .champ-team-opt {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 10px 6px; border-radius: 10px;
-  border: 1px solid var(--border); background: var(--bg-card);
-  cursor: pointer; transition: var(--transition); text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 10px 6px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer; transition: all 0.2s; text-align: center;
 }
-.champ-team-opt:hover   { border-color: var(--gold-dk); }
-.champ-team-opt.selected{ border-color: var(--gold); background: rgba(240,192,64,0.12); }
+.champ-team-opt:hover { border-color: rgba(240,192,64,0.4); transform: translateY(-1px); }
+.champ-team-opt.selected {
+  border-color: var(--gold);
+  background: rgba(240,192,64,0.12);
+  box-shadow: 0 0 14px rgba(240,192,64,0.25);
+}
 
 /* 分組賽預測 */
 .group-pick-block { margin-bottom: 20px; }
 .group-pick-title {
-  font-size: 13px; font-weight: 700; color: var(--gold);
+  font-size: 12px; font-weight: 800; color: var(--gold);
+  letter-spacing: 1px; text-transform: uppercase;
   margin-bottom: 8px;
 }
 .group-pick-teams { display: flex; flex-wrap: wrap; gap: 8px; }
 .group-pick-team {
   display: flex; align-items: center; gap: 6px;
-  padding: 7px 12px; border-radius: 999px;
-  border: 1px solid var(--border); background: var(--bg-card);
-  font-size: 13px; cursor: pointer; transition: var(--transition);
+  padding: 7px 14px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.03);
+  font-size: 13px; cursor: pointer; transition: all 0.2s;
 }
-.group-pick-team:hover   { border-color: var(--gold-dk); }
-.group-pick-team.selected{ border-color: var(--gold); background: rgba(240,192,64,0.12); font-weight: 700; }
-.group-pick-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+.group-pick-team:hover { border-color: rgba(240,192,64,0.4); }
+.group-pick-team.selected {
+  border-color: var(--gold);
+  background: rgba(240,192,64,0.12);
+  font-weight: 700; color: var(--gold);
+  box-shadow: 0 0 10px rgba(240,192,64,0.2);
+}
+.group-pick-hint { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 6px; }
 
 /* 支持球隊 */
 .support-team-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 10px; max-height: 360px; overflow-y: auto; padding: 4px 2px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+  gap: 8px; max-height: 340px; overflow-y: auto; padding: 4px 2px;
 }
 .support-team-card {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
   padding: 12px 6px; border-radius: 12px;
-  border: 1px solid var(--border); background: var(--bg-card);
-  cursor: pointer; transition: var(--transition); text-align: center;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer; transition: all 0.2s; text-align: center;
 }
-.support-team-card:hover   { border-color: var(--gold-dk); }
-.support-team-card.selected{ border-color: #e91e63; background: rgba(233,30,99,0.1); }
+.support-team-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+.support-team-card.selected {
+  border-color: #e91e63;
+  background: rgba(233,30,99,0.12);
+  box-shadow: 0 0 16px rgba(233,30,99,0.3);
+  animation: rainbowBorder 3s linear infinite;
+}
 
 /* ---------- RWD ---------- */
 @media (max-width: 768px) {

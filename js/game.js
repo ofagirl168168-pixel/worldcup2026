@@ -235,11 +235,37 @@ function renderArena() {
   const dailyState = getDailyState();
   const today      = new Date().toISOString().slice(0,10);
   const dailyDone  = dailyState.history[today] !== undefined;
+  const groupsDone = myGroups && Object.keys(myGroups).length === 12;
+  const answeredCount = Object.keys(dailyState.history).length;
+
+  // XP & Level
+  const xp       = answeredCount * 10 + (myChampion ? 50 : 0) + (groupsDone ? 50 : 0) + (myTeam ? 30 : 0);
+  const xpPerLv  = 100;
+  const level    = Math.floor(xp / xpPerLv) + 1;
+  const xpInLv   = xp % xpPerLv;
+  const xpPct    = xpInLv + '%';
+
+  // Champion display
+  const champC1  = myChampion ? TEAMS[myChampion.c1] : null;
+  const champFlag = champC1 ? `${champC1.flag} ${champC1.nameCN}` : '—';
+
+  // Groups progress
+  const groupCount = myGroups ? Object.keys(myGroups).length : 0;
 
   el.innerHTML = `
-    <div class="page-hero">
-      <h1><i class="fas fa-gamepad"></i> 預測競技場</h1>
-      <p>賽前預測、每日挑戰、搶先成為最強預言家</p>
+    <!-- 英雄區 -->
+    <div class="arena-hero">
+      <div class="arena-hero-title">⚔️ 預測競技場</div>
+      <div class="arena-hero-sub">賽前預測 · 每日挑戰 · 成為最強預言家</div>
+      <div class="arena-xp-bar-wrap">
+        <div class="arena-xp-label">
+          <span>⚡ Lv.${level} 預言家</span>
+          <span>${xpInLv} / ${xpPerLv} XP</span>
+        </div>
+        <div class="arena-xp-track">
+          <div class="arena-xp-fill" style="width:${xpPct}"></div>
+        </div>
+      </div>
     </div>
 
     <!-- 個人戰況儀表板 -->
@@ -247,22 +273,22 @@ function renderArena() {
       <div class="arena-stat-card">
         <div class="arena-stat-icon">🔥</div>
         <div class="arena-stat-num">${dailyState.streak}</div>
-        <div class="arena-stat-label">連續打卡天數</div>
+        <div class="arena-stat-label">連勝天數</div>
       </div>
       <div class="arena-stat-card">
         <div class="arena-stat-icon">📋</div>
-        <div class="arena-stat-num">${Object.keys(dailyState.history).length}</div>
-        <div class="arena-stat-label">累計答題數</div>
+        <div class="arena-stat-num">${answeredCount}</div>
+        <div class="arena-stat-label">累計答題</div>
       </div>
       <div class="arena-stat-card">
-        <div class="arena-stat-icon">🏆</div>
-        <div class="arena-stat-num">${myChampion ? '✓' : '—'}</div>
-        <div class="arena-stat-label">冠軍預測</div>
+        <div class="arena-stat-icon">⚡</div>
+        <div class="arena-stat-num">${xp}</div>
+        <div class="arena-stat-label">總 XP</div>
       </div>
       <div class="arena-stat-card">
-        <div class="arena-stat-icon">📊</div>
-        <div class="arena-stat-num">${myGroups ? Object.keys(myGroups).length + '/12' : '0/12'}</div>
-        <div class="arena-stat-label">分組預測完成</div>
+        <div class="arena-stat-icon">🎯</div>
+        <div class="arena-stat-num">${[myChampion,groupsDone,myTeam,dailyDone].filter(Boolean).length}/4</div>
+        <div class="arena-stat-label">任務完成</div>
       </div>
     </div>
 
@@ -271,41 +297,66 @@ function renderArena() {
 
       <!-- ① 每日一題 -->
       <div class="arena-card ${dailyDone ? 'done' : 'urgent'}" onclick="openDailyPick()">
-        <div class="arena-card-badge">${dailyDone ? '✓ 今日已完成' : '🔔 今日未作答'}</div>
-        <div class="arena-card-icon">❓</div>
+        <div class="arena-card-badge">${dailyDone ? '✅ 今日已完成' : '🔔 待作答'}</div>
+        <span class="arena-card-icon">❓</span>
         <div class="arena-card-title">每日一題</div>
-        <div class="arena-card-desc">每天一個世界盃話題，累積連勝天數</div>
-        <div class="arena-card-streak">🔥 ${dailyState.streak} 天連勝</div>
+        <div class="arena-card-desc">每天一個世界盃話題，累積連勝天數，展現你的足球智慧</div>
+        ${dailyState.streak > 0 ? `<div class="arena-card-streak">🔥 ${dailyState.streak} 天連勝</div>` : ''}
+        <div class="arena-card-footer">
+          <span style="font-size:11px;color:rgba(255,255,255,0.3)">+10 XP / 天</span>
+          <span class="arena-card-cta">${dailyDone ? '已完成 ✓' : '立即作答 →'}</span>
+        </div>
       </div>
 
       <!-- ② 冠軍預測 -->
       <div class="arena-card ${myChampion ? 'done' : ''}" onclick="openChampionPick()">
-        <div class="arena-card-badge">${myChampion ? '✓ 已鎖定預測' : '尚未預測'}</div>
-        <div class="arena-card-icon">🏆</div>
-        <div class="arena-card-title">冠軍預測投票</div>
+        <div class="arena-card-badge">${myChampion ? '✅ 已鎖定' : '尚未預測'}</div>
+        <span class="arena-card-icon">🏆</span>
+        <div class="arena-card-title">冠軍預測</div>
         <div class="arena-card-desc">
           ${myChampion
-            ? `你選了 ${TEAMS[myChampion.c1]?.flag||''} ${TEAMS[myChampion.c1]?.nameCN||myChampion.c1} 奪冠`
-            : '選出你心目中的冠、亞、季軍'}
+            ? `你預測 <strong style="color:var(--gold)">${champFlag}</strong> 奪冠`
+            : '選出你心目中的冠、亞、季軍，開賽前可修改'}
         </div>
-        ${myChampion ? '<div class="arena-lock-hint">⏰ 開賽前可修改</div>' : ''}
+        ${myChampion ? '<div class="arena-lock-hint">⏰ 開賽後永久鎖定</div>' : ''}
+        <div class="arena-card-footer">
+          <span style="font-size:11px;color:rgba(255,255,255,0.3)">+50 XP</span>
+          <span class="arena-card-cta">${myChampion ? '修改預測 →' : '開始預測 →'}</span>
+        </div>
       </div>
 
       <!-- ③ 分組賽預測 -->
-      <div class="arena-card ${myGroups && Object.keys(myGroups).length===12 ? 'done' : ''}" onclick="openGroupPicks()">
-        <div class="arena-card-badge">${myGroups && Object.keys(myGroups).length===12 ? '✓ 全部填完' : `完成 ${myGroups ? Object.keys(myGroups).length : 0}/12 組`}</div>
-        <div class="arena-card-icon">📋</div>
+      <div class="arena-card ${groupsDone ? 'done' : ''}" onclick="openGroupPicks()">
+        <div class="arena-card-badge">${groupsDone ? '✅ 全部填完' : `${groupCount}/12 組`}</div>
+        <span class="arena-card-icon">📋</span>
         <div class="arena-card-title">分組賽預測</div>
-        <div class="arena-card-desc">預測 12 組各自的前兩名晉級隊伍</div>
+        <div class="arena-card-desc">預測 12 組各自的前兩名出線隊伍，見證你的眼光</div>
+        ${groupCount > 0 && !groupsDone ? `
+        <div style="margin-top:12px">
+          <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden">
+            <div style="height:100%;width:${Math.round(groupCount/12*100)}%;background:linear-gradient(90deg,#2196f3,#00bcd4);border-radius:999px;transition:width .5s ease"></div>
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:5px">${groupCount}/12 已完成</div>
+        </div>` : ''}
+        <div class="arena-card-footer">
+          <span style="font-size:11px;color:rgba(255,255,255,0.3)">+50 XP</span>
+          <span class="arena-card-cta">${groupsDone ? '修改預測 →' : groupCount > 0 ? '繼續填寫 →' : '開始填寫 →'}</span>
+        </div>
       </div>
 
       <!-- ④ 支持球隊 -->
       <div class="arena-card ${myTeam ? 'done' : ''}" onclick="openTeamSupport()">
-        <div class="arena-card-badge">${myTeam ? '✓ 已選定' : '尚未選擇'}</div>
-        <div class="arena-card-icon">${myTeam ? (TEAMS[myTeam]?.flag||'⚽') : '⚽'}</div>
+        <div class="arena-card-badge">${myTeam ? '✅ 已宣示' : '尚未選擇'}</div>
+        <span class="arena-card-icon" style="font-size:44px">${myTeam ? (TEAMS[myTeam]?.flag||'⚽') : '⚽'}</span>
         <div class="arena-card-title">宣示支持球隊</div>
         <div class="arena-card-desc">
-          ${myTeam ? `你支持 ${TEAMS[myTeam]?.nameCN||myTeam}，加油！` : '選定一支你要支持的球隊'}
+          ${myTeam
+            ? `你支持 <strong style="color:#e91e63">${TEAMS[myTeam]?.nameCN||myTeam}</strong>，全力加油！`
+            : '選定一支你要整個世界盃陪伴的球隊'}
+        </div>
+        <div class="arena-card-footer">
+          <span style="font-size:11px;color:rgba(255,255,255,0.3)">+30 XP</span>
+          <span class="arena-card-cta">${myTeam ? '更換球隊 →' : '選擇球隊 →'}</span>
         </div>
       </div>
 
