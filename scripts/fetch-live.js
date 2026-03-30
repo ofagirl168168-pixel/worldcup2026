@@ -2,12 +2,11 @@
  * fetch-live.js
  * 由 GitHub Actions 每 30 分鐘執行，抓取即時足球資料並寫入 js/data-live.json
  *
- * API 用量策略：
- *   世界盃前（2026-06-11 前）：每 12 小時更新一次 → ~2 calls/day
- *   世界盃期間：每次執行最多 3 calls → ~144 calls/day … 但 free tier 100/day
- *   → 實際做法：世界盃期間仍每 30 分鐘執行，但只在「整點或半點」真正打 API
- *     奇數 30 分鐘週期直接跳過（不打 API，直接用舊資料）
- *     → 等於每 60 分鐘打 API 一次，48×(1/2)=24 次/天，完全安全
+ * API 用量策略（免費 100 次/天）：
+ *   世界盃前（2026-06-11 前）：每 12 小時一次 → ~2 calls/day
+ *   世界盃期間：cron 每 30 分鐘跑，但只讓整點（分鐘 0–4）通過
+ *     → 24 次/天 × 4 calls = 96 calls/day（在 100 以內）
+ *     endpoint: live(1) + standings(1) + topscorers(1) + topassists(1)
  */
 
 const https = require('https');
@@ -76,11 +75,12 @@ async function main() {
       }
     }
   } else {
-    // 世界盃期間：只有整點或半點（分鐘 0–5 or 30–35）才打 API
+    // 世界盃期間：只有整點（分鐘 0–4）才打 API
+    // cron 每 30 分鐘跑 → 每天 48 次觸發，只有 24 次（整點）真正執行
+    // 24 次 × 4 calls = 96 calls/day < 100 免費額度
     const mins = now.getUTCMinutes();
-    const isSlot = (mins <= 5) || (mins >= 30 && mins <= 35);
-    if (!isSlot) {
-      console.log(`WC period: not in update slot (minute ${mins}), skipping.`);
+    if (mins > 4) {
+      console.log(`WC period: skipping half-hour slot (minute ${mins}), saving quota.`);
       process.exit(0);
     }
   }
@@ -90,18 +90,15 @@ async function main() {
   const result = {
     updatedAt: now.toISOString(),
     isDuringWC,
-    standings: {},
+    standings: [],
     topScorers: [],
-    liveMatches: [],
-    fixtureResults: []
+    topAssists: [],
+    liveMatches: []
   };
 
   try {
-    // 1. FIFA 排名（只需偶爾更新，抓一次）
-    // API-Football 沒有 FIFA 排名端點，跳過
-
     if (isDuringWC) {
-      // 2. 即時比賽（世界盃期間）
+      // ── Call 1：即時比賽 ──────────────────────────────────
       const liveRes = await apiGet(`/fixtures?live=all&league=1&season=${WC_SEASON}`);
       if (liveRes.response) {
         result.liveMatches = liveRes.response.map(f => ({
@@ -111,27 +108,34 @@ async function main() {
           homeTeam: f.teams.home.name,
           awayTeam: f.teams.away.name,
           homeGoals: f.goals.home,
-          awayGoals: f.goals.away,
-          date: f.fixture.date
+          awayGoals: f.goals.away
         }));
       }
       console.log(`Live matches: ${result.liveMatches.length}`);
 
-      // 3. 最近完賽結果（最近 10 場）
-      const finishedRes = await apiGet(`/fixtures?league=1&season=${WC_SEASON}&status=FT&last=10`);
-      if (finishedRes.response) {
-        result.fixtureResults = finishedRes.response.map(f => ({
-          id: f.fixture.id,
-          homeTeam: f.teams.home.name,
-          awayTeam: f.teams.away.name,
-          homeGoals: f.goals.home,
-          awayGoals: f.goals.away,
-          date: f.fixture.date
-        }));
+      // ── Call 2：積分榜 ────────────────────────────────────
+      const standRes = await apiGet(`/standings?league=1&season=${WC_SEASON}`);
+      if (standRes.response && standRes.response[0]) {
+        const groups = standRes.response[0].league.standings;
+        result.standings = groups.map(group =>
+          group.map(entry => ({
+            rank: entry.rank,
+            group: entry.group,
+            teamName: entry.team.name,
+            played: entry.all.played,
+            win: entry.all.win,
+            draw: entry.all.draw,
+            lose: entry.all.lose,
+            goalsFor: entry.all.goals.for,
+            goalsAgainst: entry.all.goals.against,
+            goalsDiff: entry.goalsDiff,
+            points: entry.points
+          }))
+        );
       }
-      console.log(`Recent results: ${result.fixtureResults.length}`);
+      console.log(`Standings groups: ${result.standings.length}`);
 
-      // 4. 射手榜
+      // ── Call 3：射手榜 ────────────────────────────────────
       const scorersRes = await apiGet(`/players/topscorers?league=1&season=${WC_SEASON}`);
       if (scorersRes.response) {
         result.topScorers = scorersRes.response.slice(0, 10).map(p => ({
@@ -144,16 +148,26 @@ async function main() {
       }
       console.log(`Top scorers: ${result.topScorers.length}`);
 
+      // ── Call 4：助攻榜 ────────────────────────────────────
+      const assistsRes = await apiGet(`/players/topassists?league=1&season=${WC_SEASON}`);
+      if (assistsRes.response) {
+        result.topAssists = assistsRes.response.slice(0, 10).map(p => ({
+          name: p.player.name,
+          nationality: p.player.nationality,
+          assists: p.statistics[0].goals.assists,
+          goals: p.statistics[0].goals.total,
+          team: p.statistics[0].team.name
+        }));
+      }
+      console.log(`Top assists: ${result.topAssists.length}`);
+
     } else {
-      // 世界盃前：只抓最近的友誼賽結果，用來更新球隊近期勝負
-      const recentRes = await apiGet(`/fixtures?team=2&last=5&status=FT`);
-      // 僅做一次示範呼叫確認 API 正常
+      // 世界盃前：確認 API key 有效即可
       console.log('Pre-WC: API connectivity check passed.');
     }
 
   } catch (err) {
     console.error('API fetch error:', err.message);
-    // 寫入舊資料保留，僅更新 updatedAt
     const existing = loadExisting();
     if (existing) {
       existing.updatedAt = now.toISOString();

@@ -650,6 +650,43 @@ function renderStats(tab) {
   const el = document.getElementById('stats-content');
   if (!el) return;
   if (tab === 'standings') {
+    // 世界盃期間有即時積分榜資料時，直接套用
+    if (window._liveStandings && window._liveStandings.length > 0) {
+      // 建立 teamName → {flag, nameCN} 的查找表
+      const nameMap = {};
+      Object.values(TEAMS).forEach(t => { nameMap[t.name] = t; nameMap[t.nameCN] = t; });
+      el.innerHTML = `<div style="margin-bottom:16px;color:#4caf50;font-size:13px">🟢 即時積分榜</div>` +
+        window._liveStandings.map(group => {
+          const groupName = group[0]?.group || '';
+          const rows = group.map(entry => {
+            const tm = nameMap[entry.teamName];
+            const flag = tm ? tm.flag : '';
+            const name = tm ? tm.nameCN : entry.teamName;
+            const isQ = entry.rank <= 2;
+            return `<tr class="${isQ?'standings-qualify':''}">
+              <td class="standings-pos">${entry.rank}</td>
+              <td>${flag} ${name}</td>
+              <td>${entry.played}</td>
+              <td>${entry.win}</td>
+              <td>${entry.draw}</td>
+              <td>${entry.lose}</td>
+              <td>${entry.goalsFor}</td>
+              <td>${entry.goalsAgainst}</td>
+              <td>${entry.goalsDiff > 0 ? '+' : ''}${entry.goalsDiff}</td>
+              <td><strong>${entry.points}</strong></td>
+            </tr>`;
+          }).join('');
+          return `<div class="standings-group">
+            <h3>${groupName}</h3>
+            <table class="standings-table">
+              <thead><tr><th>#</th><th>球隊</th><th>賽</th><th>勝</th><th>平</th><th>負</th><th>進</th><th>失</th><th>淨</th><th>積分</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>`;
+        }).join('');
+      return;
+    }
+    // 賽前：顯示分組表（全 0）
     el.innerHTML = Object.entries(GROUPS).map(([g, gd]) => {
       const rows = gd.teams.map((code,i) => {
         const t = TEAMS[code];
@@ -672,18 +709,18 @@ function renderStats(tab) {
       </div>`;
     }).join('');
   } else if (tab === 'scorers' || tab === 'assists') {
-    const label = tab === 'scorers' ? '射手榜' : '助攻榜';
-    const unit  = tab === 'scorers' ? '球' : '助攻';
-    // 世界盃期間有即時資料時使用真實射手榜
-    const liveScorers = (tab === 'scorers') ? (window._liveTopScorers || null) : null;
-    if (liveScorers && liveScorers.length > 0) {
+    const unit = tab === 'scorers' ? '球' : '助攻';
+    // 世界盃期間有即時資料時使用
+    const liveList = tab === 'scorers' ? (window._liveTopScorers || null) : (window._liveTopAssists || null);
+    if (liveList && liveList.length > 0) {
+      const valKey = tab === 'scorers' ? 'goals' : 'assists';
       el.innerHTML = `<div style="margin-bottom:16px;color:#4caf50;font-size:13px">🟢 即時更新資料</div>
-        <div class="scorers-list">${liveScorers.map((p,i) => `
+        <div class="scorers-list">${liveList.map((p,i) => `
           <div class="scorer-card">
             <div class="scorer-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div>
             <div class="scorer-flag"></div>
             <div class="scorer-info"><div class="scorer-name">${p.name}</div><div class="scorer-sub">${p.nationality} · ${p.team}</div></div>
-            <div class="scorer-goals">${p.goals} <span>球</span></div>
+            <div class="scorer-goals">${p[valKey] ?? 0} <span>${unit}</span></div>
           </div>`).join('')}</div>`;
       return;
     }
@@ -850,23 +887,25 @@ function applyLiveData() {
         if (banner) banner.remove();
       }
 
-      // 世界盃期間：更新射手榜（scorers tab）
-      if (data.isDuringWC && data.topScorers && data.topScorers.length > 0) {
-        // 當使用者切到射手榜時重新渲染
-        window._liveTopScorers = data.topScorers;
-        // 若目前已在射手榜 tab，立刻刷新
+      if (data.isDuringWC) {
         const activeTab = document.querySelector('.stats-tab.active');
-        if (activeTab && activeTab.dataset.stats === 'scorers') {
-          renderStats('scorers');
-        }
-      }
 
-      // 世界盃期間：用真實比賽結果更新 standings（簡易版）
-      if (data.isDuringWC && data.fixtureResults && data.fixtureResults.length > 0) {
-        window._liveResults = data.fixtureResults;
-        const activeTab = document.querySelector('.stats-tab.active');
-        if (activeTab && activeTab.dataset.stats === 'standings') {
-          renderStats('standings');
+        // 積分榜
+        if (data.standings && data.standings.length > 0) {
+          window._liveStandings = data.standings;
+          if (activeTab && activeTab.dataset.stats === 'standings') renderStats('standings');
+        }
+
+        // 射手榜
+        if (data.topScorers && data.topScorers.length > 0) {
+          window._liveTopScorers = data.topScorers;
+          if (activeTab && activeTab.dataset.stats === 'scorers') renderStats('scorers');
+        }
+
+        // 助攻榜
+        if (data.topAssists && data.topAssists.length > 0) {
+          window._liveTopAssists = data.topAssists;
+          if (activeTab && activeTab.dataset.stats === 'assists') renderStats('assists');
         }
       }
     });
