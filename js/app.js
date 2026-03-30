@@ -520,20 +520,35 @@ function calcPred(ht, at) {
   else if (xgDiff > -1.2) { hw=18; d=24; aw=58; }
   else                    { hw=12; d=20; aw=68; }
 
-  // FIFA排名修正 (每10名差距約±3%)
-  const rankAdj = Math.min(18, Math.max(-18, (at.fifaRank - ht.fifaRank) * 0.35));
-  hw = Math.min(78, Math.max(8, Math.round(hw + rankAdj)));
-  aw = Math.min(78, Math.max(8, Math.round(aw - rankAdj)));
-  d  = Math.max(10, 100 - hw - aw);
+  // FIFA排名修正（上限提高至 25，讓懸殊對決能反映真實勝率）
+  const rankAdj = Math.min(25, Math.max(-25, (at.fifaRank - ht.fifaRank) * 0.35));
+  hw = Math.min(88, Math.max(6, Math.round(hw + rankAdj)));
+  aw = Math.min(88, Math.max(6, Math.round(aw - rankAdj)));
+  d  = Math.max(6, 100 - hw - aw);
 
   // 先確定勝/平/負結果
   const outcome = hw > aw && hw > d ? 'home' : aw > hw && aw > d ? 'away' : 'draw';
 
   // ── 比分換算 ──
   const rankGap = Math.abs(ht.fifaRank - at.fifaRank);
-  const winnerHw = outcome === 'home' ? hw : outcome === 'away' ? aw : d;
-  const scoreMult = winnerHw >= 70 ? 1.45 : winnerHw >= 62 ? 1.25 : winnerHw >= 55 ? 1.08 : 1.0;
-  const mismatchBonus = rankGap >= 55 ? 0.7 : rankGap >= 40 ? 0.45 : 0;
+  const winnerProb = outcome === 'home' ? hw : outcome === 'away' ? aw : d;
+
+  // 放大係數：勝率越高 → 比分差越懸殊（新增 80%+ 和 86%+ 超高倍率）
+  const scoreMult = winnerProb >= 86 ? 2.2
+                  : winnerProb >= 80 ? 1.85
+                  : winnerProb >= 72 ? 1.55
+                  : winnerProb >= 64 ? 1.3
+                  : winnerProb >= 56 ? 1.12
+                  : 1.0;
+
+  // 排名差距加成（排名差越大 → 強隊進球數越多）
+  // 參考：德8-0沙(差108)、西7-0哥(差57)
+  const mismatchBonus = rankGap >= 100 ? 2.0
+                      : rankGap >=  80 ? 1.4
+                      : rankGap >=  60 ? 0.9
+                      : rankGap >=  40 ? 0.45
+                      : 0;
+
   const hScoreXG = hXG * scoreMult + (outcome === 'home' ? mismatchBonus : 0);
   const aScoreXG = aXG * scoreMult + (outcome === 'away' ? mismatchBonus : 0);
 
@@ -550,8 +565,10 @@ function calcPred(ht, at) {
     const eq = Math.round((hScoreXG + aScoreXG) / 2);
     hGoals = eq; aGoals = eq;
   }
-  hGoals = Math.min(5, hGoals);
-  aGoals = Math.min(5, aGoals);
+  // 上限提高至 8（反映真實世界盃大比分，但加上隨機因子避免全部預測最大值）
+  const goalCap = rankGap >= 80 ? 8 : rankGap >= 50 ? 6 : 5;
+  hGoals = Math.min(goalCap, hGoals);
+  aGoals = Math.min(goalCap, aGoals);
 
   const conf = Math.abs(hw-aw) >= 28 ? 'high' : Math.abs(hw-aw) >= 14 ? 'medium' : 'low';
   const confLabel = conf==='high'?'高信心':conf==='medium'?'中信心':'低信心';
