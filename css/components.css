@@ -698,6 +698,27 @@
   .nav-user-name { display: none; }
 }
 
+/* ========== 競技場登入提示 ========== */
+.arena-login-cta {
+  margin-top: 32px; padding: 24px 28px;
+  border-radius: 20px;
+  border: 1px solid rgba(240,192,64,0.2);
+  background: linear-gradient(135deg, rgba(240,192,64,0.06), rgba(255,152,0,0.04));
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  flex-wrap: wrap;
+}
+.arena-login-left { flex: 1; min-width: 220px; }
+.arena-login-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 24px; border-radius: 14px;
+  background: #fff; color: #222;
+  font-weight: 800; font-size: 14px; border: none; cursor: pointer;
+  white-space: nowrap; flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.arena-login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.4); }
+
 /* ========== 排行榜 ========== */
 .leaderboard-section { margin-top: 16px; }
 .leaderboard-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }

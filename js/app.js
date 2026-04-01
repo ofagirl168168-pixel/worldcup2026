@@ -117,15 +117,7 @@ document.querySelectorAll('.nav-btn[data-section]').forEach(btn => {
     if (btn.dataset.section === 'stats')       renderStats('standings');
     if (btn.dataset.section === 'focus')       renderFocus();
     if (btn.dataset.section === 'predictions') renderPredictions();
-    if (btn.dataset.section === 'arena') {
-      renderArena();
-      // 顯示排行榜區塊並載入資料
-      const lbSec = document.getElementById('leaderboard-section');
-      if (lbSec) {
-        lbSec.style.display = 'block';
-        renderLeaderboard?.('leaderboard-list');
-      }
-    }
+    if (btn.dataset.section === 'arena')       renderArena();
   });
 });
 
