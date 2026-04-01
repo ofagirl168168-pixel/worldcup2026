@@ -117,7 +117,15 @@ document.querySelectorAll('.nav-btn[data-section]').forEach(btn => {
     if (btn.dataset.section === 'stats')       renderStats('standings');
     if (btn.dataset.section === 'focus')       renderFocus();
     if (btn.dataset.section === 'predictions') renderPredictions();
-    if (btn.dataset.section === 'arena')       renderArena();
+    if (btn.dataset.section === 'arena') {
+      renderArena();
+      // 顯示排行榜區塊並載入資料
+      const lbSec = document.getElementById('leaderboard-section');
+      if (lbSec) {
+        lbSec.style.display = 'block';
+        renderLeaderboard?.('leaderboard-list');
+      }
+    }
   });
 });
 
@@ -404,7 +412,30 @@ function openPredModal(id) {
         <strong style="color:var(--text-primary)">${at.keyPlayers?.[0]?.name||at.nameCN}</strong>（${at.keyPlayers?.[0]?.pos||'前鋒'}）
       </div>
       ${ht.predDesc?`<div style="margin-top:8px;font-size:12px;color:var(--text-muted)">💡 ${ht.predTitle||''}：${ht.predDesc||''}</div>`:''}
-    </div>`;
+    </div>
+
+    <!-- 你的預測 -->
+    ${(()=>{
+      const myPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
+      const mine = myPreds[m.id];
+      return `<div class="my-pred-section" id="my-pred-section-${m.id}">
+        <div class="modal-section-title" style="margin-top:16px">🎯 你的預測</div>
+        ${mine ? `
+          <div class="my-pred-result">
+            <div class="my-pred-score">${ht.flag} ${mine.h} – ${mine.a} ${at.flag}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">
+              已預測 · ${new Date(mine.savedAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}
+            </div>
+            <button class="my-pred-edit-btn" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">修改</button>
+          </div>` : `
+          <div class="my-pred-prompt">
+            <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:10px">你預測這場的比分是？</div>
+            <button class="btn-primary" style="width:100%" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">
+              ✏️ 填入我的預測
+            </button>
+          </div>`}
+      </div>`;
+    })()}`;
 
   // modal 已在 loading 階段開啟，這裡只捲到頂部
   modal.scrollTop = 0;
@@ -677,6 +708,10 @@ function renderSchedule(phaseFilter, groupFilter) {
     if (phaseFilter && phaseFilter !== 'all' && m.phase !== phaseFilter) return false;
     if (groupFilter && groupFilter !== 'all' && m.group !== groupFilter) return false;
     return true;
+  }).sort((a, b) => {
+    const ka = (a.twDate || '') + (a.twTime || '');
+    const kb = (b.twDate || '') + (b.twTime || '');
+    return ka < kb ? -1 : ka > kb ? 1 : 0;
   });
   if (!list.length) { el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">暫無賽事資料</div>'; return; }
   let lastDate = '';
@@ -745,12 +780,16 @@ function renderStats(tab) {
   const el = document.getElementById('stats-content');
   if (!el) return;
   if (tab === 'standings') {
+    const myTeam = (() => { try { return JSON.parse(localStorage.getItem('wc26_team')); } catch { return null; } })();
     // 世界盃期間有即時積分榜資料時，直接套用
     if (window._liveStandings && window._liveStandings.length > 0) {
-      // 建立 teamName → {flag, nameCN} 的查找表
       const nameMap = {};
-      Object.values(TEAMS).forEach(t => { nameMap[t.name] = t; nameMap[t.nameCN] = t; });
+      Object.entries(TEAMS).forEach(([code, t]) => {
+        nameMap[t.name] = { ...t, code };
+        nameMap[t.nameCN] = { ...t, code };
+      });
       el.innerHTML = `<div style="margin-bottom:16px;color:#4caf50;font-size:13px">🟢 即時積分榜</div>` +
+        (myTeam ? `<div class="standings-myteam-banner">⚽ 你支持的球隊：${TEAMS[myTeam]?.flag||''} ${TEAMS[myTeam]?.nameCN||myTeam}</div>` : '') +
         window._liveStandings.map(group => {
           const groupName = group[0]?.group || '';
           const rows = group.map(entry => {
@@ -758,9 +797,10 @@ function renderStats(tab) {
             const flag = tm ? tm.flag : '';
             const name = tm ? tm.nameCN : entry.teamName;
             const isQ = entry.rank <= 2;
-            return `<tr class="${isQ?'standings-qualify':''}">
+            const isMine = tm && myTeam && tm.code === myTeam;
+            return `<tr class="${isQ?'standings-qualify':''} ${isMine?'standings-myteam':''}">
               <td class="standings-pos">${entry.rank}</td>
-              <td>${flag} ${name}</td>
+              <td>${flag} ${name}${isMine?' <span class="my-team-tag">我的</span>':''}</td>
               <td>${entry.played}</td>
               <td>${entry.win}</td>
               <td>${entry.draw}</td>
@@ -782,13 +822,15 @@ function renderStats(tab) {
       return;
     }
     // 賽前：顯示分組表（全 0）
-    el.innerHTML = Object.entries(GROUPS).map(([g, gd]) => {
+    el.innerHTML = (myTeam ? `<div class="standings-myteam-banner">⚽ 你支持的球隊：${TEAMS[myTeam]?.flag||''} ${TEAMS[myTeam]?.nameCN||myTeam}</div>` : '') +
+      Object.entries(GROUPS).map(([g, gd]) => {
       const rows = gd.teams.map((code,i) => {
         const t = TEAMS[code];
         const isQ = i < 2;
-        return `<tr class="${isQ?'standings-qualify':''}">
+        const isMine = myTeam && code === myTeam;
+        return `<tr class="${isQ?'standings-qualify':''} ${isMine?'standings-myteam':''}">
           <td class="standings-pos">${i+1}</td>
-          <td>${t.flag} ${t.nameCN}</td>
+          <td>${t.flag} ${t.nameCN}${isMine?' <span class="my-team-tag">我的</span>':''}</td>
           <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
           <td><strong>0</strong></td>
         </tr>`;
@@ -1085,4 +1127,65 @@ function _fetchESPN() {
 function initLiveScoreTicker() {
   _fetchESPN();                                    // 頁面載入立刻抓一次
   setInterval(_fetchESPN, 60 * 1000);             // 之後每 60 秒
+}
+
+// ── 使用者自訂預測 ────────────────────────────────────────
+function openMyPredInput(matchId, hName, aName) {
+  const myPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
+  const mine = myPreds[matchId] || { h:0, a:0 };
+
+  const overlay = document.createElement('div');
+  overlay.id = 'my-pred-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML = `
+    <div style="background:#1a1a2e;border-radius:20px;padding:28px 24px;max-width:320px;width:100%;border:1px solid rgba(240,192,64,0.2)">
+      <div style="font-size:20px;font-weight:900;text-align:center;margin-bottom:6px;color:var(--gold)">🎯 你的預測</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:20px">${hName} vs ${aName}</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px">
+        <div style="text-align:center">
+          <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px">${hName}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button onclick="adjustMyPred('h',-1)" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:18px;cursor:pointer">−</button>
+            <span id="my-pred-h" style="font-size:36px;font-weight:900;color:#fff;min-width:36px;text-align:center">${mine.h}</span>
+            <button onclick="adjustMyPred('h',1)" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:18px;cursor:pointer">+</button>
+          </div>
+        </div>
+        <div style="font-size:28px;font-weight:900;color:rgba(255,255,255,0.3)">:</div>
+        <div style="text-align:center">
+          <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px">${aName}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button onclick="adjustMyPred('a',-1)" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:18px;cursor:pointer">−</button>
+            <span id="my-pred-a" style="font-size:36px;font-weight:900;color:#fff;min-width:36px;text-align:center">${mine.a}</span>
+            <button onclick="adjustMyPred('a',1)" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:18px;cursor:pointer">+</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-bottom:10px" onclick="saveMyPred('${matchId}')">
+        確認預測
+      </button>
+      <button onclick="document.getElementById('my-pred-overlay').remove()"
+        style="width:100%;background:none;border:none;color:rgba(255,255,255,0.3);font-size:13px;cursor:pointer;padding:8px">
+        取消
+      </button>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function adjustMyPred(side, delta) {
+  const el = document.getElementById(`my-pred-${side}`);
+  if (!el) return;
+  const val = Math.max(0, Math.min(15, parseInt(el.textContent) + delta));
+  el.textContent = val;
+}
+
+function saveMyPred(matchId) {
+  const h = parseInt(document.getElementById('my-pred-h')?.textContent || 0);
+  const a = parseInt(document.getElementById('my-pred-a')?.textContent || 0);
+  const myPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
+  myPreds[matchId] = { h, a, savedAt: new Date().toISOString() };
+  localStorage.setItem('wc26_my_preds', JSON.stringify(myPreds));
+  document.getElementById('my-pred-overlay')?.remove();
+  // 重新整理 modal 內的預測區塊
+  openPredModal(matchId);
 }

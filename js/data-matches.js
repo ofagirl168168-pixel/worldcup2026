@@ -65,24 +65,46 @@ function buildGroupMatches() {
   return matches;
 }
 
-// 淘汰賽佔位
+// 淘汰賽（依FIFA官方時間，台灣UTC+8）
+// 32強：6/28–7/3，16強：7/4–7/7，八強：7/9–7/11，四強：7/14–7/15
 const KNOCKOUT = [
-  {id:'R32-1', phase:'r32', label:'32強 第1場', twDate:'2026-07-03', twTime:'07:00', venue:'MetLife Stadium', city:'紐澤西'},
-  {id:'R32-2', phase:'r32', label:'32強 第2場', twDate:'2026-07-03', twTime:'10:00', venue:'AT&T Stadium', city:'達拉斯'},
-  {id:'R32-3', phase:'r32', label:'32強 第3場', twDate:'2026-07-04', twTime:'07:00', venue:'SoFi Stadium', city:'洛杉磯'},
-  {id:'R32-4', phase:'r32', label:'32強 第4場', twDate:'2026-07-04', twTime:'10:00', venue:'Hard Rock Stadium', city:'邁阿密'},
-  {id:'R32-5', phase:'r32', label:'32強 第5場', twDate:'2026-07-05', twTime:'07:00', venue:'Estadio Azteca', city:'墨西哥城'},
-  {id:'R32-6', phase:'r32', label:'32強 第6場', twDate:'2026-07-05', twTime:'10:00', venue:'BMO Field', city:'多倫多'},
-  {id:'R32-7', phase:'r32', label:'32強 第7場', twDate:'2026-07-06', twTime:'07:00', venue:'Rose Bowl', city:'帕薩迪納'},
-  {id:'R32-8', phase:'r32', label:'32強 第8場', twDate:'2026-07-06', twTime:'10:00', venue:'Gillette Stadium', city:'波士頓'},
-  {id:'QF-1',  phase:'qf',  label:'八強 第1場', twDate:'2026-07-14', twTime:'07:00', venue:'MetLife Stadium', city:'紐澤西'},
-  {id:'QF-2',  phase:'qf',  label:'八強 第2場', twDate:'2026-07-14', twTime:'10:00', venue:'AT&T Stadium', city:'達拉斯'},
-  {id:'QF-3',  phase:'qf',  label:'八強 第3場', twDate:'2026-07-15', twTime:'07:00', venue:'SoFi Stadium', city:'洛杉磯'},
-  {id:'QF-4',  phase:'qf',  label:'八強 第4場', twDate:'2026-07-15', twTime:'10:00', venue:'Hard Rock Stadium', city:'邁阿密'},
-  {id:'SF-1',  phase:'sf',  label:'四強 第1場', twDate:'2026-07-17', twTime:'07:00', venue:'MetLife Stadium', city:'紐澤西'},
-  {id:'SF-2',  phase:'sf',  label:'四強 第2場', twDate:'2026-07-18', twTime:'07:00', venue:'AT&T Stadium', city:'達拉斯'},
-  {id:'3RD',   phase:'final',label:'季軍賽',    twDate:'2026-07-18', twTime:'07:00', venue:'Hard Rock Stadium', city:'邁阿密'},
-  {id:'FINAL', phase:'final',label:'🏆 決賽',   twDate:'2026-07-19', twTime:'09:00', venue:'MetLife Stadium', city:'紐澤西'}
+  // ── 32強（16場）──
+  {id:'R32-1',  phase:'r32', label:'32強 第1場',  twDate:'2026-06-29', twTime:'03:00', venue:'SoFi Stadium',          city:'洛杉磯'},   // 6/28 12PM PDT
+  {id:'R32-2',  phase:'r32', label:'32強 第2場',  twDate:'2026-06-30', twTime:'01:00', venue:'NRG Stadium',           city:'休士頓'},    // 6/29 12PM CDT
+  {id:'R32-3',  phase:'r32', label:'32強 第3場',  twDate:'2026-06-30', twTime:'04:30', venue:'Gillette Stadium',      city:'波士頓'},    // 6/29  4:30PM EDT
+  {id:'R32-4',  phase:'r32', label:'32強 第4場',  twDate:'2026-06-30', twTime:'09:00', venue:'Estadio BBVA',          city:'蒙特雷'},    // 6/29  7PM CST
+  {id:'R32-5',  phase:'r32', label:'32強 第5場',  twDate:'2026-07-01', twTime:'01:00', venue:'AT&T Stadium',          city:'達拉斯'},    // 6/30 12PM CDT
+  {id:'R32-6',  phase:'r32', label:'32強 第6場',  twDate:'2026-07-01', twTime:'05:00', venue:'MetLife Stadium',       city:'紐澤西'},    // 6/30  5PM EDT
+  {id:'R32-7',  phase:'r32', label:'32強 第7場',  twDate:'2026-07-01', twTime:'09:00', venue:'Estadio Azteca',        city:'墨西哥城'},  // 6/30  7PM CST
+  {id:'R32-8',  phase:'r32', label:'32強 第8場',  twDate:'2026-07-02', twTime:'00:00', venue:'Mercedes-Benz Stadium', city:'亞特蘭大'},  // 7/1  12PM EDT
+  {id:'R32-9',  phase:'r32', label:'32強 第9場',  twDate:'2026-07-02', twTime:'04:00', venue:'Lumen Field',           city:'西雅圖'},    // 7/1   1PM PDT
+  {id:'R32-10', phase:'r32', label:'32強 第10場', twDate:'2026-07-02', twTime:'08:00', venue:"Levi's Stadium",        city:'聖荷西'},    // 7/1   5PM PDT
+  {id:'R32-11', phase:'r32', label:'32強 第11場', twDate:'2026-07-03', twTime:'03:00', venue:'SoFi Stadium',          city:'洛杉磯'},    // 7/2  12PM PDT
+  {id:'R32-12', phase:'r32', label:'32強 第12場', twDate:'2026-07-03', twTime:'07:00', venue:'BMO Field',             city:'多倫多'},    // 7/2   7PM EDT
+  {id:'R32-13', phase:'r32', label:'32強 第13場', twDate:'2026-07-03', twTime:'11:00', venue:'BC Place',              city:'溫哥華'},    // 7/2   8PM PDT
+  {id:'R32-14', phase:'r32', label:'32強 第14場', twDate:'2026-07-04', twTime:'02:00', venue:'AT&T Stadium',          city:'達拉斯'},    // 7/3   1PM CDT
+  {id:'R32-15', phase:'r32', label:'32強 第15場', twDate:'2026-07-04', twTime:'06:00', venue:'Hard Rock Stadium',     city:'邁阿密'},    // 7/3   6PM EDT
+  {id:'R32-16', phase:'r32', label:'32強 第16場', twDate:'2026-07-04', twTime:'09:30', venue:'Arrowhead Stadium',     city:'堪薩斯城'},  // 7/3  8:30PM CDT
+  // ── 16強（8場）──
+  {id:'R16-1',  phase:'r16', label:'16強 第1場',  twDate:'2026-07-05', twTime:'01:00', venue:'NRG Stadium',           city:'休士頓'},    // 7/4  12PM CDT
+  {id:'R16-2',  phase:'r16', label:'16強 第2場',  twDate:'2026-07-05', twTime:'05:00', venue:'Lincoln Financial',     city:'費城'},      // 7/4   5PM EDT
+  {id:'R16-3',  phase:'r16', label:'16強 第3場',  twDate:'2026-07-06', twTime:'04:00', venue:'MetLife Stadium',       city:'紐澤西'},    // 7/5   4PM EDT
+  {id:'R16-4',  phase:'r16', label:'16強 第4場',  twDate:'2026-07-06', twTime:'08:00', venue:'Estadio Azteca',        city:'墨西哥城'},  // 7/5   6PM CST
+  {id:'R16-5',  phase:'r16', label:'16強 第5場',  twDate:'2026-07-07', twTime:'03:00', venue:'AT&T Stadium',          city:'達拉斯'},    // 7/6   2PM CDT
+  {id:'R16-6',  phase:'r16', label:'16強 第6場',  twDate:'2026-07-07', twTime:'08:00', venue:'Lumen Field',           city:'西雅圖'},    // 7/6   5PM PDT
+  {id:'R16-7',  phase:'r16', label:'16強 第7場',  twDate:'2026-07-08', twTime:'00:00', venue:'Mercedes-Benz Stadium', city:'亞特蘭大'},  // 7/7  12PM EDT
+  {id:'R16-8',  phase:'r16', label:'16強 第8場',  twDate:'2026-07-08', twTime:'04:00', venue:'BC Place',              city:'溫哥華'},    // 7/7   1PM PDT
+  // ── 八強（4場）──
+  {id:'QF-1',   phase:'qf',  label:'八強 第1場',  twDate:'2026-07-10', twTime:'04:00', venue:'Gillette Stadium',      city:'波士頓'},    // 7/9   4PM EDT
+  {id:'QF-2',   phase:'qf',  label:'八強 第2場',  twDate:'2026-07-11', twTime:'03:00', venue:'SoFi Stadium',          city:'洛杉磯'},    // 7/10 12PM PDT
+  {id:'QF-3',   phase:'qf',  label:'八強 第3場',  twDate:'2026-07-12', twTime:'05:00', venue:'Hard Rock Stadium',     city:'邁阿密'},    // 7/11  5PM EDT
+  {id:'QF-4',   phase:'qf',  label:'八強 第4場',  twDate:'2026-07-12', twTime:'09:00', venue:'Arrowhead Stadium',     city:'堪薩斯城'},  // 7/11  8PM CDT
+  // ── 四強（2場）──
+  {id:'SF-1',   phase:'sf',  label:'四強 第1場',  twDate:'2026-07-15', twTime:'03:00', venue:'AT&T Stadium',          city:'達拉斯'},    // 7/14  2PM CDT
+  {id:'SF-2',   phase:'sf',  label:'四強 第2場',  twDate:'2026-07-16', twTime:'03:00', venue:'Mercedes-Benz Stadium', city:'亞特蘭大'},
+  // ── 季軍賽 & 決賽 ──
+  {id:'3RD',    phase:'final',label:'季軍賽',     twDate:'2026-07-19', twTime:'05:00', venue:'Hard Rock Stadium',     city:'邁阿密'},
+  {id:'FINAL',  phase:'final',label:'🏆 決賽',    twDate:'2026-07-20', twTime:'03:00', venue:'MetLife Stadium',       city:'紐澤西'}
 ];
 
 var SCHEDULE = []; // 由 data-fix.js 的 buildRealSchedule() 覆蓋

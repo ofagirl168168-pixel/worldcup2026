@@ -105,35 +105,89 @@ Object.assign(TEAMS, {
     recentForm:['L','W','W','W','W'],
     predTitle:'亞洲盃亞軍挑世界', predOdds:'500-1', predDesc:'2023亞洲盃決賽資歷讓人刮目相看，Al-Taamari是最危險武器' },
 
-  'EUPD': { name:'UEFA Playoff D Winner', nameCN:'歐洲附加賽D勝者', flag:'🏴', group:'A', conf:'UEFA', fifaRank:35,
-    coach:'待定', formation:'4-3-3', keyPlayers:[], radar:{attack:68,defense:68,midfield:66,speed:68,experience:70},
-    style:'待定', strengths:['附加賽淘汰賽磨練'], weaknesses:['確定性低'],
-    history:'歐洲附加賽晉級', recentForm:['W','D','W','D','W'], predTitle:'歐洲附加賽代表', predOdds:'150-1', predDesc:'附加賽晉級球隊充滿鬥志' },
+  'EUPD': { name:'Czechia', nameCN:'捷克', flag:'🇨🇿', group:'A', conf:'UEFA', fifaRank:35,
+    coach:'Ivan Hašek', formation:'4-2-3-1',
+    keyPlayers:[
+      {name:'Tomáš Souček',pos:'中場',club:'西漢姆'},
+      {name:'Patrik Schick',pos:'前鋒',club:'拜耳勒沃庫森'},
+      {name:'Vladimír Coufal',pos:'後衛',club:'西漢姆'}
+    ],
+    radar:{attack:68,defense:68,midfield:66,speed:68,experience:70},
+    style:'防守穩健，依靠Souček中場控制，Schick提供進攻火力',
+    strengths:['Schick禁區內威脅大','Souček體力與拼勁','歐洲賽事豐富經驗'],
+    weaknesses:['陣容老化','進攻深度不足','整體速度偏慢'],
+    history:'2021歐洲盃四強，擁有豐富大賽經驗，透過附加賽重返世界盃',
+    recentForm:['W','D','W','L','W'], predTitle:'中歐老牌勁旅', predOdds:'150-1', predDesc:'Schick和Souček組合是捷克的核心競爭力，有望突圍小組賽' },
 
-  'EUPA': { name:'UEFA Playoff A Winner', nameCN:'歐洲附加賽A勝者', flag:'🏴', group:'B', conf:'UEFA', fifaRank:38,
-    coach:'待定', formation:'4-3-3', keyPlayers:[], radar:{attack:66,defense:66,midfield:64,speed:66,experience:68},
-    style:'待定', strengths:['附加賽磨練'], weaknesses:['確定性低'],
-    history:'歐洲附加賽晉級', recentForm:['W','D','W','D','W'], predTitle:'歐洲附加賽代表', predOdds:'180-1', predDesc:'附加賽代表，力爭小組突圍' },
+  'EUPA': { name:'Bosnia and Herzegovina', nameCN:'波士尼亞', flag:'🇧🇦', group:'B', conf:'UEFA', fifaRank:65,
+    coach:'Sergej Barbarez', formation:'4-3-3',
+    keyPlayers:[
+      {name:'Edin Džeko',pos:'中鋒',club:'費倫茨瓦羅斯'},
+      {name:'Sead Kolašinac',pos:'後衛',club:'馬賽'},
+      {name:'Miralem Pjanić',pos:'中場',club:'退役'}
+    ],
+    radar:{attack:66,defense:64,midfield:64,speed:65,experience:68},
+    style:'以Džeko為箭頭的進攻足球，中場控制配合邊路突擊',
+    strengths:['Džeko豐富大賽經驗','老球員帶領年輕陣容','西巴爾幹足球文化底蘊'],
+    weaknesses:['Džeko年齡偏大','整體陣容新舊交替','大賽經驗相對有限'],
+    history:'首次參加世界盃（2014年巴西世界盃小組賽），透過附加賽重返舞台',
+    recentForm:['W','W','D','W','L'], predTitle:'巴爾幹新挑戰', predOdds:'200-1', predDesc:'Džeko老驥伏櫪，帶領波黑再度踏上世界盃舞台' },
 
-  'EUPC': { name:'UEFA Playoff C Winner', nameCN:'歐洲附加賽C勝者', flag:'🏴', group:'D', conf:'UEFA', fifaRank:40,
-    coach:'待定', formation:'4-3-3', keyPlayers:[], radar:{attack:65,defense:65,midfield:63,speed:65,experience:67},
-    style:'待定', strengths:['附加賽磨練'], weaknesses:['確定性低'],
-    history:'歐洲附加賽晉級', recentForm:['W','D','W','D','W'], predTitle:'歐洲附加賽代表', predOdds:'200-1', predDesc:'力爭出線' },
+  'EUPC': { name:'Türkiye', nameCN:'土耳其', flag:'🇹🇷', group:'D', conf:'UEFA', fifaRank:28,
+    coach:'Vincenzo Montella', formation:'4-3-3',
+    keyPlayers:[
+      {name:'Hakan Çalhanoğlu',pos:'中場',club:'國際米蘭'},
+      {name:'Arda Güler',pos:'中場',club:'皇家馬德里'},
+      {name:'Cenk Tosun',pos:'前鋒',club:'待定'}
+    ],
+    radar:{attack:72,defense:70,midfield:74,speed:72,experience:72},
+    style:'中場控制為主，依賴Çalhanoğlu組織，Güler創造力突出',
+    strengths:['Çalhanoğlu是世界頂級中場之一','Güler年輕天才','2024歐洲盃四強實力'],
+    weaknesses:['前鋒效率有待提升','整體穩定性波動','面對頂強時容易失守'],
+    history:'2002年世界盃季軍，2024年歐洲盃四強，中歐霸主級球隊',
+    recentForm:['W','W','D','W','W'], predTitle:'歐洲盃四強霸主', predOdds:'35-1', predDesc:'Çalhanoğlu與Güler是最令人期待的中場組合，土耳其有實力挺進八強' },
 
-  'EUPB': { name:'UEFA Playoff B Winner', nameCN:'歐洲附加賽B勝者', flag:'🏴', group:'F', conf:'UEFA', fifaRank:36,
-    coach:'待定', formation:'4-3-3', keyPlayers:[], radar:{attack:67,defense:67,midfield:65,speed:67,experience:69},
-    style:'待定', strengths:['附加賽磨練'], weaknesses:['確定性低'],
-    history:'歐洲附加賽晉級', recentForm:['W','D','W','D','W'], predTitle:'歐洲附加賽代表', predOdds:'170-1', predDesc:'力爭出線' },
+  'EUPB': { name:'Sweden', nameCN:'瑞典', flag:'🇸🇪', group:'F', conf:'UEFA', fifaRank:25,
+    coach:'Jon Dahl Tomasson', formation:'4-4-2',
+    keyPlayers:[
+      {name:'Victor Nilsson Lindelöf',pos:'後衛',club:'曼聯'},
+      {name:'Dejan Kulusevski',pos:'中場',club:'熱刺'},
+      {name:'Alexander Isak',pos:'前鋒',club:'紐卡素'}
+    ],
+    radar:{attack:72,defense:74,midfield:70,speed:73,experience:72},
+    style:'防守組織嚴密，依靠Isak前場突破與Kulusevski推進',
+    strengths:['Isak是英超頂級射手','Kulusevski創造力強','整體組織嚴謹'],
+    weaknesses:['Ibrahimović退役後中場組織稍弱','中場深度略顯不足'],
+    history:'2018年世界盃八強，北歐足球強國，本屆透過附加賽取得資格',
+    recentForm:['W','W','W','D','W'], predTitle:'北歐強隊', predOdds:'45-1', predDesc:'Isak+Kulusevski是瑞典最具威脅的組合，有能力從強組出線' },
 
-  'ICP1': { name:'Inter-conf Playoff 1 Winner', nameCN:'洲際附加賽1勝者', flag:'🌐', group:'K', conf:'CONCACAF', fifaRank:45,
-    coach:'待定', formation:'4-4-2', keyPlayers:[], radar:{attack:62,defense:62,midfield:60,speed:64,experience:55},
-    style:'待定', strengths:['附加賽磨練'], weaknesses:['確定性低'],
-    history:'洲際附加賽晉級', recentForm:['W','D','W','D','W'], predTitle:'洲際附加賽代表', predOdds:'300-1', predDesc:'力爭出線' },
+  'ICP1': { name:'DR Congo', nameCN:'剛果民主共和國', flag:'🇨🇩', group:'K', conf:'CAF', fifaRank:53,
+    coach:'Sébastien Desabre', formation:'4-3-3',
+    keyPlayers:[
+      {name:'Chancel Mbemba',pos:'後衛',club:'馬賽'},
+      {name:'Cédric Bakambu',pos:'前鋒',club:'待定'},
+      {name:'Arthur Masuaku',pos:'後衛',club:'貝西克塔斯'}
+    ],
+    radar:{attack:65,defense:66,midfield:62,speed:72,experience:60},
+    style:'快速反擊，依靠速度與身體對抗優勢',
+    strengths:['Mbemba是法甲頂級後衛','整體速度快','非洲附加賽磨練'],
+    weaknesses:['整體組織紀律有待加強','缺乏世界盃頂尖賽事經驗'],
+    history:'首次以剛果民主共和國名義參加世界盃，透過洲際附加賽晉級',
+    recentForm:['W','W','D','W','L'], predTitle:'非洲黑馬', predOdds:'300-1', predDesc:'剛果民主共和國的晉級是非洲足球多元化的展現，力爭創造歷史' },
 
-  'ICP2': { name:'Inter-conf Playoff 2 Winner', nameCN:'洲際附加賽2勝者', flag:'🌐', group:'I', conf:'CAF', fifaRank:48,
-    coach:'待定', formation:'4-4-2', keyPlayers:[], radar:{attack:61,defense:61,midfield:59,speed:63,experience:54},
-    style:'待定', strengths:['附加賽磨練'], weaknesses:['確定性低'],
-    history:'洲際附加賽晉級', recentForm:['W','D','W','D','W'], predTitle:'洲際附加賽代表', predOdds:'350-1', predDesc:'力爭出線' }
+  'ICP2': { name:'Iraq', nameCN:'伊拉克', flag:'🇮🇶', group:'I', conf:'AFC', fifaRank:58,
+    coach:'Jesús Casas', formation:'4-4-2',
+    keyPlayers:[
+      {name:'Aymen Hussein',pos:'前鋒',club:'Al-Zawraa'},
+      {name:'Ibrahim Bayesh',pos:'後衛',club:'Al-Shorta'},
+      {name:'Amjed Attwan',pos:'中場',club:'待定'}
+    ],
+    radar:{attack:62,defense:63,midfield:60,speed:66,experience:56},
+    style:'防守穩健，快速反擊，依靠整體配合',
+    strengths:['中東賽場實戰豐富','整體紀律佳','洲際附加賽磨練'],
+    weaknesses:['技術水準與頂強差距大','缺乏大型賽事曝光'],
+    history:'首次以伊拉克身份透過洲際附加賽晉級世界盃，中東足球新崛起',
+    recentForm:['W','D','W','W','D'], predTitle:'中東新星', predOdds:'400-1', predDesc:'伊拉克是本屆最大黑馬之一，透過洲際附加賽征服世界舞台' }
 });
 
 // 修正各球隊所屬組別（依FIFA官方抽籤結果）
@@ -165,93 +219,94 @@ Object.entries(groupFix).forEach(([g, teams]) => {
 // 原始時間 MEX CDT (UTC-5) 轉台灣: +13小時
 const realMD1 = {
   // [主場隊, 客場隊, 台灣日期, 台灣時間, 場地, 城市, 國家]
+  // 原始時間 ET (UTC-4) 轉台灣 UTC+8: +12小時
   A:[ ['MEX','RSA','2026-06-12','03:00','Estadio Azteca','墨西哥城','MEX'],
-      ['KOR','EUPD','2026-06-12','10:00','Estadio Guadalajara','瓜達拉哈拉','MEX'] ],
+      ['KOR','EUPD','2026-06-12','10:00','Estadio Akron','瓜達拉哈拉','MEX'] ],
   B:[ ['CAN','EUPA','2026-06-13','03:00','BMO Field','多倫多','CAN'],
-      ['SUI','QAT','2026-06-14','03:00','Levi\'s Stadium','聖荷西','USA'] ],
+      ['QAT','SUI','2026-06-14','03:00','Levi\'s Stadium','聖荷西','USA'] ],
   C:[ ['BRA','MAR','2026-06-14','06:00','MetLife Stadium','紐澤西','USA'],
-      ['SCO','HAI','2026-06-15','01:00','Lincoln Financial','費城','USA'] ],
+      ['HAI','SCO','2026-06-14','09:00','Gillette Stadium','波士頓','USA'] ],
   D:[ ['USA','PAR','2026-06-13','09:00','SoFi Stadium','洛杉磯','USA'],
-      ['AUS','EUPC','2026-06-14','01:00','Hard Rock Stadium','邁阿密','USA'] ],
+      ['AUS','EUPC','2026-06-14','12:00','BC Place','溫哥華','CAN'] ],
   E:[ ['GER','CUW','2026-06-15','01:00','NRG Stadium','休士頓','USA'],
-      ['ECU','CIV','2026-06-15','04:00','AT&T Stadium','達拉斯','USA'] ],
-  F:[ ['NED','JPN','2026-06-15','07:00','Lumen Field','西雅圖','USA'],
-      ['TUN','EUPB','2026-06-16','01:00','Mercedes-Benz Stadium','亞特蘭大','USA'] ],
-  G:[ ['BEL','EGY','2026-06-16','04:00','SoFi Stadium','洛杉磯','USA'],
-      ['IRN','NZL','2026-06-16','07:00','Rose Bowl','帕薩迪納','USA'] ],
-  H:[ ['ESP','CPV','2026-06-17','00:00','Hard Rock Stadium','邁阿密','USA'],
-      ['URU','KSA','2026-06-17','03:00','Arrowhead Stadium','堪薩斯城','USA'] ],
+      ['CIV','ECU','2026-06-15','07:00','Lincoln Financial','費城','USA'] ],
+  F:[ ['NED','JPN','2026-06-15','04:00','AT&T Stadium','達拉斯','USA'],
+      ['EUPB','TUN','2026-06-15','10:00','Estadio BBVA','蒙特雷','MEX'] ],
+  G:[ ['BEL','EGY','2026-06-16','03:00','Lumen Field','西雅圖','USA'],
+      ['IRN','NZL','2026-06-16','09:00','SoFi Stadium','洛杉磯','USA'] ],
+  H:[ ['ESP','CPV','2026-06-16','00:00','Mercedes-Benz Stadium','亞特蘭大','USA'],
+      ['KSA','URU','2026-06-16','06:00','Hard Rock Stadium','邁阿密','USA'] ],
   I:[ ['FRA','SEN','2026-06-17','03:00','MetLife Stadium','紐澤西','USA'],
-      ['NOR','ICP2','2026-06-17','06:00','Gillette Stadium','波士頓','USA'] ],
+      ['ICP2','NOR','2026-06-17','06:00','Gillette Stadium','波士頓','USA'] ],
   J:[ ['ARG','ALG','2026-06-17','09:00','Arrowhead Stadium','堪薩斯城','USA'],
-      ['AUT','JOR','2026-06-18','00:00','Levi\'s Stadium','聖荷西','USA'] ],
+      ['AUT','JOR','2026-06-17','12:00','Levi\'s Stadium','聖荷西','USA'] ],
   K:[ ['POR','ICP1','2026-06-18','01:00','NRG Stadium','休士頓','USA'],
-      ['COL','UZB','2026-06-18','10:00','Estadio Azteca','墨西哥城','MEX'] ],
+      ['UZB','COL','2026-06-18','10:00','Estadio Azteca','墨西哥城','MEX'] ],
   L:[ ['ENG','CRO','2026-06-18','04:00','AT&T Stadium','達拉斯','USA'],
       ['GHA','PAN','2026-06-18','07:00','BMO Field','多倫多','CAN'] ]
 };
 
-// MD2 (約June 19-24)
+// MD2 (June 18-23，依FIFA官方時間)
 const realMD2 = {
-  A:[ ['MEX','KOR','2026-06-22','09:00','Estadio Azteca','墨西哥城','MEX'],
-      ['RSA','EUPD','2026-06-22','03:00','Estadio Monterrey','蒙特雷','MEX'] ],
-  B:[ ['CAN','SUI','2026-06-21','03:00','BC Place','溫哥華','CAN'],
-      ['QAT','EUPA','2026-06-21','06:00','Lumen Field','西雅圖','USA'] ],
-  C:[ ['BRA','SCO','2026-06-22','06:00','Hard Rock Stadium','邁阿密','USA'],
-      ['MAR','HAI','2026-06-22','06:00','Mercedes-Benz Stadium','亞特蘭大','USA'] ],
-  D:[ ['USA','AUS','2026-06-22','07:00','SoFi Stadium','洛杉磯','USA'],
-      ['PAR','EUPC','2026-06-21','04:00','Lincoln Financial','費城','USA'] ],
-  E:[ ['GER','ECU','2026-06-23','03:00','MetLife Stadium','紐澤西','USA'],
-      ['CIV','CUW','2026-06-23','07:00','NRG Stadium','休士頓','USA'] ],
-  F:[ ['NED','EUPB','2026-06-23','10:00','Rose Bowl','帕薩迪納','USA'],
-      ['JPN','TUN','2026-06-24','01:00','AT&T Stadium','達拉斯','USA'] ],
-  G:[ ['BEL','IRN','2026-06-24','04:00','Gillette Stadium','波士頓','USA'],
-      ['EGY','NZL','2026-06-24','07:00','Lincoln Financial','費城','USA'] ],
-  H:[ ['ESP','URU','2026-06-25','03:00','Arrowhead Stadium','堪薩斯城','USA'],
-      ['KSA','CPV','2026-06-25','07:00','Levi\'s Stadium','聖荷西','USA'] ],
-  I:[ ['FRA','NOR','2026-06-25','06:00','MetLife Stadium','紐澤西','USA'],
-      ['SEN','ICP2','2026-06-25','10:00','Mercedes-Benz Stadium','亞特蘭大','USA'] ],
-  J:[ ['ARG','AUT','2026-06-26','03:00','Lumen Field','西雅圖','USA'],
-      ['ALG','JOR','2026-06-26','07:00','Hard Rock Stadium','邁阿密','USA'] ],
-  K:[ ['POR','COL','2026-06-26','06:00','SoFi Stadium','洛杉磯','USA'],
-      ['UZB','ICP1','2026-06-26','10:00','Estadio Guadalajara','瓜達拉哈拉','MEX'] ],
-  L:[ ['ENG','GHA','2026-06-27','03:00','AT&T Stadium','達拉斯','USA'],
-      ['CRO','PAN','2026-06-27','07:00','NRG Stadium','休士頓','USA'] ]
+  A:[ ['EUPD','RSA','2026-06-19','00:00','Mercedes-Benz Stadium','亞特蘭大','USA'],
+      ['MEX','KOR','2026-06-19','09:00','Estadio Akron','瓜達拉哈拉','MEX'] ],
+  B:[ ['SUI','EUPA','2026-06-19','03:00','SoFi Stadium','洛杉磯','USA'],
+      ['CAN','QAT','2026-06-19','06:00','BC Place','溫哥華','CAN'] ],
+  C:[ ['SCO','MAR','2026-06-20','06:00','Gillette Stadium','波士頓','USA'],
+      ['BRA','HAI','2026-06-20','09:00','Lincoln Financial','費城','USA'] ],
+  D:[ ['EUPC','PAR','2026-06-20','12:00','Levi\'s Stadium','聖荷西','USA'],
+      ['USA','AUS','2026-06-20','03:00','Lumen Field','西雅圖','USA'] ],
+  E:[ ['GER','CIV','2026-06-21','04:00','BMO Field','多倫多','CAN'],
+      ['ECU','CUW','2026-06-21','08:00','Arrowhead Stadium','堪薩斯城','USA'] ],
+  F:[ ['NED','EUPB','2026-06-21','01:00','NRG Stadium','休士頓','USA'],
+      ['TUN','JPN','2026-06-21','12:00','Estadio BBVA','蒙特雷','MEX'] ],
+  G:[ ['BEL','IRN','2026-06-22','03:00','SoFi Stadium','洛杉磯','USA'],
+      ['NZL','EGY','2026-06-22','09:00','BC Place','溫哥華','CAN'] ],
+  H:[ ['ESP','KSA','2026-06-22','00:00','Mercedes-Benz Stadium','亞特蘭大','USA'],
+      ['URU','CPV','2026-06-22','06:00','Hard Rock Stadium','邁阿密','USA'] ],
+  I:[ ['FRA','ICP2','2026-06-23','05:00','Lincoln Financial','費城','USA'],
+      ['NOR','SEN','2026-06-23','08:00','MetLife Stadium','紐澤西','USA'] ],
+  J:[ ['ARG','AUT','2026-06-23','01:00','AT&T Stadium','達拉斯','USA'],
+      ['JOR','ALG','2026-06-23','11:00','Levi\'s Stadium','聖荷西','USA'] ],
+  K:[ ['POR','UZB','2026-06-24','01:00','NRG Stadium','休士頓','USA'],
+      ['COL','ICP1','2026-06-24','10:00','Estadio Akron','瓜達拉哈拉','MEX'] ],
+  L:[ ['ENG','GHA','2026-06-24','04:00','Gillette Stadium','波士頓','USA'],
+      ['PAN','CRO','2026-06-24','07:00','BMO Field','多倫多','CAN'] ]
 };
 
-// MD3 (June 27-30，同組兩場同時開踢)
+// MD3 (June 24-27，同組兩場同時開踢，依FIFA官方時間)
 const realMD3 = {
-  A:[ ['MEX','EUPD','2026-06-30','03:00','Estadio Azteca','墨西哥城','MEX'],
-      ['KOR','RSA','2026-06-30','03:00','Estadio Monterrey','蒙特雷','MEX'] ],
-  B:[ ['CAN','QAT','2026-06-28','07:00','BMO Field','多倫多','CAN'],
-      ['SUI','EUPA','2026-06-28','07:00','BC Place','溫哥華','CAN'] ],
-  C:[ ['BRA','HAI','2026-06-29','07:00','Gillette Stadium','波士頓','USA'],
-      ['MAR','SCO','2026-06-29','07:00','Lincoln Financial','費城','USA'] ],
-  D:[ ['USA','EUPC','2026-06-29','03:00','SoFi Stadium','洛杉磯','USA'],
-      ['PAR','AUS','2026-06-29','03:00','Rose Bowl','帕薩迪納','USA'] ],
-  E:[ ['GER','CIV','2026-06-28','03:00','AT&T Stadium','達拉斯','USA'],
-      ['ECU','CUW','2026-06-28','03:00','NRG Stadium','休士頓','USA'] ],
-  F:[ ['NED','TUN','2026-06-28','10:00','Hard Rock Stadium','邁阿密','USA'],
-      ['JPN','EUPB','2026-06-28','10:00','Mercedes-Benz Stadium','亞特蘭大','USA'] ],
-  G:[ ['BEL','NZL','2026-06-30','07:00','Levi\'s Stadium','聖荷西','USA'],
-      ['IRN','EGY','2026-06-30','07:00','Arrowhead Stadium','堪薩斯城','USA'] ],
-  H:[ ['ESP','KSA','2026-06-30','10:00','MetLife Stadium','紐澤西','USA'],
-      ['URU','CPV','2026-06-30','10:00','Lumen Field','西雅圖','USA'] ],
-  I:[ ['FRA','ICP2','2026-07-01','07:00','Arrowhead Stadium','堪薩斯城','USA'],
-      ['SEN','NOR','2026-07-01','07:00','Rose Bowl','帕薩迪納','USA'] ],
-  J:[ ['ARG','JOR','2026-07-01','03:00','AT&T Stadium','達拉斯','USA'],
-      ['AUT','ALG','2026-07-01','03:00','Hard Rock Stadium','邁阿密','USA'] ],
-  K:[ ['POR','UZB','2026-07-01','10:00','SoFi Stadium','洛杉磯','USA'],
-      ['COL','ICP1','2026-07-01','10:00','NRG Stadium','休士頓','USA'] ],
-  L:[ ['ENG','PAN','2026-07-02','03:00','MetLife Stadium','紐澤西','USA'],
-      ['CRO','GHA','2026-07-02','03:00','Mercedes-Benz Stadium','亞特蘭大','USA'] ]
+  A:[ ['EUPD','MEX','2026-06-25','09:00','Estadio Azteca','墨西哥城','MEX'],
+      ['RSA','KOR','2026-06-25','09:00','Estadio BBVA','蒙特雷','MEX'] ],
+  B:[ ['SUI','CAN','2026-06-25','03:00','BC Place','溫哥華','CAN'],
+      ['EUPA','QAT','2026-06-25','03:00','Lumen Field','西雅圖','USA'] ],
+  C:[ ['SCO','BRA','2026-06-25','06:00','Hard Rock Stadium','邁阿密','USA'],
+      ['MAR','HAI','2026-06-25','06:00','Mercedes-Benz Stadium','亞特蘭大','USA'] ],
+  D:[ ['EUPC','USA','2026-06-26','10:00','SoFi Stadium','洛杉磯','USA'],
+      ['PAR','AUS','2026-06-26','10:00','Levi\'s Stadium','聖荷西','USA'] ],
+  E:[ ['CUW','CIV','2026-06-26','04:00','Lincoln Financial','費城','USA'],
+      ['ECU','GER','2026-06-26','04:00','MetLife Stadium','紐澤西','USA'] ],
+  F:[ ['JPN','EUPB','2026-06-26','07:00','AT&T Stadium','達拉斯','USA'],
+      ['TUN','NED','2026-06-26','07:00','Arrowhead Stadium','堪薩斯城','USA'] ],
+  G:[ ['EGY','IRN','2026-06-27','11:00','Lumen Field','西雅圖','USA'],
+      ['NZL','BEL','2026-06-27','11:00','BC Place','溫哥華','CAN'] ],
+  H:[ ['CPV','KSA','2026-06-27','08:00','NRG Stadium','休士頓','USA'],
+      ['URU','ESP','2026-06-27','08:00','Estadio Akron','瓜達拉哈拉','MEX'] ],
+  I:[ ['NOR','FRA','2026-06-27','03:00','Gillette Stadium','波士頓','USA'],
+      ['SEN','ICP2','2026-06-27','03:00','BMO Field','多倫多','CAN'] ],
+  J:[ ['ALG','AUT','2026-06-28','10:00','Arrowhead Stadium','堪薩斯城','USA'],
+      ['JOR','ARG','2026-06-28','10:00','AT&T Stadium','達拉斯','USA'] ],
+  K:[ ['COL','POR','2026-06-28','07:30','Hard Rock Stadium','邁阿密','USA'],
+      ['ICP1','UZB','2026-06-28','07:30','Mercedes-Benz Stadium','亞特蘭大','USA'] ],
+  L:[ ['PAN','ENG','2026-06-28','05:00','MetLife Stadium','紐澤西','USA'],
+      ['CRO','GHA','2026-06-28','05:00','Lincoln Financial','費城','USA'] ]
 };
 
 // 重新建立 SCHEDULE（覆蓋 data-matches.js 的結果）
 function buildRealSchedule() {
   const list = [];
   let idx = 1;
-  ['md1','md2','md3'].forEach((md, mdIdx) => {
+  ['md1','md2','md3'].forEach((_md, mdIdx) => {
     const srcMap = [realMD1, realMD2, realMD3][mdIdx];
     Object.entries(srcMap).forEach(([g, fixtures]) => {
       fixtures.forEach(([h,a,date,time,venue,city,country]) => {
@@ -293,5 +348,6 @@ window.addEventListener('load', () => {
   renderArena();
   renderHomeDailyChallenge();  // 首頁嵌入今日一題
   updateArenaBadge();          // 導覽列紅點
+  updateNavXP();               // 導覽列 XP 等級
   showArenaWelcomeIfNeeded();  // 首次進站提示
 });

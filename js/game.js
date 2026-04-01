@@ -12,38 +12,68 @@ const GK = {
 const load = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
 const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
-// ── 每日題庫 ──────────────────────────────────────────────
+// ── 每日題庫（客觀事實題，每題均有正確答案）────────────────
 const DAILY_QUESTIONS = [
-  { q:'你認為本屆世界盃冠軍最有可能來自哪個洲？',      opts:['歐洲','南美洲','非洲（大冷門）','亞洲（超級大冷門）'] },
-  { q:'誰會是本屆世界盃射手王？',                      opts:['Kylian Mbappé（法國）','Vinicius Jr.（巴西）','Harry Kane（英格蘭）','出乎意料的黑馬'] },
-  { q:'哪支球隊會是本屆最讓人失望的強隊？',            opts:['阿根廷','德國','葡萄牙','荷蘭'] },
-  { q:'本屆最多進球的比賽，你猜幾球？',                opts:['6球','7球','8球','9球以上'] },
-  { q:'哪個洲的代表會走得最遠（四強以上）？',          opts:['非洲（摩洛哥/塞內加爾）','亞洲（日本/韓國）','北中美（美國/墨西哥）','大洋洲'] },
-  { q:'本屆最受矚目的新星是誰？',                      opts:['Lamine Yamal（西班牙）','Endrick（巴西）','Kobbie Mainoo（英格蘭）','其他新面孔'] },
-  { q:'最終決賽會是什麼格局？',                        opts:['歐洲 vs 歐洲','歐洲 vs 南美','南美 vs 南美','其他大陸挑戰歐/南美'] },
-  { q:'本屆冠軍賽比分你猜？',                          opts:['1-0 正規時間','2-1 激戰','加時賽才分勝負','PK 大戰決定'] },
-  { q:'哪支非洲球隊最有機會打進四強？',                opts:['摩洛哥','塞內加爾','奈及利亞','埃及'] },
-  { q:'日本能走到哪個階段？',                          opts:['小組賽出局','32強','16強','八強以上'] },
-  { q:'美國在主場優勢下能走多遠？',                    opts:['小組賽出局','32強','16強','八強以上，刷新歷史'] },
-  { q:'韓國能走多遠？',                                opts:['小組賽出局','32強','16強','八強以上'] },
-  { q:'你最期待哪一場小組賽？',                        opts:['法國 vs 強敵對決','巴西 vs 南美鄰居','英格蘭 vs 歐陸勁旅','美國 vs 墨西哥'] },
-  { q:'本屆最精彩的 PK 大戰，你猜在哪個階段？',        opts:['16強','八強','四強','決賽'] },
-  { q:'哪位門將會成為本屆最大亮點？',                  opts:['Alisson（巴西）','Neuer（德國）','Maignan（法國）','黑馬門將'] },
-  { q:'Cristiano Ronaldo 的本屆世界盃？',              opts:['小組賽告別','帶葡萄牙進四強','奪金靴獎','舉起世界盃'] },
-  { q:'本屆最大冷門會出現在哪個階段？',                opts:['小組賽爆冷','32強翻盤','16強驚天逆轉','八強以後震驚世界'] },
-  { q:'誰會是本屆最佳年輕球員獎？',                    opts:['Lamine Yamal','Warren Zaïre-Emery','Pedri','來自非歐美的黑馬'] },
-  { q:'本屆進球最多的射手最終進幾球？',                opts:['6-7 球','8-9 球','10-11 球','12 球以上'] },
-  { q:'哪支球隊讓你在小組賽出局最驚訝？',              opts:['葡萄牙','比利時','荷蘭','烏拉圭'] },
-  { q:'三個地主國中表現最好的是？',                    opts:['美國（東道主優勢）','墨西哥（拉丁激情）','加拿大（黑馬之旅）','三國都讓人失望'] },
-  { q:'本屆哪個教練的戰術最讓你印象深刻？',            opts:['Deschamps（法國）','Carlo Ancelotti（巴西）','Luis de la Fuente（西班牙）','黑馬教頭'] },
-  { q:'你預計會看幾場直播？',                          opts:['1-10 場','11-30 場','31-60 場','全部 104 場我都看'] },
-  { q:'本屆哪個時區比賽你最可能熬夜看？',              opts:['台灣凌晨 1-2 點','凌晨 3-4 點','清晨 5-6 點','全部熬夜'] },
-  { q:'你覺得本屆最美麗的進球方式是？',                opts:['遠射死角','頭槌破門','個人盤帶過人後射門','任意球直接得分'] },
-  { q:'Mbappé 在本屆的最終貢獻？',                     opts:['射手王','助攻王','最佳球員','帶法國奪冠'] },
-  { q:'本屆哪場比賽你最想親臨現場？',                  opts:['開幕戰','同組強強對決','決賽','任何一場都好'] },
-  { q:'Vinicius Jr. 本屆最終成就？',                   opts:['小組賽發揮失常','16強出局','帶巴西進四強','問鼎世界盃'] },
-  { q:'本屆哪個城市的比賽氛圍最棒？',                  opts:['紐約（東部能量）','洛杉磯（好萊塢舞台）','墨西哥城（沸騰拉丁）','溫哥華（清新北美）'] },
-  { q:'本屆 VAR 爭議最大的時刻，你猜在哪？',           opts:['取消重要進球','關鍵紅牌','傷停補時爭議','決定性點球判決'] },
+  { q:'2026年世界盃共有幾支球隊參賽？',
+    opts:['32支','36支','48支','40支'], correct:2 },
+  { q:'2026年世界盃由哪幾個國家聯合主辦？',
+    opts:['僅美國','美國、加拿大與墨西哥','美國與加拿大','美國與墨西哥'], correct:1 },
+  { q:'2026年世界盃決賽將在哪座球場舉行？',
+    opts:['SoFi Stadium','AT&T Stadium','Hard Rock Stadium','MetLife Stadium'], correct:3 },
+  { q:'哪個國家贏得世界盃冠軍次數最多（5次）？',
+    opts:['德國','義大利','巴西','阿根廷'], correct:2 },
+  { q:'2022年卡達世界盃冠軍是哪支球隊？',
+    opts:['法國','阿根廷','克羅埃西亞','摩洛哥'], correct:1 },
+  { q:'2018年俄羅斯世界盃冠軍是哪支球隊？',
+    opts:['法國','克羅埃西亞','比利時','英格蘭'], correct:0 },
+  { q:'2014年巴西世界盃冠軍是哪支球隊？',
+    opts:['巴西','阿根廷','德國','荷蘭'], correct:2 },
+  { q:'2010年南非世界盃冠軍是哪支球隊？',
+    opts:['荷蘭','德國','西班牙','阿根廷'], correct:2 },
+  { q:'2026年世界盃共有幾場比賽？',
+    opts:['64場','80場','96場','104場'], correct:3 },
+  { q:'世界盃首屆於哪一年舉辦？',
+    opts:['1920年','1924年','1930年','1934年'], correct:2 },
+  { q:'首屆世界盃在哪個國家舉辦？',
+    opts:['巴西','法國','義大利','烏拉圭'], correct:3 },
+  { q:'首屆世界盃冠軍是哪支球隊？',
+    opts:['烏拉圭','阿根廷','巴西','美國'], correct:0 },
+  { q:'Miroslav Klose 的世界盃生涯總進球紀錄是幾球？',
+    opts:['12球','14球','16球','18球'], correct:2 },
+  { q:'哪支球隊在2014年世界盃準決賽以7:1大勝巴西？',
+    opts:['阿根廷','德國','荷蘭','法國'], correct:1 },
+  { q:'德國共贏得幾次世界盃冠軍？',
+    opts:['3次','4次','5次','2次'], correct:1 },
+  { q:'義大利共贏得幾次世界盃冠軍？',
+    opts:['3次','4次','5次','2次'], correct:1 },
+  { q:'阿根廷共贏得幾次世界盃冠軍（含2022年）？',
+    opts:['1次','2次','3次','4次'], correct:2 },
+  { q:'法國共贏得幾次世界盃冠軍？',
+    opts:['1次','2次','3次','4次'], correct:1 },
+  { q:'梅西在哪一年首次贏得世界盃冠軍？',
+    opts:['2014年','2018年','2022年','2026年'], correct:2 },
+  { q:'世界盃是每幾年舉辦一次？',
+    opts:['2年','3年','4年','5年'], correct:2 },
+  { q:'2026年世界盃小組賽共分幾組？',
+    opts:['8組','10組','12組','16組'], correct:2 },
+  { q:'葡萄牙在2006年世界盃的最終名次是？',
+    opts:['第三名','亞軍','四強第四名','八強'], correct:0 },
+  { q:'1994年世界盃決賽（巴西 vs 義大利）最終如何分勝負？',
+    opts:['巴西加時進球','點球大戰（巴西勝）','正規時間巴西進球','義大利加時進球'], correct:1 },
+  { q:'哪支球隊三度打入世界盃決賽但從未奪冠（截至2022年）？',
+    opts:['捷克','匈牙利','荷蘭','克羅埃西亞'], correct:2 },
+  { q:'2006年世界盃在哪個國家舉辦？',
+    opts:['法國','德國','義大利','西班牙'], correct:1 },
+  { q:'法國隊在哪一年首次奪得世界盃冠軍？',
+    opts:['1994年','1998年','2002年','2006年'], correct:1 },
+  { q:'2022年世界盃在哪個國家舉辦？',
+    opts:['沙烏地阿拉伯','阿聯酋','卡達','巴林'], correct:2 },
+  { q:'2026年世界盃32強賽共有幾場比賽？',
+    opts:['8場','12場','16場','24場'], correct:2 },
+  { q:'Pelé 在哪一年首次贏得世界盃冠軍（當時幾歲）？',
+    opts:['1954年（13歲）','1958年（17歲）','1962年（21歲）','1966年（25歲）'], correct:1 },
+  { q:'2022年世界盃決賽中，誰為法國完成帽子戲法但最終落敗？',
+    opts:['格列茲曼','奧利維耶・吉魯','姆巴佩','本澤馬'], correct:2 },
 ];
 
 // ── 模擬全站投票數（依 FIFA 排名計算合理分佈）──────────────
@@ -85,13 +115,40 @@ function recordDailyAnswer(optIdx) {
   const state = getDailyState();
   if (state.history[today] !== undefined) return state; // 今天已答
 
+  const { correct } = getTodayQuestion();
+  const isCorrect = optIdx === correct;
+
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
   const newStreak = state.lastDate === yesterday ? state.streak + 1 : 1;
   state.streak   = newStreak;
   state.lastDate = today;
-  state.history[today] = optIdx;
+  state.history[today] = { chosen: optIdx, isCorrect };
   save(GK.daily, state);
   return state;
+}
+
+// ── 導覽列 XP 等級元件 ────────────────────────────────────
+function updateNavXP() {
+  const dailyState  = getDailyState();
+  const myChampion  = load(GK.champion);
+  const myGroups    = load(GK.groups);
+  const myTeam      = load(GK.team);
+  const groupsDone  = myGroups && Object.keys(myGroups).length === 12;
+  const answeredCount = Object.keys(dailyState.history).length;
+
+  const xp      = answeredCount * 10 + (myChampion ? 50 : 0) + (groupsDone ? 50 : 0) + (myTeam ? 30 : 0);
+  const xpPerLv = 100;
+  const level   = Math.floor(xp / xpPerLv) + 1;
+  const xpInLv  = xp % xpPerLv;
+
+  const lvEl   = document.getElementById('nav-xp-level');
+  const fillEl = document.getElementById('nav-xp-mini-fill');
+  const ptsEl  = document.getElementById('nav-xp-pts');
+  if (!lvEl) return;
+
+  lvEl.textContent   = `⚡ Lv.${level}`;
+  fillEl.style.width = `${xpInLv}%`;
+  ptsEl.textContent  = `${xp} XP`;
 }
 
 // ── 導覽列紅點徽章 ────────────────────────────────────────
@@ -130,8 +187,17 @@ function renderHomeDailyChallenge() {
   const champDone  = !!load(GK.champion);
   const groupsDone = Object.keys(load(GK.groups)||{}).length === 12;
   const teamDone   = !!load(GK.team);
-  const { q, opts } = getTodayQuestion();
-  const chosen     = state.history[today];
+  const { q, opts, correct } = getTodayQuestion();
+  const record     = state.history[today]; // {chosen, isCorrect} or undefined
+  const chosen     = dailyDone ? record.chosen : -1;
+  const wasCorrect = dailyDone ? record.isCorrect : false;
+
+  function homeBtnClass(i) {
+    if (!dailyDone) return '';
+    if (i === correct) return 'selected';
+    if (i === chosen && !wasCorrect) return 'wrong';
+    return 'dimmed';
+  }
 
   const pendingItems = [];
   if (!champDone)  pendingItems.push({ icon:'🏆', label:'冠軍預測', action:"openChampionPick()" });
@@ -153,13 +219,13 @@ function renderHomeDailyChallenge() {
       <div class="home-daily-q">${q}</div>
       <div class="home-daily-opts">
         ${opts.map((o, i) => `
-          <button class="home-daily-opt ${dailyDone && chosen===i ? 'selected' : ''} ${dailyDone && chosen!==i ? 'dimmed' : ''}"
+          <button class="home-daily-opt ${homeBtnClass(i)}"
             onclick="${dailyDone ? '' : `submitDailyPickHome(${i})`}"
             ${dailyDone ? 'disabled' : ''}>
             <span class="home-daily-letter">${'ABCD'[i]}</span>${o}
           </button>`).join('')}
       </div>
-      ${dailyDone ? `<div class="home-daily-done">✅ 今日已完成！明天繼續保持 🔥</div>` : ''}
+      ${dailyDone ? `<div class="home-daily-done" style="color:${wasCorrect ? '#4caf50' : '#f44336'}">${wasCorrect ? '✅ 答對了！+10 XP 🎉' : `❌ 答錯了！正確答案是 ${opts[correct]}`}</div>` : ''}
     </div>
 
     ${pendingItems.length > 0 ? `
@@ -177,6 +243,8 @@ function renderHomeDailyChallenge() {
 
 function submitDailyPickHome(idx) {
   recordDailyAnswer(idx);
+  updateNavXP();
+  checkAchievements();
   renderHomeDailyChallenge();
   updateArenaBadge();
   // 同步更新競技場頁面（若已渲染）
@@ -360,15 +428,26 @@ function renderArena() {
         </div>
       </div>
 
-    </div>`;
+    </div>
+
+    ${renderBadges()}`;
 }
 
 // ── ① 每日一題 Modal ──────────────────────────────────────
 function openDailyPick() {
-  const { q, opts, date } = getTodayQuestion();
+  const { q, opts, correct, date } = getTodayQuestion();
   const state = getDailyState();
   const answered = state.history[date] !== undefined;
-  const chosen   = state.history[date];
+  const record   = state.history[date]; // {chosen, isCorrect} or undefined
+  const chosen   = answered ? record.chosen : -1;
+  const wasCorrect = answered ? record.isCorrect : false;
+
+  function btnClass(i) {
+    if (!answered) return '';
+    if (i === correct) return 'correct';
+    if (i === chosen && !wasCorrect) return 'wrong';
+    return 'dimmed';
+  }
 
   const mc = document.getElementById('modal-content');
   mc.innerHTML = `
@@ -380,7 +459,7 @@ function openDailyPick() {
     <div style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:20px;line-height:1.5">${q}</div>
     <div class="daily-opts">
       ${opts.map((o,i) => `
-        <button class="daily-opt ${answered && chosen===i ? 'selected' : ''} ${answered && chosen!==i ? 'dimmed' : ''}"
+        <button class="daily-opt ${btnClass(i)}"
           onclick="${answered ? '' : `submitDailyPick(${i})`}"
           style="${answered ? 'cursor:default' : ''}">
           <span class="daily-opt-letter">${'ABCD'[i]}</span>
@@ -388,17 +467,19 @@ function openDailyPick() {
         </button>`).join('')}
     </div>
     ${answered ? `
-      <div style="margin-top:16px;padding:12px;background:rgba(76,175,80,0.1);border-radius:10px;text-align:center;color:#4caf50;font-size:13px">
-        ✅ 今日已作答！明天繼續保持連勝 🔥
+      <div style="margin-top:16px;padding:12px;background:${wasCorrect ? 'rgba(76,175,80,0.1)' : 'rgba(244,67,54,0.1)'};border-radius:10px;text-align:center;color:${wasCorrect ? '#4caf50' : '#f44336'};font-size:13px">
+        ${wasCorrect ? '✅ 答對了！+10 XP 明天繼續保持連勝 🔥' : `❌ 答錯了！正確答案是 <strong>${opts[correct]}</strong>`}
       </div>` : ''}`;
 
   document.getElementById('team-modal').classList.add('open');
 }
 
 function submitDailyPick(idx) {
-  const state = recordDailyAnswer(idx);
+  recordDailyAnswer(idx);
+  updateNavXP();
+  checkAchievements();
   renderArena();
-  openDailyPick(); // 重新渲染 modal 顯示已選
+  openDailyPick();
 }
 
 // ── ② 冠軍預測 Modal ──────────────────────────────────────
@@ -468,6 +549,9 @@ function saveChampionPick() {
   if (!c1 || !c2 || !c3) { alert('請選擇冠、亞、季軍各一支球隊'); return; }
   if (c1===c2 || c1===c3 || c2===c3) { alert('冠亞季軍不能選同一支球隊'); return; }
   save(GK.champion, { c1, c2, c3, lockedAt: new Date().toISOString() });
+  syncToSupabase?.();
+  updateNavXP();
+  checkAchievements();
   renderArena();
   closeModal();
 }
@@ -543,6 +627,9 @@ function saveGroupPicks() {
     return;
   }
   save(GK.groups, groups);
+  syncToSupabase?.();
+  updateNavXP();
+  checkAchievements();
   renderArena();
   closeModal();
 }
@@ -588,6 +675,104 @@ function saveSupportTeam() {
   const code = _pendingSupportTeam || load(GK.team);
   if (!code) { alert('請選擇一支球隊'); return; }
   save(GK.team, code);
+  syncToSupabase?.();
+  updateNavXP();
+  checkAchievements();
   renderArena();
   closeModal();
+}
+
+// ── 成就徽章系統 ──────────────────────────────────────────
+const BADGES = [
+  { id:'first_daily',   icon:'🎯', name:'初次出擊',   desc:'完成第一次每日一題' },
+  { id:'streak3',       icon:'🔥', name:'三連勝',     desc:'連續答題 3 天' },
+  { id:'streak7',       icon:'💥', name:'週不停歇',   desc:'連續答題 7 天' },
+  { id:'streak30',      icon:'⚡', name:'鐵人預言家', desc:'連續答題 30 天' },
+  { id:'champion_set',  icon:'🏆', name:'押注冠軍',   desc:'完成冠軍預測' },
+  { id:'groups_done',   icon:'📋', name:'全組預測師', desc:'填完所有 12 組分組預測' },
+  { id:'team_set',      icon:'❤️', name:'死忠球迷',   desc:'宣示支持球隊' },
+  { id:'all_tasks',     icon:'🌟', name:'全能預言家', desc:'完成所有競技場任務' },
+  { id:'answered10',    icon:'🧠', name:'積累智慧',   desc:'累計答題 10 次' },
+  { id:'answered30',    icon:'🎓', name:'資深預言家', desc:'累計答題 30 次' },
+];
+
+function loadBadges() {
+  return load('wc26_badges') || [];
+}
+
+function checkAchievements() {
+  const earned    = loadBadges();
+  const earnedIds = new Set(earned.map(b => b.id));
+  const newOnes   = [];
+
+  const dailyState    = getDailyState();
+  const myChampion    = load(GK.champion);
+  const myGroups      = load(GK.groups);
+  const myTeam        = load(GK.team);
+  const answeredCount = Object.keys(dailyState.history).length;
+  const groupsDone    = myGroups && Object.keys(myGroups).length === 12;
+  const allDone       = myChampion && groupsDone && myTeam && answeredCount > 0;
+
+  const conditions = {
+    first_daily:  answeredCount >= 1,
+    streak3:      dailyState.streak >= 3,
+    streak7:      dailyState.streak >= 7,
+    streak30:     dailyState.streak >= 30,
+    champion_set: !!myChampion,
+    groups_done:  !!groupsDone,
+    team_set:     !!myTeam,
+    all_tasks:    !!allDone,
+    answered10:   answeredCount >= 10,
+    answered30:   answeredCount >= 30,
+  };
+
+  BADGES.forEach(b => {
+    if (!earnedIds.has(b.id) && conditions[b.id]) {
+      newOnes.push({ ...b, earnedAt: new Date().toISOString() });
+    }
+  });
+
+  if (newOnes.length > 0) {
+    save('wc26_badges', [...earned, ...newOnes]);
+    newOnes.forEach((b, i) => setTimeout(() => showBadgeToast(b), i * 1200));
+    // 同步更新競技場（若已開啟）
+    const arenaEl = document.getElementById('section-arena');
+    if (arenaEl && arenaEl.innerHTML.trim()) renderArena();
+  }
+}
+
+function showBadgeToast(badge) {
+  const toast = document.createElement('div');
+  toast.className = 'badge-toast';
+  toast.innerHTML = `
+    <div class="badge-toast-icon">${badge.icon}</div>
+    <div>
+      <div class="badge-toast-title">成就解鎖！</div>
+      <div class="badge-toast-name">${badge.name}</div>
+      <div class="badge-toast-desc">${badge.desc}</div>
+    </div>`;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 400);
+  }, 3500);
+}
+
+function renderBadges() {
+  const earned = loadBadges();
+  const earnedIds = new Set(earned.map(b => b.id));
+  return `
+    <div class="badges-section">
+      <div class="badges-title">🏅 成就徽章</div>
+      <div class="badges-grid">
+        ${BADGES.map(b => {
+          const e = earnedIds.has(b.id);
+          return `<div class="badge-card ${e ? 'earned' : 'locked'}" title="${b.desc}">
+            <div class="badge-card-icon">${e ? b.icon : '🔒'}</div>
+            <div class="badge-card-name">${b.name}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
 }
