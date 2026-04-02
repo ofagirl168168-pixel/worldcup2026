@@ -10,7 +10,23 @@
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({ appId: '03677034-20ab-4f1b-83e2-38b4dcc4f692' });
+      await OneSignal.init({
+        appId: '03677034-20ab-4f1b-83e2-38b4dcc4f692',
+        promptOptions: {
+          slidedown: {
+            prompts: [{
+              type: 'push',
+              autoPrompt: true,
+              text: {
+                actionMessage: '開啟通知，比賽前自動提醒你查看 AI 預測分析',
+                acceptButton: '開啟提醒',
+                cancelButton: '稍後',
+              },
+              delay: { pageViews: 2, timeDelay: 20 }
+            }]
+          }
+        }
+      });
     });
   </script>
 
