@@ -150,10 +150,11 @@
 /* 通知訂閱卡片 */
 .notify-card {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; margin-top: 20px;
+  gap: 16px; margin: 0 auto 20px;
   padding: 18px 20px; border-radius: 16px;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.08);
+  max-width: 960px; padding-left: 24px; padding-right: 24px;
 }
 .notify-card-done {
   justify-content: center; gap: 10px;
