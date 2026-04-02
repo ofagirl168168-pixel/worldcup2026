@@ -562,7 +562,10 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
   const p = calcPred(ht, at)
   const hXG = parseFloat(p.hXG)
   const aXG = parseFloat(p.aXG)
-  const lambda = hXG + aXG
+
+  // 用預測比分作為盤口計算基礎，確保大小球與比分一致
+  const [hGoalsPred, aGoalsPred] = p.score.split('-').map(Number)
+  const lambda = hGoalsPred + aGoalsPred
 
   // Poisson 輔助：P(X=k | λ)
   const pois = (k, lam) => { let r = Math.exp(-lam); for (let i = 1; i <= k; i++) r *= lam / i; return r; }
@@ -573,9 +576,9 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
   const pOver25 = Math.round((1 - poisCum(2, lambda)) * 100)
   const pOver35 = Math.round((1 - poisCum(3, lambda)) * 100)
 
-  // ── BTTS ─────────────────────────────────────────────────
-  const pHomeSc = Math.round((1 - Math.exp(-hXG)) * 100)
-  const pAwaySc = Math.round((1 - Math.exp(-aXG)) * 100)
+  // ── BTTS（用預測進球數判斷）──────────────────────────────
+  const pHomeSc = Math.round((1 - Math.exp(-Math.max(hGoalsPred, hXG))) * 100)
+  const pAwaySc = Math.round((1 - Math.exp(-Math.max(aGoalsPred, aXG))) * 100)
   const pBTTS   = Math.round((pHomeSc / 100) * (pAwaySc / 100) * 100)
 
   // ── 角球預測 ──────────────────────────────────────────────
@@ -631,7 +634,7 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
     <!-- 大小球 -->
     <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:10px">
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">⚽ 大小球（Poisson 模型）</div>
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">預期總進球 xG：${hXG} + ${aXG} = <strong style="color:var(--text-primary)">${lambda.toFixed(1)}</strong></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">預測比分 ${p.score}（總進球 <strong style="color:var(--text-primary)">${lambda}</strong>）· xG ${hXG}–${aXG}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
         ${[['大 1.5', pOver15], ['大 2.5', pOver25], ['大 3.5', pOver35]].map(([label, prob]) => `
           <div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:10px 8px">
