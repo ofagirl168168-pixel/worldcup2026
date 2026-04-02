@@ -147,6 +147,29 @@
   margin-top: 6px; min-height: 14px;
 }
 
+/* 通知訂閱卡片 */
+.notify-card {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-top: 20px;
+  padding: 18px 20px; border-radius: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.notify-card-done {
+  justify-content: center; gap: 10px;
+  border-color: rgba(76,175,80,0.2);
+  background: rgba(76,175,80,0.05);
+  color: #4caf50;
+}
+.notify-card-left { flex: 1; }
+.notify-subscribe-btn {
+  padding: 12px 20px; border-radius: 12px; flex-shrink: 0;
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  border: none; color: #fff; font-size: 13px; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+}
+.notify-subscribe-btn:hover { opacity: 0.85; }
+
 /* ---------- 即將開賽 ---------- */
 .upcoming-grid {
   display: grid;

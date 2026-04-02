@@ -479,6 +479,24 @@ function renderArena() {
 
     </div>
 
+    <!-- 通知訂閱卡片 -->
+    <div id="notify-subscribe-card" class="notify-card" style="display:none">
+      <div class="notify-card-left">
+        <div style="font-size:28px;margin-bottom:6px">🔔</div>
+        <div style="font-weight:800;font-size:15px;margin-bottom:4px">開啟每日一題提醒</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6">
+          每天提醒你回來答題・維持連勝不中斷<br>賽事開始前預測提醒也不會錯過
+        </div>
+      </div>
+      <button class="notify-subscribe-btn" onclick="subscribeNotification()">
+        開啟提醒
+      </button>
+    </div>
+    <div id="notify-subscribed-card" class="notify-card notify-card-done" style="display:none">
+      <span style="font-size:20px">✅</span>
+      <span style="font-size:13px;font-weight:700">已開啟每日提醒</span>
+    </div>
+
     ${renderBadges()}
 
     <!-- 登入 / 排行榜區塊 -->
@@ -519,6 +537,9 @@ function renderArena() {
   if (currentUser) {
     setTimeout(() => renderLeaderboard?.('leaderboard-list'), 0);
   }
+
+  // 通知訂閱卡片狀態
+  updateNotifyCard();
 
   // 非同步填入社群感數字
   if (typeof fetchSocialProof === 'function') {

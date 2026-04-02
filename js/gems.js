@@ -188,6 +188,34 @@ function showGemShortPrompt() {
   document.getElementById('team-modal').classList.add('open')
 }
 
+// ── 通知訂閱 ──────────────────────────────────────────────
+function updateNotifyCard() {
+  const subCard  = document.getElementById('notify-subscribe-card')
+  const doneCard = document.getElementById('notify-subscribed-card')
+  if (!subCard || !doneCard) return
+
+  // 檢查瀏覽器通知權限
+  const perm = Notification?.permission
+  if (perm === 'granted') {
+    subCard.style.display  = 'none'
+    doneCard.style.display = 'flex'
+  } else if (perm === 'denied') {
+    subCard.style.display  = 'none'
+    doneCard.style.display = 'none'
+  } else {
+    subCard.style.display  = 'flex'
+    doneCard.style.display = 'none'
+  }
+}
+
+async function subscribeNotification() {
+  window.OneSignalDeferred = window.OneSignalDeferred || []
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.Notifications.requestPermission()
+    updateNotifyCard()
+  })
+}
+
 // ── 寶石說明面板開關 ──────────────────────────────────────
 function toggleGemPanel() {
   const panel = document.getElementById('gem-panel')
