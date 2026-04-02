@@ -80,12 +80,14 @@ async function fetchGemBalance() {
   return data?.balance ?? 0
 }
 
-// ── 取得已解鎖的比賽清單 ──────────────────────────────────
+// ── 取得已解鎖的比賽清單（從 gem_transactions 直接查詢）──
 async function fetchUnlockedMatches() {
   if (!currentUser) return new Set()
-  const { data } = await DB.from('unlocked_matches')
-    .select('match_id').eq('user_id', currentUser.id)
-  return new Set((data ?? []).map(r => r.match_id))
+  const { data } = await DB.from('gem_transactions')
+    .select('ref_id')
+    .eq('user_id', currentUser.id)
+    .in('type', ['unlock_match', 'unlock_knockout', 'first_free'])
+  return new Set((data ?? []).map(r => r.ref_id).filter(Boolean))
 }
 
 // ── 更新導覽列寶石顯示 ────────────────────────────────────
