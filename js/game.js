@@ -119,27 +119,55 @@ function recordDailyAnswer(optIdx) {
   const isCorrect = optIdx === correct;
 
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
-  const newStreak = state.lastDate === yesterday ? state.streak + 1 : 1;
+  const newStreak = isCorrect ? (state.lastDate === yesterday ? state.streak + 1 : 1) : 0;
   state.streak   = newStreak;
   state.lastDate = today;
   state.history[today] = { chosen: optIdx, isCorrect };
   save(GK.daily, state);
+
+  // 寶石獎勵（非同步，不阻塞UI）
+  if (isCorrect) {
+    onDailyCorrect?.();
+    checkStreakGem?.(newStreak);
+  }
+
   return state;
 }
 
-// ── 導覽列 XP 等級元件 ────────────────────────────────────
-function updateNavXP() {
+// ── 等級獎勵表 ────────────────────────────────────────────
+const LEVEL_GEM_REWARDS = { 2:2, 3:2, 5:3, 7:3, 10:5, 15:5, 20:10 };
+
+// 計算 XP 與等級（共用）
+function calcXPLevel() {
   const dailyState  = getDailyState();
   const myChampion  = load(GK.champion);
   const myGroups    = load(GK.groups);
   const myTeam      = load(GK.team);
   const groupsDone  = myGroups && Object.keys(myGroups).length === 12;
-  const answeredCount = Object.keys(dailyState.history).length;
-
-  const xp      = answeredCount * 10 + (myChampion ? 50 : 0) + (groupsDone ? 50 : 0) + (myTeam ? 30 : 0);
+  const correctCount = Object.values(dailyState.history).filter(v => v && v.isCorrect).length;
+  const xp      = correctCount * 10 + (myChampion ? 50 : 0) + (groupsDone ? 50 : 0) + (myTeam ? 30 : 0);
   const xpPerLv = 100;
   const level   = Math.floor(xp / xpPerLv) + 1;
   const xpInLv  = xp % xpPerLv;
+  return { xp, level, xpInLv, xpPerLv };
+}
+
+// ── 導覽列 XP 等級元件 ────────────────────────────────────
+function updateNavXP() {
+  const { xp, level, xpInLv, xpPerLv } = calcXPLevel();
+  const prevLevel = parseInt(localStorage.getItem('wc26_last_level') || '1');
+
+  // 偵測升級，觸發等級寶石獎勵
+  if (level > prevLevel) {
+    localStorage.setItem('wc26_last_level', level);
+    for (let lv = prevLevel + 1; lv <= level; lv++) {
+      if (LEVEL_GEM_REWARDS[lv]) {
+        awardGem?.(`level_${lv}`).then(r => {
+          if (r) showToast?.(`🎉 升到 Lv.${lv}！+${r.awarded} 寶石（餘額 ${r.balance}）`);
+        });
+      }
+    }
+  }
 
   const lvEl   = document.getElementById('nav-xp-level');
   const fillEl = document.getElementById('nav-xp-mini-fill');
@@ -305,13 +333,15 @@ function renderArena() {
   const dailyDone  = dailyState.history[today] !== undefined;
   const groupsDone = myGroups && Object.keys(myGroups).length === 12;
   const answeredCount = Object.keys(dailyState.history).length;
+  const correctCount  = Object.values(dailyState.history).filter(v => v && v.isCorrect).length;
 
   // XP & Level
-  const xp       = answeredCount * 10 + (myChampion ? 50 : 0) + (groupsDone ? 50 : 0) + (myTeam ? 30 : 0);
-  const xpPerLv  = 100;
-  const level    = Math.floor(xp / xpPerLv) + 1;
-  const xpInLv   = xp % xpPerLv;
-  const xpPct    = xpInLv + '%';
+  const { xp, level, xpInLv, xpPerLv } = calcXPLevel();
+  const xpPct = xpInLv + '%';
+
+  // 下一個等級獎勵提示
+  const nextRewardLv = Object.keys(LEVEL_GEM_REWARDS).map(Number).find(lv => lv > level);
+  const nextRewardGem = nextRewardLv ? LEVEL_GEM_REWARDS[nextRewardLv] : null;
 
   // Champion display
   const champC1  = myChampion ? TEAMS[myChampion.c1] : null;
@@ -333,6 +363,10 @@ function renderArena() {
         <div class="arena-xp-track">
           <div class="arena-xp-fill" style="width:${xpPct}"></div>
         </div>
+        ${nextRewardLv ? `
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:6px;text-align:right">
+          升到 Lv.${nextRewardLv} 可獲得 💎×${nextRewardGem}
+        </div>` : ''}
       </div>
     </div>
 
@@ -345,8 +379,8 @@ function renderArena() {
       </div>
       <div class="arena-stat-card">
         <div class="arena-stat-icon">📋</div>
-        <div class="arena-stat-num">${answeredCount}</div>
-        <div class="arena-stat-label">累計答題</div>
+        <div class="arena-stat-num">${correctCount}/${answeredCount}</div>
+        <div class="arena-stat-label">答對/答題</div>
       </div>
       <div class="arena-stat-card">
         <div class="arena-stat-icon">⚡</div>
@@ -456,7 +490,10 @@ function renderArena() {
     <div style="margin-top:32px">
       <div class="section-header">
         <h2><i class="fas fa-trophy"></i> 玩家排行榜</h2>
-        <button class="link-btn" onclick="renderLeaderboard('leaderboard-list')">重新整理</button>
+        <div style="display:flex;gap:10px">
+          <button class="link-btn" onclick="copyRefLink()">📨 邀請好友 +3💎</button>
+          <button class="link-btn" onclick="renderLeaderboard('leaderboard-list')">重新整理</button>
+        </div>
       </div>
       <div id="leaderboard-list" class="leaderboard-list" style="margin-top:12px">
         <div style="text-align:center;padding:30px;color:var(--text-muted)">載入中...</div>
@@ -586,6 +623,7 @@ function saveChampionPick() {
   if (c1===c2 || c1===c3 || c2===c3) { alert('冠亞季軍不能選同一支球隊'); return; }
   save(GK.champion, { c1, c2, c3, lockedAt: new Date().toISOString() });
   syncToSupabase?.();
+  onFirstChampion?.();
   updateNavXP();
   checkAchievements();
   renderArena();
@@ -664,6 +702,7 @@ function saveGroupPicks() {
   }
   save(GK.groups, groups);
   syncToSupabase?.();
+  onFirstGroups?.();
   updateNavXP();
   checkAchievements();
   renderArena();
@@ -712,6 +751,7 @@ function saveSupportTeam() {
   if (!code) { alert('請選擇一支球隊'); return; }
   save(GK.team, code);
   syncToSupabase?.();
+  onFirstTeam?.();
   updateNavXP();
   checkAchievements();
   renderArena();

@@ -648,6 +648,55 @@
   .nav-xp-widget { display: none; }
 }
 
+/* ========== 寶石元件 ========== */
+.nav-gem-widget {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 999px;
+  border: 1px solid rgba(100,220,255,0.25);
+  background: rgba(100,220,255,0.06);
+  flex-shrink: 0; cursor: default;
+}
+.nav-gem-icon { font-size: 15px; }
+.nav-gem-count { font-size: 13px; font-weight: 800; color: #64dcff; }
+
+.gem-earn-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  font-size: 13px;
+}
+.gem-earn-row span:nth-child(2) { flex: 1; }
+.gem-earn-amt { color: #64dcff; font-weight: 800; }
+
+/* 深度分析鎖定區塊 */
+.deep-analysis-lock {
+  padding: 24px; border-radius: 16px;
+  border: 1px dashed rgba(100,220,255,0.25);
+  background: rgba(100,220,255,0.04);
+  text-align: center;
+}
+
+/* 解鎖按鈕（預測卡上） */
+.pred-lock-overlay {
+  position: absolute; inset: 0; border-radius: inherit;
+  background: rgba(10,12,28,0.85);
+  backdrop-filter: blur(4px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+  z-index: 2;
+}
+.pred-unlock-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 12px;
+  background: linear-gradient(135deg, #64dcff, #2196f3);
+  color: #000; font-weight: 800; font-size: 14px;
+  border: none; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(100,220,255,0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.pred-unlock-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(100,220,255,0.4); }
+
 /* ========== 登入 / 用戶元件 ========== */
 .nav-login-btn {
   display: flex; align-items: center; gap: 8px;

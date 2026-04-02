@@ -227,7 +227,16 @@ function renderPredictions() {
 }
 
 // 統一的比賽預測 Modal（所有入口都走這裡）
-function openPredModal(id) {
+async function openPredModal(id) {
+  // 判斷賽事階段決定費用類型
+  const match = SCHEDULE.find(x => x.id === id)
+  const isKnockout = match && match.phase && match.phase !== 'group'
+  const spendType = isKnockout ? 'unlock_knockout' : 'unlock_match'
+
+  // 寶石檢查
+  const unlocked = await spendGemForMatch?.(id, spendType)
+  if (unlocked === false) return  // 已顯示提示，取消開啟
+
   // 立即顯示 modal + loading 動畫，不讓用戶感覺沒反應
   const modal = document.getElementById('team-modal');
   const mc = document.getElementById('modal-content');
@@ -406,6 +415,20 @@ function openPredModal(id) {
       ${ht.predDesc?`<div style="margin-top:8px;font-size:12px;color:var(--text-muted)">💡 ${ht.predTitle||''}：${ht.predDesc||''}</div>`:''}
     </div>
 
+    <!-- 深度分析解鎖 -->
+    <div id="deep-analysis-${m.id}" style="margin-top:16px">
+      <div class="deep-analysis-lock">
+        <div style="font-size:28px;margin-bottom:8px">🔬</div>
+        <div style="font-weight:800;font-size:15px;margin-bottom:6px">深度分析</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">
+          歷史交手紀錄 · 傷兵狀況 · 陣型詳解
+        </div>
+        <button class="pred-unlock-btn" onclick="openDeepAnalysis('${m.id}','${m.home}','${m.away}')">
+          💎×2 解鎖深度分析
+        </button>
+      </div>
+    </div>
+
     <!-- 你的預測 -->
     ${(()=>{
       const myPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
@@ -441,6 +464,82 @@ function openPredModal(id) {
 document.getElementById('hamburger-btn').addEventListener('click', () => {
   document.getElementById('mobile-nav').classList.toggle('open');
 });
+
+// ── 深度分析解鎖 ──────────────────────────────────────────
+async function openDeepAnalysis(matchId, homeCode, awayCode) {
+  const ok = await unlockDeepAnalysis?.(matchId)
+  if (!ok) return
+
+  const ht = TEAMS[homeCode], at = TEAMS[awayCode]
+  if (!ht || !at) return
+
+  const container = document.getElementById(`deep-analysis-${matchId}`)
+  if (!container) return
+
+  // 歷史交手（靜態示例，開賽後可接 API）
+  const h2h = ht.h2h?.[awayCode] || { played: '—', wins: '—', draws: '—', losses: '—', gf: '—', ga: '—' }
+
+  // 傷兵（來自 teams 資料）
+  const hInjuries = (ht.injuries || []).slice(0, 3)
+  const aInjuries = (at.injuries || []).slice(0, 3)
+
+  container.innerHTML = `
+    <div class="modal-section-title">🔬 深度分析</div>
+
+    <!-- 歷史交手 -->
+    <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">⚔️ 歷史交手紀錄</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:8px">
+        <div>
+          <div style="font-size:20px;font-weight:800;color:var(--green)">${h2h.wins ?? '—'}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${ht.nameCN} 勝</div>
+        </div>
+        <div>
+          <div style="font-size:20px;font-weight:800;color:var(--text-secondary)">${h2h.draws ?? '—'}</div>
+          <div style="font-size:11px;color:var(--text-muted)">平局</div>
+        </div>
+        <div>
+          <div style="font-size:20px;font-weight:800;color:var(--red)">${h2h.losses ?? '—'}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${at.nameCN} 勝</div>
+        </div>
+      </div>
+      ${h2h.played !== '—' ? `<div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">共 ${h2h.played} 場 · 總進球 ${ht.nameCN} ${h2h.gf} : ${h2h.ga} ${at.nameCN}</div>` : '<div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">歷史交手資料待更新</div>'}
+    </div>
+
+    <!-- 傷兵 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">${ht.flag} 傷兵名單</div>
+        ${hInjuries.length ? hInjuries.map(p => `
+          <div style="font-size:12px;color:var(--text-secondary);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+            <span style="color:#ef9a9a">⚕</span> ${p.name} <span style="color:var(--text-muted);font-size:11px">${p.pos}</span>
+          </div>`).join('') : '<div style="font-size:12px;color:var(--text-muted)">暫無傷兵資料</div>'}
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">${at.flag} 傷兵名單</div>
+        ${aInjuries.length ? aInjuries.map(p => `
+          <div style="font-size:12px;color:var(--text-secondary);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+            <span style="color:#ef9a9a">⚕</span> ${p.name} <span style="color:var(--text-muted);font-size:11px">${p.pos}</span>
+          </div>`).join('') : '<div style="font-size:12px;color:var(--text-muted)">暫無傷兵資料</div>'}
+      </div>
+    </div>
+
+    <!-- 陣型詳解 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">${ht.flag} ${ht.formation}</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">${ht.formationDesc || ht.style || '陣型詳解待更新'}</div>
+        ${ht.strengths?.length ? `<div style="margin-top:8px;font-size:11px;color:var(--green)">✓ ${ht.strengths[0]}</div>` : ''}
+        ${ht.strengths?.[1] ? `<div style="font-size:11px;color:var(--green)">✓ ${ht.strengths[1]}</div>` : ''}
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">${at.flag} ${at.formation}</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">${at.formationDesc || at.style || '陣型詳解待更新'}</div>
+        ${at.strengths?.length ? `<div style="margin-top:8px;font-size:11px;color:var(--green)">✓ ${at.strengths[0]}</div>` : ''}
+        ${at.strengths?.[1] ? `<div style="font-size:11px;color:var(--green)">✓ ${at.strengths[1]}</div>` : ''}
+      </div>
+    </div>`
+}
 
 // 動態預測計算
 // 近期狀態分數 (W=3, D=1, L=0)

@@ -48,6 +48,10 @@ async function handleUserLoggedIn(isNew) {
   const nameEl = document.getElementById('nav-user-name');
   if (nameEl) nameEl.textContent = profile.nickname || '設定暱稱';
 
+  // 顯示寶石 widget
+  const gemWidget = document.getElementById('nav-gem-widget');
+  if (gemWidget) gemWidget.style.display = 'flex';
+
   if (!profile.nickname) {
     openNicknameModal();
   } else if (isNew) {
@@ -56,6 +60,12 @@ async function handleUserLoggedIn(isNew) {
   } else {
     await syncToSupabase();
   }
+
+  // 首次帳號綁定獎勵
+  await onFirstAccount?.();
+  // 初始化寶石（每日簽到 + 餘額）
+  await initGems?.();
+
   updateNavXP?.();
   renderArena?.();
 }
@@ -75,16 +85,19 @@ async function getOrCreateProfile() {
 
 // ── 更新導覽列 UI ─────────────────────────────────────────
 function updateAuthUI() {
-  const loginBtn  = document.getElementById('nav-login-btn');
+  const loginBtn   = document.getElementById('nav-login-btn');
   const userWidget = document.getElementById('nav-user-widget');
+  const gemWidget  = document.getElementById('nav-gem-widget');
   if (!loginBtn) return;
 
   if (currentUser) {
-    loginBtn.style.display  = 'none';
+    loginBtn.style.display   = 'none';
     userWidget.style.display = 'flex';
+    if (gemWidget) gemWidget.style.display = 'flex';
   } else {
-    loginBtn.style.display  = 'flex';
+    loginBtn.style.display   = 'flex';
     userWidget.style.display = 'none';
+    if (gemWidget) gemWidget.style.display = 'none';
   }
 }
 
