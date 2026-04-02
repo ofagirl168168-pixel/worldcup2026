@@ -558,51 +558,194 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
   const container = document.getElementById(`deep-analysis-${matchId}`)
   if (!container) return
 
-  // 歷史交手（靜態示例，開賽後可接 API）
-  const h2h = ht.h2h?.[awayCode] || { played: '—', wins: '—', draws: '—', losses: '—', gf: '—', ga: '—' }
+  // ── 重新計算預測數據 ──────────────────────────────────────
+  const p = calcPred(ht, at)
+  const hXG = parseFloat(p.hXG)
+  const aXG = parseFloat(p.aXG)
+  const lambda = hXG + aXG
 
-  // 傷兵（來自 teams 資料）
+  // Poisson 輔助：P(X=k | λ)
+  const pois = (k, lam) => { let r = Math.exp(-lam); for (let i = 1; i <= k; i++) r *= lam / i; return r; }
+  const poisCum = (maxK, lam) => { let s = 0; for (let k = 0; k <= maxK; k++) s += pois(k, lam); return s; }
+
+  // ── 大小球機率 ────────────────────────────────────────────
+  const pOver15 = Math.round((1 - poisCum(1, lambda)) * 100)
+  const pOver25 = Math.round((1 - poisCum(2, lambda)) * 100)
+  const pOver35 = Math.round((1 - poisCum(3, lambda)) * 100)
+
+  // ── BTTS ─────────────────────────────────────────────────
+  const pHomeSc = Math.round((1 - Math.exp(-hXG)) * 100)
+  const pAwaySc = Math.round((1 - Math.exp(-aXG)) * 100)
+  const pBTTS   = Math.round((pHomeSc / 100) * (pAwaySc / 100) * 100)
+
+  // ── 角球預測 ──────────────────────────────────────────────
+  const hCorners = Math.round(4.5 + (ht.radar.attack / 100) * 3 + (ht.radar.speed / 100) * 1.5)
+  const aCorners = Math.round(4.5 + (at.radar.attack / 100) * 3 + (at.radar.speed / 100) * 1.5)
+  const totalCorners = hCorners + aCorners
+  const cornerLine = totalCorners >= 12 ? 11.5 : totalCorners >= 10 ? 9.5 : 8.5
+  const cornerOverProb = Math.min(95, Math.max(5, Math.round(50 + (totalCorners - cornerLine) * 10)))
+
+  // ── 亞盤讓球 ──────────────────────────────────────────────
+  const xgDiff = hXG - aXG
+  let handicap, handicapNote
+  if      (xgDiff >=  1.3) { handicap = `${ht.nameCN} -1.5`;      handicapNote = '主場強烈優勢' }
+  else if (xgDiff >=  0.9) { handicap = `${ht.nameCN} -1 / -1.5`; handicapNote = '主場明顯優勢' }
+  else if (xgDiff >=  0.5) { handicap = `${ht.nameCN} -0.5 / -1`; handicapNote = '主場輕微優勢' }
+  else if (xgDiff >=  0.2) { handicap = `${ht.nameCN} -0.5`;      handicapNote = '主場小熱' }
+  else if (xgDiff >= -0.2) { handicap = '平手盤 (0)';              handicapNote = '勢均力敵' }
+  else if (xgDiff >= -0.5) { handicap = `${at.nameCN} -0.5`;      handicapNote = '客場小熱' }
+  else if (xgDiff >= -0.9) { handicap = `${at.nameCN} -0.5 / -1`; handicapNote = '客場輕微優勢' }
+  else if (xgDiff >= -1.3) { handicap = `${at.nameCN} -1 / -1.5`; handicapNote = '客場明顯優勢' }
+  else                     { handicap = `${at.nameCN} -1.5`;       handicapNote = '客場強烈優勢' }
+
+  // ── 上半場走向 ────────────────────────────────────────────
+  const htHW = Math.round(p.hw * 0.60)
+  const htAW = Math.round(p.aw * 0.60)
+  const htD  = Math.max(5, 100 - htHW - htAW)
+  const htLambda = lambda * 0.45
+  const htOver05 = Math.round((1 - poisCum(0, htLambda)) * 100)
+  const htOver15 = Math.round((1 - poisCum(1, htLambda)) * 100)
+
+  // ── 黃牌預測 ──────────────────────────────────────────────
+  const hCards = Math.max(1, Math.round(1.5 + (ht.radar.defense / 100) * 1.5 - (ht.radar.midfield / 100) * 0.8))
+  const aCards = Math.max(1, Math.round(1.5 + (at.radar.defense / 100) * 1.5 - (at.radar.midfield / 100) * 0.8))
+  const totalCards = hCards + aCards
+  const cardsLine  = totalCards >= 5 ? 4.5 : 3.5
+  const cardsOverProb = Math.min(95, Math.max(5, Math.round(50 + (totalCards - cardsLine) * 12)))
+
+  // ── 歷史交手 + 傷兵 ───────────────────────────────────────
+  const h2h = ht.h2h?.[awayCode] || { played: '—', wins: '—', draws: '—', losses: '—', gf: '—', ga: '—' }
   const hInjuries = (ht.injuries || []).slice(0, 3)
   const aInjuries = (at.injuries || []).slice(0, 3)
+
+  // 機率條輔助
+  const probBar = (prob, color) => `<div style="height:5px;border-radius:3px;background:rgba(255,255,255,0.07);overflow:hidden;margin-top:4px"><div style="width:${prob}%;height:100%;background:${color};border-radius:3px"></div></div>`
+  const pColor  = (prob) => prob >= 55 ? 'var(--green)' : 'var(--red)'
 
   container.innerHTML = `
     <div class="modal-section-title">🔬 深度分析</div>
 
-    <!-- 歷史交手 -->
-    <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">⚔️ 歷史交手紀錄</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:8px">
-        <div>
-          <div style="font-size:20px;font-weight:800;color:var(--green)">${h2h.wins ?? '—'}</div>
-          <div style="font-size:11px;color:var(--text-muted)">${ht.nameCN} 勝</div>
-        </div>
-        <div>
-          <div style="font-size:20px;font-weight:800;color:var(--text-secondary)">${h2h.draws ?? '—'}</div>
-          <div style="font-size:11px;color:var(--text-muted)">平局</div>
-        </div>
-        <div>
-          <div style="font-size:20px;font-weight:800;color:var(--red)">${h2h.losses ?? '—'}</div>
-          <div style="font-size:11px;color:var(--text-muted)">${at.nameCN} 勝</div>
+    <!-- ── 盤口分析 ── -->
+    <div class="modal-section-title" style="margin-top:4px;font-size:12px;letter-spacing:1px">🎰 盤口分析</div>
+
+    <!-- 大小球 -->
+    <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">⚽ 大小球（Poisson 模型）</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">預期總進球 xG：${hXG} + ${aXG} = <strong style="color:var(--text-primary)">${lambda.toFixed(1)}</strong></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        ${[['大 1.5', pOver15], ['大 2.5', pOver25], ['大 3.5', pOver35]].map(([label, prob]) => `
+          <div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:10px 8px">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">${label}</div>
+            <div style="font-size:22px;font-weight:900;color:${pColor(prob)}">${prob}%</div>
+            ${probBar(prob, pColor(prob))}
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- BTTS + 亞盤 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">🥅 兩隊都進球</div>
+        <div style="text-align:center">
+          <div style="font-size:28px;font-weight:900;color:${pColor(pBTTS)}">${pBTTS}%</div>
+          <div style="font-size:11px;color:var(--text-muted);margin:4px 0">${pBTTS >= 55 ? '較可能發生' : '較不可能'}</div>
+          ${probBar(pBTTS, pColor(pBTTS))}
+          <div style="font-size:10px;color:var(--text-muted);margin-top:6px">${ht.flag} ${pHomeSc}% · ${at.flag} ${pAwaySc}%</div>
         </div>
       </div>
-      ${h2h.played !== '—' ? `<div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">共 ${h2h.played} 場 · 總進球 ${ht.nameCN} ${h2h.gf} : ${h2h.ga} ${at.nameCN}</div>` : '<div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">歷史交手資料待更新</div>'}
+      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">⚖️ 亞盤讓球</div>
+        <div style="text-align:center">
+          <div style="font-size:14px;font-weight:900;color:var(--text-primary);line-height:1.5">${handicap}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:6px">${handicapNote}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:4px">xG差：${xgDiff >= 0 ? '+' : ''}${xgDiff.toFixed(2)}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 角球 + 黃牌 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">🚩 角球預測</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--text-muted)">${ht.flag}</div>
+            <div style="font-size:22px;font-weight:800">${hCorners}</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--text-muted)">合計</div>
+            <div style="font-size:22px;font-weight:800;color:var(--gold)">${totalCorners}</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--text-muted)">${at.flag}</div>
+            <div style="font-size:22px;font-weight:800">${aCorners}</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);text-align:center">盤口 ${cornerLine} 建議<strong style="color:${pColor(cornerOverProb)}">${cornerOverProb >= 55 ? '大' : '小'}</strong>（${cornerOverProb}%）</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">🟨 黃牌預測</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--text-muted)">${ht.flag}</div>
+            <div style="font-size:22px;font-weight:800">${hCards}</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--text-muted)">合計</div>
+            <div style="font-size:22px;font-weight:800;color:#ffd54f">${totalCards}</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--text-muted)">${at.flag}</div>
+            <div style="font-size:22px;font-weight:800">${aCards}</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);text-align:center">盤口 ${cardsLine} 建議<strong style="color:${pColor(cardsOverProb)}">${cardsOverProb >= 55 ? '大' : '小'}</strong>（${cardsOverProb}%）</div>
+      </div>
+    </div>
+
+    <!-- 上半場分析 -->
+    <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">⏱️ 上半場走向</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-bottom:10px">
+        <div><div style="font-size:18px;font-weight:900;color:var(--green)">${htHW}%</div><div style="font-size:11px;color:var(--text-muted)">${ht.nameCN} 領先</div></div>
+        <div><div style="font-size:18px;font-weight:900;color:var(--text-secondary)">${htD}%</div><div style="font-size:11px;color:var(--text-muted)">平手</div></div>
+        <div><div style="font-size:18px;font-weight:900;color:var(--red)">${htAW}%</div><div style="font-size:11px;color:var(--text-muted)">${at.nameCN} 領先</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">上半場大 0.5</div>
+          <div style="font-size:18px;font-weight:800;color:${pColor(htOver05)}">${htOver05}%</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">上半場大 1.5</div>
+          <div style="font-size:18px;font-weight:800;color:${pColor(htOver15)}">${htOver15}%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 歷史 / 傷兵 / 陣型 ── -->
+    <div class="modal-section-title" style="margin-top:4px;font-size:12px;letter-spacing:1px">📋 球隊資料</div>
+
+    <!-- 歷史交手 -->
+    <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">⚔️ 歷史交手紀錄</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:8px">
+        <div><div style="font-size:20px;font-weight:800;color:var(--green)">${h2h.wins ?? '—'}</div><div style="font-size:11px;color:var(--text-muted)">${ht.nameCN} 勝</div></div>
+        <div><div style="font-size:20px;font-weight:800;color:var(--text-secondary)">${h2h.draws ?? '—'}</div><div style="font-size:11px;color:var(--text-muted)">平局</div></div>
+        <div><div style="font-size:20px;font-weight:800;color:var(--red)">${h2h.losses ?? '—'}</div><div style="font-size:11px;color:var(--text-muted)">${at.nameCN} 勝</div></div>
+      </div>
+      ${h2h.played !== '—' ? `<div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">共 ${h2h.played} 場 · ${ht.nameCN} ${h2h.gf} : ${h2h.ga} ${at.nameCN}</div>` : '<div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">歷史交手資料待更新</div>'}
     </div>
 
     <!-- 傷兵 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
         <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">${ht.flag} 傷兵名單</div>
-        ${hInjuries.length ? hInjuries.map(p => `
-          <div style="font-size:12px;color:var(--text-secondary);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-            <span style="color:#ef9a9a">⚕</span> ${p.name} <span style="color:var(--text-muted);font-size:11px">${p.pos}</span>
-          </div>`).join('') : '<div style="font-size:12px;color:var(--text-muted)">暫無傷兵資料</div>'}
+        ${hInjuries.length ? hInjuries.map(pl => `<div style="font-size:12px;color:var(--text-secondary);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="color:#ef9a9a">⚕</span> ${pl.name} <span style="color:var(--text-muted);font-size:11px">${pl.pos}</span></div>`).join('') : '<div style="font-size:12px;color:var(--text-muted)">暫無傷兵資料</div>'}
       </div>
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
         <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">${at.flag} 傷兵名單</div>
-        ${aInjuries.length ? aInjuries.map(p => `
-          <div style="font-size:12px;color:var(--text-secondary);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-            <span style="color:#ef9a9a">⚕</span> ${p.name} <span style="color:var(--text-muted);font-size:11px">${p.pos}</span>
-          </div>`).join('') : '<div style="font-size:12px;color:var(--text-muted)">暫無傷兵資料</div>'}
+        ${aInjuries.length ? aInjuries.map(pl => `<div style="font-size:12px;color:var(--text-secondary);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="color:#ef9a9a">⚕</span> ${pl.name} <span style="color:var(--text-muted);font-size:11px">${pl.pos}</span></div>`).join('') : '<div style="font-size:12px;color:var(--text-muted)">暫無傷兵資料</div>'}
       </div>
     </div>
 
