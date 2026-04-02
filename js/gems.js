@@ -12,12 +12,19 @@ async function getToken() {
 async function callEdge(fnName, body) {
   const token = await getToken()
   if (!token) return { error: '未登入' }
-  const res = await fetch(`${FUNC_URL}/${fnName}`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  })
-  return res.json()
+  try {
+    const res = await fetch(`${FUNC_URL}/${fnName}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+    const data = await res.json()
+    if (!res.ok && !data.error) return { error: `HTTP ${res.status}` }
+    return data
+  } catch (e) {
+    console.error('callEdge error:', fnName, e)
+    return { error: e.message }
+  }
 }
 
 // ── 領取寶石（伺服器驗證）────────────────────────────────
@@ -55,7 +62,8 @@ async function spendGemForMatch(matchId, spendType = 'unlock_match') {
     return false
   }
   updateGemUI(result.balance)
-  if (result.cost) showToast(`💎 -${result.cost} 寶石（餘額 ${result.balance}）`)
+  if (result.cost) showToast(`-${result.cost} 寶石（餘額 ${result.balance}）`)
+  else if (result.unlocked) showToast('🎁 首次免費解鎖！')
   return true
 }
 
@@ -94,6 +102,9 @@ async function initGems() {
   }
   const balance = await fetchGemBalance()
   updateGemUI(balance)
+
+  // 載入已解鎖比賽清單（供 openPredModal 判斷是否顯示遮罩）
+  window.unlockedMatchSet = await fetchUnlockedMatches()
 
   // 處理邀請碼（從 URL ?ref=CODE）
   const urlRef = new URLSearchParams(window.location.search).get('ref')
@@ -153,17 +164,19 @@ function showGemShortPrompt() {
   const mc = document.getElementById('modal-content')
   mc.innerHTML = `
     <div style="text-align:center;padding:10px 0">
-      <div style="font-size:48px;margin-bottom:12px">💎</div>
+      <div style="display:flex;justify-content:center;margin-bottom:12px">
+        <span class="gem-ico" style="width:48px;height:48px;filter:drop-shadow(0 0 10px rgba(255,190,0,0.9))"></span>
+      </div>
       <div style="font-size:20px;font-weight:800;margin-bottom:8px">寶石不足</div>
       <div style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:24px">
         觀看預測分析需要 1 顆寶石<br>
         透過以下方式獲得更多寶石：
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;text-align:left;margin-bottom:24px">
-        <div class="gem-earn-row"><span>❓</span><span>每日答題答對</span><span class="gem-earn-amt">+1</span></div>
-        <div class="gem-earn-row"><span>📅</span><span>每日登入簽到</span><span class="gem-earn-amt">+1</span></div>
+        <div class="gem-earn-row"><span>❓</span><span>每日答題答對</span><span class="gem-earn-amt">+1 / 天</span></div>
         <div class="gem-earn-row"><span>🔥</span><span>連勝 7 天里程碑</span><span class="gem-earn-amt">+3</span></div>
         <div class="gem-earn-row"><span>👥</span><span>邀請好友加入</span><span class="gem-earn-amt">+3</span></div>
+        <div class="gem-earn-row"><span>⬆️</span><span>等級提升獎勵</span><span class="gem-earn-amt">+2～10</span></div>
       </div>
       <button onclick="copyRefLink();closeModal()" style="width:100%;padding:14px;border-radius:12px;background:var(--gold);color:#000;font-weight:800;font-size:14px;border:none;cursor:pointer">
         複製邀請連結，邀請好友
@@ -173,6 +186,23 @@ function showGemShortPrompt() {
       </button>
     </div>`
   document.getElementById('team-modal').classList.add('open')
+}
+
+// ── 寶石說明面板開關 ──────────────────────────────────────
+function toggleGemPanel() {
+  const panel = document.getElementById('gem-panel')
+  if (!panel) return
+  panel.classList.toggle('open')
+  if (panel.classList.contains('open')) {
+    // 點面板外部關閉
+    setTimeout(() => document.addEventListener('click', closeGemPanelOutside, { once: true }), 0)
+  }
+}
+function closeGemPanelOutside(e) {
+  const widget = document.getElementById('nav-gem-widget')
+  if (widget && !widget.contains(e.target)) {
+    document.getElementById('gem-panel')?.classList.remove('open')
+  }
 }
 
 // ── 未登入提示 ────────────────────────────────────────────

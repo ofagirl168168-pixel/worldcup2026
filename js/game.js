@@ -405,7 +405,10 @@ function renderArena() {
         <div class="arena-card-desc">每天一個世界盃話題，累積連勝天數，展現你的足球智慧</div>
         ${dailyState.streak > 0 ? `<div class="arena-card-streak">🔥 ${dailyState.streak} 天連勝</div>` : ''}
         <div class="arena-card-footer">
-          <span style="font-size:11px;color:rgba(255,255,255,0.3)">+10 XP / 天</span>
+          <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.3)">
+            +10 XP / 天
+            <span class="arena-card-gem">· 答對 <span class="gem-ico"></span>+1</span>
+          </span>
           <span class="arena-card-cta">${dailyDone ? '已完成 ✓' : '立即作答 →'}</span>
         </div>
       </div>
@@ -420,9 +423,13 @@ function renderArena() {
             ? `你預測 <strong style="color:var(--gold)">${champFlag}</strong> 奪冠`
             : '選出你心目中的冠、亞、季軍，開賽前可修改'}
         </div>
-        ${myChampion ? '<div class="arena-lock-hint">⏰ 開賽後永久鎖定</div>' : ''}
+        ${myChampion ? `<div class="arena-lock-hint">⏰ 開賽後永久鎖定</div>
+        <div id="social-champion" class="arena-social-proof"></div>` : ''}
         <div class="arena-card-footer">
-          <span style="font-size:11px;color:rgba(255,255,255,0.3)">+50 XP</span>
+          <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.3)">
+            +50 XP
+            ${!myChampion ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+2</span>` : ''}
+          </span>
           <span class="arena-card-cta">${myChampion ? '修改預測 →' : '開始預測 →'}</span>
         </div>
       </div>
@@ -433,6 +440,7 @@ function renderArena() {
         <span class="arena-card-icon">📋</span>
         <div class="arena-card-title">分組賽預測</div>
         <div class="arena-card-desc">預測 12 組各自的前兩名出線隊伍，見證你的眼光</div>
+        <div id="social-groups" class="arena-social-proof"></div>
         ${groupCount > 0 && !groupsDone ? `
         <div style="margin-top:12px">
           <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden">
@@ -441,7 +449,10 @@ function renderArena() {
           <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:5px">${groupCount}/12 已完成</div>
         </div>` : ''}
         <div class="arena-card-footer">
-          <span style="font-size:11px;color:rgba(255,255,255,0.3)">+50 XP</span>
+          <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.3)">
+            +50 XP
+            ${!groupsDone ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+2</span>` : ''}
+          </span>
           <span class="arena-card-cta">${groupsDone ? '修改預測 →' : groupCount > 0 ? '繼續填寫 →' : '開始填寫 →'}</span>
         </div>
       </div>
@@ -456,8 +467,12 @@ function renderArena() {
             ? `你支持 <strong style="color:#e91e63">${TEAMS[myTeam]?.nameCN||myTeam}</strong>，全力加油！`
             : '選定一支你要整個世界盃陪伴的球隊'}
         </div>
+        ${myTeam ? `<div id="social-team" class="arena-social-proof"></div>` : ''}
         <div class="arena-card-footer">
-          <span style="font-size:11px;color:rgba(255,255,255,0.3)">+30 XP</span>
+          <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.3)">
+            +30 XP
+            ${!myTeam ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+1</span>` : ''}
+          </span>
           <span class="arena-card-cta">${myTeam ? '更換球隊 →' : '選擇球隊 →'}</span>
         </div>
       </div>
@@ -491,7 +506,7 @@ function renderArena() {
       <div class="section-header">
         <h2><i class="fas fa-trophy"></i> 玩家排行榜</h2>
         <div style="display:flex;gap:10px">
-          <button class="link-btn" onclick="copyRefLink()">📨 邀請好友 +3💎</button>
+          <button class="link-btn" onclick="copyRefLink()">📨 邀請好友 +3<span class="gem-ico" style="width:11px;height:11px;margin-left:2px"></span></button>
           <button class="link-btn" onclick="renderLeaderboard('leaderboard-list')">重新整理</button>
         </div>
       </div>
@@ -503,6 +518,23 @@ function renderArena() {
   // 如果已登入，載入排行榜
   if (currentUser) {
     setTimeout(() => renderLeaderboard?.('leaderboard-list'), 0);
+  }
+
+  // 非同步填入社群感數字
+  if (typeof fetchSocialProof === 'function') {
+    fetchSocialProof().then(d => {
+      const champEl = document.getElementById('social-champion')
+      if (champEl && d.championCount > 1)
+        champEl.textContent = `👥 另有 ${d.championCount - 1} 人與你同選`
+
+      const groupsEl = document.getElementById('social-groups')
+      if (groupsEl && d.groupsCount > 0)
+        groupsEl.textContent = `👥 已有 ${d.groupsCount} 人完成分組預測`
+
+      const teamEl = document.getElementById('social-team')
+      if (teamEl && d.teamCount > 1)
+        teamEl.textContent = `👥 另有 ${d.teamCount - 1} 人支持同隊`
+    })
   }
 }
 

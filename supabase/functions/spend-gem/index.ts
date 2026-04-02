@@ -9,6 +9,7 @@ const COSTS: Record<string, number> = {
   unlock_match:       1,  // 小組賽預測
   unlock_knockout:    2,  // 淘汰賽預測
   unlock_deep:        2,  // 深度分析
+  first_free:         0,  // 首次免費（每用戶限一次）
 }
 
 Deno.serve(async (req) => {
@@ -27,20 +28,31 @@ Deno.serve(async (req) => {
     const { match_id, spend_type } = await req.json()
     if (!match_id) return errorRes('缺少 match_id', 400)
 
-    const txType = spend_type && COSTS[spend_type] ? spend_type : 'unlock_match'
+    const txType = spend_type && COSTS[spend_type] !== undefined ? spend_type : 'unlock_match'
     const cost = COSTS[txType]
+
+    // first_free：每位用戶全站只能用一次
+    if (txType === 'first_free') {
+      const { data: alreadyUsed } = await db
+        .from('gem_transactions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('type', 'first_free')
+        .maybeSingle()
+      if (alreadyUsed) return errorRes('首次免費已使用', 409)
+    }
 
     // 檢查是否已解鎖（不重複扣）
     const { data: unlocked } = await db
       .from('gem_transactions')
       .select('id')
       .eq('user_id', user.id)
-      .eq('type', txType)
+      .in('type', ['unlock_match', 'unlock_knockout', 'first_free'])
       .eq('ref_id', match_id)
       .maybeSingle()
     if (unlocked) return okRes({ already_unlocked: true, balance: await getBalance(db, user.id) })
 
-    // 檢查餘額
+    // 檢查餘額（first_free 費用為 0，直接通過）
     const balance = await getBalance(db, user.id)
     if (balance < cost) return errorRes('寶石不足', 402)
 
@@ -63,7 +75,7 @@ Deno.serve(async (req) => {
 })
 
 async function getBalance(db: ReturnType<typeof createClient>, userId: string) {
-  const { data } = await db.from('gem_balance').select('balance').eq('user_id', userId).single()
+  const { data } = await db.from('gem_balance').select('balance').eq('user_id', userId).maybeSingle()
   return data?.balance ?? 0
 }
 

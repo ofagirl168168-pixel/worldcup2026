@@ -11,16 +11,54 @@ function renderChampions() {
   ];
   const el = document.getElementById('champion-cards');
   if (!el) return;
-  el.innerHTML = top5.map((t,i) => {
+
+  const cards = top5.map((t, i) => {
     const tm = TEAMS[t.code];
-    return `<div class="champion-card" onclick="showSection('teams')">
+    const locked = !currentUser && i >= 2;
+    return `<div class="champion-card${locked ? ' champion-card-locked' : ''}" onclick="${locked ? 'loginWithGoogle()' : "showSection('teams')"}">
       <div class="champion-rank">#${i+1}</div>
       <div class="champion-flag">${tm.flag}</div>
       <div class="champion-name">${tm.nameCN}</div>
-      <div class="champion-prob">${t.prob}</div>
-      <div class="champion-desc">${t.desc}</div>
+      <div class="champion-prob" style="${locked ? 'filter:blur(6px);user-select:none' : ''}" id="champ-prob-${t.code}">${t.prob}</div>
+      <div class="champion-desc" style="${locked ? 'filter:blur(5px);user-select:none' : ''}">${t.desc}</div>
+      <div id="champ-votes-${t.code}" class="champion-votes"></div>
+      ${locked ? `<div class="champion-lock-hint">🔒 登入查看</div>` : ''}
     </div>`;
   }).join('');
+
+  el.innerHTML = cards;
+
+  // 未登入時在卡片下方加提示
+  if (!currentUser) {
+    document.getElementById('champion-login-cta')?.remove();
+    el.insertAdjacentHTML('afterend', `
+      <div id="champion-login-cta" style="text-align:center;margin-top:14px">
+        <button onclick="loginWithGoogle()" style="padding:10px 24px;border-radius:999px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:var(--text-secondary);font-size:13px;cursor:pointer">
+          登入即可查看完整奪冠預測 →
+        </button>
+      </div>`);
+  }
+
+  // 非同步填入真實票數
+  if (typeof fetchChampionVotes === 'function') {
+    fetchChampionVotes().then(({ counts, total }) => {
+      if (total < 2) return
+      top5.forEach(t => {
+        const votesEl = document.getElementById(`champ-votes-${t.code}`)
+        const cnt = counts[t.code] || 0
+        if (votesEl && cnt > 0) {
+          const pct = Math.round(cnt / total * 100)
+          votesEl.textContent = `👥 ${cnt} 人預測・佔 ${pct}%`
+        }
+        // 更新機率為真實票數佔比
+        const probEl = document.getElementById(`champ-prob-${t.code}`)
+        if (probEl && cnt > 0) {
+          const pct = Math.round(cnt / total * 100)
+          probEl.textContent = `${pct}%`
+        }
+      })
+    })
+  }
 }
 
 // 首頁：即將開賽（取前6場）
@@ -186,7 +224,7 @@ function renderPredictions() {
       </div>
       <div class="featured-pred-teams">
         <div class="pred-team"><div class="pred-team-flag">${ht.flag}</div><div class="pred-team-name">${ht.nameCN}</div></div>
-        <div class="pred-score-big">${p.score}</div>
+        <div class="pred-score-big" style="${window.unlockedMatchSet?.has(m.id) ? '' : 'filter:blur(8px);user-select:none'}">${p.score}</div>
         <div class="pred-team"><div class="pred-team-flag">${at.flag}</div><div class="pred-team-name">${at.nameCN}</div></div>
       </div>
       <div class="prob-row">
@@ -214,7 +252,7 @@ function renderPredictions() {
         <span style="font-weight:700">${ht.nameCN}</span>
       </div>
       <div style="text-align:center">
-        <div style="font-size:16px;font-weight:800;color:var(--gold)">${p.score}</div>
+        <div style="font-size:16px;font-weight:800;color:var(--gold);${window.unlockedMatchSet?.has(m.id) ? '' : 'filter:blur(7px);user-select:none'}">${p.score}</div>
         <div style="font-size:11px;color:var(--text-muted)">${m.twDate?.slice(5).replace('-','/')} ${m.twTime}</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
@@ -228,14 +266,10 @@ function renderPredictions() {
 
 // 統一的比賽預測 Modal（所有入口都走這裡）
 async function openPredModal(id) {
-  // 判斷賽事階段決定費用類型
   const match = SCHEDULE.find(x => x.id === id)
   const isKnockout = match && match.phase && match.phase !== 'group'
   const spendType = isKnockout ? 'unlock_knockout' : 'unlock_match'
-
-  // 寶石檢查
-  const unlocked = await spendGemForMatch?.(id, spendType)
-  if (unlocked === false) return  // 已顯示提示，取消開啟
+  const cost = isKnockout ? 2 : 1
 
   // 立即顯示 modal + loading 動畫，不讓用戶感覺沒反應
   const modal = document.getElementById('team-modal');
@@ -259,9 +293,11 @@ async function openPredModal(id) {
   const ht = TEAMS[m.home], at = TEAMS[m.away];
   if (!ht || !at) { console.warn('openPredModal: team not found', m.home, m.away); return; }
 
+  // 判斷是否已解鎖
+  const isUnlocked = !!(window.unlockedMatchSet?.has(id));
+
   const p   = calcPred(ht, at);
   const pts = generateAnalysis(ht, at, p);
-  // 有賽中資料時用實際 WC 戰績，否則用靜態近期表現
   const hForm = p.hWC ? p.hWC.recentForm : (ht.recentForm||['W','D','W','W','D']);
   const aForm = p.aWC ? p.aWC.recentForm : (at.recentForm||['W','D','W','W','D']);
   const formDots = f => f.map(r=>`<span class="form-dot ${r}" style="width:24px;height:24px;font-size:11px">${r}</span>`).join('');
@@ -296,7 +332,7 @@ async function openPredModal(id) {
       </div>
     </div>
 
-    <!-- 對陣 + 比分 -->
+    <!-- 對陣（免費顯示：旗幟 + 球隊名 + 資訊）-->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:8px">
       <div style="text-align:center;flex:1;min-width:0">
         <div style="font-size:52px;margin-bottom:6px">${ht.flag}</div>
@@ -306,7 +342,7 @@ async function openPredModal(id) {
       </div>
       <div style="text-align:center;padding:0 8px;flex-shrink:0">
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">AI 預測比分</div>
-        <div style="font-size:44px;font-weight:900;color:var(--gold);letter-spacing:4px">${p.score}</div>
+        <div style="font-size:44px;font-weight:900;color:var(--gold);letter-spacing:4px;${isUnlocked ? '' : 'filter:blur(10px);user-select:none'}">${p.score}</div>
         <div style="font-size:11px;color:var(--text-muted);margin:4px 0">xG ${p.hXG} — ${p.aXG}</div>
         <div class="confidence-badge confidence-${p.conf}">${p.confLabel}</div>
       </div>
@@ -318,7 +354,7 @@ async function openPredModal(id) {
       </div>
     </div>
 
-    <!-- 關鍵球員（獨立區塊，不干擾頂部布局）-->
+    <!-- 免費顯示：關鍵球員 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
       <div class="modal-players-box">
         <div class="modal-players-title">${ht.flag} 關鍵球員</div>
@@ -330,106 +366,142 @@ async function openPredModal(id) {
       </div>
     </div>
 
-    <!-- 勝率條 -->
-    <div style="margin-bottom:20px">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-bottom:6px">
-        <div><div style="font-size:22px;font-weight:900;color:var(--green)">${p.hw}%</div><div style="font-size:11px;color:var(--text-muted)">${ht.nameCN} 勝</div></div>
-        <div><div style="font-size:22px;font-weight:900;color:var(--text-secondary)">${p.d}%</div><div style="font-size:11px;color:var(--text-muted)">平局</div></div>
-        <div><div style="font-size:22px;font-weight:900;color:var(--red)">${p.aw}%</div><div style="font-size:11px;color:var(--text-muted)">${at.nameCN} 勝</div></div>
-      </div>
-      <div style="display:flex;height:10px;border-radius:5px;overflow:hidden">
-        <div style="width:${p.hw}%;background:var(--green)"></div>
-        <div style="width:${p.d}%;background:#546e7a"></div>
-        <div style="width:${p.aw}%;background:var(--red)"></div>
-      </div>
-    </div>
+    <!-- 鎖定區塊：勝率 + 完整分析 -->
+    <div class="pred-lock-container${isUnlocked ? '' : ' locked'}">
+      <div class="pred-lock-content">
 
-    <!-- 數據對比雷達 -->
-    <div class="modal-section-title">📊 關鍵數據對比</div>
-    <div style="margin-bottom:16px">
-      ${radarBar('⚔️ 攻擊力', ht.radar.attack, at.radar.attack)}
-      ${radarBar('🛡️ 防守力', ht.radar.defense, at.radar.defense)}
-      ${radarBar('⚙️ 中場控制', ht.radar.midfield, at.radar.midfield)}
-      ${radarBar('💨 速度', ht.radar.speed, at.radar.speed)}
-      ${radarBar('🏆 大賽經驗', ht.radar.experience, at.radar.experience)}
-    </div>
-
-    <!-- AI 戰術分析 -->
-    <div class="modal-section-title">🤖 AI 戰術分析</div>
-    <ul class="pred-key-points" style="margin-bottom:16px">
-      ${pts.map(pt=>`<li>${pt}</li>`).join('')}
-    </ul>
-
-    <!-- 球隊風格 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-      <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px">
-        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">${ht.flag} ${ht.nameCN} 踢法</div>
-        <div style="font-size:12px;color:var(--text-secondary)">${ht.style||''}</div>
-        <div style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${(ht.strengths||['整體實力強'])[0]}</div>
-        <div style="font-size:12px;color:#ef9a9a">✗ ${(ht.weaknesses||['有待觀察'])[0]}</div>
-      </div>
-      <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px">
-        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">${at.flag} ${at.nameCN} 踢法</div>
-        <div style="font-size:12px;color:var(--text-secondary)">${at.style||''}</div>
-        <div style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${(at.strengths||['整體實力強'])[0]}</div>
-        <div style="font-size:12px;color:#ef9a9a">✗ ${(at.weaknesses||['有待觀察'])[0]}</div>
-      </div>
-    </div>
-
-    <!-- 近期狀態 -->
-    <div class="modal-section-title">📈 ${p.wcFormAdj ? '本屆賽中表現（已更新預測）' : '近期狀態（最近5場）'}</div>
-    ${p.wcFormAdj ? `<div style="margin-bottom:10px;padding:8px 12px;background:rgba(76,175,80,0.1);border-radius:8px;border-left:3px solid #4caf50;font-size:12px;color:#4caf50">
-      ⚡ 預測已根據本屆世界盃實際賽果動態調整
-    </div>` : ''}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-      <div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-          <span style="font-size:20px">${ht.flag}</span>${formDots(hForm)}
-          <span style="font-size:12px;color:var(--text-muted)">${formScore(hForm)}分</span>
+        <!-- 勝率條 -->
+        <div style="margin-bottom:20px">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-bottom:6px">
+            <div><div style="font-size:22px;font-weight:900;color:var(--green)">${p.hw}%</div><div style="font-size:11px;color:var(--text-muted)">${ht.nameCN} 勝</div></div>
+            <div><div style="font-size:22px;font-weight:900;color:var(--text-secondary)">${p.d}%</div><div style="font-size:11px;color:var(--text-muted)">平局</div></div>
+            <div><div style="font-size:22px;font-weight:900;color:var(--red)">${p.aw}%</div><div style="font-size:11px;color:var(--text-muted)">${at.nameCN} 勝</div></div>
+          </div>
+          <div style="display:flex;height:10px;border-radius:5px;overflow:hidden">
+            <div style="width:${p.hw}%;background:var(--green)"></div>
+            <div style="width:${p.d}%;background:#546e7a"></div>
+            <div style="width:${p.aw}%;background:var(--red)"></div>
+          </div>
         </div>
-        ${p.hWC ? `<div style="font-size:11px;color:var(--text-muted)">
-          ${p.hWC.played}場：${p.hWC.win}勝${p.hWC.draw}平${p.hWC.lose}負
-          · 進${p.hWC.gf}失${p.hWC.ga}（場均進球 ${p.hWC.gfPerGame}）
+
+        <!-- 數據對比雷達 -->
+        <div class="modal-section-title">📊 關鍵數據對比</div>
+        <div style="margin-bottom:16px">
+          ${radarBar('⚔️ 攻擊力', ht.radar.attack, at.radar.attack)}
+          ${radarBar('🛡️ 防守力', ht.radar.defense, at.radar.defense)}
+          ${radarBar('⚙️ 中場控制', ht.radar.midfield, at.radar.midfield)}
+          ${radarBar('💨 速度', ht.radar.speed, at.radar.speed)}
+          ${radarBar('🏆 大賽經驗', ht.radar.experience, at.radar.experience)}
+        </div>
+
+        <!-- AI 戰術分析 -->
+        <div class="modal-section-title">🤖 AI 戰術分析</div>
+        <ul class="pred-key-points" style="margin-bottom:16px">
+          ${pts.map(pt=>`<li>${pt}</li>`).join('')}
+        </ul>
+
+        <!-- 球隊風格 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px">
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">${ht.flag} ${ht.nameCN} 踢法</div>
+            <div style="font-size:12px;color:var(--text-secondary)">${ht.style||''}</div>
+            <div style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${(ht.strengths||['整體實力強'])[0]}</div>
+            <div style="font-size:12px;color:#ef9a9a">✗ ${(ht.weaknesses||['有待觀察'])[0]}</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px">
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">${at.flag} ${at.nameCN} 踢法</div>
+            <div style="font-size:12px;color:var(--text-secondary)">${at.style||''}</div>
+            <div style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${(at.strengths||['整體實力強'])[0]}</div>
+            <div style="font-size:12px;color:#ef9a9a">✗ ${(at.weaknesses||['有待觀察'])[0]}</div>
+          </div>
+        </div>
+
+        <!-- 近期狀態 -->
+        <div class="modal-section-title">📈 ${p.wcFormAdj ? '本屆賽中表現（已更新預測）' : '近期狀態（最近5場）'}</div>
+        ${p.wcFormAdj ? `<div style="margin-bottom:10px;padding:8px 12px;background:rgba(76,175,80,0.1);border-radius:8px;border-left:3px solid #4caf50;font-size:12px;color:#4caf50">
+          ⚡ 預測已根據本屆世界盃實際賽果動態調整
         </div>` : ''}
-      </div>
-      <div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-          <span style="font-size:20px">${at.flag}</span>${formDots(aForm)}
-          <span style="font-size:12px;color:var(--text-muted)">${formScore(aForm)}分</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+              <span style="font-size:20px">${ht.flag}</span>${formDots(hForm)}
+              <span style="font-size:12px;color:var(--text-muted)">${formScore(hForm)}分</span>
+            </div>
+            ${p.hWC ? `<div style="font-size:11px;color:var(--text-muted)">
+              ${p.hWC.played}場：${p.hWC.win}勝${p.hWC.draw}平${p.hWC.lose}負
+              · 進${p.hWC.gf}失${p.hWC.ga}（場均進球 ${p.hWC.gfPerGame}）
+            </div>` : ''}
+          </div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+              <span style="font-size:20px">${at.flag}</span>${formDots(aForm)}
+              <span style="font-size:12px;color:var(--text-muted)">${formScore(aForm)}分</span>
+            </div>
+            ${p.aWC ? `<div style="font-size:11px;color:var(--text-muted)">
+              ${p.aWC.played}場：${p.aWC.win}勝${p.aWC.draw}平${p.aWC.lose}負
+              · 進${p.aWC.gf}失${p.aWC.ga}（場均進球 ${p.aWC.gfPerGame}）
+            </div>` : ''}
+          </div>
         </div>
-        ${p.aWC ? `<div style="font-size:11px;color:var(--text-muted)">
-          ${p.aWC.played}場：${p.aWC.win}勝${p.aWC.draw}平${p.aWC.lose}負
-          · 進${p.aWC.gf}失${p.aWC.ga}（場均進球 ${p.aWC.gfPerGame}）
-        </div>` : ''}
-      </div>
-    </div>
 
-    <!-- 焦點球員對決 -->
-    <div style="background:rgba(240,192,64,0.07);border-radius:10px;padding:14px;border-left:3px solid var(--gold)">
-      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">⚽ 焦點球員對決</div>
-      <div style="font-size:13px;color:var(--text-secondary)">
-        <strong style="color:var(--text-primary)">${ht.keyPlayers?.[0]?.name||ht.nameCN}</strong>（${ht.keyPlayers?.[0]?.pos||'前鋒'}）
-        vs
-        <strong style="color:var(--text-primary)">${at.keyPlayers?.[0]?.name||at.nameCN}</strong>（${at.keyPlayers?.[0]?.pos||'前鋒'}）
-      </div>
-      ${ht.predDesc?`<div style="margin-top:8px;font-size:12px;color:var(--text-muted)">💡 ${ht.predTitle||''}：${ht.predDesc||''}</div>`:''}
-    </div>
-
-    <!-- 深度分析解鎖 -->
-    <div id="deep-analysis-${m.id}" style="margin-top:16px">
-      <div class="deep-analysis-lock">
-        <div style="font-size:28px;margin-bottom:8px">🔬</div>
-        <div style="font-weight:800;font-size:15px;margin-bottom:6px">深度分析</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">
-          歷史交手紀錄 · 傷兵狀況 · 陣型詳解
+        <!-- 焦點球員對決 -->
+        <div style="background:rgba(240,192,64,0.07);border-radius:10px;padding:14px;border-left:3px solid var(--gold)">
+          <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">⚽ 焦點球員對決</div>
+          <div style="font-size:13px;color:var(--text-secondary)">
+            <strong style="color:var(--text-primary)">${ht.keyPlayers?.[0]?.name||ht.nameCN}</strong>（${ht.keyPlayers?.[0]?.pos||'前鋒'}）
+            vs
+            <strong style="color:var(--text-primary)">${at.keyPlayers?.[0]?.name||at.nameCN}</strong>（${at.keyPlayers?.[0]?.pos||'前鋒'}）
+          </div>
+          ${ht.predDesc?`<div style="margin-top:8px;font-size:12px;color:var(--text-muted)">💡 ${ht.predTitle||''}：${ht.predDesc||''}</div>`:''}
         </div>
-        <button class="pred-unlock-btn" onclick="openDeepAnalysis('${m.id}','${m.home}','${m.away}')">
-          💎×2 解鎖深度分析
-        </button>
+
+        <!-- 深度分析解鎖 -->
+        <div id="deep-analysis-${m.id}" style="margin-top:16px">
+          <div class="deep-analysis-lock">
+            <div style="font-size:28px;margin-bottom:8px">🔬</div>
+            <div style="font-weight:800;font-size:15px;margin-bottom:6px">深度分析</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">
+              歷史交手紀錄 · 傷兵狀況 · 陣型詳解
+            </div>
+            <button class="pred-unlock-btn" onclick="openDeepAnalysis('${m.id}','${m.home}','${m.away}')">
+              <span class="gem-ico" style="width:12px;height:12px"></span>×2 解鎖深度分析
+            </button>
+          </div>
+        </div>
+
       </div>
+
+      <!-- 鎖定遮罩（未解鎖時顯示）-->
+      ${!isUnlocked ? `
+      <div class="pred-lock-overlay">
+        <div class="pred-lock-box">
+          <div style="font-size:32px;margin-bottom:10px">🔒</div>
+          <div style="font-size:16px;font-weight:800;margin-bottom:6px">完整 AI 分析</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.7;margin-bottom:16px">
+            預測比分 · 勝率 · 關鍵球員 · 戰術分析
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px;font-size:13px;color:rgba(255,255,255,0.5)">
+            消耗 <span class="gem-ico" style="width:13px;height:13px"></span> ×${cost} 解鎖
+          </div>
+          ${currentUser
+            ? (window.unlockedMatchSet?.size === 0
+              ? `<button class="pred-unlock-btn" style="width:100%;background:linear-gradient(135deg,#43a047,#1b5e20)" onclick="unlockPredModal('${m.id}','first_free')">
+                  🎁 首次免費解鎖
+                </button>
+                <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3)">每位用戶限一次，之後需消耗寶石</div>`
+              : `<button class="pred-unlock-btn" style="width:100%" onclick="unlockPredModal('${m.id}','${spendType}')">
+                  解鎖查看分析
+                </button>`)
+            : `<button class="pred-unlock-btn" onclick="loginWithGoogle();closeModal()" style="width:100%;background:linear-gradient(135deg,#fff,#ddd);color:#222">
+                <svg width="14" height="14" viewBox="0 0 24 24" style="flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                登入後解鎖
+              </button>`
+          }
+        </div>
+      </div>` : ''}
     </div>
 
-    <!-- 你的預測 -->
+    <!-- 你的預測（永遠免費）-->
     ${(()=>{
       const myPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
       const mine = myPreds[m.id];
@@ -458,7 +530,17 @@ async function openPredModal(id) {
     console.error('openPredModal error:', e);
     mc.innerHTML = `<div style="padding:30px;text-align:center;color:#ef9a9a">⚠️ 載入預測時發生錯誤：${e.message}</div>`;
   }
-  }, 120)); // 120ms：足夠渲染 loading 畫面，又不會讓用戶等太久
+  }, 120));
+}
+
+// 解鎖後重新渲染 modal
+async function unlockPredModal(id, spendType) {
+  const ok = await spendGemForMatch?.(id, spendType)
+  if (ok) {
+    if (!window.unlockedMatchSet) window.unlockedMatchSet = new Set()
+    window.unlockedMatchSet.add(id)
+    openPredModal(id)
+  }
 }
 
 document.getElementById('hamburger-btn').addEventListener('click', () => {

@@ -237,6 +237,51 @@ async function syncToSupabase() {
   }
 }
 
+// ── 社群感：查詢各項目票數 ────────────────────────────────
+async function fetchSocialProof() {
+  const myChampion = load(GK?.champion)
+  const myTeam     = load(GK?.team)
+  const result     = {}
+
+  try {
+    // 與我同選的冠軍票數
+    if (myChampion?.c1) {
+      const { count } = await DB.from('predictions')
+        .select('*', { count: 'exact', head: true })
+        .eq('champion_c1', myChampion.c1)
+      result.championCount = count ?? 0
+    }
+    // 完成分組預測的總人數
+    const { count: gc } = await DB.from('predictions')
+      .select('*', { count: 'exact', head: true })
+      .not('groups_data', 'is', null)
+    result.groupsCount = gc ?? 0
+
+    // 與我支持同隊的人數
+    if (myTeam) {
+      const { count: tc } = await DB.from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .eq('team_code', myTeam)
+      result.teamCount = tc ?? 0
+    }
+  } catch(e) { console.warn('fetchSocialProof:', e) }
+
+  return result
+}
+
+// ── 首頁奪冠票數分佈 ──────────────────────────────────────
+async function fetchChampionVotes() {
+  try {
+    const { data } = await DB.from('predictions')
+      .select('champion_c1')
+      .not('champion_c1', 'is', null)
+    if (!data || data.length === 0) return { counts: {}, total: 0 }
+    const counts = {}
+    data.forEach(r => { counts[r.champion_c1] = (counts[r.champion_c1] || 0) + 1 })
+    return { counts, total: data.length }
+  } catch(e) { return { counts: {}, total: 0 } }
+}
+
 // ── 取得排行榜資料 ────────────────────────────────────────
 async function fetchLeaderboard() {
   const { data, error } = await DB.from('leaderboard')

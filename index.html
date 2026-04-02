@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2026 FIFA 世界盃 — 預測分析平台</title>
 
+  <!-- OneSignal Web Push -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({ appId: '03677034-20ab-4f1b-83e2-38b4dcc4f692' });
+    });
+  </script>
+
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Font Awesome -->
@@ -77,9 +86,22 @@
       </div>
 
       <!-- 寶石顯示（已登入） -->
-      <div id="nav-gem-widget" class="nav-gem-widget" style="display:none" title="我的寶石">
-        <span class="nav-gem-icon">💎</span>
+      <div id="nav-gem-widget" class="nav-gem-widget" style="display:none" onclick="toggleGemPanel()" title="我的寶石" style="cursor:pointer">
+        <span class="gem-ico"></span>
         <span id="nav-gem-count" class="nav-gem-count">0</span>
+      </div>
+
+      <!-- 寶石說明下拉面板 -->
+      <div id="gem-panel" class="gem-panel">
+        <div class="gem-panel-title">獲得寶石方式</div>
+        <div class="gem-panel-row"><span>❓ 每日答題答對</span><span class="gem-panel-val earn">+1 / 天</span></div>
+        <div class="gem-panel-row"><span>🔥 連勝 7 / 14 / 30 天</span><span class="gem-panel-val earn">+3 / +5 / +10</span></div>
+        <div class="gem-panel-row"><span>🏆 首次冠軍預測</span><span class="gem-panel-val earn">+2</span></div>
+        <div class="gem-panel-row"><span>📋 首次分組預測</span><span class="gem-panel-val earn">+2</span></div>
+        <div class="gem-panel-row"><span>❤️ 首次支持球隊</span><span class="gem-panel-val earn">+1</span></div>
+        <div class="gem-panel-row"><span>👥 邀請好友加入</span><span class="gem-panel-val earn">+3</span></div>
+        <div class="gem-panel-row"><span>⬆️ 等級提升</span><span class="gem-panel-val earn">+2 ～ +10</span></div>
+        <button onclick="copyRefLink();toggleGemPanel()" class="gem-panel-invite-btn">📨 複製邀請連結・每邀一人 +3</button>
       </div>
 
       <!-- 登入按鈕（未登入） -->

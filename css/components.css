@@ -132,6 +132,20 @@
 .champion-card:nth-child(1) { border-color: rgba(240,192,64,0.4); background: rgba(240,192,64,0.07); }
 .champion-card:nth-child(2) { border-color: rgba(180,180,180,0.3); }
 .champion-card:nth-child(3) { border-color: rgba(184,115,51,0.3); }
+.champion-card-locked { opacity: 0.6; cursor: pointer; }
+.champion-card-locked:hover { opacity: 0.85; transform: translateY(-3px); }
+.champion-lock-hint {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; color: rgba(255,255,255,0.4); white-space: nowrap;
+}
+.champion-votes {
+  font-size: 11px; color: rgba(255,255,255,0.35);
+  margin-top: 4px; min-height: 14px;
+}
+.arena-social-proof {
+  font-size: 11px; color: rgba(255,255,255,0.35);
+  margin-top: 6px; min-height: 14px;
+}
 
 /* ---------- 即將開賽 ---------- */
 .upcoming-grid {
@@ -649,15 +663,71 @@
 }
 
 /* ========== 寶石元件 ========== */
-.nav-gem-widget {
-  display: flex; align-items: center; gap: 5px;
-  padding: 5px 12px; border-radius: 999px;
-  border: 1px solid rgba(100,220,255,0.25);
-  background: rgba(100,220,255,0.06);
-  flex-shrink: 0; cursor: default;
+
+/* 黃色寶石圖示（五角形 CSS 幾何） */
+.gem-ico {
+  display: inline-block;
+  width: 14px; height: 14px;
+  background: linear-gradient(160deg, #ffe566 0%, #ffbc00 45%, #e07800 100%);
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  filter: drop-shadow(0 0 3px rgba(255,190,0,0.8));
+  vertical-align: middle;
+  flex-shrink: 0;
 }
-.nav-gem-icon { font-size: 15px; }
-.nav-gem-count { font-size: 13px; font-weight: 800; color: #64dcff; }
+
+.nav-gem-widget {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 999px;
+  border: 1px solid rgba(255,188,0,0.3);
+  background: rgba(255,188,0,0.08);
+  flex-shrink: 0; cursor: pointer;
+  position: relative;
+}
+.nav-gem-count { font-size: 13px; font-weight: 800; color: #ffbc00; }
+
+.gem-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 260px;
+  background: #13162a;
+  border: 1px solid rgba(255,188,0,0.2);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  z-index: 999;
+  animation: gemPanelIn 0.18s ease;
+}
+.gem-panel.open { display: block; }
+@keyframes gemPanelIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.gem-panel-title {
+  font-size: 11px; font-weight: 800; color: #ffbc00;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.gem-panel-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; color: var(--text-muted);
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.gem-panel-val { font-weight: 800; font-size: 12px; }
+.gem-panel-val.earn { color: #4caf50; }
+.gem-panel-val.spend { color: #ff6b6b; }
+.gem-panel-divider { margin: 12px 0 10px; border-top: 1px solid rgba(255,255,255,0.08); }
+.gem-panel-invite-btn {
+  width: 100%; margin-top: 12px;
+  padding: 10px; border-radius: 10px;
+  background: rgba(255,188,0,0.1);
+  border: 1px solid rgba(255,188,0,0.25);
+  color: #ffbc00; font-size: 12px; font-weight: 700;
+  cursor: pointer; text-align: center;
+}
+.gem-panel-invite-btn:hover { background: rgba(255,188,0,0.18); }
 
 .gem-earn-row {
   display: flex; align-items: center; gap: 12px;
@@ -667,7 +737,77 @@
   font-size: 13px;
 }
 .gem-earn-row span:nth-child(2) { flex: 1; }
-.gem-earn-amt { color: #64dcff; font-weight: 800; }
+.gem-earn-amt { color: #ffbc00; font-weight: 800; }
+
+/* 競技場寶石說明面板 */
+.gem-guide-panel {
+  margin-top: 20px;
+  background: rgba(255,188,0,0.04);
+  border: 1px solid rgba(255,188,0,0.15);
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+.gem-guide-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 800; color: #ffbc00;
+  margin-bottom: 14px;
+}
+.gem-guide-cols {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+@media (max-width: 540px) {
+  .gem-guide-cols { grid-template-columns: 1fr; }
+}
+.gem-guide-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; color: var(--text-muted);
+  padding: 7px 10px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  gap: 8px;
+}
+.gem-guide-section-label {
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.3);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin: 12px 0 6px;
+}
+.gem-earn-val { color: #4caf50; font-weight: 800; white-space: nowrap; }
+.gem-spend-val { color: #ff6b6b; font-weight: 800; white-space: nowrap; }
+
+/* 卡片寶石獎勵標籤 */
+.arena-card-gem {
+  font-size: 11px; color: #ffbc00; font-weight: 700;
+  display: flex; align-items: center; gap: 3px;
+}
+
+/* 預測分析鎖定遮罩 */
+.pred-lock-container {
+  position: relative;
+}
+.pred-lock-container.locked .pred-lock-content {
+  max-height: 220px;
+  overflow: hidden;
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
+.pred-lock-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(to bottom, transparent 0%, rgba(13,15,24,0.7) 30%, rgba(13,15,24,0.97) 60%);
+  border-radius: 12px;
+  padding: 16px;
+}
+.pred-lock-box {
+  text-align: center;
+  padding: 24px 28px;
+  background: rgba(20,22,35,0.95);
+  border: 1px solid rgba(255,188,0,0.25);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  width: 100%; max-width: 280px;
+}
 
 /* 深度分析鎖定區塊 */
 .deep-analysis-lock {
