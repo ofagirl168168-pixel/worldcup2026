@@ -484,7 +484,7 @@ async function openPredModal(id) {
             消耗 <span class="gem-ico" style="width:13px;height:13px"></span> ×${cost} 解鎖
           </div>
           ${currentUser
-            ? (window.unlockedMatchSet?.size === 0
+            ? (!window.firstFreeUsed
               ? `<button class="pred-unlock-btn" style="width:100%;background:linear-gradient(135deg,#43a047,#1b5e20)" onclick="unlockPredModal('${m.id}','first_free')">
                   🎁 首次免費解鎖
                 </button>

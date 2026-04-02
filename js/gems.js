@@ -108,6 +108,11 @@ async function initGems() {
   // 載入已解鎖比賽清單（供 openPredModal 判斷是否顯示遮罩）
   window.unlockedMatchSet = await fetchUnlockedMatches()
 
+  // 單獨確認 first_free 是否已使用（不依賴 unlockedMatchSet 大小）
+  const { data: ffRow } = await DB.from('gem_transactions')
+    .select('id').eq('user_id', currentUser.id).eq('type', 'first_free').maybeSingle()
+  window.firstFreeUsed = !!ffRow
+
   // 處理邀請碼（從 URL ?ref=CODE）
   const urlRef = new URLSearchParams(window.location.search).get('ref')
   if (urlRef) {
