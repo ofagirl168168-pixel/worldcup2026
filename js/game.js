@@ -12,68 +12,97 @@ const GK = {
 const load = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
 const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
-// ── 每日題庫（客觀事實題，每題均有正確答案）────────────────
+// ── 每日題庫 ─────────────────────────────────────────────
+// type: 'normal'=一般 | 'hard'=高難度（讓人想問朋友）| 'viral'=話題性/出人意料
 const DAILY_QUESTIONS = [
-  { q:'2026年世界盃共有幾支球隊參賽？',
-    opts:['32支','36支','48支','40支'], correct:2 },
-  { q:'2026年世界盃由哪幾個國家聯合主辦？',
-    opts:['僅美國','美國、加拿大與墨西哥','美國與加拿大','美國與墨西哥'], correct:1 },
-  { q:'2026年世界盃決賽將在哪座球場舉行？',
-    opts:['SoFi Stadium','AT&T Stadium','Hard Rock Stadium','MetLife Stadium'], correct:3 },
-  { q:'哪個國家贏得世界盃冠軍次數最多（5次）？',
-    opts:['德國','義大利','巴西','阿根廷'], correct:2 },
-  { q:'2022年卡達世界盃冠軍是哪支球隊？',
-    opts:['法國','阿根廷','克羅埃西亞','摩洛哥'], correct:1 },
-  { q:'2018年俄羅斯世界盃冠軍是哪支球隊？',
-    opts:['法國','克羅埃西亞','比利時','英格蘭'], correct:0 },
-  { q:'2014年巴西世界盃冠軍是哪支球隊？',
-    opts:['巴西','阿根廷','德國','荷蘭'], correct:2 },
-  { q:'2010年南非世界盃冠軍是哪支球隊？',
-    opts:['荷蘭','德國','西班牙','阿根廷'], correct:2 },
-  { q:'2026年世界盃共有幾場比賽？',
-    opts:['64場','80場','96場','104場'], correct:3 },
-  { q:'世界盃首屆於哪一年舉辦？',
-    opts:['1920年','1924年','1930年','1934年'], correct:2 },
-  { q:'首屆世界盃在哪個國家舉辦？',
-    opts:['巴西','法國','義大利','烏拉圭'], correct:3 },
-  { q:'首屆世界盃冠軍是哪支球隊？',
-    opts:['烏拉圭','阿根廷','巴西','美國'], correct:0 },
-  { q:'Miroslav Klose 的世界盃生涯總進球紀錄是幾球？',
-    opts:['12球','14球','16球','18球'], correct:2 },
-  { q:'哪支球隊在2014年世界盃準決賽以7:1大勝巴西？',
-    opts:['阿根廷','德國','荷蘭','法國'], correct:1 },
-  { q:'德國共贏得幾次世界盃冠軍？',
-    opts:['3次','4次','5次','2次'], correct:1 },
-  { q:'義大利共贏得幾次世界盃冠軍？',
-    opts:['3次','4次','5次','2次'], correct:1 },
-  { q:'阿根廷共贏得幾次世界盃冠軍（含2022年）？',
-    opts:['1次','2次','3次','4次'], correct:2 },
-  { q:'法國共贏得幾次世界盃冠軍？',
-    opts:['1次','2次','3次','4次'], correct:1 },
-  { q:'梅西在哪一年首次贏得世界盃冠軍？',
-    opts:['2014年','2018年','2022年','2026年'], correct:2 },
-  { q:'世界盃是每幾年舉辦一次？',
-    opts:['2年','3年','4年','5年'], correct:2 },
-  { q:'2026年世界盃小組賽共分幾組？',
+
+  // ── NORMAL ───────────────────────────────────────────────
+  { type:'normal', q:'2026年世界盃共有幾支球隊參賽？',
+    opts:['32支','40支','48支','56支'], correct:2 },
+  { type:'normal', q:'2026年世界盃由哪幾個國家聯合主辦？',
+    opts:['僅美國','美國與加拿大','美國與墨西哥','美國、加拿大與墨西哥'], correct:3 },
+  { type:'normal', q:'2022年卡達世界盃冠軍是哪支球隊？',
+    opts:['法國','克羅埃西亞','摩洛哥','阿根廷'], correct:3 },
+  { type:'normal', q:'哪個國家贏得世界盃冠軍次數最多？',
+    opts:['德國（4次）','義大利（4次）','巴西（5次）','阿根廷（3次）'], correct:2 },
+  { type:'normal', q:'梅西在哪一年首次捧起世界盃金盃？',
+    opts:['2014年','2018年','2022年','尚未奪冠'], correct:2 },
+  { type:'normal', q:'2018年俄羅斯世界盃冠軍是哪支球隊？',
+    opts:['克羅埃西亞','比利時','英格蘭','法國'], correct:3 },
+  { type:'normal', q:'2026年世界盃決賽將在哪座球場舉行？',
+    opts:['SoFi Stadium','AT&T Stadium','MetLife Stadium','Hard Rock Stadium'], correct:2 },
+  { type:'normal', q:'世界盃是每幾年舉辦一次？',
+    opts:['2年','3年','4年','8年'], correct:2 },
+  { type:'normal', q:'2014年世界盃在哪個國家舉辦？',
+    opts:['阿根廷','哥倫比亞','智利','巴西'], correct:3 },
+  { type:'normal', q:'2010年世界盃冠軍是哪支球隊？',
+    opts:['荷蘭','德國','葡萄牙','西班牙'], correct:3 },
+  { type:'normal', q:'首屆世界盃在1930年哪個國家舉辦？',
+    opts:['巴西','法國','阿根廷','烏拉圭'], correct:3 },
+  { type:'normal', q:'2026年世界盃小組賽共分幾組？',
     opts:['8組','10組','12組','16組'], correct:2 },
-  { q:'葡萄牙在2006年世界盃的最終名次是？',
-    opts:['第三名','亞軍','四強第四名','八強'], correct:0 },
-  { q:'1994年世界盃決賽（巴西 vs 義大利）最終如何分勝負？',
-    opts:['巴西加時進球','點球大戰（巴西勝）','正規時間巴西進球','義大利加時進球'], correct:1 },
-  { q:'哪支球隊三度打入世界盃決賽但從未奪冠（截至2022年）？',
-    opts:['捷克','匈牙利','荷蘭','克羅埃西亞'], correct:2 },
-  { q:'2006年世界盃在哪個國家舉辦？',
-    opts:['法國','德國','義大利','西班牙'], correct:1 },
-  { q:'法國隊在哪一年首次奪得世界盃冠軍？',
+  { type:'normal', q:'世界盃生涯進球最多的球員是誰（16球）？',
+    opts:['Pelé','Ronaldo (巴西)','Miroslav Klose','梅西'], correct:2 },
+  { type:'normal', q:'2022年世界盃哪支非洲球隊首次打入四強？',
+    opts:['塞內加爾','奈及利亞','迦納','摩洛哥'], correct:3 },
+  { type:'normal', q:'2026年世界盃共有幾場比賽？',
+    opts:['64場','80場','96場','104場'], correct:3 },
+  { type:'normal', q:'法國首次奪得世界盃冠軍是在哪一年？',
     opts:['1994年','1998年','2002年','2006年'], correct:1 },
-  { q:'2022年世界盃在哪個國家舉辦？',
-    opts:['沙烏地阿拉伯','阿聯酋','卡達','巴林'], correct:2 },
-  { q:'2026年世界盃32強賽共有幾場比賽？',
-    opts:['8場','12場','16場','24場'], correct:2 },
-  { q:'Pelé 在哪一年首次贏得世界盃冠軍（當時幾歲）？',
-    opts:['1954年（13歲）','1958年（17歲）','1962年（21歲）','1966年（25歲）'], correct:1 },
-  { q:'2022年世界盃決賽中，誰為法國完成帽子戲法但最終落敗？',
-    opts:['格列茲曼','奧利維耶・吉魯','姆巴佩','本澤馬'], correct:2 },
+  { type:'normal', q:'C羅（Ronaldo）效力哪支球隊時連續3年拿下金球獎？',
+    opts:['曼聯','拜仁慕尼黑','皇家馬德里','尤文圖斯'], correct:2 },
+  { type:'normal', q:'2022年世界盃決賽，法國誰完成帽子戲法卻最終落敗？',
+    opts:['格列茲曼','吉魯','本澤馬','姆巴佩'], correct:3 },
+  { type:'normal', q:'哪支球隊曾3度打入世界盃決賽卻從未奪冠（至2022年）？',
+    opts:['捷克','匈牙利','荷蘭','葡萄牙'], correct:2 },
+  { type:'normal', q:'阿根廷共奪得幾次世界盃冠軍（含2022年）？',
+    opts:['1次','2次','3次','4次'], correct:2 },
+
+  // ── HARD（讓人忍不住問朋友的難題）────────────────────────
+  { type:'hard', q:'世界盃史上最快進球是誰打進的？用時僅11秒！',
+    opts:['Rivaldo','Hakan Şükür（土耳其）','Pelé','Robbie Fowler'], correct:1 },
+  { type:'hard', q:'世界盃史上單場進球最多的比賽是哪一場（共12球）？',
+    opts:['巴西10:1薩爾瓦多','匈牙利10:1薩爾瓦多','奧地利7:5瑞士（1954年）','德國8:0沙烏地阿拉伯'], correct:2 },
+  { type:'hard', q:'哪位球員是世界盃決賽史上唯一完成帽子戲法的球員？',
+    opts:['Pelé','Just Fontaine','Geoff Hurst（1966英格蘭）','Paolo Rossi'], correct:2 },
+  { type:'hard', q:'1950年世界盃決賽圈，哪支球隊因拒絕搭飛機而退賽缺席？',
+    opts:['德國','印度','法國','阿根廷'], correct:1 },
+  { type:'hard', q:'世界盃史上哪支球隊以最大比分差距獲勝（13:0）？',
+    opts:['巴西','德國','匈牙利（1982年）','阿根廷'], correct:2 },
+  { type:'hard', q:'梅西在2022年世界盃總共踢進幾球？（含小組賽到決賽）',
+    opts:['5球','6球','7球','8球'], correct:2 },
+  { type:'hard', q:'世界盃史上哪位球員同時贏得金球獎與金靴獎？',
+    opts:['Ronaldo（巴西，2002）','Pelé（1970）','馬拉度納（1986）','梅西（2022）'], correct:0 },
+  { type:'hard', q:'2002年世界盃，韓國爆冷打敗義大利進四強，延長賽的絕殺是誰進的？',
+    opts:['朴智星','安貞煥','黃善洪','車範根'], correct:1 },
+  { type:'hard', q:'哪位球員連續參加了5屆世界盃（1994–2010）？',
+    opts:['卡卡','Cafu（巴西）','蒂埃里・亨利','菲利普・拉姆'], correct:1 },
+  { type:'hard', q:'世界盃史上哪位守門員在1994年以點球決勝踢進了一球？',
+    opts:['Jorge Campos','René Higuita（哥倫比亞）','Dida','Peter Schmeichel'], correct:1 },
+  { type:'hard', q:'2006年決賽，齊達內頭頂馬特拉齊後下場，法國最終輸掉世界盃。齊達內後來說馬特拉齊說了什麼？',
+    opts:['罵了他的母親和姐姐','說他是世界最差球員','說法國隊會輸','嘲笑他的禿頭'], correct:0 },
+
+  // ── VIRAL（爆笑、意外、話題十足）──────────────────────────
+  { type:'viral', q:'2022年沙烏地阿拉伯爆冷擊敗阿根廷後，沙烏地政府宣布了什麼？',
+    opts:['宣布國定假日放假一天','頒獎金給每位球員10億里亞爾','在全國放煙火3天','邀請梅西移民沙烏地'], correct:0 },
+  { type:'viral', q:'2022年世界盃，C羅在分組賽後期被換下場時做了什麼引爆話題？',
+    opts:['在場邊哭泣','親吻隊長袖章後去廁所','直接走進更衣室不看比賽','在板凳上看手機'], correct:2 },
+  { type:'viral', q:'2014年巴西慘遭德國7:1大屠殺後，巴西人如何稱呼這場比賽？',
+    opts:['黑色星期四','Mineirazo（米內羅慘案）','七比一之夜','巴西之死'], correct:1 },
+  { type:'viral', q:'馬拉度納1986年世界盃用手打進的那個球，他事後稱之為什麼？',
+    opts:['球王之手','上帝之手','魔鬼之手','天才之手'], correct:1 },
+  { type:'viral', q:'2022年世界盃，梅西對荷蘭比賽後的慶祝影片裡說了什麼話讓全球瘋傳？',
+    opts:['"Qué miras, bobo（你在看什麼，蠢蛋）"','「我是最偉大的」','「再見了，荷蘭」','「這是給巴西看的」'], correct:0 },
+  { type:'viral', q:'哪支球隊在2002年世界盃分組賽輸給了美國，引發本國政治危機？',
+    opts:['葡萄牙','南韓','墨西哥','葡萄牙'], correct:0 },
+  { type:'viral', q:'2010年世界盃，哪隻章魚準確預測了所有8場賽果並成為國際明星？',
+    opts:['保羅（Paul）','Otto','Octavio','Calimero'], correct:0 },
+  { type:'viral', q:'2022年世界盃，哪位球員在慶祝進球時模仿了梅西標誌性的「指天」動作，讓現場一片爆笑？',
+    opts:['姆巴佩','恩坎坎巴（Enzo Fernández）','C羅','荷蘭隊員Gakpo'], correct:1 },
+  { type:'viral', q:'世界盃史上，哪支球隊是連續最多屆未能晉級決賽圈的歐洲強隊？',
+    opts:['蘇格蘭（連續10屆未進決賽圈）','希臘','荷蘭','羅馬尼亞'], correct:0 },
+  { type:'viral', q:'2026年世界盃48支球隊中，哪個大洲的代表隊數量最多？',
+    opts:['歐洲（16席）','非洲（9席）','亞洲（8席）','南美洲（6席）'], correct:0 },
 ];
 
 // ── 模擬全站投票數（依 FIFA 排名計算合理分佈）──────────────
@@ -98,11 +127,27 @@ function getSimVotes() {
   return { votes, total: Object.values(votes).reduce((a,b)=>a+b,0) };
 }
 
-// ── 取今日題目（以日期為索引循環）────────────────────────
+// ── 本地日期字串（以本地時間為準，半夜12點換題）────────────
+function localDateStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// ── 取今日題目：每5天出難題，每3天出話題題，其餘一般題 ──────
 function getTodayQuestion() {
-  const today = new Date().toISOString().slice(0,10);
+  const today  = localDateStr();
   const dayIdx = Math.floor((new Date(today) - new Date('2026-01-01')) / 86400000);
-  return { ...DAILY_QUESTIONS[dayIdx % DAILY_QUESTIONS.length], date: today };
+
+  const normals = DAILY_QUESTIONS.filter(q => q.type === 'normal');
+  const hards   = DAILY_QUESTIONS.filter(q => q.type === 'hard');
+  const virals  = DAILY_QUESTIONS.filter(q => q.type === 'viral');
+
+  let pool;
+  if (dayIdx % 5 === 0 && hards.length)        pool = hards;   // 每5天難題
+  else if (dayIdx % 3 === 0 && virals.length)  pool = virals;  // 每3天話題題
+  else                                          pool = normals;
+
+  return { ...pool[dayIdx % pool.length], date: today };
 }
 
 // ── 連勝天數計算 ──────────────────────────────────────────
@@ -111,14 +156,15 @@ function getDailyState() {
 }
 
 function recordDailyAnswer(optIdx) {
-  const today = new Date().toISOString().slice(0,10);
+  const today = localDateStr();
   const state = getDailyState();
   if (state.history[today] !== undefined) return state; // 今天已答
 
   const { correct } = getTodayQuestion();
   const isCorrect = optIdx === correct;
 
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  const yd = new Date(); yd.setDate(yd.getDate() - 1);
+  const yesterday = `${yd.getFullYear()}-${String(yd.getMonth()+1).padStart(2,'0')}-${String(yd.getDate()).padStart(2,'0')}`;
   const newStreak = isCorrect ? (state.lastDate === yesterday ? state.streak + 1 : 1) : 0;
   state.streak   = newStreak;
   state.lastDate = today;
@@ -182,7 +228,7 @@ function updateNavXP() {
 
 // ── 導覽列紅點徽章 ────────────────────────────────────────
 function updateArenaBadge() {
-  const today      = new Date().toISOString().slice(0,10);
+  const today      = localDateStr();
   const dailyDone  = (load(GK.daily)?.history?.[today] !== undefined);
   const champDone  = !!load(GK.champion);
   const groupsDone = Object.keys(load(GK.groups)||{}).length === 12;
@@ -210,7 +256,7 @@ function renderHomeDailyChallenge() {
   const el = document.getElementById('home-daily-section');
   if (!el) return;
 
-  const today      = new Date().toISOString().slice(0,10);
+  const today      = localDateStr();
   const state      = getDailyState();
   const dailyDone  = state.history[today] !== undefined;
   const champDone  = !!load(GK.champion);
@@ -330,7 +376,7 @@ function renderArena() {
   const myChampion = load(GK.champion);
   const myGroups   = load(GK.groups);
   const dailyState = getDailyState();
-  const today      = new Date().toISOString().slice(0,10);
+  const today      = localDateStr();
   const dailyDone  = dailyState.history[today] !== undefined;
   const groupsDone = myGroups && Object.keys(myGroups).length === 12;
   const answeredCount = Object.keys(dailyState.history).length;
