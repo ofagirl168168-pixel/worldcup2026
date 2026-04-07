@@ -90,6 +90,16 @@ async function fetchUnlockedMatches() {
   return new Set((data ?? []).map(r => r.ref_id).filter(Boolean))
 }
 
+// ── 取得已解鎖深度分析的比賽清單 ────────────────────────
+async function fetchUnlockedDeep() {
+  if (!currentUser) return new Set()
+  const { data } = await DB.from('gem_transactions')
+    .select('ref_id')
+    .eq('user_id', currentUser.id)
+    .eq('type', 'unlock_deep')
+  return new Set((data ?? []).map(r => r.ref_id).filter(Boolean))
+}
+
 // ── 更新導覽列寶石顯示 ────────────────────────────────────
 function updateGemUI(balance) {
   const el = document.getElementById('nav-gem-count')
@@ -107,6 +117,7 @@ async function initGems() {
 
   // 載入已解鎖比賽清單（供 openPredModal 判斷是否顯示遮罩）
   window.unlockedMatchSet = await fetchUnlockedMatches()
+  window.unlockedDeepSet  = await fetchUnlockedDeep()
 
   // 單獨確認 first_free 是否已使用（不依賴 unlockedMatchSet 大小）
   const { data: ffRow } = await DB.from('gem_transactions')

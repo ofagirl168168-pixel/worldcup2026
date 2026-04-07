@@ -482,8 +482,17 @@ async function openPredModal(id) {
           <div class="deep-analysis-lock">
             <div style="font-size:28px;margin-bottom:8px">🔬</div>
             <div style="font-weight:800;font-size:15px;margin-bottom:6px">深度分析</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">
-              歷史交手紀錄 · 傷兵狀況 · 陣型詳解
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:2">
+              <div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center">
+                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">🎯 大小球</span>
+                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">🔁 讓球盤</span>
+                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">🅱 雙方進球</span>
+                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">⛳ 角球數</span>
+                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">🟨 黃牌數</span>
+                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">⏱ 半場比分</span>
+                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">🏥 傷兵狀況</span>
+                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">📋 陣型詳解</span>
+              </div>
             </div>
             <button class="pred-unlock-btn" onclick="openDeepAnalysis('${m.id}','${m.home}','${m.away}')">
               <span class="gem-ico" style="width:12px;height:12px"></span>×2 解鎖深度分析
@@ -557,6 +566,11 @@ async function openPredModal(id) {
 
   // modal 已在 loading 階段開啟，這裡只捲到頂部
   modal.scrollTop = 0;
+
+  // 若深度分析已解鎖，自動展開（不再消耗寶石）
+  if (window.unlockedDeepSet?.has(m.id)) {
+    setTimeout(() => openDeepAnalysis(m.id, m.home, m.away), 0)
+  }
   } catch(e) {
     console.error('openPredModal error:', e);
     mc.innerHTML = `<div style="padding:30px;text-align:center;color:#ef9a9a">⚠️ 載入預測時發生錯誤：${e.message}</div>`;
