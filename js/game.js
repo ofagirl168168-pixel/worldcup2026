@@ -949,7 +949,7 @@ async function shareDailyImage() {
     if (_isMobile() && navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file], text: '🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！' }).catch(() => {})
     } else {
-      showDesktopShareModal({ blob, link, filename: 'daily-challenge.png', title: '🧠 出題挑戰' })
+      showDesktopShareModal({ blob, link, filename: 'daily-challenge.png', title: '🧠 出題挑戰', text: `🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！\n${link}` })
     }
   }, 'image/png')
 }
@@ -1413,7 +1413,7 @@ async function shareGroupImage() {
       } catch {}
     }
     // 電腦版：開啟分享 Modal
-    showDesktopShareModal({ blob, link: shareLink, filename: 'wc2026-group-prediction.png', title: '📊 分享我的分組預測' })
+    showDesktopShareModal({ blob, link: shareLink, filename: 'wc2026-group-prediction.png', title: '📊 分享我的分組預測', text: `📊 我的 2026 世界盃分組晉級預測出爐！來挑戰我的選隊眼光！\n${shareLink}` })
   }, 'image/png')
 }
 
