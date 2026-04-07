@@ -482,14 +482,14 @@ function renderArena() {
 
     <!-- 分享卡（分組填完後才顯示）-->
     ${groupsDone ? `
-    <div style="max-width:900px;margin:20px auto 0;padding:0 20px">
-      <div style="display:flex;align-items:center;gap:16px;padding:20px 24px;border-radius:16px;background:linear-gradient(135deg,rgba(240,192,64,0.12),rgba(255,140,0,0.08));border:1px solid rgba(240,192,64,0.3);cursor:pointer" onclick="shareGroupImage()">
-        <div style="font-size:36px;flex-shrink:0">📤</div>
+    <div style="max-width:960px;margin:-24px auto 32px;padding:0 24px">
+      <div style="display:flex;align-items:center;gap:16px;padding:18px 22px;border-radius:16px;background:linear-gradient(135deg,rgba(240,192,64,0.10),rgba(255,140,0,0.06));border:1px solid rgba(240,192,64,0.3);cursor:pointer" onclick="shareGroupImage()">
+        <div style="font-size:32px;flex-shrink:0">📤</div>
         <div style="flex:1;min-width:0">
-          <div style="font-weight:800;font-size:15px;margin-bottom:4px;color:var(--gold)">分享你的分組預測</div>
-          <div style="font-size:12px;color:var(--text-muted);line-height:1.6">生成精美預測圖附上 QR Code，挑戰好友的眼光</div>
+          <div style="font-weight:800;font-size:14px;margin-bottom:3px;color:var(--gold)">分享你的分組預測</div>
+          <div style="font-size:12px;color:var(--text-muted)">生成精美預測圖附上 QR Code，挑戰好友的眼光</div>
         </div>
-        <button class="btn-primary" style="flex-shrink:0;padding:10px 20px;font-size:13px;pointer-events:none">
+        <button class="btn-primary" style="flex-shrink:0;padding:9px 18px;font-size:13px;pointer-events:none">
           <i class="fas fa-share-alt"></i> 立即分享
         </button>
       </div>
