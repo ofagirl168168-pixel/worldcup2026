@@ -66,6 +66,9 @@ async function handleUserLoggedIn(isNew) {
   // 初始化寶石（每日簽到 + 餘額）
   await initGems?.();
 
+  // 從 Supabase 還原競技場資料 → localStorage
+  await loadArenaFromSupabase()
+
   updateNavXP?.();
   renderArena?.();
 }
@@ -234,6 +237,63 @@ async function syncToSupabase() {
       chosen_idx: rec.chosen,
       is_correct: rec.isCorrect
     }, { onConflict: 'user_id,question_date', ignoreDuplicates: true });
+  }
+}
+
+// ── 競技場資料同步 localStorage → Supabase ──────────────────
+async function syncArenaToSupabase(type = 'picks') {
+  if (!currentUser) return
+  try {
+    if (type === 'picks' || type === 'all') {
+      await DB.from('arena_picks').upsert({
+        user_id:    currentUser.id,
+        champion:   load(GK?.champion),
+        groups:     load(GK?.groups),
+        team:       load(GK?.team),
+        badges:     load('wc26_badges') ?? [],
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' })
+    }
+    if (type === 'daily' || type === 'all') {
+      const state = getDailyState?.()
+      if (state) {
+        await DB.from('arena_daily').upsert({
+          user_id:    currentUser.id,
+          streak:     state.streak   ?? 0,
+          last_date:  state.lastDate ?? null,
+          history:    state.history  ?? {},
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' })
+      }
+    }
+  } catch (e) {
+    console.warn('syncArenaToSupabase error:', e)
+  }
+}
+
+// ── 競技場資料從 Supabase 載入 → localStorage ───────────────
+async function loadArenaFromSupabase() {
+  if (!currentUser) return
+  try {
+    const [{ data: picks }, { data: daily }] = await Promise.all([
+      DB.from('arena_picks').select('*').eq('user_id', currentUser.id).maybeSingle(),
+      DB.from('arena_daily').select('*').eq('user_id', currentUser.id).maybeSingle()
+    ])
+    if (picks) {
+      if (picks.champion) localStorage.setItem('wc26_champion', JSON.stringify(picks.champion))
+      if (picks.groups)   localStorage.setItem('wc26_groups',   JSON.stringify(picks.groups))
+      if (picks.team)     localStorage.setItem('wc26_team',     JSON.stringify(picks.team))
+      if (picks.badges?.length) localStorage.setItem('wc26_badges', JSON.stringify(picks.badges))
+    }
+    if (daily) {
+      localStorage.setItem('wc26_daily', JSON.stringify({
+        streak:   daily.streak    ?? 0,
+        lastDate: daily.last_date ?? null,
+        history:  daily.history   ?? {}
+      }))
+    }
+  } catch (e) {
+    console.warn('loadArenaFromSupabase error:', e)
   }
 }
 

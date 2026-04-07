@@ -124,6 +124,7 @@ function recordDailyAnswer(optIdx) {
   state.lastDate = today;
   state.history[today] = { chosen: optIdx, isCorrect };
   save(GK.daily, state);
+  syncArenaToSupabase?.('daily');
 
   // 寶石獎勵（非同步，不阻塞UI）
   if (isCorrect) {
@@ -676,6 +677,7 @@ function saveChampionPick() {
   if (c1===c2 || c1===c3 || c2===c3) { alert('冠亞季軍不能選同一支球隊'); return; }
   save(GK.champion, { c1, c2, c3, lockedAt: new Date().toISOString() });
   syncToSupabase?.();
+  syncArenaToSupabase?.('picks');
   onFirstChampion?.();
   updateNavXP();
   checkAchievements();
@@ -706,7 +708,7 @@ function openGroupPicks() {
               const t = TEAMS[code];
               if (!t) return '';
               const sel = picked.includes(code);
-              return `<div class="group-pick-team ${sel?'selected':''}" onclick="toggleGroupPick('${g}','${code}',this)">
+              return `<div class="group-pick-team ${sel?'selected':''}" data-code="${code}" onclick="toggleGroupPick('${g}','${code}',this)">
                 <span>${flagImg(t.flag)}</span>
                 <span>${t.nameCN}</span>
               </div>`;
@@ -748,10 +750,7 @@ function saveGroupPicks() {
   let incomplete = 0;
   document.querySelectorAll('.group-pick-teams').forEach(container => {
     const g = container.dataset.group;
-    const sel = [...container.querySelectorAll('.group-pick-team.selected')].map(el => {
-      const flag = el.querySelector('span:first-child').textContent;
-      return Object.keys(TEAMS).find(c => TEAMS[c].flag === flag) || '';
-    }).filter(Boolean);
+    const sel = [...container.querySelectorAll('.group-pick-team.selected')].map(el => el.dataset.code).filter(Boolean);
     groups[g] = sel;
     if (sel.length < 2) incomplete++;
   });
@@ -761,6 +760,7 @@ function saveGroupPicks() {
   }
   save(GK.groups, groups);
   syncToSupabase?.();
+  syncArenaToSupabase?.('picks');
   onFirstGroups?.();
   updateNavXP();
   checkAchievements();
@@ -1154,6 +1154,7 @@ function saveSupportTeam() {
   if (!code) { alert('請選擇一支球隊'); return; }
   save(GK.team, code);
   syncToSupabase?.();
+  syncArenaToSupabase?.('picks');
   onFirstTeam?.();
   updateNavXP();
   checkAchievements();
@@ -1213,6 +1214,7 @@ function checkAchievements() {
 
   if (newOnes.length > 0) {
     save('wc26_badges', [...earned, ...newOnes]);
+    syncArenaToSupabase?.('picks');
     newOnes.forEach((b, i) => setTimeout(() => showBadgeToast(b), i * 1200));
     // 同步更新競技場（若已開啟）
     const arenaEl = document.getElementById('section-arena');
