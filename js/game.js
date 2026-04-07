@@ -815,7 +815,8 @@ async function shareDailyImage() {
 
   // ── Header：Shield Logo + 標題 ──────────────────────
   const s = 44
-  drawShield(ctx, PAD, 24, s)
+  const shieldFill = (() => { const g = ctx.createLinearGradient(PAD - 24, 24, PAD + 24, 68); g.addColorStop(0,'#f5d26b'); g.addColorStop(1,'#e07800'); return g })()
+  drawShield(ctx, PAD + s/2, 24 + s/2, s, shieldFill)
   ctx.fillStyle = '#f0c040'
   ctx.font = `800 22px "Noto Sans TC", sans-serif`
   ctx.textBaseline = 'middle'
@@ -1003,6 +1004,47 @@ function showSharePromptAfterGroups() {
 }
 
 // ── 分享分組預測圖片 ──────────────────────────────────────
+// 全域盾牌繪製（供所有分享圖共用）
+function drawShield(ctx, cx, cy, size, fill, stroke) {
+  const s = size / 48
+  ctx.save()
+  ctx.translate(cx - 24 * s, cy - 27 * s)
+  ctx.scale(s, s)
+  ctx.beginPath()
+  ctx.moveTo(24, 2)
+  ctx.lineTo(44, 10); ctx.lineTo(44, 28)
+  ctx.bezierCurveTo(44, 40, 34, 50, 24, 53)
+  ctx.bezierCurveTo(14, 50, 4, 40, 4, 28)
+  ctx.lineTo(4, 10); ctx.closePath()
+  ctx.fillStyle = fill; ctx.fill()
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1.5 / s; ctx.stroke() }
+  ctx.beginPath()
+  ctx.moveTo(24, 5.5)
+  ctx.lineTo(41, 12.5); ctx.lineTo(41, 28)
+  ctx.bezierCurveTo(41, 38.5, 32.5, 47.5, 24, 50)
+  ctx.bezierCurveTo(15.5, 47.5, 7, 38.5, 7, 28)
+  ctx.lineTo(7, 12.5); ctx.closePath()
+  const ig = ctx.createLinearGradient(0, 0, 0, 54)
+  ig.addColorStop(0, '#0d1525'); ig.addColorStop(1, '#0a0f1e')
+  ctx.fillStyle = ig; ctx.fill()
+  ctx.beginPath()
+  for (let i = 0; i < 6; i++) {
+    const a = (Math.PI / 3) * i - Math.PI / 6
+    const px = 24 + 13 * Math.cos(a), py = 29 + 13 * Math.sin(a)
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)
+  }
+  ctx.closePath()
+  ctx.strokeStyle = 'rgba(240,192,64,0.6)'; ctx.lineWidth = 1.2 / s; ctx.stroke()
+  ctx.fillStyle = 'rgba(240,192,64,0.85)'
+  ctx.font = `bold ${9 / s}px sans-serif`
+  ctx.textAlign = 'center'
+  ctx.fillText('2026', 24, 19)
+  ctx.fillStyle = '#f0c040'
+  ctx.font = `bold ${13 / s}px sans-serif`
+  ctx.fillText('★', 24, 34)
+  ctx.restore()
+}
+
 // 預載圖片 helper（crossOrigin anonymous，適用有 CORS header 的 CDN）
 function loadImg(src) {
   return new Promise(resolve => {
@@ -1093,51 +1135,6 @@ async function shareGroupImage() {
 
   // ── Header（盾牌 logo + 標題）────────────────────────
   const sx = W / 2, logoSize = 60
-
-  // 盾牌外框
-  function drawShield(cx, cy, size, fill, stroke) {
-    const s = size / 48
-    ctx.save()
-    ctx.translate(cx - 24 * s, cy - 27 * s)
-    ctx.scale(s, s)
-    ctx.beginPath()
-    ctx.moveTo(24, 2)
-    ctx.lineTo(44, 10); ctx.lineTo(44, 28)
-    ctx.bezierCurveTo(44, 40, 34, 50, 24, 53)
-    ctx.bezierCurveTo(14, 50, 4, 40, 4, 28)
-    ctx.lineTo(4, 10); ctx.closePath()
-    ctx.fillStyle = fill; ctx.fill()
-    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1.5 / s; ctx.stroke() }
-    // 內部
-    ctx.beginPath()
-    ctx.moveTo(24, 5.5)
-    ctx.lineTo(41, 12.5); ctx.lineTo(41, 28)
-    ctx.bezierCurveTo(41, 38.5, 32.5, 47.5, 24, 50)
-    ctx.bezierCurveTo(15.5, 47.5, 7, 38.5, 7, 28)
-    ctx.lineTo(7, 12.5); ctx.closePath()
-    const ig = ctx.createLinearGradient(0, 0, 0, 54)
-    ig.addColorStop(0, '#0d1525'); ig.addColorStop(1, '#0a0f1e')
-    ctx.fillStyle = ig; ctx.fill()
-    // 六邊形
-    ctx.beginPath()
-    for (let i = 0; i < 6; i++) {
-      const a = (Math.PI / 3) * i - Math.PI / 6
-      const px = 24 + 13 * Math.cos(a), py = 29 + 13 * Math.sin(a)
-      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)
-    }
-    ctx.closePath()
-    ctx.strokeStyle = 'rgba(240,192,64,0.6)'; ctx.lineWidth = 1.2 / s; ctx.stroke()
-    // 2026
-    ctx.fillStyle = 'rgba(240,192,64,0.85)'
-    ctx.font = `bold ${9 / s}px sans-serif`
-    ctx.textAlign = 'center'
-    ctx.fillText('2026', 24, 19)
-    // 星
-    ctx.fillStyle = '#f0c040'
-    ctx.font = `bold ${13 / s}px sans-serif`
-    ctx.fillText('★', 24, 34)
-    ctx.restore()
-  }
 
   // 光暈背景
   const glowR = ctx.createRadialGradient(sx, 52, 0, sx, 52, 70)
