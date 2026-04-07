@@ -330,7 +330,12 @@ function renderHomeDailyChallenge() {
             <span class="home-daily-letter">${'ABCD'[i]}</span>${o}
           </button>`).join('')}
       </div>
-      ${dailyDone ? `<div class="home-daily-done" style="color:${wasCorrect ? '#4caf50' : '#f44336'}">${wasCorrect ? '✅ 答對了！+10 XP 🎉' : `❌ 答錯了！正確答案是 ${opts[correct]}`}</div>` : ''}
+      ${dailyDone ? `
+      <div class="home-daily-done" style="color:${wasCorrect ? '#4caf50' : '#f44336'}">${wasCorrect ? '✅ 答對了！+10 XP 🎉' : `❌ 答錯了！正確答案是 ${opts[correct]}`}</div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div style="font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5">考考朋友，<br>看誰足球 IQ 最高！</div>
+        <button onclick="shareDailyImage()" style="flex-shrink:0;padding:7px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(255,109,0,0.25),rgba(255,109,0,0.1));border:1px solid rgba(255,109,0,0.45);color:#ff8c42;font-size:12px;font-weight:800;cursor:pointer">🧠 出題挑戰</button>
+      </div>` : ''}
     </div>
 
     ${pendingItems.length > 0 ? `
