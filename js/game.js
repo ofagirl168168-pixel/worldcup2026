@@ -982,54 +982,67 @@ function showDesktopShareModal({ blob, text, link, title, filename }) {
   _dsImgUrl   = blob ? URL.createObjectURL(blob) : null
   _dsFilename = filename || 'share.png'
   const mc = document.getElementById('modal-content')
-  const tgText = encodeURIComponent((text || '').split('\n')[0])
-  const tgUrl  = encodeURIComponent(link || window.location.origin)
-  const tgHref = `https://t.me/share/url?url=${tgUrl}&text=${tgText}`
-  const liHref = `https://social-plugins.line.me/lineit/share?url=${tgUrl}&text=${tgText}`
+  const shareUrl  = link || window.location.origin
+  const shareText = (text || '').split('\n')[0]
+  const eu = encodeURIComponent(shareUrl)
+  const et = encodeURIComponent(shareText)
+  const ef = encodeURIComponent(text || shareText)  // full text for some platforms
+
+  // 平台設定
+  const platforms = [
+    { name:'Telegram', color:'#229ED9', href:`https://t.me/share/url?url=${eu}&text=${et}`,
+      icon:`<svg width="20" height="20" viewBox="0 0 240 240" fill="white"><path d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.9 82.4-20.3 95.7c-1.5 6.7-5.5 8.4-11.1 5.2l-30.7-22.6-14.8 14.3c-1.6 1.6-3 2.9-6.2 2.9l2.2-31.2 56.8-51.3c2.5-2.2-.5-3.4-3.8-1.2L63.5 141.1l-30.1-9.4c-6.5-2-6.7-6.5 1.4-9.7L171 74.5c5.4-2 10.2 1.3 7.9 7.9z"/></svg>` },
+    { name:'LINE', color:'#00C300', href:`https://social-plugins.line.me/lineit/share?url=${eu}&text=${et}`,
+      icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>` },
+    { name:'WhatsApp', color:'#25D366', href:`https://wa.me/?text=${et}%20${eu}`,
+      icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>` },
+    { name:'X / Twitter', color:'#000', border:'rgba(255,255,255,0.2)', href:`https://twitter.com/intent/tweet?text=${et}&url=${eu}`,
+      icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.261 5.632 5.902-5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>` },
+    { name:'Facebook', color:'#1877F2', href:`https://www.facebook.com/sharer/sharer.php?u=${eu}`,
+      icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>` },
+    { name:'Reddit', color:'#FF4500', href:`https://reddit.com/submit?url=${eu}&title=${et}`,
+      icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>` },
+  ]
+
+  const platformBtns = platforms.map(p => `
+    <a href="${p.href}" target="_blank" rel="noopener" style="display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 8px;border-radius:14px;background:${p.color};border:1px solid ${p.border||'transparent'};color:#fff;text-decoration:none;font-size:11px;font-weight:700;transition:opacity .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+      ${p.icon}
+      ${p.name}
+    </a>`).join('')
 
   mc.innerHTML = `
     <div style="padding:4px 0">
       <div style="font-size:16px;font-weight:800;margin-bottom:14px;text-align:center">${title || '分享'}</div>
 
       ${_dsImgUrl ? `
-      <div style="border-radius:12px;overflow:hidden;background:#0a0a0a;margin-bottom:16px;max-height:260px;display:flex;align-items:center;justify-content:center">
-        <img src="${_dsImgUrl}" style="width:100%;object-fit:contain;display:block;max-height:260px">
+      <div style="border-radius:12px;overflow:hidden;background:#0a0a0a;margin-bottom:16px;max-height:220px;display:flex;align-items:center;justify-content:center">
+        <img src="${_dsImgUrl}" style="width:100%;object-fit:contain;display:block;max-height:220px">
+      </div>` : `
+      <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.7;color:rgba(255,255,255,0.7);white-space:pre-wrap">${text || ''}</div>`}
+
+      <!-- 平台按鈕網格 -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+        ${platformBtns}
       </div>
-      <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:12px">
-        <a href="${tgHref}" target="_blank" rel="noopener"
-           style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border-radius:12px;background:linear-gradient(135deg,#229ED9,#1a7fb5);color:#fff;font-weight:800;font-size:14px;text-decoration:none">
-          <svg width="18" height="18" viewBox="0 0 240 240" fill="white"><path d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.9 82.4-20.3 95.7c-1.5 6.7-5.5 8.4-11.1 5.2l-30.7-22.6-14.8 14.3c-1.6 1.6-3 2.9-6.2 2.9l2.2-31.2 56.8-51.3c2.5-2.2-.5-3.4-3.8-1.2L63.5 141.1l-30.1-9.4c-6.5-2-6.7-6.5 1.4-9.7L171 74.5c5.4-2 10.2 1.3 7.9 7.9z"/></svg>
-          傳送到 Telegram
-        </a>
-        <button onclick="_dsCopyImg()" style="display:flex;align-items:center;justify-content:center;gap:9px;padding:13px;border-radius:12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;font-weight:700;font-size:13px;cursor:pointer">
-          📋 複製圖片（Ctrl+V 貼到 Telegram）
+
+      <!-- 複製 / 下載 -->
+      <div style="display:flex;gap:9px;margin-bottom:10px">
+        ${_dsImgUrl ? `
+        <button onclick="_dsCopyImg()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-radius:12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;font-weight:700;font-size:12px;cursor:pointer">
+          📋 複製圖片
         </button>
-        <button onclick="_dsDownload()" style="display:flex;align-items:center;justify-content:center;gap:9px;padding:11px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.5);font-weight:600;font-size:13px;cursor:pointer">
+        <button onclick="_dsDownload()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.5);font-weight:600;font-size:12px;cursor:pointer">
           📥 下載圖片
-        </button>
-      </div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-bottom:10px">
-        點「傳送到 Telegram」會附上網站連結 · 想傳圖片請複製後在 Telegram 貼上
-      </div>
-      ` : `
-      <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.8;color:rgba(255,255,255,0.7);white-space:pre-wrap">${text || ''}</div>
-      <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:12px">
-        <a href="${tgHref}" target="_blank" rel="noopener"
-           style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border-radius:12px;background:linear-gradient(135deg,#229ED9,#1a7fb5);color:#fff;font-weight:800;font-size:14px;text-decoration:none">
-          <svg width="18" height="18" viewBox="0 0 240 240" fill="white"><path d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.9 82.4-20.3 95.7c-1.5 6.7-5.5 8.4-11.1 5.2l-30.7-22.6-14.8 14.3c-1.6 1.6-3 2.9-6.2 2.9l2.2-31.2 56.8-51.3c2.5-2.2-.5-3.4-3.8-1.2L63.5 141.1l-30.1-9.4c-6.5-2-6.7-6.5 1.4-9.7L171 74.5c5.4-2 10.2 1.3 7.9 7.9z"/></svg>
-          傳送到 Telegram
-        </a>
-        <a href="${liHref}" target="_blank" rel="noopener"
-           style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border-radius:12px;background:linear-gradient(135deg,#00C300,#009900);color:#fff;font-weight:700;font-size:13px;text-decoration:none">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
-          分享到 LINE
-        </a>
-        <button onclick="navigator.clipboard.writeText(${JSON.stringify(text || '')}).then(()=>showToast('✅ 已複製！貼到任何地方都可以分享'))" style="display:flex;align-items:center;justify-content:center;gap:9px;padding:11px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);font-weight:600;font-size:13px;cursor:pointer">
+        </button>` : `
+        <button onclick="navigator.clipboard.writeText(${JSON.stringify(text||'')}).then(()=>showToast('✅ 已複製！'))" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-radius:12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;font-weight:700;font-size:12px;cursor:pointer">
           📋 複製文字
         </button>
+        <button onclick="navigator.clipboard.writeText(${JSON.stringify(shareUrl)}).then(()=>showToast('✅ 連結已複製！'))" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.5);font-weight:600;font-size:12px;cursor:pointer">
+          🔗 複製連結
+        </button>`}
       </div>
-      `}
-      <button onclick="closeModal()" style="width:100%;padding:10px;background:transparent;color:rgba(255,255,255,0.25);font-size:12px;border:none;cursor:pointer">關閉</button>
+      ${_dsImgUrl ? `<div style="font-size:10px;color:rgba(255,255,255,0.2);text-align:center;margin-bottom:8px">平台分享會附網站連結 · 傳圖片請用「複製圖片」後貼上</div>` : ''}
+      <button onclick="closeModal()" style="width:100%;padding:9px;background:transparent;color:rgba(255,255,255,0.2);font-size:12px;border:none;cursor:pointer">關閉</button>
     </div>`
   document.getElementById('team-modal').classList.add('open')
 }
