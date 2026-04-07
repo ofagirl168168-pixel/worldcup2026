@@ -64,8 +64,11 @@
           <line x1="9" y1="23" x2="39" y2="23" stroke="rgba(240,192,64,0.3)" stroke-width="0.7"/>
           <!-- 2026 數字（上半盾，清晰可讀）-->
           <text x="24" y="18" text-anchor="middle" font-size="9.5" fill="#f0c040" font-weight="bold" letter-spacing="1.2" opacity="0.95">2026</text>
-          <!-- 星形裝飾（下半盾中央）-->
-          <text x="24" y="41" text-anchor="middle" font-size="15" fill="#f0c040" font-weight="bold" opacity="0.88">★</text>
+          <!-- 六邊形（下半盾，中心下移避免遮擋 2026）-->
+          <circle cx="24" cy="34" r="9" fill="none" stroke="rgba(240,192,64,0.25)" stroke-width="0.8"/>
+          <polygon points="24,26 30,29.5 30,38.5 24,42 18,38.5 18,29.5" fill="none" stroke="#f0c040" stroke-width="1.2" opacity="0.85"/>
+          <!-- 星形裝飾（六邊形中央）-->
+          <text x="24" y="38" text-anchor="middle" font-size="11" fill="#f0c040" font-weight="bold" opacity="0.9">★</text>
         </svg>
         <div class="logo-text">
           <span class="logo-title">世界盃預測</span>
