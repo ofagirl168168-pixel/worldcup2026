@@ -947,7 +947,7 @@ async function shareDailyImage() {
     const file = new File([blob], 'daily-challenge.png', { type: 'image/png' })
     const link = await getMyRefLink?.() || window.location.origin
     if (_isMobile() && navigator.share && navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], text: '🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！' }).catch(() => {})
+      await navigator.share({ files: [file], text: `🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！\n${link}` }).catch(() => {})
     } else {
       showDesktopShareModal({ blob, link, filename: 'daily-challenge.png', title: '🧠 出題挑戰', text: `🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！\n${link}` })
     }
