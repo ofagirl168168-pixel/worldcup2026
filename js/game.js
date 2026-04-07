@@ -798,9 +798,8 @@ async function shareGroupImage() {
     } catch {}
   }
 
-  // ── 國旗 emoji → twemoji PNG URL（固定版本 npm CDN）──
-  const TWEMOJI_BASE = 'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72'
-  // 已知 subdivision flags 直接對應（ENG/SCO/WAL）
+  // ── 國旗 emoji → twemoji PNG URL ──────────────────────
+  const TWEMOJI_BASE = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72'
   const SUBDIVISION_MAP = {
     '🏴󠁧󠁢󠁥󠁮󠁧󠁿': '1f3f4-e0067-e0062-e0065-e006e-e0067-e007f',
     '🏴󠁧󠁢󠁳󠁣󠁴󠁿': '1f3f4-e0067-e0062-e0073-e0063-e0074-e007f',
@@ -914,10 +913,10 @@ async function shareGroupImage() {
     ctx.closePath()
     ctx.strokeStyle = 'rgba(240,192,64,0.6)'; ctx.lineWidth = 1.2 / s; ctx.stroke()
     // 2026
-    ctx.fillStyle = 'rgba(240,192,64,0.75)'
-    ctx.font = `bold ${6 / s}px sans-serif`
+    ctx.fillStyle = 'rgba(240,192,64,0.85)'
+    ctx.font = `bold ${9 / s}px sans-serif`
     ctx.textAlign = 'center'
-    ctx.fillText('2026', 24, 18)
+    ctx.fillText('2026', 24, 19)
     // 星
     ctx.fillStyle = '#f0c040'
     ctx.font = `bold ${13 / s}px sans-serif`
