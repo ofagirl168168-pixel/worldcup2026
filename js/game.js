@@ -1146,7 +1146,7 @@ async function shareGroupImage() {
   const shieldGrad = ctx.createLinearGradient(sx - 24, 20, sx + 24, 80)
   shieldGrad.addColorStop(0, '#f5d26b')
   shieldGrad.addColorStop(1, '#e07800')
-  drawShield(sx, 52, logoSize, shieldGrad)
+  drawShield(ctx, sx, 52, logoSize, shieldGrad)
 
   // 標題
   ctx.fillStyle = '#f0c040'
