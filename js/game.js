@@ -431,7 +431,10 @@ function renderArena() {
             +50 XP
             ${!myChampion ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+2</span>` : ''}
           </span>
-          <span class="arena-card-cta">${myChampion ? '修改預測 →' : '開始預測 →'}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            ${myChampion ? `<button onclick="event.stopPropagation();shareChampionText()" style="padding:4px 10px;border-radius:8px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.3);color:var(--gold);font-size:11px;cursor:pointer;font-weight:700">📤 分享</button>` : ''}
+            <span class="arena-card-cta">${myChampion ? '修改預測 →' : '開始預測 →'}</span>
+          </div>
         </div>
       </div>
 
@@ -454,7 +457,10 @@ function renderArena() {
             +50 XP
             ${!groupsDone ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+2</span>` : ''}
           </span>
-          <span class="arena-card-cta">${groupsDone ? '修改預測 →' : groupCount > 0 ? '繼續填寫 →' : '開始填寫 →'}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            ${groupsDone ? `<button onclick="event.stopPropagation();shareGroupImage()" style="padding:4px 10px;border-radius:8px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.3);color:var(--gold);font-size:11px;cursor:pointer;font-weight:700">📤 分享</button>` : ''}
+            <span class="arena-card-cta">${groupsDone ? '修改預測 →' : groupCount > 0 ? '繼續填寫 →' : '開始填寫 →'}</span>
+          </div>
         </div>
       </div>
 
@@ -474,26 +480,14 @@ function renderArena() {
             +30 XP
             ${!myTeam ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+1</span>` : ''}
           </span>
-          <span class="arena-card-cta">${myTeam ? '更換球隊 →' : '選擇球隊 →'}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            ${myTeam ? `<button onclick="event.stopPropagation();shareTeamText()" style="padding:4px 10px;border-radius:8px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.3);color:var(--gold);font-size:11px;cursor:pointer;font-weight:700">📤 分享</button>` : ''}
+            <span class="arena-card-cta">${myTeam ? '更換球隊 →' : '選擇球隊 →'}</span>
+          </div>
         </div>
       </div>
 
     </div>
-
-    <!-- 分享卡（分組填完後才顯示）-->
-    ${groupsDone ? `
-    <div style="max-width:960px;margin:-24px auto 32px;padding:0 24px">
-      <div style="display:flex;align-items:center;gap:16px;padding:18px 22px;border-radius:16px;background:linear-gradient(135deg,rgba(240,192,64,0.10),rgba(255,140,0,0.06));border:1px solid rgba(240,192,64,0.3);cursor:pointer" onclick="shareGroupImage()">
-        <div style="font-size:32px;flex-shrink:0">📤</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:800;font-size:14px;margin-bottom:3px;color:var(--gold)">分享你的分組預測</div>
-          <div style="font-size:12px;color:var(--text-muted)">生成精美預測圖附上 QR Code，挑戰好友的眼光</div>
-        </div>
-        <button class="btn-primary" style="flex-shrink:0;padding:9px 18px;font-size:13px;pointer-events:none">
-          <i class="fas fa-share-alt"></i> 立即分享
-        </button>
-      </div>
-    </div>` : ''}
 
     <!-- 通知訂閱卡片 -->
     <div id="notify-subscribe-card" class="notify-card" style="display:none">
@@ -781,6 +775,36 @@ function saveGroupPicks() {
   checkAchievements();
   renderArena();
   showSharePromptAfterGroups();
+}
+
+// ── 冠軍預測分享 ──────────────────────────────────────────
+async function shareChampionText() {
+  const champion = load(GK.champion)
+  if (!champion) return
+  const c1 = TEAMS[champion.c1]?.nameCN || champion.c1
+  const c2 = TEAMS[champion.c2]?.nameCN || champion.c2
+  const c3 = TEAMS[champion.c3]?.nameCN || champion.c3
+  const link = await getMyRefLink?.() || window.location.origin
+  const text = `🏆 我的 2026 世界盃冠軍預測\n🥇 冠軍：${c1}\n🥈 亞軍：${c2}\n🥉 季軍：${c3}\n\n你猜對了嗎？來挑戰我的眼光！\n${link}`
+  if (navigator.share) {
+    navigator.share({ text }).catch(() => {})
+  } else {
+    navigator.clipboard.writeText(text).then(() => showToast?.('✅ 已複製，快去貼給朋友！'))
+  }
+}
+
+// ── 支持球隊分享 ──────────────────────────────────────────
+async function shareTeamText() {
+  const team = load(GK.team)
+  if (!team) return
+  const t = TEAMS[team]
+  const link = await getMyRefLink?.() || window.location.origin
+  const text = `⚽ 2026 世界盃，我宣示支持 ${t?.nameCN || team}！\n整個賽事我都陪著他們！\n一起來預測世界盃吧👇\n${link}`
+  if (navigator.share) {
+    navigator.share({ text }).catch(() => {})
+  } else {
+    navigator.clipboard.writeText(text).then(() => showToast?.('✅ 已複製，快去貼給朋友！'))
+  }
 }
 
 // ── 儲存分組後彈出分享提示 ────────────────────────────────
