@@ -480,6 +480,21 @@ function renderArena() {
 
     </div>
 
+    <!-- 分享卡（分組填完後才顯示）-->
+    ${groupsDone ? `
+    <div style="max-width:900px;margin:20px auto 0;padding:0 20px">
+      <div style="display:flex;align-items:center;gap:16px;padding:20px 24px;border-radius:16px;background:linear-gradient(135deg,rgba(240,192,64,0.12),rgba(255,140,0,0.08));border:1px solid rgba(240,192,64,0.3);cursor:pointer" onclick="shareGroupImage()">
+        <div style="font-size:36px;flex-shrink:0">📤</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:15px;margin-bottom:4px;color:var(--gold)">分享你的分組預測</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.6">生成精美預測圖附上 QR Code，挑戰好友的眼光</div>
+        </div>
+        <button class="btn-primary" style="flex-shrink:0;padding:10px 20px;font-size:13px;pointer-events:none">
+          <i class="fas fa-share-alt"></i> 立即分享
+        </button>
+      </div>
+    </div>` : ''}
+
     <!-- 通知訂閱卡片 -->
     <div id="notify-subscribe-card" class="notify-card" style="display:none">
       <div class="notify-card-left">
@@ -765,7 +780,27 @@ function saveGroupPicks() {
   updateNavXP();
   checkAchievements();
   renderArena();
-  closeModal();
+  showSharePromptAfterGroups();
+}
+
+// ── 儲存分組後彈出分享提示 ────────────────────────────────
+function showSharePromptAfterGroups() {
+  const mc = document.getElementById('modal-content')
+  mc.innerHTML = `
+    <div style="text-align:center;padding:10px 0">
+      <div style="font-size:52px;margin-bottom:12px">🎉</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:8px">分組預測完成！</div>
+      <div style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:24px">
+        要把你的預測分享給朋友嗎？<br>生成精美預測圖，附上專屬 QR Code
+      </div>
+      <button onclick="closeModal();setTimeout(shareGroupImage,200)" style="width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#e0a020);color:#07091a;font-weight:800;font-size:15px;border:none;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px">
+        <i class="fas fa-share-alt"></i> 分享我的預測
+      </button>
+      <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer">
+        稍後再說
+      </button>
+    </div>`
+  document.getElementById('team-modal').classList.add('open')
 }
 
 // ── 分享分組預測圖片 ──────────────────────────────────────
