@@ -1151,6 +1151,7 @@ img.flag-img {
   position: relative; overflow: hidden;
   border: 1px solid rgba(255,255,255,0.07);
   animation: arenaReveal 0.5s both;
+  display: flex; flex-direction: column;
 }
 .arena-card:nth-child(1) { animation-delay: 0.05s; background: linear-gradient(145deg,#1a1a2e,#16213e); --card-glow: rgba(255,109,0,0.4); }
 .arena-card:nth-child(2) { animation-delay: 0.10s; background: linear-gradient(145deg,#1a1a1a,#2d2200); --card-glow: rgba(240,192,64,0.4); }
@@ -1218,7 +1219,7 @@ img.flag-img {
   color: #ff9800; animation: streakFire 2s ease-in-out infinite;
 }
 .arena-card-footer {
-  margin-top: 16px; padding-top: 14px;
+  margin-top: auto; padding-top: 14px;
   border-top: 1px solid rgba(255,255,255,0.06);
   display: flex; align-items: center; justify-content: space-between;
 }
