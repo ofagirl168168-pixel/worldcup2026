@@ -161,7 +161,7 @@ function localDateStr() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-// ── 取今日題目：每5天出難題，每2天出話題題，其餘一般題 ──────
+// ── 取今日題目：固定循環 話題→一般→話題→難題→話題→一般 ──────
 function getTodayQuestion() {
   const today  = localDateStr();
   const dayIdx = Math.floor((new Date(today) - new Date('2026-01-01')) / 86400000);
@@ -170,10 +170,10 @@ function getTodayQuestion() {
   const hards   = DAILY_QUESTIONS.filter(q => q.type === 'hard');
   const virals  = DAILY_QUESTIONS.filter(q => q.type === 'viral');
 
-  let pool;
-  if (dayIdx % 5 === 0 && hards.length)        pool = hards;   // 每5天難題
-  else if (dayIdx % 2 === 0 && virals.length)  pool = virals;  // 每2天話題題
-  else                                          pool = normals;
+  // 6天循環：viral → normal → viral → hard → viral → normal
+  const CYCLE = ['viral', 'normal', 'viral', 'hard', 'viral', 'normal'];
+  const poolType = CYCLE[dayIdx % CYCLE.length];
+  const pool = poolType === 'hard' ? hards : poolType === 'viral' ? virals : normals;
 
   return { ...pool[dayIdx % pool.length], date: today };
 }
