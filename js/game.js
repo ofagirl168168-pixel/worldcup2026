@@ -798,18 +798,22 @@ async function shareGroupImage() {
     } catch {}
   }
 
-  // ── 國旗 emoji → twemoji PNG URL ──────────────────────
+  // ── 國旗 emoji → twemoji PNG URL（固定版本 npm CDN）──
+  const TWEMOJI_BASE = 'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72'
+  // 已知 subdivision flags 直接對應（ENG/SCO/WAL）
+  const SUBDIVISION_MAP = {
+    '🏴󠁧󠁢󠁥󠁮󠁧󠁿': '1f3f4-e0067-e0062-e0065-e006e-e0067-e007f',
+    '🏴󠁧󠁢󠁳󠁣󠁴󠁿': '1f3f4-e0067-e0062-e0073-e0063-e0074-e007f',
+    '🏴󠁧󠁢󠁷󠁬󠁳󠁿': '1f3f4-e0067-e0062-e0077-e006c-e0073-e007f',
+  }
   function getFlagUrl(flagEmoji) {
+    if (SUBDIVISION_MAP[flagEmoji]) {
+      return `${TWEMOJI_BASE}/${SUBDIVISION_MAP[flagEmoji]}.png`
+    }
     const cps = [...flagEmoji].map(c => c.codePointAt(0))
-    // regional indicator flags (U+1F1E6–U+1F1FF)：一般國旗
     const regional = cps.filter(cp => cp >= 0x1F1E6 && cp <= 0x1F1FF)
     if (regional.length >= 2) {
-      return `https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/${regional.map(cp => cp.toString(16)).join('-')}.png`
-    }
-    // subdivision flags (U+1F3F4 + tag chars)：英格蘭、蘇格蘭、威爾斯
-    if (cps[0] === 0x1F3F4) {
-      const all = cps.map(cp => cp.toString(16)).join('-')
-      return `https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/${all}.png`
+      return `${TWEMOJI_BASE}/${regional.map(cp => cp.toString(16)).join('-')}.png`
     }
     return null
   }
@@ -1058,7 +1062,7 @@ async function shareGroupImage() {
   ctx.fillStyle = 'rgba(255,255,255,0.4)'
   ctx.font = '10px sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText('掃碼加入', qrX + QR_SIZE / 2, qrY + QR_SIZE + 22)
+  ctx.fillText('掃碼預測', qrX + QR_SIZE / 2, qrY + QR_SIZE + 22)
 
   // 左側 CTA 文字
   const ctaX = PAD
