@@ -945,15 +945,88 @@ async function shareDailyImage() {
   // ── 輸出 ──────────────────────────────────────────────
   canvas.toBlob(async blob => {
     const file = new File([blob], 'daily-challenge.png', { type: 'image/png' })
+    const link = await getMyRefLink?.() || window.location.origin
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file], text: '🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！' }).catch(() => {})
     } else {
-      const a = document.createElement('a')
-      a.href = URL.createObjectURL(blob)
-      a.download = 'daily-challenge.png'
-      a.click()
+      showDesktopShareModal({ blob, link, filename: 'daily-challenge.png', title: '🧠 出題挑戰' })
     }
   }, 'image/png')
+}
+
+// ── 電腦版分享 Modal ─────────────────────────────────────
+// 全域暫存，供 Modal 內 onclick 使用
+let _dsImgUrl = null, _dsFilename = 'share.png'
+
+function _dsDownload() {
+  const a = document.createElement('a')
+  a.href = _dsImgUrl; a.download = _dsFilename; a.click()
+}
+async function _dsCopyImg() {
+  try {
+    const r = await fetch(_dsImgUrl)
+    const b = await r.blob()
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': b })])
+    showToast('✅ 圖片已複製！打開 Telegram 直接 Ctrl+V 貼上')
+  } catch {
+    showToast('⚠️ 瀏覽器不支援複製圖片，請用下載後再傳')
+  }
+}
+
+function showDesktopShareModal({ blob, text, link, title, filename }) {
+  _dsImgUrl   = blob ? URL.createObjectURL(blob) : null
+  _dsFilename = filename || 'share.png'
+  const mc = document.getElementById('modal-content')
+  const tgText = encodeURIComponent((text || '').split('\n')[0])
+  const tgUrl  = encodeURIComponent(link || window.location.origin)
+  const tgHref = `https://t.me/share/url?url=${tgUrl}&text=${tgText}`
+  const liHref = `https://social-plugins.line.me/lineit/share?url=${tgUrl}&text=${tgText}`
+
+  mc.innerHTML = `
+    <div style="padding:4px 0">
+      <div style="font-size:16px;font-weight:800;margin-bottom:14px;text-align:center">${title || '分享'}</div>
+
+      ${_dsImgUrl ? `
+      <div style="border-radius:12px;overflow:hidden;background:#0a0a0a;margin-bottom:16px;max-height:260px;display:flex;align-items:center;justify-content:center">
+        <img src="${_dsImgUrl}" style="width:100%;object-fit:contain;display:block;max-height:260px">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:12px">
+        <a href="${tgHref}" target="_blank" rel="noopener"
+           style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border-radius:12px;background:linear-gradient(135deg,#229ED9,#1a7fb5);color:#fff;font-weight:800;font-size:14px;text-decoration:none">
+          <svg width="18" height="18" viewBox="0 0 240 240" fill="white"><path d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.9 82.4-20.3 95.7c-1.5 6.7-5.5 8.4-11.1 5.2l-30.7-22.6-14.8 14.3c-1.6 1.6-3 2.9-6.2 2.9l2.2-31.2 56.8-51.3c2.5-2.2-.5-3.4-3.8-1.2L63.5 141.1l-30.1-9.4c-6.5-2-6.7-6.5 1.4-9.7L171 74.5c5.4-2 10.2 1.3 7.9 7.9z"/></svg>
+          傳送到 Telegram
+        </a>
+        <button onclick="_dsCopyImg()" style="display:flex;align-items:center;justify-content:center;gap:9px;padding:13px;border-radius:12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;font-weight:700;font-size:13px;cursor:pointer">
+          📋 複製圖片（Ctrl+V 貼到 Telegram）
+        </button>
+        <button onclick="_dsDownload()" style="display:flex;align-items:center;justify-content:center;gap:9px;padding:11px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.5);font-weight:600;font-size:13px;cursor:pointer">
+          📥 下載圖片
+        </button>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-bottom:10px">
+        點「傳送到 Telegram」會附上網站連結 · 想傳圖片請複製後在 Telegram 貼上
+      </div>
+      ` : `
+      <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.8;color:rgba(255,255,255,0.7);white-space:pre-wrap">${text || ''}</div>
+      <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:12px">
+        <a href="${tgHref}" target="_blank" rel="noopener"
+           style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border-radius:12px;background:linear-gradient(135deg,#229ED9,#1a7fb5);color:#fff;font-weight:800;font-size:14px;text-decoration:none">
+          <svg width="18" height="18" viewBox="0 0 240 240" fill="white"><path d="M120 0C53.7 0 0 53.7 0 120s53.7 120 120 120 120-53.7 120-120S186.3 0 120 0zm58.9 82.4-20.3 95.7c-1.5 6.7-5.5 8.4-11.1 5.2l-30.7-22.6-14.8 14.3c-1.6 1.6-3 2.9-6.2 2.9l2.2-31.2 56.8-51.3c2.5-2.2-.5-3.4-3.8-1.2L63.5 141.1l-30.1-9.4c-6.5-2-6.7-6.5 1.4-9.7L171 74.5c5.4-2 10.2 1.3 7.9 7.9z"/></svg>
+          傳送到 Telegram
+        </a>
+        <a href="${liHref}" target="_blank" rel="noopener"
+           style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border-radius:12px;background:linear-gradient(135deg,#00C300,#009900);color:#fff;font-weight:700;font-size:13px;text-decoration:none">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+          分享到 LINE
+        </a>
+        <button onclick="navigator.clipboard.writeText(${JSON.stringify(text || '')}).then(()=>showToast('✅ 已複製！貼到任何地方都可以分享'))" style="display:flex;align-items:center;justify-content:center;gap:9px;padding:11px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);font-weight:600;font-size:13px;cursor:pointer">
+          📋 複製文字
+        </button>
+      </div>
+      `}
+      <button onclick="closeModal()" style="width:100%;padding:10px;background:transparent;color:rgba(255,255,255,0.25);font-size:12px;border:none;cursor:pointer">關閉</button>
+    </div>`
+  document.getElementById('team-modal').classList.add('open')
 }
 
 // ── 冠軍預測分享 ──────────────────────────────────────────
@@ -968,7 +1041,7 @@ async function shareChampionText() {
   if (navigator.share) {
     navigator.share({ text }).catch(() => {})
   } else {
-    navigator.clipboard.writeText(text).then(() => showToast?.('✅ 已複製，快去貼給朋友！'))
+    showDesktopShareModal({ text, link, title: '🏆 曬我的冠軍押注' })
   }
 }
 
@@ -982,7 +1055,7 @@ async function shareTeamText() {
   if (navigator.share) {
     navigator.share({ text }).catch(() => {})
   } else {
-    navigator.clipboard.writeText(text).then(() => showToast?.('✅ 已複製，快去貼給朋友！'))
+    showDesktopShareModal({ text, link, title: '⚽ 招募隊友' })
   }
 }
 
@@ -1321,14 +1394,8 @@ async function shareGroupImage() {
         return
       } catch {}
     }
-    // fallback：下載
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = 'wc2026-group-prediction.png'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    showToast('✅ 圖片已下載！')
+    // 電腦版：開啟分享 Modal
+    showDesktopShareModal({ blob, link: shareLink, filename: 'wc2026-group-prediction.png', title: '📊 分享我的分組預測' })
   }, 'image/png')
 }
 
