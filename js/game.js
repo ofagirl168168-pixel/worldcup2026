@@ -170,8 +170,8 @@ function getTodayQuestion() {
   const hards   = DAILY_QUESTIONS.filter(q => q.type === 'hard');
   const virals  = DAILY_QUESTIONS.filter(q => q.type === 'viral');
 
-  // 6天循環：viral → normal → viral → hard → viral → normal
-  const CYCLE = ['viral', 'normal', 'viral', 'hard', 'viral', 'normal'];
+  // 4天循環：normal → viral → hard → viral → normal → viral → hard → viral…
+  const CYCLE = ['normal', 'viral', 'hard', 'viral'];
   const poolType = CYCLE[dayIdx % CYCLE.length];
   const pool = poolType === 'hard' ? hards : poolType === 'viral' ? virals : normals;
 
