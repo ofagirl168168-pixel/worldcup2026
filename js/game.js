@@ -769,6 +769,17 @@ function saveGroupPicks() {
 }
 
 // ── 分享分組預測圖片 ──────────────────────────────────────
+// 預載圖片 helper
+function loadImg(src) {
+  return new Promise(resolve => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => resolve(null)
+    img.src = src
+  })
+}
+
 async function shareGroupImage() {
   const groups = load(GK.groups)
   if (!groups) return
@@ -777,6 +788,18 @@ async function shareGroupImage() {
 
   const groupKeys = Object.keys(GROUPS).sort()
   const SITE_URL = 'worldcup2026-9u0.pages.dev'
+
+  // ── 預載所有國旗圖片 ──────────────────────────────────
+  const allCodes = [...new Set(groupKeys.flatMap(g => groups[g] || []))]
+  const flagImgs = {}
+  await Promise.all(allCodes.map(async code => {
+    const iso = code.toLowerCase()
+    flagImgs[code] = await loadImg(`https://flagcdn.com/w40/${iso}.png`)
+  }))
+
+  // ── 預載 QR Code 圖片（用外部 API）───────────────────
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://' + SITE_URL)}&color=0a0f1e&bgcolor=ffffff&margin=8`
+  const qrImg = await loadImg(qrUrl)
 
   // ── 直式 Canvas（手機分享友善）────────────────────────
   const W = 800, PAD = 28
@@ -906,15 +929,24 @@ async function shareGroupImage() {
       ctx.textAlign = 'left'
       ctx.fillText(idx === 0 ? '1ST' : '2ND', x + 16, ty + 3)
 
-      // 球隊代碼
-      ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 13px sans-serif'
-      ctx.fillText(code, x + 48, ty + 3)
-
-      // 球隊中文名
-      ctx.fillStyle = 'rgba(255,255,255,0.7)'
-      ctx.font = '11px sans-serif'
-      ctx.fillText(t.nameCN, x + 82, ty + 3)
+      // 國旗圖片
+      const flag = flagImgs[code]
+      if (flag) {
+        const fh = 16, fw = Math.round(flag.width * (fh / flag.height))
+        ctx.drawImage(flag, x + 44, ty - 8, fw, fh)
+        // 球隊中文名
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'
+        ctx.font = '12px sans-serif'
+        ctx.fillText(t.nameCN, x + 44 + fw + 6, ty + 3)
+      } else {
+        // fallback：顯示代碼
+        ctx.fillStyle = '#ffffff'
+        ctx.font = 'bold 12px sans-serif'
+        ctx.fillText(code, x + 44, ty + 3)
+        ctx.fillStyle = 'rgba(255,255,255,0.7)'
+        ctx.font = '11px sans-serif'
+        ctx.fillText(t.nameCN, x + 76, ty + 3)
+      }
     })
 
     if (picked.length < 2) {
@@ -940,7 +972,7 @@ async function shareGroupImage() {
   ctx.lineTo(W - PAD, footerY)
   ctx.stroke()
 
-  // QR Code 白底框
+  // QR Code 白底框 + 圖片
   const QR_SIZE = 110
   const qrX = W - PAD - QR_SIZE
   const qrY = footerY + 24
@@ -949,18 +981,9 @@ async function shareGroupImage() {
   roundRect(ctx, qrX - 8, qrY - 8, QR_SIZE + 16, QR_SIZE + 16, 10)
   ctx.fill()
 
-  try {
-    const qrDataUrl = await QRCode.toDataURL(`https://${SITE_URL}`, {
-      width: QR_SIZE * 3, margin: 1,
-      color: { dark: '#0a0f1e', light: '#ffffff' }
-    })
-    await new Promise(resolve => {
-      const img = new Image()
-      img.onload = () => { ctx.drawImage(img, qrX, qrY, QR_SIZE, QR_SIZE); resolve() }
-      img.onerror = resolve
-      img.src = qrDataUrl
-    })
-  } catch (e) { console.warn('QR error', e) }
+  if (qrImg) {
+    ctx.drawImage(qrImg, qrX, qrY, QR_SIZE, QR_SIZE)
+  }
 
   // QR Code 說明
   ctx.fillStyle = 'rgba(255,255,255,0.4)'
