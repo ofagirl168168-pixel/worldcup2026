@@ -716,9 +716,15 @@ function openGroupPicks() {
         </div>`;
       }).join('')}
     </div>
-    <button class="btn-primary" style="width:100%;margin-top:20px" onclick="saveGroupPicks()">
-      <i class="fas fa-save"></i> 儲存預測
-    </button>`;
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="btn-primary" style="flex:1" onclick="saveGroupPicks()">
+        <i class="fas fa-save"></i> 儲存預測
+      </button>
+      ${Object.keys(current).length === groupKeys.length && Object.values(current).every(v=>v.length===2) ? `
+      <button class="btn-primary" style="flex:0 0 auto;background:linear-gradient(135deg,#1565c0,#0d47a1)" onclick="shareGroupImage()">
+        <i class="fas fa-share-alt"></i> 分享預測
+      </button>` : ''}
+    </div>`;
 
   document.getElementById('team-modal').classList.add('open');
 }
@@ -760,6 +766,154 @@ function saveGroupPicks() {
   checkAchievements();
   renderArena();
   closeModal();
+}
+
+// ── 分享分組預測圖片 ──────────────────────────────────────
+async function shareGroupImage() {
+  const groups = load(GK.groups)
+  if (!groups) return
+
+  const groupKeys = Object.keys(GROUPS).sort()
+  const SITE_URL = 'worldcup2026-9u0.pages.dev'
+
+  // ── Canvas 設定 ────────────────────────────────────────
+  const COLS = 4, ROWS = 3
+  const CARD_W = 240, CARD_H = 110
+  const PAD = 16, HEADER_H = 80, FOOTER_H = 90
+  const W = COLS * CARD_W + (COLS + 1) * PAD
+  const H = HEADER_H + ROWS * CARD_H + (ROWS + 1) * PAD + FOOTER_H
+
+  const canvas = document.createElement('canvas')
+  canvas.width = W; canvas.height = H
+  const ctx = canvas.getContext('2d')
+
+  // 背景漸層
+  const bg = ctx.createLinearGradient(0, 0, 0, H)
+  bg.addColorStop(0, '#0d1117')
+  bg.addColorStop(1, '#111827')
+  ctx.fillStyle = bg
+  ctx.fillRect(0, 0, W, H)
+
+  // ── Header ────────────────────────────────────────────
+  ctx.fillStyle = '#f0c040'
+  ctx.font = 'bold 22px "Noto Sans TC", sans-serif'
+  ctx.textAlign = 'center'
+  ctx.fillText('🏆 我的 2026 世界盃分組晉級預測', W / 2, 36)
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'
+  ctx.font = '13px "Noto Sans TC", sans-serif'
+  ctx.fillText('FIFA World Cup 2026 · Group Stage Predictions', W / 2, 58)
+
+  // ── 各組卡片 ──────────────────────────────────────────
+  groupKeys.forEach((g, i) => {
+    const col = i % COLS
+    const row = Math.floor(i / COLS)
+    const x = PAD + col * (CARD_W + PAD)
+    const y = HEADER_H + PAD + row * (CARD_H + PAD)
+    const gd = GROUPS[g]
+    const picked = groups[g] || []
+
+    // 卡片背景
+    ctx.fillStyle = 'rgba(255,255,255,0.04)'
+    roundRect(ctx, x, y, CARD_W, CARD_H, 10)
+    ctx.fill()
+
+    // 組別標題
+    ctx.fillStyle = '#f0c040'
+    ctx.font = 'bold 12px "Noto Sans TC", sans-serif'
+    ctx.textAlign = 'left'
+    ctx.fillText(gd.name, x + 10, y + 20)
+
+    // 兩支晉級球隊
+    picked.slice(0, 2).forEach((code, idx) => {
+      const t = TEAMS[code]
+      if (!t) return
+      const ty = y + 38 + idx * 32
+      ctx.fillStyle = idx === 0 ? 'rgba(76,175,80,0.15)' : 'rgba(33,150,243,0.12)'
+      roundRect(ctx, x + 8, ty - 14, CARD_W - 16, 26, 6)
+      ctx.fill()
+      ctx.font = '17px serif'
+      ctx.textAlign = 'left'
+      ctx.fillText(t.flag, x + 14, ty + 5)
+      ctx.fillStyle = 'rgba(255,255,255,0.9)'
+      ctx.font = '12px "Noto Sans TC", sans-serif'
+      ctx.fillText(t.nameCN, x + 40, ty + 5)
+      ctx.fillStyle = idx === 0 ? '#4caf50' : '#2196f3'
+      ctx.font = 'bold 10px sans-serif'
+      ctx.textAlign = 'right'
+      ctx.fillText(idx === 0 ? '第1' : '第2', x + CARD_W - 10, ty + 5)
+    })
+
+    if (picked.length < 2) {
+      ctx.fillStyle = 'rgba(255,255,255,0.2)'
+      ctx.font = '12px "Noto Sans TC", sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText('未完成預測', x + CARD_W / 2, y + CARD_H / 2 + 10)
+    }
+  })
+
+  // ── Footer：QR Code + 文字 ────────────────────────────
+  const footerY = HEADER_H + ROWS * (CARD_H + PAD) + PAD
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)'
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(PAD, footerY + 10)
+  ctx.lineTo(W - PAD, footerY + 10)
+  ctx.stroke()
+
+  // QR Code（右側）
+  const QR_SIZE = 64
+  const qrCanvas = document.createElement('canvas')
+  await QRCode.toCanvas(qrCanvas, `https://${SITE_URL}`, {
+    width: QR_SIZE, margin: 1,
+    color: { dark: '#ffffff', light: '#00000000' }
+  })
+  const qrX = W - PAD - QR_SIZE
+  const qrY = footerY + 14
+  ctx.drawImage(qrCanvas, qrX, qrY, QR_SIZE, QR_SIZE)
+
+  // 右側文字
+  ctx.fillStyle = 'rgba(255,255,255,0.6)'
+  ctx.font = '11px "Noto Sans TC", sans-serif'
+  ctx.textAlign = 'right'
+  ctx.fillText('掃描 QR Code 查看完整預測分析', qrX - 12, qrY + 22)
+  ctx.fillStyle = '#f0c040'
+  ctx.font = 'bold 12px sans-serif'
+  ctx.fillText(SITE_URL, qrX - 12, qrY + 42)
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'
+  ctx.font = '10px "Noto Sans TC", sans-serif'
+  ctx.fillText('AI 驅動 · 世界盃預測分析平台', qrX - 12, qrY + 60)
+
+  // ── 輸出 ──────────────────────────────────────────────
+  canvas.toBlob(async blob => {
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'wc2026-prediction.png', { type: 'image/png' })] })) {
+      try {
+        await navigator.share({
+          title: '我的 2026 世界盃分組晉級預測',
+          text: `快來看我的世界盃分組預測！${SITE_URL}`,
+          files: [new File([blob], 'wc2026-prediction.png', { type: 'image/png' })]
+        })
+      } catch {}
+    } else {
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = 'wc2026-group-prediction.png'
+      a.click()
+    }
+  }, 'image/png')
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+  ctx.lineTo(x + r, y + h)
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+  ctx.lineTo(x, y + r)
+  ctx.quadraticCurveTo(x, y, x + r, y)
+  ctx.closePath()
 }
 
 // ── ④ 支持球隊 Modal ──────────────────────────────────────
