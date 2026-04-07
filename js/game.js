@@ -330,6 +330,12 @@ function renderHomeDailyChallenge() {
             <span class="home-daily-letter">${'ABCD'[i]}</span>${o}
           </button>`).join('')}
       </div>
+      ${!dailyDone ? `
+      <div class="oracle-wrap" style="margin-top:12px">
+        <button onclick="showDailyOracle(this)" style="width:100%;padding:9px;border-radius:10px;background:rgba(138,43,226,0.1);border:1px solid rgba(138,43,226,0.3);color:rgba(200,150,255,0.9);font-size:12px;font-weight:700;cursor:pointer">
+          🔮 不確定？問問大神
+        </button>
+      </div>` : ''}
       ${dailyDone ? `
       <div class="home-daily-done" style="color:${wasCorrect ? '#4caf50' : '#f44336'}">${wasCorrect ? '✅ 答對了！+10 XP 🎉' : `❌ 答錯了！正確答案是 ${opts[correct]}`}</div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:10px">
@@ -689,6 +695,12 @@ function openDailyPick() {
           <span>${o}</span>
         </button>`).join('')}
     </div>
+    ${!answered ? `
+    <div class="oracle-wrap" style="margin-top:14px">
+      <button onclick="showDailyOracle(this)" style="width:100%;padding:10px;border-radius:10px;background:rgba(138,43,226,0.1);border:1px solid rgba(138,43,226,0.3);color:rgba(200,150,255,0.9);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px">
+        🔮 不確定？問問大神
+      </button>
+    </div>` : ''}
     ${answered ? `
       <div style="margin-top:16px;padding:12px;background:${wasCorrect ? 'rgba(76,175,80,0.1)' : 'rgba(244,67,54,0.1)'};border-radius:10px;text-align:center;color:${wasCorrect ? '#4caf50' : '#f44336'};font-size:13px">
         ${wasCorrect ? '✅ 答對了！+10 XP 明天繼續保持連勝 🔥' : `❌ 答錯了！正確答案是 <strong>${opts[correct]}</strong>`}
@@ -703,6 +715,39 @@ function submitDailyPick(idx) {
   checkAchievements();
   renderArena();
   openDailyPick();
+}
+
+// ── 大神神諭 ──────────────────────────────────────────────
+const _ORACLE_LINES = [
+  ['🔮', '大神掐指一算⋯⋯此題命中注定，你心中早有答案。'],
+  ['🌙', '天機不可洩露，但你的第一直覺往往是對的。'],
+  ['⭐', '星象顯示：左邊數來第二個選項散發神秘光芒。'],
+  ['🀄', '大神抽了一張牌——逆位，代表答案出乎意料。'],
+  ['💤', '大神剛睡醒，表示：選你覺得最不可能的那個。'],
+  ['🧧', '今日運勢極佳，閉眼選一個，勝率比你想像中高。'],
+  ['🐉', '龍年餘威未退，龍的傳人選 A 從未讓大神失望過。'],
+  ['🌀', '大神正在星際旅行，訊號不穩，請自求多福。'],
+  ['🎱', '大神問了神奇八號球——答案是：『不要問我』。'],
+  ['🦉', '智慧之鳥說：越難的題，越多人猜錯，你是例外嗎？'],
+  ['🔭', '大神遠眺宇宙，看到了答案，但宇宙要求保密。'],
+  ['🧿', '邪眼護身符提示：相信你的直覺，不要改答案。'],
+  ['📿', '念珠轉了三圈，大神說：此題答案藏在題目裡。'],
+  ['🎴', '抽到上上籤！但大神提醒：上上籤不代表選 A。'],
+  ['🌊', '海浪說話了：這題連章魚保羅也沒把握，加油。'],
+]
+
+function showDailyOracle(btnEl) {
+  const line = _ORACLE_LINES[Math.floor(Math.random() * _ORACLE_LINES.length)]
+  const wrap = btnEl.closest('.oracle-wrap')
+  if (!wrap) return
+  wrap.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(138,43,226,0.1);border:1px solid rgba(138,43,226,0.3);border-radius:12px;animation:fadeIn .4s ease">
+      <span style="font-size:24px;flex-shrink:0">${line[0]}</span>
+      <div>
+        <div style="font-size:10px;color:rgba(180,130,255,0.7);font-weight:700;letter-spacing:1px;margin-bottom:4px">大神神諭</div>
+        <div style="font-size:13px;color:rgba(220,180,255,0.9);line-height:1.6">${line[1]}</div>
+      </div>
+    </div>`
 }
 
 // ── ② 冠軍預測 Modal ──────────────────────────────────────
