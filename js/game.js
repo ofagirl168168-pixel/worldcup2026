@@ -796,12 +796,12 @@ async function shareGroupImage() {
 
   // ── Header ────────────────────────────────────────────
   ctx.fillStyle = '#f0c040'
-  ctx.font = 'bold 22px "Noto Sans TC", sans-serif'
+  ctx.font = 'bold 22px sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText('🏆 我的 2026 世界盃分組晉級預測', W / 2, 36)
+  ctx.fillText('我的 2026 世界盃分組晉級預測', W / 2, 36)
   ctx.fillStyle = 'rgba(255,255,255,0.35)'
-  ctx.font = '13px "Noto Sans TC", sans-serif'
-  ctx.fillText('FIFA World Cup 2026 · Group Stage Predictions', W / 2, 58)
+  ctx.font = '13px sans-serif'
+  ctx.fillText('FIFA World Cup 2026 · Group Stage Predictions', W / 2, 62)
 
   // ── 各組卡片 ──────────────────────────────────────────
   groupKeys.forEach((g, i) => {
@@ -813,91 +813,104 @@ async function shareGroupImage() {
     const picked = groups[g] || []
 
     // 卡片背景
-    ctx.fillStyle = 'rgba(255,255,255,0.04)'
+    ctx.fillStyle = 'rgba(255,255,255,0.05)'
     roundRect(ctx, x, y, CARD_W, CARD_H, 10)
     ctx.fill()
 
     // 組別標題
     ctx.fillStyle = '#f0c040'
-    ctx.font = 'bold 12px "Noto Sans TC", sans-serif'
+    ctx.font = 'bold 13px sans-serif'
     ctx.textAlign = 'left'
-    ctx.fillText(gd.name, x + 10, y + 20)
+    ctx.fillText(gd.name, x + 10, y + 22)
 
-    // 兩支晉級球隊
+    // 兩支晉級球隊（用球隊代碼 + 中文名，不用 emoji）
     picked.slice(0, 2).forEach((code, idx) => {
       const t = TEAMS[code]
       if (!t) return
-      const ty = y + 38 + idx * 32
-      ctx.fillStyle = idx === 0 ? 'rgba(76,175,80,0.15)' : 'rgba(33,150,243,0.12)'
+      const ty = y + 42 + idx * 32
+      ctx.fillStyle = idx === 0 ? 'rgba(76,175,80,0.18)' : 'rgba(33,150,243,0.15)'
       roundRect(ctx, x + 8, ty - 14, CARD_W - 16, 26, 6)
       ctx.fill()
-      ctx.font = '17px serif'
+
+      // 球隊代碼（替代 emoji）
+      ctx.fillStyle = idx === 0 ? '#4caf50' : '#2196f3'
+      ctx.font = 'bold 11px sans-serif'
       ctx.textAlign = 'left'
-      ctx.fillText(t.flag, x + 14, ty + 5)
+      ctx.fillText(code, x + 14, ty + 4)
+
+      // 球隊中文名
       ctx.fillStyle = 'rgba(255,255,255,0.9)'
-      ctx.font = '12px "Noto Sans TC", sans-serif'
-      ctx.fillText(t.nameCN, x + 40, ty + 5)
+      ctx.font = '12px sans-serif'
+      ctx.fillText(t.nameCN, x + 50, ty + 4)
+
+      // 名次
       ctx.fillStyle = idx === 0 ? '#4caf50' : '#2196f3'
       ctx.font = 'bold 10px sans-serif'
       ctx.textAlign = 'right'
-      ctx.fillText(idx === 0 ? '第1' : '第2', x + CARD_W - 10, ty + 5)
+      ctx.fillText(idx === 0 ? '第1' : '第2', x + CARD_W - 10, ty + 4)
     })
 
     if (picked.length < 2) {
       ctx.fillStyle = 'rgba(255,255,255,0.2)'
-      ctx.font = '12px "Noto Sans TC", sans-serif'
+      ctx.font = '12px sans-serif'
       ctx.textAlign = 'center'
       ctx.fillText('未完成預測', x + CARD_W / 2, y + CARD_H / 2 + 10)
     }
   })
 
   // ── Footer：QR Code + 文字 ────────────────────────────
-  const footerY = HEADER_H + ROWS * (CARD_H + PAD) + PAD
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)'
+  const footerY = HEADER_H + ROWS * (CARD_H + PAD) + PAD + 8
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)'
   ctx.lineWidth = 1
   ctx.beginPath()
-  ctx.moveTo(PAD, footerY + 10)
-  ctx.lineTo(W - PAD, footerY + 10)
+  ctx.moveTo(PAD, footerY)
+  ctx.lineTo(W - PAD, footerY)
   ctx.stroke()
 
-  // QR Code（右側）
-  const QR_SIZE = 64
-  const qrCanvas = document.createElement('canvas')
-  await QRCode.toCanvas(qrCanvas, `https://${SITE_URL}`, {
-    width: QR_SIZE, margin: 1,
-    color: { dark: '#ffffff', light: '#00000000' }
-  })
+  // QR Code（用 Promise 包裝確保完成）
+  const QR_SIZE = 68
   const qrX = W - PAD - QR_SIZE
-  const qrY = footerY + 14
-  ctx.drawImage(qrCanvas, qrX, qrY, QR_SIZE, QR_SIZE)
+  const qrY = footerY + 12
 
-  // 右側文字
-  ctx.fillStyle = 'rgba(255,255,255,0.6)'
-  ctx.font = '11px "Noto Sans TC", sans-serif'
-  ctx.textAlign = 'right'
-  ctx.fillText('掃描 QR Code 查看完整預測分析', qrX - 12, qrY + 22)
+  try {
+    const qrDataUrl = await QRCode.toDataURL(`https://${SITE_URL}`, {
+      width: QR_SIZE * 2, margin: 1,
+      color: { dark: '#ffffff', light: '#0d1117' }
+    })
+    await new Promise((resolve) => {
+      const img = new Image()
+      img.onload = () => { ctx.drawImage(img, qrX, qrY, QR_SIZE, QR_SIZE); resolve() }
+      img.src = qrDataUrl
+    })
+  } catch (e) { console.warn('QR code error', e) }
+
+  // 文字
+  ctx.fillStyle = 'rgba(255,255,255,0.55)'
+  ctx.font = '11px sans-serif'
+  ctx.textAlign = 'left'
+  ctx.fillText('掃描 QR Code 查看完整 AI 預測分析', PAD, footerY + 28)
   ctx.fillStyle = '#f0c040'
-  ctx.font = 'bold 12px sans-serif'
-  ctx.fillText(SITE_URL, qrX - 12, qrY + 42)
-  ctx.fillStyle = 'rgba(255,255,255,0.35)'
-  ctx.font = '10px "Noto Sans TC", sans-serif'
-  ctx.fillText('AI 驅動 · 世界盃預測分析平台', qrX - 12, qrY + 60)
+  ctx.font = 'bold 13px sans-serif'
+  ctx.fillText(SITE_URL, PAD, footerY + 50)
+  ctx.fillStyle = 'rgba(255,255,255,0.3)'
+  ctx.font = '10px sans-serif'
+  ctx.fillText('AI 驅動 · 世界盃預測分析平台', PAD, footerY + 68)
 
   // ── 輸出 ──────────────────────────────────────────────
   canvas.toBlob(async blob => {
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'wc2026-prediction.png', { type: 'image/png' })] })) {
+    if (!blob) { showToast('❌ 圖片產生失敗'); return }
+    const file = new File([blob], 'wc2026-group-prediction.png', { type: 'image/png' })
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
       try {
-        await navigator.share({
-          title: '我的 2026 世界盃分組晉級預測',
-          text: `快來看我的世界盃分組預測！${SITE_URL}`,
-          files: [new File([blob], 'wc2026-prediction.png', { type: 'image/png' })]
-        })
+        await navigator.share({ title: '我的 2026 世界盃分組晉級預測', files: [file] })
       } catch {}
     } else {
       const a = document.createElement('a')
       a.href = URL.createObjectURL(blob)
       a.download = 'wc2026-group-prediction.png'
+      document.body.appendChild(a)
       a.click()
+      document.body.removeChild(a)
     }
   }, 'image/png')
 }
