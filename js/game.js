@@ -946,7 +946,7 @@ async function shareDailyImage() {
   canvas.toBlob(async blob => {
     const file = new File([blob], 'daily-challenge.png', { type: 'image/png' })
     const link = await getMyRefLink?.() || window.location.origin
-    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+    if (_isMobile() && navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file], text: '🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！' }).catch(() => {})
     } else {
       showDesktopShareModal({ blob, link, filename: 'daily-challenge.png', title: '🧠 出題挑戰' })
@@ -955,6 +955,11 @@ async function shareDailyImage() {
 }
 
 // ── 電腦版分享 Modal ─────────────────────────────────────
+// 只有真正的行動裝置才用 Web Share API（Windows/Mac 桌機的 navigator.share 會開系統 UI）
+function _isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+}
+
 // 全域暫存，供 Modal 內 onclick 使用
 let _dsImgUrl = null, _dsFilename = 'share.png'
 
@@ -1038,7 +1043,7 @@ async function shareChampionText() {
   const c3 = TEAMS[champion.c3]?.nameCN || champion.c3
   const link = await getMyRefLink?.() || window.location.origin
   const text = `🏆 我的 2026 世界盃冠軍預測\n🥇 冠軍：${c1}\n🥈 亞軍：${c2}\n🥉 季軍：${c3}\n\n你猜對了嗎？來挑戰我的眼光！\n${link}`
-  if (navigator.share) {
+  if (_isMobile() && navigator.share) {
     navigator.share({ text }).catch(() => {})
   } else {
     showDesktopShareModal({ text, link, title: '🏆 曬我的冠軍押注' })
@@ -1052,7 +1057,7 @@ async function shareTeamText() {
   const t = TEAMS[team]
   const link = await getMyRefLink?.() || window.location.origin
   const text = `⚽ 2026 世界盃，我宣示支持 ${t?.nameCN || team}！\n整個賽事我都陪著他們！\n一起來預測世界盃吧👇\n${link}`
-  if (navigator.share) {
+  if (_isMobile() && navigator.share) {
     navigator.share({ text }).catch(() => {})
   } else {
     showDesktopShareModal({ text, link, title: '⚽ 招募隊友' })
@@ -1388,7 +1393,7 @@ async function shareGroupImage() {
   canvas.toBlob(async blob => {
     if (!blob) { showToast('❌ 圖片產生失敗'); return }
     const file = new File([blob], 'wc2026-group-prediction.png', { type: 'image/png' })
-    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+    if (_isMobile() && navigator.share && navigator.canShare?.({ files: [file] })) {
       try {
         await navigator.share({ title: '我的 2026 世界盃分組晉級預測', text: `來挑戰我的分組預測！${shareLink}`, files: [file] })
         return
