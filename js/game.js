@@ -741,13 +741,16 @@ function showDailyOracle(btnEl) {
   const wrap = btnEl.closest('.oracle-wrap')
   if (!wrap) return
   wrap.innerHTML = `
-    <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(138,43,226,0.1);border:1px solid rgba(138,43,226,0.3);border-radius:12px;animation:fadeIn .4s ease">
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(138,43,226,0.1);border:1px solid rgba(138,43,226,0.3);border-radius:12px;animation:fadeIn .4s ease;margin-bottom:10px">
       <span style="font-size:24px;flex-shrink:0">${line[0]}</span>
       <div>
         <div style="font-size:10px;color:rgba(180,130,255,0.7);font-weight:700;letter-spacing:1px;margin-bottom:4px">大神神諭</div>
         <div style="font-size:13px;color:rgba(220,180,255,0.9);line-height:1.6">${line[1]}</div>
       </div>
-    </div>`
+    </div>
+    <button onclick="shareDailyImage()" style="width:100%;padding:10px;border-radius:10px;background:rgba(255,109,0,0.12);border:1px solid rgba(255,109,0,0.35);color:#ff8c42;font-size:13px;font-weight:800;cursor:pointer">
+      🤝 大神也不確定？問問朋友！
+    </button>`
 }
 
 // ── ② 冠軍預測 Modal ──────────────────────────────────────
