@@ -769,14 +769,19 @@ function saveGroupPicks() {
 }
 
 // ── 分享分組預測圖片 ──────────────────────────────────────
-// 預載圖片 helper
+// 預載圖片 helper（透過 blob URL 避免 CORS taint）
 function loadImg(src) {
-  return new Promise(resolve => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => resolve(img)
-    img.onerror = () => resolve(null)
-    img.src = src
+  return new Promise(async resolve => {
+    try {
+      const res = await fetch(src)
+      if (!res.ok) throw new Error()
+      const blob = await res.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      const img = new Image()
+      img.onload = () => { URL.revokeObjectURL(blobUrl); resolve(img) }
+      img.onerror = () => { URL.revokeObjectURL(blobUrl); resolve(null) }
+      img.src = blobUrl
+    } catch { resolve(null) }
   })
 }
 
@@ -846,24 +851,43 @@ async function shareGroupImage() {
   ctx.fillStyle = topBar
   ctx.fillRect(0, 0, W, 3)
 
-  // ── Header ────────────────────────────────────────────
-  // 足球圖示（圓形）
-  ctx.fillStyle = 'rgba(240,192,64,0.15)'
+  // ── Header（盾牌 logo + 標題）────────────────────────
+  // 盾牌形狀
+  const sx = W / 2, sy = 58, sr = 38
+  ctx.save()
+  ctx.translate(sx - sr * 0.9, sy - sr)
+  ctx.scale(sr * 0.09, sr * 0.09)
   ctx.beginPath()
-  ctx.arc(W / 2, 54, 32, 0, Math.PI * 2)
+  // 盾牌路徑（縮放版）
+  ctx.moveTo(10, 0); ctx.lineTo(20, 4); ctx.lineTo(20, 14)
+  ctx.bezierCurveTo(20, 20, 15, 24, 10, 26)
+  ctx.bezierCurveTo(5, 24, 0, 20, 0, 14); ctx.lineTo(0, 4); ctx.closePath()
+  const shieldGrad = ctx.createLinearGradient(0, 0, 20, 26)
+  shieldGrad.addColorStop(0, '#f5d26b'); shieldGrad.addColorStop(1, '#e07800')
+  ctx.fillStyle = shieldGrad
   ctx.fill()
-  ctx.strokeStyle = 'rgba(240,192,64,0.5)'
-  ctx.lineWidth = 2
-  ctx.stroke()
+  ctx.restore()
+
+  // 盾牌內六邊形
+  ctx.strokeStyle = 'rgba(240,192,64,0.6)'
+  ctx.lineWidth = 1.5
+  ctx.beginPath()
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI / 3) * i - Math.PI / 6
+    const px = sx + 16 * Math.cos(angle), py = sy + 16 * Math.sin(angle)
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)
+  }
+  ctx.closePath(); ctx.stroke()
+
+  // 星形
   ctx.fillStyle = '#f0c040'
-  ctx.font = '32px serif'
+  ctx.font = 'bold 14px sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText('⚽', W / 2, 66)
+  ctx.fillText('★', sx, sy + 5)
 
   // 標題
   ctx.fillStyle = '#f0c040'
-  ctx.font = 'bold 28px sans-serif'
-  ctx.textAlign = 'center'
+  ctx.font = 'bold 30px sans-serif'
   ctx.fillText('我的世界盃分組晉級預測', W / 2, 112)
 
   // 副標題

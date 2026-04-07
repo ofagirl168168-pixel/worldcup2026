@@ -76,6 +76,7 @@ ul { list-style: none; }
   cursor: pointer; flex-shrink: 0;
 }
 .logo-icon { font-size: 28px; filter: drop-shadow(0 0 8px rgba(240,192,64,0.6)); }
+.logo-svg  { filter: drop-shadow(0 0 8px rgba(240,192,64,0.5)); flex-shrink: 0; }
 .logo-title { display: block; font-size: 14px; font-weight: 700; color: var(--gold); line-height: 1; }
 .logo-sub   { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 
