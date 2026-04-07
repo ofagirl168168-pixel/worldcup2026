@@ -199,6 +199,8 @@ function recordDailyAnswer(optIdx) {
   state.history[today] = { chosen: optIdx, isCorrect };
   save(GK.daily, state);
   syncArenaToSupabase?.('daily');
+  syncToSupabase?.();       // 同步 daily_answers 表
+  syncXPToProfile?.();      // 即時更新排行榜 XP
 
   // 寶石獎勵（非同步，不阻塞UI）
   if (isCorrect) {
@@ -766,6 +768,7 @@ function saveChampionPick() {
   if (c1===c2 || c1===c3 || c2===c3) { alert('冠亞季軍不能選同一支球隊'); return; }
   save(GK.champion, { c1, c2, c3, lockedAt: new Date().toISOString() });
   syncToSupabase?.();
+  syncXPToProfile?.();
   syncArenaToSupabase?.('picks');
   onFirstChampion?.();
   updateNavXP();
@@ -849,6 +852,7 @@ function saveGroupPicks() {
   }
   save(GK.groups, groups);
   syncToSupabase?.();
+  syncXPToProfile?.();
   syncArenaToSupabase?.('picks');
   onFirstGroups?.();
   updateNavXP();
@@ -1547,6 +1551,7 @@ function saveSupportTeam() {
   if (!code) { alert('請選擇一支球隊'); return; }
   save(GK.team, code);
   syncToSupabase?.();
+  syncXPToProfile?.();
   syncArenaToSupabase?.('picks');
   onFirstTeam?.();
   updateNavXP();

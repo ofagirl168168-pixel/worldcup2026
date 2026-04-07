@@ -240,6 +240,28 @@ async function syncToSupabase() {
   }
 }
 
+// ── XP 同步到 profiles（讓排行榜即時反映）──────────────────
+async function syncXPToProfile() {
+  if (!currentUser) return
+  try {
+    const xpData     = window.calcXPLevel?.()
+    if (!xpData) return
+    const dailyState = window.getDailyState?.() ?? {}
+    const history    = dailyState.history ?? {}
+    const correct    = Object.values(history).filter(v => v?.isCorrect).length
+    const total      = Object.values(history).filter(v => v !== undefined).length
+
+    await DB.from('profiles').update({
+      xp:             xpData.xp,
+      correct_answers: correct,
+      total_answered:  total,
+      updated_at:     new Date().toISOString()
+    }).eq('id', currentUser.id)
+  } catch (e) {
+    console.warn('syncXPToProfile:', e)
+  }
+}
+
 // ── 競技場資料同步 localStorage → Supabase ──────────────────
 async function syncArenaToSupabase(type = 'picks') {
   if (!currentUser) return
