@@ -314,7 +314,7 @@ async function renderLeaderboard(containerId) {
 
   el.innerHTML = rows.map((row, i) => {
     const team = row.team_code ? TEAMS?.[row.team_code] : null;
-    const flag = team ? team.flag : '🌍';
+    const flag = team ? team.flag : '';
     const accuracy = row.total_answered > 0
       ? Math.round(row.correct_answers / row.total_answered * 100) + '%'
       : '—';
@@ -323,7 +323,7 @@ async function renderLeaderboard(containerId) {
     return `
       <div class="lb-row ${isMe ? 'lb-me' : ''}">
         <div class="lb-rank">${medals[i] ?? `#${i + 1}`}</div>
-        <div class="lb-flag">${flag}</div>
+        <div class="lb-flag">${flagImg(flag)}</div>
         <div class="lb-name">${row.nickname}${isMe ? ' <span class="lb-you">你</span>' : ''}</div>
         <div class="lb-stats">
           <span class="lb-xp">⚡ ${row.xp} XP</span>

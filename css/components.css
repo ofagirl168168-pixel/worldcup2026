@@ -2,6 +2,16 @@
    COMPONENTS.CSS — 卡片、篩選器、彈窗、數據表
    ============================================= */
 
+/* ---------- 全站旗幟圖示（twemoji PNG）---------- */
+img.flag-img {
+  height: 1.2em;
+  width: auto;
+  object-fit: contain;
+  vertical-align: middle;
+  display: inline-block;
+  border-radius: 2px;
+}
+
 /* ---------- 篩選器 ---------- */
 .filter-bar {
   max-width: 1400px; margin: 0 auto;

@@ -345,7 +345,7 @@ function renderArena() {
 
   // Champion display
   const champC1  = myChampion ? TEAMS[myChampion.c1] : null;
-  const champFlag = champC1 ? `${champC1.flag} ${champC1.nameCN}` : '—';
+  const champFlag = champC1 ? `${flagImg(champC1.flag)} ${champC1.nameCN}` : '—';
 
   // Groups progress
   const groupCount = myGroups ? Object.keys(myGroups).length : 0;
@@ -460,7 +460,7 @@ function renderArena() {
       <!-- ④ 支持球隊 -->
       <div class="arena-card ${myTeam ? 'done' : ''}" onclick="openTeamSupport()">
         <div class="arena-card-badge">${myTeam ? '✅ 已宣示' : '尚未選擇'}</div>
-        <span class="arena-card-icon" style="font-size:44px">${myTeam ? (TEAMS[myTeam]?.flag||'⚽') : '⚽'}</span>
+        <span class="arena-card-icon" style="font-size:44px">${myTeam && TEAMS[myTeam]?.flag ? flagImg(TEAMS[myTeam].flag) : '⚽'}</span>
         <div class="arena-card-title">宣示支持球隊</div>
         <div class="arena-card-desc">
           ${myTeam
@@ -618,7 +618,7 @@ function openChampionPick() {
     const t = TEAMS[code];
     const pct = ((votes[code]||1) / total * 100).toFixed(1);
     return `<div class="champ-team-opt ${selected===code?'selected':''}" onclick="selectChampTeam('${role}','${code}')">
-      <span style="font-size:22px">${t.flag}</span>
+      <span style="font-size:22px">${flagImg(t.flag)}</span>
       <span style="font-size:13px;font-weight:600">${t.nameCN}</span>
       <span style="font-size:11px;color:var(--text-muted)">${pct}%</span>
     </div>`;
@@ -707,7 +707,7 @@ function openGroupPicks() {
               if (!t) return '';
               const sel = picked.includes(code);
               return `<div class="group-pick-team ${sel?'selected':''}" onclick="toggleGroupPick('${g}','${code}',this)">
-                <span>${t.flag}</span>
+                <span>${flagImg(t.flag)}</span>
                 <span>${t.nameCN}</span>
               </div>`;
             }).join('')}
@@ -798,32 +798,13 @@ async function shareGroupImage() {
     } catch {}
   }
 
-  // ── 國旗 emoji → twemoji PNG URL ──────────────────────
-  const TWEMOJI_BASE = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72'
-  const SUBDIVISION_MAP = {
-    '🏴󠁧󠁢󠁥󠁮󠁧󠁿': '1f3f4-e0067-e0062-e0065-e006e-e0067-e007f',
-    '🏴󠁧󠁢󠁳󠁣󠁴󠁿': '1f3f4-e0067-e0062-e0073-e0063-e0074-e007f',
-    '🏴󠁧󠁢󠁷󠁬󠁳󠁿': '1f3f4-e0067-e0062-e0077-e006c-e0073-e007f',
-  }
-  function getFlagUrl(flagEmoji) {
-    if (SUBDIVISION_MAP[flagEmoji]) {
-      return `${TWEMOJI_BASE}/${SUBDIVISION_MAP[flagEmoji]}.png`
-    }
-    const cps = [...flagEmoji].map(c => c.codePointAt(0))
-    const regional = cps.filter(cp => cp >= 0x1F1E6 && cp <= 0x1F1FF)
-    if (regional.length >= 2) {
-      return `${TWEMOJI_BASE}/${regional.map(cp => cp.toString(16)).join('-')}.png`
-    }
-    return null
-  }
-
-  // ── 預載所有國旗圖片 ──────────────────────────────────
+  // ── 預載所有國旗圖片（使用全域 getFlagImgUrl）────────
   const allCodes = [...new Set(groupKeys.flatMap(g => groups[g] || []))]
   const flagImgs = {}
   await Promise.all(allCodes.map(async code => {
     const t = TEAMS[code]
     if (!t?.flag) return
-    const url = getFlagUrl(t.flag)
+    const url = getFlagImgUrl(t.flag)
     if (url) flagImgs[code] = await loadImg(url)
   }))
 
@@ -1148,7 +1129,7 @@ function openTeamSupport() {
       ${sorted.map(([code, t]) => {
         const fanCount = Math.round((votes[code]||1) * 3.2);
         return `<div class="support-team-card ${current===code?'selected':''}" onclick="selectSupportTeam('${code}')">
-          <div style="font-size:28px">${t.flag}</div>
+          <div style="font-size:28px">${flagImg(t.flag)}</div>
           <div style="font-size:12px;font-weight:700">${t.nameCN}</div>
           <div style="font-size:10px;color:var(--text-muted)">${fanCount.toLocaleString()} 人支持</div>
         </div>`;
