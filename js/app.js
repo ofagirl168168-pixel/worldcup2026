@@ -499,8 +499,17 @@ async function openPredModal(id) {
         <div class="pred-lock-box">
           <div style="font-size:32px;margin-bottom:10px">🔒</div>
           <div style="font-size:16px;font-weight:800;margin-bottom:6px">完整 AI 分析</div>
-          <div style="font-size:12px;color:var(--text-muted);line-height:1.7;margin-bottom:16px">
-            預測比分 · 勝率 · 關鍵球員 · 戰術分析
+          <div style="font-size:12px;color:var(--text-muted);line-height:2;margin-bottom:16px">
+            <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center">
+              <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 8px">⚽ 預測比分</span>
+              <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 8px">📊 勝平負%</span>
+              <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 8px">🎯 大小球</span>
+              <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 8px">🔁 讓球盤</span>
+              <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 8px">🅱 雙方都進球</span>
+              <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 8px">⛳ 角球數</span>
+              <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 8px">🟨 黃牌數</span>
+              <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 8px">⏱ 半場比分</span>
+            </div>
           </div>
           <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px;font-size:13px;color:rgba(255,255,255,0.5)">
             消耗 <span class="gem-ico" style="width:13px;height:13px"></span> ×${cost} 解鎖
