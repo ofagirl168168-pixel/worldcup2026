@@ -367,7 +367,7 @@ async function fetchChampionVotes() {
 // ── 取得排行榜資料 ────────────────────────────────────────
 async function fetchLeaderboard() {
   const { data, error } = await DB.from('leaderboard')
-    .select('*').limit(50);
+    .select('*').order('xp', { ascending: false }).limit(50);
   if (error) { console.error('排行榜錯誤:', error); return []; }
   return data ?? [];
 }
