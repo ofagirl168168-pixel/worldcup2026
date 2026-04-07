@@ -410,7 +410,10 @@ function renderArena() {
             +10 XP / 天
             <span class="arena-card-gem">· 答對 <span class="gem-ico"></span>+1</span>
           </span>
-          <span class="arena-card-cta">${dailyDone ? '已完成 ✓' : '立即作答 →'}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button onclick="event.stopPropagation();shareDailyImage()" style="padding:4px 10px;border-radius:8px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.3);color:var(--gold);font-size:11px;cursor:pointer;font-weight:700">📤 分享</button>
+            <span class="arena-card-cta">${dailyDone ? '已完成 ✓' : '立即作答 →'}</span>
+          </div>
         </div>
       </div>
 
@@ -775,6 +778,178 @@ function saveGroupPicks() {
   checkAchievements();
   renderArena();
   showSharePromptAfterGroups();
+}
+
+// ── 每日一題分享圖 ────────────────────────────────────────
+async function shareDailyImage() {
+  const { q, opts } = getTodayQuestion()
+  const dailyState  = getDailyState()
+  const streak      = dailyState.streak || 0
+  const shareLink   = await (async () => {
+    try { return await getMyRefLink?.() || window.location.origin } catch { return window.location.origin }
+  })()
+
+  // QR Code
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(shareLink)}&color=0a0f1e&bgcolor=ffffff&margin=8`
+  const qrImg = await loadImg(qrUrl).catch(() => null)
+
+  // Canvas 尺寸
+  const W = 800, PAD = 36
+  const H = 860
+  const canvas = document.createElement('canvas')
+  canvas.width = W; canvas.height = H
+  const ctx = canvas.getContext('2d')
+
+  // ── 背景 ──────────────────────────────────────────────
+  const bg = ctx.createLinearGradient(0, 0, W, H)
+  bg.addColorStop(0, '#07091a')
+  bg.addColorStop(0.5, '#0d1030')
+  bg.addColorStop(1, '#07091a')
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H)
+
+  // 裝飾光暈
+  const glow = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, 400)
+  glow.addColorStop(0, 'rgba(240,192,64,0.07)')
+  glow.addColorStop(1, 'transparent')
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H)
+
+  // ── Header：Shield Logo + 標題 ──────────────────────
+  const s = 44
+  drawShield(ctx, PAD, 24, s)
+  ctx.fillStyle = '#f0c040'
+  ctx.font = `800 22px "Noto Sans TC", sans-serif`
+  ctx.textBaseline = 'middle'
+  ctx.fillText('世界盃預測平台 2026', PAD + s + 12, 24 + s * 0.5)
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'
+  ctx.font = `500 13px "Noto Sans TC", sans-serif`
+  ctx.fillText('worldcup2026.pages.dev', PAD + s + 12, 24 + s * 0.5 + 22)
+
+  // 分隔線
+  ctx.strokeStyle = 'rgba(240,192,64,0.25)'
+  ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(PAD, 100); ctx.lineTo(W - PAD, 100); ctx.stroke()
+
+  // ── Hook 文字 ─────────────────────────────────────────
+  ctx.textAlign = 'center'
+  ctx.fillStyle = '#f0c040'
+  ctx.font = `900 34px "Noto Sans TC", sans-serif`
+  ctx.fillText('🧠 你知道答案嗎？', W/2, 148)
+  ctx.fillStyle = 'rgba(255,255,255,0.55)'
+  ctx.font = `500 16px "Noto Sans TC", sans-serif`
+  ctx.fillText('朋友幫我一起想想，掃碼來答題挑戰！', W/2, 182)
+
+  // ── 題目卡 ────────────────────────────────────────────
+  const cardX = PAD, cardY = 210, cardW = W - PAD*2, cardH = 170
+  ctx.fillStyle = 'rgba(255,255,255,0.06)'
+  ctx.strokeStyle = 'rgba(240,192,64,0.35)'
+  ctx.lineWidth = 1.5
+  roundRect(ctx, cardX, cardY, cardW, cardH, 16)
+  ctx.fill(); ctx.stroke()
+
+  // 題目文字（多行）
+  ctx.fillStyle = '#f0f0f0'
+  ctx.font = `700 21px "Noto Sans TC", sans-serif`
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'top'
+  const qLines = []
+  let qLine = ''
+  for (const ch of q) {
+    const test = qLine + ch
+    if (ctx.measureText(test).width > cardW - 48) { qLines.push(qLine); qLine = ch }
+    else qLine = test
+  }
+  if (qLine) qLines.push(qLine)
+  const qStartY = cardY + (cardH - qLines.length * 32) / 2
+  qLines.forEach((ln, i) => ctx.fillText(ln, cardX + 24, qStartY + i * 32))
+
+  // ── 選項（2列2行）────────────────────────────────────
+  const labels = ['A', 'B', 'C', 'D']
+  const optColors = ['rgba(33,150,243,0.18)', 'rgba(76,175,80,0.18)', 'rgba(255,152,0,0.18)', 'rgba(156,39,176,0.18)']
+  const optBorder = ['rgba(33,150,243,0.5)', 'rgba(76,175,80,0.5)', 'rgba(255,152,0,0.5)', 'rgba(156,39,176,0.5)']
+  const optLabelC = ['#42a5f5', '#66bb6a', '#ffa726', '#ab47bc']
+  const oW = (W - PAD*2 - 20) / 2, oH = 64
+  const oStartY = 400
+
+  opts.forEach((opt, i) => {
+    const col = i % 2, row = Math.floor(i / 2)
+    const ox = PAD + col * (oW + 20), oy = oStartY + row * (oH + 14)
+
+    ctx.fillStyle = optColors[i]
+    ctx.strokeStyle = optBorder[i]
+    ctx.lineWidth = 1.5
+    roundRect(ctx, ox, oy, oW, oH, 12)
+    ctx.fill(); ctx.stroke()
+
+    // label 圓圈
+    ctx.fillStyle = optBorder[i]
+    ctx.beginPath(); ctx.arc(ox + 28, oy + oH/2, 14, 0, Math.PI*2); ctx.fill()
+    ctx.fillStyle = '#fff'
+    ctx.font = `800 14px "Noto Sans TC", sans-serif`
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+    ctx.fillText(labels[i], ox + 28, oy + oH/2)
+
+    // 選項文字
+    ctx.fillStyle = '#f0f0f0'
+    ctx.font = `600 15px "Noto Sans TC", sans-serif`
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle'
+    const maxOptW = oW - 60
+    let optTxt = opt
+    while (ctx.measureText(optTxt).width > maxOptW && optTxt.length > 4) optTxt = optTxt.slice(0,-1) + '…'
+    ctx.fillText(optTxt, ox + 50, oy + oH/2)
+  })
+
+  // ── 連勝 Banner（有連勝時才顯示）─────────────────────
+  let footerY = 560
+  if (streak >= 3) {
+    ctx.fillStyle = 'rgba(255,152,0,0.12)'
+    ctx.strokeStyle = 'rgba(255,152,0,0.4)'
+    ctx.lineWidth = 1
+    roundRect(ctx, PAD, footerY, W - PAD*2, 52, 12)
+    ctx.fill(); ctx.stroke()
+    ctx.fillStyle = '#ffa726'
+    ctx.font = `700 16px "Noto Sans TC", sans-serif`
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+    ctx.fillText(`🔥 我已連勝答題 ${streak} 天！你能打破紀錄嗎？`, W/2, footerY + 26)
+    footerY += 66
+  }
+
+  // ── 底部：QR Code + CTA ───────────────────────────────
+  const qrSize = 130
+  const qrX = PAD + 20, qrY = footerY + 20
+
+  // QR 白底
+  ctx.fillStyle = '#ffffff'
+  roundRect(ctx, qrX - 6, qrY - 6, qrSize + 12, qrSize + 12, 10)
+  ctx.fill()
+  if (qrImg) ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize)
+
+  // CTA 文字
+  const ctaX = qrX + qrSize + 30, ctaY = qrY + 10
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top'
+  ctx.fillStyle = '#f0c040'
+  ctx.font = `900 26px "Noto Sans TC", sans-serif`
+  ctx.fillText('掃碼來答題！', ctaX, ctaY)
+  ctx.fillStyle = 'rgba(255,255,255,0.6)'
+  ctx.font = `500 14px "Noto Sans TC", sans-serif`
+  ctx.fillText('每天一題世界盃知識挑戰', ctaX, ctaY + 38)
+  ctx.fillText('看誰的足球 IQ 最高！', ctaX, ctaY + 60)
+
+  ctx.fillStyle = 'rgba(255,255,255,0.25)'
+  ctx.font = `400 12px "Noto Sans TC", sans-serif`
+  ctx.fillText(shareLink, ctaX, ctaY + 90)
+
+  // ── 輸出 ──────────────────────────────────────────────
+  canvas.toBlob(async blob => {
+    const file = new File([blob], 'daily-challenge.png', { type: 'image/png' })
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ files: [file], text: '🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！' }).catch(() => {})
+    } else {
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = 'daily-challenge.png'
+      a.click()
+    }
+  }, 'image/png')
 }
 
 // ── 冠軍預測分享 ──────────────────────────────────────────
