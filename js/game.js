@@ -407,13 +407,13 @@ function renderArena() {
         ${dailyState.streak > 0 ? `<div class="arena-card-streak">🔥 ${dailyState.streak} 天連勝</div>` : ''}
         <div class="arena-card-footer">
           <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.3)">
-            +10 XP / 天
-            <span class="arena-card-gem">· 答對 <span class="gem-ico"></span>+1</span>
+            +10 XP / 天 <span class="arena-card-gem">· 答對 <span class="gem-ico"></span>+1</span>
           </span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button onclick="event.stopPropagation();shareDailyImage()" style="padding:4px 10px;border-radius:8px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.3);color:var(--gold);font-size:11px;cursor:pointer;font-weight:700">📤 分享</button>
-            <span class="arena-card-cta">${dailyDone ? '已完成 ✓' : '立即作答 →'}</span>
-          </div>
+          <span class="arena-card-cta">${dailyDone ? '已完成 ✓' : '立即作答 →'}</span>
+        </div>
+        <div onclick="event.stopPropagation()" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div style="font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5">考考朋友，<br>看誰足球 IQ 最高！</div>
+          <button onclick="shareDailyImage()" style="flex-shrink:0;padding:7px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(255,109,0,0.25),rgba(255,109,0,0.1));border:1px solid rgba(255,109,0,0.45);color:#ff8c42;font-size:12px;font-weight:800;cursor:pointer">🧠 出題挑戰</button>
         </div>
       </div>
 
@@ -430,15 +430,16 @@ function renderArena() {
         ${myChampion ? `<div class="arena-lock-hint">⏰ 開賽後永久鎖定</div>
         <div id="social-champion" class="arena-social-proof"></div>` : ''}
         <div class="arena-card-footer">
-          <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.3)">
-            +50 XP
-            ${!myChampion ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+2</span>` : ''}
+          <span style="font-size:11px;color:rgba(255,255,255,0.3)">
+            +50 XP ${!myChampion ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+2</span>` : ''}
           </span>
-          <div style="display:flex;align-items:center;gap:8px">
-            ${myChampion ? `<button onclick="event.stopPropagation();shareChampionText()" style="padding:4px 10px;border-radius:8px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.3);color:var(--gold);font-size:11px;cursor:pointer;font-weight:700">📤 分享</button>` : ''}
-            <span class="arena-card-cta">${myChampion ? '修改預測 →' : '開始預測 →'}</span>
-          </div>
+          <span class="arena-card-cta">${myChampion ? '修改預測 →' : '開始預測 →'}</span>
         </div>
+        ${myChampion ? `
+        <div onclick="event.stopPropagation()" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div style="font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5">曬出你的押注，<br>賽後看誰猜對！</div>
+          <button onclick="shareChampionText()" style="flex-shrink:0;padding:7px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(240,192,64,0.22),rgba(240,192,64,0.08));border:1px solid rgba(240,192,64,0.4);color:var(--gold);font-size:12px;font-weight:800;cursor:pointer">🏆 曬我押注</button>
+        </div>` : ''}
       </div>
 
       <!-- ③ 分組賽預測 -->
@@ -456,15 +457,16 @@ function renderArena() {
           <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:5px">${groupCount}/12 已完成</div>
         </div>` : ''}
         <div class="arena-card-footer">
-          <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.3)">
-            +50 XP
-            ${!groupsDone ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+2</span>` : ''}
+          <span style="font-size:11px;color:rgba(255,255,255,0.3)">
+            +50 XP ${!groupsDone ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+2</span>` : ''}
           </span>
-          <div style="display:flex;align-items:center;gap:8px">
-            ${groupsDone ? `<button onclick="event.stopPropagation();shareGroupImage()" style="padding:4px 10px;border-radius:8px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.3);color:var(--gold);font-size:11px;cursor:pointer;font-weight:700">📤 分享</button>` : ''}
-            <span class="arena-card-cta">${groupsDone ? '修改預測 →' : groupCount > 0 ? '繼續填寫 →' : '開始填寫 →'}</span>
-          </div>
+          <span class="arena-card-cta">${groupsDone ? '修改預測 →' : groupCount > 0 ? '繼續填寫 →' : '開始填寫 →'}</span>
         </div>
+        ${groupsDone ? `
+        <div onclick="event.stopPropagation()" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div style="font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5">生成精美預測圖，<br>PK 好友的選隊眼光！</div>
+          <button onclick="shareGroupImage()" style="flex-shrink:0;padding:7px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(33,150,243,0.25),rgba(33,150,243,0.1));border:1px solid rgba(33,150,243,0.45);color:#64b5f6;font-size:12px;font-weight:800;cursor:pointer">📊 分享預測圖</button>
+        </div>` : ''}
       </div>
 
       <!-- ④ 支持球隊 -->
@@ -479,15 +481,16 @@ function renderArena() {
         </div>
         ${myTeam ? `<div id="social-team" class="arena-social-proof"></div>` : ''}
         <div class="arena-card-footer">
-          <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.3)">
-            +30 XP
-            ${!myTeam ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+1</span>` : ''}
+          <span style="font-size:11px;color:rgba(255,255,255,0.3)">
+            +30 XP ${!myTeam ? `<span class="arena-card-gem">· 首次 <span class="gem-ico"></span>+1</span>` : ''}
           </span>
-          <div style="display:flex;align-items:center;gap:8px">
-            ${myTeam ? `<button onclick="event.stopPropagation();shareTeamText()" style="padding:4px 10px;border-radius:8px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.3);color:var(--gold);font-size:11px;cursor:pointer;font-weight:700">📤 分享</button>` : ''}
-            <span class="arena-card-cta">${myTeam ? '更換球隊 →' : '選擇球隊 →'}</span>
-          </div>
+          <span class="arena-card-cta">${myTeam ? '更換球隊 →' : '選擇球隊 →'}</span>
         </div>
+        ${myTeam ? `
+        <div onclick="event.stopPropagation()" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div style="font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5">讓朋友知道你力挺誰，<br>一起當死忠球迷！</div>
+          <button onclick="shareTeamText()" style="flex-shrink:0;padding:7px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(233,30,99,0.22),rgba(233,30,99,0.08));border:1px solid rgba(233,30,99,0.4);color:#f48fb1;font-size:12px;font-weight:800;cursor:pointer">⚽ 招募隊友</button>
+        </div>` : ''}
       </div>
 
     </div>
