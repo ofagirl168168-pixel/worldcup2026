@@ -769,19 +769,14 @@ function saveGroupPicks() {
 }
 
 // ── 分享分組預測圖片 ──────────────────────────────────────
-// 預載圖片 helper（透過 blob URL 避免 CORS taint）
+// 預載圖片 helper（crossOrigin anonymous，適用有 CORS header 的 CDN）
 function loadImg(src) {
-  return new Promise(async resolve => {
-    try {
-      const res = await fetch(src)
-      if (!res.ok) throw new Error()
-      const blob = await res.blob()
-      const blobUrl = URL.createObjectURL(blob)
-      const img = new Image()
-      img.onload = () => { URL.revokeObjectURL(blobUrl); resolve(img) }
-      img.onerror = () => { URL.revokeObjectURL(blobUrl); resolve(null) }
-      img.src = blobUrl
-    } catch { resolve(null) }
+  return new Promise(resolve => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => resolve(null)
+    img.src = src
   })
 }
 
@@ -794,13 +789,24 @@ async function shareGroupImage() {
   const groupKeys = Object.keys(GROUPS).sort()
   const SITE_URL = 'worldcup2026-9u0.pages.dev'
 
+  // ── 取得分享者邀請連結 ───────────────────────────────
+  let shareLink = `https://${SITE_URL}`
+  if (currentUser) {
+    try {
+      const { data } = await DB.from('profiles').select('ref_code').eq('id', currentUser.id).maybeSingle()
+      if (data?.ref_code) shareLink = `https://${SITE_URL}?ref=${data.ref_code}`
+    } catch {}
+  }
+
   // ── 國旗 emoji → twemoji PNG URL ──────────────────────
   function getFlagUrl(flagEmoji) {
-    const pts = [...flagEmoji]
-      .map(c => c.codePointAt(0).toString(16))
-      .filter(p => parseInt(p, 16) > 0xfe00) // 保留 regional indicator
-      .join('-')
-    return `https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/${pts}.png`
+    const cps = [...flagEmoji].map(c => c.codePointAt(0))
+    // regional indicator: U+1F1E6–U+1F1FF
+    const regional = cps.filter(cp => cp >= 0x1F1E6 && cp <= 0x1F1FF)
+    if (regional.length >= 2) {
+      return `https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/${regional.map(cp => cp.toString(16)).join('-')}.png`
+    }
+    return null
   }
 
   // ── 預載所有國旗圖片 ──────────────────────────────────
@@ -809,11 +815,12 @@ async function shareGroupImage() {
   await Promise.all(allCodes.map(async code => {
     const t = TEAMS[code]
     if (!t?.flag) return
-    flagImgs[code] = await loadImg(getFlagUrl(t.flag))
+    const url = getFlagUrl(t.flag)
+    if (url) flagImgs[code] = await loadImg(url)
   }))
 
-  // ── 預載 QR Code 圖片（用外部 API）───────────────────
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://' + SITE_URL)}&color=0a0f1e&bgcolor=ffffff&margin=8`
+  // ── 預載 QR Code（指向分享者邀請連結）───────────────
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(shareLink)}&color=0a0f1e&bgcolor=ffffff&margin=8`
   const qrImg = await loadImg(qrUrl)
 
   // ── 直式 Canvas（手機分享友善）────────────────────────
@@ -1066,7 +1073,7 @@ async function shareGroupImage() {
   // 網址
   ctx.fillStyle = 'rgba(240,192,64,0.8)'
   ctx.font = 'bold 14px sans-serif'
-  ctx.fillText(SITE_URL, ctaX, footerY + 130)
+  ctx.fillText(shareLink.replace('https://', ''), ctaX, footerY + 130)
 
   // 底部金色邊線
   const botBar = ctx.createLinearGradient(0, 0, W, 0)
@@ -1083,7 +1090,7 @@ async function shareGroupImage() {
     const file = new File([blob], 'wc2026-group-prediction.png', { type: 'image/png' })
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       try {
-        await navigator.share({ title: '我的 2026 世界盃分組晉級預測', text: '來挑戰我的分組預測！', files: [file] })
+        await navigator.share({ title: '我的 2026 世界盃分組晉級預測', text: `來挑戰我的分組預測！${shareLink}`, files: [file] })
         return
       } catch {}
     }
