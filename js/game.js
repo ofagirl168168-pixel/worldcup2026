@@ -801,10 +801,15 @@ async function shareGroupImage() {
   // ── 國旗 emoji → twemoji PNG URL ──────────────────────
   function getFlagUrl(flagEmoji) {
     const cps = [...flagEmoji].map(c => c.codePointAt(0))
-    // regional indicator: U+1F1E6–U+1F1FF
+    // regional indicator flags (U+1F1E6–U+1F1FF)：一般國旗
     const regional = cps.filter(cp => cp >= 0x1F1E6 && cp <= 0x1F1FF)
     if (regional.length >= 2) {
       return `https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/${regional.map(cp => cp.toString(16)).join('-')}.png`
+    }
+    // subdivision flags (U+1F3F4 + tag chars)：英格蘭、蘇格蘭、威爾斯
+    if (cps[0] === 0x1F3F4) {
+      const all = cps.map(cp => cp.toString(16)).join('-')
+      return `https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/${all}.png`
     }
     return null
   }
