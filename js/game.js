@@ -794,12 +794,22 @@ async function shareGroupImage() {
   const groupKeys = Object.keys(GROUPS).sort()
   const SITE_URL = 'worldcup2026-9u0.pages.dev'
 
+  // ── 國旗 emoji → twemoji PNG URL ──────────────────────
+  function getFlagUrl(flagEmoji) {
+    const pts = [...flagEmoji]
+      .map(c => c.codePointAt(0).toString(16))
+      .filter(p => parseInt(p, 16) > 0xfe00) // 保留 regional indicator
+      .join('-')
+    return `https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/${pts}.png`
+  }
+
   // ── 預載所有國旗圖片 ──────────────────────────────────
   const allCodes = [...new Set(groupKeys.flatMap(g => groups[g] || []))]
   const flagImgs = {}
   await Promise.all(allCodes.map(async code => {
-    const iso = code.toLowerCase()
-    flagImgs[code] = await loadImg(`https://flagcdn.com/w40/${iso}.png`)
+    const t = TEAMS[code]
+    if (!t?.flag) return
+    flagImgs[code] = await loadImg(getFlagUrl(t.flag))
   }))
 
   // ── 預載 QR Code 圖片（用外部 API）───────────────────
@@ -808,7 +818,7 @@ async function shareGroupImage() {
 
   // ── 直式 Canvas（手機分享友善）────────────────────────
   const W = 800, PAD = 28
-  const HEADER_H = 160
+  const HEADER_H = 190
   const COLS = 3, ROWS = 4
   const CARD_W = Math.floor((W - PAD * (COLS + 1)) / COLS)
   const CARD_H = 100
@@ -852,48 +862,71 @@ async function shareGroupImage() {
   ctx.fillRect(0, 0, W, 3)
 
   // ── Header（盾牌 logo + 標題）────────────────────────
-  // 盾牌形狀
-  const sx = W / 2, sy = 58, sr = 38
-  ctx.save()
-  ctx.translate(sx - sr * 0.9, sy - sr)
-  ctx.scale(sr * 0.09, sr * 0.09)
-  ctx.beginPath()
-  // 盾牌路徑（縮放版）
-  ctx.moveTo(10, 0); ctx.lineTo(20, 4); ctx.lineTo(20, 14)
-  ctx.bezierCurveTo(20, 20, 15, 24, 10, 26)
-  ctx.bezierCurveTo(5, 24, 0, 20, 0, 14); ctx.lineTo(0, 4); ctx.closePath()
-  const shieldGrad = ctx.createLinearGradient(0, 0, 20, 26)
-  shieldGrad.addColorStop(0, '#f5d26b'); shieldGrad.addColorStop(1, '#e07800')
-  ctx.fillStyle = shieldGrad
-  ctx.fill()
-  ctx.restore()
+  const sx = W / 2, logoSize = 60
 
-  // 盾牌內六邊形
-  ctx.strokeStyle = 'rgba(240,192,64,0.6)'
-  ctx.lineWidth = 1.5
-  ctx.beginPath()
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i - Math.PI / 6
-    const px = sx + 16 * Math.cos(angle), py = sy + 16 * Math.sin(angle)
-    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)
+  // 盾牌外框
+  function drawShield(cx, cy, size, fill, stroke) {
+    const s = size / 48
+    ctx.save()
+    ctx.translate(cx - 24 * s, cy - 27 * s)
+    ctx.scale(s, s)
+    ctx.beginPath()
+    ctx.moveTo(24, 2)
+    ctx.lineTo(44, 10); ctx.lineTo(44, 28)
+    ctx.bezierCurveTo(44, 40, 34, 50, 24, 53)
+    ctx.bezierCurveTo(14, 50, 4, 40, 4, 28)
+    ctx.lineTo(4, 10); ctx.closePath()
+    ctx.fillStyle = fill; ctx.fill()
+    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1.5 / s; ctx.stroke() }
+    // 內部
+    ctx.beginPath()
+    ctx.moveTo(24, 5.5)
+    ctx.lineTo(41, 12.5); ctx.lineTo(41, 28)
+    ctx.bezierCurveTo(41, 38.5, 32.5, 47.5, 24, 50)
+    ctx.bezierCurveTo(15.5, 47.5, 7, 38.5, 7, 28)
+    ctx.lineTo(7, 12.5); ctx.closePath()
+    const ig = ctx.createLinearGradient(0, 0, 0, 54)
+    ig.addColorStop(0, '#0d1525'); ig.addColorStop(1, '#0a0f1e')
+    ctx.fillStyle = ig; ctx.fill()
+    // 六邊形
+    ctx.beginPath()
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI / 3) * i - Math.PI / 6
+      const px = 24 + 13 * Math.cos(a), py = 29 + 13 * Math.sin(a)
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)
+    }
+    ctx.closePath()
+    ctx.strokeStyle = 'rgba(240,192,64,0.6)'; ctx.lineWidth = 1.2 / s; ctx.stroke()
+    // 星
+    ctx.fillStyle = '#f0c040'
+    ctx.font = `bold ${14 / s}px sans-serif`
+    ctx.textAlign = 'center'
+    ctx.fillText('★', 24, 34)
+    ctx.restore()
   }
-  ctx.closePath(); ctx.stroke()
 
-  // 星形
-  ctx.fillStyle = '#f0c040'
-  ctx.font = 'bold 14px sans-serif'
-  ctx.textAlign = 'center'
-  ctx.fillText('★', sx, sy + 5)
+  // 光暈背景
+  const glowR = ctx.createRadialGradient(sx, 52, 0, sx, 52, 70)
+  glowR.addColorStop(0, 'rgba(240,192,64,0.18)')
+  glowR.addColorStop(1, 'rgba(240,192,64,0)')
+  ctx.fillStyle = glowR
+  ctx.fillRect(sx - 70, 0, 140, 120)
+
+  const shieldGrad = ctx.createLinearGradient(sx - 24, 20, sx + 24, 80)
+  shieldGrad.addColorStop(0, '#f5d26b')
+  shieldGrad.addColorStop(1, '#e07800')
+  drawShield(sx, 52, logoSize, shieldGrad)
 
   // 標題
   ctx.fillStyle = '#f0c040'
   ctx.font = 'bold 30px sans-serif'
-  ctx.fillText('我的世界盃分組晉級預測', W / 2, 112)
+  ctx.textAlign = 'center'
+  ctx.fillText('我的世界盃分組晉級預測', W / 2, 136)
 
   // 副標題
   ctx.fillStyle = 'rgba(255,255,255,0.45)'
   ctx.font = '15px sans-serif'
-  ctx.fillText('FIFA World Cup 2026 · Group Stage Predictions', W / 2, 142)
+  ctx.fillText('FIFA World Cup 2026 · Group Stage Predictions', W / 2, 164)
 
   // 分隔線
   const divGrad = ctx.createLinearGradient(PAD, 0, W - PAD, 0)
@@ -903,8 +936,8 @@ async function shareGroupImage() {
   ctx.strokeStyle = divGrad
   ctx.lineWidth = 1
   ctx.beginPath()
-  ctx.moveTo(PAD, HEADER_H - 8)
-  ctx.lineTo(W - PAD, HEADER_H - 8)
+  ctx.moveTo(PAD, HEADER_H - 12)
+  ctx.lineTo(W - PAD, HEADER_H - 12)
   ctx.stroke()
 
   // ── 各組卡片（3欄4行）────────────────────────────────
