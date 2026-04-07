@@ -773,37 +773,94 @@ async function shareGroupImage() {
   const groups = load(GK.groups)
   if (!groups) return
 
+  showToast('⏳ 正在產生分享圖...')
+
   const groupKeys = Object.keys(GROUPS).sort()
   const SITE_URL = 'worldcup2026-9u0.pages.dev'
 
-  // ── Canvas 設定 ────────────────────────────────────────
-  const COLS = 4, ROWS = 3
-  const CARD_W = 240, CARD_H = 110
-  const PAD = 16, HEADER_H = 80, FOOTER_H = 90
-  const W = COLS * CARD_W + (COLS + 1) * PAD
-  const H = HEADER_H + ROWS * CARD_H + (ROWS + 1) * PAD + FOOTER_H
+  // ── 直式 Canvas（手機分享友善）────────────────────────
+  const W = 800, PAD = 28
+  const HEADER_H = 160
+  const COLS = 3, ROWS = 4
+  const CARD_W = Math.floor((W - PAD * (COLS + 1)) / COLS)
+  const CARD_H = 100
+  const GRID_H = ROWS * CARD_H + (ROWS + 1) * PAD
+  const FOOTER_H = 180
+  const H = HEADER_H + GRID_H + FOOTER_H
 
   const canvas = document.createElement('canvas')
   canvas.width = W; canvas.height = H
   const ctx = canvas.getContext('2d')
 
-  // 背景漸層
-  const bg = ctx.createLinearGradient(0, 0, 0, H)
-  bg.addColorStop(0, '#0d1117')
-  bg.addColorStop(1, '#111827')
+  // ── 背景（深色漸層 + 金色斜線裝飾）─────────────────────
+  const bg = ctx.createLinearGradient(0, 0, W, H)
+  bg.addColorStop(0, '#0a0f1e')
+  bg.addColorStop(0.5, '#0d1525')
+  bg.addColorStop(1, '#0a0f1e')
   ctx.fillStyle = bg
   ctx.fillRect(0, 0, W, H)
 
-  // ── Header ────────────────────────────────────────────
-  ctx.fillStyle = '#f0c040'
-  ctx.font = 'bold 22px sans-serif'
-  ctx.textAlign = 'center'
-  ctx.fillText('我的 2026 世界盃分組晉級預測', W / 2, 36)
-  ctx.fillStyle = 'rgba(255,255,255,0.35)'
-  ctx.font = '13px sans-serif'
-  ctx.fillText('FIFA World Cup 2026 · Group Stage Predictions', W / 2, 62)
+  // 頂部金色光暈
+  const glow = ctx.createRadialGradient(W / 2, 0, 0, W / 2, 0, 300)
+  glow.addColorStop(0, 'rgba(240,192,64,0.12)')
+  glow.addColorStop(1, 'rgba(240,192,64,0)')
+  ctx.fillStyle = glow
+  ctx.fillRect(0, 0, W, 300)
 
-  // ── 各組卡片 ──────────────────────────────────────────
+  // 底部藍色光暈
+  const glow2 = ctx.createRadialGradient(W / 2, H, 0, W / 2, H, 300)
+  glow2.addColorStop(0, 'rgba(33,150,243,0.1)')
+  glow2.addColorStop(1, 'rgba(33,150,243,0)')
+  ctx.fillStyle = glow2
+  ctx.fillRect(0, H - 300, W, 300)
+
+  // 頂部金色邊線
+  const topBar = ctx.createLinearGradient(0, 0, W, 0)
+  topBar.addColorStop(0, 'transparent')
+  topBar.addColorStop(0.3, '#f0c040')
+  topBar.addColorStop(0.7, '#f0c040')
+  topBar.addColorStop(1, 'transparent')
+  ctx.fillStyle = topBar
+  ctx.fillRect(0, 0, W, 3)
+
+  // ── Header ────────────────────────────────────────────
+  // 足球圖示（圓形）
+  ctx.fillStyle = 'rgba(240,192,64,0.15)'
+  ctx.beginPath()
+  ctx.arc(W / 2, 54, 32, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.strokeStyle = 'rgba(240,192,64,0.5)'
+  ctx.lineWidth = 2
+  ctx.stroke()
+  ctx.fillStyle = '#f0c040'
+  ctx.font = '32px serif'
+  ctx.textAlign = 'center'
+  ctx.fillText('⚽', W / 2, 66)
+
+  // 標題
+  ctx.fillStyle = '#f0c040'
+  ctx.font = 'bold 28px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.fillText('我的世界盃分組晉級預測', W / 2, 112)
+
+  // 副標題
+  ctx.fillStyle = 'rgba(255,255,255,0.45)'
+  ctx.font = '15px sans-serif'
+  ctx.fillText('FIFA World Cup 2026 · Group Stage Predictions', W / 2, 142)
+
+  // 分隔線
+  const divGrad = ctx.createLinearGradient(PAD, 0, W - PAD, 0)
+  divGrad.addColorStop(0, 'transparent')
+  divGrad.addColorStop(0.5, 'rgba(240,192,64,0.4)')
+  divGrad.addColorStop(1, 'transparent')
+  ctx.strokeStyle = divGrad
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(PAD, HEADER_H - 8)
+  ctx.lineTo(W - PAD, HEADER_H - 8)
+  ctx.stroke()
+
+  // ── 各組卡片（3欄4行）────────────────────────────────
   groupKeys.forEach((g, i) => {
     const col = i % COLS
     const row = Math.floor(i / COLS)
@@ -812,89 +869,133 @@ async function shareGroupImage() {
     const gd = GROUPS[g]
     const picked = groups[g] || []
 
-    // 卡片背景
-    ctx.fillStyle = 'rgba(255,255,255,0.05)'
-    roundRect(ctx, x, y, CARD_W, CARD_H, 10)
+    // 卡片背景（帶邊框）
+    ctx.fillStyle = 'rgba(255,255,255,0.04)'
+    roundRect(ctx, x, y, CARD_W, CARD_H, 12)
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)'
+    ctx.lineWidth = 1
+    roundRect(ctx, x, y, CARD_W, CARD_H, 12)
+    ctx.stroke()
+
+    // 左側金色細邊
+    ctx.fillStyle = '#f0c040'
+    roundRect(ctx, x, y, 4, CARD_H, 2)
     ctx.fill()
 
     // 組別標題
     ctx.fillStyle = '#f0c040'
-    ctx.font = 'bold 13px sans-serif'
+    ctx.font = 'bold 14px sans-serif'
     ctx.textAlign = 'left'
-    ctx.fillText(gd.name, x + 10, y + 22)
+    ctx.fillText(gd.name, x + 14, y + 22)
 
-    // 兩支晉級球隊（用球隊代碼 + 中文名，不用 emoji）
+    // 兩支球隊
     picked.slice(0, 2).forEach((code, idx) => {
       const t = TEAMS[code]
       if (!t) return
-      const ty = y + 42 + idx * 32
-      ctx.fillStyle = idx === 0 ? 'rgba(76,175,80,0.18)' : 'rgba(33,150,243,0.15)'
-      roundRect(ctx, x + 8, ty - 14, CARD_W - 16, 26, 6)
+      const ty = y + 40 + idx * 30
+
+      // 行背景
+      ctx.fillStyle = idx === 0 ? 'rgba(76,175,80,0.12)' : 'rgba(33,150,243,0.1)'
+      roundRect(ctx, x + 10, ty - 12, CARD_W - 20, 24, 5)
       ctx.fill()
 
-      // 球隊代碼（替代 emoji）
+      // 名次標籤
       ctx.fillStyle = idx === 0 ? '#4caf50' : '#2196f3'
-      ctx.font = 'bold 11px sans-serif'
+      ctx.font = 'bold 9px sans-serif'
       ctx.textAlign = 'left'
-      ctx.fillText(code, x + 14, ty + 4)
+      ctx.fillText(idx === 0 ? '1ST' : '2ND', x + 16, ty + 3)
+
+      // 球隊代碼
+      ctx.fillStyle = '#ffffff'
+      ctx.font = 'bold 13px sans-serif'
+      ctx.fillText(code, x + 48, ty + 3)
 
       // 球隊中文名
-      ctx.fillStyle = 'rgba(255,255,255,0.9)'
-      ctx.font = '12px sans-serif'
-      ctx.fillText(t.nameCN, x + 50, ty + 4)
-
-      // 名次
-      ctx.fillStyle = idx === 0 ? '#4caf50' : '#2196f3'
-      ctx.font = 'bold 10px sans-serif'
-      ctx.textAlign = 'right'
-      ctx.fillText(idx === 0 ? '第1' : '第2', x + CARD_W - 10, ty + 4)
+      ctx.fillStyle = 'rgba(255,255,255,0.7)'
+      ctx.font = '11px sans-serif'
+      ctx.fillText(t.nameCN, x + 82, ty + 3)
     })
 
     if (picked.length < 2) {
       ctx.fillStyle = 'rgba(255,255,255,0.2)'
       ctx.font = '12px sans-serif'
       ctx.textAlign = 'center'
-      ctx.fillText('未完成預測', x + CARD_W / 2, y + CARD_H / 2 + 10)
+      ctx.fillText('未完成', x + CARD_W / 2, y + CARD_H / 2 + 5)
     }
   })
 
-  // ── Footer：QR Code + 文字 ────────────────────────────
-  const footerY = HEADER_H + ROWS * (CARD_H + PAD) + PAD + 8
-  ctx.strokeStyle = 'rgba(255,255,255,0.1)'
+  // ── Footer ────────────────────────────────────────────
+  const footerY = HEADER_H + GRID_H + 10
+
+  // 分隔線
+  const divGrad2 = ctx.createLinearGradient(PAD, 0, W - PAD, 0)
+  divGrad2.addColorStop(0, 'transparent')
+  divGrad2.addColorStop(0.5, 'rgba(255,255,255,0.12)')
+  divGrad2.addColorStop(1, 'transparent')
+  ctx.strokeStyle = divGrad2
   ctx.lineWidth = 1
   ctx.beginPath()
   ctx.moveTo(PAD, footerY)
   ctx.lineTo(W - PAD, footerY)
   ctx.stroke()
 
-  // QR Code（用 Promise 包裝確保完成）
-  const QR_SIZE = 68
+  // QR Code 白底框
+  const QR_SIZE = 110
   const qrX = W - PAD - QR_SIZE
-  const qrY = footerY + 12
+  const qrY = footerY + 24
+
+  ctx.fillStyle = '#ffffff'
+  roundRect(ctx, qrX - 8, qrY - 8, QR_SIZE + 16, QR_SIZE + 16, 10)
+  ctx.fill()
 
   try {
     const qrDataUrl = await QRCode.toDataURL(`https://${SITE_URL}`, {
-      width: QR_SIZE * 2, margin: 1,
-      color: { dark: '#ffffff', light: '#0d1117' }
+      width: QR_SIZE * 3, margin: 1,
+      color: { dark: '#0a0f1e', light: '#ffffff' }
     })
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       const img = new Image()
       img.onload = () => { ctx.drawImage(img, qrX, qrY, QR_SIZE, QR_SIZE); resolve() }
+      img.onerror = resolve
       img.src = qrDataUrl
     })
-  } catch (e) { console.warn('QR code error', e) }
+  } catch (e) { console.warn('QR error', e) }
 
-  // 文字
-  ctx.fillStyle = 'rgba(255,255,255,0.55)'
-  ctx.font = '11px sans-serif'
-  ctx.textAlign = 'left'
-  ctx.fillText('掃描 QR Code 查看完整 AI 預測分析', PAD, footerY + 28)
-  ctx.fillStyle = '#f0c040'
-  ctx.font = 'bold 13px sans-serif'
-  ctx.fillText(SITE_URL, PAD, footerY + 50)
-  ctx.fillStyle = 'rgba(255,255,255,0.3)'
+  // QR Code 說明
+  ctx.fillStyle = 'rgba(255,255,255,0.4)'
   ctx.font = '10px sans-serif'
-  ctx.fillText('AI 驅動 · 世界盃預測分析平台', PAD, footerY + 68)
+  ctx.textAlign = 'center'
+  ctx.fillText('掃碼加入', qrX + QR_SIZE / 2, qrY + QR_SIZE + 22)
+
+  // 左側 CTA 文字
+  const ctaX = PAD
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'
+  ctx.font = '14px sans-serif'
+  ctx.textAlign = 'left'
+  ctx.fillText('你猜誰能晉級？', ctaX, footerY + 44)
+
+  ctx.fillStyle = '#f0c040'
+  ctx.font = 'bold 22px sans-serif'
+  ctx.fillText('來挑戰我的預測！', ctaX, footerY + 74)
+
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'
+  ctx.font = '13px sans-serif'
+  ctx.fillText('AI 驅動 · 世界盃預測分析平台', ctaX, footerY + 102)
+
+  // 網址
+  ctx.fillStyle = 'rgba(240,192,64,0.8)'
+  ctx.font = 'bold 14px sans-serif'
+  ctx.fillText(SITE_URL, ctaX, footerY + 130)
+
+  // 底部金色邊線
+  const botBar = ctx.createLinearGradient(0, 0, W, 0)
+  botBar.addColorStop(0, 'transparent')
+  botBar.addColorStop(0.3, '#f0c040')
+  botBar.addColorStop(0.7, '#f0c040')
+  botBar.addColorStop(1, 'transparent')
+  ctx.fillStyle = botBar
+  ctx.fillRect(0, H - 3, W, 3)
 
   // ── 輸出 ──────────────────────────────────────────────
   canvas.toBlob(async blob => {
@@ -902,16 +1003,18 @@ async function shareGroupImage() {
     const file = new File([blob], 'wc2026-group-prediction.png', { type: 'image/png' })
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       try {
-        await navigator.share({ title: '我的 2026 世界盃分組晉級預測', files: [file] })
+        await navigator.share({ title: '我的 2026 世界盃分組晉級預測', text: '來挑戰我的分組預測！', files: [file] })
+        return
       } catch {}
-    } else {
-      const a = document.createElement('a')
-      a.href = URL.createObjectURL(blob)
-      a.download = 'wc2026-group-prediction.png'
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
     }
+    // fallback：下載
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'wc2026-group-prediction.png'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    showToast('✅ 圖片已下載！')
   }, 'image/png')
 }
 
