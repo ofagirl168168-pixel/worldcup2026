@@ -915,10 +915,9 @@ async function shareGroupImage() {
     ctx.strokeStyle = 'rgba(240,192,64,0.6)'; ctx.lineWidth = 1.2 / s; ctx.stroke()
     // 2026
     ctx.fillStyle = 'rgba(240,192,64,0.75)'
-    ctx.font = `bold ${6.5 / s}px sans-serif`
+    ctx.font = `bold ${6 / s}px sans-serif`
     ctx.textAlign = 'center'
-    ctx.letterSpacing = `${1 / s}px`
-    ctx.fillText('2026', 24, 19)
+    ctx.fillText('2026', 24, 18)
     // 星
     ctx.fillStyle = '#f0c040'
     ctx.font = `bold ${13 / s}px sans-serif`
