@@ -555,6 +555,7 @@ img.flag-img {
 .standings-table tr:hover td { background: rgba(255,255,255,0.03); }
 .standings-pos { font-weight: 800; color: var(--text-muted); width: 32px; }
 .standings-qualify td { border-left: 3px solid var(--green); }
+.standings-elim td { border-left: 3px solid var(--red, #ef5350); opacity: 0.5; }
 .standings-myteam { background: rgba(233,30,99,0.07) !important; }
 .standings-myteam td { border-left: 3px solid #e91e63 !important; }
 .my-team-tag {
@@ -1429,4 +1430,79 @@ img.flag-img {
   .arena-grid { grid-template-columns: 1fr; }
   .champ-team-list { grid-template-columns: repeat(auto-fill, minmax(100px,1fr)); }
   .home-daily-opts { grid-template-columns: 1fr; }
+  .ucl-bracket { flex-direction: column; gap: 24px; }
+  .bracket-round { min-width: auto; }
 }
+
+/* ========== UCL 淘汰賽對陣圖 ========== */
+.ucl-bracket {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  overflow-x: auto;
+}
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 200px;
+  justify-content: space-around;
+}
+.bracket-round-title {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--tournament-color, var(--gold));
+  padding: 6px 16px;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--radius-sm);
+  margin-bottom: 4px;
+}
+.bracket-final { align-self: center; }
+.bracket-match {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  position: relative;
+}
+.bracket-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+.bracket-team + .bracket-team { border-top: 1px solid rgba(255,255,255,0.06); }
+.bracket-team.winner {
+  background: rgba(76,175,80,0.1);
+  border-left: 3px solid var(--green);
+}
+.bracket-team.tbd { opacity: 0.4; }
+.bracket-flag { font-size: 18px; flex-shrink: 0; }
+.bracket-flag img.flag-img { height: 18px; }
+.bracket-team-name { font-size: 13px; font-weight: 600; flex: 1; }
+.bracket-score {
+  font-size: 14px; font-weight: 800; color: var(--gold);
+  min-width: 20px; text-align: center;
+}
+.bracket-agg {
+  text-align: center; font-size: 11px; color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ========== UCL 藍色主題 ========== */
+:root { --tournament-color: #f0c040; --tournament-accent: #e6a817; }
+[data-tournament-active="ucl"] {
+  --tournament-color: #1a56db;
+  --tournament-accent: #0e3fa8;
+}
+/* 歐冠模式下 gold 元素改藍 */
+body.ucl-mode .match-tag.group { background: rgba(26,86,219,0.15); color: #6ea8fe; border-color: rgba(26,86,219,0.3); }
+body.ucl-mode .confidence-badge { border-color: rgba(26,86,219,0.3); }
+body.ucl-mode .bracket-round-title { color: #6ea8fe; }
+body.ucl-mode .death-card { border-color: rgba(26,86,219,0.2); }
+body.ucl-mode .section-badge { background: rgba(26,86,219,0.12); color: #6ea8fe; border-color: rgba(26,86,219,0.3); }

@@ -76,6 +76,16 @@
         </div>
       </div>
 
+      <!-- 賽事切換器 -->
+      <div class="tournament-switcher">
+        <button class="tournament-btn active" data-tournament="wc" title="2026 世界盃">
+          ⚽ <span class="t-label">世界盃</span>
+        </button>
+        <button class="tournament-btn" data-tournament="ucl" title="2025/26 歐冠">
+          🏆 <span class="t-label">歐冠</span>
+        </button>
+      </div>
+
       <!-- 桌機導覽 -->
       <nav class="main-nav">
         <button class="nav-btn active" data-section="home">
@@ -465,10 +475,17 @@
     </div>
   </footer>
 
-  <!-- JS 載入順序：data → app → supabase -->
+  <!-- JS 載入順序：data → tournament → app → supabase -->
   <script src="js/data-teams.js"></script>
   <script src="js/data-matches.js"></script>
   <script src="js/data-articles.js"></script>
+  <!-- UCL 資料 -->
+  <script src="js/ucl-data-teams.js"></script>
+  <script src="js/ucl-data-matches.js"></script>
+  <script src="js/ucl-data-daily.js"></script>
+  <script src="js/ucl-data-articles.js"></script>
+  <!-- 賽事切換控制器 -->
+  <script src="js/tournament.js"></script>
   <script src="js/app.js"></script>
   <script src="js/game.js"></script>
   <script src="js/data-fix.js"></script>

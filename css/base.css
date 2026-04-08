@@ -80,6 +80,33 @@ ul { list-style: none; }
 .logo-title { display: block; font-size: 14px; font-weight: 700; color: var(--gold); line-height: 1; }
 .logo-sub   { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 
+/* 賽事切換器 */
+.tournament-switcher {
+  display: flex; gap: 4px; flex-shrink: 0;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  border: 1px solid var(--border);
+}
+.tournament-btn {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.tournament-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.06);
+}
+.tournament-btn.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--tournament-color, var(--gold)), var(--tournament-accent, #e6a817));
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.tournament-btn .t-label { pointer-events: none; }
+
 .main-nav {
   display: flex; gap: 4px; margin-left: auto;
 }
@@ -283,6 +310,9 @@ ul { list-style: none; }
 @media (max-width: 768px) {
   .main-nav { display: none; }
   .hamburger { display: flex; }
+  .tournament-switcher { order: -1; }
+  .tournament-btn { padding: 4px 8px; font-size: 12px; }
+  .tournament-btn .t-label { display: none; }
   .mobile-nav.open { display: flex; flex-direction: column; }
   .hero-stats { flex-wrap: wrap; }
   .hero-stat { padding: 16px 20px; flex: 1 1 40%; }

@@ -166,9 +166,14 @@ function getTodayQuestion() {
   const today  = localDateStr();
   const dayIdx = Math.floor((new Date(today) - new Date('2026-01-01')) / 86400000);
 
-  const normals = DAILY_QUESTIONS.filter(q => q.type === 'normal');
-  const hards   = DAILY_QUESTIONS.filter(q => q.type === 'hard');
-  const virals  = DAILY_QUESTIONS.filter(q => q.type === 'viral');
+  // 根據賽事選擇題庫
+  const qBank = (window.Tournament?.isUCL?.() && window.UCL_DAILY_QUESTIONS)
+    ? window.UCL_DAILY_QUESTIONS
+    : DAILY_QUESTIONS;
+
+  const normals = qBank.filter(q => q.type === 'normal');
+  const hards   = qBank.filter(q => q.type === 'hard');
+  const virals  = qBank.filter(q => q.type === 'viral');
 
   // 4天循環：normal → viral → hard → viral → normal → viral → hard → viral…
   const CYCLE = ['normal', 'viral', 'hard', 'viral'];
