@@ -50,13 +50,5 @@ END $$;
 -- 重建 leaderboard VIEW（加入 tournament 欄位）
 DROP VIEW IF EXISTS leaderboard;
 CREATE VIEW leaderboard AS
-SELECT
-  p.id,
-  p.display_name,
-  p.avatar_url,
-  p.xp,
-  p.correct_answers,
-  p.total_answered,
-  p.updated_at
-FROM profiles p
-ORDER BY p.xp DESC;
+SELECT p.id, p.nickname, p.xp, p.correct_answers, p.total_answered, p.team_code, p.updated_at
+FROM profiles p ORDER BY p.xp DESC;
