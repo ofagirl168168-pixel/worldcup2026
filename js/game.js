@@ -1173,10 +1173,22 @@ async function shareDailyImage() {
   canvas.toBlob(async blob => {
     const file = new File([blob], 'daily-challenge.png', { type: 'image/png' })
     const link = await getMyRefLink?.() || window.location.origin
-    if (_isMobile() && navigator.share && navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], text: `🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！\n${link}` }).catch(() => {})
+    const shareText = `🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！\n${link}`
+    if (_isMobile() && navigator.share) {
+      // LINE 等 App 在有 files 時不顯示 text，所以先複製文字到剪貼簿
+      try { await navigator.clipboard.writeText(shareText) } catch {}
+      // 分享圖片（帶 text 給支援的 App，如 iMessage、Telegram）
+      const shareData = navigator.canShare?.({ files: [file], text: shareText })
+        ? { files: [file], title: '🧠 每日一題挑戰', text: shareText }
+        : navigator.canShare?.({ files: [file] })
+          ? { files: [file] }
+          : { title: '🧠 每日一題挑戰', text: shareText }
+      showToast('📋 文字已複製！分享圖片後可在聊天室貼上文字')
+      try {
+        await navigator.share(shareData)
+      } catch { /* 用戶取消分享 */ }
     } else {
-      showDesktopShareModal({ blob, link, filename: 'daily-challenge.png', title: '🧠 出題挑戰', text: `🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！\n${link}` })
+      showDesktopShareModal({ blob, link, filename: 'daily-challenge.png', title: '🧠 出題挑戰', text: shareText })
     }
   }, 'image/png')
 }
@@ -1633,14 +1645,17 @@ async function shareGroupImage() {
   canvas.toBlob(async blob => {
     if (!blob) { showToast('❌ 圖片產生失敗'); return }
     const file = new File([blob], 'wc2026-group-prediction.png', { type: 'image/png' })
+    const grpShareText = `📊 我的 2026 世界盃分組晉級預測出爐！來挑戰我的選隊眼光！\n${shareLink}`
     if (_isMobile() && navigator.share && navigator.canShare?.({ files: [file] })) {
+      try { await navigator.clipboard.writeText(grpShareText) } catch {}
+      showToast('📋 文字已複製！分享圖片後可在聊天室貼上文字')
       try {
-        await navigator.share({ title: '我的 2026 世界盃分組晉級預測', text: `來挑戰我的分組預測！${shareLink}`, files: [file] })
+        await navigator.share({ title: '我的 2026 世界盃分組晉級預測', text: grpShareText, files: [file] })
         return
       } catch {}
     }
     // 電腦版：開啟分享 Modal
-    showDesktopShareModal({ blob, link: shareLink, filename: 'wc2026-group-prediction.png', title: '📊 分享我的分組預測', text: `📊 我的 2026 世界盃分組晉級預測出爐！來挑戰我的選隊眼光！\n${shareLink}` })
+    showDesktopShareModal({ blob, link: shareLink, filename: 'wc2026-group-prediction.png', title: '📊 分享我的分組預測', text: grpShareText })
   }, 'image/png')
 }
 
