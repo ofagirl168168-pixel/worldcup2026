@@ -7,7 +7,7 @@ const _SUB_FLAGS = {
 }
 function getFlagImgUrl(emoji) {
   if (!emoji) return null
-  if (emoji.startsWith('http')) return emoji          // 隊徽 URL 直接回傳
+  if (emoji.startsWith('http') || emoji.startsWith('img/')) return emoji  // 隊徽 URL 直接回傳
   if (_SUB_FLAGS[emoji]) return `${_TWEMOJI}/${_SUB_FLAGS[emoji]}.png`
   const cps = [...emoji].map(c => c.codePointAt(0))
   const ri = cps.filter(cp => cp >= 0x1F1E6 && cp <= 0x1F1FF)
@@ -17,7 +17,7 @@ function getFlagImgUrl(emoji) {
 function flagImg(src) {
   if (!src) return ''
   // 若已是 URL（隊徽 logo），直接用 img
-  if (src.startsWith('http')) return `<img src="${src}" class="flag-img" alt="logo">`
+  if (src.startsWith('http') || src.startsWith('img/')) return `<img src="${src}" class="flag-img" alt="logo">`
   const url = getFlagImgUrl(src)
   if (!url) return src
   return `<img src="${url}" class="flag-img" alt="${src}">`
