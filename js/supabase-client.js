@@ -55,10 +55,10 @@ async function handleUserLoggedIn(isNew) {
   if (!profile.nickname) {
     openNicknameModal();
   } else if (isNew) {
-    await syncToSupabase();
+    try { await syncToSupabase(); } catch(e) { console.warn('syncToSupabase:', e); }
     showToast('✅ 已登入：' + profile.nickname);
   } else {
-    await syncToSupabase();
+    try { await syncToSupabase(); } catch(e) { console.warn('syncToSupabase:', e); }
   }
 
   // 首次帳號綁定獎勵
@@ -250,6 +250,16 @@ async function syncXPToProfile() {
     const history    = dailyState.history ?? {}
     const correct    = Object.values(history).filter(v => v?.isCorrect).length
     const total      = Object.values(history).filter(v => v !== undefined).length
+
+    // 安全機制：本地 XP=0 時，不覆蓋遠端已有的分數
+    if (xpData.xp === 0) {
+      const { data: cur } = await DB.from('profiles')
+        .select('xp').eq('id', currentUser.id).maybeSingle()
+      if (cur && cur.xp > 0) {
+        console.warn('syncXPToProfile: 本地 XP=0 但遠端有', cur.xp, '，跳過覆寫')
+        return
+      }
+    }
 
     await DB.from('profiles').update({
       xp:             xpData.xp,
