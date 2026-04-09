@@ -198,44 +198,49 @@ function renderDeathGroups() {
     // 更新標題
     if (header) header.innerHTML = `<h2><i class="fas fa-trophy"></i> 聯賽階段排名</h2><span class="section-badge">前8名直接晉級</span>`;
 
+    // 覆蓋 death-grid 的 grid 佈局
+    el.style.display = 'block';
+
     const standings = window.calcUCLStandings?.() || [];
     const _T = _teams();
     const top8 = standings.slice(0, 8);
     const next16 = standings.slice(8, 24);
+    const cols = 'grid-template-columns:36px 32px 1fr 50px 50px 50px 60px 60px';
 
     el.innerHTML = `
-      <div style="margin-bottom:16px">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:1px;margin-bottom:10px">🏆 直接晉級十六強</div>
-        <div style="display:flex;flex-direction:column;gap:2px;background:rgba(255,255,255,0.03);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
-          <div style="display:grid;grid-template-columns:32px 28px 1fr auto auto auto auto;gap:8px;padding:8px 12px;font-size:11px;color:var(--text-muted);font-weight:600;border-bottom:1px solid var(--border)">
-            <span>#</span><span></span><span>球隊</span><span style="width:28px;text-align:center">勝</span><span style="width:28px;text-align:center">平</span><span style="width:28px;text-align:center">負</span><span style="width:48px;text-align:right">積分</span>
+      <div style="margin-bottom:28px">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:1px;margin-bottom:12px">🏆 直接晉級十六強</div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
+          <div style="display:grid;${cols};gap:0;padding:10px 16px;font-size:11px;color:var(--text-muted);font-weight:600;border-bottom:1px solid var(--border)">
+            <span>#</span><span></span><span>球隊</span><span style="text-align:center">賽</span><span style="text-align:center">勝</span><span style="text-align:center">負</span><span style="text-align:center">淨勝球</span><span style="text-align:right">積分</span>
           </div>
           ${top8.map((row, i) => {
             const t = _T[row.code];
             if (!t) return '';
-            return `<div style="display:grid;grid-template-columns:32px 28px 1fr auto auto auto auto;gap:8px;padding:8px 12px;align-items:center;${i%2?'':'background:rgba(255,255,255,0.02)'}">
-              <span style="font-size:14px;font-weight:800;color:var(--accent)">${i+1}</span>
-              <span style="font-size:18px">${flagImg(t.flag)}</span>
-              <div><div style="font-weight:700;font-size:13px">${t.nameCN}</div><div style="font-size:10px;color:var(--text-muted)">${t.league||''}</div></div>
-              <span style="width:28px;text-align:center;font-size:13px;font-weight:600">${row.w}</span>
-              <span style="width:28px;text-align:center;font-size:13px;color:var(--text-secondary)">${row.d}</span>
-              <span style="width:28px;text-align:center;font-size:13px;color:var(--text-muted)">${row.l}</span>
-              <span style="width:48px;text-align:right;font-size:15px;font-weight:800;color:var(--accent)">${row.pts}</span>
+            return `<div style="display:grid;${cols};gap:0;padding:12px 16px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.04);${i%2?'':'background:rgba(255,255,255,0.02)'}">
+              <span style="font-size:16px;font-weight:800;color:var(--accent)">${i+1}</span>
+              <span style="font-size:22px">${flagImg(t.flag)}</span>
+              <div><div style="font-weight:700;font-size:14px">${t.nameCN}</div><div style="font-size:11px;color:var(--text-muted);margin-top:1px">${t.league||''}</div></div>
+              <span style="text-align:center;font-size:13px;color:var(--text-secondary)">${row.w+row.d+row.l}</span>
+              <span style="text-align:center;font-size:13px;font-weight:700;color:#4caf50">${row.w}</span>
+              <span style="text-align:center;font-size:13px;color:#f44336">${row.l}</span>
+              <span style="text-align:center;font-size:13px;font-weight:600;color:${row.gd>0?'#4caf50':row.gd<0?'#f44336':'var(--text-muted)'}">${row.gd>0?'+':''}${row.gd}</span>
+              <div style="text-align:right"><span style="font-size:18px;font-weight:900;color:var(--accent)">${row.pts}</span></div>
             </div>`;
           }).join('')}
         </div>
       </div>
       ${next16.length ? `<div>
-        <div style="font-size:12px;font-weight:700;color:var(--text-secondary);letter-spacing:1px;margin-bottom:10px">⚔️ 附加賽圈（第9-24名）</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px">
+        <div style="font-size:12px;font-weight:700;color:var(--text-secondary);letter-spacing:1px;margin-bottom:12px">⚔️ 附加賽圈（第9-24名）</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px">
           ${next16.map((row, i) => {
             const t = _T[row.code];
             if (!t) return '';
-            return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);border:1px solid var(--border)">
-              <span style="font-size:12px;font-weight:700;color:var(--text-muted);width:22px">${i+9}</span>
-              <span style="font-size:16px">${flagImg(t.flag)}</span>
-              <span style="flex:1;font-size:12px;font-weight:600">${t.nameCN}</span>
-              <span style="font-size:13px;font-weight:800;color:var(--text-secondary)">${row.pts}分</span>
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);border:1px solid var(--border)">
+              <span style="font-size:13px;font-weight:800;color:var(--text-muted);width:24px;text-align:center">${i+9}</span>
+              <span style="font-size:20px">${flagImg(t.flag)}</span>
+              <div style="flex:1"><div style="font-size:13px;font-weight:700">${t.nameCN}</div><div style="font-size:10px;color:var(--text-muted)">${row.w}勝${row.d}平${row.l}負</div></div>
+              <div style="text-align:right"><span style="font-size:15px;font-weight:800;color:var(--text-secondary)">${row.pts}</span><span style="font-size:11px;color:var(--text-muted)"> 分</span></div>
             </div>`;
           }).join('')}
         </div>
@@ -243,8 +248,9 @@ function renderDeathGroups() {
     return;
   }
 
-  // 世足：還原標題
+  // 世足：還原標題和佈局
   if (header) header.innerHTML = `<h2><i class="fas fa-skull"></i> 分組死亡指數</h2><span class="section-badge">激烈程度排行</span>`;
+  el.style.display = '';
 
   const scores = Object.entries(GROUPS).map(([g, gd]) => {
     const avgRank = gd.teams.reduce((s,c) => s + (TEAMS[c]?.fifaRank||50), 0) / 4;
