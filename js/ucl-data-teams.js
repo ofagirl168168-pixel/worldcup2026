@@ -7,6 +7,22 @@
 const UCL_TEAMS = {
 
   // ===== POT 1 =====
+  'PSG': {
+    name:'Paris Saint-Germain', nameCN:'巴黎聖日耳曼', flag:'https://crests.football-data.org/524.png', pot:1, league:'Ligue 1',
+    uefaCoeff:116, coach:'Luis Enrique', formation:'4-3-3',
+    keyPlayers:[
+      {name:'Ousmane Dembélé',pos:'右翼',club:'巴黎聖日耳曼'},
+      {name:'Bradley Barcola',pos:'左翼',club:'巴黎聖日耳曼'},
+      {name:'Vitinha',pos:'中場',club:'巴黎聖日耳曼'},
+      {name:'Achraf Hakimi',pos:'右後衛',club:'巴黎聖日耳曼'},
+      {name:'Gianluigi Donnarumma',pos:'門將',club:'巴黎聖日耳曼'}
+    ],
+    radar:{attack:88,defense:83,midfield:87,speed:90,experience:82},
+    style:'高控球率，邊路突破，團隊足球',
+    strengths:['Dembélé速度與盤帶頂級','Luis Enrique戰術體系清晰','年輕陣容潛力大'],
+    weaknesses:['後Mbappé時代缺乏核心射手','歐冠決賽經驗不足','關鍵戰抗壓能力存疑'],
+    history:'2019/20首進歐冠決賽，歷史最佳成績亞軍'
+  },
   'RMA': {
     name:'Real Madrid', nameCN:'皇家馬德里', flag:'https://crests.football-data.org/86.png', pot:1, league:'La Liga',
     uefaCoeff:136, coach:'Carlo Ancelotti', formation:'4-3-1-2',
@@ -55,22 +71,6 @@ const UCL_TEAMS = {
     weaknesses:['後防重建期不穩定','Kompany歐冠執教經驗不足','高線防守易被反擊'],
     history:'6次歐冠冠軍，2019/20最近一次奪冠'
   },
-  'PSG': {
-    name:'Paris Saint-Germain', nameCN:'巴黎聖日耳曼', flag:'https://crests.football-data.org/524.png', pot:1, league:'Ligue 1',
-    uefaCoeff:116, coach:'Luis Enrique', formation:'4-3-3',
-    keyPlayers:[
-      {name:'Ousmane Dembélé',pos:'右翼',club:'巴黎聖日耳曼'},
-      {name:'Bradley Barcola',pos:'左翼',club:'巴黎聖日耳曼'},
-      {name:'Vitinha',pos:'中場',club:'巴黎聖日耳曼'},
-      {name:'Achraf Hakimi',pos:'右後衛',club:'巴黎聖日耳曼'},
-      {name:'Gianluigi Donnarumma',pos:'門將',club:'巴黎聖日耳曼'}
-    ],
-    radar:{attack:88,defense:83,midfield:87,speed:90,experience:82},
-    style:'高控球率，邊路突破，團隊足球',
-    strengths:['Dembélé速度與盤帶頂級','Luis Enrique戰術體系清晰','年輕陣容潛力大'],
-    weaknesses:['後Mbappé時代缺乏核心射手','歐冠決賽經驗不足','關鍵戰抗壓能力存疑'],
-    history:'2019/20首進歐冠決賽，歷史最佳成績亞軍'
-  },
   'LIV': {
     name:'Liverpool', nameCN:'利物浦', flag:'https://crests.football-data.org/64.png', pot:1, league:'Premier League',
     uefaCoeff:114, coach:'Arne Slot', formation:'4-3-3',
@@ -102,6 +102,22 @@ const UCL_TEAMS = {
     strengths:['Lautaro+Thuram鋒線組合犀利','三後衛防守體系成熟','Barella中場引擎'],
     weaknesses:['陣容年齡偏大','翼衛體能消耗大','面對極速反擊時三後衛易被打穿'],
     history:'3次歐冠冠軍，2022/23打入決賽'
+  },
+  'CHE': {
+    name:'Chelsea', nameCN:'乂爾西', flag:'https://crests.football-data.org/61.png', pot:1, league:'Premier League',
+    uefaCoeff:66, coach:'Enzo Maresca', formation:'4-2-3-1',
+    keyPlayers:[
+      {name:'Cole Palmer',pos:'攻擊中場/右翼',club:'乂爾西'},
+      {name:'Nicolas Jackson',pos:'中鋒',club:'乂爾西'},
+      {name:'Enzo Fernández',pos:'中場',club:'乂爾西'},
+      {name:'Moisés Caicedo',pos:'防守中場',club:'乂爾西'},
+      {name:'Robert Sánchez',pos:'門將',club:'乂爾西'}
+    ],
+    radar:{attack:84,defense:78,midfield:82,speed:84,experience:70},
+    style:'控球推進，年輕化快速足球',
+    strengths:['Palmer創造力與進球能力頂級','年輕陣容充滿活力','中場Caicedo+Enzo組合強悍'],
+    weaknesses:['陣容過於年輕缺乏經驗','防守穩定性不足','新教練體系磨合中'],
+    history:'2020/21歐冠冠軍，2次奪冠（2012、2021）'
   },
   'DOR': {
     name:'Borussia Dortmund', nameCN:'多特蒙德', flag:'https://crests.football-data.org/4.png', pot:1, league:'Bundesliga',
@@ -135,8 +151,26 @@ const UCL_TEAMS = {
     weaknesses:['財務問題限制補強','ter Stegen傷病影響','後防線高度不足'],
     history:'5次歐冠冠軍，2014/15最近一次奪冠'
   },
+
+  // ===== POT 2 =====
+  'ARS': {
+    name:'Arsenal', nameCN:'兵工廠', flag:'https://crests.football-data.org/57.png', pot:2, league:'Premier League',
+    uefaCoeff:72, coach:'Mikel Arteta', formation:'4-3-3',
+    keyPlayers:[
+      {name:'Bukayo Saka',pos:'右翼',club:'兵工廠'},
+      {name:'Martin Ødegaard',pos:'攻擊中場',club:'兵工廠'},
+      {name:'Declan Rice',pos:'防守中場',club:'兵工廠'},
+      {name:'William Saliba',pos:'中後衛',club:'兵工廠'},
+      {name:'David Raya',pos:'門將',club:'兵工廠'}
+    ],
+    radar:{attack:89,defense:90,midfield:90,speed:88,experience:78},
+    style:'高位壓迫，定位球戰術強，控球推進',
+    strengths:['Saka+Ødegaard右路連線致命','Saliba後防磐石','定位球得分能力頂級'],
+    weaknesses:['歐冠經驗相對不足','鋒線缺少頂級中鋒','面對低位防守時創造力不足'],
+    history:'2005/06歐冠亞軍，近年重返歐冠行列'
+  },
   'LEV': {
-    name:'Bayer Leverkusen', nameCN:'勒沃庫森', flag:'https://crests.football-data.org/3.png', pot:1, league:'Bundesliga',
+    name:'Bayer Leverkusen', nameCN:'勒沃庫森', flag:'https://crests.football-data.org/3.png', pot:2, league:'Bundesliga',
     uefaCoeff:90, coach:'Xabi Alonso', formation:'3-4-2-1',
     keyPlayers:[
       {name:'Florian Wirtz',pos:'攻擊中場',club:'勒沃庫森'},
@@ -151,8 +185,6 @@ const UCL_TEAMS = {
     weaknesses:['歐冠深度經驗不足','關鍵球員被挖角風險','板凳深度有限'],
     history:'2023/24德甲不敗冠軍，歐冠最佳成績2001/02亞軍'
   },
-
-  // ===== POT 2 =====
   'ATM': {
     name:'Atlético Madrid', nameCN:'馬德里競技', flag:'https://crests.football-data.org/78.png', pot:2, league:'La Liga',
     uefaCoeff:104, coach:'Diego Simeone', formation:'3-5-2',
@@ -168,38 +200,6 @@ const UCL_TEAMS = {
     strengths:['Simeone防守體系歐洲最佳','Álvarez帶來新鋒線活力','大賽經驗極其豐富'],
     weaknesses:['進攻創造力偶有不足','陣容老化趨勢','控球率低時易被壓制'],
     history:'2013/14、2015/16兩次歐冠亞軍'
-  },
-  'ATA': {
-    name:'Atalanta', nameCN:'亞特蘭大', flag:'https://crests.football-data.org/102.png', pot:2, league:'Serie A',
-    uefaCoeff:81, coach:'Gian Piero Gasperini', formation:'3-4-1-2',
-    keyPlayers:[
-      {name:'Ademola Lookman',pos:'前鋒',club:'亞特蘭大'},
-      {name:'Charles De Ketelaere',pos:'攻擊中場',club:'亞特蘭大'},
-      {name:'Éderson',pos:'中場',club:'亞特蘭大'},
-      {name:'Teun Koopmeiners',pos:'中場',club:'亞特蘭大'},
-      {name:'Marco Carnesecchi',pos:'門將',club:'亞特蘭大'}
-    ],
-    radar:{attack:84,defense:82,midfield:85,speed:84,experience:74},
-    style:'高強度壓迫，人盯人防守，全攻全守',
-    strengths:['Gasperini獨特戰術體系','Lookman大賽爆發力強','團隊默契極佳'],
-    weaknesses:['缺乏頂級個人能力','歐冠經驗較淺','板凳深度不足'],
-    history:'2023/24歐聯冠軍，歐冠最佳成績2019/20八強'
-  },
-  'JUV': {
-    name:'Juventus', nameCN:'尤文圖斯', flag:'https://crests.football-data.org/109.png', pot:2, league:'Serie A',
-    uefaCoeff:80, coach:'Thiago Motta', formation:'4-2-3-1',
-    keyPlayers:[
-      {name:'Dušan Vlahović',pos:'中鋒',club:'尤文圖斯'},
-      {name:'Federico Chiesa',pos:'翼鋒',club:'尤文圖斯'},
-      {name:'Manuel Locatelli',pos:'中場',club:'尤文圖斯'},
-      {name:'Gleison Bremer',pos:'中後衛',club:'尤文圖斯'},
-      {name:'Wojciech Szczęsny',pos:'門將',club:'尤文圖斯'}
-    ],
-    radar:{attack:82,defense:84,midfield:80,speed:82,experience:88},
-    style:'穩固防守，伺機反擊，注重戰術紀律',
-    strengths:['義式防守DNA','Vlahović禁區終結力強','Motta帶來新風格'],
-    weaknesses:['進攻流暢度不足','中場創造力缺乏','近年歐冠成績下滑'],
-    history:'2次歐冠冠軍（1985、1996），近年多次進入淘汰賽'
   },
   'BEN': {
     name:'Benfica', nameCN:'本菲卡', flag:'https://crests.football-data.org/1903.png', pot:2, league:'Liga Portugal',
@@ -217,103 +217,85 @@ const UCL_TEAMS = {
     weaknesses:['每季主力被挖角','歐冠淘汰賽穩定性差','關鍵位置深度不足'],
     history:'2次歐冠冠軍（1961、1962），2022/23八強'
   },
-  'ARS': {
-    name:'Arsenal', nameCN:'兵工廠', flag:'https://crests.football-data.org/57.png', pot:2, league:'Premier League',
-    uefaCoeff:72, coach:'Mikel Arteta', formation:'4-3-3',
+  'ATA': {
+    name:'Atalanta', nameCN:'亞特蘭大', flag:'https://crests.football-data.org/102.png', pot:2, league:'Serie A',
+    uefaCoeff:81, coach:'Gian Piero Gasperini', formation:'3-4-1-2',
     keyPlayers:[
-      {name:'Bukayo Saka',pos:'右翼',club:'兵工廠'},
-      {name:'Martin Ødegaard',pos:'攻擊中場',club:'兵工廠'},
-      {name:'Declan Rice',pos:'防守中場',club:'兵工廠'},
-      {name:'William Saliba',pos:'中後衛',club:'兵工廠'},
-      {name:'David Raya',pos:'門將',club:'兵工廠'}
+      {name:'Ademola Lookman',pos:'前鋒',club:'亞特蘭大'},
+      {name:'Charles De Ketelaere',pos:'攻擊中場',club:'亞特蘭大'},
+      {name:'Éderson',pos:'中場',club:'亞特蘭大'},
+      {name:'Teun Koopmeiners',pos:'中場',club:'亞特蘭大'},
+      {name:'Marco Carnesecchi',pos:'門將',club:'亞特蘭大'}
     ],
-    radar:{attack:89,defense:90,midfield:90,speed:88,experience:78},
-    style:'高位壓迫，定位球戰術強，控球推進',
-    strengths:['Saka+Ødegaard右路連線致命','Saliba後防磐石','定位球得分能力頂級'],
-    weaknesses:['歐冠經驗相對不足','鋒線缺少頂級中鋒','面對低位防守時創造力不足'],
-    history:'2005/06歐冠亞軍，近年重返歐冠行列'
+    radar:{attack:84,defense:82,midfield:85,speed:84,experience:74},
+    style:'高強度壓迫，人盯人防守，全攻全守',
+    strengths:['Gasperini獨特戰術體系','Lookman大賽爆發力強','團隊默契極佳'],
+    weaknesses:['缺乏頂級個人能力','歐冠經驗較淺','板凳深度不足'],
+    history:'2023/24歐聯冠軍，歐冠最佳成績2019/20八強'
   },
-  'ACM': {
-    name:'AC Milan', nameCN:'AC米蘭', flag:'https://crests.football-data.org/98.png', pot:2, league:'Serie A',
-    uefaCoeff:76, coach:'Paulo Fonseca', formation:'4-2-3-1',
-    keyPlayers:[
-      {name:'Rafael Leão',pos:'左翼',club:'AC米蘭'},
-      {name:'Christian Pulisic',pos:'右翼/攻擊中場',club:'AC米蘭'},
-      {name:'Theo Hernández',pos:'左後衛',club:'AC米蘭'},
-      {name:'Tijjani Reijnders',pos:'中場',club:'AC米蘭'},
-      {name:'Mike Maignan',pos:'門將',club:'AC米蘭'}
-    ],
-    radar:{attack:84,defense:80,midfield:82,speed:88,experience:82},
-    style:'快速反擊，邊路突破，技術型足球',
-    strengths:['Leão速度與技術頂級','Theo攻守兼備','San Siro主場氣勢'],
-    weaknesses:['防守穩定性不足','比賽專注度波動大','中場硬度不夠'],
-    history:'7次歐冠冠軍，2022/23四強'
+  'VIL': {
+    name:'Villarreal', nameCN:'比利亞雷阿爾', flag:'img/villarreal.png', pot:2, league:'La Liga',
+    uefaCoeff:72, coach:'Marcelino', formation:'4-4-2',
+    keyPlayers:[{name:'Alexander Sørloth',pos:'前鋒',club:'比利亞雷阿爾'},{name:'Álex Baena',pos:'中場',club:'比利亞雷阿爾'},{name:'Yeremy Pino',pos:'右翼',club:'比利亞雷阿爾'},{name:'Dani Parejo',pos:'中場',club:'比利亞雷阿爾'},{name:'Filip Jörgensen',pos:'門將',club:'比利亞雷阿爾'}],
+    radar:{attack:82,defense:78,midfield:83,speed:80,experience:75},
+    style:'技術流西班牙足球，中場控制為主',
+    strengths:['西甲中場控制傳統','Baena創造力突出','團隊戰術紀律佳'],
+    weaknesses:['缺乏頂級球星','歐冠經驗有限','面對強隊防守壓力大'],
+    history:'2005/06歐冠四強，2020/21歐霸冠軍'
   },
-  'NAP': {
-    name:'Napoli', nameCN:'拿坡里', flag:'https://crests.football-data.org/113.png', pot:2, league:'Serie A',
-    uefaCoeff:68, coach:'Antonio Conte', formation:'3-4-2-1',
+  'JUV': {
+    name:'Juventus', nameCN:'尤文圖斯', flag:'https://crests.football-data.org/109.png', pot:2, league:'Serie A',
+    uefaCoeff:80, coach:'Thiago Motta', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Victor Osimhen',pos:'中鋒',club:'拿坡里'},
-      {name:'Khvicha Kvaratskhelia',pos:'左翼',club:'拿坡里'},
-      {name:'Stanislav Lobotka',pos:'中場',club:'拿坡里'},
-      {name:'Kim Min-jae',pos:'中後衛',club:'拿坡里'},
-      {name:'Alex Meret',pos:'門將',club:'拿坡里'}
+      {name:'Dušan Vlahović',pos:'中鋒',club:'尤文圖斯'},
+      {name:'Federico Chiesa',pos:'翼鋒',club:'尤文圖斯'},
+      {name:'Manuel Locatelli',pos:'中場',club:'尤文圖斯'},
+      {name:'Gleison Bremer',pos:'中後衛',club:'尤文圖斯'},
+      {name:'Wojciech Szczęsny',pos:'門將',club:'尤文圖斯'}
     ],
-    radar:{attack:86,defense:82,midfield:84,speed:86,experience:72},
-    style:'Conte式鐵血防守，快速轉換進攻',
-    strengths:['Osimhen身體素質與跑位頂級','Kvara盤帶突破犀利','Conte大賽執教經驗'],
-    weaknesses:['2023/24賽季信心受創','陣容磨合需要時間','歐冠淘汰賽經驗不足'],
-    history:'歐冠最佳成績2022/23八強，隊史首次'
+    radar:{attack:82,defense:84,midfield:80,speed:82,experience:88},
+    style:'穩固防守，伺機反擊，注重戰術紀律',
+    strengths:['義式防守DNA','Vlahović禁區終結力強','Motta帶來新風格'],
+    weaknesses:['進攻流暢度不足','中場創造力缺乏','近年歐冠成績下滑'],
+    history:'2次歐冠冠軍（1985、1996），近年多次進入淘汰賽'
   },
-  'CHE': {
-    name:'Chelsea', nameCN:'乂爾西', flag:'https://crests.football-data.org/61.png', pot:2, league:'Premier League',
-    uefaCoeff:66, coach:'Enzo Maresca', formation:'4-2-3-1',
-    keyPlayers:[
-      {name:'Cole Palmer',pos:'攻擊中場/右翼',club:'乂爾西'},
-      {name:'Nicolas Jackson',pos:'中鋒',club:'乂爾西'},
-      {name:'Enzo Fernández',pos:'中場',club:'乂爾西'},
-      {name:'Moisés Caicedo',pos:'防守中場',club:'乂爾西'},
-      {name:'Robert Sánchez',pos:'門將',club:'乂爾西'}
-    ],
-    radar:{attack:84,defense:78,midfield:82,speed:84,experience:70},
-    style:'控球推進，年輕化快速足球',
-    strengths:['Palmer創造力與進球能力頂級','年輕陣容充滿活力','中場Caicedo+Enzo組合強悍'],
-    weaknesses:['陣容過於年輕缺乏經驗','防守穩定性不足','新教練體系磨合中'],
-    history:'2020/21歐冠冠軍，2次奪冠（2012、2021）'
+  'SGE': {
+    name:'Eintracht Frankfurt', nameCN:'法蘭克福', flag:'https://crests.football-data.org/19.png', pot:2, league:'Bundesliga',
+    uefaCoeff:65, coach:'Dino Toppmöller', formation:'3-4-2-1',
+    keyPlayers:[{name:'Omar Marmoush',pos:'前鋒',club:'法蘭克福'},{name:'Hugo Ekitiké',pos:'前鋒',club:'法蘭克福'},{name:'Mario Götze',pos:'攻擊中場',club:'法蘭克福'},{name:'Ellyes Skhiri',pos:'中場',club:'法蘭克福'},{name:'Kevin Trapp',pos:'門將',club:'法蘭克福'}],
+    radar:{attack:80,defense:74,midfield:78,speed:82,experience:70},
+    style:'快速反擊，高位壓迫，三後衛體系',
+    strengths:['Marmoush進球效率極高','反擊速度快','主場氣氛佳'],
+    weaknesses:['防守不夠穩定','板凳深度不足','大賽經驗欠缺'],
+    history:'2021/22歐霸冠軍，重返歐冠舞台'
   },
-  'MON': {
-    name:'AS Monaco', nameCN:'摩納哥', flag:'https://crests.football-data.org/548.png', pot:2, league:'Ligue 1',
-    uefaCoeff:34, coach:'Adi Hütter', formation:'4-2-3-1',
+  'BRU': {
+    name:'Club Brugge', nameCN:'布魯日', flag:'https://crests.football-data.org/851.png', pot:2, league:'Jupiler Pro League',
+    uefaCoeff:42, coach:'Nicky Hayen', formation:'4-3-3',
     keyPlayers:[
-      {name:'Wissam Ben Yedder',pos:'前鋒',club:'摩納哥'},
-      {name:'Aleksandr Golovin',pos:'攻擊中場',club:'摩納哥'},
-      {name:'Youssouf Fofana',pos:'中場',club:'摩納哥'},
-      {name:'Vanderson',pos:'右後衛',club:'摩納哥'},
-      {name:'Philipp Köhn',pos:'門將',club:'摩納哥'}
+      {name:'Andreas Skov Olsen',pos:'右翼',club:'布魯日'},
+      {name:'Hugo Vetlesen',pos:'中場',club:'布魯日'},
+      {name:'Hans Vanaken',pos:'攻擊中場',club:'布魯日'},
+      {name:'Brandon Mechele',pos:'中後衛',club:'布魯日'},
+      {name:'Simon Mignolet',pos:'門將',club:'布魯日'}
     ],
-    radar:{attack:78,defense:74,midfield:78,speed:82,experience:62},
-    style:'年輕快速，反擊為主，培養新星',
-    strengths:['球員速度快','青訓與轉賣模式成熟','Hütter戰術紀律好'],
-    weaknesses:['歐冠經驗嚴重不足','關鍵球員隨時可能離隊','整體實力與頂級隊伍有差距'],
-    history:'2016/17歐冠四強，Mbappé成名之地'
+    radar:{attack:74,defense:74,midfield:74,speed:76,experience:72},
+    style:'比利時傳統控球，穩健務實',
+    strengths:['Vanaken大賽經驗豐富','Mignolet門將穩定','比甲霸主信心足'],
+    weaknesses:['歐冠實力差距明顯','球員個人能力有限','面對強隊難以控球'],
+    history:'歐冠最佳成績2022/23十六強'
   },
 
   // ===== POT 3 =====
-  'SCP': {
-    name:'Sporting CP', nameCN:'里斯本競技', flag:'https://crests.football-data.org/498.png', pot:3, league:'Liga Portugal',
-    uefaCoeff:54, coach:'Rúben Amorim', formation:'3-4-3',
-    keyPlayers:[
-      {name:'Viktor Gyökeres',pos:'中鋒',club:'里斯本競技'},
-      {name:'Pedro Gonçalves',pos:'攻擊中場',club:'里斯本競技'},
-      {name:'Hidemasa Morita',pos:'中場',club:'里斯本競技'},
-      {name:'Sebastián Coates',pos:'中後衛',club:'里斯本競技'},
-      {name:'Franco Israel',pos:'門將',club:'里斯本競技'}
-    ],
-    radar:{attack:84,defense:78,midfield:80,speed:84,experience:68},
-    style:'三後衛高壓體系，Gyökeres為進攻核心',
-    strengths:['Gyökeres進球效率驚人','Amorim戰術體系獨特','葡超統治力帶來信心'],
-    weaknesses:['歐冠淘汰賽經驗不足','球員被挖角風險高','板凳深度有限'],
-    history:'歐冠最佳成績2008/09十六強'
+  'TOT': {
+    name:'Tottenham Hotspur', nameCN:'托特納姆熱刺', flag:'https://crests.football-data.org/73.png', pot:3, league:'Premier League',
+    uefaCoeff:60, coach:'Ange Postecoglou', formation:'4-3-3',
+    keyPlayers:[{name:'Son Heung-min',pos:'前鋒/左翼',club:'熱刺'},{name:'James Maddison',pos:'攻擊中場',club:'熱刺'},{name:'Cristian Romero',pos:'中後衛',club:'熱刺'},{name:'Dejan Kulusevski',pos:'右翼',club:'熱刺'},{name:'Guglielmo Vicario',pos:'門將',club:'熱刺'}],
+    radar:{attack:85,defense:78,midfield:82,speed:84,experience:76},
+    style:'高位壓迫，進攻足球，控球為主',
+    strengths:['Son個人能力頂級','Postecoglou進攻體系明確','英超競爭力強'],
+    weaknesses:['防守端不穩定','傷兵問題多','歐冠決賽以來成績下滑'],
+    history:'2018/19歐冠決賽亞軍'
   },
   'PSV': {
     name:'PSV Eindhoven', nameCN:'PSV恩荷芬', flag:'https://crests.football-data.org/674.png', pot:3, league:'Eredivisie',
@@ -331,101 +313,83 @@ const UCL_TEAMS = {
     weaknesses:['歐冠對陣頂級球隊經驗不足','防守強度不夠','關鍵球員可能被挖角'],
     history:'1987/88歐冠冠軍，近年重返歐冠'
   },
-  'FEY': {
-    name:'Feyenoord', nameCN:'飛燕諾', flag:'https://crests.football-data.org/675.png', pot:3, league:'Eredivisie',
-    uefaCoeff:46, coach:'Brian Priske', formation:'4-3-3',
+  'AJA': {
+    name:'Ajax', nameCN:'阿賈克斯', flag:'https://crests.football-data.org/678.png', pot:3, league:'Eredivisie',
+    uefaCoeff:44, coach:'Francesco Farioli', formation:'4-3-3',
     keyPlayers:[
-      {name:'Santiago Giménez',pos:'中鋒',club:'飛燕諾'},
-      {name:'Quinten Timber',pos:'中場',club:'飛燕諾'},
-      {name:'Igor Paixão',pos:'翼鋒',club:'飛燕諾'},
-      {name:'Lutsharel Geertruida',pos:'右後衛',club:'飛燕諾'},
-      {name:'Justin Bijlow',pos:'門將',club:'飛燕諾'}
+      {name:'Brian Brobbey',pos:'中鋒',club:'阿賈克斯'},
+      {name:'Steven Bergwijn',pos:'翼鋒',club:'阿賈克斯'},
+      {name:'Kenneth Taylor',pos:'中場',club:'阿賈克斯'},
+      {name:'Jorrel Hato',pos:'左後衛',club:'阿賈克斯'},
+      {name:'Remko Pasveer',pos:'門將',club:'阿賈克斯'}
     ],
-    radar:{attack:80,defense:74,midfield:76,speed:80,experience:64},
-    style:'快速直接，前場壓迫，邊路進攻',
-    strengths:['Giménez進球效率高','De Kuip主場氣氛強烈','團隊拼搏精神'],
-    weaknesses:['歐冠經驗淺','陣容深度不如五大聯賽','防守端穩定性差'],
-    history:'1969/70歐冠冠軍，2022/23重返歐冠'
+    radar:{attack:78,defense:72,midfield:76,speed:80,experience:72},
+    style:'全攻全守Cruyff哲學，青訓為本',
+    strengths:['Johan Cruyff Arena主場','青訓持續產出','荷蘭足球DNA'],
+    weaknesses:['近年競爭力大幅下滑','球星流失嚴重','歐冠小組賽表現不穩'],
+    history:'4次歐冠冠軍，2018/19四強驚奇之旅'
   },
-  'CEL': {
-    name:'Celtic', nameCN:'塞爾提克', flag:'https://crests.football-data.org/732.png', pot:3, league:'Scottish Premiership',
-    uefaCoeff:32, coach:'Brendan Rodgers', formation:'4-3-3',
+  'NAP': {
+    name:'Napoli', nameCN:'拿坡里', flag:'https://crests.football-data.org/113.png', pot:3, league:'Serie A',
+    uefaCoeff:68, coach:'Antonio Conte', formation:'3-4-2-1',
     keyPlayers:[
-      {name:'Kyogo Furuhashi',pos:'中鋒',club:'塞爾提克'},
-      {name:'Matt O\'Riley',pos:'攻擊中場',club:'塞爾提克'},
-      {name:'Reo Hatate',pos:'中場',club:'塞爾提克'},
-      {name:'Cameron Carter-Vickers',pos:'中後衛',club:'塞爾提克'},
-      {name:'Joe Hart',pos:'門將',club:'塞爾提克'}
+      {name:'Victor Osimhen',pos:'中鋒',club:'拿坡里'},
+      {name:'Khvicha Kvaratskhelia',pos:'左翼',club:'拿坡里'},
+      {name:'Stanislav Lobotka',pos:'中場',club:'拿坡里'},
+      {name:'Kim Min-jae',pos:'中後衛',club:'拿坡里'},
+      {name:'Alex Meret',pos:'門將',club:'拿坡里'}
     ],
-    radar:{attack:76,defense:70,midfield:74,speed:78,experience:68},
-    style:'積極控球，高位壓迫，快速傳切',
-    strengths:['Celtic Park主場氣氛狂熱','Rodgers戰術組織能力','球隊團結與拼搏精神'],
-    weaknesses:['蘇超強度與歐冠差距大','個人能力與頂級球隊有差距','歐冠小組賽成績差'],
-    history:'1966/67歐冠冠軍（里斯本雄獅），歷史悠久'
+    radar:{attack:86,defense:82,midfield:84,speed:86,experience:72},
+    style:'Conte式鐵血防守，快速轉換進攻',
+    strengths:['Osimhen身體素質與跑位頂級','Kvara盤帶突破犀利','Conte大賽執教經驗'],
+    weaknesses:['2023/24賽季信心受創','陣容磨合需要時間','歐冠淘汰賽經驗不足'],
+    history:'歐冠最佳成績2022/23八強，隊史首次'
   },
-  'AVL': {
-    name:'Aston Villa', nameCN:'阿斯頓維拉', flag:'https://crests.football-data.org/58.png', pot:3, league:'Premier League',
-    uefaCoeff:30, coach:'Unai Emery', formation:'4-2-3-1',
+  'SCP': {
+    name:'Sporting CP', nameCN:'里斯本競技', flag:'https://crests.football-data.org/498.png', pot:3, league:'Liga Portugal',
+    uefaCoeff:54, coach:'Rúben Amorim', formation:'3-4-3',
     keyPlayers:[
-      {name:'Ollie Watkins',pos:'中鋒',club:'阿斯頓維拉'},
-      {name:'Moussa Diaby',pos:'右翼',club:'阿斯頓維拉'},
-      {name:'John McGinn',pos:'中場',club:'阿斯頓維拉'},
-      {name:'Pau Torres',pos:'中後衛',club:'阿斯頓維拉'},
-      {name:'Emiliano Martínez',pos:'門將',club:'阿斯頓維拉'}
+      {name:'Viktor Gyökeres',pos:'中鋒',club:'里斯本競技'},
+      {name:'Pedro Gonçalves',pos:'攻擊中場',club:'里斯本競技'},
+      {name:'Hidemasa Morita',pos:'中場',club:'里斯本競技'},
+      {name:'Sebastián Coates',pos:'中後衛',club:'里斯本競技'},
+      {name:'Franco Israel',pos:'門將',club:'里斯本競技'}
     ],
-    radar:{attack:82,defense:80,midfield:80,speed:82,experience:68},
-    style:'Emery式高壓，快速轉換，邊路交叉',
-    strengths:['Emery歐戰經驗豐富','Martínez門將位置頂級','Watkins進球穩定'],
-    weaknesses:['歐冠經驗極度缺乏','雙線作戰體能挑戰','陣容深度仍有提升空間'],
-    history:'1981/82歐冠冠軍，時隔40年重返歐冠'
+    radar:{attack:84,defense:78,midfield:80,speed:84,experience:68},
+    style:'三後衛高壓體系，Gyökeres為進攻核心',
+    strengths:['Gyökeres進球效率驚人','Amorim戰術體系獨特','葡超統治力帶來信心'],
+    weaknesses:['歐冠淘汰賽經驗不足','球員被挖角風險高','板凳深度有限'],
+    history:'歐冠最佳成績2008/09十六強'
   },
-  'NEW': {
-    name:'Newcastle United', nameCN:'紐卡索聯', flag:'https://crests.football-data.org/67.png', pot:3, league:'Premier League',
-    uefaCoeff:28, coach:'Eddie Howe', formation:'4-3-3',
-    keyPlayers:[
-      {name:'Alexander Isak',pos:'中鋒',club:'紐卡索聯'},
-      {name:'Bruno Guimarães',pos:'中場',club:'紐卡索聯'},
-      {name:'Anthony Gordon',pos:'左翼',club:'紐卡索聯'},
-      {name:'Sven Botman',pos:'中後衛',club:'紐卡索聯'},
-      {name:'Nick Pope',pos:'門將',club:'紐卡索聯'}
-    ],
-    radar:{attack:84,defense:82,midfield:82,speed:84,experience:62},
-    style:'快速直接，強力衝擊，堅實防守',
-    strengths:['Isak禁區內頂級終結者','Bruno中場組織核心','St. James\' Park主場氣勢'],
-    weaknesses:['歐冠經驗幾乎為零','傷病陣容管理挑戰','面對頂級球隊戰術應變不足'],
-    history:'歐冠最佳成績2002/03小組賽出線'
+  'OLY': {
+    name:'Olympiacos', nameCN:'奧林匹亞科斯', flag:'https://crests.football-data.org/567.png', pot:3, league:'Super League Greece',
+    uefaCoeff:42, coach:'José Luis Mendilibar', formation:'4-2-3-1',
+    keyPlayers:[{name:'Ayoub El Kaabi',pos:'前鋒',club:'奧林匹亞科斯'},{name:'Rodinei',pos:'右後衛',club:'奧林匹亞科斯'},{name:'Santiago Hezze',pos:'中場',club:'奧林匹亞科斯'},{name:'Gelson Martins',pos:'翼鋒',club:'奧林匹亞科斯'},{name:'Konstantinos Tzolakis',pos:'門將',club:'奧林匹亞科斯'}],
+    radar:{attack:74,defense:72,midfield:72,speed:76,experience:65},
+    style:'務實防守，快速反擊',
+    strengths:['El Kaabi進球效率高','歐協聯冠軍信心','主場氛圍狂熱'],
+    weaknesses:['整體陣容實力有差距','聯賽競爭力不足','客場表現不穩'],
+    history:'2023/24歐協聯冠軍，希臘豪門首座歐洲獎杯'
   },
-  'STU': {
-    name:'VfB Stuttgart', nameCN:'斯圖加特', flag:'https://crests.football-data.org/10.png', pot:3, league:'Bundesliga',
-    uefaCoeff:26, coach:'Sebastian Hoeneß', formation:'3-4-2-1',
-    keyPlayers:[
-      {name:'Serhou Guirassy',pos:'中鋒',club:'斯圖加特'},
-      {name:'Chris Führich',pos:'翼鋒',club:'斯圖加特'},
-      {name:'Enzo Millot',pos:'攻擊中場',club:'斯圖加特'},
-      {name:'Waldemar Anton',pos:'中後衛',club:'斯圖加特'},
-      {name:'Alexander Nübel',pos:'門將',club:'斯圖加特'}
-    ],
-    radar:{attack:80,defense:76,midfield:78,speed:80,experience:58},
-    style:'三後衛進攻足球，高位壓迫',
-    strengths:['Guirassy德甲頂級射手','整體戰術執行力強','年輕球員衝勁十足'],
-    weaknesses:['歐冠新兵缺乏經驗','板凳深度不足','雙線作戰體能考驗'],
-    history:'歐冠最佳成績2009/10十六強'
+  'SLA': {
+    name:'Slavia Prague', nameCN:'布拉格斯拉維亞', flag:'https://crests.football-data.org/396.png', pot:3, league:'Czech First League',
+    uefaCoeff:35, coach:'Jindřich Trpišovský', formation:'4-2-3-1',
+    keyPlayers:[{name:'Tomáš Chorý',pos:'前鋒',club:'布拉格斯拉維亞'},{name:'Lukáš Provod',pos:'中場',club:'布拉格斯拉維亞'},{name:'Oscar Dorley',pos:'中場',club:'布拉格斯拉維亞'},{name:'Igoh Ogbu',pos:'中後衛',club:'布拉格斯拉維亞'},{name:'Jindřich Staněk',pos:'門將',club:'布拉格斯拉維亞'}],
+    radar:{attack:70,defense:72,midfield:70,speed:74,experience:60},
+    style:'團隊足球，高壓逼搶，跑動量大',
+    strengths:['跑動量聯賽最高','團隊凝聚力強','主場難攻不落'],
+    weaknesses:['個人能力與頂級球隊差距大','國際賽經驗不足','關鍵球員可能被挖角'],
+    history:'捷克傳統豪門，近年穩定出現在歐戰'
   },
-  'LIL': {
-    name:'LOSC Lille', nameCN:'里爾', flag:'https://crests.football-data.org/521.png', pot:3, league:'Ligue 1',
-    uefaCoeff:36, coach:'Paulo Fonseca', formation:'4-2-3-1',
-    keyPlayers:[
-      {name:'Jonathan David',pos:'中鋒',club:'里爾'},
-      {name:'Rémy Cabella',pos:'攻擊中場',club:'里爾'},
-      {name:'Tiago Santos',pos:'右後衛',club:'里爾'},
-      {name:'Leny Yoro',pos:'中後衛',club:'里爾'},
-      {name:'Lucas Chevalier',pos:'門將',club:'里爾'}
-    ],
-    radar:{attack:78,defense:76,midfield:76,speed:80,experience:64},
-    style:'務實防守反擊，青訓出品',
-    strengths:['Jonathan David進球效率高','Chevalier潛力門將','團隊防守紀律好'],
-    weaknesses:['球星流失嚴重','聯賽環境競爭力不如英超','整體陣容厚度不夠'],
-    history:'2020/21歐冠十六強，法甲黑馬'
+  'BOD': {
+    name:'Bodø/Glimt', nameCN:'博德/格利姆特', flag:'https://crests.football-data.org/602.png', pot:3, league:'Eliteserien',
+    uefaCoeff:30, coach:'Kjetil Knutsen', formation:'4-3-3',
+    keyPlayers:[{name:'Kasper Junker',pos:'前鋒',club:'博德/格利姆特'},{name:'Patrick Berg',pos:'中場',club:'博德/格利姆特'},{name:'Ulrik Saltnes',pos:'中場',club:'博德/格利姆特'},{name:'Isak Määttä',pos:'翼鋒',club:'博德/格利姆特'},{name:'Nikita Haikin',pos:'門將',club:'博德/格利姆特'}],
+    radar:{attack:75,defense:68,midfield:74,speed:78,experience:55},
+    style:'北歐進攻足球，快速傳導，團隊配合',
+    strengths:['Knutsen戰術體系獨特','團隊足球流暢','不怕強隊的心態'],
+    weaknesses:['北極圈氣候影響賽程','球員流失嚴重','體能在密集賽程中是挑戰'],
+    history:'挪威小城奇蹟，曾在歐洲賽場痛擊羅馬6:1'
   },
   'MAR': {
     name:'Olympique Marseille', nameCN:'馬賽', flag:'https://crests.football-data.org/516.png', pot:3, league:'Ligue 1',
@@ -445,69 +409,31 @@ const UCL_TEAMS = {
   },
 
   // ===== POT 4 =====
-  'BRU': {
-    name:'Club Brugge', nameCN:'布魯日', flag:'https://crests.football-data.org/851.png', pot:4, league:'Jupiler Pro League',
-    uefaCoeff:42, coach:'Nicky Hayen', formation:'4-3-3',
-    keyPlayers:[
-      {name:'Andreas Skov Olsen',pos:'右翼',club:'布魯日'},
-      {name:'Hugo Vetlesen',pos:'中場',club:'布魯日'},
-      {name:'Hans Vanaken',pos:'攻擊中場',club:'布魯日'},
-      {name:'Brandon Mechele',pos:'中後衛',club:'布魯日'},
-      {name:'Simon Mignolet',pos:'門將',club:'布魯日'}
-    ],
-    radar:{attack:74,defense:74,midfield:74,speed:76,experience:72},
-    style:'比利時傳統控球，穩健務實',
-    strengths:['Vanaken大賽經驗豐富','Mignolet門將穩定','比甲霸主信心足'],
-    weaknesses:['歐冠實力差距明顯','球員個人能力有限','面對強隊難以控球'],
-    history:'歐冠最佳成績2022/23十六強'
+  'COP': {
+    name:'FC Copenhagen', nameCN:'哥本哈根', flag:'img/copenhagen.png', pot:4, league:'Danish Superliga',
+    uefaCoeff:28, coach:'Jacob Neestrup', formation:'3-4-2-1',
+    keyPlayers:[{name:'Mohamed Elyounoussi',pos:'翼鋒',club:'哥本哈根'},{name:'Diogo Gonçalves',pos:'右翼衛',club:'哥本哈根'},{name:'Lukas Lerager',pos:'中場',club:'哥本哈根'},{name:'Denis Vavro',pos:'中後衛',club:'哥本哈根'},{name:'Kamil Grabara',pos:'門將',club:'哥本哈根'}],
+    radar:{attack:72,defense:72,midfield:70,speed:74,experience:60},
+    style:'丹麥務實足球，穩守反擊',
+    strengths:['Grabara門將表現出色','防守組織嚴密','歐冠經驗累積中'],
+    weaknesses:['進攻火力不足','聯賽水平限制球員成長','板凳深度不夠'],
+    history:'2023/24歐冠16強，丹麥最成功的歐戰球隊'
   },
-  'SHA': {
-    name:'Shakhtar Donetsk', nameCN:'頓內茨克礦工', flag:'https://crests.football-data.org/1887.png', pot:4, league:'Ukrainian Premier League',
-    uefaCoeff:48, coach:'Marino Pušić', formation:'4-1-4-1',
+  'MON': {
+    name:'AS Monaco', nameCN:'摩納哥', flag:'https://crests.football-data.org/548.png', pot:4, league:'Ligue 1',
+    uefaCoeff:34, coach:'Adi Hütter', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Georgiy Sudakov',pos:'攻擊中場',club:'頓內茨克礦工'},
-      {name:'Kevin',pos:'翼鋒',club:'頓內茨克礦工'},
-      {name:'Marlon Gomes',pos:'中場',club:'頓內茨克礦工'},
-      {name:'Dmytro Riznyk',pos:'門將',club:'頓內茨克礦工'},
-      {name:'Valeriy Bondar',pos:'中後衛',club:'頓內茨克礦工'}
+      {name:'Wissam Ben Yedder',pos:'前鋒',club:'摩納哥'},
+      {name:'Aleksandr Golovin',pos:'攻擊中場',club:'摩納哥'},
+      {name:'Youssouf Fofana',pos:'中場',club:'摩納哥'},
+      {name:'Vanderson',pos:'右後衛',club:'摩納哥'},
+      {name:'Philipp Köhn',pos:'門將',club:'摩納哥'}
     ],
-    radar:{attack:76,defense:72,midfield:76,speed:78,experience:72},
-    style:'巴西球員為骨幹，技術流控球',
-    strengths:['Sudakov是烏克蘭最佳新星','巴西球員技術好','歐冠常客經驗豐富'],
-    weaknesses:['戰爭影響無法使用主場','球員心理壓力大','陣容流失嚴重'],
-    history:'歐冠常客，最佳成績2010/11八強'
-  },
-  'POR': {
-    name:'Porto', nameCN:'波爾圖', flag:'https://crests.football-data.org/503.png', pot:4, league:'Liga Portugal',
-    uefaCoeff:56, coach:'Vítor Bruno', formation:'4-4-2',
-    keyPlayers:[
-      {name:'Galeno',pos:'左翼',club:'波爾圖'},
-      {name:'Mehdi Taremi',pos:'前鋒',club:'波爾圖'},
-      {name:'Alan Varela',pos:'中場',club:'波爾圖'},
-      {name:'Pepe',pos:'中後衛',club:'波爾圖'},
-      {name:'Diogo Costa',pos:'門將',club:'波爾圖'}
-    ],
-    radar:{attack:80,defense:78,midfield:78,speed:80,experience:80},
-    style:'務實強悍，定位球戰術精準',
-    strengths:['Diogo Costa門將位置出色','葡超經驗豐富','主場龍之巢氣勢足'],
-    weaknesses:['球星持續外流','財力不如五大聯賽球隊','近年歐冠成績下滑'],
-    history:'2次歐冠冠軍（1987、2004），2003/04 Mourinho率隊奪冠'
-  },
-  'AJA': {
-    name:'Ajax', nameCN:'阿賈克斯', flag:'https://crests.football-data.org/678.png', pot:4, league:'Eredivisie',
-    uefaCoeff:44, coach:'Francesco Farioli', formation:'4-3-3',
-    keyPlayers:[
-      {name:'Brian Brobbey',pos:'中鋒',club:'阿賈克斯'},
-      {name:'Steven Bergwijn',pos:'翼鋒',club:'阿賈克斯'},
-      {name:'Kenneth Taylor',pos:'中場',club:'阿賈克斯'},
-      {name:'Jorrel Hato',pos:'左後衛',club:'阿賈克斯'},
-      {name:'Remko Pasveer',pos:'門將',club:'阿賈克斯'}
-    ],
-    radar:{attack:78,defense:72,midfield:76,speed:80,experience:72},
-    style:'全攻全守Cruyff哲學，青訓為本',
-    strengths:['Johan Cruyff Arena主場','青訓持續產出','荷蘭足球DNA'],
-    weaknesses:['近年競爭力大幅下滑','球星流失嚴重','歐冠小組賽表現不穩'],
-    history:'4次歐冠冠軍，2018/19四強驚奇之旅'
+    radar:{attack:78,defense:74,midfield:78,speed:82,experience:62},
+    style:'年輕快速，反擊為主，培養新星',
+    strengths:['球員速度快','青訓與轉賣模式成熟','Hütter戰術紀律好'],
+    weaknesses:['歐冠經驗嚴重不足','關鍵球員隨時可能離隊','整體實力與頂級隊伍有差距'],
+    history:'2016/17歐冠四強，Mbappé成名之地'
   },
   'GAL': {
     name:'Galatasaray', nameCN:'加拉塔薩雷', flag:'img/galatasaray.png', pot:4, league:'Süper Lig',
@@ -525,70 +451,72 @@ const UCL_TEAMS = {
     weaknesses:['客場戰力大幅下降','防守紀律性不足','陣容年齡偏大'],
     history:'歐冠最佳成績2000/01八強'
   },
-  'SAL': {
-    name:'Red Bull Salzburg', nameCN:'薩爾茨堡紅牛', flag:'https://crests.football-data.org/1877.png', pot:4, league:'Austrian Bundesliga',
-    uefaCoeff:38, coach:'Pepijn Lijnders', formation:'4-4-2',
-    keyPlayers:[
-      {name:'Oscar Gloukh',pos:'攻擊中場',club:'薩爾茨堡紅牛'},
-      {name:'Karim Konaté',pos:'前鋒',club:'薩爾茨堡紅牛'},
-      {name:'Amar Dedić',pos:'右後衛',club:'薩爾茨堡紅牛'},
-      {name:'Strahinja Pavlović',pos:'中後衛',club:'薩爾茨堡紅牛'},
-      {name:'Janis Blaswich',pos:'門將',club:'薩爾茨堡紅牛'}
-    ],
-    radar:{attack:76,defense:72,midfield:74,speed:82,experience:56},
-    style:'紅牛系高壓逼搶，快速轉換',
-    strengths:['Red Bull體系培養年輕球員','高壓戰術令對手不適','球員速度快'],
-    weaknesses:['每季核心流失','奧超實力差距太大','歐冠成績起伏不定'],
-    history:'歐冠常客，最佳成績2021/22十六強'
+  'USG': {
+    name:'Union Saint-Gilloise', nameCN:'聖吉爾聯合', flag:'https://crests.football-data.org/2186.png', pot:4, league:'Jupiler Pro League',
+    uefaCoeff:22, coach:'Sébastien Pocognoli', formation:'3-5-2',
+    keyPlayers:[{name:'Cameron Puertas',pos:'攻擊中場',club:'聖吉爾聯合'},{name:'Kevin Mac Allister',pos:'中後衛',club:'聖吉爾聯合'},{name:'Mohammed Fuseini',pos:'翼鋒',club:'聖吉爾聯合'},{name:'Ross Sykes',pos:'中後衛',club:'聖吉爾聯合'},{name:'Anthony Moris',pos:'門將',club:'聖吉爾聯合'}],
+    radar:{attack:70,defense:68,midfield:70,speed:72,experience:45},
+    style:'比利時新派足球，進攻導向',
+    strengths:['Puertas創造力突出','新興勁旅無畏氣勢','團隊戰術執行力好'],
+    weaknesses:['歐冠零經驗','球員可能被大隊挖走','整體實力差距大'],
+    history:'比利時足球新勢力，首次參加歐冠'
   },
-  'DZA': {
-    name:'Dinamo Zagreb', nameCN:'薩格勒布迪納摩', flag:'https://crests.football-data.org/755.png', pot:4, league:'HNL',
-    uefaCoeff:36, coach:'Sergej Jakirović', formation:'4-3-3',
-    keyPlayers:[
-      {name:'Bruno Petković',pos:'前鋒',club:'薩格勒布迪納摩'},
-      {name:'Arijan Ademi',pos:'中場',club:'薩格勒布迪納摩'},
-      {name:'Martin Baturina',pos:'攻擊中場',club:'薩格勒布迪納摩'},
-      {name:'Sadegh Moharrami',pos:'右後衛',club:'薩格勒布迪納摩'},
-      {name:'Dominik Livaković',pos:'門將',club:'薩格勒布迪納摩'}
-    ],
-    radar:{attack:74,defense:70,midfield:72,speed:76,experience:70},
-    style:'克羅埃西亞技術流，快速傳切',
-    strengths:['Livaković門將表現穩定','Baturina年輕有潛力','主場優勢'],
-    weaknesses:['整體實力與五大聯賽差距大','歐冠小組賽常墊底','球員持續外流'],
-    history:'歐冠常客，最佳成績1998/99八強'
+  'QAR': {
+    name:'Qarabağ FK', nameCN:'卡拉巴赫', flag:'img/qarabag.png', pot:4, league:'Azerbaijan Premier League',
+    uefaCoeff:25, coach:'Gurban Gurbanov', formation:'4-2-3-1',
+    keyPlayers:[{name:'Juninho',pos:'前鋒',club:'卡拉巴赫'},{name:'Abdellah Zoubir',pos:'翼鋒',club:'卡拉巴赫'},{name:'Richard Almeida',pos:'中場',club:'卡拉巴赫'},{name:'Kevin Medina',pos:'中場',club:'卡拉巴赫'},{name:'Shahrudin Mahammadaliyev',pos:'門將',club:'卡拉巴赫'}],
+    radar:{attack:68,defense:66,midfield:66,speed:72,experience:50},
+    style:'務實足球，密集防守，快速反擊',
+    strengths:['Gurbanov長期執教體系穩定','球隊凝聚力強','小組賽不放棄精神'],
+    weaknesses:['與歐洲頂級的實力差距','缺乏頂級球星','主場城市受戰爭影響'],
+    history:'阿塞拜疆足球代表，多次參加歐冠正賽'
   },
-  'BRE': {
-    name:'Stade Brestois', nameCN:'布雷斯特', flag:'https://crests.football-data.org/529.png', pot:4, league:'Ligue 1',
-    uefaCoeff:18, coach:'Éric Roy', formation:'4-3-3',
-    keyPlayers:[
-      {name:'Martin Satriano',pos:'前鋒',club:'布雷斯特'},
-      {name:'Hugo Magnetti',pos:'中場',club:'布雷斯特'},
-      {name:'Pierre Lees-Melou',pos:'中場',club:'布雷斯特'},
-      {name:'Brendan Chardonnet',pos:'中後衛',club:'布雷斯特'},
-      {name:'Marco Bizot',pos:'門將',club:'布雷斯特'}
-    ],
-    radar:{attack:72,defense:72,midfield:72,speed:76,experience:52},
-    style:'團隊足球，務實防守，快速反擊',
-    strengths:['黑馬精神毫無壓力','團隊凝聚力強','教練戰術安排務實'],
-    weaknesses:['歐冠完全沒有經驗','球員個人能力有限','財力在歐冠最低'],
-    history:'隊史首次參加歐冠，法甲驚奇黑馬'
+  'ATH': {
+    name:'Athletic Bilbao', nameCN:'畢爾包競技', flag:'https://crests.football-data.org/77.png', pot:4, league:'La Liga',
+    uefaCoeff:38, coach:'Ernesto Valverde', formation:'4-2-3-1',
+    keyPlayers:[{name:'Nico Williams',pos:'左翼',club:'畢爾包競技'},{name:'Oihan Sancet',pos:'攻擊中場',club:'畢爾包競技'},{name:'Iñaki Williams',pos:'前鋒',club:'畢爾包競技'},{name:'Unai Simón',pos:'門將',club:'畢爾包競技'},{name:'Dani Vivian',pos:'中後衛',club:'畢爾包競技'}],
+    radar:{attack:80,defense:78,midfield:78,speed:82,experience:68},
+    style:'全巴斯克球員，高強度壓迫，永不放棄',
+    strengths:['Nico Williams速度與技術頂級','巴斯克人精神永不言敗','Valverde戰術經驗豐富'],
+    weaknesses:['只用巴斯克球員限制引援','板凳深度受限','歐冠經驗不足'],
+    history:'西甲從未降級的三隊之一，只使用巴斯克球員的獨特傳統'
   },
-  'LEI': {
-    name:'Bologna', nameCN:'博洛尼亞', flag:'https://crests.football-data.org/1044.png', pot:4, league:'Serie A',
-    uefaCoeff:20, coach:'Vincenzo Italiano', formation:'4-2-3-1',
+  'NEW': {
+    name:'Newcastle United', nameCN:'紐卡索聯', flag:'https://crests.football-data.org/67.png', pot:4, league:'Premier League',
+    uefaCoeff:28, coach:'Eddie Howe', formation:'4-3-3',
     keyPlayers:[
-      {name:'Joshua Zirkzee',pos:'前鋒',club:'博洛尼亞'},
-      {name:'Lewis Ferguson',pos:'中場',club:'博洛尼亞'},
-      {name:'Riccardo Orsolini',pos:'右翼',club:'博洛尼亞'},
-      {name:'Sam Beukema',pos:'中後衛',club:'博洛尼亞'},
-      {name:'Łukasz Skorupski',pos:'門將',club:'博洛尼亞'}
+      {name:'Alexander Isak',pos:'中鋒',club:'紐卡索聯'},
+      {name:'Bruno Guimarães',pos:'中場',club:'紐卡索聯'},
+      {name:'Anthony Gordon',pos:'左翼',club:'紐卡索聯'},
+      {name:'Sven Botman',pos:'中後衛',club:'紐卡索聯'},
+      {name:'Nick Pope',pos:'門將',club:'紐卡索聯'}
     ],
-    radar:{attack:76,defense:76,midfield:76,speed:78,experience:54},
-    style:'意式務實足球，快速轉換進攻',
-    strengths:['Italiano帶來攻勢足球','Ferguson中場核心穩定','團隊戰術執行力好'],
-    weaknesses:['歐冠零經驗','球星可能被挖走','面對頂級球隊信心不足'],
-    history:'隊史首次參加歐冠，2023/24義甲第五名'
-  }
+    radar:{attack:84,defense:82,midfield:82,speed:84,experience:62},
+    style:'快速直接，強力衝擊，堅實防守',
+    strengths:['Isak禁區內頂級終結者','Bruno中場組織核心','St. James\' Park主場氣勢'],
+    weaknesses:['歐冠經驗幾乎為零','傷病陣容管理挑戰','面對頂級球隊戰術應變不足'],
+    history:'歐冠最佳成績2002/03小組賽出線'
+  },
+  'PAF': {
+    name:'Pafos FC', nameCN:'帕福斯', flag:'https://crests.football-data.org/1044.png', pot:4, league:'Cypriot First Division',
+    uefaCoeff:15, coach:'Juan Carlos Carcedo', formation:'4-3-3',
+    keyPlayers:[{name:'Anderson Correia',pos:'前鋒',club:'帕福斯'},{name:'Jairo',pos:'翼鋒',club:'帕福斯'},{name:'Bruno Felipe',pos:'中場',club:'帕福斯'},{name:'Pierre Kunde',pos:'防守中場',club:'帕福斯'},{name:'Dorde Nikolić',pos:'門將',club:'帕福斯'}],
+    radar:{attack:64,defense:62,midfield:64,speed:68,experience:40},
+    style:'地中海務實足球，防守為先',
+    strengths:['黑馬心態毫無壓力','團隊凝聚力強','主場氣氛佳'],
+    weaknesses:['歐冠完全沒經驗','個人能力差距最大','塞浦路斯聯賽水平有限'],
+    history:'塞浦路斯球隊首次打入歐冠正賽，史無前例'
+  },
+  'KAI': {
+    name:'FC Kairat', nameCN:'凱拉特', flag:'https://crests.football-data.org/6806.png', pot:4, league:'Kazakhstan Premier League',
+    uefaCoeff:12, coach:'Aleksei Shpilevski', formation:'4-2-3-1',
+    keyPlayers:[{name:'Vagner Love',pos:'前鋒',club:'凱拉特'},{name:'Bauyrzhan Islamkhan',pos:'攻擊中場',club:'凱拉特'},{name:'Gafurzhan Suyumbayev',pos:'中場',club:'凱拉特'},{name:'Marin Tomasov',pos:'翼鋒',club:'凱拉特'},{name:'Stas Pokatilov',pos:'門將',club:'凱拉特'}],
+    radar:{attack:62,defense:60,midfield:62,speed:68,experience:35},
+    style:'中亞足球風格，速度與力量',
+    strengths:['主場人工草皮優勢','球迷狂熱支持','不怕失敗的精神'],
+    weaknesses:['與歐洲強隊實力差距最大','長途客場旅程影響','缺乏國際賽經驗'],
+    history:'哈薩克斯坦傳統強隊，首次參加歐冠正賽'
+  },
 };
 
 // 導出供 tournament.js 使用
