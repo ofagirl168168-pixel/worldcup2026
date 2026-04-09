@@ -357,11 +357,13 @@ function renderPredictions() {
     return `<div class="featured-pred-card" onclick="openPredModal('${m.id}')">
       <div class="featured-pred-header">
         <span class="match-tag group">${tagLabel}</span>
-        <span class="confidence-badge confidence-${p.conf}">${p.confLabel}</span>
+        ${m.status==='finished' ? '<span class="match-tag" style="background:#4caf50;color:#fff">已結束</span>' : `<span class="confidence-badge confidence-${p.conf}">${p.confLabel}</span>`}
       </div>
       <div class="featured-pred-teams">
         <div class="pred-team"><div class="pred-team-flag">${flagImg(ht.flag)}</div><div class="pred-team-name">${ht.nameCN}</div></div>
-        <div class="pred-score-big" style="${window.unlockedMatchSet?.has(m.id) ? '' : 'filter:blur(8px);user-select:none'}">${p.score}</div>
+        ${m.status==='finished' && m.score
+          ? `<div class="pred-score-big" style="color:#4caf50">${m.score.h} – ${m.score.a}</div>`
+          : `<div class="pred-score-big" style="${window.unlockedMatchSet?.has(m.id) ? '' : 'filter:blur(8px);user-select:none'}">${p.score}</div>`}
         <div class="pred-team"><div class="pred-team-flag">${flagImg(at.flag)}</div><div class="pred-team-name">${at.nameCN}</div></div>
       </div>
       <div class="prob-row">
@@ -389,7 +391,10 @@ function renderPredictions() {
         <span style="font-weight:700">${ht.nameCN}</span>
       </div>
       <div style="text-align:center">
-        <div style="font-size:16px;font-weight:800;color:var(--gold);${window.unlockedMatchSet?.has(m.id) ? '' : 'filter:blur(7px);user-select:none'}">${p.score}</div>
+        ${m.status==='finished' && m.score
+          ? `<div style="font-size:16px;font-weight:800;color:#4caf50">${m.score.h} – ${m.score.a}</div>
+             <div style="font-size:10px;color:#4caf50;margin-top:1px">已結束</div>`
+          : `<div style="font-size:16px;font-weight:800;color:var(--gold);${window.unlockedMatchSet?.has(m.id) ? '' : 'filter:blur(7px);user-select:none'}">${p.score}</div>`}
         <div style="font-size:11px;color:var(--text-muted)">${_isUCL() ? (m.date||'').slice(5).replace('-','/') + ' ' + (m.time||'') : (m.twDate?.slice(5).replace('-','/')||'') + ' ' + (m.twTime||'')}</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
@@ -414,10 +419,11 @@ async function openPredModal(id) {
   // 立即顯示 modal + loading 動畫，不讓用戶感覺沒反應
   const modal = document.getElementById('team-modal');
   const mc = document.getElementById('modal-content');
+  const _isMatchFinished = match && match.status === 'finished' && match.score;
   mc.innerHTML = `<div class="modal-loading">
     <div class="modal-spinner"></div>
-    <div class="modal-loading-text">🤖 AI 正在分析賽事...</div>
-    <div class="modal-loading-sub">比對歷史數據 · 計算勝率 · 生成預測</div>
+    <div class="modal-loading-text">${_isMatchFinished ? '⚽ 載入賽事結果...' : '🤖 AI 正在分析賽事...'}</div>
+    <div class="modal-loading-sub">${_isMatchFinished ? '統計數據 · 比分回顧 · 預測比較' : '比對歷史數據 · 計算勝率 · 生成預測'}</div>
   </div>`;
   modal.classList.add('open');
 
@@ -438,6 +444,233 @@ async function openPredModal(id) {
   const isUnlocked = !!(window.unlockedMatchSet?.has(id));
 
   const p   = calcPred(ht, at);
+
+  // ── 已完成比賽：顯示賽果 + 數據 + 預測比較 ──────────────
+  const isFinished = m.status === 'finished' && m.score;
+  if (isFinished) {
+    const isUcl = _isUCL();
+    const phaseLabel = isUcl
+      ? ({league:'聯賽階段',playoff:'附加賽',r16:'十六強',qf:'八強',sf:'四強',final:'決賽'}[m.stage]||'')
+      : ({group:'小組賽',r32:'32強',r16:'16強',qf:'八強',sf:'四強',final:'決賽'}[m.phase]||'');
+    const matchTag = isUcl
+      ? `${phaseLabel}${m.md ? ' MD'+m.md : ''}${m.leg ? ' Leg'+m.leg : ''}`
+      : `${GROUPS[m.group]?.name||''} · ${phaseLabel}`;
+    const matchTime = isUcl
+      ? `🕒 ${(m.date||'').slice(5).replace('-','/')} ${m.time||''}`
+      : `🕒 ${m.twDate?.slice(5).replace('-','/')} ${m.twTime} 台灣時間`;
+    const matchVenue = isUcl
+      ? (m.venue ? `📍 ${m.venue}` : '')
+      : `📍 ${m.venue||''}, ${m.city||''}`;
+    const hRankLabel = isUcl ? `UEFA 係數 ${ht.uefaCoeff}` : `FIFA #${ht.fifaRank}`;
+    const aRankLabel = isUcl ? `UEFA 係數 ${at.uefaCoeff}` : `FIFA #${at.fifaRank}`;
+
+    // 判斷勝負
+    const hGoal = m.score.h, aGoal = m.score.a;
+    const resultText = hGoal > aGoal ? `${ht.nameCN} 勝` : aGoal > hGoal ? `${at.nameCN} 勝` : '平局';
+    const resultColor = hGoal > aGoal ? 'var(--green)' : aGoal > hGoal ? 'var(--red)' : 'var(--text-secondary)';
+
+    // AI 預測 vs 實際結果比較
+    const predScore = p.score; // e.g. "2-1"
+    const predParts = predScore.split('-').map(s => parseInt(s.trim()));
+    const predH = isNaN(predParts[0]) ? 0 : predParts[0];
+    const predA = isNaN(predParts[1]) ? 0 : predParts[1];
+    const predCorrect = predH === hGoal && predA === aGoal;
+    const predOutcome = predH > predA ? 'home' : predA > predH ? 'away' : 'draw';
+    const actualOutcome = hGoal > aGoal ? 'home' : aGoal > hGoal ? 'away' : 'draw';
+    const outcomeCorrect = predOutcome === actualOutcome;
+
+    // 合計比分 (兩回合)
+    const aggHTML = m.agg ? `<div style="font-size:13px;color:var(--text-muted);margin-top:4px">兩回合合計 ${m.agg.h} – ${m.agg.a}</div>` : '';
+
+    // 用戶預測
+    const myPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
+    const mine = myPreds[m.id];
+
+
+    document.getElementById('modal-content').innerHTML = `
+      <!-- 賽事資訊 -->
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:8px">
+          <span class="match-tag" style="background:#4caf50;color:#fff">已結束</span>
+          <span class="match-tag group">${matchTag}</span>
+          <span class="match-tag">${matchTime}</span>
+          ${matchVenue ? `<span class="match-tag">${matchVenue}</span>` : ''}
+        </div>
+      </div>
+
+      <!-- 比分結果（大字醒目）-->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px">
+        <div style="text-align:center;flex:1;min-width:0">
+          <div style="font-size:52px;margin-bottom:6px">${flagImg(ht.flag)}</div>
+          <div style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ht.nameCN}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${hRankLabel}</div>
+        </div>
+        <div style="text-align:center;padding:0 8px;flex-shrink:0">
+          <div style="font-size:52px;font-weight:900;color:#fff;letter-spacing:6px">${hGoal} – ${aGoal}</div>
+          <div style="font-size:14px;font-weight:700;color:${resultColor};margin-top:4px">${resultText}</div>
+          ${aggHTML}
+        </div>
+        <div style="text-align:center;flex:1;min-width:0">
+          <div style="font-size:52px;margin-bottom:6px">${flagImg(at.flag)}</div>
+          <div style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${at.nameCN}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${aRankLabel}</div>
+        </div>
+      </div>
+
+      <!-- AI 預測 vs 實際結果 -->
+      <div style="background:rgba(240,192,64,0.08);border-radius:12px;padding:16px;margin:20px 0;border:1px solid rgba(240,192,64,0.2)">
+        <div style="font-size:14px;font-weight:800;color:var(--gold);margin-bottom:12px;text-align:center">🤖 AI 預測 vs 實際結果</div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center">
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">AI 賽前預測</div>
+            <div style="font-size:28px;font-weight:900;color:var(--gold)">${predH} – ${predA}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${ht.nameCN}勝率 ${p.hw}%</div>
+          </div>
+          <div style="font-size:20px;color:var(--text-muted)">vs</div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">實際結果</div>
+            <div style="font-size:28px;font-weight:900;color:#4caf50">${hGoal} – ${aGoal}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${resultText}</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+          ${predCorrect
+            ? '<span style="color:#4caf50;font-weight:700;font-size:13px">🎯 AI 精準命中比分！</span>'
+            : outcomeCorrect
+              ? '<span style="color:var(--gold);font-weight:700;font-size:13px">✅ AI 成功預測勝負方向</span>'
+              : '<span style="color:#ef9a9a;font-weight:700;font-size:13px">❌ AI 預測失誤</span>'
+          }
+        </div>
+      </div>
+
+      <!-- 進球時間線 -->
+      ${m.goals && m.goals.length > 0 ? `
+      <div style="margin:20px 0">
+        <div class="modal-section-title">⚽ 進球紀錄</div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+          ${m.goals.map(g => {
+            const isHome = g.side === 'h';
+            const teamFlag = isHome ? flagImg(ht.flag) : flagImg(at.flag);
+            const typeLabel = g.type === 'pen' ? ' (PK)' : g.type === 'og' ? ' (烏龍球)' : g.type === 'fk' ? ' (自由球)' : '';
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isHome ? '' : 'flex-direction:row-reverse;text-align:right'}">
+              <div style="min-width:42px;font-size:13px;font-weight:800;color:var(--gold);${isHome ? 'text-align:right' : 'text-align:left'}">${g.min}'</div>
+              <div style="font-size:16px">${teamFlag}</div>
+              <div style="flex:1;${isHome ? '' : 'text-align:right'}">
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary)">${g.player}${typeLabel}</div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>` : ''}
+
+      <!-- 賽事數據統計（真實數據） -->
+      ${m.stats ? `
+      <div style="margin:20px 0">
+        <div class="modal-section-title">📊 賽事數據</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px;padding:0 4px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:16px">${flagImg(ht.flag)}</span>
+            <span style="font-size:12px;font-weight:700">${ht.nameCN}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:12px;font-weight:700">${at.nameCN}</span>
+            <span style="font-size:16px">${flagImg(at.flag)}</span>
+          </div>
+        </div>
+        ${[
+          ['控球率', m.stats.poss[0], m.stats.poss[1], '%'],
+          ['射門', m.stats.shots[0], m.stats.shots[1], ''],
+          ['射正', m.stats.sot[0], m.stats.sot[1], ''],
+          ['角球', m.stats.corners[0], m.stats.corners[1], ''],
+          ['黃牌', m.stats.yellow[0], m.stats.yellow[1], ''],
+          ['撲救', m.stats.saves[0], m.stats.saves[1], '']
+        ].map(([label, hVal, aVal, unit]) => `
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <div style="width:45px;text-align:right;font-weight:700;font-size:14px;color:${hVal>aVal?'var(--green)':'var(--text-secondary)'}">${hVal}${unit}</div>
+            <div style="flex:1;display:flex;height:6px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,0.07)">
+              <div style="width:${hVal/(hVal+aVal||1)*100}%;background:linear-gradient(90deg,var(--blue),var(--green))"></div>
+              <div style="width:${aVal/(hVal+aVal||1)*100}%;background:linear-gradient(90deg,var(--red),#ff7043)"></div>
+            </div>
+            <div style="width:45px;text-align:left;font-weight:700;font-size:14px;color:${aVal>hVal?'var(--green)':'var(--text-secondary)'}">${aVal}${unit}</div>
+          </div>
+          <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:-6px;margin-bottom:12px">${label}</div>`).join('')}
+      </div>` : ''}
+
+      <!-- 關鍵球員 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+        <div class="modal-players-box">
+          <div class="modal-players-title">${flagImg(ht.flag)} 關鍵球員</div>
+          ${(ht.keyPlayers||[]).slice(0,3).map(pl=>
+            `<div class="modal-player-row">
+              <span class="modal-player-name">${pl.name}</span>
+              <span class="modal-player-pos">${pl.pos}</span>
+            </div>`
+          ).join('')}
+        </div>
+        <div class="modal-players-box">
+          <div class="modal-players-title">${flagImg(at.flag)} 關鍵球員</div>
+          ${(at.keyPlayers||[]).slice(0,3).map(pl=>
+            `<div class="modal-player-row">
+              <span class="modal-player-name">${pl.name}</span>
+              <span class="modal-player-pos">${pl.pos}</span>
+            </div>`
+          ).join('')}
+        </div>
+      </div>
+
+      <!-- 數據對比雷達 -->
+      <div class="modal-section-title">⚔️ 球隊實力對比</div>
+      <div style="margin-bottom:16px">
+        ${[
+          ['⚔️ 攻擊力', ht.radar.attack, at.radar.attack],
+          ['🛡️ 防守力', ht.radar.defense, at.radar.defense],
+          ['⚙️ 中場控制', ht.radar.midfield, at.radar.midfield],
+          ['💨 速度', ht.radar.speed, at.radar.speed],
+          ['🏆 大賽經驗', ht.radar.experience, at.radar.experience]
+        ].map(([label, hVal, aVal]) => `
+          <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:4px">
+              <span style="font-weight:700;color:${hVal>aVal?'var(--green)':'var(--text-secondary)'}">${hVal}</span>
+              <span>${label}</span>
+              <span style="font-weight:700;color:${aVal>hVal?'var(--green)':'var(--text-secondary)'}">${aVal}</span>
+            </div>
+            <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,0.07)">
+              <div style="width:${hVal/(hVal+aVal)*100}%;background:linear-gradient(90deg,var(--blue),var(--green))"></div>
+              <div style="width:${aVal/(hVal+aVal)*100}%;background:linear-gradient(90deg,var(--red),#ff7043)"></div>
+            </div>
+          </div>`).join('')}
+      </div>
+
+      <!-- 你的預測回顧 -->
+      ${mine ? `
+      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.08)">
+        <div class="modal-section-title" style="margin-bottom:12px">🎯 你的預測回顧</div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center">
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">你的預測</div>
+            <div style="font-size:24px;font-weight:900;color:var(--blue)">${mine.h} – ${mine.a}</div>
+          </div>
+          <div style="font-size:20px;color:var(--text-muted)">vs</div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">實際結果</div>
+            <div style="font-size:24px;font-weight:900;color:#4caf50">${hGoal} – ${aGoal}</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:10px">
+          ${mine.h == hGoal && mine.a == aGoal
+            ? '<span style="color:#4caf50;font-weight:700">🎉 恭喜你精準命中！</span>'
+            : (mine.h > mine.a && hGoal > aGoal) || (mine.h < mine.a && hGoal < aGoal) || (mine.h == mine.a && hGoal == aGoal)
+              ? '<span style="color:var(--gold);font-weight:700">👍 方向正確！</span>'
+              : '<span style="color:#ef9a9a;font-weight:700">😅 下次再接再厲</span>'
+          }
+        </div>
+      </div>` : ''}
+    `;
+    modal.scrollTop = 0;
+    return; // 已完成比賽不需要後續的預測/鎖定 UI
+  }
+  // ── END 已完成比賽 ──────────────────────────────────────
+
   const pts = generateAnalysis(ht, at, p);
   const hForm = p.hWC ? p.hWC.recentForm : (ht.recentForm||['W','D','W','W','D']);
   const aForm = p.aWC ? p.aWC.recentForm : (at.recentForm||['W','D','W','W','D']);
