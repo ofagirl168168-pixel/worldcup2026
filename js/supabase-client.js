@@ -163,7 +163,7 @@ function openNicknameModal(isEdit = false) {
     <div id="nickname-error" style="color:#f44336;font-size:13px;min-height:20px;margin-bottom:14px"></div>
     <button onclick="submitNickname()"
       style="width:100%;padding:14px;border-radius:12px;
-             background:var(--gold);color:#000;
+             background:var(--accent);color:#000;
              font-weight:800;font-size:15px;border:none;cursor:pointer">
       確認設定
     </button>

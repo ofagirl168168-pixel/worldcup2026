@@ -196,7 +196,7 @@ function showGemShortPrompt() {
         <div class="gem-earn-row"><span>👥</span><span>邀請好友加入</span><span class="gem-earn-amt">+3</span></div>
         <div class="gem-earn-row"><span>⬆️</span><span>等級提升獎勵</span><span class="gem-earn-amt">+2～10</span></div>
       </div>
-      <button onclick="copyRefLink();closeModal()" style="width:100%;padding:14px;border-radius:12px;background:var(--gold);color:#000;font-weight:800;font-size:14px;border:none;cursor:pointer">
+      <button onclick="copyRefLink();closeModal()" style="width:100%;padding:14px;border-radius:12px;background:var(--accent);color:#000;font-weight:800;font-size:14px;border:none;cursor:pointer">
         複製邀請連結，邀請好友
       </button>
       <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;margin-top:10px">

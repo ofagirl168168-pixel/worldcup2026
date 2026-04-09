@@ -10,13 +10,25 @@
   --bg-card-hover: rgba(255,255,255,0.09);
   --border:        rgba(255,255,255,0.10);
   --border-accent: rgba(240,192,64,0.40);
-
   --gold:    #f0c040;
   --gold-dk: #c89a20;
   --red:     #e53935;
   --red-dk:  #b71c1c;
   --blue:    #1e88e5;
   --green:   #43a047;
+
+  /* 主題色（由賽事切換覆蓋） */
+  --accent:         #f0c040;
+  --accent-dk:      #c89a20;
+  --accent-glow:    rgba(240,192,64,0.35);
+  --accent-bg:      rgba(240,192,64,0.08);
+  --accent-bg-deep: rgba(240,192,64,0.05);
+  --accent-border:  rgba(240,192,64,0.40);
+  --accent-gradient: linear-gradient(90deg, #f0c040, #ff8c42);
+  --hero-gradient:  linear-gradient(160deg, rgba(240,192,64,0.08) 0%, transparent 40%),
+                    linear-gradient(220deg, rgba(229,57,53,0.06) 0%, transparent 40%);
+  --particle-a:     rgba(240,192,64,0.06);
+  --particle-b:     rgba(30,136,229,0.07);
 
   --text-primary:   #f0f0f0;
   --text-secondary: #90a4ae;
@@ -27,6 +39,22 @@
   --radius-sm: 8px;
   --shadow:   0 8px 32px rgba(0,0,0,0.45);
   --transition: 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ---------- 歐冠主題色覆蓋 ---------- */
+[data-tournament-active="ucl"] {
+  --accent:         #1a73e8;
+  --accent-dk:      #0d47a1;
+  --accent-glow:    rgba(26,115,232,0.35);
+  --accent-bg:      rgba(26,115,232,0.10);
+  --accent-bg-deep: rgba(26,115,232,0.06);
+  --accent-border:  rgba(26,115,232,0.40);
+  --accent-gradient: linear-gradient(90deg, #1a73e8, #5eb8ff);
+  --hero-gradient:  linear-gradient(160deg, rgba(26,115,232,0.10) 0%, transparent 40%),
+                    linear-gradient(220deg, rgba(13,71,161,0.08) 0%, transparent 40%);
+  --particle-a:     rgba(26,115,232,0.07);
+  --particle-b:     rgba(90,200,250,0.05);
+  --border-accent:  rgba(26,115,232,0.40);
 }
 
 /* ---------- 重置 ---------- */
@@ -47,14 +75,14 @@ ul { list-style: none; }
 /* ---------- 捲軸 ---------- */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
-::-webkit-scrollbar-thumb { background: var(--gold-dk); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--accent-dk); border-radius: 3px; }
 
 /* ---------- 粒子背景 ---------- */
 #particles-bg {
   position: fixed; inset: 0; z-index: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(240,192,64,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 80% at 80% 80%, rgba(30,136,229,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 20% 10%, var(--particle-a) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 80%, var(--particle-b) 0%, transparent 60%),
     var(--bg-primary);
   pointer-events: none;
 }
@@ -75,9 +103,9 @@ ul { list-style: none; }
   display: flex; align-items: center; gap: 12px;
   cursor: pointer; flex-shrink: 0;
 }
-.logo-icon { font-size: 28px; filter: drop-shadow(0 0 8px rgba(240,192,64,0.6)); }
-.logo-svg  { filter: drop-shadow(0 0 8px rgba(240,192,64,0.5)); flex-shrink: 0; }
-.logo-title { display: block; font-size: 14px; font-weight: 700; color: var(--gold); line-height: 1; }
+.logo-icon { font-size: 28px; filter: drop-shadow(0 0 8px var(--accent-glow)); }
+.logo-svg  { filter: drop-shadow(0 0 8px var(--accent-glow)); flex-shrink: 0; }
+.logo-title { display: block; font-size: 14px; font-weight: 700; color: var(--accent); line-height: 1; }
 .logo-sub   { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 
 /* 賽事切換器 */
@@ -102,7 +130,7 @@ ul { list-style: none; }
 }
 .tournament-btn.active {
   color: #fff;
-  background: linear-gradient(135deg, var(--tournament-color, var(--gold)), var(--tournament-accent, #e6a817));
+  background: linear-gradient(135deg, var(--tournament-color, var(--accent)), var(--tournament-accent, var(--accent-dk)));
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .tournament-btn .t-label { pointer-events: none; }
@@ -119,10 +147,10 @@ ul { list-style: none; }
 }
 .nav-btn i { font-size: 16px; }
 .nav-btn:hover { color: var(--text-primary); background: var(--bg-card); }
-.nav-btn.active { color: var(--gold); }
+.nav-btn.active { color: var(--accent); }
 .nav-btn.active::after {
   content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
-  width: 20px; height: 2px; background: var(--gold); border-radius: 2px;
+  width: 20px; height: 2px; background: var(--accent); border-radius: 2px;
 }
 
 .hamburger {
@@ -152,8 +180,7 @@ ul { list-style: none; }
   display: flex; flex-direction: column; justify-content: center;
   overflow: hidden;
   background:
-    linear-gradient(160deg, rgba(240,192,64,0.08) 0%, transparent 40%),
-    linear-gradient(220deg, rgba(229,57,53,0.06) 0%, transparent 40%),
+    var(--hero-gradient),
     var(--bg-primary);
 }
 .hero-bg-overlay {
@@ -171,8 +198,8 @@ ul { list-style: none; }
   display: inline-flex; align-items: center; gap: 8px;
   padding: 6px 18px; border-radius: 999px;
   border: 1px solid var(--border-accent);
-  background: rgba(240,192,64,0.08);
-  color: var(--gold); font-size: 12px; font-weight: 700;
+  background: var(--accent-bg);
+  color: var(--accent); font-size: 12px; font-weight: 700;
   letter-spacing: 2px; margin-bottom: 28px;
 }
 .hero-title {
@@ -182,7 +209,7 @@ ul { list-style: none; }
   margin-bottom: 20px;
 }
 .hero-highlight {
-  background: linear-gradient(90deg, var(--gold), #ff8c42);
+  background: var(--accent-gradient);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -208,11 +235,11 @@ ul { list-style: none; }
   backdrop-filter: blur(8px);
 }
 .countdown-num {
-  font-size: 42px; font-weight: 900; color: var(--gold);
+  font-size: 42px; font-weight: 900; color: var(--accent);
   line-height: 1; font-variant-numeric: tabular-nums;
 }
 .countdown-unit { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-.countdown-sep { font-size: 32px; font-weight: 900; color: var(--gold-dk); margin-bottom: 16px; }
+.countdown-sep { font-size: 32px; font-weight: 900; color: var(--accent-dk); margin-bottom: 16px; }
 .countdown-date {
   margin-top: 14px; font-size: 13px; color: var(--text-muted);
 }
@@ -222,21 +249,21 @@ ul { list-style: none; }
 .btn-primary {
   display: flex; align-items: center; gap: 8px;
   padding: 14px 32px; border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--gold), #e0a020);
+  background: linear-gradient(135deg, var(--accent), var(--accent-dk));
   color: #07091a; font-weight: 700; font-size: 15px;
   transition: var(--transition);
-  box-shadow: 0 4px 24px rgba(240,192,64,0.35);
+  box-shadow: 0 4px 24px var(--accent-glow);
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(240,192,64,0.5); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px var(--accent-glow); }
 .btn-secondary {
   display: flex; align-items: center; gap: 8px;
   padding: 14px 32px; border-radius: var(--radius);
   border: 1px solid var(--border-accent);
-  background: rgba(240,192,64,0.08);
-  color: var(--gold); font-weight: 700; font-size: 15px;
+  background: var(--accent-bg);
+  color: var(--accent); font-weight: 700; font-size: 15px;
   transition: var(--transition);
 }
-.btn-secondary:hover { background: rgba(240,192,64,0.16); transform: translateY(-2px); }
+.btn-secondary:hover { background: var(--accent-bg); transform: translateY(-2px); }
 
 /* Hero 統計 */
 .hero-stats {
@@ -251,17 +278,17 @@ ul { list-style: none; }
   border-right: 1px solid var(--border);
 }
 .hero-stat:last-child { border-right: none; }
-.hero-stat-num { font-size: 36px; font-weight: 900; color: var(--gold); }
+.hero-stat-num { font-size: 36px; font-weight: 900; color: var(--accent); }
 .hero-stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
 
 /* ---------- 頁面內 Hero ---------- */
 .page-hero {
   text-align: center; padding: 60px 24px 40px;
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(240,192,64,0.05) 0%, transparent 100%);
+  background: linear-gradient(180deg, var(--accent-bg-deep) 0%, transparent 100%);
 }
 .page-hero h1 { font-size: 36px; font-weight: 900; margin-bottom: 10px; }
-.page-hero h1 i { color: var(--gold); margin-right: 12px; }
+.page-hero h1 i { color: var(--accent); margin-right: 12px; }
 .page-hero p { color: var(--text-secondary); font-size: 15px; }
 
 /* ---------- 通用 Section ---------- */
@@ -278,14 +305,14 @@ ul { list-style: none; }
   font-size: 22px; font-weight: 800;
   display: flex; align-items: center; gap: 10px;
 }
-.section-header h2 i { color: var(--gold); }
+.section-header h2 i { color: var(--accent); }
 .section-badge {
   padding: 3px 12px; border-radius: 999px;
-  background: rgba(240,192,64,0.12); border: 1px solid var(--border-accent);
-  color: var(--gold); font-size: 12px; font-weight: 600;
+  background: var(--accent-bg); border: 1px solid var(--border-accent);
+  color: var(--accent); font-size: 12px; font-weight: 600;
 }
 .link-btn {
-  margin-left: auto; color: var(--gold); font-size: 14px; font-weight: 600;
+  margin-left: auto; color: var(--accent); font-size: 14px; font-weight: 600;
   transition: var(--transition);
 }
 .link-btn:hover { text-decoration: underline; }
@@ -302,7 +329,7 @@ ul { list-style: none; }
   align-items: center; justify-content: space-between;
 }
 .footer-logo { display: flex; align-items: center; gap: 14px; font-size: 24px; }
-.footer-title { font-size: 14px; font-weight: 700; color: var(--gold); }
+.footer-title { font-size: 14px; font-weight: 700; color: var(--accent); }
 .footer-sub   { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 .footer-info  { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); text-align: right; }
 

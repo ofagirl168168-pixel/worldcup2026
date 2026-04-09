@@ -415,7 +415,7 @@ function showArenaWelcomeIfNeeded() {
         <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:24px">
           現在就開始預測冠軍、填寫分組賽結果<br>
           每天答題累積連勝天數<br>
-          <strong style="color:var(--gold)">6月11日開賽，一起見證你的預測！</strong>
+          <strong style="color:var(--accent)">6月11日開賽，一起見證你的預測！</strong>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <button class="btn-primary" onclick="document.getElementById('arena-welcome-overlay').remove();showSection('arena');renderArena()">
@@ -539,7 +539,7 @@ function renderArena() {
         <div class="arena-card-title">冠軍預測</div>
         <div class="arena-card-desc">
           ${myChampion
-            ? `你預測 <strong style="color:var(--gold)">${champFlag}</strong> 奪冠`
+            ? `你預測 <strong style="color:var(--accent)">${champFlag}</strong> 奪冠`
             : '選出你心目中的冠、亞、季軍，開賽前可修改'}
         </div>
         ${myChampion ? `<div class="arena-lock-hint">⏰ 開賽後永久鎖定</div>
@@ -553,7 +553,7 @@ function renderArena() {
         ${myChampion ? `
         <div onclick="event.stopPropagation()" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:10px">
           <div style="font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5">曬出你的押注，<br>賽後看誰猜對！</div>
-          <button onclick="shareChampionText()" style="flex-shrink:0;padding:7px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(240,192,64,0.22),rgba(240,192,64,0.08));border:1px solid rgba(240,192,64,0.4);color:var(--gold);font-size:12px;font-weight:800;cursor:pointer">🏆 曬我押注</button>
+          <button onclick="shareChampionText()" style="flex-shrink:0;padding:7px 14px;border-radius:10px;background:linear-gradient(135deg,var(--accent-bg),var(--accent-bg-deep));border:1px solid var(--accent-border);color:var(--accent);font-size:12px;font-weight:800;cursor:pointer">🏆 曬我押注</button>
         </div>` : ''}
       </div>
 
@@ -1254,7 +1254,7 @@ function showSharePromptAfterGroups() {
       <div style="font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:24px">
         要把你的預測分享給朋友嗎？<br>生成精美預測圖，附上專屬 QR Code
       </div>
-      <button onclick="closeModal();setTimeout(shareGroupImage,200)" style="width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#e0a020);color:#07091a;font-weight:800;font-size:15px;border:none;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <button onclick="closeModal();setTimeout(shareGroupImage,200)" style="width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-dk));color:#07091a;font-weight:800;font-size:15px;border:none;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px">
         <i class="fas fa-share-alt"></i> 分享我的預測
       </button>
       <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer">

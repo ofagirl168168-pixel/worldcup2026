@@ -59,8 +59,8 @@
   animation: cardReveal 0.5s 0.05s both, goldPulse 3s 1s ease-in-out infinite;
 }
 @keyframes goldPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(240,192,64,0); }
-  50%       { box-shadow: 0 0 28px 4px rgba(240,192,64,0.18); }
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50%       { box-shadow: 0 0 28px 4px var(--accent-glow); }
 }
 
 /* ---------- Logo 圖示旋轉 ---------- */
@@ -139,7 +139,7 @@
 .particle {
   position: fixed; border-radius: 50%;
   pointer-events: none; z-index: 0;
-  background: radial-gradient(circle, rgba(240,192,64,0.5), transparent 70%);
+  background: radial-gradient(circle, var(--accent-glow), transparent 70%);
   animation: floatParticle linear infinite;
 }
 @keyframes floatParticle {
@@ -151,10 +151,10 @@
 
 /* ---------- 匹配卡懸浮發光 ---------- */
 .match-card:hover {
-  box-shadow: 0 8px 32px rgba(240,192,64,0.10);
+  box-shadow: 0 8px 32px var(--accent-bg);
 }
 .featured-pred-card:hover {
-  box-shadow: 0 16px 48px rgba(240,192,64,0.14);
+  box-shadow: 0 16px 48px var(--accent-bg);
 }
 
 /* ---------- 按鈕點擊波紋 ---------- */
@@ -188,8 +188,8 @@
 
 /* ========== 競技場 Arena 動畫 ========== */
 @keyframes arenaGlow {
-  0%,100% { box-shadow: 0 0 20px rgba(240,192,64,0.3), 0 0 40px rgba(240,192,64,0.1); }
-  50%      { box-shadow: 0 0 30px rgba(240,192,64,0.5), 0 0 60px rgba(240,192,64,0.2); }
+  0%,100% { box-shadow: 0 0 20px var(--accent-border), 0 0 40px var(--accent-bg); }
+  50%      { box-shadow: 0 0 30px var(--accent-glow), 0 0 60px var(--accent-bg); }
 }
 @keyframes neonPulse {
   0%,100% { opacity: 1; }

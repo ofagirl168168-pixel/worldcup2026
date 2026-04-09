@@ -202,11 +202,11 @@ function renderDeathGroups() {
         const t = _T[row.code];
         if (!t) return '';
         return `<div class="death-card" style="padding:10px 14px;display:flex;align-items:center;gap:12px">
-          <div style="font-size:18px;font-weight:800;color:${i<8?'var(--gold)':'var(--text-muted)'};width:28px;text-align:center">${i+1}</div>
+          <div style="font-size:18px;font-weight:800;color:${i<8?'var(--accent)':'var(--text-muted)'};width:28px;text-align:center">${i+1}</div>
           <div style="font-size:20px">${flagImg(t.flag)}</div>
           <div style="flex:1"><div style="font-weight:700">${t.nameCN}</div><div style="font-size:11px;color:var(--text-muted)">${t.league}</div></div>
           <div style="text-align:right">
-            <div style="font-size:16px;font-weight:800;color:var(--gold)">${row.pts} 分</div>
+            <div style="font-size:16px;font-weight:800;color:var(--accent)">${row.pts} 分</div>
             <div style="font-size:11px;color:var(--text-muted)">${row.w}勝${row.d}平${row.l}負 · 淨勝球${row.gd>0?'+':''}${row.gd}</div>
           </div>
         </div>`;
@@ -394,7 +394,7 @@ function renderPredictions() {
         ${m.status==='finished' && m.score
           ? `<div style="font-size:16px;font-weight:800;color:#4caf50">${m.score.h} – ${m.score.a}</div>
              <div style="font-size:10px;color:#4caf50;margin-top:1px">已結束</div>`
-          : `<div style="font-size:16px;font-weight:800;color:var(--gold);${window.unlockedMatchSet?.has(m.id) ? '' : 'filter:blur(7px);user-select:none'}">${p.score}</div>`}
+          : `<div style="font-size:16px;font-weight:800;color:var(--accent);${window.unlockedMatchSet?.has(m.id) ? '' : 'filter:blur(7px);user-select:none'}">${p.score}</div>`}
         <div style="font-size:11px;color:var(--text-muted)">${_isUCL() ? (m.date||'').slice(5).replace('-','/') + ' ' + (m.time||'') : (m.twDate?.slice(5).replace('-','/')||'') + ' ' + (m.twTime||'')}</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
@@ -518,12 +518,12 @@ async function openPredModal(id) {
       </div>
 
       <!-- AI 預測 vs 實際結果 -->
-      <div style="background:rgba(240,192,64,0.08);border-radius:12px;padding:16px;margin:20px 0;border:1px solid rgba(240,192,64,0.2)">
-        <div style="font-size:14px;font-weight:800;color:var(--gold);margin-bottom:12px;text-align:center">🤖 AI 預測 vs 實際結果</div>
+      <div style="background:var(--accent-bg);border-radius:12px;padding:16px;margin:20px 0;border:1px solid var(--accent-border)">
+        <div style="font-size:14px;font-weight:800;color:var(--accent);margin-bottom:12px;text-align:center">🤖 AI 預測 vs 實際結果</div>
         <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center">
           <div>
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">AI 賽前預測</div>
-            <div style="font-size:28px;font-weight:900;color:var(--gold)">${predH} – ${predA}</div>
+            <div style="font-size:28px;font-weight:900;color:var(--accent)">${predH} – ${predA}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${ht.nameCN}勝率 ${p.hw}%</div>
           </div>
           <div style="font-size:20px;color:var(--text-muted)">vs</div>
@@ -537,7 +537,7 @@ async function openPredModal(id) {
           ${predCorrect
             ? '<span style="color:#4caf50;font-weight:700;font-size:13px">🎯 AI 精準命中比分！</span>'
             : outcomeCorrect
-              ? '<span style="color:var(--gold);font-weight:700;font-size:13px">✅ AI 成功預測勝負方向</span>'
+              ? '<span style="color:var(--accent);font-weight:700;font-size:13px">✅ AI 成功預測勝負方向</span>'
               : '<span style="color:#ef9a9a;font-weight:700;font-size:13px">❌ AI 預測失誤</span>'
           }
         </div>
@@ -553,7 +553,7 @@ async function openPredModal(id) {
             const teamFlag = isHome ? flagImg(ht.flag) : flagImg(at.flag);
             const typeLabel = g.type === 'pen' ? ' (PK)' : g.type === 'og' ? ' (烏龍球)' : g.type === 'fk' ? ' (自由球)' : '';
             return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isHome ? '' : 'flex-direction:row-reverse;text-align:right'}">
-              <div style="min-width:42px;font-size:13px;font-weight:800;color:var(--gold);${isHome ? 'text-align:right' : 'text-align:left'}">${g.min}'</div>
+              <div style="min-width:42px;font-size:13px;font-weight:800;color:var(--accent);${isHome ? 'text-align:right' : 'text-align:left'}">${g.min}'</div>
               <div style="font-size:16px">${teamFlag}</div>
               <div style="flex:1;${isHome ? '' : 'text-align:right'}">
                 <div style="font-size:13px;font-weight:700;color:var(--text-primary)">${g.player}${typeLabel}</div>
@@ -659,7 +659,7 @@ async function openPredModal(id) {
           ${mine.h == hGoal && mine.a == aGoal
             ? '<span style="color:#4caf50;font-weight:700">🎉 恭喜你精準命中！</span>'
             : (mine.h > mine.a && hGoal > aGoal) || (mine.h < mine.a && hGoal < aGoal) || (mine.h == mine.a && hGoal == aGoal)
-              ? '<span style="color:var(--gold);font-weight:700">👍 方向正確！</span>'
+              ? '<span style="color:var(--accent);font-weight:700">👍 方向正確！</span>'
               : '<span style="color:#ef9a9a;font-weight:700">😅 下次再接再厲</span>'
           }
         </div>
@@ -729,7 +729,7 @@ async function openPredModal(id) {
       </div>
       <div style="text-align:center;padding:0 8px;flex-shrink:0">
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">AI 預測比分</div>
-        <div style="font-size:44px;font-weight:900;color:var(--gold);letter-spacing:4px;${isUnlocked ? '' : 'filter:blur(10px);user-select:none'}">${p.score}</div>
+        <div style="font-size:44px;font-weight:900;color:var(--accent);letter-spacing:4px;${isUnlocked ? '' : 'filter:blur(10px);user-select:none'}">${p.score}</div>
         <div style="font-size:11px;color:var(--text-muted);margin:4px 0">xG ${p.hXG} — ${p.aXG}</div>
         <div class="confidence-badge confidence-${p.conf}">${p.confLabel}</div>
       </div>
@@ -790,13 +790,13 @@ async function openPredModal(id) {
         <!-- 球隊風格 -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
           <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px">
-            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">${flagImg(ht.flag)} ${ht.nameCN} 踢法</div>
+            <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">${flagImg(ht.flag)} ${ht.nameCN} 踢法</div>
             <div style="font-size:12px;color:var(--text-secondary)">${ht.style||''}</div>
             <div style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${(ht.strengths||['整體實力強'])[0]}</div>
             <div style="font-size:12px;color:#ef9a9a">✗ ${(ht.weaknesses||['有待觀察'])[0]}</div>
           </div>
           <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px">
-            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">${flagImg(at.flag)} ${at.nameCN} 踢法</div>
+            <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">${flagImg(at.flag)} ${at.nameCN} 踢法</div>
             <div style="font-size:12px;color:var(--text-secondary)">${at.style||''}</div>
             <div style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${(at.strengths||['整體實力強'])[0]}</div>
             <div style="font-size:12px;color:#ef9a9a">✗ ${(at.weaknesses||['有待觀察'])[0]}</div>
@@ -832,8 +832,8 @@ async function openPredModal(id) {
         </div>
 
         <!-- 焦點球員對決 -->
-        <div style="background:rgba(240,192,64,0.07);border-radius:10px;padding:14px;border-left:3px solid var(--gold)">
-          <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">⚽ 焦點球員對決</div>
+        <div style="background:var(--accent-bg);border-radius:10px;padding:14px;border-left:3px solid var(--accent)">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">⚽ 焦點球員對決</div>
           <div style="font-size:13px;color:var(--text-secondary)">
             <strong style="color:var(--text-primary)">${ht.keyPlayers?.[0]?.name||ht.nameCN}</strong>（${ht.keyPlayers?.[0]?.pos||'前鋒'}）
             vs
@@ -1044,7 +1044,7 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
 
     <!-- 大小球 -->
     <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">⚽ 大小球（Poisson 模型）</div>
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">⚽ 大小球（Poisson 模型）</div>
       <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">預測比分 ${p.score}（總進球 <strong style="color:var(--text-primary)">${lambda}</strong>）· xG ${hXG}–${aXG}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
         ${[['大 1.5', pOver15], ['大 2.5', pOver25], ['大 3.5', pOver35]].map(([label, prob]) => `
@@ -1059,7 +1059,7 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
     <!-- BTTS + 亞盤 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">🥅 兩隊都進球</div>
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">🥅 兩隊都進球</div>
         <div style="text-align:center">
           <div style="font-size:28px;font-weight:900;color:${pColor(pBTTS)}">${pBTTS}%</div>
           <div style="font-size:11px;color:var(--text-muted);margin:4px 0">${pBTTS >= 55 ? '較可能發生' : '較不可能'}</div>
@@ -1068,7 +1068,7 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
         </div>
       </div>
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">⚖️ 亞盤讓球</div>
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">⚖️ 亞盤讓球</div>
         <div style="text-align:center">
           <div style="font-size:14px;font-weight:900;color:var(--text-primary);line-height:1.5">${handicap}</div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:6px">${handicapNote}</div>
@@ -1080,7 +1080,7 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
     <!-- 角球 + 黃牌 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">🚩 角球預測</div>
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">🚩 角球預測</div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <div style="text-align:center">
             <div style="font-size:11px;color:var(--text-muted)">${flagImg(ht.flag)}</div>
@@ -1088,7 +1088,7 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
           </div>
           <div style="text-align:center">
             <div style="font-size:11px;color:var(--text-muted)">合計</div>
-            <div style="font-size:22px;font-weight:800;color:var(--gold)">${totalCorners}</div>
+            <div style="font-size:22px;font-weight:800;color:var(--accent)">${totalCorners}</div>
           </div>
           <div style="text-align:center">
             <div style="font-size:11px;color:var(--text-muted)">${flagImg(at.flag)}</div>
@@ -1098,7 +1098,7 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
         <div style="font-size:11px;color:var(--text-muted);text-align:center">盤口 ${cornerLine} 建議<strong style="color:${pColor(cornerOverProb)}">${cornerOverProb >= 55 ? '大' : '小'}</strong>（${cornerOverProb}%）</div>
       </div>
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">🟨 黃牌預測</div>
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">🟨 黃牌預測</div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <div style="text-align:center">
             <div style="font-size:11px;color:var(--text-muted)">${flagImg(ht.flag)}</div>
@@ -1119,7 +1119,7 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
 
     <!-- 上半場分析 -->
     <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">⏱️ 上半場走向</div>
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">⏱️ 上半場走向</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-bottom:10px">
         <div><div style="font-size:18px;font-weight:900;color:var(--green)">${htHW}%</div><div style="font-size:11px;color:var(--text-muted)">${ht.nameCN} 領先</div></div>
         <div><div style="font-size:18px;font-weight:900;color:var(--text-secondary)">${htD}%</div><div style="font-size:11px;color:var(--text-muted)">平手</div></div>
@@ -1142,7 +1142,7 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
 
     <!-- 歷史交手 -->
     <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">⚔️ 歷史交手紀錄</div>
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">⚔️ 歷史交手紀錄</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:8px">
         <div><div style="font-size:20px;font-weight:800;color:var(--green)">${h2h.wins ?? '—'}</div><div style="font-size:11px;color:var(--text-muted)">${ht.nameCN} 勝</div></div>
         <div><div style="font-size:20px;font-weight:800;color:var(--text-secondary)">${h2h.draws ?? '—'}</div><div style="font-size:11px;color:var(--text-muted)">平局</div></div>
@@ -1154,11 +1154,11 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
     <!-- 傷兵 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
-        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">${flagImg(ht.flag)} 傷兵名單</div>
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">${flagImg(ht.flag)} 傷兵名單</div>
         ${hInjuries.length ? hInjuries.map(pl => `<div style="font-size:12px;color:var(--text-secondary);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="color:#ef9a9a">⚕</span> ${pl.name} <span style="color:var(--text-muted);font-size:11px">${pl.pos}</span></div>`).join('') : '<div style="font-size:12px;color:var(--text-muted)">暫無傷兵資料</div>'}
       </div>
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
-        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">${flagImg(at.flag)} 傷兵名單</div>
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">${flagImg(at.flag)} 傷兵名單</div>
         ${aInjuries.length ? aInjuries.map(pl => `<div style="font-size:12px;color:var(--text-secondary);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="color:#ef9a9a">⚕</span> ${pl.name} <span style="color:var(--text-muted);font-size:11px">${pl.pos}</span></div>`).join('') : '<div style="font-size:12px;color:var(--text-muted)">暫無傷兵資料</div>'}
       </div>
     </div>
@@ -1166,13 +1166,13 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
     <!-- 陣型詳解 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
-        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">${flagImg(ht.flag)} ${ht.formation}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">${flagImg(ht.flag)} ${ht.formation}</div>
         <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">${ht.formationDesc || ht.style || '陣型詳解待更新'}</div>
         ${ht.strengths?.length ? `<div style="margin-top:8px;font-size:11px;color:var(--green)">✓ ${ht.strengths[0]}</div>` : ''}
         ${ht.strengths?.[1] ? `<div style="font-size:11px;color:var(--green)">✓ ${ht.strengths[1]}</div>` : ''}
       </div>
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
-        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">${flagImg(at.flag)} ${at.formation}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">${flagImg(at.flag)} ${at.formation}</div>
         <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">${at.formationDesc || at.style || '陣型詳解待更新'}</div>
         ${at.strengths?.length ? `<div style="margin-top:8px;font-size:11px;color:var(--green)">✓ ${at.strengths[0]}</div>` : ''}
         ${at.strengths?.[1] ? `<div style="font-size:11px;color:var(--green)">✓ ${at.strengths[1]}</div>` : ''}
@@ -1504,7 +1504,7 @@ function renderSchedule(phaseFilter, groupFilter) {
         const stageLabel = {league:'聯賽階段',playoff:'附加賽',r16:'十六強',qf:'八強',sf:'四強',final:'決賽'}[m.stage]||'';
         return header + `<div class="match-card" style="justify-content:center;grid-template-columns:1fr">
           <div style="text-align:center">
-            <div style="font-size:16px;font-weight:700;color:var(--gold)">${stageLabel} — 待定</div>
+            <div style="font-size:16px;font-weight:700;color:var(--accent)">${stageLabel} — 待定</div>
             <div style="font-size:13px;color:var(--text-muted);margin-top:6px">🕒 ${m.date?.slice(5).replace('-','/')||''} ${m.time||''}${m.venue ? ' · 📍 '+m.venue : ''}</div>
           </div></div>`;
       }
@@ -1559,7 +1559,7 @@ function renderSchedule(phaseFilter, groupFilter) {
     if (!m.home) {
       return header + `<div class="match-card" style="justify-content:center;grid-template-columns:1fr">
         <div style="text-align:center">
-          <div style="font-size:16px;font-weight:700;color:var(--gold)">${m.label||'待定'}</div>
+          <div style="font-size:16px;font-weight:700;color:var(--accent)">${m.label||'待定'}</div>
           <div style="font-size:13px;color:var(--text-muted);margin-top:6px">🕒 ${m.twDate?.slice(5).replace('-','/')||''} ${m.twTime||''} 台灣時間 · 📍 ${m.venue||''}</div>
         </div></div>`;
     }
@@ -1704,7 +1704,7 @@ function renderStats(tab) {
           <div class="scorer-name">${t.nameCN}</div>
           <div class="scorer-sub">${t.league} · 第${t.pot}檔</div>
         </div>
-        <div style="font-size:14px;font-weight:700;color:var(--gold)">係數 ${t.uefaCoeff}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--accent)">係數 ${t.uefaCoeff}</div>
       </div>`).join('')}</div>`;
     return;
   }
@@ -2098,8 +2098,8 @@ function openTeamModal(code) {
     ${t.recentForm ? `<div class="modal-section-title">近期狀態（最近5場）</div><div class="form-dots">${formDots}</div>` : ''}
     <div class="modal-section-title">歷史戰績</div>
     <p style="font-size:14px;color:var(--text-secondary)">${t.history}</p>
-    ${t.predTitle ? `<div style="margin-top:16px;padding:14px;background:rgba(240,192,64,0.07);border-radius:10px;border-left:3px solid var(--gold)">
-      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:4px">${t.predTitle}</div>
+    ${t.predTitle ? `<div style="margin-top:16px;padding:14px;background:var(--accent-bg);border-radius:10px;border-left:3px solid var(--accent)">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px">${t.predTitle}</div>
       <div style="font-size:13px;color:var(--text-secondary)">${t.predDesc||''}</div>
     </div>` : ''}`;
   document.getElementById('team-modal').classList.add('open');
@@ -2244,8 +2244,8 @@ function openMyPredInput(matchId, hName, aName) {
   overlay.id = 'my-pred-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px';
   overlay.innerHTML = `
-    <div style="background:#1a1a2e;border-radius:20px;padding:28px 24px;max-width:320px;width:100%;border:1px solid rgba(240,192,64,0.2)">
-      <div style="font-size:20px;font-weight:900;text-align:center;margin-bottom:6px;color:var(--gold)">🎯 你的預測</div>
+    <div style="background:#1a1a2e;border-radius:20px;padding:28px 24px;max-width:320px;width:100%;border:1px solid var(--accent-border)">
+      <div style="font-size:20px;font-weight:900;text-align:center;margin-bottom:6px;color:var(--accent)">🎯 你的預測</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:20px">${hName} vs ${aName}</div>
       <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px">
         <div style="text-align:center">
