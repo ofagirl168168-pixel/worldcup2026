@@ -12,6 +12,15 @@ var GK = {
 const load = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
 const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
+// 同步 GK 鍵值前綴：確保讀寫的 localStorage key 對應當前賽事
+function _syncGK() {
+  const p = (window.Tournament?.isUCL?.()) ? 'ucl26_' : 'wc26_';
+  GK.team = p + 'team';
+  GK.champion = p + 'champion';
+  GK.groups = p + 'groups';
+  GK.daily = p + 'daily';
+}
+
 // ── 每日題庫 ─────────────────────────────────────────────
 // type: 'normal'=一般 | 'hard'=高難度（讓人想問朋友）| 'viral'=話題性/出人意料
 const DAILY_QUESTIONS = [
@@ -185,6 +194,7 @@ function getTodayQuestion() {
 
 // ── 連勝天數計算 ──────────────────────────────────────────
 function getDailyState() {
+  _syncGK();
   return load(GK.daily) || { streak:0, lastDate:null, history:{} };
 }
 
@@ -221,6 +231,7 @@ const LEVEL_GEM_REWARDS = { 2:2, 3:2, 5:3, 7:3, 10:5, 15:5, 20:10 };
 
 // 計算 XP 與等級（共用）
 function calcXPLevel() {
+  _syncGK();
   const dailyState  = getDailyState();
   const myChampion  = load(GK.champion);
   const myGroups    = load(GK.groups);
@@ -263,6 +274,7 @@ function updateNavXP() {
 
 // ── 導覽列紅點徽章 ────────────────────────────────────────
 function updateArenaBadge() {
+  _syncGK();
   const today      = localDateStr();
   const dailyDone  = (load(GK.daily)?.history?.[today] !== undefined);
   const champDone  = !!load(GK.champion);
@@ -288,6 +300,7 @@ function updateArenaBadge() {
 
 // ── 首頁今日挑戰卡 ────────────────────────────────────────
 function renderHomeDailyChallenge() {
+  _syncGK();
   const el = document.getElementById('home-daily-section');
   if (!el) return;
 
@@ -376,6 +389,7 @@ function submitDailyPickHome(idx) {
 
 // ── 首次進站提示（每 7 天出現一次）──────────────────────────
 function showArenaWelcomeIfNeeded() {
+  _syncGK();
   const KEY = 'wc26_welcome_shown';
   const last = localStorage.getItem(KEY);
   const now  = Date.now();
@@ -418,6 +432,8 @@ function showArenaWelcomeIfNeeded() {
 function renderArena() {
   const el = document.getElementById('section-arena');
   if (!el) return;
+
+  _syncGK();
 
   const myTeam     = load(GK.team);
   const myChampion = load(GK.champion);
@@ -763,6 +779,7 @@ function showDailyOracle(btnEl) {
 
 // ── ② 冠軍預測 Modal ──────────────────────────────────────
 function openChampionPick() {
+  _syncGK();
   const current = load(GK.champion);
   const { votes, total } = getSimVotes();
   const _isUcl = window.Tournament?.isUCL?.() ?? false;
@@ -827,6 +844,7 @@ function selectChampTeam(role, code) {
 }
 
 function saveChampionPick() {
+  _syncGK();
   const picks = document.getElementById('champ-picks');
   const c1 = picks.dataset.c1, c2 = picks.dataset.c2, c3 = picks.dataset.c3;
   if (!c1 || !c2 || !c3) { alert('請選擇冠、亞、季軍各一支球隊'); return; }
@@ -844,6 +862,7 @@ function saveChampionPick() {
 
 // ── ③ 分組賽預測 Modal ────────────────────────────────────
 function openGroupPicks() {
+  _syncGK();
   const current = load(GK.groups) || {};
   const groupKeys = Object.keys(GROUPS).sort();
 
@@ -903,6 +922,7 @@ function toggleGroupPick(group, code, el) {
 }
 
 function saveGroupPicks() {
+  _syncGK();
   const groups = {};
   let incomplete = 0;
   document.querySelectorAll('.group-pick-teams').forEach(container => {
@@ -1576,6 +1596,7 @@ function roundRect(ctx, x, y, w, h, r) {
 
 // ── ④ 支持球隊 Modal ──────────────────────────────────────
 function openTeamSupport() {
+  _syncGK();
   const current = load(GK.team);
   const _isUcl = window.Tournament?.isUCL?.() ?? false;
   const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
@@ -1616,6 +1637,7 @@ function selectSupportTeam(code) {
 }
 
 function saveSupportTeam() {
+  _syncGK();
   const code = _pendingSupportTeam || load(GK.team);
   if (!code) { alert('請選擇一支球隊'); return; }
   save(GK.team, code);
@@ -1648,6 +1670,7 @@ function loadBadges() {
 }
 
 function checkAchievements() {
+  _syncGK();
   const earned    = loadBadges();
   const earnedIds = new Set(earned.map(b => b.id));
   const newOnes   = [];
