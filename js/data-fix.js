@@ -325,29 +325,31 @@ function buildRealSchedule() {
 // 覆蓋 SCHEDULE，並初始化所有頁面
 window.addEventListener('load', () => {
   SCHEDULE = buildRealSchedule();
+  // 安全執行：單一模組失敗不影響其他模組
+  const _safe = (fn, label) => { try { fn(); } catch(e) { console.error('['+label+']', e); } };
   // 首頁
-  renderChampions();
-  renderUpcoming();
-  renderDeathGroups();
-  renderHighlights();
+  _safe(() => renderChampions(), 'renderChampions');
+  _safe(() => renderUpcoming(), 'renderUpcoming');
+  _safe(() => renderDeathGroups(), 'renderDeathGroups');
+  _safe(() => renderHighlights(), 'renderHighlights');
   // 預先渲染賽程（讓使用者點進去就有資料）
-  renderSchedule('all', 'all');
+  _safe(() => renderSchedule('all', 'all'), 'renderSchedule');
   // 預先渲染球隊
-  renderTeams('all', '');
+  _safe(() => renderTeams('all', ''), 'renderTeams');
   // 預先渲染數據
-  renderStats('standings');
+  _safe(() => renderStats('standings'), 'renderStats');
   // 預先渲染文章
-  renderFocus();
+  _safe(() => renderFocus(), 'renderFocus');
   // 預先渲染AI預測
-  renderPredictions();
+  _safe(() => renderPredictions(), 'renderPredictions');
   // 載入 GitHub Actions 統計資料（積分榜、射手榜等）
-  applyLiveData();
+  _safe(() => applyLiveData(), 'applyLiveData');
   // 啟動 ESPN 即時比分 ticker（每 60 秒，比賽進行中才顯示）
-  initLiveScoreTicker();
+  _safe(() => initLiveScoreTicker(), 'initLiveScoreTicker');
   // 競技場：預先渲染 + 主動推送
-  renderArena();
-  renderHomeDailyChallenge();  // 首頁嵌入今日一題
-  updateArenaBadge();          // 導覽列紅點
-  updateNavXP();               // 導覽列 XP 等級
-  showArenaWelcomeIfNeeded();  // 首次進站提示
+  _safe(() => renderArena(), 'renderArena');
+  _safe(() => renderHomeDailyChallenge(), 'renderHomeDailyChallenge');
+  _safe(() => updateArenaBadge(), 'updateArenaBadge');
+  _safe(() => updateNavXP(), 'updateNavXP');
+  _safe(() => showArenaWelcomeIfNeeded(), 'showArenaWelcomeIfNeeded');
 });

@@ -50,14 +50,15 @@ if (window.Tournament) {
 }
 
 /* ── 賽事感知資料取得器 ───────────────────────────── */
+// 注意：WC 資料用 const 宣告（不在 window 上），UCL 資料有 window 導出
 function _isUCL() { return window.Tournament?.isUCL?.() ?? false; }
-function _teams() { return _isUCL() ? (window.UCL_TEAMS||{}) : (window.TEAMS||{}); }
+function _teams() { return _isUCL() ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {}); }
 function _matches() {
   if (_isUCL()) return (window.UCL_MATCHES||[]);
-  return window.SCHEDULE?.length ? window.SCHEDULE : [];
+  return (typeof SCHEDULE!=='undefined' && SCHEDULE.length) ? SCHEDULE : [];
 }
-function _articles() { return _isUCL() ? (window.UCL_ARTICLES||[]) : (window.ARTICLES||[]); }
-function _dailyQ() { return _isUCL() ? (window.UCL_DAILY_QUESTIONS||[]) : (window.DAILY_QUESTIONS||[]); }
+function _articles() { return _isUCL() ? (window.UCL_ARTICLES||[]) : (typeof ARTICLES!=='undefined' ? ARTICLES : []); }
+function _dailyQ() { return _isUCL() ? (window.UCL_DAILY_QUESTIONS||[]) : (typeof DAILY_QUESTIONS!=='undefined' ? DAILY_QUESTIONS : []); }
 
 /* app.js — 導覽 + 倒計時 + 首頁 */
 

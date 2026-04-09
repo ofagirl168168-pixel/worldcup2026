@@ -85,11 +85,11 @@
       if (window.UCL_DAILY_QUESTIONS) window._activeDailyQ = window.UCL_DAILY_QUESTIONS;
       if (window.UCL_ARTICLES) window._activeArticles = window.UCL_ARTICLES;
     } else {
-      // 世界盃資料 → 全域
-      if (window.TEAMS)    window._activeTeams = window.TEAMS;
-      if (window.SCHEDULE) window._activeMatches = window.SCHEDULE;
-      if (window.DAILY_QUESTIONS) window._activeDailyQ = window.DAILY_QUESTIONS;
-      if (window.ARTICLES) window._activeArticles = window.ARTICLES;
+      // 世界盃資料 → 全域（const 宣告不在 window 上，需用 typeof 檢查）
+      if (typeof TEAMS !== 'undefined')           window._activeTeams = TEAMS;
+      if (typeof SCHEDULE !== 'undefined')        window._activeMatches = SCHEDULE;
+      if (typeof DAILY_QUESTIONS !== 'undefined') window._activeDailyQ = DAILY_QUESTIONS;
+      if (typeof ARTICLES !== 'undefined')        window._activeArticles = ARTICLES;
     }
 
     // 更新 game.js 的 GK（localStorage key）
