@@ -24,12 +24,15 @@ function flagImg(emoji) {
 if (window.Tournament) {
   Tournament.init();
   Tournament.bind();
+  updateHero();
   // 賽事切換時重新渲染當前頁面
   window.addEventListener('tournamentChanged', () => {
     const activeSection = document.querySelector('.page-section.active')?.id?.replace('section-','');
+    updateHero();
     if (activeSection === 'home' || !activeSection) {
       renderChampions();
-      updateCountdown();
+      renderUpcoming();
+      renderDeathGroups();
       if (typeof renderDailyChallenge === 'function') renderDailyChallenge();
     }
     if (activeSection === 'schedule')    renderSchedule('all','all');
@@ -1181,6 +1184,31 @@ function generateAnalysis(ht, at, pred) {
 
 function closeModal() {
   document.getElementById('team-modal').classList.remove('open');
+}
+
+// ── 首頁 Hero 區塊切換 ──────────────────────────────────
+function updateHero() {
+  const isUcl = _isUCL();
+  const badge = document.getElementById('hero-badge');
+  const title = document.getElementById('hero-title');
+  const desc  = document.getElementById('hero-desc');
+  const date  = document.getElementById('countdown-date');
+  const stats = document.getElementById('hero-stats');
+  const label = document.querySelector('.countdown-label');
+  if (badge) badge.textContent = isUcl ? '🏆 UEFA CHAMPIONS LEAGUE 2025/26' : '🏆 2026 FIFA WORLD CUP';
+  if (title) title.innerHTML   = isUcl ? '歐冠<br><span class="hero-highlight">預測分析平台</span>' : '世界盃<br><span class="hero-highlight">預測分析平台</span>';
+  if (desc)  desc.textContent  = isUcl ? '結合AI數據分析，帶你深入解讀2025/26歐冠聯賽每一場對決' : '結合AI數據分析與專家洞察，帶你深入解讀2026美加墨世界盃每一場賽事';
+  if (date)  date.textContent  = isUcl ? '2025年9月17日 開幕 · 歐洲各地' : '2026年6月11日 開幕 · 美國 / 加拿大 / 墨西哥';
+  if (label) label.textContent = isUcl ? '歐冠賽季進行中' : '距離開幕還有';
+  if (stats) stats.innerHTML   = isUcl
+    ? `<div class="hero-stat"><span class="hero-stat-num">36</span><span class="hero-stat-label">參賽球會</span></div>
+       <div class="hero-stat"><span class="hero-stat-num">189</span><span class="hero-stat-label">場比賽</span></div>
+       <div class="hero-stat"><span class="hero-stat-num">8</span><span class="hero-stat-label">聯賽輪次</span></div>
+       <div class="hero-stat"><span class="hero-stat-num">QF</span><span class="hero-stat-label">目前階段</span></div>`
+    : `<div class="hero-stat"><span class="hero-stat-num">48</span><span class="hero-stat-label">參賽球隊</span></div>
+       <div class="hero-stat"><span class="hero-stat-num">104</span><span class="hero-stat-label">場比賽</span></div>
+       <div class="hero-stat"><span class="hero-stat-num">16</span><span class="hero-stat-label">比賽場館</span></div>
+       <div class="hero-stat"><span class="hero-stat-num">39</span><span class="hero-stat-label">比賽天數</span></div>`;
 }
 
 // 倒計時
