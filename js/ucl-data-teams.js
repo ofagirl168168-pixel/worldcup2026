@@ -8,7 +8,7 @@ const UCL_TEAMS = {
 
   // ===== POT 1 =====
   'RMA': {
-    name:'Real Madrid', nameCN:'皇家馬德里', flag:'🇪🇸', pot:1, league:'La Liga',
+    name:'Real Madrid', nameCN:'皇家馬德里', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/80px-Real_Madrid_CF.svg.png', pot:1, league:'La Liga',
     uefaCoeff:136, coach:'Carlo Ancelotti', formation:'4-3-1-2',
     keyPlayers:[
       {name:'Jude Bellingham',pos:'攻擊中場',club:'皇家馬德里'},
@@ -24,7 +24,7 @@ const UCL_TEAMS = {
     history:'歐冠史上最成功球隊，15次奪冠，2023/24衛冕冠軍'
   },
   'MCI': {
-    name:'Manchester City', nameCN:'曼城', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', pot:1, league:'Premier League',
+    name:'Manchester City', nameCN:'曼城', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/Manchester_City_FC_badge.svg/80px-Manchester_City_FC_badge.svg.png', pot:1, league:'Premier League',
     uefaCoeff:148, coach:'Pep Guardiola', formation:'4-3-3',
     keyPlayers:[
       {name:'Erling Haaland',pos:'中鋒',club:'曼城'},
@@ -40,7 +40,7 @@ const UCL_TEAMS = {
     history:'2022/23首奪歐冠，近年穩定進入八強以上'
   },
   'BAY': {
-    name:'Bayern Munich', nameCN:'拜仁慕尼黑', flag:'🇩🇪', pot:1, league:'Bundesliga',
+    name:'Bayern Munich', nameCN:'拜仁慕尼黑', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/FC_Bayern_M%C3%BCnchen_logo_%282024%29.svg/80px-FC_Bayern_M%C3%BCnchen_logo_%282024%29.svg.png', pot:1, league:'Bundesliga',
     uefaCoeff:144, coach:'Vincent Kompany', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Harry Kane',pos:'中鋒',club:'拜仁慕尼黑'},
@@ -56,7 +56,7 @@ const UCL_TEAMS = {
     history:'6次歐冠冠軍，2019/20最近一次奪冠'
   },
   'PSG': {
-    name:'Paris Saint-Germain', nameCN:'巴黎聖日耳曼', flag:'🇫🇷', pot:1, league:'Ligue 1',
+    name:'Paris Saint-Germain', nameCN:'巴黎聖日耳曼', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Paris_Saint-Germain_F.C..svg/80px-Paris_Saint-Germain_F.C..svg.png', pot:1, league:'Ligue 1',
     uefaCoeff:116, coach:'Luis Enrique', formation:'4-3-3',
     keyPlayers:[
       {name:'Ousmane Dembélé',pos:'右翼',club:'巴黎聖日耳曼'},
@@ -72,7 +72,7 @@ const UCL_TEAMS = {
     history:'2019/20首進歐冠決賽，歷史最佳成績亞軍'
   },
   'LIV': {
-    name:'Liverpool', nameCN:'利物浦', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', pot:1, league:'Premier League',
+    name:'Liverpool', nameCN:'利物浦', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Liverpool_FC.svg/80px-Liverpool_FC.svg.png', pot:1, league:'Premier League',
     uefaCoeff:114, coach:'Arne Slot', formation:'4-3-3',
     keyPlayers:[
       {name:'Mohamed Salah',pos:'右翼',club:'利物浦'},
@@ -88,7 +88,7 @@ const UCL_TEAMS = {
     history:'6次歐冠冠軍，2018/19最近一次奪冠'
   },
   'INT': {
-    name:'Inter Milan', nameCN:'國際米蘭', flag:'🇮🇹', pot:1, league:'Serie A',
+    name:'Inter Milan', nameCN:'國際米蘭', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/FC_Internazionale_Milano_2021.svg/80px-FC_Internazionale_Milano_2021.svg.png', pot:1, league:'Serie A',
     uefaCoeff:101, coach:'Simone Inzaghi', formation:'3-5-2',
     keyPlayers:[
       {name:'Lautaro Martínez',pos:'前鋒',club:'國際米蘭'},
@@ -104,7 +104,7 @@ const UCL_TEAMS = {
     history:'3次歐冠冠軍，2022/23打入決賽'
   },
   'DOR': {
-    name:'Borussia Dortmund', nameCN:'多特蒙德', flag:'🇩🇪', pot:1, league:'Bundesliga',
+    name:'Borussia Dortmund', nameCN:'多特蒙德', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Borussia_Dortmund_logo.svg/80px-Borussia_Dortmund_logo.svg.png', pot:1, league:'Bundesliga',
     uefaCoeff:97, coach:'Nuri Şahin', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Karim Adeyemi',pos:'翼鋒',club:'多特蒙德'},
@@ -120,7 +120,7 @@ const UCL_TEAMS = {
     history:'1996/97歐冠冠軍，2023/24打入決賽'
   },
   'BAR': {
-    name:'FC Barcelona', nameCN:'巴塞隆納', flag:'🇪🇸', pot:1, league:'La Liga',
+    name:'FC Barcelona', nameCN:'巴塞隆納', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_%28crest%29.svg/80px-FC_Barcelona_%28crest%29.svg.png', pot:1, league:'La Liga',
     uefaCoeff:122, coach:'Hansi Flick', formation:'4-3-3',
     keyPlayers:[
       {name:'Lamine Yamal',pos:'右翼',club:'巴塞隆納'},
@@ -136,7 +136,7 @@ const UCL_TEAMS = {
     history:'5次歐冠冠軍，2014/15最近一次奪冠'
   },
   'LEV': {
-    name:'Bayer Leverkusen', nameCN:'勒沃庫森', flag:'🇩🇪', pot:1, league:'Bundesliga',
+    name:'Bayer Leverkusen', nameCN:'勒沃庫森', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/5/59/Bayer_04_Leverkusen_logo.svg/80px-Bayer_04_Leverkusen_logo.svg.png', pot:1, league:'Bundesliga',
     uefaCoeff:90, coach:'Xabi Alonso', formation:'3-4-2-1',
     keyPlayers:[
       {name:'Florian Wirtz',pos:'攻擊中場',club:'勒沃庫森'},
@@ -154,7 +154,7 @@ const UCL_TEAMS = {
 
   // ===== POT 2 =====
   'ATM': {
-    name:'Atlético Madrid', nameCN:'馬德里競技', flag:'🇪🇸', pot:2, league:'La Liga',
+    name:'Atlético Madrid', nameCN:'馬德里競技', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/f/f9/Atletico_Madrid_Logo_2024.svg/80px-Atletico_Madrid_Logo_2024.svg.png', pot:2, league:'La Liga',
     uefaCoeff:104, coach:'Diego Simeone', formation:'3-5-2',
     keyPlayers:[
       {name:'Antoine Griezmann',pos:'前鋒/攻擊中場',club:'馬德里競技'},
@@ -170,7 +170,7 @@ const UCL_TEAMS = {
     history:'2013/14、2015/16兩次歐冠亞軍'
   },
   'ATA': {
-    name:'Atalanta', nameCN:'亞特蘭大', flag:'🇮🇹', pot:2, league:'Serie A',
+    name:'Atalanta', nameCN:'亞特蘭大', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/6/66/AtalantaBC.svg/80px-AtalantaBC.svg.png', pot:2, league:'Serie A',
     uefaCoeff:81, coach:'Gian Piero Gasperini', formation:'3-4-1-2',
     keyPlayers:[
       {name:'Ademola Lookman',pos:'前鋒',club:'亞特蘭大'},
@@ -186,7 +186,7 @@ const UCL_TEAMS = {
     history:'2023/24歐聯冠軍，歐冠最佳成績2019/20八強'
   },
   'JUV': {
-    name:'Juventus', nameCN:'尤文圖斯', flag:'🇮🇹', pot:2, league:'Serie A',
+    name:'Juventus', nameCN:'尤文圖斯', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Juventus_FC_-_logo_black_%28Italy%2C_2020%29.svg/80px-Juventus_FC_-_logo_black_%28Italy%2C_2020%29.svg.png', pot:2, league:'Serie A',
     uefaCoeff:80, coach:'Thiago Motta', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Dušan Vlahović',pos:'中鋒',club:'尤文圖斯'},
@@ -202,7 +202,7 @@ const UCL_TEAMS = {
     history:'2次歐冠冠軍（1985、1996），近年多次進入淘汰賽'
   },
   'BEN': {
-    name:'Benfica', nameCN:'本菲卡', flag:'🇵🇹', pot:2, league:'Liga Portugal',
+    name:'Benfica', nameCN:'本菲卡', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/SL_Benfica_logo.svg/80px-SL_Benfica_logo.svg.png', pot:2, league:'Liga Portugal',
     uefaCoeff:79, coach:'Roger Schmidt', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Ángel Di María',pos:'右翼',club:'本菲卡'},
@@ -218,7 +218,7 @@ const UCL_TEAMS = {
     history:'2次歐冠冠軍（1961、1962），2022/23八強'
   },
   'ARS': {
-    name:'Arsenal', nameCN:'兵工廠', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', pot:2, league:'Premier League',
+    name:'Arsenal', nameCN:'兵工廠', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Arsenal_FC.svg/80px-Arsenal_FC.svg.png', pot:2, league:'Premier League',
     uefaCoeff:72, coach:'Mikel Arteta', formation:'4-3-3',
     keyPlayers:[
       {name:'Bukayo Saka',pos:'右翼',club:'兵工廠'},
@@ -234,7 +234,7 @@ const UCL_TEAMS = {
     history:'2005/06歐冠亞軍，近年重返歐冠行列'
   },
   'ACM': {
-    name:'AC Milan', nameCN:'AC米蘭', flag:'🇮🇹', pot:2, league:'Serie A',
+    name:'AC Milan', nameCN:'AC米蘭', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Logo_of_AC_Milan.svg/80px-Logo_of_AC_Milan.svg.png', pot:2, league:'Serie A',
     uefaCoeff:76, coach:'Paulo Fonseca', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Rafael Leão',pos:'左翼',club:'AC米蘭'},
@@ -250,7 +250,7 @@ const UCL_TEAMS = {
     history:'7次歐冠冠軍，2022/23四強'
   },
   'NAP': {
-    name:'Napoli', nameCN:'拿坡里', flag:'🇮🇹', pot:2, league:'Serie A',
+    name:'Napoli', nameCN:'拿坡里', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/SSC_Napoli_2025_%28white_and_azure%29.svg/80px-SSC_Napoli_2025_%28white_and_azure%29.svg.png', pot:2, league:'Serie A',
     uefaCoeff:68, coach:'Antonio Conte', formation:'3-4-2-1',
     keyPlayers:[
       {name:'Victor Osimhen',pos:'中鋒',club:'拿坡里'},
@@ -266,7 +266,7 @@ const UCL_TEAMS = {
     history:'歐冠最佳成績2022/23八強，隊史首次'
   },
   'CHE': {
-    name:'Chelsea', nameCN:'乂爾西', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', pot:2, league:'Premier League',
+    name:'Chelsea', nameCN:'乂爾西', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/c/cc/Chelsea_FC.svg/80px-Chelsea_FC.svg.png', pot:2, league:'Premier League',
     uefaCoeff:66, coach:'Enzo Maresca', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Cole Palmer',pos:'攻擊中場/右翼',club:'乂爾西'},
@@ -282,7 +282,7 @@ const UCL_TEAMS = {
     history:'2020/21歐冠冠軍，2次奪冠（2012、2021）'
   },
   'MON': {
-    name:'AS Monaco', nameCN:'摩納哥', flag:'🇫🇷', pot:2, league:'Ligue 1',
+    name:'AS Monaco', nameCN:'摩納哥', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/c/cf/LogoASMonacoFC2021.svg/80px-LogoASMonacoFC2021.svg.png', pot:2, league:'Ligue 1',
     uefaCoeff:34, coach:'Adi Hütter', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Wissam Ben Yedder',pos:'前鋒',club:'摩納哥'},
@@ -300,7 +300,7 @@ const UCL_TEAMS = {
 
   // ===== POT 3 =====
   'SCP': {
-    name:'Sporting CP', nameCN:'里斯本競技', flag:'🇵🇹', pot:3, league:'Liga Portugal',
+    name:'Sporting CP', nameCN:'里斯本競技', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/9/95/Sporting_CP_crest.svg/80px-Sporting_CP_crest.svg.png', pot:3, league:'Liga Portugal',
     uefaCoeff:54, coach:'Rúben Amorim', formation:'3-4-3',
     keyPlayers:[
       {name:'Viktor Gyökeres',pos:'中鋒',club:'里斯本競技'},
@@ -316,7 +316,7 @@ const UCL_TEAMS = {
     history:'歐冠最佳成績2008/09十六強'
   },
   'PSV': {
-    name:'PSV Eindhoven', nameCN:'PSV恩荷芬', flag:'🇳🇱', pot:3, league:'Eredivisie',
+    name:'PSV Eindhoven', nameCN:'PSV恩荷芬', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/0/05/PSV_Eindhoven.svg/80px-PSV_Eindhoven.svg.png', pot:3, league:'Eredivisie',
     uefaCoeff:52, coach:'Peter Bosz', formation:'4-3-3',
     keyPlayers:[
       {name:'Johan Bakayoko',pos:'右翼',club:'PSV恩荷芬'},
@@ -332,7 +332,7 @@ const UCL_TEAMS = {
     history:'1987/88歐冠冠軍，近年重返歐冠'
   },
   'FEY': {
-    name:'Feyenoord', nameCN:'飛燕諾', flag:'🇳🇱', pot:3, league:'Eredivisie',
+    name:'Feyenoord', nameCN:'飛燕諾', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Feyenoord_logo_since_2024.svg/80px-Feyenoord_logo_since_2024.svg.png', pot:3, league:'Eredivisie',
     uefaCoeff:46, coach:'Brian Priske', formation:'4-3-3',
     keyPlayers:[
       {name:'Santiago Giménez',pos:'中鋒',club:'飛燕諾'},
@@ -348,7 +348,7 @@ const UCL_TEAMS = {
     history:'1969/70歐冠冠軍，2022/23重返歐冠'
   },
   'CEL': {
-    name:'Celtic', nameCN:'塞爾提克', flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', pot:3, league:'Scottish Premiership',
+    name:'Celtic', nameCN:'塞爾提克', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/7/71/Celtic_FC_crest.svg/80px-Celtic_FC_crest.svg.png', pot:3, league:'Scottish Premiership',
     uefaCoeff:32, coach:'Brendan Rodgers', formation:'4-3-3',
     keyPlayers:[
       {name:'Kyogo Furuhashi',pos:'中鋒',club:'塞爾提克'},
@@ -364,7 +364,7 @@ const UCL_TEAMS = {
     history:'1966/67歐冠冠軍（里斯本雄獅），歷史悠久'
   },
   'AVL': {
-    name:'Aston Villa', nameCN:'阿斯頓維拉', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', pot:3, league:'Premier League',
+    name:'Aston Villa', nameCN:'阿斯頓維拉', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Aston_Villa_FC_new_crest.svg/80px-Aston_Villa_FC_new_crest.svg.png', pot:3, league:'Premier League',
     uefaCoeff:30, coach:'Unai Emery', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Ollie Watkins',pos:'中鋒',club:'阿斯頓維拉'},
@@ -380,7 +380,7 @@ const UCL_TEAMS = {
     history:'1981/82歐冠冠軍，時隔40年重返歐冠'
   },
   'NEW': {
-    name:'Newcastle United', nameCN:'紐卡索聯', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', pot:3, league:'Premier League',
+    name:'Newcastle United', nameCN:'紐卡索聯', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Newcastle_United_Logo.svg/80px-Newcastle_United_Logo.svg.png', pot:3, league:'Premier League',
     uefaCoeff:28, coach:'Eddie Howe', formation:'4-3-3',
     keyPlayers:[
       {name:'Alexander Isak',pos:'中鋒',club:'紐卡索聯'},
@@ -396,7 +396,7 @@ const UCL_TEAMS = {
     history:'歐冠最佳成績2002/03小組賽出線'
   },
   'STU': {
-    name:'VfB Stuttgart', nameCN:'斯圖加特', flag:'🇩🇪', pot:3, league:'Bundesliga',
+    name:'VfB Stuttgart', nameCN:'斯圖加特', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/VfB_Stuttgart_1893_Logo.svg/80px-VfB_Stuttgart_1893_Logo.svg.png', pot:3, league:'Bundesliga',
     uefaCoeff:26, coach:'Sebastian Hoeneß', formation:'3-4-2-1',
     keyPlayers:[
       {name:'Serhou Guirassy',pos:'中鋒',club:'斯圖加特'},
@@ -412,7 +412,7 @@ const UCL_TEAMS = {
     history:'歐冠最佳成績2009/10十六強'
   },
   'LIL': {
-    name:'LOSC Lille', nameCN:'里爾', flag:'🇫🇷', pot:3, league:'Ligue 1',
+    name:'LOSC Lille', nameCN:'里爾', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/3/3f/Lille_OSC_2018_logo.svg/80px-Lille_OSC_2018_logo.svg.png', pot:3, league:'Ligue 1',
     uefaCoeff:36, coach:'Paulo Fonseca', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Jonathan David',pos:'中鋒',club:'里爾'},
@@ -428,7 +428,7 @@ const UCL_TEAMS = {
     history:'2020/21歐冠十六強，法甲黑馬'
   },
   'MAR': {
-    name:'Olympique Marseille', nameCN:'馬賽', flag:'🇫🇷', pot:3, league:'Ligue 1',
+    name:'Olympique Marseille', nameCN:'馬賽', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Olympique_Marseille_logo.svg/80px-Olympique_Marseille_logo.svg.png', pot:3, league:'Ligue 1',
     uefaCoeff:38, coach:'Roberto De Zerbi', formation:'3-4-3',
     keyPlayers:[
       {name:'Pierre-Emerick Aubameyang',pos:'前鋒',club:'馬賽'},
@@ -446,7 +446,7 @@ const UCL_TEAMS = {
 
   // ===== POT 4 =====
   'BRU': {
-    name:'Club Brugge', nameCN:'布魯日', flag:'🇧🇪', pot:4, league:'Jupiler Pro League',
+    name:'Club Brugge', nameCN:'布魯日', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/d/d0/Club_Brugge_KV_logo.svg/80px-Club_Brugge_KV_logo.svg.png', pot:4, league:'Jupiler Pro League',
     uefaCoeff:42, coach:'Nicky Hayen', formation:'4-3-3',
     keyPlayers:[
       {name:'Andreas Skov Olsen',pos:'右翼',club:'布魯日'},
@@ -462,7 +462,7 @@ const UCL_TEAMS = {
     history:'歐冠最佳成績2022/23十六強'
   },
   'SHA': {
-    name:'Shakhtar Donetsk', nameCN:'頓內茨克礦工', flag:'🇺🇦', pot:4, league:'Ukrainian Premier League',
+    name:'Shakhtar Donetsk', nameCN:'頓內茨克礦工', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/a/a1/FC_Shakhtar_Donetsk.svg/80px-FC_Shakhtar_Donetsk.svg.png', pot:4, league:'Ukrainian Premier League',
     uefaCoeff:48, coach:'Marino Pušić', formation:'4-1-4-1',
     keyPlayers:[
       {name:'Georgiy Sudakov',pos:'攻擊中場',club:'頓內茨克礦工'},
@@ -478,7 +478,7 @@ const UCL_TEAMS = {
     history:'歐冠常客，最佳成績2010/11八強'
   },
   'POR': {
-    name:'Porto', nameCN:'波爾圖', flag:'🇵🇹', pot:4, league:'Liga Portugal',
+    name:'Porto', nameCN:'波爾圖', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/FC_Porto.svg/80px-FC_Porto.svg.png', pot:4, league:'Liga Portugal',
     uefaCoeff:56, coach:'Vítor Bruno', formation:'4-4-2',
     keyPlayers:[
       {name:'Galeno',pos:'左翼',club:'波爾圖'},
@@ -494,7 +494,7 @@ const UCL_TEAMS = {
     history:'2次歐冠冠軍（1987、2004），2003/04 Mourinho率隊奪冠'
   },
   'AJA': {
-    name:'Ajax', nameCN:'阿賈克斯', flag:'🇳🇱', pot:4, league:'Eredivisie',
+    name:'Ajax', nameCN:'阿賈克斯', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Logo_AFC_Ajax_%281928-1991%2C_2025-%29.png/80px-Logo_AFC_Ajax_%281928-1991%2C_2025-%29.png', pot:4, league:'Eredivisie',
     uefaCoeff:44, coach:'Francesco Farioli', formation:'4-3-3',
     keyPlayers:[
       {name:'Brian Brobbey',pos:'中鋒',club:'阿賈克斯'},
@@ -510,7 +510,7 @@ const UCL_TEAMS = {
     history:'4次歐冠冠軍，2018/19四強驚奇之旅'
   },
   'GAL': {
-    name:'Galatasaray', nameCN:'加拉塔薩雷', flag:'🇹🇷', pot:4, league:'Süper Lig',
+    name:'Galatasaray', nameCN:'加拉塔薩雷', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Galatasaray_S.K._Logo_2026_5-stars.svg/80px-Galatasaray_S.K._Logo_2026_5-stars.svg.png', pot:4, league:'Süper Lig',
     uefaCoeff:40, coach:'Okan Buruk', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Mauro Icardi',pos:'中鋒',club:'加拉塔薩雷'},
@@ -526,7 +526,7 @@ const UCL_TEAMS = {
     history:'歐冠最佳成績2000/01八強'
   },
   'SAL': {
-    name:'Red Bull Salzburg', nameCN:'薩爾茨堡紅牛', flag:'🇦🇹', pot:4, league:'Austrian Bundesliga',
+    name:'Red Bull Salzburg', nameCN:'薩爾茨堡紅牛', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/7/77/FC_Red_Bull_Salzburg_logo.svg/80px-FC_Red_Bull_Salzburg_logo.svg.png', pot:4, league:'Austrian Bundesliga',
     uefaCoeff:38, coach:'Pepijn Lijnders', formation:'4-4-2',
     keyPlayers:[
       {name:'Oscar Gloukh',pos:'攻擊中場',club:'薩爾茨堡紅牛'},
@@ -542,7 +542,7 @@ const UCL_TEAMS = {
     history:'歐冠常客，最佳成績2021/22十六強'
   },
   'DZA': {
-    name:'Dinamo Zagreb', nameCN:'薩格勒布迪納摩', flag:'🇭🇷', pot:4, league:'HNL',
+    name:'Dinamo Zagreb', nameCN:'薩格勒布迪納摩', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Logo_GNK_Dinamo_Zagreb_%282019%29.svg/80px-Logo_GNK_Dinamo_Zagreb_%282019%29.svg.png', pot:4, league:'HNL',
     uefaCoeff:36, coach:'Sergej Jakirović', formation:'4-3-3',
     keyPlayers:[
       {name:'Bruno Petković',pos:'前鋒',club:'薩格勒布迪納摩'},
@@ -558,7 +558,7 @@ const UCL_TEAMS = {
     history:'歐冠常客，最佳成績1998/99八強'
   },
   'BRE': {
-    name:'Stade Brestois', nameCN:'布雷斯特', flag:'🇫🇷', pot:4, league:'Ligue 1',
+    name:'Stade Brestois', nameCN:'布雷斯特', flag:'https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Stade_Brestois_29_logo.svg/80px-Stade_Brestois_29_logo.svg.png', pot:4, league:'Ligue 1',
     uefaCoeff:18, coach:'Éric Roy', formation:'4-3-3',
     keyPlayers:[
       {name:'Martin Satriano',pos:'前鋒',club:'布雷斯特'},
@@ -574,7 +574,7 @@ const UCL_TEAMS = {
     history:'隊史首次參加歐冠，法甲驚奇黑馬'
   },
   'LEI': {
-    name:'Bologna', nameCN:'博洛尼亞', flag:'🇮🇹', pot:4, league:'Serie A',
+    name:'Bologna', nameCN:'博洛尼亞', flag:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Bologna_F.C._1909_logo.svg/80px-Bologna_F.C._1909_logo.svg.png', pot:4, league:'Serie A',
     uefaCoeff:20, coach:'Vincenzo Italiano', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Joshua Zirkzee',pos:'前鋒',club:'博洛尼亞'},
