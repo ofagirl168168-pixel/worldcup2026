@@ -3,7 +3,7 @@
    ─────────────────────────────── */
 
 // ── localStorage 鍵值 ─────────────────────────────────────
-const GK = {
+var GK = {
   team:     'wc26_team',      // 支持球隊
   champion: 'wc26_champion',  // 冠軍預測 {c1,c2,c3,lockedAt}
   groups:   'wc26_groups',    // 分組預測 {A:['BRA','MEX'],...}

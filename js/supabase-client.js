@@ -312,18 +312,20 @@ async function syncArenaToSupabase(type = 'picks') {
 async function loadArenaFromSupabase() {
   if (!currentUser) return
   try {
+    const _t = window.Tournament?.current?.() ?? 'wc';
+    const prefix = _t === 'ucl' ? 'ucl26_' : 'wc26_';
     const [{ data: picks }, { data: daily }] = await Promise.all([
-      DB.from('arena_picks').select('*').eq('user_id', currentUser.id).maybeSingle(),
-      DB.from('arena_daily').select('*').eq('user_id', currentUser.id).maybeSingle()
+      DB.from('arena_picks').select('*').eq('user_id', currentUser.id).eq('tournament', _t).maybeSingle(),
+      DB.from('arena_daily').select('*').eq('user_id', currentUser.id).eq('tournament', _t).maybeSingle()
     ])
     if (picks) {
-      if (picks.champion) localStorage.setItem('wc26_champion', JSON.stringify(picks.champion))
-      if (picks.groups)   localStorage.setItem('wc26_groups',   JSON.stringify(picks.groups))
-      if (picks.team)     localStorage.setItem('wc26_team',     JSON.stringify(picks.team))
-      if (picks.badges?.length) localStorage.setItem('wc26_badges', JSON.stringify(picks.badges))
+      if (picks.champion) localStorage.setItem(prefix + 'champion', JSON.stringify(picks.champion))
+      if (picks.groups)   localStorage.setItem(prefix + 'groups',   JSON.stringify(picks.groups))
+      if (picks.team)     localStorage.setItem(prefix + 'team',     JSON.stringify(picks.team))
+      if (picks.badges?.length) localStorage.setItem(prefix + 'badges', JSON.stringify(picks.badges))
     }
     if (daily) {
-      localStorage.setItem('wc26_daily', JSON.stringify({
+      localStorage.setItem(prefix + 'daily', JSON.stringify({
         streak:   daily.streak    ?? 0,
         lastDate: daily.last_date ?? null,
         history:  daily.history   ?? {}
