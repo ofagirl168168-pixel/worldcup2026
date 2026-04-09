@@ -211,8 +211,7 @@ async function syncToSupabase() {
   }
 
   // 更新預測
-  const _t = window.Tournament?.current?.() ?? 'wc';
-  const pred = { user_id: currentUser.id, tournament: _t, updated_at: new Date().toISOString() };
+  const pred = { user_id: currentUser.id, updated_at: new Date().toISOString() };
   if (champion) {
     pred.champion_c1 = champion.c1 ?? null;
     pred.champion_c2 = champion.c2 ?? null;
@@ -222,7 +221,7 @@ async function syncToSupabase() {
   if (groups) pred.groups_data = groups;
 
   if (champion || groups) {
-    await DB.from('predictions').upsert(pred, { onConflict: 'user_id,tournament' });
+    await DB.from('predictions').upsert(pred, { onConflict: 'user_id' });
   }
 
   // 同步每日答題（只上傳新格式 {chosen, isCorrect}）
@@ -234,7 +233,6 @@ async function syncToSupabase() {
   for (const [date, rec] of entries) {
     await DB.from('daily_answers').upsert({
       user_id: currentUser.id,
-      tournament: _t,
       question_date: date,
       chosen_idx: rec.chosen,
       is_correct: rec.isCorrect
@@ -268,29 +266,26 @@ async function syncXPToProfile() {
 async function syncArenaToSupabase(type = 'picks') {
   if (!currentUser) return
   try {
-    const _t = window.Tournament?.current?.() ?? 'wc';
     if (type === 'picks' || type === 'all') {
       await DB.from('arena_picks').upsert({
         user_id:    currentUser.id,
-        tournament: _t,
         champion:   load(GK?.champion),
         groups:     load(GK?.groups),
         team:       load(GK?.team),
         badges:     load('wc26_badges') ?? [],
         updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id,tournament' })
+      }, { onConflict: 'user_id' })
     }
     if (type === 'daily' || type === 'all') {
       const state = getDailyState?.()
       if (state) {
         await DB.from('arena_daily').upsert({
           user_id:    currentUser.id,
-          tournament: _t,
           streak:     state.streak   ?? 0,
           last_date:  state.lastDate ?? null,
           history:    state.history  ?? {},
           updated_at: new Date().toISOString()
-        }, { onConflict: 'user_id,tournament' })
+        }, { onConflict: 'user_id' })
       }
     }
   } catch (e) {
