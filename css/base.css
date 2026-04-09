@@ -335,9 +335,12 @@ ul { list-style: none; }
 
 /* ---------- RWD ---------- */
 @media (max-width: 768px) {
+  .header-inner { gap: 10px; padding: 0 12px; }
+  .logo-title { font-size: 12px; }
+  .logo-sub { display: none; }
   .main-nav { display: none; }
-  .hamburger { display: flex; }
-  .tournament-switcher { order: -1; }
+  .hamburger { display: flex; margin-left: auto; flex-shrink: 0; }
+  .tournament-switcher { flex-shrink: 1; min-width: 0; }
   .tournament-btn { padding: 4px 8px; font-size: 12px; }
   .tournament-btn .t-label { display: none; }
   .mobile-nav.open { display: flex; flex-direction: column; }
