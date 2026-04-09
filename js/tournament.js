@@ -53,27 +53,86 @@
   }
 
   // ── 切換賽事 ─────────────────────────────────────
+  let _switching = false;
   function switchTournament(target) {
-    if (!TOURNAMENT_CONFIG[target] || target === _current) return;
-    _current = target;
+    if (!TOURNAMENT_CONFIG[target] || target === _current || _switching) return;
+    _switching = true;
 
-    // 更新 URL 不刷頁
-    const url = new URL(window.location);
-    if (target === DEFAULT_TOURNAMENT) {
-      url.searchParams.delete('t');
-    } else {
-      url.searchParams.set('t', target);
+    const cfg = TOURNAMENT_CONFIG[target];
+
+    // 播放轉場動畫
+    _playTransition(cfg, () => {
+      _current = target;
+
+      // 更新 URL 不刷頁
+      const url = new URL(window.location);
+      if (target === DEFAULT_TOURNAMENT) {
+        url.searchParams.delete('t');
+      } else {
+        url.searchParams.set('t', target);
+      }
+      history.replaceState(null, '', url);
+
+      // 切換全域資料
+      _swapGlobalData(target);
+
+      // 更新 UI
+      _updateSwitcherUI(target);
+
+      // 內容淡入效果
+      const main = document.getElementById('main-content');
+      if (main) {
+        main.classList.add('tt-content-enter');
+        main.addEventListener('animationend', () => main.classList.remove('tt-content-enter'), { once: true });
+      }
+
+      // 觸發事件讓各模組知道
+      window.dispatchEvent(new CustomEvent('tournamentChanged', { detail: { tournament: target } }));
+      _switching = false;
+    });
+  }
+
+  // ── 轉場動畫 ─────────────────────────────────────
+  function _playTransition(cfg, onMid) {
+    const overlay = document.createElement('div');
+    overlay.className = 'tournament-transition';
+    overlay.style.setProperty('--tt-color', cfg.color);
+
+    // 色帶刷過
+    overlay.innerHTML += '<div class="tt-wipe"></div>';
+    // 中央光環爆發
+    overlay.innerHTML += '<div class="tt-flash"></div>';
+    // 邊框閃光
+    overlay.innerHTML += '<div class="tt-border-flash"></div>';
+    // 中央 Emblem
+    overlay.innerHTML += `<div class="tt-emblem">
+      <div class="tt-emblem-icon">${cfg.emoji}</div>
+      <div class="tt-emblem-text">${cfg.shortName}</div>
+    </div>`;
+
+    // 粒子爆發（16顆）
+    const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    for (let i = 0; i < 16; i++) {
+      const angle = (Math.PI * 2 / 16) * i + (Math.random() - 0.5) * 0.4;
+      const dist = 120 + Math.random() * 200;
+      const size = 4 + Math.random() * 8;
+      const p = document.createElement('div');
+      p.className = 'tt-particle';
+      p.style.cssText = `width:${size}px;height:${size}px;left:${cx}px;top:${cy}px;` +
+        `--tx:${Math.cos(angle) * dist}px;--ty:${Math.sin(angle) * dist}px;` +
+        `animation:ttParticleFly 0.7s ${i * 15}ms cubic-bezier(0.25,0,0,1) forwards`;
+      overlay.appendChild(p);
     }
-    history.replaceState(null, '', url);
 
-    // 切換全域資料
-    _swapGlobalData(target);
+    document.body.appendChild(overlay);
 
-    // 更新 UI
-    _updateSwitcherUI(target);
+    // 動畫進行到一半時切換資料
+    setTimeout(onMid, 350);
 
-    // 觸發事件讓各模組知道
-    window.dispatchEvent(new CustomEvent('tournamentChanged', { detail: { tournament: target } }));
+    // 動畫結束後移除
+    setTimeout(() => {
+      overlay.remove();
+    }, 1000);
   }
 
   // ── 切換全域資料指標 ─────────────────────────────

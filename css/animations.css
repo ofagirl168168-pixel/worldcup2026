@@ -226,3 +226,108 @@
   100% { border-color: #f0c040; }
 }
 .arena-nav-badge { animation: badgePulse 1.5s ease-in-out infinite; }
+
+/* ========== 賽事切換轉場效果 ========== */
+.tournament-transition {
+  position: fixed; inset: 0; z-index: 99999;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* 中央光環爆發 */
+.tt-flash {
+  position: absolute; top: 50%; left: 50%;
+  width: 0; height: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, var(--tt-color) 0%, transparent 70%);
+  animation: ttFlashBurst 0.9s cubic-bezier(0.25, 0, 0, 1) forwards;
+}
+@keyframes ttFlashBurst {
+  0%   { width: 0; height: 0; opacity: 0.9; }
+  60%  { opacity: 0.6; }
+  100% { width: 300vmax; height: 300vmax; opacity: 0; }
+}
+
+/* 橫向色帶刷過 */
+.tt-wipe {
+  position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent 0%, var(--tt-color) 30%, var(--tt-color) 70%, transparent 100%);
+  opacity: 0.35;
+  animation: ttWipe 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes ttWipe {
+  0%   { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* 中央 Emoji + 文字 */
+.tt-emblem {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  animation: ttEmblemPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  filter: drop-shadow(0 0 40px var(--tt-color));
+}
+.tt-emblem-icon {
+  font-size: 72px;
+  animation: ttEmblemSpin 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.tt-emblem-text {
+  font-size: 18px; font-weight: 900; letter-spacing: 4px;
+  color: #fff; text-shadow: 0 0 30px var(--tt-color);
+  opacity: 0;
+  animation: ttTextReveal 0.4s 0.3s ease forwards;
+}
+@keyframes ttEmblemPop {
+  0%   { transform: translate(-50%, -50%) scale(0) rotate(-20deg); opacity: 0; }
+  50%  { transform: translate(-50%, -50%) scale(1.3) rotate(5deg); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+}
+@keyframes ttEmblemSpin {
+  0%   { transform: rotate(-180deg) scale(0); }
+  50%  { transform: rotate(10deg) scale(1.4); }
+  100% { transform: rotate(0deg) scale(0); }
+}
+@keyframes ttTextReveal {
+  0%   { opacity: 0; transform: translateY(10px); letter-spacing: 12px; }
+  60%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-5px); letter-spacing: 4px; }
+}
+
+/* 粒子爆發 */
+.tt-particle {
+  position: absolute; border-radius: 50%;
+  background: var(--tt-color);
+  animation: ttParticleExplode 0.8s cubic-bezier(0.25, 0, 0, 1) forwards;
+}
+@keyframes ttParticleExplode {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes ttParticleFly {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+/* 邊框閃光 */
+.tt-border-flash {
+  position: absolute; inset: 0;
+  border: 3px solid var(--tt-color);
+  opacity: 0;
+  animation: ttBorderFlash 0.6s 0.1s ease forwards;
+}
+@keyframes ttBorderFlash {
+  0%   { opacity: 0; inset: 40px; border-radius: 50%; }
+  30%  { opacity: 0.8; }
+  100% { opacity: 0; inset: -10px; border-radius: 0; }
+}
+
+/* 切換後的內容淡入 */
+.tt-content-enter {
+  animation: ttContentEnter 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes ttContentEnter {
+  from { opacity: 0; transform: scale(0.97); filter: blur(4px); }
+  to   { opacity: 1; transform: scale(1); filter: blur(0); }
+}
