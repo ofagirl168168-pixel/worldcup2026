@@ -248,10 +248,13 @@ async function syncXPToProfile() {
   try {
     const xpData     = window.calcXPLevel?.()
     if (!xpData) return
-    const dailyState = window.getDailyState?.() ?? {}
-    const history    = dailyState.history ?? {}
-    const correct    = Object.values(history).filter(v => v?.isCorrect).length
-    const total      = Object.values(history).filter(v => v !== undefined).length
+    // 合併兩個賽事的答題統計
+    let correct = 0, total = 0
+    for (const p of ['wc26_', 'ucl26_']) {
+      const h = (JSON.parse(localStorage.getItem(p + 'daily') || 'null') ?? {}).history ?? {}
+      correct += Object.values(h).filter(v => v?.isCorrect).length
+      total   += Object.values(h).filter(v => v !== undefined).length
+    }
 
     // 安全機制：本地 XP=0 時，不覆蓋遠端已有的分數
     if (xpData.xp === 0) {

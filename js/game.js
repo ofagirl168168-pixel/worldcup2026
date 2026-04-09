@@ -231,14 +231,18 @@ const LEVEL_GEM_REWARDS = { 2:2, 3:2, 5:3, 7:3, 10:5, 15:5, 20:10 };
 
 // 計算 XP 與等級（共用）
 function calcXPLevel() {
-  _syncGK();
-  const dailyState  = getDailyState();
-  const myChampion  = load(GK.champion);
-  const myGroups    = load(GK.groups);
-  const myTeam      = load(GK.team);
-  const groupsDone  = myGroups && Object.keys(myGroups).length === 12;
-  const correctCount = Object.values(dailyState.history).filter(v => v && v.isCorrect).length;
-  const xp      = correctCount * 10 + (myChampion ? 50 : 0) + (groupsDone ? 50 : 0) + (myTeam ? 30 : 0);
+  // 合併世足＋歐冠兩個賽事的 XP（排行榜共用）
+  let xp = 0;
+  ['wc26_', 'ucl26_'].forEach(p => {
+    const daily  = load(p + 'daily') || { history:{} };
+    const champ  = load(p + 'champion');
+    const groups = load(p + 'groups');
+    const team   = load(p + 'team');
+    const correct = Object.values(daily.history).filter(v => v && v.isCorrect).length;
+    xp += correct * 10 + (champ ? 50 : 0)
+        + (groups && Object.keys(groups).length === 12 ? 50 : 0)
+        + (team ? 30 : 0);
+  });
   const xpPerLv = 100;
   const level   = Math.floor(xp / xpPerLv) + 1;
   const xpInLv  = xp % xpPerLv;
