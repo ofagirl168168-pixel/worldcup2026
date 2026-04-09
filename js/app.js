@@ -36,6 +36,7 @@ if (window.Tournament) {
       renderChampions();
       renderUpcoming();
       renderDeathGroups();
+      renderHighlights();
       if (typeof renderHomeDailyChallenge === 'function') renderHomeDailyChallenge();
     }
     if (activeSection === 'schedule')    renderSchedule('all','all');
@@ -236,7 +237,8 @@ function renderDeathGroups() {
 function renderHighlights() {
   const el = document.getElementById('highlights-grid');
   if (!el) return;
-  const items = [
+
+  const wcItems = [
     {title:'Messi的謝幕之旅',desc:'阿根廷衛冕，Messi最後一次世界盃，每場都可能是絕唱'},
     {title:'Ronaldo vs Messi最終章',desc:'兩大巨星同場世界盃，誰能笑到最後？'},
     {title:'日本能否首進八強？',desc:'亞洲足球的榮耀之戰，日本歐洲軍團組成史上最強陣'},
@@ -248,6 +250,21 @@ function renderHighlights() {
     {title:'比利時黃金一代謝幕',desc:'De Bruyne、Lukaku最後機會，不拿冠軍終成遺憾'},
     {title:'48隊新制帶來更多驚喜',desc:'首屆48隊制，更多黑馬、更多爆冷、更多意外'}
   ];
+
+  const uclItems = [
+    {title:'新制歐冠元年',desc:'36隊瑞士制取代傳統小組賽，8場聯賽階段讓每輪都充滿懸念'},
+    {title:'皇馬王朝能否延續？',desc:'15冠豪門加入 Mbappé 後火力全開，劍指史無前例的連霸'},
+    {title:'巴薩 Yamal 世代崛起',desc:'17歲的 Lamine Yamal 領軍，巴薩青春風暴席捲歐冠'},
+    {title:'曼城的衛冕挑戰',desc:'Haaland+De Bruyne 組合能否再次征服歐洲，Guardiola 續寫傳奇？'},
+    {title:'Arsenal 的歐冠回歸',desc:'闊別多年重返歐冠淘汰賽，Saka 領軍的槍手能走多遠？'},
+    {title:'拜仁慕尼黑的復仇之路',desc:'去年準決賽出局，Kane+Musiala 組合誓言捲土重來'},
+    {title:'PSG 後 Mbappé 時代',desc:'失去頭號球星後，Dembélé 能否扛起巴黎的歐冠夢？'},
+    {title:'國際米蘭衛冕之路',desc:'意甲霸主再戰歐冠，Lautaro 領銜的藍黑軍團實力不容小覷'},
+    {title:'多特蒙德黃牆再響',desc:'去年闖入決賽的黑馬能否再創奇蹟？黃牆威力依舊震撼'},
+    {title:'VAR 與新越位技術',desc:'半自動越位系統全面啟用，科技如何改變歐冠的判罰爭議？'}
+  ];
+
+  const items = _isUCL() ? uclItems : wcItems;
   el.innerHTML = items.map((item,i) => `
     <div class="highlight-card">
       <div class="highlight-num">${String(i+1).padStart(2,'0')}</div>
