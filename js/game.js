@@ -437,7 +437,9 @@ function renderArena() {
   const nextRewardGem = nextRewardLv ? LEVEL_GEM_REWARDS[nextRewardLv] : null;
 
   // Champion display
-  const champC1  = myChampion ? TEAMS[myChampion.c1] : null;
+  const _isUcl = window.Tournament?.isUCL?.() ?? false;
+  const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
+  const champC1  = myChampion ? _T[myChampion.c1] : null;
   const champFlag = champC1 ? `${flagImg(champC1.flag)} ${champC1.nameCN}` : '—';
 
   // Groups progress
@@ -482,7 +484,7 @@ function renderArena() {
       </div>
       <div class="arena-stat-card">
         <div class="arena-stat-icon">🎯</div>
-        <div class="arena-stat-num">${[myChampion,groupsDone,myTeam,dailyDone].filter(Boolean).length}/4</div>
+        <div class="arena-stat-num">${(_isUcl ? [myChampion,myTeam,dailyDone] : [myChampion,groupsDone,myTeam,dailyDone]).filter(Boolean).length}/${_isUcl ? 3 : 4}</div>
         <div class="arena-stat-label">任務完成</div>
       </div>
     </div>
@@ -495,7 +497,7 @@ function renderArena() {
         <div class="arena-card-badge">${dailyDone ? '✅ 今日已完成' : '🔔 待作答'}</div>
         <span class="arena-card-icon">❓</span>
         <div class="arena-card-title">每日一題</div>
-        <div class="arena-card-desc">每天一個世界盃話題，累積連勝天數，展現你的足球智慧</div>
+        <div class="arena-card-desc">每天一個${_isUcl ? '歐冠' : '世界盃'}話題，累積連勝天數，展現你的足球智慧</div>
         ${dailyState.streak > 0 ? `<div class="arena-card-streak">🔥 ${dailyState.streak} 天連勝</div>` : ''}
         <div class="arena-card-footer">
           <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.3)">
@@ -534,8 +536,8 @@ function renderArena() {
         </div>` : ''}
       </div>
 
-      <!-- ③ 分組賽預測 -->
-      <div class="arena-card ${groupsDone ? 'done' : ''}" onclick="openGroupPicks()">
+      <!-- ③ 分組賽預測（歐冠聯賽階段已結束，不顯示）-->
+      ${_isUcl ? '' : `<div class="arena-card ${groupsDone ? 'done' : ''}" onclick="openGroupPicks()">
         <div class="arena-card-badge">${groupsDone ? '✅ 全部填完' : `${groupCount}/12 組`}</div>
         <span class="arena-card-icon">📋</span>
         <div class="arena-card-title">分組賽預測</div>
@@ -559,17 +561,17 @@ function renderArena() {
           <div style="font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5">生成精美預測圖，<br>PK 好友的選隊眼光！</div>
           <button onclick="shareGroupImage()" style="flex-shrink:0;padding:7px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(33,150,243,0.25),rgba(33,150,243,0.1));border:1px solid rgba(33,150,243,0.45);color:#64b5f6;font-size:12px;font-weight:800;cursor:pointer">📊 分享預測圖</button>
         </div>` : ''}
-      </div>
+      </div>`}
 
       <!-- ④ 支持球隊 -->
       <div class="arena-card ${myTeam ? 'done' : ''}" onclick="openTeamSupport()">
         <div class="arena-card-badge">${myTeam ? '✅ 已宣示' : '尚未選擇'}</div>
-        <span class="arena-card-icon" style="font-size:44px">${myTeam && TEAMS[myTeam]?.flag ? flagImg(TEAMS[myTeam].flag) : '⚽'}</span>
-        <div class="arena-card-title">宣示支持球隊</div>
+        <span class="arena-card-icon" style="font-size:44px">${myTeam && _T[myTeam]?.flag ? flagImg(_T[myTeam].flag) : '⚽'}</span>
+        <div class="arena-card-title">宣示支持${_isUcl ? '球會' : '球隊'}</div>
         <div class="arena-card-desc">
           ${myTeam
-            ? `你支持 <strong style="color:#e91e63">${TEAMS[myTeam]?.nameCN||myTeam}</strong>，全力加油！`
-            : '選定一支你要整個世界盃陪伴的球隊'}
+            ? `你支持 <strong style="color:#e91e63">${_T[myTeam]?.nameCN||myTeam}</strong>，全力加油！`
+            : `選定一支你要整個${_isUcl ? '歐冠' : '世界盃'}陪伴的${_isUcl ? '球會' : '球隊'}`}
         </div>
         ${myTeam ? `<div id="social-team" class="arena-social-proof"></div>` : ''}
         <div class="arena-card-footer">
@@ -762,10 +764,14 @@ function showDailyOracle(btnEl) {
 function openChampionPick() {
   const current = load(GK.champion);
   const { votes, total } = getSimVotes();
-  const allCodes = Object.keys(TEAMS).sort((a,b) => (TEAMS[a].fifaRank||99) - (TEAMS[b].fifaRank||99));
+  const _isUcl = window.Tournament?.isUCL?.() ?? false;
+  const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
+  const allCodes = _isUcl
+    ? Object.keys(_T).sort((a,b) => (_T[b].uefaCoeff||0) - (_T[a].uefaCoeff||0))
+    : Object.keys(_T).sort((a,b) => (_T[a].fifaRank||99) - (_T[b].fifaRank||99));
 
   const teamOpt = (code, role, selected) => {
-    const t = TEAMS[code];
+    const t = _T[code];
     const pct = ((votes[code]||1) / total * 100).toFixed(1);
     return `<div class="champ-team-opt ${selected===code?'selected':''}" onclick="selectChampTeam('${role}','${code}')">
       <span style="font-size:22px">${flagImg(t.flag)}</span>
@@ -1570,15 +1576,19 @@ function roundRect(ctx, x, y, w, h, r) {
 // ── ④ 支持球隊 Modal ──────────────────────────────────────
 function openTeamSupport() {
   const current = load(GK.team);
-  const sorted  = Object.entries(TEAMS).sort((a,b) => (a[1].fifaRank||99) - (b[1].fifaRank||99));
+  const _isUcl = window.Tournament?.isUCL?.() ?? false;
+  const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
+  const sorted = _isUcl
+    ? Object.entries(_T).sort((a,b) => (b[1].uefaCoeff||0) - (a[1].uefaCoeff||0))
+    : Object.entries(_T).sort((a,b) => (a[1].fifaRank||99) - (b[1].fifaRank||99));
   const { votes, total } = getSimVotes();
 
   const mc = document.getElementById('modal-content');
   mc.innerHTML = `
     <div style="text-align:center;margin-bottom:20px">
       <div style="font-size:32px;margin-bottom:8px">⚽</div>
-      <div style="font-size:18px;font-weight:800">宣示支持球隊</div>
-      <div style="font-size:12px;color:var(--text-muted);margin-top:4px">選一支你要在整個世界盃陪伴的隊伍</div>
+      <div style="font-size:18px;font-weight:800">宣示支持${_isUcl ? '球會' : '球隊'}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:4px">選一支你要在整個${_isUcl ? '歐冠' : '世界盃'}陪伴的${_isUcl ? '球會' : '隊伍'}</div>
     </div>
     <div class="support-team-grid" id="support-team-grid">
       ${sorted.map(([code, t]) => {
