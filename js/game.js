@@ -309,10 +309,11 @@ function renderHomeDailyChallenge() {
     return 'dimmed';
   }
 
+  const _isUcl = window.Tournament?.isUCL?.() ?? false;
   const pendingItems = [];
-  if (!champDone)  pendingItems.push({ icon:'🏆', label:'冠軍預測', action:"openChampionPick()" });
-  if (!groupsDone) pendingItems.push({ icon:'📋', label:'分組賽預測', action:"openGroupPicks()" });
-  if (!teamDone)   pendingItems.push({ icon:'⚽', label:'選擇支持球隊', action:"openTeamSupport()" });
+  if (!champDone)            pendingItems.push({ icon:'🏆', label:'冠軍預測', action:"openChampionPick()" });
+  if (!groupsDone && !_isUcl) pendingItems.push({ icon:'📋', label:'分組賽預測', action:"openGroupPicks()" });
+  if (!teamDone)             pendingItems.push({ icon:'⚽', label:`選擇支持${_isUcl?'球會':'球隊'}`, action:"openTeamSupport()" });
 
   el.innerHTML = `
     <div class="section-header">

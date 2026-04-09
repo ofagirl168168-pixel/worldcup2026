@@ -33,7 +33,7 @@ if (window.Tournament) {
       renderChampions();
       renderUpcoming();
       renderDeathGroups();
-      if (typeof renderDailyChallenge === 'function') renderDailyChallenge();
+      if (typeof renderHomeDailyChallenge === 'function') renderHomeDailyChallenge();
     }
     if (activeSection === 'schedule')    renderSchedule('all','all');
     if (activeSection === 'teams')       renderTeams('all','');
