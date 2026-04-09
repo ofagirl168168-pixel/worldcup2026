@@ -1290,30 +1290,203 @@ function showDesktopShareModal({ blob, text, link, title, filename }) {
 async function shareChampionText() {
   const champion = load(GK.champion)
   if (!champion) return
-  const c1 = TEAMS[champion.c1]?.nameCN || champion.c1
-  const c2 = TEAMS[champion.c2]?.nameCN || champion.c2
-  const c3 = TEAMS[champion.c3]?.nameCN || champion.c3
+  const _isUcl = window.Tournament?.isUCL?.() ?? false
+  const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {})
+  const t1 = _T[champion.c1], t2 = _T[champion.c2], t3 = _T[champion.c3]
   const link = await getMyRefLink?.() || window.location.origin
-  const text = `🏆 我的 2026 世界盃冠軍預測\n🥇 冠軍：${c1}\n🥈 亞軍：${c2}\n🥉 季軍：${c3}\n\n你猜對了嗎？來挑戰我的眼光！\n${link}`
-  if (_isMobile() && navigator.share) {
-    navigator.share({ text }).catch(() => {})
-  } else {
-    showDesktopShareModal({ text, link, title: '🏆 曬我的冠軍押注' })
-  }
+  const eventName = _isUcl ? '2025/26 歐冠' : '2026 世界盃'
+  const shareText = `🏆 我的${eventName}冠軍預測\n🥇 冠軍：${t1?.nameCN||champion.c1}\n🥈 亞軍：${t2?.nameCN||champion.c2}\n🥉 季軍：${t3?.nameCN||champion.c3}\n\n你猜對了嗎？來挑戰我的眼光！\n${link}`
+
+  // QR Code
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(link)}&color=0a0f1e&bgcolor=ffffff&margin=8`
+  const [qrImg, flag1, flag2, flag3] = await Promise.all([
+    loadImg(qrUrl).catch(() => null),
+    loadImg(getFlagImgUrl(t1?.flag)).catch(() => null),
+    loadImg(getFlagImgUrl(t2?.flag)).catch(() => null),
+    loadImg(getFlagImgUrl(t3?.flag)).catch(() => null)
+  ])
+
+  const W = 800, H = 720, PAD = 36
+  const canvas = document.createElement('canvas')
+  canvas.width = W; canvas.height = H
+  const ctx = canvas.getContext('2d')
+
+  // 背景
+  const bg = ctx.createLinearGradient(0, 0, W, H)
+  bg.addColorStop(0, '#07091a'); bg.addColorStop(0.5, '#0d1030'); bg.addColorStop(1, '#07091a')
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H)
+  const glow = ctx.createRadialGradient(W/2, 180, 0, W/2, 180, 350)
+  glow.addColorStop(0, 'rgba(240,192,64,0.1)'); glow.addColorStop(1, 'transparent')
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H)
+
+  // Header
+  const s = 44
+  const shieldFill = (() => { const g = ctx.createLinearGradient(PAD, 24, PAD+48, 68); g.addColorStop(0,'#f5d26b'); g.addColorStop(1,'#e07800'); return g })()
+  drawShield(ctx, PAD + s/2, 24 + s/2, s, shieldFill)
+  ctx.fillStyle = '#f0c040'; ctx.font = `800 22px "Noto Sans TC", sans-serif`
+  ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
+  ctx.fillText(_isUcl ? '歐冠預測平台 2025/26' : '世界盃預測平台 2026', PAD + s + 12, 24 + s * 0.5)
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 13px "Noto Sans TC", sans-serif`
+  ctx.fillText('worldcup2026.pages.dev', PAD + s + 12, 24 + s * 0.5 + 22)
+  ctx.strokeStyle = 'rgba(240,192,64,0.25)'; ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(PAD, 100); ctx.lineTo(W-PAD, 100); ctx.stroke()
+
+  // 標題
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillStyle = '#f0c040'; ctx.font = `900 32px "Noto Sans TC", sans-serif`
+  ctx.fillText('🏆 我的冠軍預測', W/2, 140)
+
+  // 三強卡片
+  const medals = [
+    { label:'🥇 冠軍', name: t1?.nameCN||champion.c1, flag: flag1, color:'#f0c040', bgA:'rgba(240,192,64,0.12)', border:'rgba(240,192,64,0.5)', size:90 },
+    { label:'🥈 亞軍', name: t2?.nameCN||champion.c2, flag: flag2, color:'#c0c0c0', bgA:'rgba(192,192,192,0.08)', border:'rgba(192,192,192,0.3)', size:70 },
+    { label:'🥉 季軍', name: t3?.nameCN||champion.c3, flag: flag3, color:'#cd7f32', bgA:'rgba(205,127,50,0.08)', border:'rgba(205,127,50,0.3)', size:70 }
+  ]
+  // 冠軍居中大圖
+  const champY = 190, champFlagSize = medals[0].size
+  ctx.fillStyle = medals[0].bgA
+  ctx.strokeStyle = medals[0].border; ctx.lineWidth = 2
+  roundRect(ctx, W/2-120, champY, 240, 180, 16); ctx.fill(); ctx.stroke()
+  if (flag1) ctx.drawImage(flag1, W/2 - champFlagSize/2, champY + 16, champFlagSize, champFlagSize)
+  ctx.fillStyle = medals[0].color; ctx.font = `800 13px "Noto Sans TC", sans-serif`
+  ctx.fillText(medals[0].label, W/2, champY + champFlagSize + 28)
+  ctx.fillStyle = '#fff'; ctx.font = `900 24px "Noto Sans TC", sans-serif`
+  ctx.fillText(medals[0].name, W/2, champY + champFlagSize + 56)
+
+  // 亞軍、季軍左右
+  const subY = 400, subW = 200, subH = 140
+  ;[1, 2].forEach((mi, idx) => {
+    const m = medals[mi]
+    const cx = idx === 0 ? W/2 - 130 : W/2 + 130
+    ctx.fillStyle = m.bgA; ctx.strokeStyle = m.border; ctx.lineWidth = 1.5
+    roundRect(ctx, cx - subW/2, subY, subW, subH, 14); ctx.fill(); ctx.stroke()
+    if (m.flag) ctx.drawImage(m.flag, cx - m.size/2, subY + 12, m.size, m.size)
+    ctx.fillStyle = m.color; ctx.font = `700 12px "Noto Sans TC", sans-serif`
+    ctx.fillText(m.label, cx, subY + m.size + 22)
+    ctx.fillStyle = '#fff'; ctx.font = `800 18px "Noto Sans TC", sans-serif`
+    ctx.fillText(m.name, cx, subY + m.size + 46)
+  })
+
+  // CTA + QR
+  const qrSize = 100, qrX = PAD + 20, qrY = 570
+  ctx.fillStyle = '#fff'; roundRect(ctx, qrX-5, qrY-5, qrSize+10, qrSize+10, 8); ctx.fill()
+  if (qrImg) ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize)
+  const ctaX = qrX + qrSize + 28
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top'
+  ctx.fillStyle = '#f0c040'; ctx.font = `900 22px "Noto Sans TC", sans-serif`
+  ctx.fillText('你選誰？來押注！', ctaX, qrY + 8)
+  ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.font = `500 14px "Noto Sans TC", sans-serif`
+  ctx.fillText('掃碼或點連結，選出你的冠軍預測', ctaX, qrY + 42)
+  ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = `400 12px "Noto Sans TC", sans-serif`
+  ctx.fillText(link, ctaX, qrY + 70)
+
+  // 輸出
+  canvas.toBlob(async blob => {
+    const file = new File([blob], 'champion-prediction.png', { type: 'image/png' })
+    if (_isMobile() && navigator.share) {
+      try { await navigator.clipboard.writeText(shareText) } catch {}
+      const shareData = navigator.canShare?.({ files: [file], text: shareText })
+        ? { files: [file], title: '🏆 冠軍預測', text: shareText } : { files: [file] }
+      showToast('📋 文字已複製！分享圖片後可在聊天室貼上文字')
+      try { await navigator.share(shareData) } catch {}
+    } else {
+      showDesktopShareModal({ blob, link, filename: 'champion-prediction.png', title: '🏆 曬我的冠軍押注', text: shareText })
+    }
+  }, 'image/png')
 }
 
 // ── 支持球隊分享 ──────────────────────────────────────────
 async function shareTeamText() {
-  const team = load(GK.team)
-  if (!team) return
-  const t = TEAMS[team]
+  const teamCode = load(GK.team)
+  if (!teamCode) return
+  const _isUcl = window.Tournament?.isUCL?.() ?? false
+  const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {})
+  const t = _T[teamCode]
+  if (!t) return
   const link = await getMyRefLink?.() || window.location.origin
-  const text = `⚽ 2026 世界盃，我宣示支持 ${t?.nameCN || team}！\n整個賽事我都陪著他們！\n一起來預測世界盃吧👇\n${link}`
-  if (_isMobile() && navigator.share) {
-    navigator.share({ text }).catch(() => {})
-  } else {
-    showDesktopShareModal({ text, link, title: '⚽ 招募隊友' })
-  }
+  const eventName = _isUcl ? '2025/26 歐冠' : '2026 世界盃'
+  const shareText = `⚽ ${eventName}，我宣示支持 ${t.nameCN}！\n整個賽事我都陪著他們！\n一起來預測吧👇\n${link}`
+
+  const [qrImg, flagImg2] = await Promise.all([
+    loadImg(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(link)}&color=0a0f1e&bgcolor=ffffff&margin=8`).catch(() => null),
+    loadImg(getFlagImgUrl(t.flag)).catch(() => null)
+  ])
+
+  const W = 800, H = 600, PAD = 36
+  const canvas = document.createElement('canvas')
+  canvas.width = W; canvas.height = H
+  const ctx = canvas.getContext('2d')
+
+  // 背景
+  const bg = ctx.createLinearGradient(0, 0, W, H)
+  bg.addColorStop(0, '#07091a'); bg.addColorStop(0.5, '#0d1030'); bg.addColorStop(1, '#07091a')
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H)
+  // 球隊色光暈
+  const glow = ctx.createRadialGradient(W/2, 200, 0, W/2, 200, 300)
+  glow.addColorStop(0, 'rgba(30,136,229,0.1)'); glow.addColorStop(1, 'transparent')
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H)
+
+  // Header
+  const s = 40
+  const shieldFill = (() => { const g = ctx.createLinearGradient(PAD, 20, PAD+44, 60); g.addColorStop(0,'#f5d26b'); g.addColorStop(1,'#e07800'); return g })()
+  drawShield(ctx, PAD + s/2, 20 + s/2, s, shieldFill)
+  ctx.fillStyle = '#f0c040'; ctx.font = `800 20px "Noto Sans TC", sans-serif`
+  ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
+  ctx.fillText(_isUcl ? '歐冠預測平台 2025/26' : '世界盃預測平台 2026', PAD + s + 10, 20 + s * 0.5)
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 12px "Noto Sans TC", sans-serif`
+  ctx.fillText('worldcup2026.pages.dev', PAD + s + 10, 20 + s * 0.5 + 20)
+  ctx.strokeStyle = 'rgba(240,192,64,0.25)'; ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(PAD, 88); ctx.lineTo(W-PAD, 88); ctx.stroke()
+
+  // 中央：球隊旗幟 + 宣示文
+  const flagSize = 130
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  if (flagImg2) ctx.drawImage(flagImg2, W/2 - flagSize/2, 110, flagSize, flagSize)
+  // 光環
+  ctx.strokeStyle = 'rgba(240,192,64,0.3)'; ctx.lineWidth = 3
+  ctx.beginPath(); ctx.arc(W/2, 110 + flagSize/2, flagSize/2 + 16, 0, Math.PI*2); ctx.stroke()
+
+  ctx.fillStyle = '#fff'; ctx.font = `900 32px "Noto Sans TC", sans-serif`
+  ctx.fillText(t.nameCN, W/2, 270)
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = `600 14px "Noto Sans TC", sans-serif`
+  ctx.fillText(t.name || '', W/2, 302)
+
+  // 宣言
+  ctx.fillStyle = '#f0c040'; ctx.font = `800 20px "Noto Sans TC", sans-serif`
+  ctx.fillText(`⚽ 整個${_isUcl?'歐冠':'世界盃'}賽事，我只挺這隊！`, W/2, 350)
+  ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = `500 15px "Noto Sans TC", sans-serif`
+  ctx.fillText('你支持誰？掃碼來宣示你的主隊！', W/2, 382)
+
+  // QR + CTA
+  const qrSize = 90, qrX = PAD + 20, qrY = 420
+  ctx.fillStyle = '#fff'; roundRect(ctx, qrX-5, qrY-5, qrSize+10, qrSize+10, 8); ctx.fill()
+  if (qrImg) ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize)
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top'
+  ctx.fillStyle = '#f0c040'; ctx.font = `900 20px "Noto Sans TC", sans-serif`
+  ctx.fillText('來選你的主隊！', qrX + qrSize + 24, qrY + 8)
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = `500 13px "Noto Sans TC", sans-serif`
+  ctx.fillText('掃碼加入預測，一起為喜歡的隊伍加油', qrX + qrSize + 24, qrY + 38)
+  ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = `400 12px "Noto Sans TC", sans-serif`
+  ctx.fillText(link, qrX + qrSize + 24, qrY + 62)
+
+  // 底部裝飾線
+  const bar = ctx.createLinearGradient(0, 0, W, 0)
+  bar.addColorStop(0, 'transparent'); bar.addColorStop(0.3, '#f0c040'); bar.addColorStop(0.7, '#f0c040'); bar.addColorStop(1, 'transparent')
+  ctx.fillStyle = bar; ctx.fillRect(0, H-3, W, 3)
+
+  // 輸出
+  canvas.toBlob(async blob => {
+    const file = new File([blob], 'team-support.png', { type: 'image/png' })
+    if (_isMobile() && navigator.share) {
+      try { await navigator.clipboard.writeText(shareText) } catch {}
+      const shareData = navigator.canShare?.({ files: [file], text: shareText })
+        ? { files: [file], title: '⚽ 我支持的隊伍', text: shareText } : { files: [file] }
+      showToast('📋 文字已複製！分享圖片後可在聊天室貼上文字')
+      try { await navigator.share(shareData) } catch {}
+    } else {
+      showDesktopShareModal({ blob, link, filename: 'team-support.png', title: '⚽ 招募隊友', text: shareText })
+    }
+  }, 'image/png')
 }
 
 // ── 儲存分組後彈出分享提示 ────────────────────────────────
