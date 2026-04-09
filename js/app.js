@@ -563,37 +563,36 @@ async function openPredModal(id) {
         </div>
       </div>` : ''}
 
-      <!-- 賽事數據統計（真實數據） -->
+      <!-- 賽事數據統計（真實數據）-->
       ${m.stats ? `
       <div style="margin:20px 0">
         <div class="modal-section-title">📊 賽事數據</div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:14px;padding:0 4px">
-          <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:16px">${flagImg(ht.flag)}</span>
-            <span style="font-size:12px;font-weight:700">${ht.nameCN}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:12px;font-weight:700">${at.nameCN}</span>
-            <span style="font-size:16px">${flagImg(at.flag)}</span>
-          </div>
-        </div>
-        ${[
-          ['控球率', m.stats.poss[0], m.stats.poss[1], '%'],
-          ['射門', m.stats.shots[0], m.stats.shots[1], ''],
-          ['射正', m.stats.sot[0], m.stats.sot[1], ''],
-          ['角球', m.stats.corners[0], m.stats.corners[1], ''],
-          ['黃牌', m.stats.yellow[0], m.stats.yellow[1], ''],
-          ['撲救', m.stats.saves[0], m.stats.saves[1], '']
-        ].map(([label, hVal, aVal, unit]) => `
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-            <div style="width:45px;text-align:right;font-weight:700;font-size:14px;color:${hVal>aVal?'var(--green)':'var(--text-secondary)'}">${hVal}${unit}</div>
-            <div style="flex:1;display:flex;height:6px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,0.07)">
-              <div style="width:${hVal/(hVal+aVal||1)*100}%;background:linear-gradient(90deg,var(--blue),var(--green))"></div>
-              <div style="width:${aVal/(hVal+aVal||1)*100}%;background:linear-gradient(90deg,var(--red),#ff7043)"></div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)">
+          <div style="display:grid;grid-template-columns:1fr auto 1fr;background:rgba(255,255,255,0.05);padding:10px 16px">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:14px">${flagImg(ht.flag)}</span>
+              <span style="font-size:12px;font-weight:700">${ht.nameCN}</span>
             </div>
-            <div style="width:45px;text-align:left;font-weight:700;font-size:14px;color:${aVal>hVal?'var(--green)':'var(--text-secondary)'}">${aVal}${unit}</div>
+            <div></div>
+            <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+              <span style="font-size:12px;font-weight:700">${at.nameCN}</span>
+              <span style="font-size:14px">${flagImg(at.flag)}</span>
+            </div>
           </div>
-          <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:-6px;margin-bottom:12px">${label}</div>`).join('')}
+          ${[
+            ['控球率', m.stats.poss[0], m.stats.poss[1], '%'],
+            ['射門', m.stats.shots[0], m.stats.shots[1], ''],
+            ['射正', m.stats.sot[0], m.stats.sot[1], ''],
+            ['角球', m.stats.corners[0], m.stats.corners[1], ''],
+            ['黃牌', m.stats.yellow[0], m.stats.yellow[1], ''],
+            ['撲救', m.stats.saves[0], m.stats.saves[1], '']
+          ].map(([label, hVal, aVal, unit]) => `
+            <div style="display:grid;grid-template-columns:1fr auto 1fr;padding:10px 16px;border-top:1px solid rgba(255,255,255,0.04)">
+              <div style="font-size:15px;font-weight:800;${hVal>aVal?'color:var(--green)':'color:var(--text-secondary)'}">${hVal}${unit}</div>
+              <div style="font-size:12px;color:var(--text-muted);text-align:center;min-width:60px">${label}</div>
+              <div style="font-size:15px;font-weight:800;text-align:right;${aVal>hVal?'color:var(--green)':'color:var(--text-secondary)'}">${aVal}${unit}</div>
+            </div>`).join('')}
+        </div>
       </div>` : ''}
 
       <!-- 關鍵球員 -->
