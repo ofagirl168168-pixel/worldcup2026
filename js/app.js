@@ -35,6 +35,7 @@ if (window.Tournament) {
     if (activeSection === 'home' || !activeSection) {
       renderChampions();
       renderUpcoming();
+      renderHomeBracket();
       renderDeathGroups();
       renderHighlights();
       if (typeof renderHomeDailyChallenge === 'function') renderHomeDailyChallenge();
@@ -186,6 +187,142 @@ function renderUpcoming() {
       </div>
     </div>`;
   }).join('');
+}
+
+// 首頁：歐冠淘汰賽對陣樹
+function renderHomeBracket() {
+  const section = document.getElementById('home-bracket-section');
+  const el = document.getElementById('home-bracket');
+  if (!section || !el) return;
+
+  if (!_isUCL()) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  const T = _teams(), M = window.UCL_MATCHES || [];
+  const fm = id => M.find(m => m.id === id);
+
+  // ── 兩回合 tie 結果 ──
+  function tieR(id1, id2) {
+    const l1 = fm(id1), l2 = fm(id2);
+    const home = l1?.home || 'TBD', away = l1?.away || 'TBD';
+    const aggH = (l1?.score?.h||0) + (l2?.score?.a||0);
+    const aggA = (l1?.score?.a||0) + (l2?.score?.h||0);
+    const done = l1?.status === 'finished' && l2?.status === 'finished';
+    const partial = l1?.status === 'finished' && !done;
+    const winner = done ? (aggH > aggA ? home : aggA > aggH ? away : null) : null;
+    const dt = !done ? (l2?.date || l1?.date || '') : '';
+    // 點擊目標：優先跳到尚未開賽的最近一場
+    const clickId = l1?.status === 'finished' ? id2 : id1;
+    return { home, away, aggH, aggA, done, partial, winner, date: dt, clickId };
+  }
+
+  // ── 單場結果（決賽）──
+  function singleR(id) {
+    const m = fm(id);
+    const home = m?.home||'TBD', away = m?.away||'TBD';
+    const done = m?.status === 'finished';
+    return { home, away, aggH: m?.score?.h??null, aggA: m?.score?.a??null,
+      done, partial: false, winner: done ? (m.score.h > m.score.a ? home : m.score.a > m.score.h ? away : null) : null,
+      date: m?.date||'', venue: m?.venue, clickId: id };
+  }
+
+  // ── Bracket 資料（依對陣樹排列）──
+  const r16 = [
+    tieR('UCL-R16-06','UCL-R16-09'), tieR('UCL-R16-05','UCL-R16-10'),
+    tieR('UCL-R16-08','UCL-R16-12'), tieR('UCL-R16-01','UCL-R16-15'),
+    tieR('UCL-R16-03','UCL-R16-13'), tieR('UCL-R16-02','UCL-R16-16'),
+    tieR('UCL-R16-07','UCL-R16-11'), tieR('UCL-R16-04','UCL-R16-14'),
+  ];
+  const qf = [
+    tieR('UCL-QF-01','UCL-QF-07'), tieR('UCL-QF-02','UCL-QF-08'),
+    tieR('UCL-QF-03','UCL-QF-05'), tieR('UCL-QF-04','UCL-QF-06'),
+  ];
+  const sf = [tieR('UCL-SF-01','UCL-SF-03'), tieR('UCL-SF-02','UCL-SF-04')];
+  const fin = singleR('UCL-F-01');
+
+  // ── 隊伍行 HTML ──
+  function tmH(code, score, isW, isL) {
+    if (code === 'TBD') return `<div class="hb-tm tbd"><span class="hb-n">待定</span></div>`;
+    const t = T[code];
+    return `<div class="hb-tm${isW?' w':''}${isL?' ld':''}">
+      <span class="hb-f">${flagImg(t?.flag)}</span>
+      <span class="hb-n">${t?.nameCN||code}</span>
+      ${score !== null && score !== undefined ? `<span class="hb-s">${score}</span>` : ''}
+    </div>`;
+  }
+
+  // ── 比賽卡片 HTML ──
+  function mcH(d, col, rs, re, compact) {
+    const { home, away, aggH, aggA, done, partial, winner, date, clickId } = d;
+    const show = done || partial;
+    const hW = winner === home, aW = winner === away;
+    const hL = partial && aggH > aggA, aL = partial && aggA > aggH;
+    const cls = done ? 'done' : partial ? 'live' : 'soon';
+    const hasTBD = home === 'TBD' || away === 'TBD';
+    const click = (!hasTBD && clickId) ? ` onclick="openPredModal('${clickId}')"` : '';
+    let foot = '';
+    if (done) foot = `<div class="hb-agg">總 ${aggH}-${aggA}</div>`;
+    else if (partial) foot = `<div class="hb-dt live">🔴 次回合 ${date.slice(5).replace('-','/')}</div>`;
+    else if (date) foot = `<div class="hb-dt">${date.slice(5).replace('-','/')}</div>`;
+    return `<div class="hb-m hb-${cls}${compact?' compact':''}${click?' clickable':''}" style="grid-column:${col};grid-row:${rs}/${re}"${click}>
+      ${tmH(home, show ? aggH : null, hW, hL)}
+      ${tmH(away, show ? aggA : null, aW, aL)}
+      ${foot}
+    </div>`;
+  }
+
+  // ── 連接線 ──
+  function connH(col, rs, re) {
+    return `<div class="hb-c" style="grid-column:${col};grid-row:${rs}/${re}"></div>`;
+  }
+
+  // ── 組裝 HTML ──
+  let html = '<div class="hb-tree">';
+
+  // 標題列（row 1）
+  html += `<div class="hb-lbl" style="grid-column:1;grid-row:1">十六強</div>`;
+  html += `<div class="hb-lbl hb-lbl-active" style="grid-column:3;grid-row:1">🔴 八強</div>`;
+  html += `<div class="hb-lbl" style="grid-column:5;grid-row:1">四強</div>`;
+  html += `<div class="hb-lbl" style="grid-column:7;grid-row:1">🏆 決賽</div>`;
+
+  // R16（col 1, rows 2-9）
+  r16.forEach((d, i) => { html += mcH(d, 1, i + 2, i + 3, true); });
+
+  // R16→QF 連接線（col 2）
+  for (let i = 0; i < 4; i++) html += connH(2, i * 2 + 2, i * 2 + 4);
+
+  // QF（col 3, 每場跨2行）
+  qf.forEach((d, i) => { html += mcH(d, 3, i * 2 + 2, i * 2 + 4, false); });
+
+  // QF→SF 連接線（col 4）
+  html += connH(4, 2, 6);
+  html += connH(4, 6, 10);
+
+  // SF（col 5, 每場跨4行）
+  html += mcH(sf[0], 5, 2, 6, false);
+  html += mcH(sf[1], 5, 6, 10, false);
+
+  // SF→Final 連接線（col 6）
+  html += connH(6, 2, 10);
+
+  // 決賽（col 7, 跨全部8行）
+  const { home: fH, away: fA, aggH: fsH, aggA: fsA, done: fDone, winner: fW, date: fDate, venue: fVenue, clickId: fClick } = fin;
+  const fHw = fW === fH, fAw = fW === fA;
+  const fHasTBD = fH === 'TBD' || fA === 'TBD';
+  const fClickAttr = (!fHasTBD && fClick) ? ` onclick="openPredModal('${fClick}')"` : '';
+  let fFoot = '';
+  if (fDone) fFoot = `<div class="hb-final-score">${fsH} - ${fsA}</div>`;
+  else fFoot = `<div class="hb-dt">${(fDate||'').slice(5).replace('-','/')}${fVenue ? '<br>📍 ' + fVenue : ''}</div>`;
+  html += `<div class="hb-m hb-final-m${fDone ? ' done' : ' soon'}${fClickAttr?' clickable':''}" style="grid-column:7;grid-row:2/10"${fClickAttr}>
+    <div class="hb-trophy">🏆</div>
+    ${tmH(fH, fDone ? fsH : null, fHw, false)}
+    <div class="hb-vs">VS</div>
+    ${tmH(fA, fDone ? fsA : null, fAw, false)}
+    ${fFoot}
+  </div>`;
+
+  html += '</div>';
+  el.innerHTML = html;
 }
 
 // 首頁：死亡組指數 / 歐冠聯賽排名

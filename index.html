@@ -283,6 +283,15 @@
         <div id="upcoming-matches" class="upcoming-grid"></div>
       </div>
 
+      <!-- 歐冠淘汰賽對陣圖 (UCL only) -->
+      <div class="home-section" id="home-bracket-section" style="display:none">
+        <div class="section-header">
+          <h2><i class="fas fa-sitemap"></i> 淘汰賽對陣圖</h2>
+          <span class="section-badge">KNOCKOUT BRACKET</span>
+        </div>
+        <div id="home-bracket" class="home-bracket-wrap"></div>
+      </div>
+
       <!-- 分組死亡指數 / 歐冠聯賽排名 -->
       <div class="home-section">
         <div class="section-header" id="death-section-header">
@@ -491,5 +500,7 @@
   <script src="js/data-fix.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/gems.js"></script>
+  <!-- 歐冠即時比分載入器（從 football-data.org 自動同步） -->
+  <script src="js/ucl-live-loader.js"></script>
 </body>
 </html>

@@ -1432,6 +1432,17 @@ img.flag-img {
   .home-daily-opts { grid-template-columns: 1fr; }
   .ucl-bracket { flex-direction: column; gap: 24px; }
   .bracket-round { min-width: auto; }
+  /* 首頁對陣樹手機版 */
+  .hb-tree {
+    grid-template-columns: 100px 20px 115px 20px 115px 20px 130px;
+    min-height: 460px;
+    min-width: 600px;
+  }
+  .hb-n { font-size: 10px; }
+  .compact .hb-n { font-size: 9px; }
+  .hb-s { font-size: 11px; }
+  .hb-f img.flag-img { height: 12px; }
+  .hb-trophy { font-size: 28px; }
 }
 
 /* ========== UCL 淘汰賽對陣圖 ========== */
@@ -1492,6 +1503,146 @@ img.flag-img {
 .bracket-agg {
   text-align: center; font-size: 11px; color: var(--text-muted);
   margin-top: 4px;
+}
+
+/* ========== 首頁淘汰賽對陣樹 ========== */
+.home-bracket-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+  /* 右側漸層暗示可捲動 */
+  mask-image: linear-gradient(to right, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 92%, transparent);
+}
+.home-bracket-wrap:hover,
+.home-bracket-wrap:focus-within {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+.hb-tree {
+  display: grid;
+  grid-template-columns:
+    minmax(120px,1fr) 28px minmax(140px,1fr) 28px minmax(140px,1fr) 28px minmax(150px,1fr);
+  grid-template-rows: auto repeat(8, 1fr);
+  gap: 4px 0;
+  min-height: 540px;
+  min-width: 700px;
+  padding: 8px 0;
+}
+/* 輪次標題 */
+.hb-lbl {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 1px;
+  padding: 4px 8px 8px;
+  align-self: end;
+}
+.hb-lbl-active {
+  color: #ff4444;
+  animation: neonPulse 1.5s ease-in-out infinite;
+}
+/* 比賽卡片 */
+.hb-m {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  margin: 2px 4px;
+  align-self: center;
+  transition: var(--transition);
+}
+.hb-m.compact { padding: 2px 4px; }
+.hb-m.clickable { cursor: pointer; }
+.hb-m.clickable:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-bg);
+  transform: scale(1.04);
+  z-index: 2;
+}
+.hb-m.clickable:active { transform: scale(0.98); }
+.hb-m.hb-live {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px var(--accent-bg);
+}
+.hb-m.hb-done { border-color: rgba(76,175,80,0.25); }
+.hb-m.hb-soon { opacity: 0.7; }
+/* 隊伍行 */
+.hb-tm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px;
+  border-radius: 4px;
+  min-height: 22px;
+}
+.hb-tm + .hb-tm { border-top: 1px solid rgba(255,255,255,0.04); }
+.hb-tm.w {
+  background: rgba(76,175,80,0.12);
+  border-left: 2px solid var(--green);
+}
+.hb-tm.ld {
+  background: var(--accent-bg);
+  border-left: 2px solid var(--accent);
+}
+.hb-tm.tbd { opacity: 0.35; }
+.hb-f { font-size: 14px; flex-shrink: 0; }
+.hb-f img.flag-img { height: 14px; }
+.hb-n {
+  flex: 1; font-weight: 600; font-size: 12px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.compact .hb-n { font-size: 11px; }
+.hb-s {
+  font-weight: 800; font-size: 13px; color: var(--accent);
+  min-width: 16px; text-align: center;
+}
+.compact .hb-s { font-size: 12px; }
+/* 比分 / 日期 footer */
+.hb-agg { text-align: center; font-size: 10px; color: var(--text-muted); padding-top: 2px; }
+.hb-dt { text-align: center; font-size: 10px; color: var(--text-muted); padding-top: 2px; }
+.hb-dt.live { color: var(--accent); font-weight: 700; font-size: 9px; }
+/* 連接線 bracket connector */
+.hb-c { position: relative; }
+.hb-c::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 25%;
+  width: 55%; height: 50%;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+}
+.hb-c::after {
+  content: '';
+  position: absolute;
+  left: 55%; right: 0;
+  top: calc(50% - 1px);
+  height: 2px;
+  background: rgba(255,255,255,0.1);
+}
+/* 決賽特殊卡片 */
+.hb-final-m {
+  background: linear-gradient(135deg, var(--accent-bg-deep), var(--accent-bg));
+  border-color: var(--accent-border);
+  text-align: center;
+  padding: 12px 8px;
+  flex-direction: column;
+  align-items: center;
+}
+.hb-trophy { font-size: 36px; margin-bottom: 8px; }
+.hb-vs {
+  font-size: 11px; font-weight: 800; color: var(--text-muted);
+  padding: 4px 0; letter-spacing: 2px;
+}
+.hb-final-m .hb-tm { justify-content: center; border: none; }
+.hb-final-m .hb-tm + .hb-tm { border-top: none; }
+.hb-final-score {
+  font-size: 28px; font-weight: 900; color: var(--accent); margin-top: 8px;
 }
 
 /* ========== 賽事切換按鈕色 ========== */

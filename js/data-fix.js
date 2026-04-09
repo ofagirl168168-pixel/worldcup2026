@@ -330,6 +330,7 @@ window.addEventListener('load', () => {
   // 首頁
   _safe(() => renderChampions(), 'renderChampions');
   _safe(() => renderUpcoming(), 'renderUpcoming');
+  _safe(() => renderHomeBracket(), 'renderHomeBracket');
   _safe(() => renderDeathGroups(), 'renderDeathGroups');
   _safe(() => renderHighlights(), 'renderHighlights');
   // 預先渲染賽程（讓使用者點進去就有資料）
