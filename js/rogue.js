@@ -129,9 +129,9 @@
     if (w >= 5) types.push('captain');
     // 確保至少 1~2 個 sentry 擋中路
     const sentryCount = Math.min(1 + Math.floor(w / 2), 4);
-    // 血量指數成長，速度穩步提升
-    const hpMul  = Math.pow(1.45, w - 1);        // wave1=1x, wave3=2.1x, wave5=4.4x, wave8=16x
-    const spdMul = 1 + (w - 1) * 0.15;           // wave1=1x, wave5=1.6x, wave10=2.35x
+    // 血量成長配合主角傷害預估（每波約+25%）
+    const hpMul  = Math.pow(1.25, w - 1);        // wave3=1.56x, wave5=2.4x, wave8=4.8x, wave10=7.5x
+    const spdMul = 1 + (w - 1) * 0.12;           // wave1=1x, wave5=1.48x, wave10=2.08x
     return { count, types, hpMul, spdMul, sentryCount };
   }
 
@@ -343,6 +343,12 @@
       const step = dt / 16;
       d.z -= sp * step;
       d.x += (d.vx || 0) * step;
+      // 越靠近主角，越往中間收攏（模擬包夾）
+      const closeness = 1 - Math.max(0, d.z) / FIELD_DEPTH; // 0=球門端, 1=玩家端
+      if (closeness > 0.4) {
+        const pullStrength = (closeness - 0.4) * 0.03;
+        d.x += (d.x > 0 ? -pullStrength : pullStrength) * step;
+      }
       // 碰牆反彈 x 方向（限制在可視範圍內）
       const xBound = FIELD_HW * 0.85;
       if (d.x < -xBound + d.w) { d.x = -xBound + d.w; d.vx = Math.abs(d.vx || 0); }
@@ -457,8 +463,11 @@
   //  渲染
   // ═══════════════════════════════════════════════════════════
   function render() {
-    // 清除畫布（防殘影）
-    ctx.clearRect(0, 0, W, H);
+    // 清除畫布（防殘影）— 用實際像素大小清除
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+    ctx.restore();
 
     ctx.save();
     // screen shake
@@ -1001,8 +1010,9 @@
 
   function onClick(e) {
     const rect = cvs.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (cvs.width / rect.width);
-    const y = (e.clientY - rect.top) * (cvs.height / rect.height);
+    // 使用邏輯座標（與繪製座標一致）
+    const x = (e.clientX - rect.left) * (W / rect.width);
+    const y = (e.clientY - rect.top) * (H / rect.height);
 
     if (G.phase === 'title') {
       if (hitTest(x, y, G._startR)) {
@@ -1051,11 +1061,15 @@
 
   function resize() {
     if (!cvs) return;
+    const dpr = window.devicePixelRatio || 1;
     W = window.innerWidth;
     H = window.innerHeight;
-    cvs.width = W;
-    cvs.height = H;
-    horizY = H * 0.08;  // 地平線很高，球場佔螢幕更大比例
+    cvs.width = W * dpr;
+    cvs.height = H * dpr;
+    cvs.style.width = W + 'px';
+    cvs.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);  // 所有繪製自動縮放
+    horizY = H * 0.08;
   }
 
   function startGame() {
