@@ -31,10 +31,13 @@
     { id:'dmg30',    name:'力量訓練',   desc:'傷害 +30%',                icon:'💪', rarity:'common',    apply(s){ s.dmgMul *= 1.3; }},
     { id:'spd20',    name:'速度鞋',     desc:'球速 +20%',                icon:'👟', rarity:'common',    apply(s){ s.spdMul *= 1.2; }},
     { id:'spd40',    name:'閃電射門',   desc:'球速 +40%',                icon:'⚡', rarity:'common',    apply(s){ s.spdMul *= 1.4; }},
-    { id:'bigball',  name:'大力丸',     desc:'球體增大 20%',             icon:'⭕', rarity:'common',    apply(s){ s.ballScale *= 1.2; }},
-    { id:'bigball2', name:'巨型足球',   desc:'球體增大 40%',             icon:'🔵', rarity:'common',    apply(s){ s.ballScale *= 1.4; }},
+    { id:'bigball',  name:'大力丸',     desc:'球體+20%（增大也提升傷害）',icon:'⭕', rarity:'common',    apply(s){ s.ballScale *= 1.2; }},
+    { id:'bigball2', name:'巨型足球',   desc:'球體+40%（增大也提升傷害）',icon:'🔵', rarity:'common',    apply(s){ s.ballScale *= 1.4; }},
     { id:'rapid',    name:'快速連射',   desc:'射門冷卻 -30%',            icon:'⏩', rarity:'common',    apply(s){ s.cdMul *= 0.7; }},
+    { id:'rapid2',   name:'輕量化',     desc:'射門冷卻 -20%',            icon:'💨', rarity:'common',    apply(s){ s.cdMul *= 0.8; }},
     { id:'multi1',   name:'雙重射擊',   desc:'連續射球數量 +1',          icon:'⚽', rarity:'common',    apply(s){ s.multiShot += 1; }},
+    { id:'ironleg',  name:'鐵腿',       desc:'傷害 +50%，球速 -15%',     icon:'🦵', rarity:'common',    apply(s){ s.dmgMul *= 1.5; s.spdMul *= 0.85; }},
+    { id:'magnet',   name:'磁力門框',   desc:'球門判定寬度 +20%',        icon:'🧲', rarity:'common',    apply(s){ s.goalBonus = (s.goalBonus||0) + 0.2; }},
 
     // ── 能力卡 (rare) ──────────────────────
     { id:'burn',     name:'火焰射擊',   desc:'命中附帶灼燒（每秒 1 傷害）',icon:'🔥', rarity:'rare',  apply(s){ s.burn = true; }},
@@ -42,9 +45,16 @@
     { id:'explode',  name:'爆裂射擊',   desc:'命中時爆炸傷害周圍',       icon:'💥', rarity:'rare',    apply(s){ s.explode = true; }},
     { id:'sniper',   name:'狙擊射門',   desc:'傷害 ×2.5，球變小',        icon:'🔫', rarity:'rare',    apply(s){ s.dmgMul *= 2.5; s.ballScale *= 0.65; }},
     { id:'multi2',   name:'三重射擊',   desc:'連續射球數量 +2',          icon:'🎱', rarity:'rare',     apply(s){ s.multiShot += 2; }},
+    { id:'bounce',   name:'反彈射擊',   desc:'球碰敵人後反彈繼續飛（傷害減半）',icon:'🔄', rarity:'rare', apply(s){ s.bounce = true; }},
+    { id:'crit',     name:'致命一擊',   desc:'每次射門 20% 機率暴擊 ×3', icon:'⚡', rarity:'rare',     apply(s){ s.critPct = Math.min(0.6, (s.critPct||0) + 0.2); }},
+    { id:'gkSlow',   name:'守門員削弱', desc:'守門員移速 -30%',          icon:'🧤', rarity:'rare',     apply(s){ s.gkSlowMul = (s.gkSlowMul||1) * 0.7; }},
+    { id:'extraLife', name:'鋼鐵防線', desc:'+1 條命（上限 5）',         icon:'🛡️', rarity:'rare',    apply(s){ if(s.lives < 5) s.lives++; }},
+    { id:'guard',    name:'後衛守衛',   desc:'召喚守衛擋住靠近的敵人 5 秒',icon:'🏋️', rarity:'rare',  apply(s){ s._spawnGuard = true; }},
 
     // ── 進階卡 (epic) ──────────────────────
     { id:'power2',   name:'重砲射擊',   desc:'傷害 ×2',                  icon:'🔨', rarity:'epic',     apply(s){ s.dmgMul *= 2; }},
+    { id:'split',    name:'分裂射擊',   desc:'命中敵人後分裂成 2 顆小球', icon:'💀', rarity:'epic',     apply(s){ s.split = true; }},
+    { id:'timeSlow', name:'時間壓迫',   desc:'敵人全體速度永久 -20%',    icon:'⏱️', rarity:'epic',     apply(s){ s.globalSlow = (s.globalSlow||1) * 0.8; }},
 
     // ── 傳說卡 (legendary) ─────────────────
     { id:'ghost',    name:'幽靈球',     desc:'+10% 機率穿過敵人（上限30%）',icon:'👻', rarity:'legendary', apply(s){ s.ghostPct = Math.min(0.3, (s.ghostPct||0) + 0.1); }},
@@ -56,7 +66,7 @@
   // ═══════════════════════════════════════════════════════════
   const DTYPE = {
     normal:  { label:'防守員',   fill:'#4fc3f7', hp:3,  spd:0.30, w:44, h:62 },
-    fast:    { label:'快速前鋒', fill:'#fff176', hp:2,  spd:0.42, w:38, h:54 },
+    fast:    { label:'快速前鋒', fill:'#fff176', hp:1,  spd:0.42, w:38, h:54 },
     tank:    { label:'中後衛',   fill:'#ef5350', hp:8,  spd:0.18, w:56, h:72 },
     captain: { label:'隊長',     fill:'#ce93d8', hp:5,  spd:0.28, w:50, h:66, aura:true },
     sentry:  { label:'中路守衛', fill:'#81d4fa', hp:4,  spd:0.12, w:48, h:64 },
@@ -87,11 +97,15 @@
       dmgMul: 1, spdMul: 1, ballScale: 1, multiShot: 1, cdMul: 1,
       pierce: false, burn: false, freeze: false,
       explode: false, ghostPct: 0, vampire: false,
+      bounce: false, split: false,
+      critPct: 0, goalBonus: 0, gkSlowMul: 1, globalSlow: 1,
+      _spawnGuard: false,
       collected: [],            // card ids
 
       // entities
       balls: [],
       defs: [],
+      allies: [],               // guard allies
       gk: { x: 0, dir: 1, spd: GK_BASE_SPD, w: 50, h: 45, z: GOAL_Z - 35 },
       particles: [],
 
@@ -187,7 +201,7 @@
     G.spawnTimer = 1500;
 
     waveFlash = 1800;
-    G.gk.spd = GK_BASE_SPD + G.wave * 0.18;
+    G.gk.spd = (GK_BASE_SPD + G.wave * 0.18) * (G.gkSlowMul || 1);
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -269,7 +283,8 @@
 
     // ── 守門員 ──
     const gk = G.gk;
-    gk.x += gk.dir * gk.spd * (dt / 16);
+    const gkEffSpd = gk.spd * (G.globalSlow || 1);
+    gk.x += gk.dir * gkEffSpd * (dt / 16);
     if (gk.x > GOAL_HW - gk.w / 2) { gk.x = GOAL_HW - gk.w / 2; gk.dir = -1; }
     if (gk.x < -GOAL_HW + gk.w / 2) { gk.x = -GOAL_HW + gk.w / 2; gk.dir = 1; }
 
@@ -297,14 +312,45 @@
         if (Math.abs(b.x - d.x) < b.r + d.w * 0.4 && Math.abs(b.z - d.z) < d.h * 0.5) {
           // ghost 穿過
           if (G.ghostPct > 0 && Math.random() < G.ghostPct) { addPart(d.x, d.z, '👻', 0.6); continue; }
-          const dmg = Math.ceil(BASE_DMG * G.dmgMul);
+          // 傷害 = 基礎 × 倍率 × 球大小 × 暴擊
+          let dmg = Math.ceil(BASE_DMG * G.dmgMul * G.ballScale);
+          const isCrit = G.critPct > 0 && Math.random() < G.critPct;
+          if (isCrit) { dmg *= 3; addPart(d.x, d.z - 20, '⚡暴擊!', 0.7); }
+          // 反彈球傷害減半
+          if (b._bounced) dmg = Math.max(1, Math.ceil(dmg * 0.5));
+          // 分裂小球傷害減半
+          if (b._split) dmg = Math.max(1, Math.ceil(dmg * 0.5));
           d.hp -= dmg;
-          addPart(d.x, d.z, `-${dmg}`, 0.5);
+          addPart(d.x, d.z, isCrit ? `-${dmg}!` : `-${dmg}`, 0.5);
           if (G.burn)   d.burning = 3000;
           if (G.freeze) d.frozen  = 3000;
           if (G.explode) explodeAOE(d, dmg);
           if (d.hp <= 0) onDefKill(d);
-          if (!G.pierce) { b.alive = false; hitDef = true; break; }
+          // 分裂：命中時產生 2 顆小球繼續飛
+          if (G.split && !b._split) {
+            for (let si = 0; si < 2; si++) {
+              const angle = (si === 0 ? -0.4 : 0.4);
+              const cos = Math.cos(angle), sin = Math.sin(angle);
+              const spd = Math.sqrt(b.vx * b.vx + b.vz * b.vz) * 0.8;
+              const nvx = cos * b.vx - sin * b.vz;
+              const nvz = sin * b.vx + cos * b.vz;
+              const len = Math.sqrt(nvx * nvx + nvz * nvz) || 1;
+              G.balls.push({
+                x: b.x, z: b.z, vx: (nvx / len) * spd, vz: (nvz / len) * spd,
+                r: b.r * 0.7, alive: true, age: 0, trail: [], _split: true,
+              });
+            }
+          }
+          // 反彈：球反向繼續飛
+          if (G.bounce && !b._bounced) {
+            b.vz = -Math.abs(b.vz) * 0.7;
+            b.vx += (Math.random() - 0.5) * 2;
+            b._bounced = true;
+            hitDef = false; // 不消滅球
+          } else if (!G.pierce) {
+            b.alive = false; hitDef = true;
+          }
+          break;
         }
       }
       if (hitDef) continue;
@@ -320,7 +366,8 @@
       // 進球判定（同一波只算一次）
       if (b.z >= GOAL_Z) {
         b.alive = false;
-        if (Math.abs(b.x) < GOAL_HW && G.phase === 'playing') { onGoal(); return; }
+        const effectiveGoalHW = GOAL_HW * (1 + (G.goalBonus || 0));
+        if (Math.abs(b.x) < effectiveGoalHW && G.phase === 'playing') { onGoal(); return; }
       }
       // 飛出場外
       if (b.z < -50) b.alive = false;
@@ -337,12 +384,12 @@
         if (d.burnTick <= 0) { d.hp -= 1; d.burnTick = 1000; addPart(d.x, d.z, '🔥', 0.3); if (d.hp <= 0) onDefKill(d); }
       }
       // 前進 + 斜向移動（速度上限 0.8）
-      const rawSp = d.frozen > 0 ? d.spd * 0.5 : d.spd;
+      const rawSp = (d.frozen > 0 ? d.spd * 0.5 : d.spd) * (G.globalSlow || 1);
       const sp = Math.min(rawSp, 0.8);
       if (d.frozen > 0) d.frozen -= dt;
       const step = dt / 16;
       d.z -= sp * step;
-      d.x += (d.vx || 0) * step;
+      d.x += (d.vx || 0) * (G.globalSlow || 1) * step;
       // 越靠近主角，越往中間收攏（模擬包夾）
       const closeness = 1 - Math.max(0, d.z) / FIELD_DEPTH; // 0=球門端, 1=玩家端
       if (closeness > 0.4) {
@@ -371,6 +418,29 @@
     }
     G.defs = G.defs.filter(d => d.hp > 0);
 
+    // ── 守衛盟友 ──
+    for (const a of G.allies) {
+      a.age += dt;
+      if (a.age >= a.life) { a.alive = false; continue; }
+      // 找最近的低 z 敵人並阻擋
+      let nearest = null, nd = Infinity;
+      for (const d of G.defs) {
+        if (d.hp <= 0) continue;
+        const dist = Math.sqrt((d.x - a.x) ** 2 + (d.z - a.z) ** 2);
+        if (d.z < FIELD_DEPTH * 0.4 && dist < nd) { nd = dist; nearest = d; }
+      }
+      if (nearest && nd < 120) {
+        // 移向敵人
+        const dx = nearest.x - a.x, dz = nearest.z - a.z;
+        const len = Math.sqrt(dx * dx + dz * dz) || 1;
+        a.x += (dx / len) * 0.6 * (dt / 16);
+        a.z += (dz / len) * 0.6 * (dt / 16);
+        // 阻擋（凍結敵人移動）
+        if (nd < 50) nearest.frozen = Math.max(nearest.frozen || 0, 200);
+      }
+    }
+    G.allies = G.allies.filter(a => a.alive);
+
     // ── 粒子 ──
     for (const p of G.particles) p.age += dt;
     G.particles = G.particles.filter(p => p.age < p.life);
@@ -390,7 +460,8 @@
   function onDefKill(d) {
     G.score += 10;
     addPart(d.x, d.z, '💀', 0.7);
-    if (G.vampire && G.lives < MAX_LIVES) { G.lives++; addPart(d.x, d.z, '❤️', 0.9); }
+    const maxLives = Math.max(MAX_LIVES, G.lives); // extraLife 可能超過初始上限
+    if (G.vampire && G.lives < maxLives) { G.lives++; addPart(d.x, d.z, '❤️', 0.9); }
   }
 
   function onGoal() {
@@ -405,7 +476,7 @@
   }
 
   // 可無限疊加的純數值卡
-  const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','multi1','multi2','power2']);
+  const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','rapid2','multi1','multi2','power2','ironleg','magnet','crit']);
   // 有次數上限的疊加卡
   const STACK_LIMIT = { ghost: 3 };
 
@@ -441,6 +512,15 @@
     const c = G.cardPick[idx];
     c.apply(G);
     G.collected.push(c.id);
+    // 守衛卡：生成一個盟友
+    if (G._spawnGuard) {
+      G._spawnGuard = false;
+      G.allies.push({
+        x: (Math.random() - 0.5) * FIELD_HW * 0.6,
+        z: FIELD_DEPTH * 0.15,
+        alive: true, age: 0, life: 5000,
+      });
+    }
     G.phase = 'playing';
     G.wave++;
     setTimeout(() => { if (G && G.phase === 'playing') beginWave(); }, 400);
@@ -483,11 +563,13 @@
     G.defs.forEach(d => { if (d.hp > 0) ents.push({ k: 'd', o: d, z: d.z }); });
     ents.push({ k: 'gk', o: G.gk, z: G.gk.z });
     G.balls.forEach(b => { if (b.alive) ents.push({ k: 'b', o: b, z: b.z }); });
+    G.allies.forEach(a => { if (a.alive) ents.push({ k: 'a', o: a, z: a.z }); });
     ents.sort((a, b) => b.z - a.z);
     for (const e of ents) {
       if (e.k === 'd')  drawDef(e.o);
       if (e.k === 'gk') drawGK(e.o);
       if (e.k === 'b')  drawBall(e.o);
+      if (e.k === 'a')  drawAlly(e.o);
     }
 
     drawParticles();
@@ -752,6 +834,58 @@
     ctx.beginPath(); ctx.arc(p.x, p.y - r, r * 0.28, 0, Math.PI * 2); ctx.fill();
   }
 
+  // ─── 守衛盟友 ──────────────────────────────────────────────
+  function drawAlly(a) {
+    const p = proj(a.x, a.z);
+    const w = 40 * p.s, h = 56 * p.s;
+    if (p.y < horizY - 10 || p.s < 0.05) return;
+
+    const remaining = 1 - a.age / a.life;
+    ctx.globalAlpha = Math.min(1, remaining * 2); // 最後時刻漸隱
+
+    // 陰影
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath(); ctx.ellipse(p.x, p.y + 2, w * 0.5, h * 0.07, 0, 0, Math.PI * 2); ctx.fill();
+
+    const bx = p.x - w / 2, by = p.y - h;
+    const baseColor = '#66bb6a';
+
+    // 身體
+    const bodyGrad = ctx.createLinearGradient(bx, by + h * 0.3, bx + w, by + h * 0.3);
+    bodyGrad.addColorStop(0, '#81c784');
+    bodyGrad.addColorStop(0.5, baseColor);
+    bodyGrad.addColorStop(1, '#388e3c');
+    ctx.fillStyle = bodyGrad;
+    rr(ctx, bx, by + h * 0.3, w * 0.9, h * 0.45, w * 0.15); ctx.fill();
+
+    // 盾牌
+    ctx.fillStyle = '#ffd54f';
+    ctx.beginPath();
+    ctx.arc(p.x, by + h * 0.52, w * 0.25, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#f57f17';
+    ctx.font = `${Math.max(8, 12 * p.s)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('🛡', p.x, by + h * 0.57);
+
+    // 頭
+    const headR = w * 0.28;
+    const headGrad = ctx.createRadialGradient(p.x - headR * 0.3, by + h * 0.18, headR * 0.1, p.x, by + h * 0.2, headR);
+    headGrad.addColorStop(0, '#a5d6a7');
+    headGrad.addColorStop(1, '#2e7d32');
+    ctx.fillStyle = headGrad;
+    ctx.beginPath(); ctx.arc(p.x, by + h * 0.2, headR, 0, Math.PI * 2); ctx.fill();
+
+    // 倒計時條
+    const bw = w * 1.1, bh = Math.max(2, 3 * p.s);
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    rr(ctx, p.x - bw / 2, by - bh - 3, bw, bh, 2); ctx.fill();
+    ctx.fillStyle = '#76ff03';
+    rr(ctx, p.x - bw / 2, by - bh - 3, bw * remaining, bh, 2); ctx.fill();
+
+    ctx.globalAlpha = 1;
+  }
+
   // ─── 粒子 ────────────────────────────────────────────────
   function drawParticles() {
     for (const p of G.particles) {
@@ -772,7 +906,8 @@
     // 生命
     ctx.font = '20px sans-serif';
     ctx.textAlign = 'left';
-    for (let i = 0; i < MAX_LIVES; i++) {
+    const dispLives = Math.max(MAX_LIVES, G.lives);
+    for (let i = 0; i < dispLives; i++) {
       ctx.globalAlpha = i < G.lives ? 1 : 0.25;
       ctx.fillText('❤️', 16 + i * 30, 32);
     }
