@@ -68,7 +68,7 @@
     normal:  { label:'防守員',   fill:'#4fc3f7', hp:3,  spd:0.30, w:44, h:62 },
     fast:    { label:'快速前鋒', fill:'#fff176', hp:1,  spd:0.42, w:38, h:54 },
     tank:    { label:'中後衛',   fill:'#ef5350', hp:8,  spd:0.18, w:56, h:72 },
-    captain: { label:'隊長',     fill:'#ce93d8', hp:5,  spd:0.28, w:50, h:66, aura:true },
+    captain: { label:'攔截者',   fill:'#ce93d8', hp:5,  spd:0.28, w:50, h:66, tracker:true },
     sentry:  { label:'中路守衛', fill:'#81d4fa', hp:4,  spd:0.12, w:48, h:64 },
   };
 
@@ -139,14 +139,15 @@
     const types = ['normal'];
     if (w >= 1) types.push('sentry');  // 每波都有中路守衛擋住直射
     if (w >= 2) types.push('fast');
-    if (w >= 3) types.push('tank');
-    if (w >= 5) types.push('captain');
+    if (w >= 3) { types.push('tank'); types.push('captain'); }
     // 確保至少 1~2 個 sentry 擋中路
     const sentryCount = Math.min(1 + Math.floor(w / 2), 4);
-    // 血量成長配合主角傷害預估（每波約+25%）
-    const hpMul  = Math.pow(1.25, w - 1);        // wave3=1.56x, wave5=2.4x, wave8=4.8x, wave10=7.5x
+    // 保底紫色攔截者數量（wave3 起）
+    const captainCount = w >= 3 ? Math.min(1 + Math.floor((w - 2) / 2), 3) : 0;
+    // 血量成長（緩和）
+    const hpMul  = Math.pow(1.15, w - 1);        // wave3=1.32x, wave5=1.75x, wave8=2.66x, wave10=3.52x
     const spdMul = 1 + (w - 1) * 0.12;           // wave1=1x, wave5=1.48x, wave10=2.08x
-    return { count, types, hpMul, spdMul, sentryCount };
+    return { count, types, hpMul, spdMul, sentryCount, captainCount };
   }
 
   function makeDef(type, hpMul, spdMul) {
@@ -188,11 +189,15 @@
     for (let i = 0; i < cfg.sentryCount; i++) {
       G.spawnQueue.push(makeDef('sentry', cfg.hpMul, cfg.spdMul, i, cfg.sentryCount));
     }
+    // 保底紫色攔截者
+    for (let i = 0; i < cfg.captainCount; i++) {
+      G.spawnQueue.push(makeDef('captain', cfg.hpMul, cfg.spdMul));
+    }
     // 其餘隨機類型
-    const rest = cfg.count - cfg.sentryCount;
+    const rest = cfg.count - cfg.sentryCount - cfg.captainCount;
     for (let i = 0; i < rest; i++) {
-      const nonSentry = cfg.types.filter(t => t !== 'sentry');
-      const t = nonSentry[Math.floor(Math.random() * nonSentry.length)];
+      const nonFixed = cfg.types.filter(t => t !== 'sentry' && t !== 'captain');
+      const t = nonFixed[Math.floor(Math.random() * nonFixed.length)];
       G.spawnQueue.push(makeDef(t, cfg.hpMul, cfg.spdMul));
     }
     // 立刻放一半，其餘排隊
@@ -403,11 +408,18 @@
       const xBound = FIELD_HW * 0.85;
       if (d.x < -xBound + d.w) { d.x = -xBound + d.w; d.vx = Math.abs(d.vx || 0); }
       if (d.x > xBound - d.w)  { d.x = xBound - d.w;  d.vx = -Math.abs(d.vx || 0); }
-      // 隊長光環
-      if (DTYPE[d.type]?.aura) {
-        for (const d2 of G.defs) {
-          if (d2 === d || d2.hp <= 0) continue;
-          if (Math.sqrt((d2.x - d.x) ** 2 + (d2.z - d.z) ** 2) < 100) d2.z -= 0.08 * (dt / 16);
+      // 攔截者：x 軸追蹤最近的球
+      if (DTYPE[d.type]?.tracker) {
+        let nearBall = null, nbd = Infinity;
+        for (const b of G.balls) {
+          if (!b.alive) continue;
+          const dist = Math.abs(b.z - d.z);
+          if (dist < nbd) { nbd = dist; nearBall = b; }
+        }
+        if (nearBall) {
+          const trackSpd = sp * 1.8; // x 軸追蹤速度比前進速度快
+          if (nearBall.x > d.x + 5) d.x += trackSpd * step;
+          else if (nearBall.x < d.x - 5) d.x -= trackSpd * step;
         }
       }
       // 突破底線
@@ -846,52 +858,70 @@
   // ─── 守衛盟友 ──────────────────────────────────────────────
   function drawAlly(a) {
     const p = proj(a.x, a.z);
-    const w = 40 * p.s, h = 56 * p.s;
+    const w = 42 * p.s, h = 60 * p.s;
     if (p.y < horizY - 10 || p.s < 0.05) return;
 
     const remaining = a.blocking ? Math.max(0, a.blockTimer / 5000) : 1;
-    ctx.globalAlpha = a.blocking ? Math.min(1, remaining * 2) : 1; // 阻擋中才漸隱
+    ctx.globalAlpha = a.blocking ? Math.min(1, remaining * 2) : 1;
 
-    // 陰影
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.ellipse(p.x, p.y + 2, w * 0.5, h * 0.07, 0, 0, Math.PI * 2); ctx.fill();
-
+    const baseColor = '#43a047';
+    const darkSide = shadeColor(baseColor, -45);
+    const highlight = shadeColor(baseColor, 50);
     const bx = p.x - w / 2, by = p.y - h;
-    const baseColor = '#66bb6a';
 
-    // 身體
-    const bodyGrad = ctx.createLinearGradient(bx, by + h * 0.3, bx + w, by + h * 0.3);
-    bodyGrad.addColorStop(0, '#81c784');
-    bodyGrad.addColorStop(0.5, baseColor);
-    bodyGrad.addColorStop(1, '#388e3c');
+    // 地面陰影
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(p.x, p.y + 2, w * 0.55, h * 0.08, 0, 0, Math.PI * 2); ctx.fill();
+
+    // ── 雙腿 ──
+    const legW = w * 0.22, legH = h * 0.32;
+    const legY = p.y - legH;
+    ctx.fillStyle = darkSide;
+    rr(ctx, p.x - w * 0.28, legY, legW, legH, legW * 0.3); ctx.fill();
+    ctx.fillStyle = baseColor;
+    rr(ctx, p.x + w * 0.08, legY, legW, legH, legW * 0.3); ctx.fill();
+
+    // ── 身體（漸層厚度） ──
+    const bodyY = by + h * 0.28, bodyH = h * 0.42;
+    ctx.fillStyle = darkSide;
+    rr(ctx, bx + w * 0.08, bodyY + 2, w * 0.88, bodyH, w * 0.15); ctx.fill();
+    const bodyGrad = ctx.createLinearGradient(bx, bodyY, bx + w, bodyY);
+    bodyGrad.addColorStop(0, highlight);
+    bodyGrad.addColorStop(0.4, baseColor);
+    bodyGrad.addColorStop(1, darkSide);
     ctx.fillStyle = bodyGrad;
-    rr(ctx, bx, by + h * 0.3, w * 0.9, h * 0.45, w * 0.15); ctx.fill();
+    rr(ctx, bx, bodyY, w * 0.92, bodyH, w * 0.15); ctx.fill();
 
-    // 盾牌
-    ctx.fillStyle = '#ffd54f';
-    ctx.beginPath();
-    ctx.arc(p.x, by + h * 0.52, w * 0.25, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#f57f17';
-    ctx.font = `${Math.max(8, 12 * p.s)}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.fillText('🛡', p.x, by + h * 0.57);
+    // 盾牌裝飾（身體正面）
+    ctx.fillStyle = 'rgba(255,213,79,0.6)';
+    ctx.beginPath(); ctx.arc(p.x, bodyY + bodyH * 0.5, w * 0.18, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#f9a825'; ctx.lineWidth = Math.max(1, 1.5 * p.s);
+    ctx.stroke();
 
-    // 頭
-    const headR = w * 0.28;
-    const headGrad = ctx.createRadialGradient(p.x - headR * 0.3, by + h * 0.18, headR * 0.1, p.x, by + h * 0.2, headR);
-    headGrad.addColorStop(0, '#a5d6a7');
-    headGrad.addColorStop(1, '#2e7d32');
+    // ── 雙肩 ──
+    const shoulderR = w * 0.18;
+    ctx.fillStyle = baseColor;
+    ctx.beginPath(); ctx.arc(bx + shoulderR * 0.6, bodyY + shoulderR * 0.5, shoulderR, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = darkSide;
+    ctx.beginPath(); ctx.arc(bx + w * 0.92 - shoulderR * 0.6, bodyY + shoulderR * 0.5, shoulderR * 0.9, 0, Math.PI * 2); ctx.fill();
+
+    // ── 頭部（球形漸層） ──
+    const headR = w * 0.32;
+    const headY = by + h * 0.18;
+    const headGrad = ctx.createRadialGradient(p.x - headR * 0.3, headY - headR * 0.3, headR * 0.1, p.x, headY, headR);
+    headGrad.addColorStop(0, highlight);
+    headGrad.addColorStop(1, darkSide);
     ctx.fillStyle = headGrad;
-    ctx.beginPath(); ctx.arc(p.x, by + h * 0.2, headR, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(p.x, headY, headR, 0, Math.PI * 2); ctx.fill();
 
     // 倒計時條（阻擋中才顯示）
     if (a.blocking) {
-      const bw = w * 1.1, bh = Math.max(2, 3 * p.s);
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      rr(ctx, p.x - bw / 2, by - bh - 3, bw, bh, 2); ctx.fill();
+      const bw = w * 1.2, bh = Math.max(3, 4 * p.s);
+      const bxp = p.x - bw / 2, byp = by - bh - 4;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      rr(ctx, bxp, byp, bw, bh, 2); ctx.fill();
       ctx.fillStyle = '#76ff03';
-      rr(ctx, p.x - bw / 2, by - bh - 3, bw * remaining, bh, 2); ctx.fill();
+      rr(ctx, bxp, byp, bw * remaining, bh, 2); ctx.fill();
     }
 
     ctx.globalAlpha = 1;
