@@ -1999,20 +1999,66 @@ img.flag-img {
 
 /* ========== 視覺特效（fx.js）========== */
 
-/* 滑鼠光暈 */
-.fx-cursor-glow {
+/* 黑霧遮罩（滑鼠探照燈用 JS 設 radial-gradient） */
+.fx-fog {
   position: fixed;
-  width: 350px; height: 350px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(240,192,64,0.18) 0%, rgba(240,192,64,0.06) 35%, transparent 70%);
-  pointer-events: none;
+  inset: 0;
   z-index: 9990;
-  transition: width 0.3s, height 0.3s, background 0.3s;
-  will-change: transform;
+  pointer-events: none;
+  will-change: background;
 }
-.fx-glow-bright {
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(240,192,64,0.3) 0%, rgba(240,192,64,0.1) 35%, transparent 70%);
+
+/* 標靶容器 */
+.fx-target-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 9989;
+  pointer-events: none;
+}
+
+/* 隱藏標靶 */
+.fx-target {
+  position: fixed;
+  font-size: 26px;
+  opacity: 0;
+  pointer-events: auto;
+  cursor: crosshair;
+  transition: opacity 0.15s;
+  animation: fx-float 4s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 6px rgba(255,215,0,0.5));
+  user-select: none;
+}
+@keyframes fx-float {
+  0%   { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-10px) rotate(8deg); }
+}
+
+/* 標靶被擊中：爆開 */
+.fx-target-hit {
+  animation: fx-target-explode 0.5s ease-out forwards !important;
+  opacity: 1 !important;
+}
+@keyframes fx-target-explode {
+  0%   { transform: scale(1); opacity: 1; }
+  40%  { transform: scale(2.2); opacity: 0.8; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+/* 飛出的分數文字 */
+.fx-score-fly {
+  position: fixed;
+  font-size: 22px;
+  font-weight: 900;
+  pointer-events: none;
+  z-index: 9999;
+  text-shadow: 0 0 8px currentColor, 0 2px 4px rgba(0,0,0,0.5);
+  animation: fx-score-up 0.9s ease-out forwards;
+  transform: translate(-50%, -50%);
+}
+@keyframes fx-score-up {
+  0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  15%  { transform: translate(calc(-50% + var(--fly-x) * 0.2), calc(-50% - 15px)) scale(1.4); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--fly-x)), calc(-50% - 80px)) scale(0.8); opacity: 0; }
 }
 
 /* 足球飛行 */
@@ -2051,6 +2097,10 @@ img.flag-img {
   z-index: 9997;
   animation: fx-ring 0.4s ease-out forwards;
 }
+.fx-ring-big {
+  border-color: rgba(255,215,0,0.9);
+  animation: fx-ring 0.6s ease-out forwards;
+}
 @keyframes fx-ring {
   0% { transform: scale(0); opacity: 1; }
   100% { transform: scale(6); opacity: 0; }
@@ -2067,14 +2117,20 @@ img.flag-img {
   z-index: 9997;
   animation: fx-spark 0.4s ease-out forwards;
 }
+.fx-spark-big {
+  width: 6px; height: 6px;
+  margin: -3px 0 0 -3px;
+  background: #ffd700;
+  animation: fx-spark 0.6s ease-out forwards;
+}
 @keyframes fx-spark {
   0% { transform: translate(0, 0) scale(1); opacity: 1; }
   100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
 }
 
-/* 手機隱藏光暈 */
+/* 手機隱藏特效 */
 @media (max-width: 767px) {
-  .fx-cursor-glow { display: none !important; }
+  .fx-fog, .fx-target-layer { display: none !important; }
 }
 
 /* ========== 賽事切換按鈕色 ========== */
