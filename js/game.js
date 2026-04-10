@@ -686,6 +686,15 @@ function renderArena() {
       </div>
     </div>
 
+    <!-- 射門挑戰入口 -->
+    <div style="margin:0 0 24px;padding:18px 20px;border-radius:14px;background:linear-gradient(135deg,rgba(45,122,58,0.25),rgba(0,0,0,0.3));border:1px solid rgba(76,175,80,0.3);display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer" onclick="startRogueGame()">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:#fff">⚽ 射門挑戰 <span style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(255,215,0,0.15);color:#ffd700;margin-left:6px">肉鴿</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px">第一人稱射門 × 卡牌 Build × 無盡生存</div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:#4caf50;white-space:nowrap">開始遊戲 →</div>
+    </div>
+
     <!-- 四大功能卡 -->
     <div class="arena-grid">
 

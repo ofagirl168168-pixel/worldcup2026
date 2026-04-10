@@ -2219,6 +2219,24 @@ img.flag-img {
   .fx-fog, .fx-target-layer { display: none !important; }
 }
 
+/* ========== 肉鴿射門挑戰 Overlay ========== */
+#rogue-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: #000; display: none;
+  align-items: center; justify-content: center;
+}
+#rogue-overlay.active { display: flex; }
+#rogue-cvs { width: 100%; height: 100%; display: block; }
+#rogue-x {
+  position: absolute; top: 12px; right: 12px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; font-size: 18px; cursor: pointer; z-index: 10001;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+#rogue-x:hover { background: rgba(255,255,255,0.25); }
+
 /* ========== 賽事切換按鈕色 ========== */
 :root { --tournament-color: #f0c040; --tournament-accent: #e6a817; }
 [data-tournament-active="ucl"] {
