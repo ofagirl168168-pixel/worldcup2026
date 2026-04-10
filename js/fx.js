@@ -37,7 +37,8 @@
   targetLayer.className = 'fx-target-layer';
   document.body.appendChild(targetLayer);
 
-  function getPageHeight() {
+  // 取得頁面內容實際高度（不含標靶層自身）
+  function getContentHeight() {
     return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
   }
 
@@ -45,10 +46,11 @@
     const t = document.createElement('div');
     t.className = 'fx-target';
     t.textContent = targetEmojis[Math.floor(Math.random() * targetEmojis.length)];
-    // 隨機位置：橫向用 vw，縱向用整個頁面高度（px）
-    const pageH = getPageHeight();
+    // 隨機位置：橫向用 vw，縱向用頁面座標 px（存在 dataset 中）
+    const pageH = getContentHeight();
     t.style.left = (8 + Math.random() * 84) + 'vw';
-    t.style.top = (pageH * 0.05 + Math.random() * pageH * 0.9) + 'px';
+    const pageY = pageH * 0.05 + Math.random() * pageH * 0.9;
+    t._pageY = pageY; // 記住頁面座標
     // 微微浮動動畫偏移
     t.style.animationDelay = (Math.random() * 3) + 's';
     targetLayer.appendChild(t);
@@ -59,14 +61,15 @@
   // 初始化標靶
   for (let i = 0; i < TARGET_COUNT; i++) spawnTarget();
 
-  // 頁面高度變化時更新標靶層高度
-  function updateLayerHeight() {
-    targetLayer.style.height = getPageHeight() + 'px';
+  // 用 transform 模擬滾動（fixed 層不會撐長頁面）
+  function updateTargetScroll() {
+    const scrollY = window.scrollY || window.pageYOffset;
+    targets.forEach(t => {
+      t.style.top = (t._pageY - scrollY) + 'px';
+    });
+    requestAnimationFrame(updateTargetScroll);
   }
-  updateLayerHeight();
-  window.addEventListener('resize', updateLayerHeight);
-  // 定期更新（動態內容可能改變頁面高度）
-  setInterval(updateLayerHeight, 3000);
+  updateTargetScroll();
 
   // 標靶靠近滑鼠時才亮起（用 JS 控制，因為標靶在霧下方）
   function updateTargetVisibility() {

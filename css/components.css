@@ -2008,10 +2008,10 @@ img.flag-img {
   will-change: background;
 }
 
-/* 標靶容器（absolute 讓標靶隨頁面滾動） */
+/* 標靶容器（fixed + JS translateY 模擬滾動，不撐長頁面） */
 .fx-target-layer {
-  position: absolute;
-  top: 0; left: 0; right: 0;
+  position: fixed;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
