@@ -1997,6 +1997,85 @@ img.flag-img {
 .badge-card { cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
 .badge-card:active { transform: scale(0.96); }
 
+/* ========== 視覺特效（fx.js）========== */
+
+/* 滑鼠光暈 */
+.fx-cursor-glow {
+  position: fixed;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240,192,64,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 9990;
+  transition: opacity 0.3s ease;
+  will-change: transform;
+}
+.fx-glow-bright {
+  background: radial-gradient(circle, rgba(240,192,64,0.14) 0%, rgba(240,192,64,0.04) 40%, transparent 70%);
+}
+
+/* 足球飛行 */
+.fx-ball {
+  position: fixed;
+  font-size: 28px;
+  pointer-events: none;
+  z-index: 9998;
+  animation: fx-kick var(--fx-dur, 400ms) cubic-bezier(0.2, 0, 0.2, 1) forwards;
+  filter: drop-shadow(0 0 8px rgba(255,200,0,0.6));
+  will-change: transform, opacity;
+}
+@keyframes fx-kick {
+  0% {
+    transform: translate(0, 0) scale(1.6) rotate(0deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(calc(var(--fx-dx) * 0.5), calc(var(--fx-dy) * 0.5 - 40px)) scale(1) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--fx-dx), var(--fx-dy)) scale(0.5) rotate(360deg);
+    opacity: 0.7;
+  }
+}
+
+/* 落點光環 */
+.fx-impact-ring {
+  position: fixed;
+  width: 10px; height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  border: 2px solid rgba(240,192,64,0.8);
+  pointer-events: none;
+  z-index: 9997;
+  animation: fx-ring 0.4s ease-out forwards;
+}
+@keyframes fx-ring {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(6); opacity: 0; }
+}
+
+/* 火花粒子 */
+.fx-spark {
+  position: fixed;
+  width: 4px; height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: var(--accent);
+  pointer-events: none;
+  z-index: 9997;
+  animation: fx-spark 0.4s ease-out forwards;
+}
+@keyframes fx-spark {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
+}
+
+/* 手機隱藏光暈 */
+@media (max-width: 767px) {
+  .fx-cursor-glow { display: none !important; }
+}
+
 /* ========== 賽事切換按鈕色 ========== */
 :root { --tournament-color: #f0c040; --tournament-accent: #e6a817; }
 [data-tournament-active="ucl"] {
