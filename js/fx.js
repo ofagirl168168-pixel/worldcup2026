@@ -37,13 +37,18 @@
   targetLayer.className = 'fx-target-layer';
   document.body.appendChild(targetLayer);
 
+  function getPageHeight() {
+    return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+  }
+
   function spawnTarget() {
     const t = document.createElement('div');
     t.className = 'fx-target';
     t.textContent = targetEmojis[Math.floor(Math.random() * targetEmojis.length)];
-    // 隨機位置（避開太邊緣）
+    // 隨機位置：橫向用 vw，縱向用整個頁面高度（px）
+    const pageH = getPageHeight();
     t.style.left = (8 + Math.random() * 84) + 'vw';
-    t.style.top = (8 + Math.random() * 84) + 'vh';
+    t.style.top = (pageH * 0.05 + Math.random() * pageH * 0.9) + 'px';
     // 微微浮動動畫偏移
     t.style.animationDelay = (Math.random() * 3) + 's';
     targetLayer.appendChild(t);
@@ -53,6 +58,15 @@
 
   // 初始化標靶
   for (let i = 0; i < TARGET_COUNT; i++) spawnTarget();
+
+  // 頁面高度變化時更新標靶層高度
+  function updateLayerHeight() {
+    targetLayer.style.height = getPageHeight() + 'px';
+  }
+  updateLayerHeight();
+  window.addEventListener('resize', updateLayerHeight);
+  // 定期更新（動態內容可能改變頁面高度）
+  setInterval(updateLayerHeight, 3000);
 
   // 標靶靠近滑鼠時才亮起（用 JS 控制，因為標靶在霧下方）
   function updateTargetVisibility() {

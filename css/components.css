@@ -2008,17 +2008,18 @@ img.flag-img {
   will-change: background;
 }
 
-/* 標靶容器 */
+/* 標靶容器（absolute 讓標靶隨頁面滾動） */
 .fx-target-layer {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  top: 0; left: 0; right: 0;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 
 /* 隱藏標靶 */
 .fx-target {
-  position: fixed;
+  position: absolute;
   font-size: 26px;
   opacity: 0;
   pointer-events: auto;
