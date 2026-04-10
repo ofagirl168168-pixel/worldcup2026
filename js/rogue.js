@@ -31,8 +31,8 @@
     { id:'dmg30',    name:'力量訓練',   desc:'傷害 +30%',                icon:'💪', rarity:'common',    apply(s){ s.dmgMul *= 1.3; }},
     { id:'spd20',    name:'速度鞋',     desc:'球速 +20%',                icon:'👟', rarity:'common',    apply(s){ s.spdMul *= 1.2; }},
     { id:'spd40',    name:'閃電射門',   desc:'球速 +40%',                icon:'⚡', rarity:'common',    apply(s){ s.spdMul *= 1.4; }},
-    { id:'bigball',  name:'大力丸',     desc:'球體+20%（增大也提升傷害）',icon:'⭕', rarity:'common',    apply(s){ s.ballScale *= 1.2; }},
-    { id:'bigball2', name:'巨型足球',   desc:'球體+40%（增大也提升傷害）',icon:'🔵', rarity:'common',    apply(s){ s.ballScale *= 1.4; }},
+    { id:'bigball',  name:'大力丸',     desc:'球體+20%（增大也提升傷害，上限3倍）',icon:'⭕', rarity:'common',    apply(s){ s.ballScale = Math.min(3, s.ballScale * 1.2); }},
+    { id:'bigball2', name:'巨型足球',   desc:'球體+40%（增大也提升傷害，上限3倍）',icon:'🔵', rarity:'common',    apply(s){ s.ballScale = Math.min(3, s.ballScale * 1.4); }},
     { id:'rapid',    name:'快速連射',   desc:'射門冷卻 -30%',            icon:'⏩', rarity:'common',    apply(s){ s.cdMul *= 0.7; }},
     { id:'rapid2',   name:'輕量化',     desc:'射門冷卻 -20%',            icon:'💨', rarity:'common',    apply(s){ s.cdMul *= 0.8; }},
     { id:'multi1',   name:'雙重射擊',   desc:'連續射球數量 +1',          icon:'⚽', rarity:'common',    apply(s){ s.multiShot += 1; }},
@@ -145,7 +145,7 @@
     // 保底紫色攔截者數量（wave3 起）
     const captainCount = w >= 3 ? Math.min(1 + Math.floor((w - 2) / 2), 3) : 0;
     // 血量成長（緩和）
-    const hpMul  = Math.pow(1.15, w - 1);        // wave3=1.32x, wave5=1.75x, wave8=2.66x, wave10=3.52x
+    const hpMul  = Math.pow(1.20, w - 1);        // wave3=1.44x, wave5=2.07x, wave8=3.58x, wave10=5.16x
     const spdMul = 1 + (w - 1) * 0.12;           // wave1=1x, wave5=1.48x, wave10=2.08x
     return { count, types, hpMul, spdMul, sentryCount, captainCount };
   }
@@ -408,7 +408,7 @@
       const xBound = FIELD_HW * 0.85;
       if (d.x < -xBound + d.w) { d.x = -xBound + d.w; d.vx = Math.abs(d.vx || 0); }
       if (d.x > xBound - d.w)  { d.x = xBound - d.w;  d.vx = -Math.abs(d.vx || 0); }
-      // 攔截者：x 軸高速追蹤最近的球（越近越快，鏟球感）
+      // 攔截者：球在 z 軸接近時才高速 x 軸追蹤（鏟球感）
       if (DTYPE[d.type]?.tracker) {
         let nearBall = null, nbd = Infinity;
         for (const b of G.balls) {
@@ -417,12 +417,17 @@
           if (dist < nbd) { nbd = dist; nearBall = b; }
         }
         if (nearBall) {
-          const xDist = Math.abs(nearBall.x - d.x);
-          // 基礎追蹤速度 2.5，越靠近球越快（最高 6.0），模擬撲球鏟球
-          const proximity = Math.max(0, 1 - xDist / 400); // 0~1
-          const trackSpd = (2.5 + proximity * 3.5) * (G.globalSlow || 1);
-          if (nearBall.x > d.x + 3) d.x += trackSpd * step;
-          else if (nearBall.x < d.x - 3) d.x -= trackSpd * step;
+          const zDist = Math.abs(nearBall.z - d.z);
+          const zRange = 300; // 球在 z 軸 300 以內才開始反應
+          if (zDist < zRange) {
+            const xDist = Math.abs(nearBall.x - d.x);
+            // z 越近追蹤越快：遠處慢慢移動，近處瘋狂鏟球
+            const zUrgency = 1 - zDist / zRange; // 0（剛進範圍）~1（同一z軸）
+            const xProximity = Math.max(0, 1 - xDist / 400);
+            const trackSpd = (0.5 + zUrgency * 4.0 + xProximity * 2.5) * (G.globalSlow || 1);
+            if (nearBall.x > d.x + 3) d.x += trackSpd * step;
+            else if (nearBall.x < d.x - 3) d.x -= trackSpd * step;
+          }
         }
       }
       // 突破底線
