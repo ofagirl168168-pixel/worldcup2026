@@ -2740,13 +2740,12 @@ function startPredCountdowns() {
       if (d > 0) parts.push(`${d}天`);
       if (h > 0) parts.push(`${h}小時`);
       if (m > 0) parts.push(`${m}分鐘`);
-      if (d === 0) parts.push(`${s}秒`);
+      parts.push(`${s}秒`);
       el.textContent = `⏰ 距離鎖定還有 ${parts.join(' ')}`;
       el.className = 'pred-countdown' + (ms < 30*60000 ? ' urgent' : ms < 2*3600000 ? ' warn' : '');
     }
     tick();
-    const remaining = kickoff - Date.now();
-    const iv = setInterval(tick, remaining < 86400000 ? 1000 : 60000);
+    const iv = setInterval(tick, 1000);
     el._cdInterval = iv;
   });
 }
