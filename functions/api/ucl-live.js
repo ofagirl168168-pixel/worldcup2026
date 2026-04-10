@@ -116,7 +116,21 @@ function transformMatch(m) {
     time = tw.toISOString().slice(11, 16);
   }
 
-  return { home, away, stage, status, score, goals, date, time, venue: m.venue || null };
+  // 比賽進行中的分鐘數
+  let minute = null;
+  if (status === 'live') {
+    if (m.minute !== undefined && m.minute !== null) {
+      minute = m.minute;
+    }
+    // 如果 fullTime 沒有比分但 halfTime 或 regularTime 有
+    if (!score && m.score) {
+      if (m.score.halfTime && m.score.halfTime.home !== null) {
+        score = { h: m.score.halfTime.home, a: m.score.halfTime.away };
+      }
+    }
+  }
+
+  return { home, away, stage, status, score, goals, date, time, venue: m.venue || null, minute };
 }
 
 // ── Handler ──

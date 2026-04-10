@@ -54,18 +54,27 @@
         existing.status = 'finished';
         existing.score = live.score;
         if (live.goals?.length) existing.goals = live.goals;
+        existing.minute = null;
         updated++;
       } else if (apiHasScore && live.status === 'live') {
-        // 進行中：更新即時比分
+        // 進行中：更新即時比分 + 分鐘數
         existing.status = 'live';
         existing.score = live.score;
         if (live.goals?.length) existing.goals = live.goals;
+        if (live.minute !== undefined) existing.minute = live.minute;
+        updated++;
+      } else if (live.status === 'live' && existing.status !== 'live') {
+        // 比賽剛開始，可能還沒有比分
+        existing.status = 'live';
+        existing.score = live.score || { h: 0, a: 0 };
+        if (live.minute !== undefined) existing.minute = live.minute;
         updated++;
       } else if (apiHasScore && !localHasScore) {
         // 靜態資料沒有比分但 API 有（補資料）
         existing.status = live.status;
         existing.score = live.score;
         if (live.goals?.length) existing.goals = live.goals;
+        if (live.minute !== undefined) existing.minute = live.minute;
         updated++;
       }
 
@@ -153,15 +162,22 @@
     setTimeout(loadLiveData, 1000);
   }
 
-  // ── 比賽日自動輪詢（每 2 分鐘）──
-  // 只在有進行中比賽時才啟動
-  setInterval(() => {
+  // ── 自動輪詢：有進行中比賽 60 秒，否則 2 分鐘 ──
+  let pollTimer = null;
+  function startPolling() {
     const hasLive = window.UCL_MATCHES?.some(m => m.status === 'live');
-    if (hasLive) {
-      localStorage.removeItem(CACHE_KEY); // 清除 cache 強制重新拉取
-      loadLiveData();
-    }
-  }, 2 * 60 * 1000);
+    const interval = hasLive ? 60 * 1000 : 2 * 60 * 1000;
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(() => {
+      const stillLive = window.UCL_MATCHES?.some(m => m.status === 'live');
+      if (stillLive || hasLive) {
+        localStorage.removeItem(CACHE_KEY);
+        loadLiveData().then(startPolling); // 重新調整間隔
+      }
+    }, interval);
+  }
+  // 初始啟動輪詢
+  setTimeout(startPolling, 3000);
 
   // 導出供手動呼叫
   window.UCLLive = { refresh: loadLiveData };

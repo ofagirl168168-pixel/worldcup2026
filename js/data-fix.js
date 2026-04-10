@@ -353,4 +353,11 @@ window.addEventListener('load', () => {
   _safe(() => updateArenaBadge(), 'updateArenaBadge');
   _safe(() => updateNavXP(), 'updateNavXP');
   _safe(() => showArenaWelcomeIfNeeded(), 'showArenaWelcomeIfNeeded');
+  // 預測結算（延遲執行，避免阻塞初始渲染）
+  setTimeout(() => {
+    _safe(() => {
+      const settled = settlePredictions();
+      if (settled.length) showSettlementPopups(settled);
+    }, 'settlePredictions');
+  }, 2000);
 });

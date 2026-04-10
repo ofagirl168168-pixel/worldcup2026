@@ -250,10 +250,17 @@ async function syncXPToProfile() {
     if (!xpData) return
     // 合併兩個賽事的答題統計
     let correct = 0, total = 0
+    let predCorrectDir = 0, predExact = 0, predTotal = 0
     for (const p of ['wc26_', 'ucl26_']) {
       const h = (JSON.parse(localStorage.getItem(p + 'daily') || 'null') ?? {}).history ?? {}
       correct += Object.values(h).filter(v => v?.isCorrect).length
       total   += Object.values(h).filter(v => v !== undefined).length
+      // 預測結算統計
+      const settled = JSON.parse(localStorage.getItem(p + 'settled') || '{}')
+      const entries = Object.values(settled)
+      predTotal += entries.length
+      predCorrectDir += entries.filter(s => s.direction).length
+      predExact += entries.filter(s => s.exact).length
     }
 
     // 安全機制：本地 XP=0 時，不覆蓋遠端已有的分數
@@ -270,6 +277,9 @@ async function syncXPToProfile() {
       xp:             xpData.xp,
       correct_answers: correct,
       total_answered:  total,
+      pred_correct_direction: predCorrectDir,
+      pred_exact_score: predExact,
+      pred_total_settled: predTotal,
       updated_at:     new Date().toISOString()
     }).eq('id', currentUser.id)
   } catch (e) {
@@ -414,22 +424,38 @@ async function renderLeaderboard(containerId) {
   const myId = currentUser?.id;
   const medals = ['🥇', '🥈', '🥉'];
 
+  function getPredTitle(row) {
+    const n = row.pred_total_settled || 0;
+    const acc = n > 0 ? (row.pred_correct_direction || 0) / n : 0;
+    const exact = row.pred_exact_score || 0;
+    if (acc >= 0.70 && n >= 10) return { icon: '🔮', name: '神算子', cls: 'title-master' };
+    if (acc >= 0.55 && n >= 5)  return { icon: '🧙', name: '預言家', cls: 'title-prophet' };
+    if (acc >= 0.40 && n >= 3)  return { icon: '📊', name: '分析師', cls: 'title-analyst' };
+    if (n >= 1)                 return { icon: '🌱', name: '新手', cls: 'title-rookie' };
+    return null;
+  }
+
   el.innerHTML = rows.map((row, i) => {
-    const team = row.team_code ? TEAMS?.[row.team_code] : null;
+    const _T = window.UCL_TEAMS || (typeof TEAMS!=='undefined' ? TEAMS : {});
+    const team = row.team_code ? _T[row.team_code] : null;
     const flag = team ? team.flag : '';
-    const accuracy = row.total_answered > 0
-      ? Math.round(row.correct_answers / row.total_answered * 100) + '%'
+    const predAcc = (row.pred_total_settled || 0) > 0
+      ? Math.round((row.pred_correct_direction || 0) / row.pred_total_settled * 100) + '%'
       : '—';
     const isMe = row.id === myId;
+    const title = getPredTitle(row);
 
     return `
       <div class="lb-row ${isMe ? 'lb-me' : ''}">
         <div class="lb-rank">${medals[i] ?? `#${i + 1}`}</div>
         <div class="lb-flag">${flagImg(flag)}</div>
-        <div class="lb-name">${row.nickname}${isMe ? ' <span class="lb-you">你</span>' : ''}</div>
+        <div class="lb-name">
+          ${row.nickname}${isMe ? ' <span class="lb-you">你</span>' : ''}
+          ${title ? `<span class="lb-title ${title.cls}">${title.icon} ${title.name}</span>` : ''}
+        </div>
         <div class="lb-stats">
           <span class="lb-xp">⚡ ${row.xp} XP</span>
-          <span class="lb-acc">🎯 ${accuracy}</span>
+          <span class="lb-acc">🎯 ${predAcc}</span>
         </div>
       </div>`;
   }).join('');

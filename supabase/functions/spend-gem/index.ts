@@ -42,12 +42,15 @@ Deno.serve(async (req) => {
       if (alreadyUsed) return errorRes('首次免費已使用', 409)
     }
 
-    // 檢查是否已解鎖（不重複扣）
+    // 檢查是否已解鎖（不重複扣）— 深度分析與比賽解鎖分開計算
+    const typesToCheck = txType === 'unlock_deep'
+      ? ['unlock_deep']
+      : ['unlock_match', 'unlock_knockout', 'first_free']
     const { data: unlocked } = await db
       .from('gem_transactions')
       .select('id')
       .eq('user_id', user.id)
-      .in('type', ['unlock_match', 'unlock_knockout', 'first_free'])
+      .in('type', typesToCheck)
       .eq('ref_id', match_id)
       .maybeSingle()
     if (unlocked) return okRes({ already_unlocked: true, balance: await getBalance(db, user.id) })

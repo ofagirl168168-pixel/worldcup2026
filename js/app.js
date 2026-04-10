@@ -30,22 +30,21 @@ if (window.Tournament) {
   updateHero();
   // 賽事切換時重新渲染當前頁面
   window.addEventListener('tournamentChanged', () => {
-    const activeSection = document.querySelector('.page-section.active')?.id?.replace('section-','');
-    updateHero();
-    if (activeSection === 'home' || !activeSection) {
-      renderChampions();
-      renderUpcoming();
-      renderHomeBracket();
-      renderDeathGroups();
-      renderHighlights();
-      if (typeof renderHomeDailyChallenge === 'function') renderHomeDailyChallenge();
-    }
-    if (activeSection === 'schedule')    renderSchedule('all','all');
-    if (activeSection === 'teams')       renderTeams('all','');
-    if (activeSection === 'stats')       renderStats('standings');
-    if (activeSection === 'focus')       renderFocus();
-    if (activeSection === 'predictions') renderPredictions();
-    if (activeSection === 'arena')       renderArena();
+    // 切換賽事時重新渲染所有頁面（try/catch 防止單一模組失敗阻擋其他）
+    const _s = (fn) => { try { fn(); } catch(e) { console.error('[tournamentChanged]', e); } };
+    _s(() => updateHero());
+    _s(() => renderChampions());
+    _s(() => renderUpcoming());
+    _s(() => renderHomeBracket());
+    _s(() => renderDeathGroups());
+    _s(() => renderHighlights());
+    _s(() => { if (typeof renderHomeDailyChallenge === 'function') renderHomeDailyChallenge(); });
+    _s(() => renderSchedule('all','all'));
+    _s(() => renderTeams('all',''));
+    _s(() => renderStats('standings'));
+    _s(() => renderFocus());
+    _s(() => renderPredictions());
+    _s(() => renderArena());
     // 更新 header 標題
     const cfg = Tournament.config();
     const titleEl = document.querySelector('.logo-title');
@@ -146,10 +145,12 @@ function renderUpcoming() {
   const schedule = _matches();
   if (!schedule.length) { el.innerHTML = ''; return; }
 
-  // UCL: 找尚未結束的比賽；WC: 直接取前6場
+  // UCL: 進行中優先，再取尚未結束的比賽；WC: 直接取前6場
   let upcoming;
   if (_isUCL()) {
-    upcoming = schedule.filter(m => m.home && m.away && m.home !== 'TBD' && m.status === 'scheduled').slice(0, 6);
+    const live = schedule.filter(m => m.home && m.away && m.home !== 'TBD' && m.status === 'live');
+    const sched = schedule.filter(m => m.home && m.away && m.home !== 'TBD' && m.status === 'scheduled');
+    upcoming = [...live, ...sched].slice(0, 6);
     if (!upcoming.length) upcoming = schedule.filter(m => m.home && m.away && m.home !== 'TBD').slice(-6);
   } else {
     upcoming = schedule.filter(m => m.home && m.away).slice(0, 6);
@@ -167,16 +168,20 @@ function renderUpcoming() {
     const subInfo = _isUCL()
       ? `${dateStr} · ${stageLabel}${m.md ? ' MD'+m.md : ''}`
       : `${dateStr} · ${GROUPS[m.group]?.name||''}`;
-    return `<div class="upcoming-card" onclick="openPredModal('${m.id}')">
+    const isLive = m.status === 'live';
+    const liveScore = isLive && m.score ? `${m.score.h} - ${m.score.a}` : null;
+    const minuteText = isLive && m.minute ? `${m.minute}'` : '';
+    return `<div class="upcoming-card${isLive ? ' match-live' : ''}" onclick="openPredModal('${m.id}')">
+      ${isLive ? '<div class="live-badge"><span class="live-dot"></span>LIVE</div>' : ''}
       <div class="upcoming-teams">
         <div class="upcoming-team"><div class="upcoming-flag">${flagImg(ht.flag)}</div><div class="upcoming-name">${ht.nameCN}</div></div>
-        <div class="upcoming-vs">${m.status==='finished' && m.score ? m.score.h+' - '+m.score.a : 'VS'}</div>
+        <div class="upcoming-vs${isLive ? ' live-score' : ''}">${isLive && liveScore ? liveScore : m.status==='finished' && m.score ? m.score.h+' - '+m.score.a : 'VS'}${isLive && minuteText ? `<div class="live-minute">${minuteText}</div>` : ''}</div>
         <div class="upcoming-team"><div class="upcoming-flag">${flagImg(at.flag)}</div><div class="upcoming-name">${at.nameCN}</div></div>
       </div>
       <div class="upcoming-info">
         <div>
-          <div class="upcoming-time">${timeStr}${_isUCL() ? '' : ' 台灣時間'}</div>
-          <div style="font-size:12px;color:var(--text-muted)">${subInfo}</div>
+          <div class="upcoming-time">${isLive ? '⚽ 比賽進行中' : timeStr}${!isLive && !_isUCL() ? ' 台灣時間' : ''}</div>
+          <div style="font-size:12px;color:${isLive ? 'var(--accent)' : 'var(--text-muted)'}">${subInfo}</div>
         </div>
       </div>
       <div class="prob-mini">
@@ -209,11 +214,12 @@ function renderHomeBracket() {
     const aggA = (l1?.score?.a||0) + (l2?.score?.h||0);
     const done = l1?.status === 'finished' && l2?.status === 'finished';
     const partial = l1?.status === 'finished' && !done;
+    const live = l1?.status === 'live' || l2?.status === 'live';
     const winner = done ? (aggH > aggA ? home : aggA > aggH ? away : null) : null;
     const dt = !done ? (l2?.date || l1?.date || '') : '';
-    // 點擊目標：優先跳到尚未開賽的最近一場
     const clickId = l1?.status === 'finished' ? id2 : id1;
-    return { home, away, aggH, aggA, done, partial, winner, date: dt, clickId };
+    const minute = live ? (l2?.status === 'live' ? l2?.minute : l1?.minute) : null;
+    return { home, away, aggH, aggA, done, partial, live, winner, date: dt, clickId, minute };
   }
 
   // ── 單場結果（決賽）──
@@ -253,15 +259,16 @@ function renderHomeBracket() {
 
   // ── 比賽卡片 HTML ──
   function mcH(d, col, rs, re, compact) {
-    const { home, away, aggH, aggA, done, partial, winner, date, clickId } = d;
-    const show = done || partial;
+    const { home, away, aggH, aggA, done, partial, live, winner, date, clickId, minute } = d;
+    const show = done || partial || live;
     const hW = winner === home, aW = winner === away;
-    const hL = partial && aggH > aggA, aL = partial && aggA > aggH;
-    const cls = done ? 'done' : partial ? 'live' : 'soon';
+    const hL = (partial || live) && aggH > aggA, aL = (partial || live) && aggA > aggH;
+    const cls = done ? 'done' : live ? 'live' : partial ? 'live' : 'soon';
     const hasTBD = home === 'TBD' || away === 'TBD';
     const click = (!hasTBD && clickId) ? ` onclick="openPredModal('${clickId}')"` : '';
     let foot = '';
     if (done) foot = `<div class="hb-agg">總 ${aggH}-${aggA}</div>`;
+    else if (live) foot = `<div class="hb-dt live"><span class="live-dot"></span> LIVE${minute ? ` ${minute}'` : ''}</div>`;
     else if (partial) foot = `<div class="hb-dt live">🔴 次回合 ${date.slice(5).replace('-','/')}</div>`;
     else if (date) foot = `<div class="hb-dt">${date.slice(5).replace('-','/')}</div>`;
     return `<div class="hb-m hb-${cls}${compact?' compact':''}${click?' clickable':''}" style="grid-column:${col};grid-row:${rs}/${re}"${click}>
@@ -453,17 +460,28 @@ function showSection(id) {
   document.querySelectorAll('[data-section="' + id + '"]').forEach(b => b.classList.add('active'));
   document.getElementById('mobile-nav').classList.remove('open');
   window.scrollTo(0, 0);
+  // 觸發對應頁面渲染（確保切換賽事後資料正確）
+  const _r = (fn) => { try { fn(); } catch(e) { console.error('[showSection]', e); } };
+  if (id === 'home') {
+    _r(() => updateHero());
+    _r(() => renderChampions());
+    _r(() => renderUpcoming());
+    _r(() => renderHomeBracket());
+    _r(() => renderDeathGroups());
+    _r(() => renderHighlights());
+    _r(() => { if (typeof renderHomeDailyChallenge === 'function') renderHomeDailyChallenge(); });
+  }
+  if (id === 'schedule')    _r(() => renderSchedule('all','all'));
+  if (id === 'teams')       _r(() => renderTeams('all',''));
+  if (id === 'stats')       _r(() => renderStats('standings'));
+  if (id === 'focus')       _r(() => renderFocus());
+  if (id === 'predictions') _r(() => renderPredictions());
+  if (id === 'arena')       _r(() => renderArena());
 }
 
 document.querySelectorAll('.nav-btn[data-section]').forEach(btn => {
   btn.addEventListener('click', () => {
     showSection(btn.dataset.section);
-    if (btn.dataset.section === 'schedule')    renderSchedule('all','all');
-    if (btn.dataset.section === 'teams')       renderTeams('all','');
-    if (btn.dataset.section === 'stats')       renderStats('standings');
-    if (btn.dataset.section === 'focus')       renderFocus();
-    if (btn.dataset.section === 'predictions') renderPredictions();
-    if (btn.dataset.section === 'arena')       renderArena();
   });
 });
 
@@ -602,7 +620,7 @@ async function openPredModal(id) {
   const schedule = _matches();
   const match = schedule.find(x => x.id === id);
   const isKnockout = _isUCL()
-    ? (match && match.stage && match.stage !== 'league')
+    ? false
     : (match && match.phase && match.phase !== 'group');
   const spendType = isKnockout ? 'unlock_knockout' : 'unlock_match'
   const cost = isKnockout ? 2 : 1
@@ -611,10 +629,11 @@ async function openPredModal(id) {
   const modal = document.getElementById('team-modal');
   const mc = document.getElementById('modal-content');
   const _isMatchFinished = match && match.status === 'finished' && match.score;
+  const _isMatchLive = match && match.status === 'live';
   mc.innerHTML = `<div class="modal-loading">
     <div class="modal-spinner"></div>
-    <div class="modal-loading-text">${_isMatchFinished ? '⚽ 載入賽事結果...' : '🤖 AI 正在分析賽事...'}</div>
-    <div class="modal-loading-sub">${_isMatchFinished ? '統計數據 · 比分回顧 · 預測比較' : '比對歷史數據 · 計算勝率 · 生成預測'}</div>
+    <div class="modal-loading-text">${_isMatchLive ? '⚽ 載入即時數據...' : _isMatchFinished ? '⚽ 載入賽事結果...' : '🤖 AI 正在分析賽事...'}</div>
+    <div class="modal-loading-sub">${_isMatchLive ? '即時比分 · 進球紀錄 · 比賽數據' : _isMatchFinished ? '統計數據 · 比分回顧 · 預測比較' : '比對歷史數據 · 計算勝率 · 生成預測'}</div>
   </div>`;
   modal.classList.add('open');
 
@@ -861,6 +880,127 @@ async function openPredModal(id) {
   }
   // ── END 已完成比賽 ──────────────────────────────────────
 
+  // ── 進行中比賽：即時比分 + 進球 + 數據 ──────────────
+  const isLive = m.status === 'live';
+  if (isLive) {
+    const isUcl = _isUCL();
+    const phaseLabel = isUcl
+      ? ({league:'聯賽階段',playoff:'附加賽',r16:'十六強',qf:'八強',sf:'四強',final:'決賽'}[m.stage]||'')
+      : ({group:'小組賽',r32:'32強',r16:'16強',qf:'八強',sf:'四強',final:'決賽'}[m.phase]||'');
+    const matchTag = isUcl
+      ? `${phaseLabel}${m.md ? ' MD'+m.md : ''}${m.leg ? ' Leg'+m.leg : ''}`
+      : `${GROUPS[m.group]?.name||''} · ${phaseLabel}`;
+    const matchVenue = isUcl
+      ? (m.venue ? `📍 ${m.venue}` : '')
+      : `📍 ${m.venue||''}, ${m.city||''}`;
+    const hRankLabel = isUcl ? `UEFA 係數 ${ht.uefaCoeff}` : `FIFA #${ht.fifaRank}`;
+    const aRankLabel = isUcl ? `UEFA 係數 ${at.uefaCoeff}` : `FIFA #${at.fifaRank}`;
+    const hGoal = m.score?.h ?? 0, aGoal = m.score?.a ?? 0;
+    const minuteText = m.minute ? `${m.minute}'` : '進行中';
+
+    document.getElementById('modal-content').innerHTML = `
+      <!-- 賽事資訊 -->
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:8px">
+          <span class="live-badge" style="font-size:13px;padding:4px 12px"><span class="live-dot"></span>LIVE ${minuteText}</span>
+          <span class="match-tag group">${matchTag}</span>
+          ${matchVenue ? `<span class="match-tag">${matchVenue}</span>` : ''}
+        </div>
+      </div>
+
+      <!-- 即時比分（大字醒目 + 脈動效果）-->
+      <div style="background:linear-gradient(135deg, rgba(255,69,58,0.12), rgba(255,69,58,0.04));border:1px solid rgba(255,69,58,0.3);border-radius:16px;padding:24px 16px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="text-align:center;flex:1;min-width:0">
+            <div style="font-size:52px;margin-bottom:6px">${flagImg(ht.flag)}</div>
+            <div style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ht.nameCN}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${hRankLabel}</div>
+          </div>
+          <div style="text-align:center;padding:0 8px;flex-shrink:0">
+            <div class="live-score-big" style="font-size:56px;font-weight:900;letter-spacing:8px">${hGoal} – ${aGoal}</div>
+            <div style="margin-top:6px"><span class="live-badge"><span class="live-dot"></span>${minuteText}</span></div>
+          </div>
+          <div style="text-align:center;flex:1;min-width:0">
+            <div style="font-size:52px;margin-bottom:6px">${flagImg(at.flag)}</div>
+            <div style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${at.nameCN}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${aRankLabel}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 進球時間線 -->
+      ${m.goals && m.goals.length > 0 ? `
+      <div style="margin:16px 0">
+        <div class="modal-section-title">⚽ 進球紀錄</div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+          ${m.goals.map(g => {
+            const isHome = g.side === 'h';
+            const teamFlag = isHome ? flagImg(ht.flag) : flagImg(at.flag);
+            const typeLabel = g.type === 'pen' ? ' (PK)' : g.type === 'og' ? ' (烏龍球)' : g.type === 'fk' ? ' (自由球)' : '';
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isHome ? '' : 'flex-direction:row-reverse;text-align:right'}">
+              <div style="min-width:42px;font-size:13px;font-weight:800;color:var(--accent);${isHome ? 'text-align:right' : 'text-align:left'}">${g.min}'</div>
+              <div style="font-size:16px">${teamFlag}</div>
+              <div style="flex:1;${isHome ? '' : 'text-align:right'}">
+                <div style="font-size:13px;font-weight:700;color:var(--text-primary)">${g.player}${typeLabel}</div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>` : `
+      <div style="text-align:center;padding:16px;color:var(--text-muted);font-size:14px">⚽ 暫無進球</div>`}
+
+      <!-- AI 賽前預測 -->
+      <div style="background:var(--accent-bg);border-radius:12px;padding:16px;margin:16px 0;border:1px solid var(--accent-border)">
+        <div style="font-size:14px;font-weight:800;color:var(--accent);margin-bottom:12px;text-align:center">🤖 AI 賽前預測</div>
+        <div style="display:flex;justify-content:center;gap:24px;text-align:center">
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">${ht.nameCN} 勝率</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent)">${p.hw}%</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">平局</div>
+            <div style="font-size:22px;font-weight:900;color:var(--text-secondary)">${p.d}%</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">${at.nameCN} 勝率</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent)">${p.aw}%</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:10px;font-size:12px;color:var(--text-muted)">預測比分 ${p.score}</div>
+      </div>
+
+      <!-- 球隊實力對比 -->
+      <div class="modal-section-title">⚔️ 球隊實力對比</div>
+      <div style="margin-bottom:16px">
+        ${[
+          ['⚔️ 攻擊力', ht.radar.attack, at.radar.attack],
+          ['🛡️ 防守力', ht.radar.defense, at.radar.defense],
+          ['⚙️ 中場控制', ht.radar.midfield, at.radar.midfield],
+          ['💨 速度', ht.radar.speed, at.radar.speed],
+          ['🏆 大賽經驗', ht.radar.experience, at.radar.experience]
+        ].map(([label, hVal, aVal]) => `
+          <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:4px">
+              <span style="font-weight:700;color:${hVal>aVal?'var(--green)':'var(--text-secondary)'}">${hVal}</span>
+              <span>${label}</span>
+              <span style="font-weight:700;color:${aVal>hVal?'var(--green)':'var(--text-secondary)'}">${aVal}</span>
+            </div>
+            <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,0.07)">
+              <div style="width:${hVal/(hVal+aVal)*100}%;background:linear-gradient(90deg,var(--blue),var(--green))"></div>
+              <div style="width:${aVal/(hVal+aVal)*100}%;background:linear-gradient(90deg,var(--red),#ff7043)"></div>
+            </div>
+          </div>`).join('')}
+      </div>
+
+      <div style="text-align:center;padding:12px;font-size:12px;color:var(--text-muted);border-top:1px solid rgba(255,255,255,0.06)">
+        即時數據每 60 秒自動更新 · <a href="javascript:void(0)" onclick="UCLLive.refresh().then(()=>openPredModal('${m.id}'))" style="color:var(--accent);text-decoration:none">🔄 手動刷新</a>
+      </div>
+    `;
+    modal.scrollTop = 0;
+    return;
+  }
+  // ── END 進行中比賽 ──────────────────────────────────────
+
   const pts = generateAnalysis(ht, at, p);
   const hForm = p.hWC ? p.hWC.recentForm : (ht.recentForm||['W','D','W','W','D']);
   const aForm = p.aWC ? p.aWC.recentForm : (at.recentForm||['W','D','W','W','D']);
@@ -1097,31 +1237,59 @@ async function openPredModal(id) {
       </div>` : ''}
     </div>
 
-    <!-- 你的預測（永遠免費）-->
+    <!-- 你的預測（含鎖定倒數）-->
     ${(()=>{
       const myPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
       const mine = myPreds[m.id];
+      // 計算開賽時間，判斷是否已鎖定
+      const isUcl = _isUCL();
+      let kickoffMs = 0;
+      if (isUcl && m.date && m.time) {
+        kickoffMs = new Date(m.date + 'T' + m.time + ':00+08:00').getTime();
+      } else if (m.twDate && m.twTime) {
+        kickoffMs = new Date(m.twDate + 'T' + m.twTime + ':00+08:00').getTime();
+      }
+      const now = Date.now();
+      const isLocked = m.status !== 'scheduled' || (kickoffMs > 0 && now >= kickoffMs);
+      const msLeft = kickoffMs > 0 ? kickoffMs - now : 0;
+      const showCountdown = !isLocked && msLeft > 0 && msLeft < 48 * 3600000; // 48小時內顯示倒數
+      const urgencyClass = msLeft < 30*60000 ? 'urgent' : msLeft < 2*3600000 ? 'warn' : '';
+
       return `<div class="my-pred-section" id="my-pred-section-${m.id}">
         <div class="modal-section-title" style="margin-top:16px">🎯 你的預測</div>
-        ${mine ? `
-          <div class="my-pred-result">
-            <div class="my-pred-score">${flagImg(ht.flag)} ${mine.h} – ${mine.a} ${flagImg(at.flag)}</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">
-              已預測 · ${new Date(mine.savedAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}
-            </div>
-            <button class="my-pred-edit-btn" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">修改</button>
-          </div>` : `
-          <div class="my-pred-prompt">
-            <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:10px">你預測這場的比分是？</div>
-            <button class="btn-primary" style="width:100%" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">
-              ✏️ 填入我的預測
-            </button>
-          </div>`}
+        ${showCountdown ? `<div class="pred-countdown ${urgencyClass}" id="pred-cd-${m.id}" data-kickoff="${kickoffMs}">⏰ 計算中...</div>` : ''}
+        ${isLocked ? `
+          ${mine ? `
+            <div class="my-pred-result">
+              <div class="my-pred-score">${flagImg(ht.flag)} ${mine.h} – ${mine.a} ${flagImg(at.flag)}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">🔒 預測已鎖定</div>
+            </div>` : `
+            <div class="my-pred-prompt">
+              <div style="font-size:13px;color:rgba(255,69,58,0.7);text-align:center;padding:12px">🔒 比賽已開始，無法填寫預測</div>
+            </div>`}
+        ` : `
+          ${mine ? `
+            <div class="my-pred-result">
+              <div class="my-pred-score">${flagImg(ht.flag)} ${mine.h} – ${mine.a} ${flagImg(at.flag)}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">
+                已預測 · ${new Date(mine.savedAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}
+              </div>
+              <button class="my-pred-edit-btn" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">修改</button>
+            </div>` : `
+            <div class="my-pred-prompt">
+              <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:10px">你預測這場的比分是？</div>
+              <button class="btn-primary" style="width:100%" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">
+                ✏️ 填入我的預測
+              </button>
+            </div>`}
+        `}
       </div>`;
     })()}`;
 
   // modal 已在 loading 階段開啟，這裡只捲到頂部
   modal.scrollTop = 0;
+  // 啟動預測鎖定倒數計時
+  startPredCountdowns();
 
   // 若深度分析已解鎖，自動展開（不再消耗寶石）
   if (window.unlockedDeepSet?.has(m.id)) {
@@ -1702,9 +1870,15 @@ function renderSchedule(phaseFilter, groupFilter) {
       const ht = _T[m.home], at = _T[m.away];
       if (!ht || !at) return header;
       const stageLabel = {league:'聯賽階段',playoff:'附加賽',r16:'十六強',qf:'八強',sf:'四強',final:'決賽'}[m.stage]||'';
-      const scoreDisplay = m.status === 'finished' && m.score ? `<div class="match-vs" style="font-size:20px;font-weight:800">${m.score.h} - ${m.score.a}</div>` : `<div class="match-vs">VS</div>`;
+      const isLive = m.status === 'live';
+      const scoreDisplay = isLive && m.score
+        ? `<div class="match-vs live-score" style="font-size:20px;font-weight:800">${m.score.h} - ${m.score.a}</div>${m.minute ? `<div class="live-minute">${m.minute}'</div>` : ''}`
+        : m.status === 'finished' && m.score
+          ? `<div class="match-vs" style="font-size:20px;font-weight:800">${m.score.h} - ${m.score.a}</div>`
+          : `<div class="match-vs">VS</div>`;
       const aggText = m.agg ? `<div style="font-size:11px;color:var(--text-muted)">總比分 ${m.agg.h}-${m.agg.a}</div>` : '';
-      return header + `<div class="match-card" onclick="openPredModal('${m.id}')">
+      return header + `<div class="match-card${isLive ? ' match-live' : ''}" onclick="openPredModal('${m.id}')">
+        ${isLive ? '<div class="live-badge"><span class="live-dot"></span>LIVE</div>' : ''}
         <div class="match-team">
           <div class="match-team-flag">${flagImg(ht.flag)}</div>
           <div><div class="match-team-name">${ht.nameCN}</div><div class="match-team-sub">${ht.league}</div></div>
@@ -1712,7 +1886,7 @@ function renderSchedule(phaseFilter, groupFilter) {
         <div class="match-center">
           ${scoreDisplay}
           ${aggText}
-          <div class="match-time">${m.time||''}</div>
+          <div class="match-time">${isLive ? '⚽ 進行中' : m.time||''}</div>
           <div class="match-date">${m.date?.slice(5).replace('-','/')||''}</div>
           <div class="match-meta">
             <span class="match-tag group">${stageLabel}${m.md ? ' MD'+m.md : ''}${m.leg ? ' Leg'+m.leg : ''}</span>
@@ -1727,7 +1901,8 @@ function renderSchedule(phaseFilter, groupFilter) {
     return;
   }
 
-  // ── 世界盃賽程（原邏輯）──
+  // ── 世界盃賽程（原邏輯）── 還原篩選器
+  _renderWCScheduleFilters();
   let list = SCHEDULE.filter(m => {
     if (phaseFilter && phaseFilter !== 'all' && m.phase !== phaseFilter) return false;
     if (groupFilter && groupFilter !== 'all' && m.group !== groupFilter) return false;
@@ -1796,6 +1971,24 @@ function _renderUCLFilters() {
   }
 }
 
+function _renderWCScheduleFilters() {
+  const phaseEl = document.getElementById('phase-filter');
+  const groupEl = document.getElementById('group-filter');
+  if (phaseEl) {
+    phaseEl.innerHTML = ['all','group','r32','r16','qf','sf','final'].map(s => {
+      const label = {all:'全部',group:'小組賽',r32:'32強',r16:'16強',qf:'八強',sf:'四強',final:'決賽'}[s];
+      return `<button class="filter-tab${s==='all'?' active':''}" data-phase="${s}">${label}</button>`;
+    }).join('');
+  }
+  if (groupEl) {
+    groupEl.innerHTML = '<button class="filter-tab active" data-group="all">全部</button>' +
+      'ABCDEFGHIJKL'.split('').map(g => `<button class="filter-tab" data-group="${g}">${g}組</button>`).join('');
+  }
+  // 還原 label
+  const label = groupEl?.closest('.filter-group')?.querySelector('label');
+  if (label) label.textContent = '小組篩選';
+}
+
 // 球隊頁
 function renderTeams(confFilter, search) {
   const el = document.getElementById('teams-grid');
@@ -1821,6 +2014,8 @@ function renderTeams(confFilter, search) {
     return;
   }
 
+  // 世界盃：還原篩選器為聯盟
+  _renderWCTeamFilters();
   let list = Object.entries(_T).filter(([code, t]) => {
     if (confFilter && confFilter !== 'all' && t.conf !== confFilter) return false;
     if (search && !t.nameCN.includes(search) && !t.name.toLowerCase().includes(search.toLowerCase())) return false;
@@ -1844,6 +2039,18 @@ function _renderUCLTeamFilters() {
       return `<button class="filter-tab${p==='all'?' active':''}" data-conf="${p}">${label}</button>`;
     }).join('');
   }
+}
+
+function _renderWCTeamFilters() {
+  const confEl = document.getElementById('conf-filter');
+  if (!confEl) return;
+  const confs = [
+    ['all','全部'],['UEFA','歐洲'],['CONMEBOL','南美'],['CAF','非洲'],
+    ['AFC','亞洲'],['CONCACAF','北中美'],['OFC','大洋洲']
+  ];
+  confEl.innerHTML = confs.map(([v,l]) =>
+    `<button class="filter-tab${v==='all'?' active':''}" data-conf="${v}">${l}</button>`
+  ).join('');
 }
 
 // 數據頁
@@ -2477,12 +2684,37 @@ function adjustMyPred(side, delta) {
 }
 
 function saveMyPred(matchId) {
+  // 鎖定檢查：比賽已開始則拒絕
+  const match = _matches().find(m => m.id === matchId);
+  if (match && match.status !== 'scheduled') {
+    showToast?.('🔒 比賽已開始，無法修改預測');
+    document.getElementById('my-pred-overlay')?.remove();
+    return;
+  }
   const h = parseInt(document.getElementById('my-pred-h')?.textContent || 0);
   const a = parseInt(document.getElementById('my-pred-a')?.textContent || 0);
   const myPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
   myPreds[matchId] = { h, a, savedAt: new Date().toISOString() };
   localStorage.setItem('wc26_my_preds', JSON.stringify(myPreds));
   document.getElementById('my-pred-overlay')?.remove();
-  // 重新整理 modal 內的預測區塊
   openPredModal(matchId);
+}
+
+// ── 預測倒數計時器 ──
+function startPredCountdowns() {
+  document.querySelectorAll('.pred-countdown[data-kickoff]').forEach(el => {
+    const kickoff = parseInt(el.dataset.kickoff);
+    function tick() {
+      const ms = kickoff - Date.now();
+      if (ms <= 0) { el.textContent = '🔒 預測已鎖定'; el.className = 'pred-countdown urgent'; return; }
+      const h = Math.floor(ms / 3600000);
+      const m = Math.floor((ms % 3600000) / 60000);
+      const s = Math.floor((ms % 60000) / 1000);
+      el.textContent = h > 0 ? `⏰ 距離鎖定還有 ${h}h ${m}m` : `⏰ 距離鎖定還有 ${m}m ${s}s`;
+      el.className = 'pred-countdown' + (ms < 30*60000 ? ' urgent' : ms < 2*3600000 ? ' warn' : '');
+    }
+    tick();
+    const iv = setInterval(tick, ms < 120000 ? 1000 : 30000);
+    el._cdInterval = iv;
+  });
 }

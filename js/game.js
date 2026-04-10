@@ -284,6 +284,124 @@ function recordDailyAnswer(optIdx) {
 // ── 等級獎勵表 ────────────────────────────────────────────
 const LEVEL_GEM_REWARDS = { 2:2, 3:2, 5:3, 7:3, 10:5, 15:5, 20:10 };
 
+// ── 預測結算系統 ──────────────────────────────────────────
+function settlePredictions() {
+  const newlySettled = [];
+  ['wc26_', 'ucl26_'].forEach(p => {
+    const predsKey = p + 'my_preds';
+    const settledKey = p + 'settled';
+    const bonusKey = p + 'bonus_xp';
+    const myPreds = (() => { try { return JSON.parse(localStorage.getItem(predsKey))||{}; } catch { return {}; } })();
+    const settled = (() => { try { return JSON.parse(localStorage.getItem(settledKey))||{}; } catch { return {}; } })();
+    let bonusXP = parseInt(localStorage.getItem(bonusKey)||'0') || 0;
+
+    const matches = p === 'ucl26_' ? (window.UCL_MATCHES||[]) : (typeof SCHEDULE!=='undefined' ? SCHEDULE : []);
+
+    for (const [matchId, pred] of Object.entries(myPreds)) {
+      if (settled[matchId]) continue; // 已結算過
+      const match = matches.find(m => m.id === matchId);
+      if (!match || match.status !== 'finished' || !match.score) continue;
+
+      const predH = pred.h, predA = pred.a;
+      const actH = match.score.h, actA = match.score.a;
+      const exact = predH === actH && predA === actA;
+      const predDir = predH > predA ? 'h' : predA > predH ? 'a' : 'd';
+      const actDir = actH > actA ? 'h' : actA > actH ? 'a' : 'd';
+      const direction = predDir === actDir;
+
+      let xpReward = 0;
+      if (exact) xpReward = 20;
+      else if (direction) xpReward = 5;
+
+      bonusXP += xpReward;
+
+      const result = {
+        predH, predA, actH, actA, exact, direction,
+        xp: xpReward, gem: exact ? 1 : 0,
+        settledAt: new Date().toISOString(),
+        prefix: p
+      };
+      settled[matchId] = result;
+      newlySettled.push({ matchId, ...result });
+
+      // 精確命中獎勵寶石
+      if (exact) awardGem?.(`exact_pred_${matchId}`);
+    }
+
+    localStorage.setItem(settledKey, JSON.stringify(settled));
+    localStorage.setItem(bonusKey, String(bonusXP));
+  });
+
+  if (newlySettled.length > 0) {
+    updateNavXP?.();
+    syncXPToProfile?.();
+    checkTieredAchievements?.();
+  }
+  return newlySettled;
+}
+
+// ── 賽後結算彈窗 ──────────────────────────────────────────
+function showSettlementPopups(settled) {
+  const shownKey = (_isUCL?.() ? 'ucl26_' : 'wc26_') + 'settled_shown';
+  const shown = (() => { try { return JSON.parse(localStorage.getItem(shownKey))||[]; } catch { return []; } })();
+  const shownSet = new Set(shown);
+  const queue = settled.filter(s => !shownSet.has(s.matchId));
+  if (!queue.length) return;
+
+  function showNext(idx) {
+    if (idx >= queue.length) return;
+    const s = queue[idx];
+    const _T = s.prefix === 'ucl26_' ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
+    const matches = s.prefix === 'ucl26_' ? (window.UCL_MATCHES||[]) : (typeof SCHEDULE!=='undefined' ? SCHEDULE : []);
+    const match = matches.find(m => m.id === s.matchId);
+    const ht = _T[match?.home], at = _T[match?.away];
+    const hFlag = ht ? flagImg(ht.flag) : '', aFlag = at ? flagImg(at.flag) : '';
+    const hName = ht?.nameCN || match?.home || '?', aName = at?.nameCN || match?.away || '?';
+
+    const icon = s.exact ? '🎯' : s.direction ? '✅' : '❌';
+    const title = s.exact ? '完美命中！' : s.direction ? '方向正確！' : '預測失誤';
+    const color = s.exact ? '#4caf50' : s.direction ? 'var(--accent)' : '#ef9a9a';
+    const rewardText = s.xp > 0 ? `+${s.xp} XP${s.gem ? ' +1 💎' : ''}` : '';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'settlement-overlay';
+    overlay.innerHTML = `
+      <div class="settlement-card">
+        <div class="settlement-icon">${icon}</div>
+        <div class="settlement-title" style="color:${color}">${title}</div>
+        <div class="settlement-match">
+          <span>${hFlag} ${hName}</span>
+          <span style="color:var(--text-muted);margin:0 8px">vs</span>
+          <span>${aFlag} ${aName}</span>
+        </div>
+        <div class="settlement-scores">
+          <div class="settlement-score-box">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">你的預測</div>
+            <div style="font-size:28px;font-weight:900">${s.predH} – ${s.predA}</div>
+          </div>
+          <div style="font-size:20px;color:var(--text-muted);align-self:center">vs</div>
+          <div class="settlement-score-box">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">實際結果</div>
+            <div style="font-size:28px;font-weight:900;color:${color}">${s.actH} – ${s.actA}</div>
+          </div>
+        </div>
+        ${rewardText ? `<div class="settlement-reward">${rewardText}</div>` : ''}
+        <button class="btn-primary settlement-btn" onclick="this.closest('.settlement-overlay').remove()">
+          ${idx < queue.length - 1 ? '下一場 →' : '繼續'}
+        </button>
+      </div>`;
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) { overlay.remove(); showNext(idx + 1); }
+    });
+    overlay.querySelector('.settlement-btn').addEventListener('click', () => { showNext(idx + 1); });
+    document.body.appendChild(overlay);
+
+    shown.push(s.matchId);
+    localStorage.setItem(shownKey, JSON.stringify(shown));
+  }
+  showNext(0);
+}
+
 // 計算 XP 與等級（共用）
 function calcXPLevel() {
   // 合併世足＋歐冠兩個賽事的 XP（排行榜共用）
@@ -297,6 +415,8 @@ function calcXPLevel() {
     xp += correct * 10 + (champ ? 50 : 0)
         + (groups && Object.keys(groups).length === 12 ? 50 : 0)
         + (team ? 30 : 0);
+    // 預測結算獎勵 XP
+    xp += parseInt(localStorage.getItem(p + 'bonus_xp')||'0') || 0;
   });
   const xpPerLv = 100;
   const level   = Math.floor(xp / xpPerLv) + 1;
@@ -1016,7 +1136,7 @@ async function shareDailyImage() {
   const dailyState  = getDailyState()
   const streak      = dailyState.streak || 0
   const shareLink   = await (async () => {
-    try { return await getMyRefLink?.() || window.location.origin } catch { return window.location.origin }
+    try { return await getMyRefLink?.() || _shareBaseUrl() } catch { return _shareBaseUrl() }
   })()
 
   // QR Code
@@ -1050,10 +1170,11 @@ async function shareDailyImage() {
   ctx.fillStyle = '#f0c040'
   ctx.font = `800 22px "Noto Sans TC", sans-serif`
   ctx.textBaseline = 'middle'
-  ctx.fillText('世界盃預測平台 2026', PAD + s + 12, 24 + s * 0.5)
+  const _dailyIsUcl = window.Tournament?.isUCL?.() ?? false
+  ctx.fillText(_dailyIsUcl ? '歐冠預測平台 2025/26' : '世界盃預測平台 2026', PAD + s + 12, 24 + s * 0.5)
   ctx.fillStyle = 'rgba(255,255,255,0.35)'
   ctx.font = `500 13px "Noto Sans TC", sans-serif`
-  ctx.fillText('worldcup2026.pages.dev', PAD + s + 12, 24 + s * 0.5 + 22)
+  ctx.fillText(window.location.host, PAD + s + 12, 24 + s * 0.5 + 22)
 
   // 分隔線
   ctx.strokeStyle = 'rgba(240,192,64,0.25)'
@@ -1162,7 +1283,7 @@ async function shareDailyImage() {
   ctx.fillText('掃碼來答題！', ctaX, ctaY)
   ctx.fillStyle = 'rgba(255,255,255,0.6)'
   ctx.font = `500 14px "Noto Sans TC", sans-serif`
-  ctx.fillText('每天一題世界盃知識挑戰', ctaX, ctaY + 38)
+  ctx.fillText(_dailyIsUcl ? '每天一題歐冠知識挑戰' : '每天一題世界盃知識挑戰', ctaX, ctaY + 38)
   ctx.fillText('看誰的足球 IQ 最高！', ctaX, ctaY + 60)
 
   ctx.fillStyle = 'rgba(255,255,255,0.25)'
@@ -1172,8 +1293,8 @@ async function shareDailyImage() {
   // ── 輸出 ──────────────────────────────────────────────
   canvas.toBlob(async blob => {
     const file = new File([blob], 'daily-challenge.png', { type: 'image/png' })
-    const link = await getMyRefLink?.() || window.location.origin
-    const shareText = `🧠 今日世界盃挑戰題，你知道答案嗎？快來挑戰！\n${link}`
+    const link = await getMyRefLink?.() || _shareBaseUrl()
+    const shareText = `🧠 今日${_dailyIsUcl ? '歐冠' : '世界盃'}挑戰題，你知道答案嗎？快來挑戰！\n${link}`
     if (_isMobile() && navigator.share) {
       // LINE 等 App 在有 files 時不顯示 text，所以先複製文字到剪貼簿
       try { await navigator.clipboard.writeText(shareText) } catch {}
@@ -1221,7 +1342,7 @@ function showDesktopShareModal({ blob, text, link, title, filename }) {
   _dsImgUrl   = blob ? URL.createObjectURL(blob) : null
   _dsFilename = filename || 'share.png'
   const mc = document.getElementById('modal-content')
-  const shareUrl  = link || window.location.origin
+  const shareUrl  = link || _shareBaseUrl()
   const shareText = (text || '').split('\n')[0]
   const eu = encodeURIComponent(shareUrl)
   const et = encodeURIComponent(shareText)
@@ -1293,7 +1414,7 @@ async function shareChampionText() {
   const _isUcl = window.Tournament?.isUCL?.() ?? false
   const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {})
   const t1 = _T[champion.c1], t2 = _T[champion.c2], t3 = _T[champion.c3]
-  const link = await getMyRefLink?.() || window.location.origin
+  const link = await getMyRefLink?.() || _shareBaseUrl()
   const eventName = _isUcl ? '2025/26 歐冠' : '2026 世界盃'
   const shareText = `🏆 我的${eventName}冠軍預測\n🥇 冠軍：${t1?.nameCN||champion.c1}\n🥈 亞軍：${t2?.nameCN||champion.c2}\n🥉 季軍：${t3?.nameCN||champion.c3}\n\n你猜對了嗎？來挑戰我的眼光！\n${link}`
 
@@ -1327,7 +1448,7 @@ async function shareChampionText() {
   ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
   ctx.fillText(_isUcl ? '歐冠預測平台 2025/26' : '世界盃預測平台 2026', PAD + s + 12, 24 + s * 0.5)
   ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 13px "Noto Sans TC", sans-serif`
-  ctx.fillText('worldcup2026.pages.dev', PAD + s + 12, 24 + s * 0.5 + 22)
+  ctx.fillText(window.location.host, PAD + s + 12, 24 + s * 0.5 + 22)
   ctx.strokeStyle = 'rgba(240,192,64,0.25)'; ctx.lineWidth = 1
   ctx.beginPath(); ctx.moveTo(PAD, 100); ctx.lineTo(W-PAD, 100); ctx.stroke()
 
@@ -1403,7 +1524,7 @@ async function shareTeamText() {
   const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {})
   const t = _T[teamCode]
   if (!t) return
-  const link = await getMyRefLink?.() || window.location.origin
+  const link = await getMyRefLink?.() || _shareBaseUrl()
   const eventName = _isUcl ? '2025/26 歐冠' : '2026 世界盃'
   const shareText = `⚽ ${eventName}，我宣示支持 ${t.nameCN}！\n整個賽事我都陪著他們！\n一起來預測吧👇\n${link}`
 
@@ -1434,7 +1555,7 @@ async function shareTeamText() {
   ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
   ctx.fillText(_isUcl ? '歐冠預測平台 2025/26' : '世界盃預測平台 2026', PAD + s + 10, 20 + s * 0.5)
   ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 12px "Noto Sans TC", sans-serif`
-  ctx.fillText('worldcup2026.pages.dev', PAD + s + 10, 20 + s * 0.5 + 20)
+  ctx.fillText(window.location.host, PAD + s + 10, 20 + s * 0.5 + 20)
   ctx.strokeStyle = 'rgba(240,192,64,0.25)'; ctx.lineWidth = 1
   ctx.beginPath(); ctx.moveTo(PAD, 88); ctx.lineTo(W-PAD, 88); ctx.stroke()
 
@@ -1569,14 +1690,17 @@ async function shareGroupImage() {
   showToast('⏳ 正在產生分享圖...')
 
   const groupKeys = Object.keys(GROUPS).sort()
-  const SITE_URL = 'worldcup2026-9u0.pages.dev'
+  const SITE_URL = window.location.host
 
   // ── 取得分享者邀請連結 ───────────────────────────────
-  let shareLink = `https://${SITE_URL}`
+  let shareLink = _shareBaseUrl()
   if (currentUser) {
     try {
       const { data } = await DB.from('profiles').select('ref_code').eq('id', currentUser.id).maybeSingle()
-      if (data?.ref_code) shareLink = `https://${SITE_URL}?ref=${data.ref_code}`
+      const isUcl = window.Tournament?.isUCL?.() ?? false
+      if (data?.ref_code) shareLink = isUcl
+        ? `${window.location.origin}?t=ucl&ref=${data.ref_code}`
+        : `${window.location.origin}?ref=${data.ref_code}`
     } catch {}
   }
 
@@ -1658,12 +1782,13 @@ async function shareGroupImage() {
   ctx.fillStyle = '#f0c040'
   ctx.font = 'bold 30px sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText('我的世界盃分組晉級預測', W / 2, 136)
+  const _grpIsUcl = window.Tournament?.isUCL?.() ?? false
+  ctx.fillText(_grpIsUcl ? '我的歐冠聯賽階段預測' : '我的世界盃分組晉級預測', W / 2, 136)
 
   // 副標題
   ctx.fillStyle = 'rgba(255,255,255,0.45)'
   ctx.font = '15px sans-serif'
-  ctx.fillText('FIFA World Cup 2026 · Group Stage Predictions', W / 2, 164)
+  ctx.fillText(_grpIsUcl ? 'UEFA Champions League 2025/26 · League Phase' : 'FIFA World Cup 2026 · Group Stage Predictions', W / 2, 164)
 
   // 分隔線
   const divGrad = ctx.createLinearGradient(PAD, 0, W - PAD, 0)
@@ -1798,7 +1923,7 @@ async function shareGroupImage() {
 
   ctx.fillStyle = 'rgba(255,255,255,0.35)'
   ctx.font = '13px sans-serif'
-  ctx.fillText('AI 驅動 · 世界盃預測分析平台', ctaX, footerY + 102)
+  ctx.fillText(_grpIsUcl ? 'AI 驅動 · 歐冠預測分析平台' : 'AI 驅動 · 世界盃預測分析平台', ctaX, footerY + 102)
 
   // 網址
   ctx.fillStyle = 'rgba(240,192,64,0.8)'
@@ -1817,18 +1942,21 @@ async function shareGroupImage() {
   // ── 輸出 ──────────────────────────────────────────────
   canvas.toBlob(async blob => {
     if (!blob) { showToast('❌ 圖片產生失敗'); return }
-    const file = new File([blob], 'wc2026-group-prediction.png', { type: 'image/png' })
-    const grpShareText = `📊 我的 2026 世界盃分組晉級預測出爐！來挑戰我的選隊眼光！\n${shareLink}`
+    const fname = _grpIsUcl ? 'ucl-league-prediction.png' : 'wc2026-group-prediction.png'
+    const file = new File([blob], fname, { type: 'image/png' })
+    const grpShareText = _grpIsUcl
+      ? `📊 我的 2025/26 歐冠聯賽階段預測出爐！來挑戰我的選隊眼光！\n${shareLink}`
+      : `📊 我的 2026 世界盃分組晉級預測出爐！來挑戰我的選隊眼光！\n${shareLink}`
     if (_isMobile() && navigator.share && navigator.canShare?.({ files: [file] })) {
       try { await navigator.clipboard.writeText(grpShareText) } catch {}
       showToast('📋 文字已複製！分享圖片後可在聊天室貼上文字')
       try {
-        await navigator.share({ title: '我的 2026 世界盃分組晉級預測', text: grpShareText, files: [file] })
+        await navigator.share({ title: _grpIsUcl ? '我的歐冠聯賽階段預測' : '我的 2026 世界盃分組晉級預測', text: grpShareText, files: [file] })
         return
       } catch {}
     }
     // 電腦版：開啟分享 Modal
-    showDesktopShareModal({ blob, link: shareLink, filename: 'wc2026-group-prediction.png', title: '📊 分享我的分組預測', text: grpShareText })
+    showDesktopShareModal({ blob, link: shareLink, filename: fname, title: '📊 分享我的分組預測', text: grpShareText })
   }, 'image/png')
 }
 
@@ -1904,6 +2032,100 @@ function saveSupportTeam() {
 }
 
 // ── 成就徽章系統 ──────────────────────────────────────────
+// ── 進階成就（銅/銀/金三階）──────────────────────────────
+const TIERED_BADGES = [
+  { id:'pred_direction', tiers:[
+    { icon:'🥉', name:'方向感',     desc:'正確預測勝負方向 3 次',  threshold:3 },
+    { icon:'🥈', name:'方向大師',   desc:'正確預測勝負方向 10 次', threshold:10 },
+    { icon:'🥇', name:'神準方向',   desc:'正確預測勝負方向 25 次', threshold:25 },
+  ]},
+  { id:'pred_exact', tiers:[
+    { icon:'🎯', name:'精準出手',   desc:'命中精確比分 1 次',  threshold:1 },
+    { icon:'💎', name:'比分獵人',   desc:'命中精確比分 3 次',  threshold:3 },
+    { icon:'👑', name:'完美預言',   desc:'命中精確比分 10 次', threshold:10 },
+  ]},
+  { id:'matches_unlocked', tiers:[
+    { icon:'🔓', name:'初探門道',   desc:'解鎖 5 場比賽',  threshold:5 },
+    { icon:'🗝️', name:'解鎖達人',  desc:'解鎖 15 場比賽', threshold:15 },
+    { icon:'🏟️', name:'全場制霸',  desc:'解鎖 30 場比賽', threshold:30 },
+  ]},
+  { id:'referrals', tiers:[
+    { icon:'📣', name:'口耳相傳',   desc:'邀請 1 位朋友',  threshold:1 },
+    { icon:'📢', name:'推廣大使',   desc:'邀請 5 位朋友',  threshold:5 },
+    { icon:'🌐', name:'社群領袖',   desc:'邀請 10 位朋友', threshold:10 },
+  ]},
+  { id:'level', tiers:[
+    { icon:'⭐', name:'小有成就',   desc:'達到 Lv.5',  threshold:5 },
+    { icon:'🌟', name:'經驗豐富',   desc:'達到 Lv.10', threshold:10 },
+    { icon:'💫', name:'傳奇玩家',   desc:'達到 Lv.20', threshold:20 },
+  ]},
+  { id:'streak', tiers:[
+    { icon:'🔥', name:'三日連勝',   desc:'連續答題 3 天',  threshold:3 },
+    { icon:'💥', name:'週不停歇',   desc:'連續答題 7 天',  threshold:7 },
+    { icon:'⚡', name:'鐵人預言家', desc:'連續答題 30 天', threshold:30 },
+  ]},
+];
+
+function loadTieredBadges() {
+  return (() => { try { return JSON.parse(localStorage.getItem('wc26_tiered_badges'))||[]; } catch { return []; } })();
+}
+
+function getTieredValues() {
+  let predDir = 0, predExact = 0;
+  for (const p of ['wc26_', 'ucl26_']) {
+    const settled = (() => { try { return JSON.parse(localStorage.getItem(p + 'settled'))||{}; } catch { return {}; } })();
+    const entries = Object.values(settled);
+    predDir += entries.filter(s => s.direction).length;
+    predExact += entries.filter(s => s.exact).length;
+  }
+  const unlocked = window.unlockedMatchSet?.size || 0;
+  const referrals = parseInt(localStorage.getItem('wc26_referral_count')||'0') || 0;
+  const level = calcXPLevel().level;
+  const streak = getDailyState().streak || 0;
+  return { pred_direction: predDir, pred_exact: predExact, matches_unlocked: unlocked, referrals, level, streak };
+}
+
+function checkTieredAchievements() {
+  const earned = loadTieredBadges();
+  const earnedMap = {};
+  earned.forEach(b => { earnedMap[b.id] = b.tier; });
+  const vals = getTieredValues();
+  const newOnes = [];
+
+  TIERED_BADGES.forEach(badge => {
+    const currentVal = vals[badge.id] || 0;
+    const currentTier = earnedMap[badge.id] ?? -1;
+    badge.tiers.forEach((t, tierIdx) => {
+      if (tierIdx > currentTier && currentVal >= t.threshold) {
+        earnedMap[badge.id] = tierIdx;
+        newOnes.push({ id: badge.id, tier: tierIdx, icon: t.icon, name: t.name, desc: t.desc, earnedAt: new Date().toISOString() });
+      }
+    });
+  });
+
+  if (newOnes.length > 0) {
+    // 更新 earned 陣列（保留最高 tier）
+    const updated = [];
+    const seen = new Set();
+    // 先加新的（最高 tier）
+    for (const n of newOnes) {
+      if (!seen.has(n.id)) { updated.push(n); seen.add(n.id); }
+    }
+    // 保留舊的沒被更新的
+    for (const e of earned) {
+      if (!seen.has(e.id)) { updated.push(e); seen.add(e.id); }
+    }
+    localStorage.setItem('wc26_tiered_badges', JSON.stringify(updated));
+    syncArenaToSupabase?.('picks');
+    // Toast 動畫
+    const tierLabels = ['🥉 銅階', '🥈 銀階', '🥇 金階'];
+    newOnes.forEach((b, i) => setTimeout(() => showBadgeToast({ ...b, name: `${tierLabels[b.tier]} ${b.name}` }), i * 1200));
+    // 重渲染競技場
+    const arenaEl = document.getElementById('section-arena');
+    if (arenaEl && arenaEl.innerHTML.trim()) renderArena();
+  }
+}
+
 const BADGES = [
   { id:'first_daily',   icon:'🎯', name:'初次出擊',   desc:'完成第一次每日一題' },
   { id:'streak3',       icon:'🔥', name:'三連勝',     desc:'連續答題 3 天' },
@@ -1958,10 +2180,11 @@ function checkAchievements() {
     save('wc26_badges', [...earned, ...newOnes]);
     syncArenaToSupabase?.('picks');
     newOnes.forEach((b, i) => setTimeout(() => showBadgeToast(b), i * 1200));
-    // 同步更新競技場（若已開啟）
     const arenaEl = document.getElementById('section-arena');
     if (arenaEl && arenaEl.innerHTML.trim()) renderArena();
   }
+  // 同時檢查進階成就
+  checkTieredAchievements();
 }
 
 function showBadgeToast(badge) {
@@ -1985,6 +2208,13 @@ function showBadgeToast(badge) {
 function renderBadges() {
   const earned = loadBadges();
   const earnedIds = new Set(earned.map(b => b.id));
+  const tieredEarned = loadTieredBadges();
+  const tieredMap = {};
+  tieredEarned.forEach(b => { tieredMap[b.id] = b.tier; });
+  const vals = getTieredValues();
+  const tierCls = ['tier-bronze', 'tier-silver', 'tier-gold'];
+  const tierLabel = ['銅', '銀', '金'];
+
   return `
     <div class="badges-section">
       <div class="badges-title">🏅 成就徽章</div>
@@ -1994,6 +2224,26 @@ function renderBadges() {
           return `<div class="badge-card ${e ? 'earned' : 'locked'}" title="${b.desc}">
             <div class="badge-card-icon">${e ? b.icon : '🔒'}</div>
             <div class="badge-card-name">${b.name}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="badges-section" style="margin-top:20px">
+      <div class="badges-title">🏆 進階成就</div>
+      <div class="badges-grid tiered">
+        ${TIERED_BADGES.map(badge => {
+          const currentTier = tieredMap[badge.id] ?? -1;
+          const currentVal = vals[badge.id] || 0;
+          const nextTier = badge.tiers[currentTier + 1];
+          const displayTier = currentTier >= 0 ? badge.tiers[currentTier] : null;
+          const progress = nextTier ? Math.min(100, Math.round(currentVal / nextTier.threshold * 100)) : 100;
+          const cls = currentTier >= 0 ? tierCls[currentTier] : 'locked';
+          return `<div class="badge-card ${cls}" title="${displayTier?.desc || badge.tiers[0].desc}">
+            <div class="badge-card-icon">${displayTier ? displayTier.icon : '🔒'}</div>
+            <div class="badge-card-name">${displayTier ? displayTier.name : badge.tiers[0].name}</div>
+            ${currentTier >= 0 ? `<div class="badge-tier-label">${tierLabel[currentTier]}階</div>` : ''}
+            ${nextTier ? `<div class="badge-tier-progress"><div class="badge-tier-fill ${currentTier >= 0 ? tierCls[currentTier] : ''}" style="width:${progress}%"></div></div>
+            <div class="badge-tier-next">${currentVal}/${nextTier.threshold}</div>` : `<div class="badge-tier-label" style="color:#ffd700">已滿階</div>`}
           </div>`;
         }).join('')}
       </div>

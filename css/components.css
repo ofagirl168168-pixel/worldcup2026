@@ -214,6 +214,74 @@ img.flag-img {
 .prob-mini { display: flex; gap: 4px; margin-top: 8px; align-items: center; font-size: 11px; color: var(--text-muted); }
 .prob-mini-bar { height: 4px; border-radius: 2px; }
 
+/* ---------- LIVE 即時比賽狀態 ---------- */
+/* 脈動紅點 */
+.live-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  background: #ff453a;
+  border-radius: 50%;
+  margin-right: 4px;
+  animation: livePulse 1.4s ease-in-out infinite;
+  vertical-align: middle;
+}
+@keyframes livePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,69,58,0.6); }
+  50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(255,69,58,0); }
+}
+/* LIVE 標籤 */
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255,69,58,0.15);
+  color: #ff453a;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255,69,58,0.3);
+}
+/* 進行中比賽卡片外框 */
+.match-card.match-live {
+  border-color: rgba(255,69,58,0.4) !important;
+  box-shadow: 0 0 20px rgba(255,69,58,0.1);
+  position: relative;
+}
+.match-card.match-live::before {
+  background: linear-gradient(180deg, rgba(255,69,58,0.4), transparent) !important;
+  opacity: 1 !important;
+}
+.match-card.match-live .live-badge {
+  position: absolute;
+  top: 8px; right: 8px;
+}
+.upcoming-card.match-live {
+  border-color: rgba(255,69,58,0.4);
+  box-shadow: 0 0 20px rgba(255,69,58,0.1);
+  position: relative;
+}
+.upcoming-card.match-live .live-badge {
+  position: absolute;
+  top: 6px; right: 6px;
+}
+/* 即時比分文字 */
+.live-score {
+  color: #ff453a !important;
+  font-weight: 900 !important;
+}
+.live-score-big {
+  color: #ff453a;
+  text-shadow: 0 0 24px rgba(255,69,58,0.4);
+}
+.live-minute {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ff453a;
+  margin-top: 2px;
+  animation: livePulse 1.4s ease-in-out infinite;
+}
+
 /* ---------- 死亡組指數 ---------- */
 .death-grid {
   display: grid;
@@ -1643,6 +1711,149 @@ img.flag-img {
 .hb-final-m .hb-tm + .hb-tm { border-top: none; }
 .hb-final-score {
   font-size: 28px; font-weight: 900; color: var(--accent); margin-top: 8px;
+}
+
+/* ========== 結算彈窗（Settlement Popup）========== */
+.settlement-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn .25s ease;
+}
+.settlement-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 28px 24px;
+  width: min(88vw, 360px);
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  animation: popIn .3s ease;
+}
+@keyframes popIn {
+  from { transform: scale(0.85) translateY(20px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+.settlement-icon { font-size: 48px; margin-bottom: 8px; }
+.settlement-title { font-size: 22px; font-weight: 900; margin-bottom: 14px; }
+.settlement-match {
+  font-size: 14px; color: var(--text-muted);
+  margin-bottom: 16px; line-height: 1.6;
+}
+.settlement-scores {
+  display: flex; justify-content: center; gap: 16px;
+  margin-bottom: 18px;
+}
+.settlement-score-box {
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 10px 18px;
+  font-size: 13px; line-height: 1.6;
+}
+.settlement-score-box strong {
+  display: block; font-size: 20px; font-weight: 900;
+}
+.settlement-reward {
+  font-size: 15px; font-weight: 700;
+  color: var(--accent); margin-bottom: 18px;
+}
+.settlement-btn {
+  width: 100%; padding: 14px; border-radius: 12px;
+  font-size: 15px; font-weight: 800;
+}
+
+/* ========== 預測鎖定倒計時 ========== */
+.pred-countdown {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  text-align: center;
+  margin-top: 8px;
+}
+.pred-countdown.warn {
+  color: #f0a020;
+  background: rgba(240,160,32,0.1);
+}
+.pred-countdown.urgent {
+  color: #ef4444;
+  background: rgba(239,68,68,0.12);
+  animation: pulse-urgent 1.5s ease-in-out infinite;
+}
+@keyframes pulse-urgent {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+/* ========== 排行榜稱號 ========== */
+.lb-title {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.title-master {
+  background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(236,72,153,0.25));
+  color: #d8b4fe;
+}
+.title-prophet {
+  background: rgba(59,130,246,0.2);
+  color: #93c5fd;
+}
+.title-analyst {
+  background: rgba(34,197,94,0.18);
+  color: #86efac;
+}
+.title-rookie {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-muted);
+}
+
+/* ========== 階層成就徽章 ========== */
+.badges-grid.tiered {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.badge-card.tier-bronze {
+  border-color: #cd7f32;
+  box-shadow: 0 0 8px rgba(205,127,50,0.25);
+}
+.badge-card.tier-silver {
+  border-color: #b0b0b0;
+  box-shadow: 0 0 8px rgba(192,192,192,0.3);
+}
+.badge-card.tier-gold {
+  border-color: #ffd700;
+  box-shadow: 0 0 12px rgba(255,215,0,0.35);
+}
+.badge-tier-progress {
+  width: 100%; height: 5px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 99px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.badge-tier-fill {
+  height: 100%; border-radius: 99px;
+  background: var(--accent);
+  transition: width .4s ease;
+}
+.badge-tier-fill.tier-bronze { background: #cd7f32; }
+.badge-tier-fill.tier-silver { background: #c0c0c0; }
+.badge-tier-fill.tier-gold   { background: #ffd700; }
+.badge-tier-label {
+  font-size: 11px; font-weight: 700;
+  margin-top: 4px;
+  color: var(--text-muted);
+}
+.badge-tier-next {
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.7;
 }
 
 /* ========== 賽事切換按鈕色 ========== */
