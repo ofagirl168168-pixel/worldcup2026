@@ -1916,12 +1916,22 @@ img.flag-img {
   margin-left: 5px;
   padding: 2px 7px 2px 4px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,170,0,0.1));
-  border: 1px solid rgba(255,215,0,0.3);
-  color: #ffd700;
   line-height: 1.2;
   white-space: nowrap;
+  /* 預設普通 */
+  background: rgba(156,163,175,0.12);
+  border: 1px solid rgba(156,163,175,0.3);
+  color: #9ca3af;
 }
+/* 基礎成就稀有度 */
+.lb-badge-common { background: rgba(156,163,175,0.12); border-color: rgba(156,163,175,0.3); color: #9ca3af; }
+.lb-badge-rare { background: rgba(96,165,250,0.15); border-color: rgba(96,165,250,0.4); color: #60a5fa; }
+.lb-badge-epic { background: rgba(192,132,252,0.15); border-color: rgba(192,132,252,0.4); color: #c084fc; }
+.lb-badge-legendary { background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.45); color: #fbbf24; box-shadow: 0 0 6px rgba(251,191,36,0.3); }
+/* 進階成就階級 */
+.lb-badge-bronze { background: rgba(205,127,50,0.15); border-color: rgba(205,127,50,0.4); color: #cd7f32; }
+.lb-badge-silver { background: rgba(192,192,192,0.15); border-color: rgba(192,192,192,0.4); color: #c0c0c0; }
+.lb-badge-gold { background: rgba(255,215,0,0.15); border-color: rgba(255,215,0,0.45); color: #ffd700; box-shadow: 0 0 6px rgba(255,215,0,0.3); }
 
 /* ========== 徽章卡片可點擊 ========== */
 .badge-card { cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
