@@ -2134,7 +2134,7 @@ const BADGES = [
   { id:'champion_set',  icon:'🏆', name:'冠軍直覺',   desc:'完成冠軍預測',           rarity:'common' },
   { id:'groups_done',   icon:'📋', name:'全組預測師', desc:'填完所有 12 組分組預測', rarity:'rare' },
   { id:'team_set',      icon:'❤️', name:'死忠球迷',   desc:'宣示支持球隊',           rarity:'common' },
-  { id:'all_tasks',     icon:'🌟', name:'任務達人',   desc:'完成所有競技場任務',     rarity:'epic' },
+  { id:'all_tasks',     icon:'🌟', name:'任務達人',   desc:'完成所有競技場任務',     rarity:'rare' },
   { id:'answered10',    icon:'🧠', name:'積累智慧',   desc:'累計答題 10 次',         rarity:'rare' },
   { id:'answered30',    icon:'🎓', name:'資深預言家', desc:'累計答題 30 次',         rarity:'epic' },
 ];
