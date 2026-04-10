@@ -2750,18 +2750,7 @@ function startPredCountdowns() {
   });
 }
 
-// ── 賽程卡片預測倒數（全局 60s 刷新）──
-function _formatPredCd(ms) {
-  if (ms <= 0) return null;
-  const d = Math.floor(ms / 86400000);
-  const h = Math.floor((ms % 86400000) / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  if (d > 7) return `${d} 天後截止`;
-  if (d > 0) return `${d}天${h}時 後截止`;
-  if (h > 0) return `${h}時${m}分 後截止`;
-  return `${m}分鐘 後截止`;
-}
-
+// ── 賽程卡片預測倒數（全局刷新）──
 function startSchedulePredCountdowns() {
   function tick() {
     document.querySelectorAll('.match-pred-tag[data-pred-cd]').forEach(el => {
@@ -2770,17 +2759,30 @@ function startSchedulePredCountdowns() {
       const ms = ko - Date.now();
       if (ms <= 0) {
         el.textContent = '🔒 已截止';
-        el.classList.add('expired');
+        el.className = 'match-pred-tag expired';
         return;
       }
-      const cdText = _formatPredCd(ms);
-      el.innerHTML = `🎯 預測比分 <span class="pred-cd-text">${cdText}</span>`;
-      if (ms < 2 * 3600000) el.classList.add('urgent');
-      else if (ms < 24 * 3600000) el.classList.add('soon');
+      // 超過 3 天：只顯示一行
+      if (ms > 3 * 86400000) {
+        el.innerHTML = '🎯 預測比分';
+        el.className = 'match-pred-tag';
+        return;
+      }
+      // 3 天內：顯示倒數
+      const d = Math.floor(ms / 86400000);
+      const h = Math.floor((ms % 86400000) / 3600000);
+      const m = Math.floor((ms % 3600000) / 60000);
+      const s = Math.floor((ms % 60000) / 1000);
+      let cdText;
+      if (d > 0) cdText = `${d}天${h}時${m}分`;
+      else if (h > 0) cdText = `${h}時${m}分${s}秒`;
+      else cdText = `${m}分${s}秒`;
+      el.innerHTML = `🎯 預測比分 · <span class="pred-cd-text">⏰ ${cdText}</span>`;
+      el.className = 'match-pred-tag' + (ms < 2*3600000 ? ' urgent' : ms < 24*3600000 ? ' soon' : '');
     });
   }
   tick();
-  setInterval(tick, 60000);
+  setInterval(tick, 1000);
 }
 
 // 頁面載入後啟動

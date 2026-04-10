@@ -1769,11 +1769,9 @@ img.flag-img {
   animation: none;
 }
 .match-pred-tag .pred-cd-text {
-  display: block;
   font-size: 10px;
   font-weight: 600;
-  opacity: 0.75;
-  margin-top: 1px;
+  opacity: 0.8;
 }
 .match-pred-tag.soon {
   border-color: rgba(240,160,32,0.4);
