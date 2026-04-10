@@ -2131,10 +2131,10 @@ const BADGES = [
   { id:'streak3',       icon:'🔥', name:'三連勝',     desc:'連續答題 3 天' },
   { id:'streak7',       icon:'💥', name:'週不停歇',   desc:'連續答題 7 天' },
   { id:'streak30',      icon:'⚡', name:'鐵人預言家', desc:'連續答題 30 天' },
-  { id:'champion_set',  icon:'🏆', name:'押注冠軍',   desc:'完成冠軍預測' },
+  { id:'champion_set',  icon:'🏆', name:'冠軍直覺',   desc:'完成冠軍預測' },
   { id:'groups_done',   icon:'📋', name:'全組預測師', desc:'填完所有 12 組分組預測' },
   { id:'team_set',      icon:'❤️', name:'死忠球迷',   desc:'宣示支持球隊' },
-  { id:'all_tasks',     icon:'🌟', name:'全能預言家', desc:'完成所有競技場任務' },
+  { id:'all_tasks',     icon:'🌟', name:'任務達人', desc:'完成所有競技場任務' },
   { id:'answered10',    icon:'🧠', name:'積累智慧',   desc:'累計答題 10 次' },
   { id:'answered30',    icon:'🎓', name:'資深預言家', desc:'累計答題 30 次' },
 ];
