@@ -56,7 +56,7 @@
   // ═══════════════════════════════════════════════════════════
   const DTYPE = {
     normal:  { label:'防守員',   fill:'#4fc3f7', hp:3,  spd:0.30, w:44, h:62 },
-    fast:    { label:'快速前鋒', fill:'#fff176', hp:2,  spd:0.65, w:38, h:54 },
+    fast:    { label:'快速前鋒', fill:'#fff176', hp:2,  spd:0.42, w:38, h:54 },
     tank:    { label:'中後衛',   fill:'#ef5350', hp:8,  spd:0.18, w:56, h:72 },
     captain: { label:'隊長',     fill:'#ce93d8', hp:5,  spd:0.28, w:50, h:66, aura:true },
     sentry:  { label:'中路守衛', fill:'#81d4fa', hp:4,  spd:0.12, w:48, h:64 },
@@ -336,8 +336,9 @@
         d.burnTick -= dt;
         if (d.burnTick <= 0) { d.hp -= 1; d.burnTick = 1000; addPart(d.x, d.z, '🔥', 0.3); if (d.hp <= 0) onDefKill(d); }
       }
-      // 前進 + 斜向移動
-      const sp = d.frozen > 0 ? d.spd * 0.5 : d.spd;
+      // 前進 + 斜向移動（速度上限 0.8）
+      const rawSp = d.frozen > 0 ? d.spd * 0.5 : d.spd;
+      const sp = Math.min(rawSp, 0.8);
       if (d.frozen > 0) d.frozen -= dt;
       const step = dt / 16;
       d.z -= sp * step;
@@ -578,52 +579,140 @@
   }
 
   // ─── 防守員 ──────────────────────────────────────────────
+  // 顏色工具：變亮/變暗
+  function shadeColor(hex, amt) {
+    let r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    r = Math.min(255, Math.max(0, r + amt));
+    g = Math.min(255, Math.max(0, g + amt));
+    b = Math.min(255, Math.max(0, b + amt));
+    return `rgb(${r},${g},${b})`;
+  }
+
   function drawDef(d) {
     const p = proj(d.x, d.z);
     const w = d.w * p.s, h = d.h * p.s;
     if (p.y < horizY - 10 || p.s < 0.05) return;
 
-    // 影子
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.ellipse(p.x, p.y, w * 0.5, h * 0.1, 0, 0, Math.PI * 2); ctx.fill();
-
+    const baseColor = d.frozen > 0 ? '#90caf9' : d.fill;
+    const darkSide = shadeColor(baseColor, -50);
+    const highlight = shadeColor(baseColor, 40);
     const bx = p.x - w / 2, by = p.y - h;
-    // 身體
-    ctx.fillStyle = d.frozen > 0 ? '#90caf9' : d.fill;
-    ctx.fillRect(bx, by + h * 0.25, w, h * 0.75);
-    // 頭
-    ctx.beginPath(); ctx.arc(p.x, by + h * 0.15, w * 0.35, 0, Math.PI * 2); ctx.fill();
-    // 灼燒效果
-    if (d.burning > 0) { ctx.fillStyle = 'rgba(255,80,0,0.35)'; ctx.fillRect(bx - 2, by, w + 4, h); }
 
-    // 血條
+    // 地面陰影
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(p.x, p.y + 2, w * 0.55, h * 0.08, 0, 0, Math.PI * 2); ctx.fill();
+
+    // ── 雙腿 ──
+    const legW = w * 0.22, legH = h * 0.32;
+    const legY = p.y - legH;
+    // 左腿（暗面）
+    ctx.fillStyle = darkSide;
+    rr(ctx, p.x - w * 0.28, legY, legW, legH, legW * 0.3); ctx.fill();
+    // 右腿（亮面）
+    ctx.fillStyle = baseColor;
+    rr(ctx, p.x + w * 0.08, legY, legW, legH, legW * 0.3); ctx.fill();
+
+    // ── 身體（主體圓角矩形 + 側面厚度） ──
+    const bodyY = by + h * 0.28, bodyH = h * 0.42;
+    // 暗面（右側厚度感）
+    ctx.fillStyle = darkSide;
+    rr(ctx, bx + w * 0.08, bodyY + 2, w * 0.88, bodyH, w * 0.15); ctx.fill();
+    // 主體正面
+    const bodyGrad = ctx.createLinearGradient(bx, bodyY, bx + w, bodyY);
+    bodyGrad.addColorStop(0, highlight);
+    bodyGrad.addColorStop(0.4, baseColor);
+    bodyGrad.addColorStop(1, darkSide);
+    ctx.fillStyle = bodyGrad;
+    rr(ctx, bx, bodyY, w * 0.92, bodyH, w * 0.15); ctx.fill();
+
+    // 球衣號碼線條（裝飾）
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = Math.max(1, 1.5 * p.s);
+    const midY = bodyY + bodyH * 0.5;
+    ctx.beginPath(); ctx.moveTo(p.x - w * 0.15, midY - bodyH * 0.15);
+    ctx.lineTo(p.x + w * 0.05, midY + bodyH * 0.15); ctx.stroke();
+
+    // ── 雙肩（圓形，增加厚度感） ──
+    const shoulderR = w * 0.18;
+    ctx.fillStyle = baseColor;
+    ctx.beginPath(); ctx.arc(bx + shoulderR * 0.6, bodyY + shoulderR * 0.5, shoulderR, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = darkSide;
+    ctx.beginPath(); ctx.arc(bx + w * 0.92 - shoulderR * 0.6, bodyY + shoulderR * 0.5, shoulderR * 0.9, 0, Math.PI * 2); ctx.fill();
+
+    // ── 頭部（球形漸層） ──
+    const headR = w * 0.32;
+    const headY = by + h * 0.18;
+    const headGrad = ctx.createRadialGradient(p.x - headR * 0.3, headY - headR * 0.3, headR * 0.1, p.x, headY, headR);
+    headGrad.addColorStop(0, highlight);
+    headGrad.addColorStop(1, darkSide);
+    ctx.fillStyle = headGrad;
+    ctx.beginPath(); ctx.arc(p.x, headY, headR, 0, Math.PI * 2); ctx.fill();
+
+    // 灼燒效果
+    if (d.burning > 0) {
+      ctx.fillStyle = 'rgba(255,80,0,0.25)';
+      rr(ctx, bx - 2, by, w + 4, h, w * 0.1); ctx.fill();
+    }
+
+    // ── 血條 ──
     const bw = w * 1.2, bh = Math.max(3, 4 * p.s);
-    const bxp = p.x - bw / 2, byp = by - bh - 2;
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(bxp, byp, bw, bh);
+    const bxp = p.x - bw / 2, byp = by - bh - 4;
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    rr(ctx, bxp, byp, bw, bh, 2); ctx.fill();
     const ratio = d.hp / d.maxHp;
     ctx.fillStyle = ratio > 0.5 ? '#4caf50' : ratio > 0.25 ? '#ff9800' : '#f44336';
-    ctx.fillRect(bxp, byp, bw * ratio, bh);
+    rr(ctx, bxp, byp, bw * ratio, bh, 2); ctx.fill();
   }
 
-  // ─── 守門員 ──────────────────────────────────────────────
+  // ─── 守門員（3D 風格） ─────────────────────────────────────
   function drawGK(gk) {
     const p = proj(gk.x, gk.z);
     const w = gk.w * p.s, h = gk.h * p.s;
-
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.ellipse(p.x, p.y, w * 0.5, h * 0.1, 0, 0, Math.PI * 2); ctx.fill();
-
     const bx = p.x - w / 2, by = p.y - h;
-    ctx.fillStyle = '#c0ca33';
-    ctx.fillRect(bx, by + h * 0.25, w, h * 0.75);
-    ctx.beginPath(); ctx.arc(p.x, by + h * 0.15, w * 0.35, 0, Math.PI * 2); ctx.fill();
+    const baseColor = '#c0ca33';
 
-    // 手套
+    // 地面陰影
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(p.x, p.y + 2, w * 0.55, h * 0.08, 0, 0, Math.PI * 2); ctx.fill();
+
+    // 雙腿
+    const legW = w * 0.22, legH = h * 0.3;
+    ctx.fillStyle = shadeColor(baseColor, -40);
+    rr(ctx, p.x - w * 0.28, p.y - legH, legW, legH, legW * 0.3); ctx.fill();
+    ctx.fillStyle = baseColor;
+    rr(ctx, p.x + w * 0.08, p.y - legH, legW, legH, legW * 0.3); ctx.fill();
+
+    // 身體
+    const bodyY = by + h * 0.28, bodyH = h * 0.42;
+    const gkGrad = ctx.createLinearGradient(bx, bodyY, bx + w, bodyY);
+    gkGrad.addColorStop(0, shadeColor(baseColor, 40));
+    gkGrad.addColorStop(0.4, baseColor);
+    gkGrad.addColorStop(1, shadeColor(baseColor, -50));
+    ctx.fillStyle = gkGrad;
+    rr(ctx, bx, bodyY, w * 0.92, bodyH, w * 0.15); ctx.fill();
+
+    // 肩膀
+    const sr = w * 0.18;
+    ctx.fillStyle = baseColor;
+    ctx.beginPath(); ctx.arc(bx + sr * 0.6, bodyY + sr * 0.5, sr, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = shadeColor(baseColor, -50);
+    ctx.beginPath(); ctx.arc(bx + w * 0.92 - sr * 0.6, bodyY + sr * 0.5, sr * 0.9, 0, Math.PI * 2); ctx.fill();
+
+    // 手套（伸展）
     ctx.fillStyle = '#ff8f00';
-    const gloveW = Math.max(3, 5 * p.s), gloveH = Math.max(4, 8 * p.s);
-    ctx.fillRect(bx - gloveW, by + h * 0.4, gloveW, gloveH);
-    ctx.fillRect(bx + w, by + h * 0.4, gloveW, gloveH);
+    const gloveR = Math.max(4, w * 0.16);
+    ctx.beginPath(); ctx.arc(bx - gloveR * 0.3, bodyY + bodyH * 0.3, gloveR, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = shadeColor('#ff8f00', -30);
+    ctx.beginPath(); ctx.arc(bx + w * 0.92 + gloveR * 0.3, bodyY + bodyH * 0.3, gloveR * 0.9, 0, Math.PI * 2); ctx.fill();
+
+    // 頭部
+    const headR = w * 0.32;
+    const headY = by + h * 0.18;
+    const hGrad = ctx.createRadialGradient(p.x - headR * 0.3, headY - headR * 0.3, headR * 0.1, p.x, headY, headR);
+    hGrad.addColorStop(0, shadeColor(baseColor, 50));
+    hGrad.addColorStop(1, shadeColor(baseColor, -40));
+    ctx.fillStyle = hGrad;
+    ctx.beginPath(); ctx.arc(p.x, headY, headR, 0, Math.PI * 2); ctx.fill();
   }
 
   // ─── 足球 ────────────────────────────────────────────────
