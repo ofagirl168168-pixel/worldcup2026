@@ -206,7 +206,7 @@
     G.spawnTimer = 1500;
 
     waveFlash = 1800;
-    G.gk.spd = (GK_BASE_SPD + G.wave * 0.18) * (G.gkSlowMul || 1);
+    G.gk.spd = (GK_BASE_SPD + G.wave * 0.3) * (G.gkSlowMul || 1);
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -286,10 +286,25 @@
       }
     }
 
-    // ── 守門員 ──
+    // ── 守門員（追蹤球） ──
     const gk = G.gk;
     const gkEffSpd = gk.spd * (G.globalSlow || 1);
-    gk.x += gk.dir * gkEffSpd * (dt / 16);
+    // 找最接近球門的球來追蹤
+    let trackBall = null, bestZ = 0;
+    for (const b of G.balls) {
+      if (!b.alive) continue;
+      if (b.z > bestZ) { bestZ = b.z; trackBall = b; }
+    }
+    if (trackBall) {
+      // 追蹤球的 x 軸位置
+      const diff = trackBall.x - gk.x;
+      if (Math.abs(diff) > 3) {
+        gk.x += Math.sign(diff) * gkEffSpd * (dt / 16);
+      }
+    } else {
+      // 沒有球時左右巡邏
+      gk.x += gk.dir * gkEffSpd * (dt / 16);
+    }
     if (gk.x > GOAL_HW - gk.w / 2) { gk.x = GOAL_HW - gk.w / 2; gk.dir = -1; }
     if (gk.x < -GOAL_HW + gk.w / 2) { gk.x = -GOAL_HW + gk.w / 2; gk.dir = 1; }
 
@@ -391,6 +406,8 @@
         d.burnTick -= dt;
         if (d.burnTick <= 0) { d.hp -= 1; d.burnTick = 1000; addPart(d.x, d.z, '🔥', 0.3); if (d.hp <= 0) onDefKill(d); }
       }
+      // 被守衛抱住時完全無法移動
+      if (d._grabbed) continue;
       // 前進 + 斜向移動（速度上限 0.8）
       const rawSp = (d.frozen > 0 ? d.spd * 0.5 : d.spd) * (G.globalSlow || 1);
       const sp = Math.min(rawSp, 0.8);
@@ -441,43 +458,50 @@
     }
     G.defs = G.defs.filter(d => d.hp > 0);
 
-    // ── 守衛盟友 ──
-    const SAFETY_Z = FIELD_DEPTH * 0.3; // 安全線：敵人越過此線就觸發守衛
+    // ── 守衛盟友（抱住敵人機制） ──
+    const SAFETY_Z = FIELD_DEPTH * 0.3;
+    // 收集已被守衛鎖定的敵人，確保多個守衛不會搶同一個
+    const grabbedDefs = new Set();
     for (const a of G.allies) {
-      // 開始阻擋後才倒計時
-      if (a.blocking) {
+      if (a._target && a._target.hp > 0) grabbedDefs.add(a._target);
+    }
+    for (const a of G.allies) {
+      if (a.grabbing) {
+        // 抱住中：倒計時，敵人完全無法移動（位置鎖定在守衛身上）
         a.blockTimer -= dt;
-        if (a.blockTimer <= 0) { a.alive = false; continue; }
-        // 阻擋中持續凍結目標
-        if (a._target && a._target.hp > 0) {
-          a._target.frozen = Math.max(a._target.frozen || 0, 200);
+        if (a.blockTimer <= 0 || !a._target || a._target.hp <= 0) {
+          if (a._target) a._target._grabbed = false;
+          a.alive = false; continue;
         }
-      }
-      // 找越過安全線且最靠近底線的敵人（優先攔截最危險的）
-      let nearest = null, lowestZ = Infinity;
-      for (const d of G.defs) {
-        if (d.hp <= 0 || d._guardLocked) continue; // 已被其他守衛鎖定的跳過
-        if (d.z < SAFETY_Z && d.z < lowestZ) { lowestZ = d.z; nearest = d; }
-      }
-      if (nearest && !a.blocking) {
-        nearest._guardLocked = true; // 鎖定此敵人，避免多個守衛搶同一個
-        a._target = nearest;
-        // 高速衝向敵人
-        const dx = nearest.x - a.x, dz = nearest.z - a.z;
-        const len = Math.sqrt(dx * dx + dz * dz) || 1;
-        const rushSpd = 2.0; // 衝刺速度
-        a.x += (dx / len) * rushSpd * (dt / 16);
-        a.z += (dz / len) * rushSpd * (dt / 16);
-        // 接觸後開始阻擋
-        if (len < 50) {
-          a.blocking = true;
-          a.blockTimer = 5000;
-          nearest.frozen = Math.max(nearest.frozen || 0, 200);
+        // 守衛貼在敵人身上
+        a.x = a._target.x;
+        a.z = a._target.z;
+        // 敵人完全停住
+        a._target._grabbed = true;
+      } else {
+        // 尚未抱住：尋找越過安全線的敵人
+        let nearest = null, lowestZ = Infinity;
+        for (const d of G.defs) {
+          if (d.hp <= 0 || d._grabbed || grabbedDefs.has(d)) continue;
+          if (d.z < SAFETY_Z && d.z < lowestZ) { lowestZ = d.z; nearest = d; }
+        }
+        if (nearest) {
+          a._target = nearest;
+          grabbedDefs.add(nearest); // 立刻標記，防止同幀其他守衛搶
+          const dx = nearest.x - a.x, dz = nearest.z - a.z;
+          const len = Math.sqrt(dx * dx + dz * dz) || 1;
+          const rushSpd = 2.5;
+          a.x += (dx / len) * rushSpd * (dt / 16);
+          a.z += (dz / len) * rushSpd * (dt / 16);
+          // 接觸 → 抱住
+          if (len < 45) {
+            a.grabbing = true;
+            a.blockTimer = 5000;
+            nearest._grabbed = true;
+          }
         }
       }
     }
-    // 清除鎖定標記（每幀重置，下幀重新分配）
-    for (const d of G.defs) d._guardLocked = false;
     G.allies = G.allies.filter(a => a.alive);
 
     // ── 粒子 ──
@@ -557,7 +581,7 @@
       G.allies.push({
         x: (Math.random() - 0.5) * FIELD_HW * 0.6,
         z: FIELD_DEPTH * 0.15,
-        alive: true, blocking: false, blockTimer: 5000,
+        alive: true, grabbing: false, blockTimer: 5000,
       });
     }
     G.phase = 'playing';
@@ -879,8 +903,8 @@
     const w = 42 * p.s, h = 60 * p.s;
     if (p.y < horizY - 10 || p.s < 0.05) return;
 
-    const remaining = a.blocking ? Math.max(0, a.blockTimer / 5000) : 1;
-    ctx.globalAlpha = a.blocking ? Math.min(1, remaining * 2) : 1;
+    const remaining = a.grabbing ? Math.max(0, a.blockTimer / 5000) : 1;
+    ctx.globalAlpha = a.grabbing ? Math.min(1, remaining * 2) : 1;
 
     const baseColor = '#43a047';
     const darkSide = shadeColor(baseColor, -45);
@@ -932,8 +956,8 @@
     ctx.fillStyle = headGrad;
     ctx.beginPath(); ctx.arc(p.x, headY, headR, 0, Math.PI * 2); ctx.fill();
 
-    // 倒計時條（阻擋中才顯示）
-    if (a.blocking) {
+    // 倒計時條（抱住中才顯示）
+    if (a.grabbing) {
       const bw = w * 1.2, bh = Math.max(3, 4 * p.s);
       const bxp = p.x - bw / 2, byp = by - bh - 4;
       ctx.fillStyle = 'rgba(0,0,0,0.6)';
