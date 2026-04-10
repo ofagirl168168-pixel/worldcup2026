@@ -2034,35 +2034,35 @@ function saveSupportTeam() {
 // ── 成就徽章系統 ──────────────────────────────────────────
 // ── 進階成就（銅/銀/金三階）──────────────────────────────
 const TIERED_BADGES = [
-  { id:'pred_direction', tiers:[
-    { icon:'🥉', name:'方向感',     desc:'正確預測勝負方向 3 次',  threshold:3 },
-    { icon:'🥈', name:'方向大師',   desc:'正確預測勝負方向 10 次', threshold:10 },
-    { icon:'🥇', name:'神準方向',   desc:'正確預測勝負方向 25 次', threshold:25 },
+  { id:'pred_direction', icon:'🧭', tiers:[
+    { name:'方向感',     desc:'正確預測勝負方向 3 次',  threshold:3 },
+    { name:'方向大師',   desc:'正確預測勝負方向 10 次', threshold:10 },
+    { name:'神準方向',   desc:'正確預測勝負方向 25 次', threshold:25 },
   ]},
-  { id:'pred_exact', tiers:[
-    { icon:'🎯', name:'精準出手',   desc:'命中精確比分 1 次',  threshold:1 },
-    { icon:'💎', name:'比分獵人',   desc:'命中精確比分 3 次',  threshold:3 },
-    { icon:'👑', name:'完美預言',   desc:'命中精確比分 10 次', threshold:10 },
+  { id:'pred_exact', icon:'🎯', tiers:[
+    { name:'精準出手',   desc:'命中精確比分 1 次',  threshold:1 },
+    { name:'比分獵人',   desc:'命中精確比分 3 次',  threshold:3 },
+    { name:'完美預言',   desc:'命中精確比分 10 次', threshold:10 },
   ]},
-  { id:'matches_unlocked', tiers:[
-    { icon:'🔓', name:'初探門道',   desc:'解鎖 5 場比賽',  threshold:5 },
-    { icon:'🗝️', name:'解鎖達人',  desc:'解鎖 15 場比賽', threshold:15 },
-    { icon:'🏟️', name:'全場制霸',  desc:'解鎖 30 場比賽', threshold:30 },
+  { id:'matches_unlocked', icon:'🏟️', tiers:[
+    { name:'初探門道',   desc:'解鎖 5 場比賽',  threshold:5 },
+    { name:'解鎖達人',   desc:'解鎖 15 場比賽', threshold:15 },
+    { name:'全場制霸',   desc:'解鎖 30 場比賽', threshold:30 },
   ]},
-  { id:'referrals', tiers:[
-    { icon:'📣', name:'口耳相傳',   desc:'邀請 1 位朋友',  threshold:1 },
-    { icon:'📢', name:'推廣大使',   desc:'邀請 5 位朋友',  threshold:5 },
-    { icon:'🌐', name:'社群領袖',   desc:'邀請 10 位朋友', threshold:10 },
+  { id:'referrals', icon:'🤝', tiers:[
+    { name:'口耳相傳',   desc:'邀請 1 位朋友',  threshold:1 },
+    { name:'推廣大使',   desc:'邀請 5 位朋友',  threshold:5 },
+    { name:'社群領袖',   desc:'邀請 10 位朋友', threshold:10 },
   ]},
-  { id:'level', tiers:[
-    { icon:'⭐', name:'小有成就',   desc:'達到 Lv.5',  threshold:5 },
-    { icon:'🌟', name:'經驗豐富',   desc:'達到 Lv.10', threshold:10 },
-    { icon:'💫', name:'傳奇玩家',   desc:'達到 Lv.20', threshold:20 },
+  { id:'level', icon:'⭐', tiers:[
+    { name:'小有成就',   desc:'達到 Lv.5',  threshold:5 },
+    { name:'經驗豐富',   desc:'達到 Lv.10', threshold:10 },
+    { name:'傳奇玩家',   desc:'達到 Lv.20', threshold:20 },
   ]},
-  { id:'streak', tiers:[
-    { icon:'🔥', name:'三日連勝',   desc:'連續答題 3 天',  threshold:3 },
-    { icon:'💥', name:'週不停歇',   desc:'連續答題 7 天',  threshold:7 },
-    { icon:'⚡', name:'鐵人預言家', desc:'連續答題 30 天', threshold:30 },
+  { id:'streak', icon:'🔥', tiers:[
+    { name:'三日連勝',   desc:'連續答題 3 天',  threshold:3 },
+    { name:'週不停歇',   desc:'連續答題 7 天',  threshold:7 },
+    { name:'鐵人預言家', desc:'連續答題 30 天', threshold:30 },
   ]},
 ];
 
@@ -2098,7 +2098,7 @@ function checkTieredAchievements() {
     badge.tiers.forEach((t, tierIdx) => {
       if (tierIdx > currentTier && currentVal >= t.threshold) {
         earnedMap[badge.id] = tierIdx;
-        newOnes.push({ id: badge.id, tier: tierIdx, icon: t.icon, name: t.name, desc: t.desc, earnedAt: new Date().toISOString() });
+        newOnes.push({ id: badge.id, tier: tierIdx, icon: badge.icon, name: t.name, desc: t.desc, earnedAt: new Date().toISOString() });
       }
     });
   });
@@ -2234,7 +2234,6 @@ function renderBadges() {
         ${TIERED_BADGES.map((badge, bi) => {
           const storedTier = tieredMap[badge.id] ?? -1;
           const currentVal = vals[badge.id] || 0;
-          // 即時計算實際達成階級（不只依賴 localStorage）
           let liveTier = -1;
           badge.tiers.forEach((t, ti) => { if (currentVal >= t.threshold) liveTier = ti; });
           const currentTier = Math.max(storedTier, liveTier);
@@ -2242,8 +2241,10 @@ function renderBadges() {
           const displayTier = currentTier >= 0 ? badge.tiers[currentTier] : null;
           const progress = nextTier ? Math.min(100, Math.round(currentVal / nextTier.threshold * 100)) : 100;
           const cls = currentTier >= 0 ? tierCls[currentTier] : 'locked';
+          const tierGlow = ['drop-shadow(0 0 8px rgba(205,127,50,0.7))','drop-shadow(0 0 8px rgba(192,192,192,0.8))','drop-shadow(0 0 10px rgba(255,215,0,0.8))'];
+          const iconStyle = currentTier >= 0 ? `filter:${tierGlow[currentTier]}` : 'filter:grayscale(1);opacity:0.4';
           return `<div class="badge-card ${cls}" onclick="showBadgeDetail('tiered',${bi})">
-            <div class="badge-card-icon">${displayTier ? displayTier.icon : '🔒'}</div>
+            <div class="badge-card-icon" style="${iconStyle}">${badge.icon}</div>
             <div class="badge-card-name">${displayTier ? displayTier.name : badge.tiers[0].name}</div>
             ${currentTier >= 0 ? `<div class="badge-tier-label">${tierLabel[currentTier]}階</div>` : ''}
             ${nextTier ? `<div class="badge-tier-progress"><div class="badge-tier-fill ${currentTier >= 0 ? tierCls[currentTier] : ''}" style="width:${progress}%"></div></div>
@@ -2287,11 +2288,15 @@ function showBadgeDetail(type, idx) {
     const tierColors = ['#cd7f32', '#c0c0c0', '#ffd700'];
     const tierNames = ['銅階', '銀階', '金階'];
 
+    const tierIcons = ['🥉', '🥈', '🥇'];
+    const tierGlow = ['drop-shadow(0 0 10px rgba(205,127,50,0.8))', 'drop-shadow(0 0 10px rgba(192,192,192,0.9))', 'drop-shadow(0 0 12px rgba(255,215,0,0.9))'];
+    const iconFilter = effectiveTier >= 0 ? tierGlow[effectiveTier] : 'grayscale(1)';
+
     mc.innerHTML = `
       <div style="text-align:center;padding:10px 0">
-        <div style="font-size:48px;margin-bottom:8px">${effectiveTier >= 0 ? badge.tiers[effectiveTier].icon : '🔒'}</div>
-        <div style="font-size:20px;font-weight:900;margin-bottom:4px">${badge.tiers[0].name.replace(/[🥉🥈🥇🎯💎👑🔓🗝️🏟️📣📢🌐⭐🌟💫🔥💥⚡]/g,'').trim()}</div>
-        <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px">目前進度：${currentVal}</div>
+        <div style="font-size:56px;margin-bottom:4px;filter:${iconFilter}">${badge.icon}</div>
+        ${effectiveTier >= 0 ? `<div style="font-size:13px;font-weight:800;color:${tierColors[effectiveTier]};margin-bottom:4px">${tierIcons[effectiveTier]} ${tierNames[effectiveTier]}</div>` : ''}
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:18px">目前進度：<b>${currentVal}</b></div>
         <div style="display:flex;flex-direction:column;gap:12px;text-align:left;margin-bottom:20px">
           ${badge.tiers.map((t, ti) => {
             const done = currentVal >= t.threshold;
@@ -2299,7 +2304,7 @@ function showBadgeDetail(type, idx) {
             const prog = Math.min(100, Math.round(currentVal / t.threshold * 100));
             return `<div style="background:rgba(255,255,255,${done ? '0.08' : '0.03'});border-radius:12px;padding:12px 14px;border:1px solid ${done ? tierColors[ti] : 'rgba(255,255,255,0.06)'}${isCurrent ? ';box-shadow:0 0 10px ' + tierColors[ti] + '40' : ''}">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                <span style="font-size:14px;font-weight:700;${done ? 'color:' + tierColors[ti] : 'color:var(--text-muted)'}">${t.icon} ${tierNames[ti]} — ${t.name}</span>
+                <span style="font-size:14px;font-weight:700;${done ? 'color:' + tierColors[ti] : 'color:var(--text-muted)'}">${tierIcons[ti]} ${tierNames[ti]} — ${t.name}</span>
                 <span style="font-size:12px;font-weight:700;${done ? 'color:#86efac' : 'color:var(--text-muted)'}">
                   ${done ? '✅' : `${currentVal}/${t.threshold}`}
                 </span>
