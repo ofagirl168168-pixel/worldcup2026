@@ -148,7 +148,7 @@
     } else if (isSentry) {
       startX = (Math.random() - 0.5) * GOAL_HW * 2;
     } else {
-      startX = (Math.random() - 0.5) * FIELD_HW * 1.4;
+      startX = (Math.random() - 0.5) * FIELD_HW * 0.9;  // 可視範圍內生成
     }
     const startZ = isSentry
       ? FIELD_DEPTH * (0.65 + Math.random() * 0.2)
@@ -342,9 +342,10 @@
       const step = dt / 16;
       d.z -= sp * step;
       d.x += (d.vx || 0) * step;
-      // 碰牆反彈 x 方向
-      if (d.x < -FIELD_HW + d.w) { d.x = -FIELD_HW + d.w; d.vx = Math.abs(d.vx || 0); }
-      if (d.x > FIELD_HW - d.w)  { d.x = FIELD_HW - d.w;  d.vx = -Math.abs(d.vx || 0); }
+      // 碰牆反彈 x 方向（限制在可視範圍內）
+      const xBound = FIELD_HW * 0.85;
+      if (d.x < -xBound + d.w) { d.x = -xBound + d.w; d.vx = Math.abs(d.vx || 0); }
+      if (d.x > xBound - d.w)  { d.x = xBound - d.w;  d.vx = -Math.abs(d.vx || 0); }
       // 隊長光環
       if (DTYPE[d.type]?.aura) {
         for (const d2 of G.defs) {
@@ -965,7 +966,7 @@
     H = window.innerHeight;
     cvs.width = W;
     cvs.height = H;
-    horizY = H * 0.2;  // 更平坦的視角
+    horizY = H * 0.08;  // 地平線很高，球場佔螢幕更大比例
   }
 
   function startGame() {
