@@ -28,7 +28,6 @@
   animateFog();
 
   // ── 2. 隱藏標靶系統 ──────────────────────────────────────
-  const targetEmojis = ['🎯', '💎', '⚽', '🏆', '🥇', '🌟', '🔥', '💰'];
   const targets = [];
   const TARGET_COUNT = 12;
   const TARGET_RESPAWN = 8000; // 被擊中後重生時間
@@ -45,12 +44,20 @@
   function spawnTarget() {
     const t = document.createElement('div');
     t.className = 'fx-target';
-    t.textContent = targetEmojis[Math.floor(Math.random() * targetEmojis.length)];
-    // 隨機位置：橫向用 vw，縱向用頁面座標 px（存在 dataset 中）
+    // 純 CSS 標靶（同心圓 + 竿子），不用 emoji
+    t.innerHTML =
+      '<div class="fx-target-board">' +
+        '<div class="fx-ring r1"></div>' +
+        '<div class="fx-ring r2"></div>' +
+        '<div class="fx-ring r3"></div>' +
+        '<div class="fx-bullseye"></div>' +
+      '</div>' +
+      '<div class="fx-target-pole"></div>';
+    // 隨機位置：橫向用 vw，縱向用頁面座標 px
     const pageH = getContentHeight();
     t.style.left = (8 + Math.random() * 84) + 'vw';
     const pageY = pageH * 0.05 + Math.random() * pageH * 0.9;
-    t._pageY = pageY; // 記住頁面座標
+    t._pageY = pageY;
     // 微微浮動動畫偏移
     t.style.animationDelay = (Math.random() * 3) + 's';
     targetLayer.appendChild(t);

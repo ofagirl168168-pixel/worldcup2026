@@ -2017,21 +2017,66 @@ img.flag-img {
   overflow: hidden;
 }
 
-/* 隱藏標靶 */
+/* 隱藏標靶（同心圓 + 竿子） */
 .fx-target {
   position: absolute;
-  font-size: 26px;
   opacity: 0;
   pointer-events: auto;
   cursor: crosshair;
   transition: opacity 0.15s;
   animation: fx-float 4s ease-in-out infinite alternate;
-  filter: drop-shadow(0 0 6px rgba(255,215,0,0.5));
+  filter: drop-shadow(0 0 8px rgba(255,50,50,0.4));
   user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
+/* 標靶圓盤 */
+.fx-target-board {
+  position: relative;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* 同心環 */
+.fx-ring {
+  position: absolute;
+  border-radius: 50%;
+}
+.fx-ring.r1 {
+  width: 44px; height: 44px;
+  background: #e53935;
+}
+.fx-ring.r2 {
+  width: 32px; height: 32px;
+  background: #fff;
+}
+.fx-ring.r3 {
+  width: 20px; height: 20px;
+  background: #e53935;
+}
+.fx-bullseye {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  z-index: 1;
+}
+
+/* 竿子 */
+.fx-target-pole {
+  width: 3px;
+  height: 28px;
+  background: linear-gradient(to bottom, #8d6e63, #5d4037);
+  border-radius: 0 0 2px 2px;
+}
+
 @keyframes fx-float {
-  0%   { transform: translateY(0) rotate(0deg); }
-  100% { transform: translateY(-10px) rotate(8deg); }
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
 }
 
 /* 標靶被擊中：爆開 */
