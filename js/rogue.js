@@ -5,11 +5,11 @@
   // ═══════════════════════════════════════════════════════════
   //  常數
   // ═══════════════════════════════════════════════════════════
-  const FIELD_HW    = 340;   // 球場半寬 (world)
-  const FIELD_DEPTH = 900;   // 球場深度
-  const GOAL_HW     = 110;   // 球門半寬
+  const FIELD_HW    = 450;   // 球場半寬 (world)
+  const FIELD_DEPTH = 1200;  // 球場深度
+  const GOAL_HW     = 130;   // 球門半寬
   const GOAL_Z      = FIELD_DEPTH;
-  const FOCAL       = 280;   // 透視焦距
+  const FOCAL       = 200;   // 透視焦距（小=更平坦視角）
   const MAX_LIVES   = 3;
   const BALL_SPD    = 11;    // 基礎球速
   const BALL_R      = 10;    // 基礎球半徑 (world)
@@ -21,19 +21,36 @@
   // ═══════════════════════════════════════════════════════════
   //  卡牌
   // ═══════════════════════════════════════════════════════════
+  // 稀有度權重：common 出現最多，legendary 最少
+  const RARITY_WEIGHT = { common: 50, rare: 25, epic: 10, legendary: 3 };
+
   const CARDS = [
-    { id:'power',   name:'重砲射擊',   desc:'傷害 ×2',                  icon:'💪', rarity:'common',    apply(s){ s.dmgMul *= 2; }},
-    { id:'bigball', name:'巨型足球',   desc:'球體增大，更容易命中',      icon:'⏺️', rarity:'common',    apply(s){ s.ballScale *= 1.4; }},
-    { id:'speed',   name:'閃電射門',   desc:'球速 +50%',                icon:'⚡', rarity:'common',    apply(s){ s.spdMul *= 1.5; }},
-    { id:'curve',   name:'弧線球',     desc:'足球帶隨機橫向飄移',       icon:'🌀', rarity:'common',    apply(s){ s.curve = true; }},
-    { id:'burn',    name:'火焰射擊',   desc:'命中附帶灼燒（每秒 1 傷害）',icon:'🔥', rarity:'rare',   apply(s){ s.burn = true; }},
-    { id:'freeze',  name:'冰凍射擊',   desc:'命中後敵人減速 50%',       icon:'❄️', rarity:'rare',     apply(s){ s.freeze = true; }},
-    { id:'explode', name:'爆裂射擊',   desc:'命中時爆炸傷害周圍敵人',   icon:'💥', rarity:'rare',     apply(s){ s.explode = true; }},
-    { id:'sniper',  name:'狙擊射門',   desc:'傷害 ×3，但球變小',        icon:'🔫', rarity:'rare',     apply(s){ s.dmgMul *= 3; s.ballScale *= 0.6; }},
-    { id:'multi',   name:'多重射擊',   desc:'同時踢出 +1 顆球',        icon:'⚽', rarity:'epic',      apply(s){ s.multiShot += 1; }},
-    { id:'pierce',  name:'貫穿射擊',   desc:'足球穿透敵人不反彈',       icon:'💨', rarity:'epic',      apply(s){ s.pierce = true; }},
-    { id:'ghost',   name:'幽靈球',     desc:'30% 機率直接穿過敵人',     icon:'👻', rarity:'legendary', apply(s){ s.ghostPct = Math.min(0.9, (s.ghostPct||0) + 0.3); }},
-    { id:'vampire', name:'吸血足球',   desc:'擊殺敵人回復 1 條命',      icon:'🧛', rarity:'legendary', apply(s){ s.vampire = true; }},
+    // ── 基礎數值卡 (common) ─────────────────
+    { id:'dmg20',    name:'射門強化',   desc:'傷害 +20%',                icon:'👊', rarity:'common',    apply(s){ s.dmgMul *= 1.2; }},
+    { id:'dmg30',    name:'力量訓練',   desc:'傷害 +30%',                icon:'💪', rarity:'common',    apply(s){ s.dmgMul *= 1.3; }},
+    { id:'spd20',    name:'速度鞋',     desc:'球速 +20%',                icon:'👟', rarity:'common',    apply(s){ s.spdMul *= 1.2; }},
+    { id:'spd40',    name:'閃電射門',   desc:'球速 +40%',                icon:'⚡', rarity:'common',    apply(s){ s.spdMul *= 1.4; }},
+    { id:'bigball',  name:'大力丸',     desc:'球體增大 20%',             icon:'⭕', rarity:'common',    apply(s){ s.ballScale *= 1.2; }},
+    { id:'bigball2', name:'巨型足球',   desc:'球體增大 40%',             icon:'🔵', rarity:'common',    apply(s){ s.ballScale *= 1.4; }},
+    { id:'rapid',    name:'快速連射',   desc:'射門冷卻 -30%',            icon:'⏩', rarity:'common',    apply(s){ s.cdMul *= 0.7; }},
+    { id:'multi1',   name:'雙重射擊',   desc:'連續射球數量 +1',          icon:'⚽', rarity:'common',    apply(s){ s.multiShot += 1; }},
+
+    // ── 能力卡 (rare) ──────────────────────
+    { id:'curve',    name:'弧線球',     desc:'足球帶隨機橫向飄移',       icon:'🌀', rarity:'rare',     apply(s){ s.curve = true; }},
+    { id:'burn',     name:'火焰射擊',   desc:'命中附帶灼燒（每秒 1 傷害）',icon:'🔥', rarity:'rare',  apply(s){ s.burn = true; }},
+    { id:'freeze',   name:'冰凍射擊',   desc:'命中後敵人減速 50%',       icon:'❄️', rarity:'rare',    apply(s){ s.freeze = true; }},
+    { id:'explode',  name:'爆裂射擊',   desc:'命中時爆炸傷害周圍',       icon:'💥', rarity:'rare',    apply(s){ s.explode = true; }},
+    { id:'sniper',   name:'狙擊射門',   desc:'傷害 ×2.5，球變小',        icon:'🔫', rarity:'rare',    apply(s){ s.dmgMul *= 2.5; s.ballScale *= 0.65; }},
+    { id:'multi2',   name:'三重射擊',   desc:'連續射球數量 +2',          icon:'🎱', rarity:'rare',     apply(s){ s.multiShot += 2; }},
+
+    // ── 進階卡 (epic) ──────────────────────
+    { id:'pierce',   name:'貫穿射擊',   desc:'足球穿透敵人不反彈',       icon:'💨', rarity:'epic',     apply(s){ s.pierce = true; }},
+    { id:'power2',   name:'重砲射擊',   desc:'傷害 ×2',                  icon:'🔨', rarity:'epic',     apply(s){ s.dmgMul *= 2; }},
+    { id:'homing',   name:'追蹤導彈',   desc:'足球微幅追蹤最近敵人',     icon:'🎯', rarity:'epic',     apply(s){ s.homing = true; }},
+
+    // ── 傳說卡 (legendary) ─────────────────
+    { id:'ghost',    name:'幽靈球',     desc:'30% 機率穿過敵人',         icon:'👻', rarity:'legendary', apply(s){ s.ghostPct = Math.min(0.9, (s.ghostPct||0) + 0.3); }},
+    { id:'vampire',  name:'吸血足球',   desc:'擊殺敵人回復 1 條命',      icon:'🧛', rarity:'legendary', apply(s){ s.vampire = true; }},
   ];
 
   // ═══════════════════════════════════════════════════════════
@@ -68,8 +85,8 @@
       wave: 1,
 
       // buffs
-      dmgMul: 1, spdMul: 1, ballScale: 1, multiShot: 1,
-      pierce: false, burn: false, freeze: false,
+      dmgMul: 1, spdMul: 1, ballScale: 1, multiShot: 1, cdMul: 1,
+      pierce: false, burn: false, freeze: false, homing: false,
       explode: false, curve: false, ghostPct: 0, vampire: false,
       collected: [],            // card ids
 
@@ -161,7 +178,7 @@
       G.balls.push(b);
     }
     G.canShoot = false;
-    G.shootCD = SHOOT_CD;
+    G.shootCD = SHOOT_CD * G.cdMul;
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -212,6 +229,21 @@
       if (b.trail.length > 8) b.trail.shift();
 
       const step = dt / 16;
+
+      // 追蹤導彈：微幅偏向最近敵人
+      if (G.homing && G.defs.length) {
+        let nearest = null, bestDist = Infinity;
+        for (const d of G.defs) {
+          if (d.hp <= 0) continue;
+          const dist = Math.sqrt((b.x - d.x) ** 2 + (b.z - d.z) ** 2);
+          if (dist < bestDist) { bestDist = dist; nearest = d; }
+        }
+        if (nearest && bestDist < 300) {
+          const ax = (nearest.x - b.x) > 0 ? 0.08 : -0.08;
+          b.vx += ax * step;
+        }
+      }
+
       b.x += b.vx * step;
       b.z += b.vz * step;
       if (b.curveAcc) b.vx += b.curveAcc * step;
@@ -247,10 +279,10 @@
         continue;
       }
 
-      // 進球判定
+      // 進球判定（同一波只算一次）
       if (b.z >= GOAL_Z) {
         b.alive = false;
-        if (Math.abs(b.x) < GOAL_HW) { onGoal(); return; }
+        if (Math.abs(b.x) < GOAL_HW && G.phase === 'playing') { onGoal(); return; }
       }
       // 飛出場外
       if (b.z < -50) b.alive = false;
@@ -322,8 +354,21 @@
   }
 
   function pickCards(n) {
-    const pool = [...CARDS].sort(() => Math.random() - 0.5);
-    return pool.slice(0, n);
+    // 依稀有度權重抽卡，不重複
+    const weighted = [];
+    for (const c of CARDS) {
+      const w = RARITY_WEIGHT[c.rarity] || 10;
+      for (let i = 0; i < w; i++) weighted.push(c);
+    }
+    const picked = [];
+    const usedIds = new Set();
+    while (picked.length < n && weighted.length) {
+      const idx = Math.floor(Math.random() * weighted.length);
+      const c = weighted[idx];
+      if (!usedIds.has(c.id)) { picked.push(c); usedIds.add(c.id); }
+      weighted.splice(idx, 1);
+    }
+    return picked;
   }
 
   function selectCard(idx) {
@@ -859,7 +904,7 @@
     H = window.innerHeight;
     cvs.width = W;
     cvs.height = H;
-    horizY = H * 0.28;
+    horizY = H * 0.2;  // 更平坦的視角
   }
 
   function startGame() {
