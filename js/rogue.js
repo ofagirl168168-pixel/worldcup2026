@@ -16,7 +16,7 @@
   const BALL_R      = 10;    // 基礎球半徑 (world)
   const BASE_DMG    = 1;
   const SHOOT_CD    = 350;   // 射門冷卻 ms
-  const BALL_TTL    = 4000;  // 球最長存活 ms
+  const BALL_TTL    = 8000;  // 球最長存活 ms
   const GK_BASE_SPD = 1.2;
 
   // ═══════════════════════════════════════════════════════════
@@ -162,25 +162,30 @@
   // ═══════════════════════════════════════════════════════════
   //  射門
   // ═══════════════════════════════════════════════════════════
+  // 螢幕座標 → 世界座標（反投影）
+  function unproj(sx, sy) {
+    // proj: s = FOCAL/(FOCAL+z), screenX = W/2 + wx*s, screenY = horizY + (H-horizY)*s
+    // 反推：s = (sy - horizY) / (H - horizY), z = FOCAL/s - FOCAL, wx = (sx - W/2) / s
+    const s = Math.max(0.05, (sy - horizY) / (H - horizY));
+    const wz = FOCAL / s - FOCAL;
+    const wx = (sx - W / 2) / s;
+    return { x: wx, z: Math.max(10, wz) };
+  }
+
   function shoot(cx, cy) {
     if (!G.canShoot || G.phase !== 'playing') return;
 
-    // 計算從畫面底部中央到點擊位置的方向向量
-    const originX = W / 2;
-    const originY = H;
-    const dx = cx - originX;
-    const dy = cy - originY;  // 負值（向上）
-    const len = Math.sqrt(dx * dx + dy * dy) || 1;
-    // 歸一化方向，確保 vz 為正（向前）
-    const dirX = dx / len;
-    const dirY = -dy / len;   // 反轉：螢幕向上 = 世界向前
+    // 反投影點擊位置到世界座標，計算射球方向
+    const target = unproj(cx, cy);
+    const dx = target.x - 0;    // 球起始 x=0
+    const dz = target.z - 10;   // 球起始 z=10
+    const len = Math.sqrt(dx * dx + dz * dz) || 1;
 
     // 實際球速（有上限）
     const spd = Math.min(BALL_SPD * G.spdMul, MAX_BALL_SPD);
 
-    // 同角度連續射出（前後間隔，不散射）
-    const vx = dirX * spd * 0.7;
-    const vz = Math.max(dirY * spd, spd * 0.4);
+    const vx = (dx / len) * spd;
+    const vz = Math.max((dz / len) * spd, spd * 0.3);
     const n = G.multiShot;
     for (let i = 0; i < n; i++) {
       const delay = i * 120; // 每顆間隔 120ms
