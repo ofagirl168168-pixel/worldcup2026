@@ -1768,6 +1768,32 @@ img.flag-img {
   color: #86efac;
   animation: none;
 }
+.match-pred-tag .pred-cd-text {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.75;
+  margin-top: 1px;
+}
+.match-pred-tag.soon {
+  border-color: rgba(240,160,32,0.4);
+  color: #f0a020;
+  background: rgba(240,160,32,0.1);
+}
+.match-pred-tag.urgent {
+  border-color: rgba(239,68,68,0.4);
+  color: #ef4444;
+  background: rgba(239,68,68,0.1);
+  animation: pred-tag-urgent 1.5s ease-in-out infinite;
+}
+.match-pred-tag.expired {
+  opacity: 0.4;
+  animation: none;
+}
+@keyframes pred-tag-urgent {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
 @keyframes pred-tag-pulse {
   0%, 100% { opacity: 0.85; }
   50% { opacity: 1; }

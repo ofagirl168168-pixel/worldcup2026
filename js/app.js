@@ -1881,9 +1881,10 @@ function renderSchedule(phaseFilter, groupFilter) {
       const aggText = m.agg ? `<div style="font-size:11px;color:var(--text-muted)">總比分 ${m.agg.h}-${m.agg.a}</div>` : '';
       const uclPreds = (() => { try { return JSON.parse(localStorage.getItem('ucl26_my_preds'))||{}; } catch { return {}; } })();
       const uclMine = uclPreds[m.id];
-      const uclPredTag = m.status === 'finished' ? '' : uclMine
+      const uclKo = (m.date && m.time) ? new Date(m.date+'T'+m.time+':00+08:00').getTime() : 0;
+      const uclPredTag = (m.status === 'finished' || m.status === 'live') ? '' : uclMine
         ? `<div class="match-pred-tag predicted">${uclMine.h}-${uclMine.a} 已預測</div>`
-        : `<div class="match-pred-tag">🎯 預測比分</div>`;
+        : `<div class="match-pred-tag" data-pred-cd="${uclKo}">🎯 預測比分</div>`;
       return header + `<div class="match-card${isLive ? ' match-live' : ''}" onclick="openPredModal('${m.id}')">
         ${isLive ? '<div class="live-badge"><span class="live-dot"></span>LIVE</div>' : ''}
         <div class="match-team">
@@ -1943,9 +1944,11 @@ function renderSchedule(phaseFilter, groupFilter) {
     const phaseLabel = {group:'小組賽',r32:'32強',r16:'16強',qf:'八強',sf:'四強',final:'決賽'}[m.phase]||'';
     const wcPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
     const wcMine = wcPreds[m.id];
-    const wcPredTag = wcMine
+    const wcKo = (m.twDate && m.twTime) ? new Date(m.twDate+'T'+m.twTime+':00+08:00').getTime() : 0;
+    const wcStarted = wcKo > 0 && Date.now() >= wcKo;
+    const wcPredTag = wcStarted ? '' : wcMine
       ? `<div class="match-pred-tag predicted">${wcMine.h}-${wcMine.a} 已預測</div>`
-      : `<div class="match-pred-tag">🎯 預測比分</div>`;
+      : `<div class="match-pred-tag" data-pred-cd="${wcKo}">🎯 預測比分</div>`;
     return header + `<div class="match-card" onclick="openPredModal('${m.id}')">
       <div class="match-team">
         <div class="match-team-flag">${flagImg(ht.flag)}</div>
@@ -2721,7 +2724,7 @@ function saveMyPred(matchId) {
   openPredModal(matchId);
 }
 
-// ── 預測倒數計時器 ──
+// ── 預測倒數計時器（Modal 內）──
 function startPredCountdowns() {
   document.querySelectorAll('.pred-countdown[data-kickoff]').forEach(el => {
     const kickoff = parseInt(el.dataset.kickoff);
@@ -2739,3 +2742,39 @@ function startPredCountdowns() {
     el._cdInterval = iv;
   });
 }
+
+// ── 賽程卡片預測倒數（全局 60s 刷新）──
+function _formatPredCd(ms) {
+  if (ms <= 0) return null;
+  const d = Math.floor(ms / 86400000);
+  const h = Math.floor((ms % 86400000) / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  if (d > 7) return `${d} 天後截止`;
+  if (d > 0) return `${d}天${h}時 後截止`;
+  if (h > 0) return `${h}時${m}分 後截止`;
+  return `${m}分鐘 後截止`;
+}
+
+function startSchedulePredCountdowns() {
+  function tick() {
+    document.querySelectorAll('.match-pred-tag[data-pred-cd]').forEach(el => {
+      const ko = parseInt(el.dataset.predCd);
+      if (!ko) return;
+      const ms = ko - Date.now();
+      if (ms <= 0) {
+        el.textContent = '🔒 已截止';
+        el.classList.add('expired');
+        return;
+      }
+      const cdText = _formatPredCd(ms);
+      el.innerHTML = `🎯 預測比分 <span class="pred-cd-text">${cdText}</span>`;
+      if (ms < 2 * 3600000) el.classList.add('urgent');
+      else if (ms < 24 * 3600000) el.classList.add('soon');
+    });
+  }
+  tick();
+  setInterval(tick, 60000);
+}
+
+// 頁面載入後啟動
+document.addEventListener('DOMContentLoaded', () => setTimeout(startSchedulePredCountdowns, 1500));
