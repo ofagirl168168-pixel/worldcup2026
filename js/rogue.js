@@ -449,7 +449,7 @@
       // 越靠近主角，越往中間收攏（模擬包夾）— 很早就開始
       const closeness = 1 - Math.max(0, d.z) / FIELD_DEPTH; // 0=球門端, 1=玩家端
       if (closeness > 0.4) {
-        const pullStrength = (closeness - 0.4) * 0.08;
+        const pullStrength = (closeness - 0.4) * 0.2;
         d.x += (d.x > 0 ? -pullStrength : pullStrength) * step;
       }
       // 碰牆反彈 x 方向（限制在可視範圍內）
