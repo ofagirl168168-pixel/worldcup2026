@@ -2732,15 +2732,21 @@ function startPredCountdowns() {
     function tick() {
       const ms = kickoff - Date.now();
       if (ms <= 0) { el.textContent = '🔒 預測已鎖定'; el.className = 'pred-countdown urgent'; return; }
-      const h = Math.floor(ms / 3600000);
+      const d = Math.floor(ms / 86400000);
+      const h = Math.floor((ms % 86400000) / 3600000);
       const m = Math.floor((ms % 3600000) / 60000);
       const s = Math.floor((ms % 60000) / 1000);
-      el.textContent = h > 0 ? `⏰ 距離鎖定還有 ${h}h ${m}m` : `⏰ 距離鎖定還有 ${m}m ${s}s`;
+      const parts = [];
+      if (d > 0) parts.push(`${d}天`);
+      if (h > 0) parts.push(`${h}小時`);
+      if (m > 0) parts.push(`${m}分鐘`);
+      if (d === 0) parts.push(`${s}秒`);
+      el.textContent = `⏰ 距離鎖定還有 ${parts.join(' ')}`;
       el.className = 'pred-countdown' + (ms < 30*60000 ? ' urgent' : ms < 2*3600000 ? ' warn' : '');
     }
     tick();
     const remaining = kickoff - Date.now();
-    const iv = setInterval(tick, remaining < 120000 ? 1000 : 30000);
+    const iv = setInterval(tick, remaining < 86400000 ? 1000 : 60000);
     el._cdInterval = iv;
   });
 }
