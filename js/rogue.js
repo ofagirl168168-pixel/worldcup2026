@@ -58,10 +58,11 @@
   //  防守員類型
   // ═══════════════════════════════════════════════════════════
   const DTYPE = {
-    normal:  { label:'防守員',   fill:'#4fc3f7', hp:3,  spd:0.30, w:28, h:40 },
-    fast:    { label:'快速前鋒', fill:'#fff176', hp:2,  spd:0.65, w:24, h:36 },
-    tank:    { label:'中後衛',   fill:'#ef5350', hp:8,  spd:0.18, w:36, h:48 },
-    captain: { label:'隊長',     fill:'#ce93d8', hp:5,  spd:0.28, w:32, h:44, aura:true },
+    normal:  { label:'防守員',   fill:'#4fc3f7', hp:3,  spd:0.30, w:44, h:62 },
+    fast:    { label:'快速前鋒', fill:'#fff176', hp:2,  spd:0.65, w:38, h:54 },
+    tank:    { label:'中後衛',   fill:'#ef5350', hp:8,  spd:0.18, w:56, h:72 },
+    captain: { label:'隊長',     fill:'#ce93d8', hp:5,  spd:0.28, w:50, h:66, aura:true },
+    sentry:  { label:'中路守衛', fill:'#81d4fa', hp:4,  spd:0.12, w:48, h:64 },
   };
 
   // ═══════════════════════════════════════════════════════════
@@ -123,20 +124,32 @@
   //  Wave 管理
   // ═══════════════════════════════════════════════════════════
   function waveConfig(w) {
-    const count = Math.min(2 + w, 14);
+    const count = Math.min(3 + w, 16);
     const types = ['normal'];
+    if (w >= 1) types.push('sentry');  // 每波都有中路守衛擋住直射
     if (w >= 2) types.push('fast');
     if (w >= 3) types.push('tank');
     if (w >= 5) types.push('captain');
-    return { count, types, hpMul: 1 + (w - 1) * 0.15, spdMul: 1 + (w - 1) * 0.08 };
+    // 確保至少 1~2 個 sentry 擋中路
+    const sentryCount = Math.min(1 + Math.floor(w / 2), 4);
+    return { count, types, hpMul: 1 + (w - 1) * 0.15, spdMul: 1 + (w - 1) * 0.08, sentryCount };
   }
 
   function makeDef(type, hpMul, spdMul) {
     const d = DTYPE[type];
     const hp = Math.ceil(d.hp * hpMul);
+    // 中路守衛固定在中央附近
+    const isSentry = type === 'sentry';
+    const startX = isSentry
+      ? (Math.random() - 0.5) * GOAL_HW * 1.5
+      : (Math.random() - 0.5) * FIELD_HW * 1.4;
+    const startZ = isSentry
+      ? FIELD_DEPTH * (0.6 + Math.random() * 0.25)
+      : FIELD_DEPTH * (0.5 + Math.random() * 0.4);
+    // 斜向移動速度（x 軸）
+    const vx = isSentry ? 0 : (Math.random() - 0.5) * d.spd * spdMul * 0.6;
     return {
-      type, x: (Math.random() - 0.5) * FIELD_HW * 1.4,
-      z: FIELD_DEPTH * (0.5 + Math.random() * 0.4),
+      type, x: startX, z: startZ, vx,
       hp, maxHp: hp,
       spd: d.spd * spdMul, w: d.w, h: d.h, fill: d.fill,
       frozen: 0, burning: 0, burnTick: 0,
@@ -146,8 +159,15 @@
   function beginWave() {
     const cfg = waveConfig(G.wave);
     G.spawnQueue = [];
-    for (let i = 0; i < cfg.count; i++) {
-      const t = cfg.types[Math.floor(Math.random() * cfg.types.length)];
+    // 先放保底的中路守衛
+    for (let i = 0; i < cfg.sentryCount; i++) {
+      G.spawnQueue.push(makeDef('sentry', cfg.hpMul, cfg.spdMul));
+    }
+    // 其餘隨機類型
+    const rest = cfg.count - cfg.sentryCount;
+    for (let i = 0; i < rest; i++) {
+      const nonSentry = cfg.types.filter(t => t !== 'sentry');
+      const t = nonSentry[Math.floor(Math.random() * nonSentry.length)];
       G.spawnQueue.push(makeDef(t, cfg.hpMul, cfg.spdMul));
     }
     // 立刻放一半，其餘排隊
@@ -322,11 +342,15 @@
         d.burnTick -= dt;
         if (d.burnTick <= 0) { d.hp -= 1; d.burnTick = 1000; addPart(d.x, d.z, '🔥', 0.3); if (d.hp <= 0) onDefKill(d); }
       }
-      // 前進
+      // 前進 + 斜向移動
       const sp = d.frozen > 0 ? d.spd * 0.5 : d.spd;
       if (d.frozen > 0) d.frozen -= dt;
-      d.z -= sp * (dt / 16);
-      d.x += Math.sin(Date.now() * 0.001 + d.z * 0.01) * 0.15;
+      const step = dt / 16;
+      d.z -= sp * step;
+      d.x += (d.vx || 0) * step;
+      // 碰牆反彈 x 方向
+      if (d.x < -FIELD_HW + d.w) { d.x = -FIELD_HW + d.w; d.vx = Math.abs(d.vx || 0); }
+      if (d.x > FIELD_HW - d.w)  { d.x = FIELD_HW - d.w;  d.vx = -Math.abs(d.vx || 0); }
       // 隊長光環
       if (DTYPE[d.type]?.aura) {
         for (const d2 of G.defs) {
