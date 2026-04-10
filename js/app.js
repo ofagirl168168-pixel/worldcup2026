@@ -2739,7 +2739,8 @@ function startPredCountdowns() {
       el.className = 'pred-countdown' + (ms < 30*60000 ? ' urgent' : ms < 2*3600000 ? ' warn' : '');
     }
     tick();
-    const iv = setInterval(tick, ms < 120000 ? 1000 : 30000);
+    const remaining = kickoff - Date.now();
+    const iv = setInterval(tick, remaining < 120000 ? 1000 : 30000);
     el._cdInterval = iv;
   });
 }
