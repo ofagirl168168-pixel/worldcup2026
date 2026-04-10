@@ -11,7 +11,7 @@
   const GOAL_Z      = FIELD_DEPTH;
   const FOCAL       = 200;   // 透視焦距（小=更平坦視角）
   const MAX_LIVES   = 3;
-  const BALL_SPD    = 6;     // 基礎球速（調慢，讓球可見）
+  const BALL_SPD    = 4.5;   // 基礎球速（調慢，讓球可見）
   const MAX_BALL_SPD = 14;   // 球速上限
   const BALL_R      = 10;    // 基礎球半徑 (world)
   const BASE_DMG    = 1;
@@ -178,21 +178,26 @@
     // 實際球速（有上限）
     const spd = Math.min(BALL_SPD * G.spdMul, MAX_BALL_SPD);
 
+    // 同角度連續射出（前後間隔，不散射）
+    const vx = dirX * spd * 0.7;
+    const vz = Math.max(dirY * spd, spd * 0.4);
     const n = G.multiShot;
     for (let i = 0; i < n; i++) {
-      const spread = n > 1 ? (i - (n - 1) / 2) * 20 : 0;
-      const b = {
-        x: spread * 0.3, z: 10,
-        vx: (dirX + spread * 0.005) * spd * 0.7,
-        vz: Math.max(dirY * spd, spd * 0.4),  // 確保至少向前
-        r: BALL_R * G.ballScale,
-        alive: true, age: 0, trail: [],
-      };
-      if (G.curve) b.curveAcc = (Math.random() - 0.5) * 0.15;
-      G.balls.push(b);
+      const delay = i * 120; // 每顆間隔 120ms
+      setTimeout(() => {
+        if (!G || G.phase !== 'playing') return;
+        const b = {
+          x: 0, z: 10,
+          vx, vz,
+          r: BALL_R * G.ballScale,
+          alive: true, age: 0, trail: [],
+        };
+        if (G.curve) b.curveAcc = (Math.random() - 0.5) * 0.15;
+        G.balls.push(b);
+      }, delay);
     }
     G.canShoot = false;
-    G.shootCD = SHOOT_CD * G.cdMul;
+    G.shootCD = SHOOT_CD * G.cdMul + (n - 1) * 120; // 冷卻包含連射時間
   }
 
   // ═══════════════════════════════════════════════════════════
