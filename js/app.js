@@ -1250,7 +1250,8 @@ async function openPredModal(id) {
         kickoffMs = new Date(m.twDate + 'T' + m.twTime + ':00+08:00').getTime();
       }
       const now = Date.now();
-      const isLocked = m.status !== 'scheduled' || (kickoffMs > 0 && now >= kickoffMs);
+      const matchStatus = m.status || (kickoffMs > 0 && now >= kickoffMs ? 'started' : 'scheduled');
+      const isLocked = matchStatus !== 'scheduled' || (kickoffMs > 0 && now >= kickoffMs);
       const msLeft = kickoffMs > 0 ? kickoffMs - now : 0;
       const showCountdown = !isLocked && msLeft > 0 && msLeft < 48 * 3600000; // 48小時內顯示倒數
       const urgencyClass = msLeft < 30*60000 ? 'urgent' : msLeft < 2*3600000 ? 'warn' : '';
@@ -2686,10 +2687,16 @@ function adjustMyPred(side, delta) {
 function saveMyPred(matchId) {
   // 鎖定檢查：比賽已開始則拒絕
   const match = _matches().find(m => m.id === matchId);
-  if (match && match.status !== 'scheduled') {
-    showToast?.('🔒 比賽已開始，無法修改預測');
-    document.getElementById('my-pred-overlay')?.remove();
-    return;
+  if (match) {
+    let ko = 0;
+    if (_isUCL() && match.date && match.time) ko = new Date(match.date+'T'+match.time+':00+08:00').getTime();
+    else if (match.twDate && match.twTime) ko = new Date(match.twDate+'T'+match.twTime+':00+08:00').getTime();
+    const started = (match.status && match.status !== 'scheduled') || (ko > 0 && Date.now() >= ko);
+    if (started) {
+      showToast?.('🔒 比賽已開始，無法修改預測');
+      document.getElementById('my-pred-overlay')?.remove();
+      return;
+    }
   }
   const h = parseInt(document.getElementById('my-pred-h')?.textContent || 0);
   const a = parseInt(document.getElementById('my-pred-a')?.textContent || 0);
