@@ -5,13 +5,14 @@
   // ═══════════════════════════════════════════════════════════
   //  常數
   // ═══════════════════════════════════════════════════════════
-  const FIELD_HW    = 450;   // 球場半寬 (world)
+  const FIELD_HW    = 600;   // 球場半寬 (world) — 更寬
   const FIELD_DEPTH = 1200;  // 球場深度
-  const GOAL_HW     = 130;   // 球門半寬
+  const GOAL_HW     = 140;   // 球門半寬
   const GOAL_Z      = FIELD_DEPTH;
   const FOCAL       = 200;   // 透視焦距（小=更平坦視角）
   const MAX_LIVES   = 3;
-  const BALL_SPD    = 11;    // 基礎球速
+  const BALL_SPD    = 6;     // 基礎球速（調慢，讓球可見）
+  const MAX_BALL_SPD = 14;   // 球速上限
   const BALL_R      = 10;    // 基礎球半徑 (world)
   const BASE_DMG    = 1;
   const SHOOT_CD    = 350;   // 射門冷卻 ms
@@ -163,14 +164,27 @@
   // ═══════════════════════════════════════════════════════════
   function shoot(cx, cy) {
     if (!G.canShoot || G.phase !== 'playing') return;
+
+    // 計算從畫面底部中央到點擊位置的方向向量
+    const originX = W / 2;
+    const originY = H;
+    const dx = cx - originX;
+    const dy = cy - originY;  // 負值（向上）
+    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+    // 歸一化方向，確保 vz 為正（向前）
+    const dirX = dx / len;
+    const dirY = -dy / len;   // 反轉：螢幕向上 = 世界向前
+
+    // 實際球速（有上限）
+    const spd = Math.min(BALL_SPD * G.spdMul, MAX_BALL_SPD);
+
     const n = G.multiShot;
     for (let i = 0; i < n; i++) {
-      const spread = n > 1 ? (i - (n - 1) / 2) * 25 : 0;
-      const xR = ((cx + spread) - W / 2) / (W / 2);
+      const spread = n > 1 ? (i - (n - 1) / 2) * 20 : 0;
       const b = {
         x: spread * 0.3, z: 10,
-        vx: xR * BALL_SPD * G.spdMul * 0.5,
-        vz: BALL_SPD * G.spdMul,
+        vx: (dirX + spread * 0.005) * spd * 0.7,
+        vz: Math.max(dirY * spd, spd * 0.4),  // 確保至少向前
         r: BALL_R * G.ballScale,
         alive: true, age: 0, trail: [],
       };
@@ -347,6 +361,7 @@
     G.score += 100;
     G.defs = [];
     G.spawnQueue = [];
+    G.balls = [];          // 清除場上所有球
     shakeAmt = 10;
     addPart(0, GOAL_Z - 50, '⚽ GOAL!', 1.5);
     G.phase = 'cards';
