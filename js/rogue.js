@@ -208,7 +208,7 @@
     waveFlash = 1800;
     // 守門員速度：每 5 波才提升一次
     const gkTier = Math.floor(G.wave / 5); // wave5=1, wave10=2, wave15=3...
-    G.gk.spd = (GK_BASE_SPD + gkTier * 0.5) * (G.gkSlowMul || 1);
+    G.gk.spd = (GK_BASE_SPD + gkTier * 1.0) * (G.gkSlowMul || 1);
     G.gk.tracking = G.wave >= 5; // wave5 起才追蹤球
 
     // 每 5 波警告
@@ -300,15 +300,35 @@
     const gk = G.gk;
     const gkEffSpd = gk.spd * (G.globalSlow || 1);
     if (gk.tracking) {
-      // wave5 起：追蹤最接近球門的球
-      let trackBall = null, bestZ = 0;
+      // 找最具威脅的球：預判球到達球門線時的 x 位置
+      let targetX = null, bestThreat = -Infinity;
       for (const b of G.balls) {
-        if (!b.alive) continue;
-        if (b.z > bestZ) { bestZ = b.z; trackBall = b; }
+        if (!b.alive || b.vz <= 0) continue; // 只追正在飛向球門的球
+        // 預測球到球門 z 時的 x 位置（考慮牆壁反彈）
+        const timeToGoal = (GOAL_Z - b.z) / b.vz; // frames
+        let predictX = b.x + b.vx * timeToGoal;
+        // 簡易牆壁反彈預測
+        while (predictX < -FIELD_HW || predictX > FIELD_HW) {
+          if (predictX < -FIELD_HW) predictX = -2 * FIELD_HW - predictX;
+          if (predictX > FIELD_HW) predictX = 2 * FIELD_HW - predictX;
+        }
+        // 威脅度 = z 越高越危險
+        const threat = b.z;
+        if (threat > bestThreat) { bestThreat = threat; targetX = predictX; }
       }
-      if (trackBall) {
-        const diff = trackBall.x - gk.x;
-        if (Math.abs(diff) > 3) gk.x += Math.sign(diff) * gkEffSpd * (dt / 16);
+      // 也追蹤反彈球（vz < 0 但仍在場上且離球門近）
+      if (targetX === null) {
+        for (const b of G.balls) {
+          if (!b.alive) continue;
+          if (b.z > FIELD_DEPTH * 0.4) {
+            const threat = b.z;
+            if (threat > bestThreat) { bestThreat = threat; targetX = b.x; }
+          }
+        }
+      }
+      if (targetX !== null) {
+        const diff = targetX - gk.x;
+        if (Math.abs(diff) > 2) gk.x += Math.sign(diff) * gkEffSpd * (dt / 16);
       } else {
         gk.x += gk.dir * gkEffSpd * (dt / 16);
       }
