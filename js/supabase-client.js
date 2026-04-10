@@ -407,6 +407,24 @@ async function fetchLeaderboard() {
 }
 
 // ── 渲染排行榜（插入 arena 區塊後方）────────────────────────
+function _lookupBadgeName(icon) {
+  if (!icon) return '';
+  // 搜尋成就徽章
+  const flat = (typeof BADGES !== 'undefined' ? BADGES : []).find(b => b.icon === icon);
+  if (flat) return flat.name;
+  // 搜尋進階成就（以類別 icon 匹配）
+  const tiered = (typeof TIERED_BADGES !== 'undefined' ? TIERED_BADGES : []).find(b => b.icon === icon);
+  if (tiered) {
+    // 找到最高已達成的階級名稱
+    const vals = typeof getTieredValues === 'function' ? getTieredValues() : {};
+    const v = vals[tiered.id] || 0;
+    let name = tiered.tiers[0].name;
+    tiered.tiers.forEach(t => { if (v >= t.threshold) name = t.name; });
+    return name;
+  }
+  return '';
+}
+
 async function renderLeaderboard(containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
@@ -450,14 +468,15 @@ async function renderLeaderboard(containerId) {
       : '—';
     const isMe = row.id === myId;
     const title = getPredTitle(row);
-    const badge = row.showcase_badge || '';
+    const badgeIcon = row.showcase_badge || '';
+    const badgeName = badgeIcon ? _lookupBadgeName(badgeIcon) : '';
 
     return `
       <div class="lb-row ${isMe ? 'lb-me' : ''}">
         <div class="lb-rank">${medals[i] ?? `#${i + 1}`}</div>
         <div class="lb-flag">${flagImg(flag)}</div>
         <div class="lb-name">
-          ${row.nickname}${badge ? ` <span class="lb-badge" title="${badge}">${badge}</span>` : ''}${isMe ? ' <span class="lb-you">你</span>' : ''}
+          ${row.nickname}${badgeIcon ? ` <span class="lb-badge">${badgeIcon} ${badgeName}</span>` : ''}${isMe ? ' <span class="lb-you">你</span>' : ''}
           ${title ? `<span class="lb-title ${title.cls}">${title.icon} ${title.name}</span>` : ''}
         </div>
         <div class="lb-stats">
