@@ -2127,16 +2127,16 @@ function checkTieredAchievements() {
 }
 
 const BADGES = [
-  { id:'first_daily',   icon:'🎯', name:'初次出擊',   desc:'完成第一次每日一題' },
-  { id:'streak3',       icon:'🔥', name:'三連勝',     desc:'連續答題 3 天' },
-  { id:'streak7',       icon:'💥', name:'週不停歇',   desc:'連續答題 7 天' },
-  { id:'streak30',      icon:'⚡', name:'鐵人預言家', desc:'連續答題 30 天' },
-  { id:'champion_set',  icon:'🏆', name:'冠軍直覺',   desc:'完成冠軍預測' },
-  { id:'groups_done',   icon:'📋', name:'全組預測師', desc:'填完所有 12 組分組預測' },
-  { id:'team_set',      icon:'❤️', name:'死忠球迷',   desc:'宣示支持球隊' },
-  { id:'all_tasks',     icon:'🌟', name:'任務達人', desc:'完成所有競技場任務' },
-  { id:'answered10',    icon:'🧠', name:'積累智慧',   desc:'累計答題 10 次' },
-  { id:'answered30',    icon:'🎓', name:'資深預言家', desc:'累計答題 30 次' },
+  { id:'first_daily',   icon:'🎯', name:'初次出擊',   desc:'完成第一次每日一題',     rarity:'common' },
+  { id:'streak3',       icon:'🔥', name:'三連勝',     desc:'連續答題 3 天',          rarity:'rare' },
+  { id:'streak7',       icon:'💥', name:'週不停歇',   desc:'連續答題 7 天',          rarity:'epic' },
+  { id:'streak30',      icon:'⚡', name:'鐵人預言家', desc:'連續答題 30 天',         rarity:'legendary' },
+  { id:'champion_set',  icon:'🏆', name:'冠軍直覺',   desc:'完成冠軍預測',           rarity:'common' },
+  { id:'groups_done',   icon:'📋', name:'全組預測師', desc:'填完所有 12 組分組預測', rarity:'rare' },
+  { id:'team_set',      icon:'❤️', name:'死忠球迷',   desc:'宣示支持球隊',           rarity:'common' },
+  { id:'all_tasks',     icon:'🌟', name:'任務達人',   desc:'完成所有競技場任務',     rarity:'epic' },
+  { id:'answered10',    icon:'🧠', name:'積累智慧',   desc:'累計答題 10 次',         rarity:'rare' },
+  { id:'answered30',    icon:'🎓', name:'資深預言家', desc:'累計答題 30 次',         rarity:'epic' },
 ];
 
 function loadBadges() {
@@ -2221,9 +2221,11 @@ function renderBadges() {
       <div class="badges-grid">
         ${BADGES.map((b, i) => {
           const e = earnedIds.has(b.id);
-          return `<div class="badge-card ${e ? 'earned' : 'locked'}" onclick="showBadgeDetail('flat',${i})">
+          const rCls = e ? `rarity-${b.rarity}` : 'locked';
+          return `<div class="badge-card ${rCls}" onclick="showBadgeDetail('flat',${i})">
             <div class="badge-card-icon">${e ? b.icon : '🔒'}</div>
             <div class="badge-card-name">${b.name}</div>
+            ${e ? `<div class="badge-rarity-label rarity-${b.rarity}">${{common:'普通',rare:'稀有',epic:'史詩',legendary:'傳說'}[b.rarity]}</div>` : ''}
           </div>`;
         }).join('')}
       </div>
@@ -2269,10 +2271,13 @@ function showBadgeDetail(type, idx) {
     const e = earnedIds.has(b.id);
     const earnedData = earned.find(x => x.id === b.id);
     const isShowcased = currentShowcase === b.icon;
+    const rarityNames = {common:'普通',rare:'稀有',epic:'史詩',legendary:'傳說'};
+    const rarityColors = {common:'#9ca3af',rare:'#60a5fa',epic:'#c084fc',legendary:'#fbbf24'};
     mc.innerHTML = `
       <div style="text-align:center;padding:10px 0">
-        <div style="font-size:56px;margin-bottom:12px;${e ? '' : 'filter:grayscale(1);opacity:0.4'}">${b.icon}</div>
-        <div style="font-size:20px;font-weight:900;margin-bottom:6px">${b.name}</div>
+        <div style="font-size:56px;margin-bottom:8px;${e ? '' : 'filter:grayscale(1);opacity:0.4'}">${b.icon}</div>
+        <div style="font-size:20px;font-weight:900;margin-bottom:4px">${b.name}</div>
+        <div style="font-size:12px;font-weight:700;color:${rarityColors[b.rarity]};margin-bottom:8px">${rarityNames[b.rarity]}</div>
         <div style="font-size:14px;color:var(--text-muted);margin-bottom:20px">${b.desc}</div>
         <div style="display:inline-block;padding:6px 18px;border-radius:999px;font-size:13px;font-weight:700;${e ? 'background:rgba(34,197,94,0.15);color:#86efac' : 'background:rgba(255,255,255,0.06);color:var(--text-muted)'}">
           ${e ? '✅ 已達成' + (earnedData?.at ? '（' + new Date(earnedData.at).toLocaleDateString('zh-TW') + '）' : '') : '🔒 尚未達成'}
