@@ -2260,12 +2260,15 @@ function showBadgeDetail(type, idx) {
   const mc = document.getElementById('modal-content');
   if (!mc) return;
 
+  const currentShowcase = localStorage.getItem('wc26_showcase_badge') || '';
+
   if (type === 'flat') {
     const b = BADGES[idx];
     const earned = loadBadges();
     const earnedIds = new Set(earned.map(x => x.id));
     const e = earnedIds.has(b.id);
     const earnedData = earned.find(x => x.id === b.id);
+    const isShowcased = currentShowcase === b.icon;
     mc.innerHTML = `
       <div style="text-align:center;padding:10px 0">
         <div style="font-size:56px;margin-bottom:12px;${e ? '' : 'filter:grayscale(1);opacity:0.4'}">${b.icon}</div>
@@ -2274,7 +2277,10 @@ function showBadgeDetail(type, idx) {
         <div style="display:inline-block;padding:6px 18px;border-radius:999px;font-size:13px;font-weight:700;${e ? 'background:rgba(34,197,94,0.15);color:#86efac' : 'background:rgba(255,255,255,0.06);color:var(--text-muted)'}">
           ${e ? '✅ 已達成' + (earnedData?.at ? '（' + new Date(earnedData.at).toLocaleDateString('zh-TW') + '）' : '') : '🔒 尚未達成'}
         </div>
-        <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;margin-top:24px">關閉</button>
+        ${e ? `<button onclick="setShowcaseBadge('${b.icon}')" style="width:100%;padding:12px;border-radius:12px;background:${isShowcased ? 'rgba(255,255,255,0.06)' : 'var(--accent)'};color:${isShowcased ? 'var(--text-muted)' : '#000'};font-size:13px;font-weight:700;border:1px solid ${isShowcased ? 'rgba(255,255,255,0.1)' : 'var(--accent)'};cursor:pointer;margin-top:16px">
+          ${isShowcased ? '✅ 展示中' : '🏷️ 展示在排行榜'}
+        </button>` : ''}
+        <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;margin-top:${e ? '8' : '24'}px">關閉</button>
       </div>`;
   } else {
     const badge = TIERED_BADGES[idx];
@@ -2316,8 +2322,29 @@ function showBadgeDetail(type, idx) {
             </div>`;
           }).join('')}
         </div>
-        <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer">關閉</button>
+        ${effectiveTier >= 0 ? (() => {
+          const isShowcased = currentShowcase === badge.icon;
+          return `<button onclick="setShowcaseBadge('${badge.icon}')" style="width:100%;padding:12px;border-radius:12px;background:${isShowcased ? 'rgba(255,255,255,0.06)' : 'var(--accent)'};color:${isShowcased ? 'var(--text-muted)' : '#000'};font-size:13px;font-weight:700;border:1px solid ${isShowcased ? 'rgba(255,255,255,0.1)' : 'var(--accent)'};cursor:pointer">
+            ${isShowcased ? '✅ 展示中' : '🏷️ 展示在排行榜'}
+          </button>`;
+        })() : ''}
+        <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;margin-top:8px">關閉</button>
       </div>`;
   }
   document.getElementById('team-modal').classList.add('open');
+}
+
+// ── 設定展示徽章 ──────────────────────────────────────────
+function setShowcaseBadge(icon) {
+  const current = localStorage.getItem('wc26_showcase_badge') || '';
+  if (current === icon) {
+    // 取消展示
+    localStorage.removeItem('wc26_showcase_badge');
+    showToast('已取消展示徽章');
+  } else {
+    localStorage.setItem('wc26_showcase_badge', icon);
+    showToast(`${icon} 已設為排行榜展示徽章！`);
+  }
+  syncXPToProfile?.();
+  closeModal();
 }

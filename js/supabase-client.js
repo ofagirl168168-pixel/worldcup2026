@@ -275,6 +275,7 @@ async function syncXPToProfile() {
       }
     }
 
+    const showcaseBadge = localStorage.getItem('wc26_showcase_badge') || null;
     await DB.from('profiles').update({
       xp:             xpData.xp,
       correct_answers: correct,
@@ -282,6 +283,7 @@ async function syncXPToProfile() {
       pred_correct_direction: predCorrectDir,
       pred_exact_score: predExact,
       pred_total_settled: predTotal,
+      showcase_badge:  showcaseBadge,
       updated_at:     new Date().toISOString()
     }).eq('id', currentUser.id)
   } catch (e) {
@@ -438,21 +440,24 @@ async function renderLeaderboard(containerId) {
   }
 
   el.innerHTML = rows.map((row, i) => {
-    const _T = window.UCL_TEAMS || (typeof TEAMS!=='undefined' ? TEAMS : {});
-    const team = row.team_code ? _T[row.team_code] : null;
+    // 同時搜尋世足+歐冠球隊資料以找到國旗
+    const wcT = typeof TEAMS !== 'undefined' ? TEAMS : {};
+    const uclT = window.UCL_TEAMS || {};
+    const team = row.team_code ? (wcT[row.team_code] || uclT[row.team_code]) : null;
     const flag = team ? team.flag : '';
     const predAcc = (row.pred_total_settled || 0) > 0
       ? Math.round((row.pred_correct_direction || 0) / row.pred_total_settled * 100) + '%'
       : '—';
     const isMe = row.id === myId;
     const title = getPredTitle(row);
+    const badge = row.showcase_badge || '';
 
     return `
       <div class="lb-row ${isMe ? 'lb-me' : ''}">
         <div class="lb-rank">${medals[i] ?? `#${i + 1}`}</div>
         <div class="lb-flag">${flagImg(flag)}</div>
         <div class="lb-name">
-          ${row.nickname}${isMe ? ' <span class="lb-you">你</span>' : ''}
+          ${row.nickname}${badge ? ` <span class="lb-badge" title="${badge}">${badge}</span>` : ''}${isMe ? ' <span class="lb-you">你</span>' : ''}
           ${title ? `<span class="lb-title ${title.cls}">${title.icon} ${title.name}</span>` : ''}
         </div>
         <div class="lb-stats">

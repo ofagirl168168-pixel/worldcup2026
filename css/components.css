@@ -1856,6 +1856,15 @@ img.flag-img {
   opacity: 0.7;
 }
 
+/* ========== 排行榜展示徽章 ========== */
+.lb-badge {
+  display: inline-block;
+  font-size: 16px;
+  vertical-align: middle;
+  margin-left: 2px;
+  filter: drop-shadow(0 0 4px rgba(255,215,0,0.5));
+}
+
 /* ========== 徽章卡片可點擊 ========== */
 .badge-card { cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
 .badge-card:active { transform: scale(0.96); }
