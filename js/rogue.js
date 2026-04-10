@@ -37,7 +37,6 @@
     { id:'multi1',   name:'雙重射擊',   desc:'連續射球數量 +1',          icon:'⚽', rarity:'common',    apply(s){ s.multiShot += 1; }},
 
     // ── 能力卡 (rare) ──────────────────────
-    { id:'curve',    name:'弧線球',     desc:'足球帶隨機橫向飄移',       icon:'🌀', rarity:'rare',     apply(s){ s.curve = true; }},
     { id:'burn',     name:'火焰射擊',   desc:'命中附帶灼燒（每秒 1 傷害）',icon:'🔥', rarity:'rare',  apply(s){ s.burn = true; }},
     { id:'freeze',   name:'冰凍射擊',   desc:'命中後敵人減速 50%',       icon:'❄️', rarity:'rare',    apply(s){ s.freeze = true; }},
     { id:'explode',  name:'爆裂射擊',   desc:'命中時爆炸傷害周圍',       icon:'💥', rarity:'rare',    apply(s){ s.explode = true; }},
@@ -45,12 +44,10 @@
     { id:'multi2',   name:'三重射擊',   desc:'連續射球數量 +2',          icon:'🎱', rarity:'rare',     apply(s){ s.multiShot += 2; }},
 
     // ── 進階卡 (epic) ──────────────────────
-    { id:'pierce',   name:'貫穿射擊',   desc:'足球穿透敵人不反彈',       icon:'💨', rarity:'epic',     apply(s){ s.pierce = true; }},
     { id:'power2',   name:'重砲射擊',   desc:'傷害 ×2',                  icon:'🔨', rarity:'epic',     apply(s){ s.dmgMul *= 2; }},
-    { id:'homing',   name:'追蹤導彈',   desc:'足球微幅追蹤最近敵人',     icon:'🎯', rarity:'epic',     apply(s){ s.homing = true; }},
 
     // ── 傳說卡 (legendary) ─────────────────
-    { id:'ghost',    name:'幽靈球',     desc:'30% 機率穿過敵人',         icon:'👻', rarity:'legendary', apply(s){ s.ghostPct = Math.min(0.9, (s.ghostPct||0) + 0.3); }},
+    { id:'ghost',    name:'幽靈球',     desc:'+10% 機率穿過敵人（上限30%）',icon:'👻', rarity:'legendary', apply(s){ s.ghostPct = Math.min(0.3, (s.ghostPct||0) + 0.1); }},
     { id:'vampire',  name:'吸血足球',   desc:'擊殺敵人回復 1 條命',      icon:'🧛', rarity:'legendary', apply(s){ s.vampire = true; }},
   ];
 
@@ -88,8 +85,8 @@
 
       // buffs
       dmgMul: 1, spdMul: 1, ballScale: 1, multiShot: 1, cdMul: 1,
-      pierce: false, burn: false, freeze: false, homing: false,
-      explode: false, curve: false, ghostPct: 0, vampire: false,
+      pierce: false, burn: false, freeze: false,
+      explode: false, ghostPct: 0, vampire: false,
       collected: [],            // card ids
 
       // entities
@@ -141,11 +138,18 @@
   function makeDef(type, hpMul, spdMul) {
     const d = DTYPE[type];
     const hp = Math.ceil(d.hp * hpMul);
-    // 中路守衛固定在球門正前方密集排列
+    // 中路守衛均勻分佈覆蓋球門全寬（由 beginWave 傳入 sentryIdx/sentryTotal）
     const isSentry = type === 'sentry';
-    const startX = isSentry
-      ? (Math.random() - 0.5) * GOAL_HW * 0.7   // 更密集地擋在球門前
-      : (Math.random() - 0.5) * FIELD_HW * 1.4;
+    let startX;
+    if (isSentry && arguments[3] !== undefined) {
+      // 均勻分佈在球門寬度內
+      const idx = arguments[3], total = arguments[4];
+      startX = -GOAL_HW + (GOAL_HW * 2) * ((idx + 0.5) / total);
+    } else if (isSentry) {
+      startX = (Math.random() - 0.5) * GOAL_HW * 2;
+    } else {
+      startX = (Math.random() - 0.5) * FIELD_HW * 1.4;
+    }
     const startZ = isSentry
       ? FIELD_DEPTH * (0.65 + Math.random() * 0.2)
       : FIELD_DEPTH * (0.5 + Math.random() * 0.4);
@@ -166,9 +170,9 @@
   function beginWave() {
     const cfg = waveConfig(G.wave);
     G.spawnQueue = [];
-    // 先放保底的中路守衛
+    // 先放保底的中路守衛（均勻分佈覆蓋球門全寬）
     for (let i = 0; i < cfg.sentryCount; i++) {
-      G.spawnQueue.push(makeDef('sentry', cfg.hpMul, cfg.spdMul));
+      G.spawnQueue.push(makeDef('sentry', cfg.hpMul, cfg.spdMul, i, cfg.sentryCount));
     }
     // 其餘隨機類型
     const rest = cfg.count - cfg.sentryCount;
@@ -224,7 +228,6 @@
           r: BALL_R * G.ballScale,
           alive: true, age: 0, trail: [],
         };
-        if (G.curve) b.curveAcc = (Math.random() - 0.5) * 0.15;
         G.balls.push(b);
       }, delay);
     }
@@ -280,23 +283,8 @@
 
       const step = dt / 16;
 
-      // 追蹤導彈：微幅偏向最近敵人
-      if (G.homing && G.defs.length) {
-        let nearest = null, bestDist = Infinity;
-        for (const d of G.defs) {
-          if (d.hp <= 0) continue;
-          const dist = Math.sqrt((b.x - d.x) ** 2 + (b.z - d.z) ** 2);
-          if (dist < bestDist) { bestDist = dist; nearest = d; }
-        }
-        if (nearest && bestDist < 300) {
-          const ax = (nearest.x - b.x) > 0 ? 0.08 : -0.08;
-          b.vx += ax * step;
-        }
-      }
-
       b.x += b.vx * step;
       b.z += b.vz * step;
-      if (b.curveAcc) b.vx += b.curveAcc * step;
 
       // 牆壁反彈
       if (b.x < -FIELD_HW + b.r) { b.x = -FIELD_HW + b.r; b.vx = Math.abs(b.vx); }
@@ -408,12 +396,21 @@
     G.cardPick = pickCards(3);
   }
 
-  // 可疊加的純數值卡（可重複抽到）
+  // 可無限疊加的純數值卡
   const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','multi1','multi2','power2']);
+  // 有次數上限的疊加卡
+  const STACK_LIMIT = { ghost: 3 };
 
   function pickCards(n) {
-    // 過濾掉已收集的不可疊加能力卡
-    const pool = CARDS.filter(c => STACKABLE.has(c.id) || !G.collected.includes(c.id));
+    // 過濾卡池：純數值無限疊、ghost 限 3 次、其餘能力卡選過就移除
+    const pool = CARDS.filter(c => {
+      if (STACKABLE.has(c.id)) return true;
+      if (STACK_LIMIT[c.id]) {
+        const count = G.collected.filter(id => id === c.id).length;
+        return count < STACK_LIMIT[c.id];
+      }
+      return !G.collected.includes(c.id);
+    });
 
     // 依稀有度權重抽卡，不重複
     const weighted = [];
