@@ -1072,6 +1072,55 @@ async function openPredModal(id) {
       </div>
     </div>
 
+    <!-- 你的預測（含鎖定倒數）— 移到最上方 -->
+    ${(()=>{
+      const _predPrefix = _isUCL() ? 'ucl26_my_preds' : 'wc26_my_preds';
+      const myPreds = (() => { try { return JSON.parse(localStorage.getItem(_predPrefix))||{}; } catch { return {}; } })();
+      const mine = myPreds[m.id];
+      let kickoffMs = 0;
+      if (_isUCL() && m.date && m.time) kickoffMs = new Date(m.date+'T'+m.time+':00+08:00').getTime();
+      else if (m.twDate && m.twTime) kickoffMs = new Date(m.twDate+'T'+m.twTime+':00+08:00').getTime();
+      const now = Date.now();
+      const matchStatus = m.status || (kickoffMs > 0 && now >= kickoffMs ? 'started' : 'scheduled');
+      const isLocked = matchStatus !== 'scheduled' || (kickoffMs > 0 && now >= kickoffMs);
+      const msLeft = kickoffMs > 0 ? kickoffMs - now : 0;
+      const showCountdown = !isLocked && msLeft > 0 && msLeft < 48 * 3600000;
+      const urgencyClass = msLeft < 30*60000 ? 'urgent' : msLeft < 2*3600000 ? 'warn' : '';
+
+      return `<div class="my-pred-section pred-top" id="my-pred-section-${m.id}">
+        ${showCountdown ? `<div class="pred-countdown ${urgencyClass}" id="pred-cd-${m.id}" data-kickoff="${kickoffMs}">⏰ 計算中...</div>` : ''}
+        ${isLocked ? `
+          ${mine ? `
+            <div class="my-pred-result">
+              <div class="my-pred-score">${flagImg(ht.flag)} ${mine.h} – ${mine.a} ${flagImg(at.flag)}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">🔒 預測已鎖定</div>
+            </div>` : `
+            <div class="my-pred-prompt">
+              <div style="font-size:13px;color:rgba(255,69,58,0.7);text-align:center;padding:12px">🔒 比賽已開始，無法填寫預測</div>
+            </div>`}
+        ` : `
+          ${mine ? `
+            <div class="my-pred-result">
+              <div class="my-pred-score">${flagImg(ht.flag)} ${mine.h} – ${mine.a} ${flagImg(at.flag)}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">
+                已預測 · ${new Date(mine.savedAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}
+              </div>
+              <button class="my-pred-edit-btn" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">修改</button>
+            </div>` : `
+            <div class="my-pred-prompt pred-cta">
+              <div style="font-size:15px;font-weight:800;margin-bottom:6px">🎯 預測這場比分</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6">
+                猜對方向 <span style="color:var(--green);font-weight:700">+5 XP</span>
+                ｜精準比分 <span style="color:var(--accent);font-weight:700">+20 XP + 1 💎</span>
+              </div>
+              <button class="btn-primary" style="width:100%;font-size:14px;padding:12px" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">
+                ✏️ 填入我的預測
+              </button>
+            </div>`}
+        `}
+      </div>`;
+    })()}
+
     <!-- 免費顯示：關鍵球員 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
       <div class="modal-players-box">
@@ -1237,55 +1286,7 @@ async function openPredModal(id) {
       </div>` : ''}
     </div>
 
-    <!-- 你的預測（含鎖定倒數）-->
-    ${(()=>{
-      const myPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
-      const mine = myPreds[m.id];
-      // 計算開賽時間，判斷是否已鎖定
-      const isUcl = _isUCL();
-      let kickoffMs = 0;
-      if (isUcl && m.date && m.time) {
-        kickoffMs = new Date(m.date + 'T' + m.time + ':00+08:00').getTime();
-      } else if (m.twDate && m.twTime) {
-        kickoffMs = new Date(m.twDate + 'T' + m.twTime + ':00+08:00').getTime();
-      }
-      const now = Date.now();
-      const matchStatus = m.status || (kickoffMs > 0 && now >= kickoffMs ? 'started' : 'scheduled');
-      const isLocked = matchStatus !== 'scheduled' || (kickoffMs > 0 && now >= kickoffMs);
-      const msLeft = kickoffMs > 0 ? kickoffMs - now : 0;
-      const showCountdown = !isLocked && msLeft > 0 && msLeft < 48 * 3600000; // 48小時內顯示倒數
-      const urgencyClass = msLeft < 30*60000 ? 'urgent' : msLeft < 2*3600000 ? 'warn' : '';
-
-      return `<div class="my-pred-section" id="my-pred-section-${m.id}">
-        <div class="modal-section-title" style="margin-top:16px">🎯 你的預測</div>
-        ${showCountdown ? `<div class="pred-countdown ${urgencyClass}" id="pred-cd-${m.id}" data-kickoff="${kickoffMs}">⏰ 計算中...</div>` : ''}
-        ${isLocked ? `
-          ${mine ? `
-            <div class="my-pred-result">
-              <div class="my-pred-score">${flagImg(ht.flag)} ${mine.h} – ${mine.a} ${flagImg(at.flag)}</div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">🔒 預測已鎖定</div>
-            </div>` : `
-            <div class="my-pred-prompt">
-              <div style="font-size:13px;color:rgba(255,69,58,0.7);text-align:center;padding:12px">🔒 比賽已開始，無法填寫預測</div>
-            </div>`}
-        ` : `
-          ${mine ? `
-            <div class="my-pred-result">
-              <div class="my-pred-score">${flagImg(ht.flag)} ${mine.h} – ${mine.a} ${flagImg(at.flag)}</div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">
-                已預測 · ${new Date(mine.savedAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}
-              </div>
-              <button class="my-pred-edit-btn" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">修改</button>
-            </div>` : `
-            <div class="my-pred-prompt">
-              <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:10px">你預測這場的比分是？</div>
-              <button class="btn-primary" style="width:100%" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">
-                ✏️ 填入我的預測
-              </button>
-            </div>`}
-        `}
-      </div>`;
-    })()}`;
+    `;
 
   // modal 已在 loading 階段開啟，這裡只捲到頂部
   modal.scrollTop = 0;
@@ -1878,6 +1879,11 @@ function renderSchedule(phaseFilter, groupFilter) {
           ? `<div class="match-vs" style="font-size:20px;font-weight:800">${m.score.h} - ${m.score.a}</div>`
           : `<div class="match-vs">VS</div>`;
       const aggText = m.agg ? `<div style="font-size:11px;color:var(--text-muted)">總比分 ${m.agg.h}-${m.agg.a}</div>` : '';
+      const uclPreds = (() => { try { return JSON.parse(localStorage.getItem('ucl26_my_preds'))||{}; } catch { return {}; } })();
+      const uclMine = uclPreds[m.id];
+      const uclPredTag = m.status === 'finished' ? '' : uclMine
+        ? `<div class="match-pred-tag predicted">${uclMine.h}-${uclMine.a} 已預測</div>`
+        : `<div class="match-pred-tag">🎯 預測比分</div>`;
       return header + `<div class="match-card${isLive ? ' match-live' : ''}" onclick="openPredModal('${m.id}')">
         ${isLive ? '<div class="live-badge"><span class="live-dot"></span>LIVE</div>' : ''}
         <div class="match-team">
@@ -1892,6 +1898,7 @@ function renderSchedule(phaseFilter, groupFilter) {
           <div class="match-meta">
             <span class="match-tag group">${stageLabel}${m.md ? ' MD'+m.md : ''}${m.leg ? ' Leg'+m.leg : ''}</span>
           </div>
+          ${uclPredTag}
         </div>
         <div class="match-team away">
           <div class="match-team-flag">${flagImg(at.flag)}</div>
@@ -1934,6 +1941,11 @@ function renderSchedule(phaseFilter, groupFilter) {
     if (!ht || !at) return header;
     const p = calcPred(ht, at);
     const phaseLabel = {group:'小組賽',r32:'32強',r16:'16強',qf:'八強',sf:'四強',final:'決賽'}[m.phase]||'';
+    const wcPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
+    const wcMine = wcPreds[m.id];
+    const wcPredTag = wcMine
+      ? `<div class="match-pred-tag predicted">${wcMine.h}-${wcMine.a} 已預測</div>`
+      : `<div class="match-pred-tag">🎯 預測比分</div>`;
     return header + `<div class="match-card" onclick="openPredModal('${m.id}')">
       <div class="match-team">
         <div class="match-team-flag">${flagImg(ht.flag)}</div>
@@ -1947,6 +1959,7 @@ function renderSchedule(phaseFilter, groupFilter) {
           <span class="match-tag group">${GROUPS[m.group]?.name||''} MD${m.matchday}</span>
           <span class="match-tag">${phaseLabel}</span>
         </div>
+        ${wcPredTag}
       </div>
       <div class="match-team away">
         <div class="match-team-flag">${flagImg(at.flag)}</div>
@@ -2700,9 +2713,10 @@ function saveMyPred(matchId) {
   }
   const h = parseInt(document.getElementById('my-pred-h')?.textContent || 0);
   const a = parseInt(document.getElementById('my-pred-a')?.textContent || 0);
-  const myPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
+  const predKey = _isUCL() ? 'ucl26_my_preds' : 'wc26_my_preds';
+  const myPreds = (() => { try { return JSON.parse(localStorage.getItem(predKey))||{}; } catch { return {}; } })();
   myPreds[matchId] = { h, a, savedAt: new Date().toISOString() };
-  localStorage.setItem('wc26_my_preds', JSON.stringify(myPreds));
+  localStorage.setItem(predKey, JSON.stringify(myPreds));
   document.getElementById('my-pred-overlay')?.remove();
   openPredModal(matchId);
 }

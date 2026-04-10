@@ -1749,6 +1749,42 @@ img.flag-img {
   font-size: 28px; font-weight: 900; color: var(--accent); margin-top: 8px;
 }
 
+/* ========== 賽程卡片預測標籤 ========== */
+.match-pred-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(var(--accent-rgb, 240,192,64),0.15), rgba(var(--accent-rgb, 240,192,64),0.08));
+  border: 1px solid rgba(var(--accent-rgb, 240,192,64),0.3);
+  color: var(--accent);
+  animation: pred-tag-pulse 2.5s ease-in-out infinite;
+}
+.match-pred-tag.predicted {
+  background: rgba(34,197,94,0.12);
+  border-color: rgba(34,197,94,0.3);
+  color: #86efac;
+  animation: none;
+}
+@keyframes pred-tag-pulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+/* ========== Modal 頂部預測區 ========== */
+.my-pred-section.pred-top {
+  background: linear-gradient(135deg, rgba(var(--accent-rgb, 240,192,64),0.08), rgba(var(--accent-rgb, 240,192,64),0.02));
+  border: 1px solid rgba(var(--accent-rgb, 240,192,64),0.15);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.pred-cta {
+  text-align: center;
+}
+
 /* ========== 結算彈窗（Settlement Popup）========== */
 .settlement-overlay {
   position: fixed; inset: 0; z-index: 9999;
