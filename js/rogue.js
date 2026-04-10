@@ -274,7 +274,6 @@
     for (const b of G.balls) {
       if (!b.alive) continue;
       b.age += dt;
-      if (b.age > BALL_TTL) { b.alive = false; continue; }
 
       b.trail.push({ x: b.x, z: b.z });
       if (b.trail.length > 8) b.trail.shift();
