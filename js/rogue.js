@@ -45,11 +45,11 @@
     { id:'explode',  name:'爆裂射擊',   desc:'命中時爆炸傷害周圍',       icon:'💥', rarity:'rare',    apply(s){ s.explode = true; }},
     { id:'sniper',   name:'狙擊射門',   desc:'傷害 ×2.5，球變小',        icon:'🔫', rarity:'rare',    apply(s){ s.dmgMul *= 2.5; s.ballScale *= 0.65; }},
     { id:'multi2',   name:'三重射擊',   desc:'連續射球數量 +2',          icon:'🎱', rarity:'rare',     apply(s){ s.multiShot += 2; }},
-    { id:'bounce',   name:'反彈射擊',   desc:'球碰敵人後反彈繼續飛（傷害減半）',icon:'🔄', rarity:'rare', apply(s){ s.bounce = true; }},
+    { id:'bounce',   name:'反彈射擊',   desc:'球碰敵人後反彈+1次（上限4）',icon:'🔄', rarity:'rare', apply(s){ s.bounce = Math.min(4, (s.bounce||0) + 1); }},
     { id:'crit',     name:'致命一擊',   desc:'每次射門 20% 機率暴擊 ×3', icon:'⚡', rarity:'rare',     apply(s){ s.critPct = Math.min(0.6, (s.critPct||0) + 0.2); }},
     { id:'gkSlow',   name:'守門員削弱', desc:'守門員移速 -30%',          icon:'🧤', rarity:'rare',     apply(s){ s.gkSlowMul = (s.gkSlowMul||1) * 0.7; }},
     { id:'extraLife', name:'鋼鐵防線', desc:'+1 條命（上限 5）',         icon:'🛡️', rarity:'rare',    apply(s){ if(s.lives < 5) s.lives++; }},
-    { id:'guard',    name:'後衛守衛',   desc:'召喚守衛擋住靠近的敵人 5 秒',icon:'🏋️', rarity:'rare',  apply(s){ s._spawnGuard = true; }},
+    { id:'guard',    name:'後衛守衛',   desc:'召喚一個守衛，敵人靠近時阻擋 5 秒',icon:'🏋️', rarity:'rare',  apply(s){ s._spawnGuard = (s._spawnGuard||0) + 1; }},
 
     // ── 進階卡 (epic) ──────────────────────
     { id:'power2',   name:'重砲射擊',   desc:'傷害 ×2',                  icon:'🔨', rarity:'epic',     apply(s){ s.dmgMul *= 2; }},
@@ -97,9 +97,9 @@
       dmgMul: 1, spdMul: 1, ballScale: 1, multiShot: 1, cdMul: 1,
       pierce: false, burn: false, freeze: false,
       explode: false, ghostPct: 0, vampire: false,
-      bounce: false, split: false,
+      bounce: 0, split: false,
       critPct: 0, goalBonus: 0, gkSlowMul: 1, globalSlow: 1,
-      _spawnGuard: false,
+      _spawnGuard: 0,
       collected: [],            // card ids
 
       // entities
@@ -341,10 +341,13 @@
               });
             }
           }
-          // 反彈：球反向繼續飛
-          if (G.bounce && !b._bounced) {
-            b.vz = -Math.abs(b.vz) * 0.7;
+          // 反彈：球反向繼續飛（可多次反彈）
+          const maxBounce = G.bounce || 0;
+          const curBounce = b._bounceCount || 0;
+          if (maxBounce > 0 && curBounce < maxBounce) {
+            b.vz = -b.vz * 0.7;
             b.vx += (Math.random() - 0.5) * 2;
+            b._bounceCount = curBounce + 1;
             b._bounced = true;
             hitDef = false; // 不消滅球
           } else if (!G.pierce) {
@@ -420,9 +423,12 @@
 
     // ── 守衛盟友 ──
     for (const a of G.allies) {
-      a.age += dt;
-      if (a.age >= a.life) { a.alive = false; continue; }
-      // 找最近的低 z 敵人並阻擋
+      // 開始阻擋後才倒計時
+      if (a.blocking) {
+        a.blockTimer -= dt;
+        if (a.blockTimer <= 0) { a.alive = false; continue; }
+      }
+      // 找最近的低 z 敵人
       let nearest = null, nd = Infinity;
       for (const d of G.defs) {
         if (d.hp <= 0) continue;
@@ -435,8 +441,11 @@
         const len = Math.sqrt(dx * dx + dz * dz) || 1;
         a.x += (dx / len) * 0.6 * (dt / 16);
         a.z += (dz / len) * 0.6 * (dt / 16);
-        // 阻擋（凍結敵人移動）
-        if (nd < 50) nearest.frozen = Math.max(nearest.frozen || 0, 200);
+        // 接觸後開始阻擋（凍結敵人 + 啟動 5 秒倒計時）
+        if (nd < 50) {
+          nearest.frozen = Math.max(nearest.frozen || 0, 200);
+          if (!a.blocking) { a.blocking = true; a.blockTimer = 5000; }
+        }
       }
     }
     G.allies = G.allies.filter(a => a.alive);
@@ -476,7 +485,7 @@
   }
 
   // 可無限疊加的純數值卡
-  const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','rapid2','multi1','multi2','power2','ironleg','magnet','crit']);
+  const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','rapid2','multi1','multi2','power2','ironleg','magnet','crit','bounce','guard']);
   // 有次數上限的疊加卡
   const STACK_LIMIT = { ghost: 3 };
 
@@ -512,13 +521,13 @@
     const c = G.cardPick[idx];
     c.apply(G);
     G.collected.push(c.id);
-    // 守衛卡：生成一個盟友
-    if (G._spawnGuard) {
-      G._spawnGuard = false;
+    // 守衛卡：生成盟友（每張卡+1個）
+    while (G._spawnGuard > 0) {
+      G._spawnGuard--;
       G.allies.push({
         x: (Math.random() - 0.5) * FIELD_HW * 0.6,
         z: FIELD_DEPTH * 0.15,
-        alive: true, age: 0, life: 5000,
+        alive: true, blocking: false, blockTimer: 5000,
       });
     }
     G.phase = 'playing';
@@ -840,8 +849,8 @@
     const w = 40 * p.s, h = 56 * p.s;
     if (p.y < horizY - 10 || p.s < 0.05) return;
 
-    const remaining = 1 - a.age / a.life;
-    ctx.globalAlpha = Math.min(1, remaining * 2); // 最後時刻漸隱
+    const remaining = a.blocking ? Math.max(0, a.blockTimer / 5000) : 1;
+    ctx.globalAlpha = a.blocking ? Math.min(1, remaining * 2) : 1; // 阻擋中才漸隱
 
     // 陰影
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
@@ -876,12 +885,14 @@
     ctx.fillStyle = headGrad;
     ctx.beginPath(); ctx.arc(p.x, by + h * 0.2, headR, 0, Math.PI * 2); ctx.fill();
 
-    // 倒計時條
-    const bw = w * 1.1, bh = Math.max(2, 3 * p.s);
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    rr(ctx, p.x - bw / 2, by - bh - 3, bw, bh, 2); ctx.fill();
-    ctx.fillStyle = '#76ff03';
-    rr(ctx, p.x - bw / 2, by - bh - 3, bw * remaining, bh, 2); ctx.fill();
+    // 倒計時條（阻擋中才顯示）
+    if (a.blocking) {
+      const bw = w * 1.1, bh = Math.max(2, 3 * p.s);
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      rr(ctx, p.x - bw / 2, by - bh - 3, bw, bh, 2); ctx.fill();
+      ctx.fillStyle = '#76ff03';
+      rr(ctx, p.x - bw / 2, by - bh - 3, bw * remaining, bh, 2); ctx.fill();
+    }
 
     ctx.globalAlpha = 1;
   }
