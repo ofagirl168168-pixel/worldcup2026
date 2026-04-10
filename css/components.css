@@ -2002,16 +2002,17 @@ img.flag-img {
 /* 滑鼠光暈 */
 .fx-cursor-glow {
   position: fixed;
-  width: 300px; height: 300px;
+  width: 350px; height: 350px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(240,192,64,0.07) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(240,192,64,0.18) 0%, rgba(240,192,64,0.06) 35%, transparent 70%);
   pointer-events: none;
   z-index: 9990;
-  transition: opacity 0.3s ease;
+  transition: width 0.3s, height 0.3s, background 0.3s;
   will-change: transform;
 }
 .fx-glow-bright {
-  background: radial-gradient(circle, rgba(240,192,64,0.14) 0%, rgba(240,192,64,0.04) 40%, transparent 70%);
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(240,192,64,0.3) 0%, rgba(240,192,64,0.1) 35%, transparent 70%);
 }
 
 /* 足球飛行 */

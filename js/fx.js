@@ -19,7 +19,8 @@
   function animateGlow() {
     gx += (mx - gx) * 0.15;
     gy += (my - gy) * 0.15;
-    glow.style.transform = `translate(${gx - 150}px, ${gy - 150}px)`;
+    const half = glow.offsetWidth / 2 || 175;
+    glow.style.transform = `translate(${gx - half}px, ${gy - half}px)`;
     requestAnimationFrame(animateGlow);
   }
   animateGlow();
