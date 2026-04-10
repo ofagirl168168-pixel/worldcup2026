@@ -50,8 +50,14 @@
           '<div class="fx-ring r2"></div>' +
           '<div class="fx-ring r3"></div>' +
           '<div class="fx-bullseye"></div>' +
+          '<div class="fx-crosshair ch-h"></div>' +
+          '<div class="fx-crosshair ch-v"></div>' +
         '</div>' +
-        '<div class="fx-target-pole"></div>';
+        '<div class="fx-target-stand">' +
+          '<div class="fx-stand-pole"></div>' +
+          '<div class="fx-stand-leg leg-l"></div>' +
+          '<div class="fx-stand-leg leg-r"></div>' +
+        '</div>';
       const pageH = getContentHeight();
       t.style.left = (8 + Math.random() * 84) + 'vw';
       const pageY = pageH * 0.05 + Math.random() * pageH * 0.9;

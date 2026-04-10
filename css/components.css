@@ -2033,12 +2033,16 @@ img.flag-img {
 }
 
 /* 標靶圓盤 */
+/* 靶板（方形圓角，邊框強化） */
 .fx-target-board {
   position: relative;
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: #fff;
+  width: 48px; height: 48px;
+  border-radius: 6px;
+  background: #f5f0e0;
   display: flex; align-items: center; justify-content: center;
+  border: 2px solid #5d4037;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  overflow: hidden;
 }
 
 /* 同心環 */
@@ -2047,31 +2051,67 @@ img.flag-img {
   border-radius: 50%;
 }
 .fx-ring.r1 {
-  width: 44px; height: 44px;
+  width: 42px; height: 42px;
   background: #e53935;
 }
 .fx-ring.r2 {
-  width: 32px; height: 32px;
-  background: #fff;
+  width: 30px; height: 30px;
+  background: #f5f0e0;
 }
 .fx-ring.r3 {
-  width: 20px; height: 20px;
+  width: 18px; height: 18px;
   background: #e53935;
 }
 .fx-bullseye {
   position: absolute;
-  width: 8px; height: 8px;
+  width: 7px; height: 7px;
   border-radius: 50%;
-  background: #fff;
-  z-index: 1;
+  background: #ffd600;
+  z-index: 2;
+  box-shadow: 0 0 4px rgba(255,214,0,0.8);
 }
 
-/* 竿子 */
-.fx-target-pole {
-  width: 3px;
-  height: 28px;
+/* 十字準心 */
+.fx-crosshair {
+  position: absolute;
+  background: rgba(0,0,0,0.25);
+  z-index: 1;
+}
+.fx-crosshair.ch-h {
+  width: 100%; height: 1px;
+}
+.fx-crosshair.ch-v {
+  width: 1px; height: 100%;
+}
+
+/* 腳架 */
+.fx-target-stand {
+  position: relative;
+  width: 30px; height: 24px;
+}
+.fx-stand-pole {
+  position: absolute;
+  left: 50%; top: 0;
+  transform: translateX(-50%);
+  width: 3px; height: 16px;
   background: linear-gradient(to bottom, #8d6e63, #5d4037);
-  border-radius: 0 0 2px 2px;
+}
+.fx-stand-leg {
+  position: absolute;
+  bottom: 0;
+  width: 2px; height: 14px;
+  background: #5d4037;
+  border-radius: 0 0 1px 1px;
+}
+.fx-stand-leg.leg-l {
+  left: 4px;
+  transform: rotate(18deg);
+  transform-origin: top center;
+}
+.fx-stand-leg.leg-r {
+  right: 4px;
+  transform: rotate(-18deg);
+  transform-origin: top center;
 }
 
 @keyframes fx-float {
