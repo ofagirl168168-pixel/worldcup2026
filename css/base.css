@@ -179,9 +179,7 @@ ul { list-style: none; }
   position: relative; min-height: 92vh;
   display: flex; flex-direction: column; justify-content: center;
   overflow: hidden;
-  background:
-    var(--hero-gradient),
-    var(--bg-primary);
+  background: var(--hero-gradient);
 }
 .hero-bg-overlay {
   position: absolute; inset: 0;
