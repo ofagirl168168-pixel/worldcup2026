@@ -553,7 +553,7 @@ function renderHomeDailyChallenge() {
             ${item.icon} ${item.label}
           </button>`).join('')}
       </div>
-    </div>` : '<div class="home-pending-tasks" style="color:#4caf50;font-size:13px;font-weight:600">🎉 所有挑戰已完成，開賽時見！</div>'}`;
+    </div>` : '<div class="home-pending-tasks" style="color:#4caf50;font-size:13px;font-weight:600">✅ 今日任務已完成！明天還有新的每日問答與挑戰，記得回來拿 XP 🔥</div>'}`;
 }
 
 function submitDailyPickHome(idx) {
