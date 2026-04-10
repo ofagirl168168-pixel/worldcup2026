@@ -206,7 +206,15 @@
     G.spawnTimer = 1500;
 
     waveFlash = 1800;
-    G.gk.spd = (GK_BASE_SPD + G.wave * 0.3) * (G.gkSlowMul || 1);
+    // 守門員速度：每 5 波才提升一次
+    const gkTier = Math.floor(G.wave / 5); // wave5=1, wave10=2, wave15=3...
+    G.gk.spd = (GK_BASE_SPD + gkTier * 0.5) * (G.gkSlowMul || 1);
+    G.gk.tracking = G.wave >= 5; // wave5 起才追蹤球
+
+    // 每 5 波警告
+    if (G.wave >= 5 && G.wave % 5 === 0) {
+      G._warning = { timer: 3000, tier: gkTier };
+    }
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -271,6 +279,8 @@
 
     // wave flash
     if (waveFlash > 0) waveFlash -= dt;
+    // warning timer
+    if (G._warning && G._warning.timer > 0) G._warning.timer -= dt;
 
     if (G.phase !== 'playing') return;
 
@@ -286,23 +296,24 @@
       }
     }
 
-    // ── 守門員（追蹤球） ──
+    // ── 守門員 ──
     const gk = G.gk;
     const gkEffSpd = gk.spd * (G.globalSlow || 1);
-    // 找最接近球門的球來追蹤
-    let trackBall = null, bestZ = 0;
-    for (const b of G.balls) {
-      if (!b.alive) continue;
-      if (b.z > bestZ) { bestZ = b.z; trackBall = b; }
-    }
-    if (trackBall) {
-      // 追蹤球的 x 軸位置
-      const diff = trackBall.x - gk.x;
-      if (Math.abs(diff) > 3) {
-        gk.x += Math.sign(diff) * gkEffSpd * (dt / 16);
+    if (gk.tracking) {
+      // wave5 起：追蹤最接近球門的球
+      let trackBall = null, bestZ = 0;
+      for (const b of G.balls) {
+        if (!b.alive) continue;
+        if (b.z > bestZ) { bestZ = b.z; trackBall = b; }
+      }
+      if (trackBall) {
+        const diff = trackBall.x - gk.x;
+        if (Math.abs(diff) > 3) gk.x += Math.sign(diff) * gkEffSpd * (dt / 16);
+      } else {
+        gk.x += gk.dir * gkEffSpd * (dt / 16);
       }
     } else {
-      // 沒有球時左右巡邏
+      // wave1~4：左右巡邏
       gk.x += gk.dir * gkEffSpd * (dt / 16);
     }
     if (gk.x > GOAL_HW - gk.w / 2) { gk.x = GOAL_HW - gk.w / 2; gk.dir = -1; }
@@ -646,6 +657,34 @@
       ctx.font = `bold ${Math.min(48, W * 0.08)}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
       ctx.fillText(`Wave ${G.wave}`, W / 2, H * 0.38);
+      ctx.globalAlpha = 1;
+    }
+
+    // 每 5 波警告
+    if (G._warning && G._warning.timer > 0) {
+      const wt = G._warning.timer;
+      const wa = Math.min(1, wt / 800);
+      ctx.globalAlpha = wa;
+      // 紅色閃爍背景條
+      const flash = Math.sin(Date.now() * 0.008) * 0.15 + 0.25;
+      ctx.fillStyle = `rgba(255,0,0,${flash})`;
+      ctx.fillRect(0, H * 0.44, W, H * 0.18);
+      // 警告圖示與文字
+      ctx.fillStyle = '#ff1744';
+      ctx.font = `bold ${Math.min(36, W * 0.065)}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('⚠️ WARNING ⚠️', W / 2, H * 0.50);
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${Math.min(18, W * 0.035)}px "Noto Sans TC", sans-serif`;
+      const tier = G._warning.tier;
+      const msgs = [
+        '守門員覺醒！開始自動追蹤球路',
+        '守門員強化！移動速度大幅提升',
+        '守門員狂暴！反應速度接近極限',
+        '守門員究極體！幾乎無法突破',
+      ];
+      const msg = msgs[Math.min(tier - 1, msgs.length - 1)];
+      ctx.fillText(msg, W / 2, H * 0.56);
       ctx.globalAlpha = 1;
     }
 
