@@ -2219,9 +2219,9 @@ function renderBadges() {
     <div class="badges-section">
       <div class="badges-title">🏅 成就徽章</div>
       <div class="badges-grid">
-        ${BADGES.map(b => {
+        ${BADGES.map((b, i) => {
           const e = earnedIds.has(b.id);
-          return `<div class="badge-card ${e ? 'earned' : 'locked'}" title="${b.desc}">
+          return `<div class="badge-card ${e ? 'earned' : 'locked'}" onclick="showBadgeDetail('flat',${i})">
             <div class="badge-card-icon">${e ? b.icon : '🔒'}</div>
             <div class="badge-card-name">${b.name}</div>
           </div>`;
@@ -2231,14 +2231,18 @@ function renderBadges() {
     <div class="badges-section" style="margin-top:20px">
       <div class="badges-title">🏆 進階成就</div>
       <div class="badges-grid tiered">
-        ${TIERED_BADGES.map(badge => {
-          const currentTier = tieredMap[badge.id] ?? -1;
+        ${TIERED_BADGES.map((badge, bi) => {
+          const storedTier = tieredMap[badge.id] ?? -1;
           const currentVal = vals[badge.id] || 0;
+          // 即時計算實際達成階級（不只依賴 localStorage）
+          let liveTier = -1;
+          badge.tiers.forEach((t, ti) => { if (currentVal >= t.threshold) liveTier = ti; });
+          const currentTier = Math.max(storedTier, liveTier);
           const nextTier = badge.tiers[currentTier + 1];
           const displayTier = currentTier >= 0 ? badge.tiers[currentTier] : null;
           const progress = nextTier ? Math.min(100, Math.round(currentVal / nextTier.threshold * 100)) : 100;
           const cls = currentTier >= 0 ? tierCls[currentTier] : 'locked';
-          return `<div class="badge-card ${cls}" title="${displayTier?.desc || badge.tiers[0].desc}">
+          return `<div class="badge-card ${cls}" onclick="showBadgeDetail('tiered',${bi})">
             <div class="badge-card-icon">${displayTier ? displayTier.icon : '🔒'}</div>
             <div class="badge-card-name">${displayTier ? displayTier.name : badge.tiers[0].name}</div>
             ${currentTier >= 0 ? `<div class="badge-tier-label">${tierLabel[currentTier]}階</div>` : ''}
@@ -2248,4 +2252,67 @@ function renderBadges() {
         }).join('')}
       </div>
     </div>`;
+}
+
+// ── 點擊徽章顯示詳情 ────────────────────────────────────
+function showBadgeDetail(type, idx) {
+  const mc = document.getElementById('modal-content');
+  if (!mc) return;
+
+  if (type === 'flat') {
+    const b = BADGES[idx];
+    const earned = loadBadges();
+    const earnedIds = new Set(earned.map(x => x.id));
+    const e = earnedIds.has(b.id);
+    const earnedData = earned.find(x => x.id === b.id);
+    mc.innerHTML = `
+      <div style="text-align:center;padding:10px 0">
+        <div style="font-size:56px;margin-bottom:12px;${e ? '' : 'filter:grayscale(1);opacity:0.4'}">${b.icon}</div>
+        <div style="font-size:20px;font-weight:900;margin-bottom:6px">${b.name}</div>
+        <div style="font-size:14px;color:var(--text-muted);margin-bottom:20px">${b.desc}</div>
+        <div style="display:inline-block;padding:6px 18px;border-radius:999px;font-size:13px;font-weight:700;${e ? 'background:rgba(34,197,94,0.15);color:#86efac' : 'background:rgba(255,255,255,0.06);color:var(--text-muted)'}">
+          ${e ? '✅ 已達成' + (earnedData?.at ? '（' + new Date(earnedData.at).toLocaleDateString('zh-TW') + '）' : '') : '🔒 尚未達成'}
+        </div>
+        <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;margin-top:24px">關閉</button>
+      </div>`;
+  } else {
+    const badge = TIERED_BADGES[idx];
+    const vals = getTieredValues();
+    const currentVal = vals[badge.id] || 0;
+    const tieredEarned = loadTieredBadges();
+    const storedTier = tieredEarned.find(b => b.id === badge.id)?.tier ?? -1;
+    let liveTier = -1;
+    badge.tiers.forEach((t, ti) => { if (currentVal >= t.threshold) liveTier = ti; });
+    const effectiveTier = Math.max(storedTier, liveTier);
+    const tierColors = ['#cd7f32', '#c0c0c0', '#ffd700'];
+    const tierNames = ['銅階', '銀階', '金階'];
+
+    mc.innerHTML = `
+      <div style="text-align:center;padding:10px 0">
+        <div style="font-size:48px;margin-bottom:8px">${effectiveTier >= 0 ? badge.tiers[effectiveTier].icon : '🔒'}</div>
+        <div style="font-size:20px;font-weight:900;margin-bottom:4px">${badge.tiers[0].name.replace(/[🥉🥈🥇🎯💎👑🔓🗝️🏟️📣📢🌐⭐🌟💫🔥💥⚡]/g,'').trim()}</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px">目前進度：${currentVal}</div>
+        <div style="display:flex;flex-direction:column;gap:12px;text-align:left;margin-bottom:20px">
+          ${badge.tiers.map((t, ti) => {
+            const done = currentVal >= t.threshold;
+            const isCurrent = ti === effectiveTier;
+            const prog = Math.min(100, Math.round(currentVal / t.threshold * 100));
+            return `<div style="background:rgba(255,255,255,${done ? '0.08' : '0.03'});border-radius:12px;padding:12px 14px;border:1px solid ${done ? tierColors[ti] : 'rgba(255,255,255,0.06)'}${isCurrent ? ';box-shadow:0 0 10px ' + tierColors[ti] + '40' : ''}">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="font-size:14px;font-weight:700;${done ? 'color:' + tierColors[ti] : 'color:var(--text-muted)'}">${t.icon} ${tierNames[ti]} — ${t.name}</span>
+                <span style="font-size:12px;font-weight:700;${done ? 'color:#86efac' : 'color:var(--text-muted)'}">
+                  ${done ? '✅' : `${currentVal}/${t.threshold}`}
+                </span>
+              </div>
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">${t.desc}</div>
+              <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden">
+                <div style="height:100%;width:${prog}%;background:${done ? tierColors[ti] : 'rgba(255,255,255,0.2)'};border-radius:99px;transition:width .3s"></div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+        <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer">關閉</button>
+      </div>`;
+  }
+  document.getElementById('team-modal').classList.add('open');
 }

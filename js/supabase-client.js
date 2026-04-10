@@ -65,6 +65,8 @@ async function handleUserLoggedIn(isNew) {
   await onFirstAccount?.();
   // 初始化寶石（每日簽到 + 餘額）
   await initGems?.();
+  // unlockedMatchSet 已就緒，重新檢查階層成就
+  checkTieredAchievements?.();
 
   // 從 Supabase 還原競技場資料 → localStorage
   await loadArenaFromSupabase()

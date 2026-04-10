@@ -1856,6 +1856,10 @@ img.flag-img {
   opacity: 0.7;
 }
 
+/* ========== 徽章卡片可點擊 ========== */
+.badge-card { cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
+.badge-card:active { transform: scale(0.96); }
+
 /* ========== 賽事切換按鈕色 ========== */
 :root { --tournament-color: #f0c040; --tournament-accent: #e6a817; }
 [data-tournament-active="ucl"] {
