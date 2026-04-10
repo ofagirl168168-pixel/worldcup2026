@@ -141,16 +141,20 @@
   function makeDef(type, hpMul, spdMul) {
     const d = DTYPE[type];
     const hp = Math.ceil(d.hp * hpMul);
-    // 中路守衛固定在中央附近
+    // 中路守衛固定在球門正前方密集排列
     const isSentry = type === 'sentry';
     const startX = isSentry
-      ? (Math.random() - 0.5) * GOAL_HW * 1.5
+      ? (Math.random() - 0.5) * GOAL_HW * 0.7   // 更密集地擋在球門前
       : (Math.random() - 0.5) * FIELD_HW * 1.4;
     const startZ = isSentry
-      ? FIELD_DEPTH * (0.6 + Math.random() * 0.25)
+      ? FIELD_DEPTH * (0.65 + Math.random() * 0.2)
       : FIELD_DEPTH * (0.5 + Math.random() * 0.4);
-    // 斜向移動速度（x 軸）
-    const vx = isSentry ? 0 : (Math.random() - 0.5) * d.spd * spdMul * 0.6;
+    // 斜向移動速度（x 軸）— 非守衛的敵人大幅度斜走
+    let vx = 0;
+    if (!isSentry) {
+      const dir = Math.random() > 0.5 ? 1 : -1;
+      vx = dir * (0.3 + Math.random() * 0.5) * d.spd * spdMul;  // 明顯的斜向移動
+    }
     return {
       type, x: startX, z: startZ, vx,
       hp, maxHp: hp,
@@ -455,6 +459,9 @@
   //  渲染
   // ═══════════════════════════════════════════════════════════
   function render() {
+    // 清除畫布（防殘影）
+    ctx.clearRect(0, 0, W, H);
+
     ctx.save();
     // screen shake
     if (shakeAmt > 0.5) ctx.translate((Math.random() - 0.5) * shakeAmt, (Math.random() - 0.5) * shakeAmt);
