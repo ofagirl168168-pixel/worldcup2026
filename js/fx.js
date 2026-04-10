@@ -3,109 +3,130 @@
 (function() {
   'use strict';
 
-  // 手機不啟用
-  if ('ontouchstart' in window && window.innerWidth < 768) return;
+  const isMobile = 'ontouchstart' in window && window.innerWidth < 768;
 
-  // ── 1. 黑霧遮罩 + 滑鼠探照燈 ─────────────────────────────
-  const fog = document.createElement('div');
-  fog.className = 'fx-fog';
-  document.body.appendChild(fog);
-
-  let mx = -500, my = -500, gx = -500, gy = -500;
-
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX;
-    my = e.clientY;
-  });
-
-  function animateFog() {
-    gx += (mx - gx) * 0.12;
-    gy += (my - gy) * 0.12;
-    // 用 radial-gradient 做探照燈（中心透明，外圍黑霧）
-    fog.style.background = `radial-gradient(circle 180px at ${gx}px ${gy}px, transparent 0%, transparent 40%, rgba(0,0,0,0.35) 100%)`;
-    requestAnimationFrame(animateFog);
-  }
-  animateFog();
-
-  // ── 2. 隱藏標靶系統 ──────────────────────────────────────
+  // ── 1 & 2. 黑霧 + 標靶（僅桌機） ─────────────────────────────
+  let gx = -500, gy = -500;
   const targets = [];
-  const TARGET_COUNT = 12;
-  const TARGET_RESPAWN = 8000; // 被擊中後重生時間
 
-  const targetLayer = document.createElement('div');
-  targetLayer.className = 'fx-target-layer';
-  document.body.appendChild(targetLayer);
+  if (!isMobile) {
+    const fog = document.createElement('div');
+    fog.className = 'fx-fog';
+    document.body.appendChild(fog);
 
-  // 取得頁面內容實際高度（不含標靶層自身）
-  function getContentHeight() {
-    return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-  }
+    let mx = -500, my = -500;
 
-  function spawnTarget() {
-    const t = document.createElement('div');
-    t.className = 'fx-target';
-    // 純 CSS 標靶（同心圓 + 竿子），不用 emoji
-    t.innerHTML =
-      '<div class="fx-target-board">' +
-        '<div class="fx-ring r1"></div>' +
-        '<div class="fx-ring r2"></div>' +
-        '<div class="fx-ring r3"></div>' +
-        '<div class="fx-bullseye"></div>' +
-      '</div>' +
-      '<div class="fx-target-pole"></div>';
-    // 隨機位置：橫向用 vw，縱向用頁面座標 px
-    const pageH = getContentHeight();
-    t.style.left = (8 + Math.random() * 84) + 'vw';
-    const pageY = pageH * 0.05 + Math.random() * pageH * 0.9;
-    t._pageY = pageY;
-    // 微微浮動動畫偏移
-    t.style.animationDelay = (Math.random() * 3) + 's';
-    targetLayer.appendChild(t);
-    targets.push(t);
-    return t;
-  }
-
-  // 初始化標靶
-  for (let i = 0; i < TARGET_COUNT; i++) spawnTarget();
-
-  // 用 transform 模擬滾動（fixed 層不會撐長頁面）
-  function updateTargetScroll() {
-    const scrollY = window.scrollY || window.pageYOffset;
-    targets.forEach(t => {
-      t.style.top = (t._pageY - scrollY) + 'px';
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX;
+      my = e.clientY;
     });
-    requestAnimationFrame(updateTargetScroll);
-  }
-  updateTargetScroll();
 
-  // 標靶靠近滑鼠時才亮起（用 JS 控制，因為標靶在霧下方）
-  function updateTargetVisibility() {
-    targets.forEach(t => {
-      if (t._hit) return;
-      const rect = t.getBoundingClientRect();
-      const tx = rect.left + rect.width / 2;
-      const ty = rect.top + rect.height / 2;
-      const dist = Math.sqrt((gx - tx) ** 2 + (gy - ty) ** 2);
-      // 探照燈半徑內才可見
-      if (dist < 200) {
-        const opacity = Math.max(0, 1 - dist / 200);
-        t.style.opacity = opacity * 0.7;
-      } else {
-        t.style.opacity = 0;
-      }
-    });
-    requestAnimationFrame(updateTargetVisibility);
-  }
-  updateTargetVisibility();
+    function animateFog() {
+      gx += (mx - gx) * 0.12;
+      gy += (my - gy) * 0.12;
+      fog.style.background = `radial-gradient(circle 180px at ${gx}px ${gy}px, transparent 0%, transparent 40%, rgba(0,0,0,0.35) 100%)`;
+      requestAnimationFrame(animateFog);
+    }
+    animateFog();
 
-  // ── 3. 足球踢擊 + 標靶碰撞 ───────────────────────────────
+    // ── 標靶系統 ──
+    const TARGET_COUNT = 12;
+    const TARGET_RESPAWN = 8000;
+
+    const targetLayer = document.createElement('div');
+    targetLayer.className = 'fx-target-layer';
+    document.body.appendChild(targetLayer);
+
+    function getContentHeight() {
+      return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    }
+
+    function spawnTarget() {
+      const t = document.createElement('div');
+      t.className = 'fx-target';
+      t.innerHTML =
+        '<div class="fx-target-board">' +
+          '<div class="fx-ring r1"></div>' +
+          '<div class="fx-ring r2"></div>' +
+          '<div class="fx-ring r3"></div>' +
+          '<div class="fx-bullseye"></div>' +
+        '</div>' +
+        '<div class="fx-target-pole"></div>';
+      const pageH = getContentHeight();
+      t.style.left = (8 + Math.random() * 84) + 'vw';
+      const pageY = pageH * 0.05 + Math.random() * pageH * 0.9;
+      t._pageY = pageY;
+      t.style.animationDelay = (Math.random() * 3) + 's';
+      targetLayer.appendChild(t);
+      targets.push(t);
+      return t;
+    }
+
+    for (let i = 0; i < TARGET_COUNT; i++) spawnTarget();
+
+    function updateTargetScroll() {
+      const scrollY = window.scrollY || window.pageYOffset;
+      targets.forEach(t => {
+        t.style.top = (t._pageY - scrollY) + 'px';
+      });
+      requestAnimationFrame(updateTargetScroll);
+    }
+    updateTargetScroll();
+
+    function updateTargetVisibility() {
+      targets.forEach(t => {
+        if (t._hit) return;
+        const rect = t.getBoundingClientRect();
+        const tx = rect.left + rect.width / 2;
+        const ty = rect.top + rect.height / 2;
+        const dist = Math.sqrt((gx - tx) ** 2 + (gy - ty) ** 2);
+        if (dist < 200) {
+          const opacity = Math.max(0, 1 - dist / 200);
+          t.style.opacity = opacity * 0.7;
+        } else {
+          t.style.opacity = 0;
+        }
+      });
+      requestAnimationFrame(updateTargetVisibility);
+    }
+    updateTargetVisibility();
+
+    // 標靶命中處理（掛到外層供足球碰撞用）
+    window._fxOnTargetHit = function(target, x, y) {
+      target._hit = true;
+      target.classList.add('fx-target-hit');
+
+      const score = [1, 2, 3, 5, 10, 15, 20, 50][Math.floor(Math.random() * 8)];
+      const scoreEl = document.createElement('div');
+      scoreEl.className = 'fx-score-fly';
+      scoreEl.textContent = `+${score}`;
+      scoreEl.style.left = x + 'px';
+      scoreEl.style.top = y + 'px';
+      const colors = ['#ffd700', '#ff6b6b', '#51cf66', '#748ffc', '#ff922b', '#e599f7'];
+      scoreEl.style.color = colors[Math.floor(Math.random() * colors.length)];
+      const flyX = (Math.random() - 0.5) * 80;
+      scoreEl.style.setProperty('--fly-x', flyX + 'px');
+      document.body.appendChild(scoreEl);
+      scoreEl.addEventListener('animationend', () => scoreEl.remove());
+
+      spawnImpactBig(x, y);
+
+      setTimeout(() => {
+        const idx = targets.indexOf(target);
+        if (idx >= 0) targets.splice(idx, 1);
+        target.remove();
+        spawnTarget();
+      }, TARGET_RESPAWN);
+    };
+  } // end !isMobile
+
+  // ── 3. 足球踢擊（所有裝置） ──────────────────────────────────
   document.addEventListener('click', e => {
-    if (e.target.closest('input, textarea, select, .fx-target')) return;
+    if (e.target.closest('input, textarea, select, button, a, .fx-target')) return;
 
     const endX = e.clientX;
     const endY = e.clientY;
 
-    // 發射足球
     const ball = document.createElement('div');
     ball.className = 'fx-ball';
     ball.textContent = '⚽';
@@ -126,10 +147,9 @@
 
     ball.addEventListener('animationend', () => {
       ball.remove();
-      // 碰撞偵測：檢查落點附近有沒有標靶
       const hitTarget = checkTargetHit(endX, endY);
       if (hitTarget) {
-        onTargetHit(hitTarget, endX, endY);
+        window._fxOnTargetHit?.(hitTarget, endX, endY);
       } else {
         spawnImpact(endX, endY);
       }
@@ -147,42 +167,6 @@
       if (dist < 50) return t;
     }
     return null;
-  }
-
-  function onTargetHit(target, x, y) {
-    target._hit = true;
-
-    // 標靶爆開動畫
-    target.classList.add('fx-target-hit');
-
-    // 飛出分數文字
-    const score = [1, 2, 3, 5, 10, 15, 20, 50][Math.floor(Math.random() * 8)];
-    const scoreEl = document.createElement('div');
-    scoreEl.className = 'fx-score-fly';
-    scoreEl.textContent = `+${score}`;
-    scoreEl.style.left = x + 'px';
-    scoreEl.style.top = y + 'px';
-
-    // 隨機顏色
-    const colors = ['#ffd700', '#ff6b6b', '#51cf66', '#748ffc', '#ff922b', '#e599f7'];
-    scoreEl.style.color = colors[Math.floor(Math.random() * colors.length)];
-    // 隨機飛出方向
-    const flyX = (Math.random() - 0.5) * 80;
-    scoreEl.style.setProperty('--fly-x', flyX + 'px');
-
-    document.body.appendChild(scoreEl);
-    scoreEl.addEventListener('animationend', () => scoreEl.remove());
-
-    // 大量火花
-    spawnImpactBig(x, y);
-
-    // 重生標靶
-    setTimeout(() => {
-      const idx = targets.indexOf(target);
-      if (idx >= 0) targets.splice(idx, 1);
-      target.remove();
-      spawnTarget();
-    }, TARGET_RESPAWN);
   }
 
   // ── 4. 落點效果 ──────────────────────────────────────────
