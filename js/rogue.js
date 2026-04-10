@@ -68,7 +68,7 @@
     normal:  { label:'防守員',   fill:'#4fc3f7', hp:3,  spd:0.30, w:44, h:62 },
     fast:    { label:'快速前鋒', fill:'#fff176', hp:1,  spd:0.42, w:38, h:54 },
     tank:    { label:'中後衛',   fill:'#ef5350', hp:8,  spd:0.18, w:56, h:72 },
-    captain: { label:'攔截者',   fill:'#ce93d8', hp:5,  spd:0.28, w:50, h:66, tracker:true },
+    captain: { label:'攔截者',   fill:'#ce93d8', hp:5,  spd:0.12, w:50, h:66, tracker:true },
     sentry:  { label:'中路守衛', fill:'#81d4fa', hp:4,  spd:0.12, w:48, h:64 },
   };
 
@@ -408,7 +408,7 @@
       const xBound = FIELD_HW * 0.85;
       if (d.x < -xBound + d.w) { d.x = -xBound + d.w; d.vx = Math.abs(d.vx || 0); }
       if (d.x > xBound - d.w)  { d.x = xBound - d.w;  d.vx = -Math.abs(d.vx || 0); }
-      // 攔截者：x 軸追蹤最近的球
+      // 攔截者：x 軸高速追蹤最近的球（越近越快，鏟球感）
       if (DTYPE[d.type]?.tracker) {
         let nearBall = null, nbd = Infinity;
         for (const b of G.balls) {
@@ -417,9 +417,12 @@
           if (dist < nbd) { nbd = dist; nearBall = b; }
         }
         if (nearBall) {
-          const trackSpd = sp * 1.8; // x 軸追蹤速度比前進速度快
-          if (nearBall.x > d.x + 5) d.x += trackSpd * step;
-          else if (nearBall.x < d.x - 5) d.x -= trackSpd * step;
+          const xDist = Math.abs(nearBall.x - d.x);
+          // 基礎追蹤速度 2.5，越靠近球越快（最高 6.0），模擬撲球鏟球
+          const proximity = Math.max(0, 1 - xDist / 400); // 0~1
+          const trackSpd = (2.5 + proximity * 3.5) * (G.globalSlow || 1);
+          if (nearBall.x > d.x + 3) d.x += trackSpd * step;
+          else if (nearBall.x < d.x - 3) d.x -= trackSpd * step;
         }
       }
       // 突破底線
@@ -434,32 +437,42 @@
     G.defs = G.defs.filter(d => d.hp > 0);
 
     // ── 守衛盟友 ──
+    const SAFETY_Z = FIELD_DEPTH * 0.3; // 安全線：敵人越過此線就觸發守衛
     for (const a of G.allies) {
       // 開始阻擋後才倒計時
       if (a.blocking) {
         a.blockTimer -= dt;
         if (a.blockTimer <= 0) { a.alive = false; continue; }
+        // 阻擋中持續凍結目標
+        if (a._target && a._target.hp > 0) {
+          a._target.frozen = Math.max(a._target.frozen || 0, 200);
+        }
       }
-      // 找最近的低 z 敵人
-      let nearest = null, nd = Infinity;
+      // 找越過安全線且最靠近底線的敵人（優先攔截最危險的）
+      let nearest = null, lowestZ = Infinity;
       for (const d of G.defs) {
-        if (d.hp <= 0) continue;
-        const dist = Math.sqrt((d.x - a.x) ** 2 + (d.z - a.z) ** 2);
-        if (d.z < FIELD_DEPTH * 0.4 && dist < nd) { nd = dist; nearest = d; }
+        if (d.hp <= 0 || d._guardLocked) continue; // 已被其他守衛鎖定的跳過
+        if (d.z < SAFETY_Z && d.z < lowestZ) { lowestZ = d.z; nearest = d; }
       }
-      if (nearest && nd < 120) {
-        // 移向敵人
+      if (nearest && !a.blocking) {
+        nearest._guardLocked = true; // 鎖定此敵人，避免多個守衛搶同一個
+        a._target = nearest;
+        // 高速衝向敵人
         const dx = nearest.x - a.x, dz = nearest.z - a.z;
         const len = Math.sqrt(dx * dx + dz * dz) || 1;
-        a.x += (dx / len) * 0.6 * (dt / 16);
-        a.z += (dz / len) * 0.6 * (dt / 16);
-        // 接觸後開始阻擋（凍結敵人 + 啟動 5 秒倒計時）
-        if (nd < 50) {
+        const rushSpd = 2.0; // 衝刺速度
+        a.x += (dx / len) * rushSpd * (dt / 16);
+        a.z += (dz / len) * rushSpd * (dt / 16);
+        // 接觸後開始阻擋
+        if (len < 50) {
+          a.blocking = true;
+          a.blockTimer = 5000;
           nearest.frozen = Math.max(nearest.frozen || 0, 200);
-          if (!a.blocking) { a.blocking = true; a.blockTimer = 5000; }
         }
       }
     }
+    // 清除鎖定標記（每幀重置，下幀重新分配）
+    for (const d of G.defs) d._guardLocked = false;
     G.allies = G.allies.filter(a => a.alive);
 
     // ── 粒子 ──
