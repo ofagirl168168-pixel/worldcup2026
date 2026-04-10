@@ -15,7 +15,7 @@
   const MAX_BALL_SPD = 14;   // 球速上限
   const BALL_R      = 10;    // 基礎球半徑 (world)
   const BASE_DMG    = 1;
-  const SHOOT_CD    = 350;   // 射門冷卻 ms
+  const SHOOT_CD    = 900;   // 射門冷卻 ms（較長，靠卡牌縮短）
   const BALL_TTL    = 8000;  // 球最長存活 ms
   const GK_BASE_SPD = 1.2;
 
@@ -132,7 +132,10 @@
     if (w >= 5) types.push('captain');
     // 確保至少 1~2 個 sentry 擋中路
     const sentryCount = Math.min(1 + Math.floor(w / 2), 4);
-    return { count, types, hpMul: 1 + (w - 1) * 0.15, spdMul: 1 + (w - 1) * 0.08, sentryCount };
+    // 血量指數成長，速度穩步提升
+    const hpMul  = Math.pow(1.45, w - 1);        // wave1=1x, wave3=2.1x, wave5=4.4x, wave8=16x
+    const spdMul = 1 + (w - 1) * 0.15;           // wave1=1x, wave5=1.6x, wave10=2.35x
+    return { count, types, hpMul, spdMul, sentryCount };
   }
 
   function makeDef(type, hpMul, spdMul) {
@@ -402,10 +405,16 @@
     G.cardPick = pickCards(3);
   }
 
+  // 可疊加的純數值卡（可重複抽到）
+  const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','multi1','multi2','power2']);
+
   function pickCards(n) {
+    // 過濾掉已收集的不可疊加能力卡
+    const pool = CARDS.filter(c => STACKABLE.has(c.id) || !G.collected.includes(c.id));
+
     // 依稀有度權重抽卡，不重複
     const weighted = [];
-    for (const c of CARDS) {
+    for (const c of pool) {
       const w = RARITY_WEIGHT[c.rarity] || 10;
       for (let i = 0; i < w; i++) weighted.push(c);
     }
