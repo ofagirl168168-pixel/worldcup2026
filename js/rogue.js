@@ -484,7 +484,7 @@
         d.hp = 0;
         shakeAmt = 12;
         addPart(d.x, 30, '🔴', 1.2);
-        if (G.lives <= 0) { G.phase = 'gameover'; saveResult(); return; }
+        if (G.lives <= 0) { G.phase = 'gameover'; G._gameoverStart = performance.now(); saveResult(); return; }
       }
     }
     G.defs = G.defs.filter(d => d.hp > 0);
@@ -567,6 +567,7 @@
     addPart(0, GOAL_Z - 50, '⚽ GOAL!', 1.5);
     G.phase = 'cards';
     G.cardPick = pickCards(3);
+    G._cardRevealStart = performance.now(); // 卡片逐張進場計時
   }
 
   // 可無限疊加的純數值卡
@@ -1145,6 +1146,10 @@
 
   // ─── 選牌畫面 ────────────────────────────────────────────
   function drawCards() {
+    const CARD_REVEAL_EACH = 500; // 每張卡 500ms 進場
+    const elapsed = performance.now() - (G._cardRevealStart || 0);
+    const allRevealed = elapsed >= G.cardPick.length * CARD_REVEAL_EACH;
+
     ctx.fillStyle = 'rgba(0,0,0,0.7)';
     ctx.fillRect(0, 0, W, H);
 
@@ -1166,45 +1171,78 @@
     const rarName = { common:'普通', rare:'稀有', epic:'史詩', legendary:'傳說' };
 
     G.cardPick.forEach((c, i) => {
-      const cx = sx + i * (cw + gap);
-      G._cardR.push({ x: cx, y: cy, w: cw, h: ch, idx: i });
+      const cardStart = i * CARD_REVEAL_EACH;
+      const cardElapsed = elapsed - cardStart;
+      if (cardElapsed < 0) return; // 尚未輪到
 
+      // 進場動畫：從下方飛入 + 縮放 + 透明度
+      const t = Math.min(1, cardElapsed / 400); // 400ms 動畫
+      const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
+      const offsetY = (1 - ease) * 120;
+      const scale = 0.5 + ease * 0.5;
+      const alpha = ease;
+
+      const cx2 = sx + i * (cw + gap);
+      const drawW = cw * scale, drawH = ch * scale;
+      const drawX = cx2 + (cw - drawW) / 2;
+      const drawY = cy + (ch - drawH) / 2 + offsetY;
+
+      // 只有完全顯示後才註冊點擊區
+      if (allRevealed) {
+        G._cardR.push({ x: cx2, y: cy, w: cw, h: ch, idx: i });
+      }
+
+      ctx.globalAlpha = alpha;
       const bg = rarCol[c.rarity] || '#4a5568';
 
       // 光暈
-      ctx.shadowColor = bg; ctx.shadowBlur = 18;
+      ctx.shadowColor = bg; ctx.shadowBlur = 18 * ease;
       ctx.fillStyle = bg;
-      rr(ctx, cx, cy, cw, ch, 12); ctx.fill();
+      rr(ctx, drawX, drawY, drawW, drawH, 12 * scale); ctx.fill();
       ctx.shadowBlur = 0;
 
       // 內框
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      rr(ctx, cx + 4, cy + 4, cw - 8, ch - 8, 10); ctx.fill();
+      rr(ctx, drawX + 4 * scale, drawY + 4 * scale, drawW - 8 * scale, drawH - 8 * scale, 10 * scale); ctx.fill();
 
       // 圖示
-      ctx.font = `${cw * 0.28}px sans-serif`;
+      ctx.font = `${drawW * 0.28}px sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText(c.icon, cx + cw / 2, cy + ch * 0.28);
+      ctx.fillText(c.icon, drawX + drawW / 2, drawY + drawH * 0.28);
 
       // 名稱
       ctx.fillStyle = '#fff';
-      ctx.font = `bold ${Math.max(11, cw * 0.085)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText(c.name, cx + cw / 2, cy + ch * 0.48);
+      ctx.font = `bold ${Math.max(11, drawW * 0.085)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText(c.name, drawX + drawW / 2, drawY + drawH * 0.48);
 
       // 描述
       ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = `${Math.max(9, cw * 0.07)}px "Noto Sans TC", sans-serif`;
-      wrapCenter(ctx, c.desc, cx + cw / 2, cy + ch * 0.6, cw - 16, cw * 0.08);
+      ctx.font = `${Math.max(9, drawW * 0.07)}px "Noto Sans TC", sans-serif`;
+      wrapCenter(ctx, c.desc, drawX + drawW / 2, drawY + drawH * 0.6, drawW - 16 * scale, drawW * 0.08);
 
       // 稀有度
       ctx.fillStyle = bg;
-      ctx.font = `bold ${Math.max(9, cw * 0.06)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText(rarName[c.rarity], cx + cw / 2, cy + ch - 14);
+      ctx.font = `bold ${Math.max(9, drawW * 0.06)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText(rarName[c.rarity], drawX + drawW / 2, drawY + drawH - 14 * scale);
+
+      ctx.globalAlpha = 1;
     });
+
+    // 提示文字（全部翻完才顯示）
+    if (allRevealed) {
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = `${Math.min(14, W * 0.03)}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('點擊卡片選擇', W / 2, H * 0.88);
+    }
   }
 
   // ─── 結算畫面 ────────────────────────────────────────────
   function drawGameOver() {
+    const elapsed = performance.now() - (G._gameoverStart || 0);
+    const fade = Math.min(1, elapsed / 1000); // 1 秒漸入
+
+    ctx.globalAlpha = fade;
     ctx.fillStyle = 'rgba(0,0,0,0.82)';
     ctx.fillRect(0, 0, W, H);
 
@@ -1232,24 +1270,28 @@
       ctx.fillText(`🏆 最高紀錄：${best.score} 分`, W / 2, H * 0.56);
     }
 
-    // 按鈕
-    const btnW = Math.min(200, W * 0.4), btnH = 46;
-    const bx = W / 2 - btnW / 2;
+    // 按鈕（漸入完成才顯示）
+    if (fade >= 1) {
+      const btnW = Math.min(200, W * 0.4), btnH = 46;
+      const bx = W / 2 - btnW / 2;
 
-    const y1 = H * 0.63;
-    G._restartR = { x: bx, y: y1, w: btnW, h: btnH };
-    ctx.fillStyle = '#4caf50';
-    rr(ctx, bx, y1, btnW, btnH, 12); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = `bold ${Math.min(17, W * 0.033)}px "Noto Sans TC", sans-serif`;
-    ctx.fillText('再來一局', W / 2, y1 + 30);
+      const y1 = H * 0.63;
+      G._restartR = { x: bx, y: y1, w: btnW, h: btnH };
+      ctx.fillStyle = '#4caf50';
+      rr(ctx, bx, y1, btnW, btnH, 12); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${Math.min(17, W * 0.033)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('再來一局', W / 2, y1 + 30);
 
-    const y2 = y1 + btnH + 14;
-    G._closeR = { x: bx, y: y2, w: btnW, h: btnH };
-    ctx.fillStyle = '#555';
-    rr(ctx, bx, y2, btnW, btnH, 12); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.fillText('返回網站', W / 2, y2 + 30);
+      const y2 = y1 + btnH + 14;
+      G._closeR = { x: bx, y: y2, w: btnW, h: btnH };
+      ctx.fillStyle = '#555';
+      rr(ctx, bx, y2, btnW, btnH, 12); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.fillText('返回網站', W / 2, y2 + 30);
+    }
+
+    ctx.globalAlpha = 1;
   }
 
   // ─── 繪圖工具 ────────────────────────────────────────────
@@ -1306,12 +1348,18 @@
     }
     if (G.phase === 'playing') { shoot(x, y); return; }
     if (G.phase === 'cards') {
+      // 卡片全部翻完才能點（每張 500ms，3 張 = 1500ms）
+      const CARD_REVEAL_EACH = 500;
+      const elapsed = performance.now() - (G._cardRevealStart || 0);
+      if (elapsed < G.cardPick.length * CARD_REVEAL_EACH) return;
       for (const r of (G._cardR || [])) {
         if (hitTest(x, y, r)) { selectCard(r.idx); return; }
       }
       return;
     }
     if (G.phase === 'gameover') {
+      // 死亡 1 秒內不能點
+      if (performance.now() - (G._gameoverStart || 0) < 1000) return;
       if (hitTest(x, y, G._restartR)) { startGame(); return; }
       if (hitTest(x, y, G._closeR))   { closeGame(); return; }
     }
