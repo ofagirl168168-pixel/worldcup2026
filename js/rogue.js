@@ -27,38 +27,38 @@
 
   const CARDS = [
     // ── 基礎數值卡 (common) ─────────────────
-    { id:'dmg20',    name:'射門強化',   desc:'傷害 +20%',                icon:'👊', rarity:'common',    apply(s){ s.dmgMul *= 1.2; }},
-    { id:'dmg30',    name:'力量訓練',   desc:'傷害 +30%',                icon:'💪', rarity:'common',    apply(s){ s.dmgMul *= 1.3; }},
-    { id:'spd20',    name:'速度鞋',     desc:'球速 +20%',                icon:'👟', rarity:'common',    apply(s){ s.spdMul *= 1.2; }},
-    { id:'spd40',    name:'閃電射門',   desc:'球速 +40%',                icon:'⚡', rarity:'common',    apply(s){ s.spdMul *= 1.4; }},
-    { id:'bigball',  name:'大力丸',     desc:'球體+20%（增大也提升傷害，上限3倍）',icon:'⭕', rarity:'common',    apply(s){ s.ballScale = Math.min(3, s.ballScale * 1.2); }},
-    { id:'bigball2', name:'巨型足球',   desc:'球體+40%（增大也提升傷害，上限3倍）',icon:'🔵', rarity:'common',    apply(s){ s.ballScale = Math.min(3, s.ballScale * 1.4); }},
-    { id:'rapid',    name:'快速連射',   desc:'射門冷卻 -30%',            icon:'⏩', rarity:'common',    apply(s){ s.cdMul *= 0.7; }},
-    { id:'rapid2',   name:'輕量化',     desc:'射門冷卻 -20%',            icon:'💨', rarity:'common',    apply(s){ s.cdMul *= 0.8; }},
-    { id:'multi1',   name:'雙重射擊',   desc:'連續射球數量 +1',          icon:'⚽', rarity:'common',    apply(s){ s.multiShot += 1; }},
-    { id:'ironleg',  name:'鐵腿',       desc:'傷害 +50%，球速 -15%',     icon:'🦵', rarity:'common',    apply(s){ s.dmgMul *= 1.5; s.spdMul *= 0.85; }},
-    { id:'magnet',   name:'磁力門框',   desc:'球門判定寬度 +20%',        icon:'🧲', rarity:'common',    apply(s){ s.goalBonus = (s.goalBonus||0) + 0.2; }},
+    { id:'dmg20',    name:'射門強化',   desc:'傷害 +20%',                rarity:'common',    apply(s){ s.dmgMul *= 1.2; }},
+    { id:'dmg30',    name:'力量訓練',   desc:'傷害 +30%',                rarity:'common',    apply(s){ s.dmgMul *= 1.3; }},
+    { id:'spd20',    name:'速度鞋',     desc:'球速 +20%',                rarity:'common',    apply(s){ s.spdMul *= 1.2; }},
+    { id:'spd40',    name:'閃電射門',   desc:'球速 +40%',                rarity:'common',    apply(s){ s.spdMul *= 1.4; }},
+    { id:'bigball',  name:'大力丸',     desc:'球體+20%（增大也提升傷害，上限3倍）', rarity:'common', apply(s){ s.ballScale = Math.min(3, s.ballScale * 1.2); }},
+    { id:'bigball2', name:'巨型足球',   desc:'球體+40%（增大也提升傷害，上限3倍）', rarity:'common', apply(s){ s.ballScale = Math.min(3, s.ballScale * 1.4); }},
+    { id:'rapid',    name:'快速連射',   desc:'射門冷卻 -30%',            rarity:'common',    apply(s){ s.cdMul *= 0.7; }},
+    { id:'rapid2',   name:'輕量化',     desc:'射門冷卻 -20%',            rarity:'common',    apply(s){ s.cdMul *= 0.8; }},
+    { id:'multi1',   name:'雙重射擊',   desc:'連續射球數量 +1',          rarity:'common',    apply(s){ s.multiShot += 1; }},
+    { id:'ironleg',  name:'鐵腿',       desc:'傷害 +50%，球速 -15%',     rarity:'common',    apply(s){ s.dmgMul *= 1.5; s.spdMul *= 0.85; }},
+    { id:'magnet',   name:'磁力門框',   desc:'球門判定寬度 +20%',        rarity:'common',    apply(s){ s.goalBonus = (s.goalBonus||0) + 0.2; }},
 
     // ── 能力卡 (rare) ──────────────────────
-    { id:'burn',     name:'火焰射擊',   desc:'命中附帶灼燒（每秒 1 傷害）',icon:'🔥', rarity:'rare',  apply(s){ s.burn = true; }},
-    { id:'freeze',   name:'冰凍射擊',   desc:'命中後敵人減速 50%',       icon:'❄️', rarity:'rare',    apply(s){ s.freeze = true; }},
-    { id:'explode',  name:'爆裂射擊',   desc:'命中時爆炸傷害周圍',       icon:'💥', rarity:'rare',    apply(s){ s.explode = true; }},
-    { id:'sniper',   name:'狙擊射門',   desc:'傷害 ×2.5，球變小',        icon:'🔫', rarity:'rare',    apply(s){ s.dmgMul *= 2.5; s.ballScale *= 0.65; }},
-    { id:'multi2',   name:'三重射擊',   desc:'連續射球數量 +2',          icon:'🎱', rarity:'rare',     apply(s){ s.multiShot += 2; }},
-    { id:'bounce',   name:'反彈射擊',   desc:'球碰敵人後反彈+1次（上限4）',icon:'🔄', rarity:'rare', apply(s){ s.bounce = Math.min(4, (s.bounce||0) + 1); }},
-    { id:'crit',     name:'致命一擊',   desc:'每次射門 20% 機率暴擊 ×3', icon:'⚡', rarity:'rare',     apply(s){ s.critPct = Math.min(0.6, (s.critPct||0) + 0.2); }},
-    { id:'gkSlow',   name:'守門員削弱', desc:'守門員移速 -30%',          icon:'🧤', rarity:'rare',     apply(s){ s.gkSlowMul = (s.gkSlowMul||1) * 0.7; }},
-    { id:'extraLife', name:'鋼鐵防線', desc:'+1 條命（上限 5）',         icon:'🛡️', rarity:'rare',    apply(s){ if(s.lives < 5) s.lives++; }},
-    { id:'guard',    name:'後衛守衛',   desc:'召喚一個守衛，敵人靠近時阻擋 5 秒',icon:'🏋️', rarity:'rare',  apply(s){ s._spawnGuard = (s._spawnGuard||0) + 1; }},
+    { id:'burn',     name:'火焰射擊',   desc:'命中附帶灼燒（每秒 1 傷害）', rarity:'rare',  apply(s){ s.burn = true; }},
+    { id:'freeze',   name:'冰凍射擊',   desc:'命中後敵人減速 50%',       rarity:'rare',    apply(s){ s.freeze = true; }},
+    { id:'explode',  name:'爆裂射擊',   desc:'命中時爆炸傷害周圍',       rarity:'rare',    apply(s){ s.explode = true; }},
+    { id:'sniper',   name:'狙擊射門',   desc:'傷害 ×2.5，球變小',        rarity:'rare',    apply(s){ s.dmgMul *= 2.5; s.ballScale *= 0.65; }},
+    { id:'multi2',   name:'三重射擊',   desc:'連續射球數量 +2',          rarity:'rare',     apply(s){ s.multiShot += 2; }},
+    { id:'bounce',   name:'反彈射擊',   desc:'球碰敵人後反彈+1次（上限4）', rarity:'rare', apply(s){ s.bounce = Math.min(4, (s.bounce||0) + 1); }},
+    { id:'crit',     name:'致命一擊',   desc:'每次射門 20% 機率暴擊 ×3', rarity:'rare',     apply(s){ s.critPct = Math.min(0.6, (s.critPct||0) + 0.2); }},
+    { id:'gkSlow',   name:'守門員削弱', desc:'守門員移速 -30%',          rarity:'rare',     apply(s){ s.gkSlowMul = (s.gkSlowMul||1) * 0.7; }},
+    { id:'extraLife', name:'鋼鐵防線', desc:'+1 條命（上限 5）',         rarity:'rare',    apply(s){ if(s.lives < 5) s.lives++; }},
+    { id:'guard',    name:'後衛守衛',   desc:'召喚一個守衛，敵人靠近時阻擋 5 秒', rarity:'rare', apply(s){ s._spawnGuard = (s._spawnGuard||0) + 1; }},
 
     // ── 進階卡 (epic) ──────────────────────
-    { id:'power2',   name:'重砲射擊',   desc:'傷害 ×2',                  icon:'🔨', rarity:'epic',     apply(s){ s.dmgMul *= 2; }},
-    { id:'split',    name:'分裂射擊',   desc:'命中敵人後分裂成 2 顆小球', icon:'💀', rarity:'epic',     apply(s){ s.split = true; }},
-    { id:'timeSlow', name:'時間壓迫',   desc:'敵人全體速度永久 -20%',    icon:'⏱️', rarity:'epic',     apply(s){ s.globalSlow = (s.globalSlow||1) * 0.8; }},
+    { id:'power2',   name:'重砲射擊',   desc:'傷害 ×2',                  rarity:'epic',     apply(s){ s.dmgMul *= 2; }},
+    { id:'split',    name:'分裂射擊',   desc:'命中敵人後分裂成 2 顆小球', rarity:'epic',     apply(s){ s.split = true; }},
+    { id:'timeSlow', name:'時間壓迫',   desc:'敵人全體速度永久 -20%',    rarity:'epic',     apply(s){ s.globalSlow = (s.globalSlow||1) * 0.8; }},
 
     // ── 傳說卡 (legendary) ─────────────────
-    { id:'ghost',    name:'幽靈球',     desc:'+10% 機率穿過敵人（上限30%）',icon:'👻', rarity:'legendary', apply(s){ s.ghostPct = Math.min(0.3, (s.ghostPct||0) + 0.1); }},
-    { id:'vampire',  name:'吸血足球',   desc:'擊殺敵人回復 1 條命',      icon:'🧛', rarity:'legendary', apply(s){ s.vampire = true; }},
+    { id:'ghost',    name:'幽靈球',     desc:'+10% 機率穿過敵人（上限30%）', rarity:'legendary', apply(s){ s.ghostPct = Math.min(0.3, (s.ghostPct||0) + 0.1); }},
+    { id:'vampire',  name:'吸血足球',   desc:'擊殺敵人回復 1 條命',      rarity:'legendary', apply(s){ s.vampire = true; }},
   ];
 
   // ═══════════════════════════════════════════════════════════
@@ -265,8 +265,8 @@
   // ═══════════════════════════════════════════════════════════
   //  粒子
   // ═══════════════════════════════════════════════════════════
-  function addPart(x, z, text, dur) {
-    G.particles.push({ x, z, text, age: 0, life: dur * 1000 });
+  function addPart(x, z, text, dur, type) {
+    G.particles.push({ x, z, text, age: 0, life: dur * 1000, type: type || 'text' });
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -362,11 +362,11 @@
         if (d.hp <= 0) continue;
         if (Math.abs(b.x - d.x) < b.r + d.w * 0.4 && Math.abs(b.z - d.z) < d.h * 0.5) {
           // ghost 穿過
-          if (G.ghostPct > 0 && Math.random() < G.ghostPct) { addPart(d.x, d.z, '👻', 0.6); continue; }
+          if (G.ghostPct > 0 && Math.random() < G.ghostPct) { addPart(d.x, d.z, '', 0.6, 'ghost'); continue; }
           // 傷害 = 基礎 × 倍率 × 球大小 × 暴擊
           let dmg = Math.ceil(BASE_DMG * G.dmgMul * G.ballScale);
           const isCrit = G.critPct > 0 && Math.random() < G.critPct;
-          if (isCrit) { dmg *= 3; addPart(d.x, d.z - 20, '⚡暴擊!', 0.7); }
+          if (isCrit) { dmg *= 3; addPart(d.x, d.z - 20, 'CRIT!', 0.7, 'crit'); }
           // 反彈球傷害減半
           if (b._bounced) dmg = Math.max(1, Math.ceil(dmg * 0.5));
           // 分裂小球傷害減半
@@ -412,7 +412,7 @@
       // 碰守門員
       if (b.z > gk.z - 20 && b.z < gk.z + 20 && Math.abs(b.x - gk.x) < gk.w * 0.55) {
         b.alive = false;
-        addPart(gk.x, gk.z, '🧤', 0.8);
+        addPart(gk.x, gk.z, '', 0.8, 'block');
         shakeAmt = 4;
         continue;
       }
@@ -435,7 +435,7 @@
       if (d.burning > 0) {
         d.burning -= dt;
         d.burnTick -= dt;
-        if (d.burnTick <= 0) { d.hp -= 1; d.burnTick = 1000; addPart(d.x, d.z, '🔥', 0.3); if (d.hp <= 0) onDefKill(d); }
+        if (d.burnTick <= 0) { d.hp -= 1; d.burnTick = 1000; addPart(d.x, d.z, '', 0.3, 'flame'); if (d.hp <= 0) onDefKill(d); }
       }
       // 被守衛抱住時完全無法移動
       if (d._grabbed) continue;
@@ -483,7 +483,7 @@
         G.lives--;
         d.hp = 0;
         shakeAmt = 12;
-        addPart(d.x, 30, '🔴', 1.2);
+        addPart(d.x, 30, '', 1.2, 'breach');
         if (G.lives <= 0) { G.phase = 'gameover'; G._gameoverStart = performance.now(); saveResult(); return; }
       }
     }
@@ -545,7 +545,7 @@
       if (d === src || d.hp <= 0) continue;
       if (Math.sqrt((d.x - src.x) ** 2 + (d.z - src.z) ** 2) < 80) {
         d.hp -= Math.ceil(dmg * 0.5);
-        addPart(d.x, d.z, '💥', 0.4);
+        addPart(d.x, d.z, '', 0.4, 'explode');
         if (d.hp <= 0) onDefKill(d);
       }
     }
@@ -553,9 +553,9 @@
 
   function onDefKill(d) {
     G.score += 10;
-    addPart(d.x, d.z, '💀', 0.7);
+    addPart(d.x, d.z, '', 0.7, 'kill');
     const maxLives = Math.max(MAX_LIVES, G.lives); // extraLife 可能超過初始上限
-    if (G.vampire && G.lives < maxLives) { G.lives++; addPart(d.x, d.z, '❤️', 0.9); }
+    if (G.vampire && G.lives < maxLives) { G.lives++; addPart(d.x, d.z, '', 0.9, 'heal'); }
   }
 
   function onGoal() {
@@ -564,7 +564,7 @@
     G.spawnQueue = [];
     G.balls = [];          // 清除場上所有球
     shakeAmt = 10;
-    addPart(0, GOAL_Z - 50, '⚽ GOAL!', 1.5);
+    addPart(0, GOAL_Z - 50, 'GOAL!', 1.5, 'goal');
     G.phase = 'cards';
     G.cardPick = pickCards(3);
     G._cardRevealStart = performance.now(); // 卡片逐張進場計時
@@ -694,7 +694,7 @@
       ctx.fillStyle = '#ff1744';
       ctx.font = `bold ${Math.min(36, W * 0.065)}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText('⚠️ WARNING ⚠️', W / 2, H * 0.50);
+      ctx.fillText('WARNING', W / 2, H * 0.50);
       ctx.fillStyle = '#fff';
       ctx.font = `bold ${Math.min(18, W * 0.035)}px "Noto Sans TC", sans-serif`;
       const tier = G._warning.tier;
@@ -707,7 +707,7 @@
         '守門員異次元反應！球路無所遁形',
         '守門員時間靜止！射門窗口趨近於零',
         '守門員已成神！你確定要繼續嗎？',
-        '⚠ 傳說守門員降臨 ⚠ 放棄抵抗吧',
+        '傳說守門員降臨！放棄抵抗吧',
         '守門員：「你的射門...我全都看得見」',
       ];
       const msg = msgs[Math.min(tier - 1, msgs.length - 1)];
@@ -1036,29 +1036,166 @@
   }
 
   // ─── 粒子 ────────────────────────────────────────────────
+  // ─── 紅心 ──────────────────────────────────────────────────
+  function drawHeart(cx, cy, sz) {
+    ctx.save();
+    ctx.fillStyle = '#e53935';
+    ctx.shadowColor = '#e53935'; ctx.shadowBlur = sz * 0.4;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + sz * 0.6);
+    ctx.bezierCurveTo(cx - sz, cy, cx - sz, cy - sz * 0.8, cx, cy - sz * 0.35);
+    ctx.bezierCurveTo(cx + sz, cy - sz * 0.8, cx + sz, cy, cx, cy + sz * 0.6);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ─── 獎盃 ──────────────────────────────────────────────────
+  function drawTrophy(cx, cy, sz) {
+    ctx.save();
+    ctx.fillStyle = '#ffd700';
+    ctx.shadowColor = '#ffd700'; ctx.shadowBlur = sz * 0.3;
+    // 杯身
+    ctx.beginPath();
+    ctx.moveTo(cx - sz * 0.5, cy - sz * 0.6);
+    ctx.lineTo(cx + sz * 0.5, cy - sz * 0.6);
+    ctx.lineTo(cx + sz * 0.3, cy + sz * 0.1);
+    ctx.lineTo(cx - sz * 0.3, cy + sz * 0.1);
+    ctx.closePath(); ctx.fill();
+    // 底座
+    ctx.fillRect(cx - sz * 0.2, cy + sz * 0.1, sz * 0.4, sz * 0.2);
+    ctx.fillRect(cx - sz * 0.35, cy + sz * 0.3, sz * 0.7, sz * 0.15);
+    // 把手
+    ctx.strokeStyle = '#ffd700'; ctx.lineWidth = sz * 0.1; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(cx - sz * 0.55, cy - sz * 0.25, sz * 0.2, -Math.PI * 0.5, Math.PI * 0.5); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx + sz * 0.55, cy - sz * 0.25, sz * 0.2, Math.PI * 0.5, -Math.PI * 0.5); ctx.stroke();
+    ctx.restore();
+  }
+
   function drawParticles() {
-    for (const p of G.particles) {
-      const pos = proj(p.x, p.z);
-      const a = 1 - p.age / p.life;
-      const fy = -(p.age / 1000) * 40;
+    for (const pt of G.particles) {
+      const pos = proj(pt.x, pt.z);
+      const t = pt.age / pt.life; // 0→1
+      const a = 1 - t;
+      const fy = -t * 40;
+      const sz = Math.max(8, 16 * pos.s);
+
       ctx.globalAlpha = a;
-      ctx.font = `bold ${Math.max(12, 18 * pos.s)}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#fff';
-      ctx.fillText(p.text, pos.x, pos.y - 25 * pos.s + fy);
+      ctx.save();
+
+      switch (pt.type) {
+        case 'ghost': { // 半透明紫光擴散
+          const gr = sz * (1 + t * 2);
+          const gg = ctx.createRadialGradient(pos.x, pos.y + fy, 0, pos.x, pos.y + fy, gr);
+          gg.addColorStop(0, 'rgba(179,136,255,0.5)');
+          gg.addColorStop(1, 'rgba(179,136,255,0)');
+          ctx.fillStyle = gg;
+          ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, gr, 0, Math.PI * 2); ctx.fill();
+          break;
+        }
+        case 'crit': { // 紅色閃電+文字
+          ctx.fillStyle = '#ff1744';
+          ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 12;
+          ctx.font = `bold ${sz * 1.3}px "Noto Sans TC", sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText('CRIT!', pos.x, pos.y - sz * 1.5 + fy);
+          ctx.shadowBlur = 0;
+          break;
+        }
+        case 'block': { // 黃色擋球光環
+          const br = sz * (0.8 + t * 1.5);
+          ctx.strokeStyle = `rgba(255,143,0,${a})`;
+          ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, br, 0, Math.PI * 2); ctx.stroke();
+          ctx.strokeStyle = `rgba(255,224,130,${a * 0.5})`;
+          ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, br * 0.6, 0, Math.PI * 2); ctx.stroke();
+          break;
+        }
+        case 'flame': { // 火焰粒子（橘紅漸層上飄）
+          const fr = sz * 0.6;
+          const fg = ctx.createRadialGradient(pos.x, pos.y + fy, 0, pos.x, pos.y + fy, fr);
+          fg.addColorStop(0, `rgba(255,109,0,${a})`);
+          fg.addColorStop(0.5, `rgba(255,145,0,${a * 0.6})`);
+          fg.addColorStop(1, 'rgba(255,214,0,0)');
+          ctx.fillStyle = fg;
+          ctx.beginPath(); ctx.arc(pos.x, pos.y + fy * 2, fr, 0, Math.PI * 2); ctx.fill();
+          break;
+        }
+        case 'breach': { // 紅色警告環
+          const rr2 = sz * (1 + t * 3);
+          ctx.strokeStyle = `rgba(244,67,54,${a})`;
+          ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, rr2, 0, Math.PI * 2); ctx.stroke();
+          ctx.fillStyle = `rgba(244,67,54,${a * 0.3})`;
+          ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, rr2, 0, Math.PI * 2); ctx.fill();
+          break;
+        }
+        case 'explode': { // 爆炸星芒
+          const er = sz * (0.5 + t * 2);
+          ctx.fillStyle = `rgba(255,109,0,${a})`;
+          ctx.beginPath();
+          for (let i = 0; i < 8; i++) {
+            const ea = (Math.PI / 4) * i;
+            const or2 = (i % 2 === 0) ? er : er * 0.4;
+            const px = pos.x + Math.cos(ea) * or2, py = pos.y + fy + Math.sin(ea) * or2;
+            i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+          }
+          ctx.closePath(); ctx.fill();
+          break;
+        }
+        case 'kill': { // 白色 X 標記
+          const ks = sz * 0.8;
+          ctx.strokeStyle = `rgba(255,255,255,${a})`;
+          ctx.lineWidth = 3; ctx.lineCap = 'round';
+          ctx.beginPath(); ctx.moveTo(pos.x - ks, pos.y + fy - ks); ctx.lineTo(pos.x + ks, pos.y + fy + ks); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(pos.x + ks, pos.y + fy - ks); ctx.lineTo(pos.x - ks, pos.y + fy + ks); ctx.stroke();
+          break;
+        }
+        case 'heal': { // 綠色+紅心形
+          ctx.fillStyle = `rgba(76,175,80,${a})`;
+          const hs = sz * 0.7;
+          ctx.beginPath();
+          ctx.moveTo(pos.x, pos.y + fy + hs * 0.7);
+          ctx.bezierCurveTo(pos.x - hs, pos.y + fy, pos.x - hs, pos.y + fy - hs * 0.7, pos.x, pos.y + fy - hs * 0.3);
+          ctx.bezierCurveTo(pos.x + hs, pos.y + fy - hs * 0.7, pos.x + hs, pos.y + fy, pos.x, pos.y + fy + hs * 0.7);
+          ctx.fill();
+          break;
+        }
+        case 'goal': { // 金色 GOAL 文字 + 光環
+          ctx.fillStyle = '#ffd700';
+          ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 20;
+          ctx.font = `bold ${sz * 2}px "Noto Sans TC", sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText('GOAL!', pos.x, pos.y + fy);
+          ctx.shadowBlur = 0;
+          const gr2 = sz * (1 + t * 4);
+          ctx.strokeStyle = `rgba(255,215,0,${a * 0.4})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, gr2, 0, Math.PI * 2); ctx.stroke();
+          break;
+        }
+        default: { // 普通文字粒子（傷害數字等）
+          ctx.font = `bold ${Math.max(12, 18 * pos.s)}px sans-serif`;
+          ctx.textAlign = 'center';
+          // 傷害數字用紅色，其他白色
+          const isNeg = pt.text && pt.text.startsWith('-');
+          ctx.fillStyle = isNeg ? '#ff5252' : '#fff';
+          if (isNeg) { ctx.shadowColor = '#ff5252'; ctx.shadowBlur = 6; }
+          ctx.fillText(pt.text, pos.x, pos.y - 25 * pos.s + fy);
+          break;
+        }
+      }
+      ctx.restore();
     }
     ctx.globalAlpha = 1;
   }
 
   // ─── HUD ─────────────────────────────────────────────────
   function drawHUD() {
-    // 生命
-    ctx.font = '20px sans-serif';
-    ctx.textAlign = 'left';
+    // 生命（Canvas 紅心）
     const dispLives = Math.max(MAX_LIVES, G.lives);
     for (let i = 0; i < dispLives; i++) {
       ctx.globalAlpha = i < G.lives ? 1 : 0.25;
-      ctx.fillText('❤️', 16 + i * 30, 32);
+      drawHeart(16 + i * 26 + 10, 24, 10);
     }
     ctx.globalAlpha = 1;
 
@@ -1072,14 +1209,11 @@
     ctx.textAlign = 'right';
     ctx.fillText(`Wave ${G.wave}`, W - 16, 28);
 
-    // 已收集 buff
+    // 已收集 buff（Canvas 圖示）
     if (G.collected.length) {
-      ctx.font = '15px sans-serif';
-      ctx.textAlign = 'left';
       const uniq = [...new Set(G.collected)];
       uniq.forEach((id, i) => {
-        const c = CARDS.find(x => x.id === id);
-        if (c) ctx.fillText(c.icon, 16 + i * 22, 58);
+        drawIcon(id, 24 + i * 22, 55, 16);
       });
     }
 
@@ -1088,7 +1222,7 @@
       ctx.fillStyle = 'rgba(255,255,255,0.4)';
       ctx.font = `${Math.min(14, W * 0.03)}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText('點擊畫面射門 ⚽', W / 2, H - 16);
+      ctx.fillText('點擊畫面射門', W / 2, H - 16);
     }
   }
 
@@ -1107,7 +1241,7 @@
     // 標題
     ctx.fillStyle = '#ffd700';
     ctx.font = `bold ${Math.min(42, W * 0.08)}px "Noto Sans TC", sans-serif`;
-    ctx.fillText('⚽ 射門挑戰', W / 2, H * 0.25);
+    ctx.fillText('射門挑戰', W / 2, H * 0.25);
 
     ctx.fillStyle = '#fff';
     ctx.font = `${Math.min(18, W * 0.035)}px "Noto Sans TC", sans-serif`;
@@ -1117,10 +1251,10 @@
     ctx.fillStyle = 'rgba(255,255,255,0.65)';
     ctx.font = `${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
     const rules = [
-      '🎯 點擊畫面踢出足球，射進球門得分',
-      '🛡️ 防守球員會向你逼近，踢球擊退他們',
-      '🔴 防守員突破底線會失去生命（共 3 條）',
-      '🃏 每次進球可選一張強化卡 Build 你的射門',
+      '點擊畫面踢出足球，射進球門得分',
+      '防守球員會向你逼近，踢球擊退他們',
+      '防守員突破底線會失去生命（共 3 條）',
+      '每次進球可選一張強化卡強化你的射門',
     ];
     rules.forEach((r, i) => ctx.fillText(r, W / 2, H * 0.42 + i * (Math.min(24, W * 0.045))));
 
@@ -1129,7 +1263,8 @@
     if (best.score) {
       ctx.fillStyle = 'rgba(255,215,0,0.6)';
       ctx.font = `${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText(`🏆 最高紀錄：${best.score} 分（Wave ${best.wave}）`, W / 2, H * 0.68);
+      drawTrophy(W / 2 - ctx.measureText(`最高紀錄：${best.score} 分（Wave ${best.wave}）`).width / 2 - 16, H * 0.68 - 6, 12);
+      ctx.fillText(`最高紀錄：${best.score} 分（Wave ${best.wave}）`, W / 2, H * 0.68);
     }
 
     // 開始按鈕
@@ -1144,6 +1279,303 @@
     ctx.fillText('開始遊戲', W / 2, btnY + 33);
   }
 
+  // ─── 卡片圖標繪製系統 ────────────────────────────────────
+  function drawIcon(c, cx, cy, sz) {
+    const id = typeof c === 'string' ? c : c.id;
+    const r = sz / 2;
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    switch (id) {
+      case 'dmg20': // 射門強化 — 上箭頭
+        ctx.fillStyle = '#ef5350';
+        ctx.shadowColor = '#ef5350'; ctx.shadowBlur = sz * 0.3;
+        ctx.beginPath(); ctx.moveTo(0, -r); ctx.lineTo(r * 0.7, r * 0.2); ctx.lineTo(r * 0.25, r * 0.2);
+        ctx.lineTo(r * 0.25, r); ctx.lineTo(-r * 0.25, r); ctx.lineTo(-r * 0.25, r * 0.2);
+        ctx.lineTo(-r * 0.7, r * 0.2); ctx.closePath(); ctx.fill();
+        break;
+      case 'dmg30': // 力量訓練 — 雙上箭頭
+        ctx.fillStyle = '#ff7043';
+        ctx.shadowColor = '#ff7043'; ctx.shadowBlur = sz * 0.3;
+        ctx.beginPath(); ctx.moveTo(0, -r); ctx.lineTo(r * 0.6, -r * 0.1); ctx.lineTo(r * 0.2, -r * 0.1);
+        ctx.lineTo(r * 0.2, r * 0.15); ctx.lineTo(-r * 0.2, r * 0.15); ctx.lineTo(-r * 0.2, -r * 0.1);
+        ctx.lineTo(-r * 0.6, -r * 0.1); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(0, r * 0.1); ctx.lineTo(r * 0.6, r * 0.7); ctx.lineTo(r * 0.2, r * 0.7);
+        ctx.lineTo(r * 0.2, r); ctx.lineTo(-r * 0.2, r); ctx.lineTo(-r * 0.2, r * 0.7);
+        ctx.lineTo(-r * 0.6, r * 0.7); ctx.closePath(); ctx.fill();
+        break;
+      case 'spd20': // 速度鞋 — 右雙箭頭（風）
+        ctx.strokeStyle = '#42a5f5'; ctx.lineWidth = sz * 0.12; ctx.lineCap = 'round';
+        ctx.shadowColor = '#42a5f5'; ctx.shadowBlur = sz * 0.3;
+        for (let i = -1; i <= 1; i++) {
+          const y = i * r * 0.45;
+          ctx.beginPath(); ctx.moveTo(-r * 0.6, y); ctx.lineTo(r * 0.3, y);
+          ctx.lineTo(r * 0.1, y - r * 0.2); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(r * 0.3, y); ctx.lineTo(r * 0.1, y + r * 0.2); ctx.stroke();
+        }
+        break;
+      case 'spd40': // 閃電射門 — 閃電
+        ctx.fillStyle = '#ffca28';
+        ctx.shadowColor = '#ffca28'; ctx.shadowBlur = sz * 0.4;
+        ctx.beginPath(); ctx.moveTo(r * 0.1, -r); ctx.lineTo(-r * 0.5, r * 0.05);
+        ctx.lineTo(-r * 0.05, r * 0.05); ctx.lineTo(-r * 0.2, r);
+        ctx.lineTo(r * 0.5, -r * 0.1); ctx.lineTo(r * 0.05, -r * 0.1);
+        ctx.closePath(); ctx.fill();
+        break;
+      case 'bigball': // 大力丸 — 圓環 + 上箭頭
+        ctx.strokeStyle = '#ab47bc'; ctx.lineWidth = sz * 0.1;
+        ctx.shadowColor = '#ab47bc'; ctx.shadowBlur = sz * 0.3;
+        ctx.beginPath(); ctx.arc(0, r * 0.1, r * 0.55, 0, Math.PI * 2); ctx.stroke();
+        ctx.fillStyle = '#ab47bc';
+        ctx.beginPath(); ctx.moveTo(0, -r); ctx.lineTo(r * 0.3, -r * 0.5);
+        ctx.lineTo(-r * 0.3, -r * 0.5); ctx.closePath(); ctx.fill();
+        break;
+      case 'bigball2': // 巨型足球 — 大實心圓
+        ctx.shadowColor = '#7e57c2'; ctx.shadowBlur = sz * 0.4;
+        const bg2 = ctx.createRadialGradient(-r * 0.2, -r * 0.2, r * 0.05, 0, 0, r * 0.7);
+        bg2.addColorStop(0, '#b39ddb'); bg2.addColorStop(1, '#512da8');
+        ctx.fillStyle = bg2;
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.7, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#311b92';
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.22, 0, Math.PI * 2); ctx.fill();
+        break;
+      case 'rapid': // 快速連射 — 三重右箭頭
+      case 'rapid2':
+        const rc = id === 'rapid' ? '#26c6da' : '#80deea';
+        ctx.fillStyle = rc; ctx.shadowColor = rc; ctx.shadowBlur = sz * 0.3;
+        for (let i = 0; i < 3; i++) {
+          const ox = (i - 1) * r * 0.5;
+          ctx.beginPath(); ctx.moveTo(ox - r * 0.2, -r * 0.4);
+          ctx.lineTo(ox + r * 0.25, 0); ctx.lineTo(ox - r * 0.2, r * 0.4);
+          ctx.closePath(); ctx.fill();
+        }
+        break;
+      case 'multi1': // 雙重射擊 — 雙圓
+        ctx.shadowColor = '#fff'; ctx.shadowBlur = sz * 0.2;
+        const mg = ctx.createRadialGradient(-r * 0.15, -r * 0.15, r * 0.02, 0, 0, r * 0.35);
+        mg.addColorStop(0, '#fff'); mg.addColorStop(1, '#aaa');
+        ctx.fillStyle = mg;
+        ctx.beginPath(); ctx.arc(-r * 0.3, 0, r * 0.32, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(r * 0.3, 0, r * 0.32, 0, Math.PI * 2); ctx.fill();
+        break;
+      case 'ironleg': // 鐵腿 — 靴子形
+        ctx.fillStyle = '#78909c';
+        ctx.shadowColor = '#90a4ae'; ctx.shadowBlur = sz * 0.3;
+        ctx.beginPath(); ctx.moveTo(-r * 0.3, -r); ctx.lineTo(r * 0.1, -r);
+        ctx.lineTo(r * 0.1, r * 0.3); ctx.lineTo(r * 0.7, r * 0.5);
+        ctx.lineTo(r * 0.7, r); ctx.lineTo(-r * 0.5, r);
+        ctx.lineTo(-r * 0.5, r * 0.3); ctx.lineTo(-r * 0.3, r * 0.1);
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#546e7a';
+        ctx.fillRect(-r * 0.5, r * 0.6, r * 1.2, r * 0.4);
+        break;
+      case 'magnet': // 磁力門框 — U型磁鐵
+        ctx.lineWidth = sz * 0.14; ctx.lineCap = 'round';
+        ctx.shadowColor = '#e53935'; ctx.shadowBlur = sz * 0.3;
+        ctx.strokeStyle = '#e53935';
+        ctx.beginPath(); ctx.moveTo(-r * 0.55, -r * 0.6); ctx.lineTo(-r * 0.55, r * 0.1);
+        ctx.arc(0, r * 0.1, r * 0.55, Math.PI, 0, true);
+        ctx.lineTo(r * 0.55, -r * 0.6); ctx.stroke();
+        ctx.strokeStyle = '#1565c0';
+        ctx.beginPath(); ctx.moveTo(-r * 0.55, -r * 0.6); ctx.lineTo(-r * 0.55, -r * 0.9); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(r * 0.55, -r * 0.6); ctx.lineTo(r * 0.55, -r * 0.9); ctx.stroke();
+        break;
+      case 'burn': // 火焰 — 火苗形
+        ctx.shadowColor = '#ff6d00'; ctx.shadowBlur = sz * 0.4;
+        const fg = ctx.createLinearGradient(0, -r, 0, r);
+        fg.addColorStop(0, '#ff6d00'); fg.addColorStop(0.6, '#ff9100'); fg.addColorStop(1, '#ffd600');
+        ctx.fillStyle = fg;
+        ctx.beginPath(); ctx.moveTo(0, -r);
+        ctx.bezierCurveTo(r * 0.6, -r * 0.3, r * 0.7, r * 0.3, r * 0.2, r);
+        ctx.lineTo(0, r * 0.5);
+        ctx.lineTo(-r * 0.2, r);
+        ctx.bezierCurveTo(-r * 0.7, r * 0.3, -r * 0.6, -r * 0.3, 0, -r);
+        ctx.fill();
+        break;
+      case 'freeze': // 冰凍 — 六角雪花
+        ctx.strokeStyle = '#4fc3f7'; ctx.lineWidth = sz * 0.08; ctx.lineCap = 'round';
+        ctx.shadowColor = '#4fc3f7'; ctx.shadowBlur = sz * 0.4;
+        for (let i = 0; i < 6; i++) {
+          const a = (Math.PI / 3) * i;
+          const ex = Math.cos(a) * r * 0.85, ey = Math.sin(a) * r * 0.85;
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(ex, ey); ctx.stroke();
+          // 分支
+          const mx = ex * 0.55, my = ey * 0.55;
+          const pa = a + Math.PI / 6, pb = a - Math.PI / 6;
+          ctx.beginPath(); ctx.moveTo(mx, my);
+          ctx.lineTo(mx + Math.cos(pa) * r * 0.25, my + Math.sin(pa) * r * 0.25); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(mx, my);
+          ctx.lineTo(mx + Math.cos(pb) * r * 0.25, my + Math.sin(pb) * r * 0.25); ctx.stroke();
+        }
+        break;
+      case 'explode': // 爆裂 — 星芒放射
+        ctx.shadowColor = '#ff6d00'; ctx.shadowBlur = sz * 0.4;
+        ctx.fillStyle = '#ff6d00';
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+          const a = (Math.PI / 4) * i - Math.PI / 2;
+          const or = (i % 2 === 0) ? r * 0.9 : r * 0.4;
+          const px = Math.cos(a) * or, py = Math.sin(a) * or;
+          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#ffd600';
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.25, 0, Math.PI * 2); ctx.fill();
+        break;
+      case 'sniper': // 狙擊 — 十字準星
+        ctx.strokeStyle = '#e53935'; ctx.lineWidth = sz * 0.08;
+        ctx.shadowColor = '#e53935'; ctx.shadowBlur = sz * 0.3;
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -r * 0.85); ctx.lineTo(0, r * 0.85); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-r * 0.85, 0); ctx.lineTo(r * 0.85, 0); ctx.stroke();
+        ctx.fillStyle = '#e53935';
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.12, 0, Math.PI * 2); ctx.fill();
+        break;
+      case 'multi2': // 三重射擊 — 三圓
+        ctx.shadowColor = '#fff'; ctx.shadowBlur = sz * 0.2;
+        const m3g = ctx.createRadialGradient(-r * 0.1, -r * 0.1, r * 0.02, 0, 0, r * 0.28);
+        m3g.addColorStop(0, '#fff'); m3g.addColorStop(1, '#999');
+        ctx.fillStyle = m3g;
+        [-r * 0.4, 0, r * 0.4].forEach(ox => {
+          ctx.beginPath(); ctx.arc(ox, 0, r * 0.26, 0, Math.PI * 2); ctx.fill();
+        });
+        break;
+      case 'bounce': // 反彈 — 折線箭頭
+        ctx.strokeStyle = '#66bb6a'; ctx.lineWidth = sz * 0.1; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.shadowColor = '#66bb6a'; ctx.shadowBlur = sz * 0.3;
+        ctx.beginPath(); ctx.moveTo(-r * 0.7, -r * 0.6);
+        ctx.lineTo(0, r * 0.4); ctx.lineTo(r * 0.7, -r * 0.6); ctx.stroke();
+        // 箭頭
+        ctx.fillStyle = '#66bb6a';
+        ctx.beginPath(); ctx.moveTo(r * 0.7, -r * 0.6);
+        ctx.lineTo(r * 0.9, -r * 0.2); ctx.lineTo(r * 0.4, -r * 0.35); ctx.closePath(); ctx.fill();
+        break;
+      case 'crit': // 暴擊 — 閃電（紅）
+        ctx.fillStyle = '#ff1744';
+        ctx.shadowColor = '#ff1744'; ctx.shadowBlur = sz * 0.5;
+        ctx.beginPath(); ctx.moveTo(r * 0.1, -r); ctx.lineTo(-r * 0.5, r * 0.05);
+        ctx.lineTo(-r * 0.05, r * 0.05); ctx.lineTo(-r * 0.2, r);
+        ctx.lineTo(r * 0.5, -r * 0.1); ctx.lineTo(r * 0.05, -r * 0.1);
+        ctx.closePath(); ctx.fill();
+        break;
+      case 'gkSlow': // 守門員削弱 — 手套+向下箭頭
+        ctx.fillStyle = '#ff8f00';
+        ctx.shadowColor = '#ff8f00'; ctx.shadowBlur = sz * 0.3;
+        ctx.beginPath(); ctx.arc(0, -r * 0.2, r * 0.45, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#e65100';
+        ctx.beginPath(); ctx.moveTo(0, r * 0.3); ctx.lineTo(r * 0.4, r * 0.3);
+        ctx.lineTo(0, r); ctx.lineTo(-r * 0.4, r * 0.3); ctx.closePath(); ctx.fill();
+        break;
+      case 'extraLife': // 鋼鐵防線 — 盾牌
+        ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = sz * 0.4;
+        const sg = ctx.createLinearGradient(0, -r, 0, r);
+        sg.addColorStop(0, '#ffd54f'); sg.addColorStop(1, '#f9a825');
+        ctx.fillStyle = sg;
+        ctx.beginPath(); ctx.moveTo(0, -r * 0.85);
+        ctx.lineTo(r * 0.75, -r * 0.45); ctx.lineTo(r * 0.65, r * 0.3);
+        ctx.lineTo(0, r * 0.9); ctx.lineTo(-r * 0.65, r * 0.3);
+        ctx.lineTo(-r * 0.75, -r * 0.45); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = '#f57f17'; ctx.lineWidth = sz * 0.06;
+        ctx.stroke();
+        // 十字
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = sz * 0.08;
+        ctx.beginPath(); ctx.moveTo(0, -r * 0.35); ctx.lineTo(0, r * 0.35); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-r * 0.3, 0); ctx.lineTo(r * 0.3, 0); ctx.stroke();
+        break;
+      case 'guard': // 後衛守衛 — 人形盾
+        ctx.fillStyle = '#43a047';
+        ctx.shadowColor = '#43a047'; ctx.shadowBlur = sz * 0.3;
+        // 頭
+        ctx.beginPath(); ctx.arc(0, -r * 0.55, r * 0.28, 0, Math.PI * 2); ctx.fill();
+        // 身體
+        ctx.fillRect(-r * 0.3, -r * 0.28, r * 0.6, r * 0.7);
+        // 盾
+        ctx.fillStyle = '#ffd54f';
+        ctx.beginPath(); ctx.arc(0, r * 0.1, r * 0.35, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#f57f17'; ctx.lineWidth = sz * 0.05;
+        ctx.stroke();
+        break;
+      case 'power2': // 重砲 — 雙倍箭頭
+        ctx.fillStyle = '#ff5252';
+        ctx.shadowColor = '#ff5252'; ctx.shadowBlur = sz * 0.5;
+        ctx.beginPath(); ctx.moveTo(0, -r * 0.95);
+        ctx.lineTo(r * 0.8, 0); ctx.lineTo(r * 0.3, 0);
+        ctx.lineTo(r * 0.3, r * 0.95); ctx.lineTo(-r * 0.3, r * 0.95);
+        ctx.lineTo(-r * 0.3, 0); ctx.lineTo(-r * 0.8, 0);
+        ctx.closePath(); ctx.fill();
+        // ×2 文字
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${sz * 0.28}px sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('×2', 0, r * 0.45);
+        break;
+      case 'split': // 分裂 — 一圓分三
+        ctx.shadowColor = '#ba68c8'; ctx.shadowBlur = sz * 0.3;
+        ctx.fillStyle = '#ba68c8';
+        ctx.beginPath(); ctx.arc(0, -r * 0.35, r * 0.3, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#9c27b0';
+        ctx.beginPath(); ctx.arc(-r * 0.35, r * 0.35, r * 0.22, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(r * 0.35, r * 0.35, r * 0.22, 0, Math.PI * 2); ctx.fill();
+        // 連線
+        ctx.strokeStyle = 'rgba(186,104,200,0.5)'; ctx.lineWidth = sz * 0.05;
+        ctx.beginPath(); ctx.moveTo(0, -r * 0.1); ctx.lineTo(-r * 0.25, r * 0.2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -r * 0.1); ctx.lineTo(r * 0.25, r * 0.2); ctx.stroke();
+        break;
+      case 'timeSlow': // 時間壓迫 — 時鐘
+        ctx.strokeStyle = '#90caf9'; ctx.lineWidth = sz * 0.08;
+        ctx.shadowColor = '#90caf9'; ctx.shadowBlur = sz * 0.4;
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.7, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = sz * 0.07;
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -r * 0.45); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(r * 0.3, r * 0.1); ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.08, 0, Math.PI * 2); ctx.fill();
+        break;
+      case 'ghost': // 幽靈 — 半透明飄浮體
+        ctx.shadowColor = '#b388ff'; ctx.shadowBlur = sz * 0.5;
+        ctx.fillStyle = 'rgba(179,136,255,0.6)';
+        ctx.beginPath(); ctx.arc(0, -r * 0.15, r * 0.55, Math.PI, 0);
+        ctx.lineTo(r * 0.55, r * 0.5);
+        // 波浪底
+        ctx.lineTo(r * 0.35, r * 0.3); ctx.lineTo(r * 0.15, r * 0.55);
+        ctx.lineTo(-r * 0.1, r * 0.3); ctx.lineTo(-r * 0.35, r * 0.55);
+        ctx.lineTo(-r * 0.55, r * 0.3);
+        ctx.closePath(); ctx.fill();
+        // 眼睛
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(-r * 0.2, -r * 0.2, r * 0.12, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(r * 0.15, -r * 0.2, r * 0.12, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#311b92';
+        ctx.beginPath(); ctx.arc(-r * 0.18, -r * 0.18, r * 0.06, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(r * 0.17, -r * 0.18, r * 0.06, 0, Math.PI * 2); ctx.fill();
+        break;
+      case 'vampire': // 吸血 — 血滴 + 牙
+        ctx.shadowColor = '#d50000'; ctx.shadowBlur = sz * 0.4;
+        const vg = ctx.createLinearGradient(0, -r, 0, r);
+        vg.addColorStop(0, '#f44336'); vg.addColorStop(1, '#b71c1c');
+        ctx.fillStyle = vg;
+        ctx.beginPath(); ctx.moveTo(0, -r * 0.85);
+        ctx.bezierCurveTo(r * 0.7, -r * 0.1, r * 0.6, r * 0.6, 0, r * 0.85);
+        ctx.bezierCurveTo(-r * 0.6, r * 0.6, -r * 0.7, -r * 0.1, 0, -r * 0.85);
+        ctx.fill();
+        // 牙
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.moveTo(-r * 0.15, -r * 0.05); ctx.lineTo(-r * 0.08, r * 0.25);
+        ctx.lineTo(-r * 0.01, -r * 0.05); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(r * 0.01, -r * 0.05); ctx.lineTo(r * 0.08, r * 0.25);
+        ctx.lineTo(r * 0.15, -r * 0.05); ctx.closePath(); ctx.fill();
+        break;
+      default:
+        // fallback：圓形+問號
+        ctx.fillStyle = '#666';
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = `bold ${sz * 0.4}px sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('?', 0, 0);
+    }
+    ctx.restore();
+  }
+
   // ─── 選牌畫面 ────────────────────────────────────────────
   function drawCards() {
     const CARD_REVEAL_EACH = 500; // 每張卡 500ms 進場
@@ -1156,7 +1588,7 @@
     ctx.fillStyle = '#ffd700';
     ctx.font = `bold ${Math.min(28, W * 0.05)}px "Noto Sans TC", sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('⚽ GOAL! 選擇一張強化卡', W / 2, H * 0.13);
+    ctx.fillText('GOAL! 選擇一張強化卡', W / 2, H * 0.13);
 
     const cw = Math.min(170, W * 0.24);
     const ch = cw * 1.5;
@@ -1205,10 +1637,8 @@
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
       rr(ctx, drawX + 4 * scale, drawY + 4 * scale, drawW - 8 * scale, drawH - 8 * scale, 10 * scale); ctx.fill();
 
-      // 圖示
-      ctx.font = `${drawW * 0.28}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillText(c.icon, drawX + drawW / 2, drawY + drawH * 0.28);
+      // 圖示（Canvas 繪製）
+      drawIcon(c, drawX + drawW / 2, drawY + drawH * 0.22, drawW * 0.38);
 
       // 名稱
       ctx.fillStyle = '#fff';
@@ -1250,7 +1680,7 @@
 
     ctx.fillStyle = '#f44336';
     ctx.font = `bold ${Math.min(36, W * 0.07)}px "Noto Sans TC", sans-serif`;
-    ctx.fillText('🔴 終場哨響！', W / 2, H * 0.25);
+    ctx.fillText('終場哨響！', W / 2, H * 0.25);
 
     ctx.fillStyle = '#fff';
     ctx.font = `bold ${Math.min(24, W * 0.045)}px "Noto Sans TC", sans-serif`;
@@ -1267,7 +1697,8 @@
     if (best.score) {
       ctx.fillStyle = '#ffd700';
       ctx.font = `${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText(`🏆 最高紀錄：${best.score} 分`, W / 2, H * 0.56);
+      drawTrophy(W / 2 - ctx.measureText(`最高紀錄：${best.score} 分`).width / 2 - 16, H * 0.56 - 6, 12);
+      ctx.fillText(`最高紀錄：${best.score} 分`, W / 2, H * 0.56);
     }
 
     // 按鈕（漸入完成才顯示）
