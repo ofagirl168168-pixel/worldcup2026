@@ -874,83 +874,269 @@
   function line(a, b) { ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
   function polyLine(pts) { ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.stroke(); }
 
-  // ─── 背景物件（球場上緣裝飾） ──────────────────────────────
-  // 每場遊戲生成固定的隨機佈局，存在 G._sceneProps
-  function ensureSceneProps() {
-    if (G._sceneProps) return G._sceneProps;
-    const props = [];
-    const count = 8 + Math.floor(Math.random() * 5); // 8~12 個物件
-    for (let i = 0; i < count; i++) {
-      const type = Math.random() < 0.5 ? 'tree' : 'lamp';
-      const xPct = 0.03 + Math.random() * 0.94; // 3%~97% 水平位置
-      const scale = 0.6 + Math.random() * 0.5;  // 大小隨機
-      props.push({ type, xPct, scale });
+  // ─── 背景物件（每個場景固定設計） ──────────────────────────────
+  function drawSceneProps() {
+    const goalP = proj(0, FIELD_DEPTH);
+    const baseY = goalP.y;
+    const u = Math.min(1, W / 500); // 響應式縮放單位
+    ctx.save();
+
+    const name = curScene.name;
+
+    if (name === '夜間球場') {
+      // 四盞對稱大燈照向球場
+      [0.08, 0.28, 0.72, 0.92].forEach(xp => {
+        drawStadiumLight(W * xp, baseY, u, true);
+      });
+      // 兩側低矮廣告板
+      drawAdBoard(W * 0.15, baseY, u * 0.8, '#1a237e');
+      drawAdBoard(W * 0.85, baseY, u * 0.8, '#1a237e');
     }
-    // 按 x 排序避免重疊太嚴重
-    props.sort((a, b) => a.xPct - b.xPct);
-    G._sceneProps = props;
-    return props;
+
+    else if (name === '夕陽球場') {
+      // 棕櫚樹剪影
+      [0.05, 0.18, 0.82, 0.95].forEach(xp => {
+        drawPalmTree(W * xp, baseY, u);
+      });
+      // 中間兩盞矮燈
+      drawStadiumLight(W * 0.38, baseY, u * 0.7, false);
+      drawStadiumLight(W * 0.62, baseY, u * 0.7, false);
+    }
+
+    else if (name === '正午豔陽') {
+      // 綠樹 + 旗幟
+      [0.06, 0.2, 0.8, 0.94].forEach(xp => {
+        drawRoundTree(W * xp, baseY, u, '#2e7d32', '#1b5e20');
+      });
+      [0.35, 0.5, 0.65].forEach(xp => {
+        drawFlag(W * xp, baseY, u);
+      });
+    }
+
+    else if (name === '陰天球場') {
+      // 禿樹 + 看台剪影
+      [0.07, 0.22, 0.78, 0.93].forEach(xp => {
+        drawBareTree(W * xp, baseY, u);
+      });
+      drawStand(W * 0.5, baseY, u);
+    }
+
+    else if (name === '暴風雨夜') {
+      // 高燈柱（微弱光）+ 搖擺旗
+      [0.1, 0.35, 0.65, 0.9].forEach(xp => {
+        drawStadiumLight(W * xp, baseY, u * 1.1, true);
+      });
+      [0.22, 0.78].forEach(xp => {
+        drawFlag(W * xp, baseY, u, '#546e7a');
+      });
+    }
+
+    else if (name === '極光球場') {
+      // 針葉松
+      [0.04, 0.14, 0.24, 0.76, 0.86, 0.96].forEach(xp => {
+        drawPineTree(W * xp, baseY, u);
+      });
+      // 兩盞小燈
+      drawStadiumLight(W * 0.42, baseY, u * 0.6, true);
+      drawStadiumLight(W * 0.58, baseY, u * 0.6, true);
+    }
+
+    else if (name === '金色決賽') {
+      // 大型聚光燈對稱排列，照向球場
+      [0.06, 0.22, 0.38, 0.62, 0.78, 0.94].forEach(xp => {
+        drawSpotlight(W * xp, baseY, u);
+      });
+      // 金色獎盃裝飾（球場中央上方）
+      drawTrophyDeco(W * 0.5, baseY, u);
+    }
+
+    ctx.restore();
   }
 
-  function drawSceneProps() {
-    const props = ensureSceneProps();
-    const goalProj = proj(0, FIELD_DEPTH);
-    const baseY = goalProj.y;  // 球門投影 y，物件畫在這之上
-
-    ctx.save();
-    props.forEach(p => {
-      const x = W * p.xPct;
-      const s = p.scale * Math.min(1, W / 500);
-
-      if (p.type === 'tree') {
-        // 樹幹
-        const trunkW = 4 * s, trunkH = 18 * s;
-        ctx.fillStyle = '#5d4037';
-        ctx.fillRect(x - trunkW / 2, baseY - trunkH, trunkW, trunkH);
-        // 樹冠（兩層圓）
-        ctx.fillStyle = curScene.name === '暴風雨夜' ? '#1b4a28' :
-                         curScene.name === '夕陽球場' ? '#3a6030' :
-                         curScene.name === '金色決賽' ? '#1e4428' : '#2d6e2e';
-        ctx.beginPath();
-        ctx.arc(x, baseY - trunkH - 8 * s, 10 * s, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = curScene.name === '暴風雨夜' ? '#164020' :
-                         curScene.name === '夕陽球場' ? '#2e5028' :
-                         curScene.name === '金色決賽' ? '#183a20' : '#245a26';
-        ctx.beginPath();
-        ctx.arc(x - 4 * s, baseY - trunkH - 4 * s, 8 * s, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x + 5 * s, baseY - trunkH - 5 * s, 7 * s, 0, Math.PI * 2);
-        ctx.fill();
-      } else {
-        // 燈柱
-        const poleW = 2.5 * s, poleH = 28 * s;
-        ctx.fillStyle = '#78909c';
-        ctx.fillRect(x - poleW / 2, baseY - poleH, poleW, poleH);
-        // 燈頭橫桿
-        const armW = 10 * s;
-        ctx.fillRect(x - armW / 2, baseY - poleH, armW, 2.5 * s);
-        // 燈光（小光暈）
-        const isNight = ['夜間球場','暴風雨夜','極光球場','金色決賽'].includes(curScene.name);
-        if (isNight) {
-          const glow = ctx.createRadialGradient(x, baseY - poleH, 0, x, baseY - poleH, 18 * s);
-          glow.addColorStop(0, 'rgba(255,240,180,0.25)');
-          glow.addColorStop(1, 'transparent');
-          ctx.fillStyle = glow;
-          ctx.fillRect(x - 20 * s, baseY - poleH - 20 * s, 40 * s, 40 * s);
-        }
-        // 燈泡
-        ctx.fillStyle = isNight ? '#fff3b0' : '#cfd8dc';
-        ctx.beginPath();
-        ctx.arc(x - armW * 0.3, baseY - poleH - 1 * s, 2 * s, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x + armW * 0.3, baseY - poleH - 1 * s, 2 * s, 0, Math.PI * 2);
-        ctx.fill();
-      }
+  // ── 繪製元件 ─────────────────���────────────────────────────
+  function drawStadiumLight(x, baseY, u, glow) {
+    const pH = 30 * u, pW = 2.5 * u;
+    ctx.fillStyle = '#607d8b';
+    ctx.fillRect(x - pW / 2, baseY - pH, pW, pH);
+    const armW = 10 * u;
+    ctx.fillRect(x - armW / 2, baseY - pH, armW, 2.5 * u);
+    if (glow) {
+      const g = ctx.createRadialGradient(x, baseY - pH, 0, x, baseY - pH + 15 * u, 22 * u);
+      g.addColorStop(0, 'rgba(255,240,180,0.2)');
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.fillRect(x - 25 * u, baseY - pH - 5 * u, 50 * u, 40 * u);
+    }
+    ctx.fillStyle = glow ? '#fff3b0' : '#b0bec5';
+    [-0.3, 0, 0.3].forEach(off => {
+      ctx.beginPath();
+      ctx.arc(x + armW * off, baseY - pH - 1.5 * u, 1.8 * u, 0, Math.PI * 2);
+      ctx.fill();
     });
-    ctx.restore();
+  }
+
+  function drawPalmTree(x, baseY, u) {
+    const tH = 26 * u;
+    ctx.fillStyle = '#4e342e';
+    ctx.fillRect(x - 1.5 * u, baseY - tH, 3 * u, tH);
+    // 棕櫚葉（扇形弧線）
+    ctx.strokeStyle = '#2e5a1e';
+    ctx.lineWidth = 2 * u;
+    for (let i = 0; i < 5; i++) {
+      const ang = -Math.PI * 0.8 + i * Math.PI * 0.4 / 4;
+      ctx.beginPath();
+      ctx.moveTo(x, baseY - tH);
+      ctx.quadraticCurveTo(
+        x + Math.cos(ang) * 14 * u,
+        baseY - tH + Math.sin(ang) * 6 * u - 6 * u,
+        x + Math.cos(ang) * 18 * u,
+        baseY - tH + Math.sin(ang) * 10 * u + 2 * u
+      );
+      ctx.stroke();
+    }
+    ctx.lineWidth = 1;
+  }
+
+  function drawRoundTree(x, baseY, u, c1, c2) {
+    const tH = 16 * u;
+    ctx.fillStyle = '#5d4037';
+    ctx.fillRect(x - 2 * u, baseY - tH, 4 * u, tH);
+    ctx.fillStyle = c1;
+    ctx.beginPath(); ctx.arc(x, baseY - tH - 7 * u, 9 * u, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = c2;
+    ctx.beginPath(); ctx.arc(x - 4 * u, baseY - tH - 3 * u, 7 * u, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 4 * u, baseY - tH - 4 * u, 6 * u, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function drawBareTree(x, baseY, u) {
+    const tH = 20 * u;
+    ctx.strokeStyle = '#5d4037';
+    ctx.lineWidth = 2 * u;
+    // 主幹
+    ctx.beginPath(); ctx.moveTo(x, baseY); ctx.lineTo(x, baseY - tH); ctx.stroke();
+    // 分支
+    ctx.lineWidth = 1.2 * u;
+    [[-6, -5], [5, -7], [-8, -2], [7, -3]].forEach(([dx, dy]) => {
+      const by = baseY - tH * 0.55 + dy * u;
+      ctx.beginPath();
+      ctx.moveTo(x, by);
+      ctx.lineTo(x + dx * u, by - 6 * u);
+      ctx.stroke();
+    });
+    ctx.lineWidth = 1;
+  }
+
+  function drawPineTree(x, baseY, u) {
+    const tH = 8 * u;
+    ctx.fillStyle = '#4e342e';
+    ctx.fillRect(x - 1.5 * u, baseY - tH, 3 * u, tH);
+    // 三層三角形
+    ctx.fillStyle = '#1b5e20';
+    [0, 1, 2].forEach(i => {
+      const ty = baseY - tH - i * 7 * u;
+      const tw = (10 - i * 2) * u;
+      ctx.beginPath();
+      ctx.moveTo(x - tw, ty);
+      ctx.lineTo(x, ty - 9 * u);
+      ctx.lineTo(x + tw, ty);
+      ctx.closePath();
+      ctx.fill();
+    });
+  }
+
+  function drawFlag(x, baseY, u, color) {
+    const pH = 24 * u;
+    ctx.fillStyle = '#78909c';
+    ctx.fillRect(x - 1 * u, baseY - pH, 2 * u, pH);
+    ctx.fillStyle = color || '#c62828';
+    ctx.beginPath();
+    ctx.moveTo(x + 1 * u, baseY - pH);
+    ctx.lineTo(x + 10 * u, baseY - pH + 3 * u);
+    ctx.lineTo(x + 1 * u, baseY - pH + 7 * u);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawStand(cx, baseY, u) {
+    // 簡易看台剪影
+    const sw = W * 0.3, sh = 10 * u;
+    ctx.fillStyle = 'rgba(50,50,60,0.5)';
+    ctx.fillRect(cx - sw / 2, baseY - sh, sw, sh);
+    ctx.fillStyle = 'rgba(60,60,70,0.4)';
+    ctx.fillRect(cx - sw / 2 + 4 * u, baseY - sh - 5 * u, sw - 8 * u, 5 * u);
+    // 人頭點綴
+    ctx.fillStyle = 'rgba(180,180,180,0.25)';
+    for (let i = 0; i < 12; i++) {
+      const px = cx - sw / 2 + 8 * u + i * (sw - 16 * u) / 11;
+      ctx.beginPath();
+      ctx.arc(px, baseY - sh - 2 * u, 1.5 * u, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawSpotlight(x, baseY, u) {
+    const pH = 34 * u, pW = 3 * u;
+    ctx.fillStyle = '#5d4037';
+    ctx.fillRect(x - pW / 2, baseY - pH, pW, pH);
+    // 聚光燈頭
+    ctx.fillStyle = '#ffd600';
+    ctx.beginPath();
+    ctx.arc(x, baseY - pH - 2 * u, 4 * u, 0, Math.PI * 2);
+    ctx.fill();
+    // 光束向下
+    const g = ctx.createLinearGradient(x, baseY - pH, x, baseY + 5 * u);
+    g.addColorStop(0, 'rgba(255,215,0,0.12)');
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(x - 3 * u, baseY - pH);
+    ctx.lineTo(x - 16 * u, baseY + 5 * u);
+    ctx.lineTo(x + 16 * u, baseY + 5 * u);
+    ctx.lineTo(x + 3 * u, baseY - pH);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawTrophyDeco(x, baseY, u) {
+    const s = u * 1.2;
+    const ty = baseY - 36 * u;
+    // 獎盃杯身
+    ctx.fillStyle = '#ffd600';
+    ctx.beginPath();
+    ctx.moveTo(x - 5 * s, ty);
+    ctx.quadraticCurveTo(x - 6 * s, ty + 10 * s, x - 3 * s, ty + 12 * s);
+    ctx.lineTo(x + 3 * s, ty + 12 * s);
+    ctx.quadraticCurveTo(x + 6 * s, ty + 10 * s, x + 5 * s, ty);
+    ctx.closePath();
+    ctx.fill();
+    // 底座
+    ctx.fillRect(x - 3 * s, ty + 12 * s, 6 * s, 2 * s);
+    ctx.fillRect(x - 5 * s, ty + 14 * s, 10 * s, 2 * s);
+    // 把手
+    ctx.strokeStyle = '#ffd600';
+    ctx.lineWidth = 1.5 * s;
+    ctx.beginPath();
+    ctx.arc(x - 6 * s, ty + 5 * s, 3 * s, -Math.PI * 0.5, Math.PI * 0.5);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x + 6 * s, ty + 5 * s, 3 * s, Math.PI * 0.5, -Math.PI * 0.5);
+    ctx.stroke();
+    ctx.lineWidth = 1;
+    // 光暈
+    const g = ctx.createRadialGradient(x, ty + 6 * s, 0, x, ty + 6 * s, 20 * s);
+    g.addColorStop(0, 'rgba(255,215,0,0.1)');
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(x - 22 * s, ty - 10 * s, 44 * s, 36 * s);
+  }
+
+  function drawAdBoard(x, baseY, u, color) {
+    const bw = 28 * u, bh = 6 * u;
+    ctx.fillStyle = color;
+    ctx.fillRect(x - bw / 2, baseY - bh, bw, bh);
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(x - bw / 2, baseY - bh, bw, bh);
   }
 
   // ─── 球門 ────────────────────────────────────────────────
