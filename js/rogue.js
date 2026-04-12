@@ -1225,33 +1225,81 @@
     '金色決賽': ['vipchair','speaker','vipchair','speaker','vipchair'],
   };
 
+  // 彩蛋物件：wave 越高越多，越稀有
+  const EGGS = [
+    { minWave: 3,  weight: 5, type: 'cat' },       // 貓咪打盹
+    { minWave: 3,  weight: 5, type: 'bird_nest' },  // 鳥巢
+    { minWave: 5,  weight: 4, type: 'football' },   // 被遺忘的足球
+    { minWave: 5,  weight: 4, type: 'campfire' },   // 營火
+    { minWave: 7,  weight: 3, type: 'ufo' },        // UFO
+    { minWave: 7,  weight: 3, type: 'mushroom' },   // 蘑菇
+    { minWave: 10, weight: 2, type: 'treasure' },   // 寶箱
+    { minWave: 10, weight: 2, type: 'robot' },      // 小機器人
+    { minWave: 13, weight: 1, type: 'dragon' },     // 小龍
+    { minWave: 15, weight: 1, type: 'unicorn' },    // 獨角獸
+    { minWave: 18, weight: 1, type: 'rocket' },     // 火箭
+    { minWave: 20, weight: 1, type: 'crown' },      // 皇冠
+  ];
+
   let _cornerProps = []; // 當前波的角落物件
 
   function generateCornerProps() {
     const types = CORNER_TYPES[curScene.name];
     if (!types) { _cornerProps = []; return; }
+    const wave = G ? G.wave : 1;
     const props = [];
-    // 上半部（高z，遠端）三角更寬，多放物件且 xOff 大
-    // 下半部（低z，近端）三角窄，少放且 xOff 小
     const slots = [
-      // 上半部密集（z 0.5~0.95），xOff 大
       { zMin: 0.85, zMax: 0.95, xMin: 200, xMax: 600 },
       { zMin: 0.75, zMax: 0.85, xMin: 180, xMax: 500 },
       { zMin: 0.65, zMax: 0.75, xMin: 150, xMax: 450 },
       { zMin: 0.55, zMax: 0.65, xMin: 130, xMax: 380 },
       { zMin: 0.45, zMax: 0.55, xMin: 110, xMax: 300 },
-      // 下半部稀疏
       { zMin: 0.3, zMax: 0.45, xMin: 80, xMax: 200 },
       { zMin: 0.15, zMax: 0.3, xMin: 60, xMax: 150 },
     ];
+
+    // 計算這波可出現的彩蛋數量（wave 越高越多）
+    const eggCount = Math.min(6, Math.floor(wave / 3));
+    // 篩選可用彩蛋
+    const available = EGGS.filter(e => wave >= e.minWave);
+
+    // 加權隨機選彩蛋
+    function pickEgg() {
+      if (!available.length) return null;
+      const total = available.reduce((s, e) => s + e.weight, 0);
+      let r = Math.random() * total;
+      for (const e of available) { r -= e.weight; if (r <= 0) return e.type; }
+      return available[available.length - 1].type;
+    }
+
+    // 先收集所有 slot 位置
+    const allSlots = [];
     for (const side of [-1, 1]) {
       for (const slot of slots) {
-        const zPct = slot.zMin + Math.random() * (slot.zMax - slot.zMin);
-        const xOff = slot.xMin + Math.random() * (slot.xMax - slot.xMin);
-        const type = types[Math.floor(Math.random() * types.length)];
-        props.push({ side, zPct, xOff, type });
+        allSlots.push({ side, slot });
       }
     }
+
+    // 隨機選幾個 slot 放彩蛋
+    const eggSlots = new Set();
+    const shuffled = allSlots.map((_, i) => i).sort(() => Math.random() - 0.5);
+    for (let i = 0; i < eggCount && i < shuffled.length; i++) {
+      eggSlots.add(shuffled[i]);
+    }
+
+    allSlots.forEach((s, idx) => {
+      const { side, slot } = s;
+      const zPct = slot.zMin + Math.random() * (slot.zMax - slot.zMin);
+      const xOff = slot.xMin + Math.random() * (slot.xMax - slot.xMin);
+      let type;
+      if (eggSlots.has(idx)) {
+        type = pickEgg() || types[Math.floor(Math.random() * types.length)];
+      } else {
+        type = types[Math.floor(Math.random() * types.length)];
+      }
+      props.push({ side, zPct, xOff, type });
+    });
+
     _cornerProps = props;
   }
 
@@ -1332,6 +1380,19 @@
             case 'snowpile': _drawCornerSnowpile(p.x, p.y, s); break;
             case 'speaker': _drawCornerSpeaker(p.x, p.y, s); break;
             case 'vipchair': _drawCornerVIPChair(p.x, p.y, s); break;
+            // 彩蛋
+            case 'cat': _drawEggCat(p.x, p.y, s); break;
+            case 'bird_nest': _drawEggNest(p.x, p.y, s); break;
+            case 'football': _drawEggFootball(p.x, p.y, s); break;
+            case 'campfire': _drawEggCampfire(p.x, p.y, s); break;
+            case 'ufo': _drawEggUFO(p.x, p.y, s); break;
+            case 'mushroom': _drawEggMushroom(p.x, p.y, s); break;
+            case 'treasure': _drawEggTreasure(p.x, p.y, s); break;
+            case 'robot': _drawEggRobot(p.x, p.y, s); break;
+            case 'dragon': _drawEggDragon(p.x, p.y, s); break;
+            case 'unicorn': _drawEggUnicorn(p.x, p.y, s); break;
+            case 'rocket': _drawEggRocket(p.x, p.y, s); break;
+            case 'crown': _drawEggCrown(p.x, p.y, s); break;
           }
         }
       }
@@ -1438,6 +1499,207 @@
     ctx.fillRect(x + 2.5 * s, y - 8 * s, 1.5 * s, 8 * s); // 椅背右
     ctx.fillStyle = '#ffd600';
     ctx.fillRect(x - 3.5 * s, y - 3.5 * s, 7 * s, 1 * s); // 金邊
+  }
+
+  // ── 彩蛋物件繪製（簡約雙色風格） ──────────────────────────
+  function _drawEggCat(x, y, s) {
+    // 蜷縮的貓
+    ctx.fillStyle = '#ff8f00';
+    ctx.beginPath(); ctx.ellipse(x, y - 4 * s, 6 * s, 4 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 5 * s, y - 7 * s, 3 * s, 0, Math.PI * 2); ctx.fill();
+    // 耳朵
+    ctx.beginPath(); ctx.moveTo(x + 3 * s, y - 10 * s); ctx.lineTo(x + 5 * s, y - 13 * s); ctx.lineTo(x + 7 * s, y - 10 * s); ctx.fill();
+    // 尾巴
+    ctx.strokeStyle = '#ff8f00'; ctx.lineWidth = 1.5 * s;
+    ctx.beginPath(); ctx.moveTo(x - 6 * s, y - 4 * s);
+    ctx.quadraticCurveTo(x - 10 * s, y - 10 * s, x - 7 * s, y - 12 * s); ctx.stroke();
+    // zzz
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.font = `${3 * s}px sans-serif`; ctx.textAlign = 'left';
+    ctx.fillText('z', x + 8 * s, y - 10 * s);
+    ctx.fillText('z', x + 10 * s, y - 13 * s);
+    ctx.lineWidth = 1;
+  }
+
+  function _drawEggNest(x, y, s) {
+    // 鳥巢 + 蛋
+    ctx.fillStyle = '#5d4037';
+    ctx.beginPath(); ctx.ellipse(x, y - 2 * s, 7 * s, 3 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#8d6e63';
+    ctx.beginPath(); ctx.ellipse(x, y - 3 * s, 5 * s, 2 * s, 0, 0, Math.PI * 2); ctx.fill();
+    // 蛋
+    ctx.fillStyle = '#eceff1';
+    [-2, 0, 2].forEach(dx => {
+      ctx.beginPath(); ctx.ellipse(x + dx * s, y - 4 * s, 1.5 * s, 2 * s, 0, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+
+  function _drawEggFootball(x, y, s) {
+    // 被遺忘的足球
+    ctx.fillStyle = '#e0e0e0';
+    ctx.beginPath(); ctx.arc(x, y - 4 * s, 4 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#424242';
+    // 五角形花紋
+    for (let i = 0; i < 5; i++) {
+      const a = i * Math.PI * 2 / 5 - Math.PI / 2;
+      ctx.beginPath(); ctx.arc(x + Math.cos(a) * 2 * s, y - 4 * s + Math.sin(a) * 2 * s, 1 * s, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function _drawEggCampfire(x, y, s) {
+    // 木頭
+    ctx.fillStyle = '#5d4037';
+    ctx.fillRect(x - 5 * s, y - 2 * s, 4 * s, 2 * s);
+    ctx.fillRect(x + 1 * s, y - 2 * s, 4 * s, 2 * s);
+    // 火焰
+    ctx.fillStyle = '#ff6d00';
+    ctx.beginPath(); ctx.moveTo(x, y - 10 * s); ctx.quadraticCurveTo(x - 4 * s, y - 4 * s, x - 3 * s, y - 2 * s);
+    ctx.lineTo(x + 3 * s, y - 2 * s); ctx.quadraticCurveTo(x + 4 * s, y - 4 * s, x, y - 10 * s); ctx.fill();
+    ctx.fillStyle = '#ffd600';
+    ctx.beginPath(); ctx.moveTo(x, y - 8 * s); ctx.quadraticCurveTo(x - 2 * s, y - 4 * s, x - 1.5 * s, y - 2 * s);
+    ctx.lineTo(x + 1.5 * s, y - 2 * s); ctx.quadraticCurveTo(x + 2 * s, y - 4 * s, x, y - 8 * s); ctx.fill();
+  }
+
+  function _drawEggUFO(x, y, s) {
+    // 飛碟
+    ctx.fillStyle = '#78909c';
+    ctx.beginPath(); ctx.ellipse(x, y - 6 * s, 8 * s, 3 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#b0bec5';
+    ctx.beginPath(); ctx.arc(x, y - 9 * s, 4 * s, Math.PI, 0); ctx.fill();
+    // 光束
+    ctx.fillStyle = 'rgba(130,255,130,0.15)';
+    ctx.beginPath(); ctx.moveTo(x - 3 * s, y - 5 * s); ctx.lineTo(x - 6 * s, y + 2 * s);
+    ctx.lineTo(x + 6 * s, y + 2 * s); ctx.lineTo(x + 3 * s, y - 5 * s); ctx.fill();
+    // 燈
+    ctx.fillStyle = '#76ff03';
+    [-3, 0, 3].forEach(dx => {
+      ctx.beginPath(); ctx.arc(x + dx * s, y - 6 * s, 0.8 * s, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+
+  function _drawEggMushroom(x, y, s) {
+    // 蘑菇
+    ctx.fillStyle = '#efebe9';
+    ctx.fillRect(x - 1.5 * s, y - 5 * s, 3 * s, 5 * s);
+    ctx.fillStyle = '#e53935';
+    ctx.beginPath(); ctx.arc(x, y - 6 * s, 5 * s, Math.PI, 0); ctx.fill();
+    // 白點
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(x - 2 * s, y - 8 * s, 1 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 2 * s, y - 7 * s, 1 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y - 10 * s, 0.8 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawEggTreasure(x, y, s) {
+    // 寶箱
+    ctx.fillStyle = '#5d4037';
+    ctx.fillRect(x - 5 * s, y - 5 * s, 10 * s, 5 * s);
+    ctx.fillStyle = '#8d6e63';
+    ctx.beginPath(); ctx.arc(x, y - 5 * s, 5 * s, Math.PI, 0); ctx.fill();
+    // 金邊
+    ctx.fillStyle = '#ffd600';
+    ctx.fillRect(x - 5 * s, y - 5.5 * s, 10 * s, 1 * s);
+    // 鎖
+    ctx.beginPath(); ctx.arc(x, y - 5 * s, 1.5 * s, 0, Math.PI * 2); ctx.fill();
+    // 金光
+    ctx.fillStyle = 'rgba(255,215,0,0.2)';
+    ctx.beginPath(); ctx.arc(x, y - 5 * s, 10 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawEggRobot(x, y, s) {
+    // 小機器人
+    ctx.fillStyle = '#78909c';
+    ctx.fillRect(x - 4 * s, y - 8 * s, 8 * s, 8 * s); // 身
+    ctx.fillStyle = '#546e7a';
+    ctx.fillRect(x - 3 * s, y - 14 * s, 6 * s, 6 * s); // 頭
+    // 眼睛
+    ctx.fillStyle = '#76ff03';
+    ctx.fillRect(x - 2 * s, y - 12 * s, 1.5 * s, 1.5 * s);
+    ctx.fillRect(x + 0.5 * s, y - 12 * s, 1.5 * s, 1.5 * s);
+    // 天線
+    ctx.fillStyle = '#90a4ae';
+    ctx.fillRect(x - 0.4 * s, y - 17 * s, 0.8 * s, 3 * s);
+    ctx.fillStyle = '#ff1744';
+    ctx.beginPath(); ctx.arc(x, y - 17.5 * s, 1 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawEggDragon(x, y, s) {
+    // 小龍
+    ctx.fillStyle = '#4caf50';
+    ctx.beginPath(); ctx.ellipse(x, y - 5 * s, 6 * s, 4 * s, 0, 0, Math.PI * 2); ctx.fill(); // 身
+    ctx.beginPath(); ctx.arc(x + 6 * s, y - 9 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill(); // 頭
+    // 角
+    ctx.fillStyle = '#ff8f00';
+    ctx.beginPath(); ctx.moveTo(x + 5 * s, y - 12 * s); ctx.lineTo(x + 4 * s, y - 16 * s); ctx.lineTo(x + 7 * s, y - 12 * s); ctx.fill();
+    // 眼
+    ctx.fillStyle = '#ff1744';
+    ctx.beginPath(); ctx.arc(x + 7.5 * s, y - 10 * s, 1 * s, 0, Math.PI * 2); ctx.fill();
+    // 翅膀
+    ctx.fillStyle = 'rgba(76,175,80,0.5)';
+    ctx.beginPath(); ctx.moveTo(x - 2 * s, y - 7 * s);
+    ctx.quadraticCurveTo(x - 1 * s, y - 16 * s, x + 5 * s, y - 12 * s); ctx.lineTo(x + 2 * s, y - 7 * s); ctx.fill();
+    // 火焰
+    ctx.fillStyle = '#ff6d00';
+    ctx.beginPath(); ctx.moveTo(x + 9 * s, y - 9 * s); ctx.lineTo(x + 15 * s, y - 8 * s); ctx.lineTo(x + 9 * s, y - 7 * s); ctx.fill();
+  }
+
+  function _drawEggUnicorn(x, y, s) {
+    // 獨角獸
+    ctx.fillStyle = '#e1bee7';
+    ctx.beginPath(); ctx.ellipse(x, y - 5 * s, 7 * s, 4 * s, 0, 0, Math.PI * 2); ctx.fill(); // 身
+    ctx.beginPath(); ctx.arc(x + 6 * s, y - 9 * s, 3 * s, 0, Math.PI * 2); ctx.fill(); // 頭
+    // 角
+    ctx.fillStyle = '#ffd600';
+    ctx.beginPath(); ctx.moveTo(x + 6 * s, y - 12 * s); ctx.lineTo(x + 5.5 * s, y - 18 * s); ctx.lineTo(x + 7.5 * s, y - 12 * s); ctx.fill();
+    // 鬃毛
+    ctx.fillStyle = '#f48fb1';
+    ctx.beginPath(); ctx.moveTo(x + 4 * s, y - 10 * s);
+    ctx.quadraticCurveTo(x + 1 * s, y - 14 * s, x - 1 * s, y - 8 * s); ctx.lineTo(x + 2 * s, y - 7 * s); ctx.fill();
+    // 腿
+    ctx.fillStyle = '#e1bee7';
+    [-3, -1, 1, 3].forEach(dx => ctx.fillRect(x + dx * s, y - 1 * s, 1.5 * s, 4 * s));
+  }
+
+  function _drawEggRocket(x, y, s) {
+    // 火箭
+    ctx.fillStyle = '#e0e0e0';
+    ctx.fillRect(x - 2.5 * s, y - 16 * s, 5 * s, 12 * s);
+    // 頭錐
+    ctx.fillStyle = '#e53935';
+    ctx.beginPath(); ctx.moveTo(x, y - 22 * s); ctx.lineTo(x - 2.5 * s, y - 16 * s); ctx.lineTo(x + 2.5 * s, y - 16 * s); ctx.fill();
+    // 尾翼
+    ctx.fillStyle = '#1565c0';
+    ctx.beginPath(); ctx.moveTo(x - 2.5 * s, y - 4 * s); ctx.lineTo(x - 5 * s, y); ctx.lineTo(x - 2.5 * s, y); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x + 2.5 * s, y - 4 * s); ctx.lineTo(x + 5 * s, y); ctx.lineTo(x + 2.5 * s, y); ctx.fill();
+    // 火焰
+    ctx.fillStyle = '#ff6d00';
+    ctx.beginPath(); ctx.moveTo(x - 2 * s, y - 4 * s); ctx.quadraticCurveTo(x, y + 4 * s, x + 2 * s, y - 4 * s); ctx.fill();
+    // 窗
+    ctx.fillStyle = '#42a5f5';
+    ctx.beginPath(); ctx.arc(x, y - 12 * s, 1.5 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawEggCrown(x, y, s) {
+    // 皇冠
+    ctx.fillStyle = '#ffd600';
+    ctx.beginPath();
+    ctx.moveTo(x - 6 * s, y);
+    ctx.lineTo(x - 6 * s, y - 6 * s);
+    ctx.lineTo(x - 3 * s, y - 3 * s);
+    ctx.lineTo(x, y - 8 * s);
+    ctx.lineTo(x + 3 * s, y - 3 * s);
+    ctx.lineTo(x + 6 * s, y - 6 * s);
+    ctx.lineTo(x + 6 * s, y);
+    ctx.closePath(); ctx.fill();
+    // 寶石
+    ctx.fillStyle = '#e53935';
+    ctx.beginPath(); ctx.arc(x, y - 4 * s, 1.2 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#2196f3';
+    ctx.beginPath(); ctx.arc(x - 3 * s, y - 2.5 * s, 1 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 3 * s, y - 2.5 * s, 1 * s, 0, Math.PI * 2); ctx.fill();
+    // 金光
+    ctx.fillStyle = 'rgba(255,215,0,0.15)';
+    ctx.beginPath(); ctx.arc(x, y - 4 * s, 12 * s, 0, Math.PI * 2); ctx.fill();
   }
 
   function drawSideCrowd() {
