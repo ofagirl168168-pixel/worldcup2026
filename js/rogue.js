@@ -1173,13 +1173,10 @@
           ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, gr2, 0, Math.PI * 2); ctx.stroke();
           break;
         }
-        default: { // 普通文字粒子（傷害數字等）
+        default: { // 普通文字粒子（傷害數字等）— 白色簡潔風
           ctx.font = `bold ${Math.max(12, 18 * pos.s)}px sans-serif`;
           ctx.textAlign = 'center';
-          // 傷害數字用紅色，其他白色
-          const isNeg = pt.text && pt.text.startsWith('-');
-          ctx.fillStyle = isNeg ? '#ff5252' : '#fff';
-          if (isNeg) { ctx.shadowColor = '#ff5252'; ctx.shadowBlur = 6; }
+          ctx.fillStyle = '#fff';
           ctx.fillText(pt.text, pos.x, pos.y - 25 * pos.s + fy);
           break;
         }
@@ -1280,6 +1277,16 @@
   }
 
   // ─── 卡片圖標繪製系統 ────────────────────────────────────
+  // 迷你足球（共用圖標元素）
+  function drawMiniBall(x, y, r) {
+    const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.05, x, y, r);
+    g.addColorStop(0, '#fff'); g.addColorStop(1, '#bbb');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#333';
+    ctx.beginPath(); ctx.arc(x, y, r * 0.35, 0, Math.PI * 2); ctx.fill();
+  }
+
   function drawIcon(c, cx, cy, sz) {
     const id = typeof c === 'string' ? c : c.id;
     const r = sz / 2;
@@ -1287,31 +1294,50 @@
     ctx.translate(cx, cy);
 
     switch (id) {
-      case 'dmg20': // 射門強化 — 上箭頭
-        ctx.fillStyle = '#ef5350';
+      case 'dmg20': // 射門強化 — 足球 + 拳頭
         ctx.shadowColor = '#ef5350'; ctx.shadowBlur = sz * 0.3;
-        ctx.beginPath(); ctx.moveTo(0, -r); ctx.lineTo(r * 0.7, r * 0.2); ctx.lineTo(r * 0.25, r * 0.2);
-        ctx.lineTo(r * 0.25, r); ctx.lineTo(-r * 0.25, r); ctx.lineTo(-r * 0.25, r * 0.2);
-        ctx.lineTo(-r * 0.7, r * 0.2); ctx.closePath(); ctx.fill();
+        drawMiniBall(-r * 0.35, r * 0.15, r * 0.32);
+        // 拳頭形狀
+        ctx.fillStyle = '#ef5350';
+        ctx.beginPath();
+        ctx.moveTo(r * 0.05, -r * 0.1); ctx.lineTo(r * 0.75, -r * 0.6);
+        ctx.lineTo(r * 0.85, -r * 0.35); ctx.lineTo(r * 0.6, -r * 0.2);
+        ctx.lineTo(r * 0.7, r * 0.1); ctx.lineTo(r * 0.3, r * 0.25);
+        ctx.lineTo(r * 0.05, r * 0.15);
+        ctx.closePath(); ctx.fill();
         break;
-      case 'dmg30': // 力量訓練 — 雙上箭頭
-        ctx.fillStyle = '#ff7043';
+      case 'dmg30': // 力量訓練 — 足球 + 肌肉手臂
         ctx.shadowColor = '#ff7043'; ctx.shadowBlur = sz * 0.3;
-        ctx.beginPath(); ctx.moveTo(0, -r); ctx.lineTo(r * 0.6, -r * 0.1); ctx.lineTo(r * 0.2, -r * 0.1);
-        ctx.lineTo(r * 0.2, r * 0.15); ctx.lineTo(-r * 0.2, r * 0.15); ctx.lineTo(-r * 0.2, -r * 0.1);
-        ctx.lineTo(-r * 0.6, -r * 0.1); ctx.closePath(); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(0, r * 0.1); ctx.lineTo(r * 0.6, r * 0.7); ctx.lineTo(r * 0.2, r * 0.7);
-        ctx.lineTo(r * 0.2, r); ctx.lineTo(-r * 0.2, r); ctx.lineTo(-r * 0.2, r * 0.7);
-        ctx.lineTo(-r * 0.6, r * 0.7); ctx.closePath(); ctx.fill();
+        drawMiniBall(-r * 0.4, r * 0.25, r * 0.28);
+        // 彎曲手臂（肌肉）
+        ctx.strokeStyle = '#ff7043'; ctx.lineWidth = sz * 0.13; ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(r * 0.6, r * 0.4);
+        ctx.quadraticCurveTo(r * 0.65, -r * 0.1, r * 0.2, -r * 0.4);
+        ctx.quadraticCurveTo(-r * 0.1, -r * 0.7, -r * 0.15, -r * 0.5);
+        ctx.stroke();
+        // 肌肉鼓起
+        ctx.fillStyle = '#ff7043';
+        ctx.beginPath(); ctx.arc(r * 0.25, -r * 0.45, r * 0.2, 0, Math.PI * 2); ctx.fill();
         break;
-      case 'spd20': // 速度鞋 — 右雙箭頭（風）
-        ctx.strokeStyle = '#42a5f5'; ctx.lineWidth = sz * 0.12; ctx.lineCap = 'round';
+      case 'spd20': // 速度鞋 — 球鞋 + 風線
         ctx.shadowColor = '#42a5f5'; ctx.shadowBlur = sz * 0.3;
-        for (let i = -1; i <= 1; i++) {
-          const y = i * r * 0.45;
-          ctx.beginPath(); ctx.moveTo(-r * 0.6, y); ctx.lineTo(r * 0.3, y);
-          ctx.lineTo(r * 0.1, y - r * 0.2); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(r * 0.3, y); ctx.lineTo(r * 0.1, y + r * 0.2); ctx.stroke();
+        // 球鞋
+        ctx.fillStyle = '#42a5f5';
+        ctx.beginPath();
+        ctx.moveTo(-r * 0.1, -r * 0.5); ctx.lineTo(r * 0.2, -r * 0.5);
+        ctx.lineTo(r * 0.2, r * 0.1); ctx.lineTo(r * 0.7, r * 0.2);
+        ctx.lineTo(r * 0.7, r * 0.6); ctx.lineTo(-r * 0.3, r * 0.6);
+        ctx.lineTo(-r * 0.3, r * 0.1); ctx.lineTo(-r * 0.1, -r * 0.05);
+        ctx.closePath(); ctx.fill();
+        // 鞋底
+        ctx.fillStyle = '#1565c0';
+        ctx.fillRect(-r * 0.3, r * 0.4, r * 1.0, r * 0.2);
+        // 速度風線
+        ctx.strokeStyle = 'rgba(66,165,245,0.6)'; ctx.lineWidth = sz * 0.06; ctx.lineCap = 'round';
+        for (let i = 0; i < 3; i++) {
+          const ly = -r * 0.3 + i * r * 0.35;
+          ctx.beginPath(); ctx.moveTo(-r * 0.9, ly); ctx.lineTo(-r * 0.45, ly); ctx.stroke();
         }
         break;
       case 'spd40': // 閃電射門 — 閃電
@@ -1322,41 +1348,48 @@
         ctx.lineTo(r * 0.5, -r * 0.1); ctx.lineTo(r * 0.05, -r * 0.1);
         ctx.closePath(); ctx.fill();
         break;
-      case 'bigball': // 大力丸 — 圓環 + 上箭頭
-        ctx.strokeStyle = '#ab47bc'; ctx.lineWidth = sz * 0.1;
+      case 'bigball': // 大力丸 — 小足球→大足球
         ctx.shadowColor = '#ab47bc'; ctx.shadowBlur = sz * 0.3;
-        ctx.beginPath(); ctx.arc(0, r * 0.1, r * 0.55, 0, Math.PI * 2); ctx.stroke();
+        // 小球（左下）
+        drawMiniBall(-r * 0.45, r * 0.25, r * 0.22);
+        // 箭頭
         ctx.fillStyle = '#ab47bc';
-        ctx.beginPath(); ctx.moveTo(0, -r); ctx.lineTo(r * 0.3, -r * 0.5);
-        ctx.lineTo(-r * 0.3, -r * 0.5); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-r * 0.1, r * 0.05); ctx.lineTo(r * 0.15, -r * 0.2);
+        ctx.lineTo(r * 0.05, r * 0.05); ctx.closePath(); ctx.fill();
+        // 大球（右上）
+        drawMiniBall(r * 0.3, -r * 0.2, r * 0.42);
         break;
-      case 'bigball2': // 巨型足球 — 大實心圓
-        ctx.shadowColor = '#7e57c2'; ctx.shadowBlur = sz * 0.4;
-        const bg2 = ctx.createRadialGradient(-r * 0.2, -r * 0.2, r * 0.05, 0, 0, r * 0.7);
-        bg2.addColorStop(0, '#b39ddb'); bg2.addColorStop(1, '#512da8');
-        ctx.fillStyle = bg2;
-        ctx.beginPath(); ctx.arc(0, 0, r * 0.7, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#311b92';
-        ctx.beginPath(); ctx.arc(0, 0, r * 0.22, 0, Math.PI * 2); ctx.fill();
+      case 'bigball2': // 巨型足球 — 超大足球+光環
+        ctx.shadowColor = '#7e57c2'; ctx.shadowBlur = sz * 0.5;
+        // 光環
+        ctx.strokeStyle = 'rgba(126,87,194,0.4)'; ctx.lineWidth = sz * 0.06;
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2); ctx.stroke();
+        // 大足球
+        drawMiniBall(0, 0, r * 0.65);
         break;
-      case 'rapid': // 快速連射 — 三重右箭頭
-      case 'rapid2':
+      case 'rapid': // 快速連射 — 足球+連射箭頭
+      case 'rapid2': {
         const rc = id === 'rapid' ? '#26c6da' : '#80deea';
-        ctx.fillStyle = rc; ctx.shadowColor = rc; ctx.shadowBlur = sz * 0.3;
-        for (let i = 0; i < 3; i++) {
-          const ox = (i - 1) * r * 0.5;
-          ctx.beginPath(); ctx.moveTo(ox - r * 0.2, -r * 0.4);
-          ctx.lineTo(ox + r * 0.25, 0); ctx.lineTo(ox - r * 0.2, r * 0.4);
+        ctx.shadowColor = rc; ctx.shadowBlur = sz * 0.3;
+        // 足球在左側
+        drawMiniBall(-r * 0.45, 0, r * 0.28);
+        // 三條短橫線（連射線）
+        ctx.strokeStyle = rc; ctx.lineWidth = sz * 0.09; ctx.lineCap = 'round';
+        for (let i = -1; i <= 1; i++) {
+          const ly = i * r * 0.35;
+          ctx.beginPath(); ctx.moveTo(r * 0.0, ly); ctx.lineTo(r * 0.55, ly); ctx.stroke();
+          // 箭頭尖
+          ctx.fillStyle = rc;
+          ctx.beginPath(); ctx.moveTo(r * 0.55, ly - r * 0.12);
+          ctx.lineTo(r * 0.78, ly); ctx.lineTo(r * 0.55, ly + r * 0.12);
           ctx.closePath(); ctx.fill();
         }
         break;
-      case 'multi1': // 雙重射擊 — 雙圓
+      }
+      case 'multi1': // 雙重射擊 — 兩顆足球
         ctx.shadowColor = '#fff'; ctx.shadowBlur = sz * 0.2;
-        const mg = ctx.createRadialGradient(-r * 0.15, -r * 0.15, r * 0.02, 0, 0, r * 0.35);
-        mg.addColorStop(0, '#fff'); mg.addColorStop(1, '#aaa');
-        ctx.fillStyle = mg;
-        ctx.beginPath(); ctx.arc(-r * 0.3, 0, r * 0.32, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(r * 0.3, 0, r * 0.32, 0, Math.PI * 2); ctx.fill();
+        drawMiniBall(-r * 0.35, 0, r * 0.32);
+        drawMiniBall(r * 0.35, 0, r * 0.32);
         break;
       case 'ironleg': // 鐵腿 — 靴子形
         ctx.fillStyle = '#78909c';
@@ -1422,33 +1455,35 @@
         ctx.fillStyle = '#ffd600';
         ctx.beginPath(); ctx.arc(0, 0, r * 0.25, 0, Math.PI * 2); ctx.fill();
         break;
-      case 'sniper': // 狙擊 — 十字準星
-        ctx.strokeStyle = '#e53935'; ctx.lineWidth = sz * 0.08;
+      case 'sniper': // 狙擊 — 準星內足球
+        ctx.strokeStyle = '#e53935'; ctx.lineWidth = sz * 0.07;
         ctx.shadowColor = '#e53935'; ctx.shadowBlur = sz * 0.3;
-        ctx.beginPath(); ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, -r * 0.85); ctx.lineTo(0, r * 0.85); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(-r * 0.85, 0); ctx.lineTo(r * 0.85, 0); ctx.stroke();
-        ctx.fillStyle = '#e53935';
-        ctx.beginPath(); ctx.arc(0, 0, r * 0.12, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(0, 0, r * 0.7, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -r * 0.9); ctx.lineTo(0, -r * 0.4); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, r * 0.4); ctx.lineTo(0, r * 0.9); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-r * 0.9, 0); ctx.lineTo(-r * 0.4, 0); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(r * 0.4, 0); ctx.lineTo(r * 0.9, 0); ctx.stroke();
+        drawMiniBall(0, 0, r * 0.28);
         break;
-      case 'multi2': // 三重射擊 — 三圓
+      case 'multi2': // 三重射擊 — 三顆足球
         ctx.shadowColor = '#fff'; ctx.shadowBlur = sz * 0.2;
-        const m3g = ctx.createRadialGradient(-r * 0.1, -r * 0.1, r * 0.02, 0, 0, r * 0.28);
-        m3g.addColorStop(0, '#fff'); m3g.addColorStop(1, '#999');
-        ctx.fillStyle = m3g;
-        [-r * 0.4, 0, r * 0.4].forEach(ox => {
-          ctx.beginPath(); ctx.arc(ox, 0, r * 0.26, 0, Math.PI * 2); ctx.fill();
-        });
+        drawMiniBall(-r * 0.45, r * 0.1, r * 0.26);
+        drawMiniBall(0, -r * 0.25, r * 0.26);
+        drawMiniBall(r * 0.45, r * 0.1, r * 0.26);
         break;
-      case 'bounce': // 反彈 — 折線箭頭
-        ctx.strokeStyle = '#66bb6a'; ctx.lineWidth = sz * 0.1; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      case 'bounce': // 反彈 — 足球+反彈軌跡+牆
         ctx.shadowColor = '#66bb6a'; ctx.shadowBlur = sz * 0.3;
-        ctx.beginPath(); ctx.moveTo(-r * 0.7, -r * 0.6);
-        ctx.lineTo(0, r * 0.4); ctx.lineTo(r * 0.7, -r * 0.6); ctx.stroke();
-        // 箭頭
-        ctx.fillStyle = '#66bb6a';
-        ctx.beginPath(); ctx.moveTo(r * 0.7, -r * 0.6);
-        ctx.lineTo(r * 0.9, -r * 0.2); ctx.lineTo(r * 0.4, -r * 0.35); ctx.closePath(); ctx.fill();
+        // 牆壁（底部橫線）
+        ctx.strokeStyle = '#888'; ctx.lineWidth = sz * 0.08; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(-r * 0.8, r * 0.5); ctx.lineTo(r * 0.8, r * 0.5); ctx.stroke();
+        // 反彈軌跡（V形虛線）
+        ctx.strokeStyle = '#66bb6a'; ctx.lineWidth = sz * 0.06;
+        ctx.setLineDash([sz * 0.06, sz * 0.04]);
+        ctx.beginPath(); ctx.moveTo(-r * 0.6, -r * 0.7);
+        ctx.lineTo(0, r * 0.4); ctx.lineTo(r * 0.6, -r * 0.7); ctx.stroke();
+        ctx.setLineDash([]);
+        // 足球在反彈出去的位置
+        drawMiniBall(r * 0.55, -r * 0.6, r * 0.22);
         break;
       case 'crit': // 暴擊 — 閃電（紅）
         ctx.fillStyle = '#ff1744';
@@ -1495,31 +1530,34 @@
         ctx.strokeStyle = '#f57f17'; ctx.lineWidth = sz * 0.05;
         ctx.stroke();
         break;
-      case 'power2': // 重砲 — 雙倍箭頭
-        ctx.fillStyle = '#ff5252';
+      case 'power2': // 重砲 — 足球+衝擊波+×2
         ctx.shadowColor = '#ff5252'; ctx.shadowBlur = sz * 0.5;
-        ctx.beginPath(); ctx.moveTo(0, -r * 0.95);
-        ctx.lineTo(r * 0.8, 0); ctx.lineTo(r * 0.3, 0);
-        ctx.lineTo(r * 0.3, r * 0.95); ctx.lineTo(-r * 0.3, r * 0.95);
-        ctx.lineTo(-r * 0.3, 0); ctx.lineTo(-r * 0.8, 0);
-        ctx.closePath(); ctx.fill();
+        // 足球
+        drawMiniBall(-r * 0.3, -r * 0.15, r * 0.3);
+        // 衝擊波紋
+        ctx.strokeStyle = 'rgba(255,82,82,0.5)'; ctx.lineWidth = sz * 0.05;
+        for (let i = 1; i <= 3; i++) {
+          ctx.beginPath();
+          ctx.arc(-r * 0.3, -r * 0.15, r * 0.3 + i * r * 0.15, -0.6, 0.6);
+          ctx.stroke();
+        }
         // ×2 文字
-        ctx.fillStyle = '#fff';
-        ctx.font = `bold ${sz * 0.28}px sans-serif`;
+        ctx.fillStyle = '#ff5252';
+        ctx.font = `bold ${sz * 0.32}px sans-serif`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('×2', 0, r * 0.45);
+        ctx.fillText('×2', r * 0.4, r * 0.45);
         break;
-      case 'split': // 分裂 — 一圓分三
+      case 'split': // 分裂 — 一球分裂成三球
         ctx.shadowColor = '#ba68c8'; ctx.shadowBlur = sz * 0.3;
-        ctx.fillStyle = '#ba68c8';
-        ctx.beginPath(); ctx.arc(0, -r * 0.35, r * 0.3, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#9c27b0';
-        ctx.beginPath(); ctx.arc(-r * 0.35, r * 0.35, r * 0.22, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(r * 0.35, r * 0.35, r * 0.22, 0, Math.PI * 2); ctx.fill();
-        // 連線
+        // 上方主球
+        drawMiniBall(0, -r * 0.35, r * 0.28);
+        // 分裂連線
         ctx.strokeStyle = 'rgba(186,104,200,0.5)'; ctx.lineWidth = sz * 0.05;
-        ctx.beginPath(); ctx.moveTo(0, -r * 0.1); ctx.lineTo(-r * 0.25, r * 0.2); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, -r * 0.1); ctx.lineTo(r * 0.25, r * 0.2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -r * 0.1); ctx.lineTo(-r * 0.3, r * 0.15); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -r * 0.1); ctx.lineTo(r * 0.3, r * 0.15); ctx.stroke();
+        // 下方兩顆小球
+        drawMiniBall(-r * 0.4, r * 0.35, r * 0.22);
+        drawMiniBall(r * 0.4, r * 0.35, r * 0.22);
         break;
       case 'timeSlow': // 時間壓迫 — 時鐘
         ctx.strokeStyle = '#90caf9'; ctx.lineWidth = sz * 0.08;
