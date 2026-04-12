@@ -48,7 +48,7 @@
     { id:'explode',  name:'爆裂射擊',   desc:'命中時爆炸傷害周圍',       rarity:'rare',    apply(s){ s.explode = true; }},
     { id:'sniper',   name:'狙擊射門',   desc:'傷害 ×2.5，球變小',        rarity:'rare',    apply(s){ s.dmgMul *= 2.5; s.ballScale *= 0.65; }},
     { id:'multi2',   name:'三重射擊',   desc:'連續射球數量 +2',          rarity:'rare',     apply(s){ s.multiShot += 2; }},
-    { id:'bounce',   name:'反彈射擊',   desc:'球碰到敵人後反彈繼續飛+1次（上限4）', rarity:'rare', apply(s){ s.bounce = Math.min(4, (s.bounce||0) + 1); }},
+    { id:'bounce',   name:'反彈射擊',   desc:'球碰到敵人後反彈繼續飛+1次（上限5）', rarity:'rare', apply(s){ s.bounce = Math.min(5, (s.bounce||0) + 1); }},
     { id:'crit',     name:'致命一擊',   desc:'每次射門 20% 機率暴擊 ×3', rarity:'rare',     apply(s){ s.critPct = Math.min(0.6, (s.critPct||0) + 0.2); }},
     { id:'gkSlow',   name:'守門員削弱', desc:'守門員移速 -30%',          rarity:'rare',     apply(s){ s.gkSlowMul = (s.gkSlowMul||1) * 0.7; }},
     { id:'extraLife', name:'鋼鐵防線', desc:'+1 條命（上限 5）',         rarity:'rare',    apply(s){ if(s.lives < 5) s.lives++; }},
@@ -448,12 +448,13 @@
       const sp = Math.min(rawSp, 0.8);
       if (d.frozen > 0) d.frozen -= dt;
       const step = dt / 16;
-      // 判定線：z < FIELD_DEPTH * 0.15 後直接朝中心點(0,0)直線前進
+      // 判定線：z < FIELD_DEPTH * 0.15 後直接朝中心點(0,0)直線前進（不減速）
       if (d.z < FIELD_DEPTH * 0.15) {
-        const dist = Math.sqrt(d.x * d.x + d.z * d.z);
+        const dx = -d.x, dz = -d.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
         if (dist > 1) {
-          d.z -= (d.z / dist) * sp * step;
-          d.x -= (d.x / dist) * sp * step;
+          d.x += (dx / dist) * sp * step;
+          d.z += (dz / dist) * sp * step;
         } else {
           d.z -= sp * step;
         }
@@ -582,7 +583,7 @@
   // 可無限疊加的純數值卡
   const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','rapid2','multi1','multi2','power2','ironleg','magnet','guard']);
   // 有次數上限的疊加卡（critG 和 crit 共用暴擊率上限 60%，分開計數）
-  const STACK_LIMIT = { ghost: 3, bounce: 4, crit: 3, critG: 6 };
+  const STACK_LIMIT = { ghost: 3, bounce: 5, crit: 3, critG: 6 };
 
   function pickCards(n) {
     // 過濾卡池：純數值無限疊、ghost 限 3 次、其餘能力卡選過就移除
@@ -1478,14 +1479,14 @@
     bounce: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
       <filter id="gl1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <g opacity="0.8"><circle cx="36" cy="22" r="7" fill="#4fc3f7"/><rect x="28" y="28" width="16" height="18" rx="3" fill="#4fc3f7"/></g>
-      <path d="M12 50L34 32" stroke="#66bb6a" stroke-width="2" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
-      <circle cx="34" cy="32" r="3" fill="#ffd600" opacity="0.7"/>
-      <path d="M34 32L54 12" stroke="#66bb6a" stroke-width="2.5" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
-      <circle cx="54" cy="12" r="8" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M54 12l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
-      <circle cx="12" cy="50" r="7" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M12 50l-2-1 1-3 1 0 2 0 1 3z" fill="#555" opacity="0.3"/></svg>`,
+      <g opacity="0.8"><circle cx="30" cy="16" r="7" fill="#4fc3f7"/><rect x="22" y="22" width="16" height="18" rx="3" fill="#4fc3f7"/></g>
+      <path d="M8 10L28 26" stroke="#66bb6a" stroke-width="2" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
+      <circle cx="28" cy="26" r="3" fill="#ffd600" opacity="0.7"/>
+      <path d="M28 26L52 52" stroke="#66bb6a" stroke-width="2.5" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
+      <circle cx="8" cy="10" r="7" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M8 10l-2-1 1-3 1 0 2 0 1 3z" fill="#555" opacity="0.3"/>
+      <circle cx="52" cy="52" r="8" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M52 52l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/></svg>`,
 
     crit: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><linearGradient id="c1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff5252"/><stop offset="100%" stop-color="#b71c1c"/></linearGradient>
