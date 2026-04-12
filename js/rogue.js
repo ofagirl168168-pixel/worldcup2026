@@ -30,9 +30,9 @@
       grass: ['#3d6b2e','#4a7a2e'],
       line: 'rgba(255,240,200,0.3)' },
     { name:'正午豔陽',
-      sky: ['#4a90d9','#87ceeb','#d4efff'],
-      grass: ['#34a040','#2ecc40'],
-      line: 'rgba(255,255,255,0.4)' },
+      sky: ['#2a6ab0','#4a8ac0','#6aa0cc'],
+      grass: ['#2a7a35','#258a30'],
+      line: 'rgba(255,255,255,0.35)' },
     { name:'陰天球場',
       sky: ['#3a4a5c','#5a6a7c','#7a8a9c'],
       grass: ['#2a6830','#266030'],
@@ -859,17 +859,99 @@
     ctx.ellipse(cc.x, cc.y, 60 * cc.s, 35 * cc.s, 0, 0, Math.PI * 2);
     ctx.stroke();
 
-    // 禁區
+    // 禁區（封閉四邊）
     const pw = GOAL_HW + 70, pz = FIELD_DEPTH - 160;
-    polyLine([proj(-pw, pz), proj(-pw, FIELD_DEPTH), proj(pw, FIELD_DEPTH), proj(pw, pz)]);
+    polyLine([proj(-pw, pz), proj(-pw, FIELD_DEPTH), proj(pw, FIELD_DEPTH), proj(pw, pz), proj(-pw, pz)]);
 
-    // 小禁區
-    const sw = GOAL_HW + 20, sz = FIELD_DEPTH - 60;
-    polyLine([proj(-sw, sz), proj(-sw, FIELD_DEPTH), proj(sw, FIELD_DEPTH), proj(sw, sz)]);
+    // 小禁區（封閉四邊）
+    const sw = GOAL_HW + 20, sz2 = FIELD_DEPTH - 60;
+    polyLine([proj(-sw, sz2), proj(-sw, FIELD_DEPTH), proj(sw, FIELD_DEPTH), proj(sw, sz2), proj(-sw, sz2)]);
+
+    // 球場上緣背景物件（樹、燈柱）
+    drawSceneProps();
   }
 
   function line(a, b) { ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
   function polyLine(pts) { ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.stroke(); }
+
+  // ─── 背景物件（球場上緣裝飾） ──────────────────────────────
+  // 每場遊戲生成固定的隨機佈局，存在 G._sceneProps
+  function ensureSceneProps() {
+    if (G._sceneProps) return G._sceneProps;
+    const props = [];
+    const count = 8 + Math.floor(Math.random() * 5); // 8~12 個物件
+    for (let i = 0; i < count; i++) {
+      const type = Math.random() < 0.5 ? 'tree' : 'lamp';
+      const xPct = 0.03 + Math.random() * 0.94; // 3%~97% 水平位置
+      const scale = 0.6 + Math.random() * 0.5;  // 大小隨機
+      props.push({ type, xPct, scale });
+    }
+    // 按 x 排序避免重疊太嚴重
+    props.sort((a, b) => a.xPct - b.xPct);
+    G._sceneProps = props;
+    return props;
+  }
+
+  function drawSceneProps() {
+    const props = ensureSceneProps();
+    const goalProj = proj(0, FIELD_DEPTH);
+    const baseY = goalProj.y;  // 球門投影 y，物件畫在這之上
+
+    ctx.save();
+    props.forEach(p => {
+      const x = W * p.xPct;
+      const s = p.scale * Math.min(1, W / 500);
+
+      if (p.type === 'tree') {
+        // 樹幹
+        const trunkW = 4 * s, trunkH = 18 * s;
+        ctx.fillStyle = '#5d4037';
+        ctx.fillRect(x - trunkW / 2, baseY - trunkH, trunkW, trunkH);
+        // 樹冠（兩層圓）
+        ctx.fillStyle = curScene.name === '暴風雨夜' ? '#1b4a28' :
+                         curScene.name === '夕陽球場' ? '#3a6030' :
+                         curScene.name === '金色決賽' ? '#1e4428' : '#2d6e2e';
+        ctx.beginPath();
+        ctx.arc(x, baseY - trunkH - 8 * s, 10 * s, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = curScene.name === '暴風雨夜' ? '#164020' :
+                         curScene.name === '夕陽球場' ? '#2e5028' :
+                         curScene.name === '金色決賽' ? '#183a20' : '#245a26';
+        ctx.beginPath();
+        ctx.arc(x - 4 * s, baseY - trunkH - 4 * s, 8 * s, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x + 5 * s, baseY - trunkH - 5 * s, 7 * s, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // 燈柱
+        const poleW = 2.5 * s, poleH = 28 * s;
+        ctx.fillStyle = '#78909c';
+        ctx.fillRect(x - poleW / 2, baseY - poleH, poleW, poleH);
+        // 燈頭橫桿
+        const armW = 10 * s;
+        ctx.fillRect(x - armW / 2, baseY - poleH, armW, 2.5 * s);
+        // 燈光（小光暈）
+        const isNight = ['夜間球場','暴風雨夜','極光球場','金色決賽'].includes(curScene.name);
+        if (isNight) {
+          const glow = ctx.createRadialGradient(x, baseY - poleH, 0, x, baseY - poleH, 18 * s);
+          glow.addColorStop(0, 'rgba(255,240,180,0.25)');
+          glow.addColorStop(1, 'transparent');
+          ctx.fillStyle = glow;
+          ctx.fillRect(x - 20 * s, baseY - poleH - 20 * s, 40 * s, 40 * s);
+        }
+        // 燈泡
+        ctx.fillStyle = isNight ? '#fff3b0' : '#cfd8dc';
+        ctx.beginPath();
+        ctx.arc(x - armW * 0.3, baseY - poleH - 1 * s, 2 * s, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x + armW * 0.3, baseY - poleH - 1 * s, 2 * s, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+    ctx.restore();
+  }
 
   // ─── 球門 ────────────────────────────────────────────────
   function drawGoal() {
