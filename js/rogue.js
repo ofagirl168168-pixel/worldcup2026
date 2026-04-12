@@ -59,7 +59,6 @@
     // ── 傳說卡 (legendary) ─────────────────
     { id:'ghost',      name:'幽靈球',     desc:'+10% 機率穿過敵人（上限30%）', rarity:'legendary', apply(s){ s.ghostPct = Math.min(0.3, (s.ghostPct||0) + 0.1); }},
     { id:'vampire',    name:'吸血足球',   desc:'擊殺敵人回復 1 條命',      rarity:'legendary', apply(s){ s.vampire = true; }},
-    { id:'wallBounce', name:'銅牆鐵壁',   desc:'球碰到邊界會反彈回來',    rarity:'legendary', apply(s){ s.wallBounce = true; }},
   ];
 
   // ═══════════════════════════════════════════════════════════
@@ -98,7 +97,7 @@
       dmgMul: 1, spdMul: 1, ballScale: 1, multiShot: 1, cdMul: 1,
       pierce: false, burn: false, freeze: false,
       explode: false, ghostPct: 0, vampire: false,
-      bounce: 0, split: false, wallBounce: false,
+      bounce: 0, split: false,
       critPct: 0, goalBonus: 0, gkSlowMul: 1, globalSlow: 1,
       _spawnGuard: 0,
       collected: [],            // card ids
@@ -308,14 +307,11 @@
         // 預測球到球門 z 時的 x 位置（考慮牆壁反彈）
         const timeToGoal = (GOAL_Z - b.z) / b.vz; // frames
         let predictX = b.x + b.vx * timeToGoal;
-        // 簡易牆壁反彈預測（只在有銅牆鐵壁時才考慮反彈）
-        if (G.wallBounce) {
-          while (predictX < -FIELD_HW || predictX > FIELD_HW) {
-            if (predictX < -FIELD_HW) predictX = -2 * FIELD_HW - predictX;
-            if (predictX > FIELD_HW) predictX = 2 * FIELD_HW - predictX;
-          }
+        // 簡易牆壁反彈預測
+        while (predictX < -FIELD_HW || predictX > FIELD_HW) {
+          if (predictX < -FIELD_HW) predictX = -2 * FIELD_HW - predictX;
+          if (predictX > FIELD_HW) predictX = 2 * FIELD_HW - predictX;
         }
-        predictX = Math.max(-FIELD_HW, Math.min(FIELD_HW, predictX));
         // 威脅度 = z 越高越危險
         const threat = b.z;
         if (threat > bestThreat) { bestThreat = threat; targetX = predictX; }
@@ -340,8 +336,9 @@
       // wave1~4：左右巡邏
       gk.x += gk.dir * gkEffSpd * (dt / 16);
     }
-    if (gk.x > GOAL_HW - gk.w / 2) { gk.x = GOAL_HW - gk.w / 2; gk.dir = -1; }
-    if (gk.x < -GOAL_HW + gk.w / 2) { gk.x = -GOAL_HW + gk.w / 2; gk.dir = 1; }
+    const gkPatrolHW = GOAL_HW * (1 + (G.goalBonus || 0));
+    if (gk.x > gkPatrolHW - gk.w / 2) { gk.x = gkPatrolHW - gk.w / 2; gk.dir = -1; }
+    if (gk.x < -gkPatrolHW + gk.w / 2) { gk.x = -gkPatrolHW + gk.w / 2; gk.dir = 1; }
 
     // ── 足球更新 ──
     for (const b of G.balls) {
@@ -356,15 +353,9 @@
       b.x += b.vx * step;
       b.z += b.vz * step;
 
-      // 牆壁反彈（需要銅牆鐵壁卡）
-      if (b.x < -FIELD_HW + b.r) {
-        b.x = -FIELD_HW + b.r;
-        if (G.wallBounce) { b.vx = Math.abs(b.vx); } else { b.vx = 0; }
-      }
-      if (b.x > FIELD_HW - b.r) {
-        b.x = FIELD_HW - b.r;
-        if (G.wallBounce) { b.vx = -Math.abs(b.vx); } else { b.vx = 0; }
-      }
+      // 牆壁反彈
+      if (b.x < -FIELD_HW + b.r) { b.x = -FIELD_HW + b.r; b.vx = Math.abs(b.vx); }
+      if (b.x > FIELD_HW - b.r)  { b.x = FIELD_HW - b.r;  b.vx = -Math.abs(b.vx); }
 
       // 碰防守員
       let hitDef = false;
@@ -782,8 +773,9 @@
 
   // ─── 球門 ────────────────────────────────────────────────
   function drawGoal() {
-    const pL = proj(-GOAL_HW, GOAL_Z);
-    const pR = proj(GOAL_HW, GOAL_Z);
+    const effectiveGoalHW = GOAL_HW * (1 + (G.goalBonus || 0));
+    const pL = proj(-effectiveGoalHW, GOAL_Z);
+    const pR = proj(effectiveGoalHW, GOAL_Z);
     const gh = 55 * pL.s;
     const lw = Math.max(3, 5 * pL.s);
 
@@ -1150,12 +1142,24 @@
           ctx.closePath(); ctx.fill();
           break;
         }
-        case 'kill': { // 白色 X 標記
-          const ks = sz * 0.8;
-          ctx.strokeStyle = `rgba(255,255,255,${a})`;
-          ctx.lineWidth = 3; ctx.lineCap = 'round';
-          ctx.beginPath(); ctx.moveTo(pos.x - ks, pos.y + fy - ks); ctx.lineTo(pos.x + ks, pos.y + fy + ks); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(pos.x + ks, pos.y + fy - ks); ctx.lineTo(pos.x - ks, pos.y + fy + ks); ctx.stroke();
+        case 'kill': { // 骷髏頭
+          const ks = sz * 1.2;
+          const kx = pos.x, ky = pos.y + fy;
+          ctx.fillStyle = `rgba(255,255,255,${a})`;
+          // 頭骨
+          ctx.beginPath(); ctx.arc(kx, ky - ks * 0.15, ks * 0.45, 0, Math.PI * 2); ctx.fill();
+          // 下巴
+          ctx.beginPath();
+          ctx.moveTo(kx - ks * 0.3, ky + ks * 0.15);
+          ctx.quadraticCurveTo(kx, ky + ks * 0.5, kx + ks * 0.3, ky + ks * 0.15);
+          ctx.fill();
+          // 眼睛
+          ctx.fillStyle = `rgba(0,0,0,${a})`;
+          ctx.beginPath(); ctx.arc(kx - ks * 0.15, ky - ks * 0.15, ks * 0.1, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(kx + ks * 0.15, ky - ks * 0.15, ks * 0.1, 0, Math.PI * 2); ctx.fill();
+          // 鼻子（三角）
+          ctx.beginPath(); ctx.moveTo(kx, ky - ks * 0.02); ctx.lineTo(kx - ks * 0.05, ky + ks * 0.08);
+          ctx.lineTo(kx + ks * 0.05, ky + ks * 0.08); ctx.closePath(); ctx.fill();
           break;
         }
         case 'heal': { // 綠色+紅心形
@@ -1290,22 +1294,29 @@
     dmg20: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
       <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <circle cx="22" cy="38" r="14" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M22 38l-4-3 2-5 4 1 4-1 2 5z" fill="#555" opacity="0.3"/>
-      <g filter="url(#gl1)"><path d="M34 14c2-3 8-6 12-4s5 6 4 10c-1 3-3 5-6 6l-4 8-6-2 2-8c-3-2-4-6-2-10z" fill="#ef5350"/>
-      <path d="M46 20c1-3 0-6-2-8" stroke="#c62828" stroke-width="1.5" fill="none"/>
-      <path d="M36 30l-2 4" stroke="#ffcdd2" stroke-width="1.5" stroke-linecap="round"/></g>
-      <path d="M30 28l6-8" stroke="#ef5350" stroke-width="2" stroke-linecap="round" opacity="0.5"/></svg>`,
+      <circle cx="24" cy="36" r="13" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M24 36l-3-2 1-4 3 1 3-1 1 4z" fill="#555" opacity="0.3"/>
+      <g filter="url(#gl1)">
+      <polygon points="46,6 52,22 48,24 50,28 44,30 42,26 38,28 36,12" fill="#ef5350"/>
+      <polygon points="46,6 52,22 48,24 50,28 44,30 42,26 38,28 36,12" fill="none" stroke="#c62828" stroke-width="1"/>
+      <rect x="42" y="28" width="6" height="16" rx="2" fill="#8d6e63" transform="rotate(10,45,36)"/>
+      </g>
+      <path d="M34 30l4-6" stroke="#ff8a80" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+      <text x="50" y="56" text-anchor="middle" font-size="12" font-weight="bold" fill="#ef5350" filter="url(#gl1)">+</text></svg>`,
 
     dmg30: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
       <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <circle cx="20" cy="44" r="12" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M20 44l-3-2 1-4 3 1 3-1 1 4z" fill="#555" opacity="0.3"/>
-      <g filter="url(#gl1)"><path d="M48 40c0 0-2 6-8 6s-8-4-10-10c-2-6-1-14 4-18s10-2 12 2c2 5 0 8-2 10" stroke="#ff7043" stroke-width="6" stroke-linecap="round" fill="none"/>
-      <ellipse cx="40" cy="16" rx="7" ry="5" fill="#ff7043"/></g>
-      <line x1="38" y1="12" x2="42" y2="8" stroke="#ffab91" stroke-width="1.5" stroke-linecap="round"/>
-      <line x1="42" y1="14" x2="48" y2="10" stroke="#ffab91" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      <circle cx="20" cy="42" r="12" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M20 42l-3-2 1-4 3 1 3-1 1 4z" fill="#555" opacity="0.3"/>
+      <g filter="url(#gl1)">
+      <polygon points="46,4 54,20 50,22 52,28 46,30 44,24 40,26 38,10" fill="#ff7043"/>
+      <polygon points="46,4 54,20 50,22 52,28 46,30 44,24 40,26 38,10" fill="none" stroke="#e64a19" stroke-width="1"/>
+      <rect x="44" y="28" width="6" height="18" rx="2" fill="#8d6e63" transform="rotate(8,47,37)"/>
+      </g>
+      <g filter="url(#gl1)" stroke="#ff7043" stroke-width="2.5" stroke-linecap="round" opacity="0.6">
+      <line x1="36" y1="44" x2="30" y2="50"/><line x1="40" y1="48" x2="34" y2="54"/><line x1="44" y1="44" x2="40" y2="52"/></g>
+      <text x="50" y="58" text-anchor="middle" font-size="11" font-weight="bold" fill="#ff7043" filter="url(#gl1)">++</text></svg>`,
 
     spd20: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><linearGradient id="s1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#42a5f5"/><stop offset="100%" stop-color="#1565c0"/></linearGradient>
@@ -1328,13 +1339,14 @@
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
       <radialGradient id="g2" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#ccc"/></radialGradient>
       <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <circle cx="16" cy="46" r="9" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M16 46l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
-      <path d="M24 38l8-10" stroke="#ab47bc" stroke-width="3" stroke-linecap="round" marker-end="url(#arr)"/>
-      <polygon points="34,26 30,32 36,30" fill="#ab47bc"/>
-      <circle cx="42" cy="22" r="16" fill="url(#g2)" filter="url(#gl1)"/>
-      <path d="M42 22l-5-4 2-7 5 1 5-1 2 7z" fill="#555" opacity="0.3"/>
-      <circle cx="42" cy="22" r="16" fill="none" stroke="#ab47bc" stroke-width="1.5" opacity="0.4"/></svg>`,
+      <circle cx="12" cy="50" r="8" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M12 50l-2-1 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
+      <circle cx="40" cy="26" r="18" fill="url(#g2)" filter="url(#gl1)"/>
+      <path d="M40 26l-5-4 2-7 5 1 5-1 2 7z" fill="#555" opacity="0.3"/>
+      <g stroke="#ab47bc" stroke-width="2" opacity="0.6" stroke-linecap="round">
+      <line x1="18" y1="44" x2="24" y2="38"/><line x1="20" y1="48" x2="28" y2="40"/>
+      <line x1="56" y1="16" x2="60" y2="10"/><line x1="56" y1="22" x2="62" y2="20"/>
+      <line x1="56" y1="30" x2="60" y2="36"/></g></svg>`,
 
     bigball2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#ccc"/></radialGradient>
@@ -1543,23 +1555,6 @@
       <circle cx="26" cy="28" r="2" fill="#fff" opacity="0.3"/>
       <circle cx="38" cy="28" r="2" fill="#fff" opacity="0.3"/></svg>`,
 
-    wallBounce: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
-      <linearGradient id="w1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8d6e63"/><stop offset="50%" stop-color="#a1887f"/><stop offset="100%" stop-color="#6d4c41"/></linearGradient>
-      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <rect x="2" y="2" width="10" height="60" rx="1" fill="url(#w1)"/>
-      <g opacity="0.4"><rect x="3" y="4" width="8" height="8" rx="1" stroke="#5d4037" stroke-width="0.5" fill="none"/>
-      <rect x="3" y="14" width="8" height="8" rx="1" stroke="#5d4037" stroke-width="0.5" fill="none"/>
-      <rect x="3" y="24" width="8" height="8" rx="1" stroke="#5d4037" stroke-width="0.5" fill="none"/>
-      <rect x="3" y="34" width="8" height="8" rx="1" stroke="#5d4037" stroke-width="0.5" fill="none"/>
-      <rect x="3" y="44" width="8" height="8" rx="1" stroke="#5d4037" stroke-width="0.5" fill="none"/></g>
-      <path d="M36 52L14 32" stroke="#ffd54f" stroke-width="2" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
-      <circle cx="14" cy="32" r="3" fill="#ffd600" opacity="0.8"/>
-      <path d="M14 32L42 10" stroke="#ffd54f" stroke-width="2.5" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
-      <circle cx="42" cy="10" r="9" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M42 10l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
-      <circle cx="36" cy="52" r="8" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M36 52l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/></svg>`,
   };
 
   // 預載 SVG → Image 快取
