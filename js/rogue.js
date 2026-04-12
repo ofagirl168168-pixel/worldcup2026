@@ -339,7 +339,7 @@
       // wave1~4：左右巡邏
       gk.x += gk.dir * gkEffSpd * (dt / 16);
     }
-    const gkPatrolHW = GOAL_HW * (1 + (G.goalBonus || 0));
+    const gkPatrolHW = Math.min(FIELD_HW * 0.7, GOAL_HW * (1 + (G.goalBonus || 0)));
     if (gk.x > gkPatrolHW - gk.w / 2) { gk.x = gkPatrolHW - gk.w / 2; gk.dir = -1; }
     if (gk.x < -gkPatrolHW + gk.w / 2) { gk.x = -gkPatrolHW + gk.w / 2; gk.dir = 1; }
 
@@ -366,7 +366,7 @@
         if (d.hp <= 0) continue;
         if (Math.abs(b.x - d.x) < b.r + d.w * 0.4 && Math.abs(b.z - d.z) < d.h * 0.5) {
           // ghost 穿過
-          if (G.ghostPct > 0 && Math.random() < G.ghostPct) { addPart(d.x, d.z, '', 0.6, 'ghost'); continue; }
+          if (G.ghostPct > 0 && Math.random() < G.ghostPct) { addPart(d.x, d.z, '穿透!', 0.6, 'ghost'); continue; }
           // 傷害 = 基礎 × 倍率 × 球大小 × 暴擊
           let dmg = Math.ceil(BASE_DMG * G.dmgMul * G.ballScale);
           const isCrit = G.critPct > 0 && Math.random() < G.critPct;
@@ -424,7 +424,7 @@
       // 進球判定（同一波只算一次）
       if (b.z >= GOAL_Z) {
         b.alive = false;
-        const effectiveGoalHW = GOAL_HW * (1 + (G.goalBonus || 0));
+        const effectiveGoalHW = Math.min(FIELD_HW * 0.7, GOAL_HW * (1 + (G.goalBonus || 0)));
         if (Math.abs(b.x) < effectiveGoalHW && G.phase === 'playing') { onGoal(); return; }
       }
       // 飛出場外
@@ -448,8 +448,8 @@
       const sp = Math.min(rawSp, 0.8);
       if (d.frozen > 0) d.frozen -= dt;
       const step = dt / 16;
-      // 判定線：z < FIELD_DEPTH * 0.3 後直接朝中心點(0,0)直線前進
-      if (d.z < FIELD_DEPTH * 0.3) {
+      // 判定線：z < FIELD_DEPTH * 0.15 後直接朝中心點(0,0)直線前進
+      if (d.z < FIELD_DEPTH * 0.15) {
         const dist = Math.sqrt(d.x * d.x + d.z * d.z);
         if (dist > 1) {
           d.z -= (d.z / dist) * sp * step;
@@ -781,7 +781,7 @@
 
   // ─── 球門 ────────────────────────────────────────────────
   function drawGoal() {
-    const effectiveGoalHW = GOAL_HW * (1 + (G.goalBonus || 0));
+    const effectiveGoalHW = Math.min(FIELD_HW * 0.7, GOAL_HW * (1 + (G.goalBonus || 0)));
     const pL = proj(-effectiveGoalHW, GOAL_Z);
     const pR = proj(effectiveGoalHW, GOAL_Z);
     const gh = 55 * pL.s;
@@ -1106,13 +1106,20 @@
       ctx.save();
 
       switch (pt.type) {
-        case 'ghost': { // 半透明紫光擴散
+        case 'ghost': { // 半透明紫光擴散 + 穿透文字
           const gr = sz * (1 + t * 2);
           const gg = ctx.createRadialGradient(pos.x, pos.y + fy, 0, pos.x, pos.y + fy, gr);
           gg.addColorStop(0, 'rgba(179,136,255,0.5)');
           gg.addColorStop(1, 'rgba(179,136,255,0)');
           ctx.fillStyle = gg;
           ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, gr, 0, Math.PI * 2); ctx.fill();
+          // 穿透文字
+          ctx.fillStyle = `rgba(179,136,255,${a})`;
+          ctx.shadowColor = '#b388ff'; ctx.shadowBlur = 8;
+          ctx.font = `bold ${sz * 1.1}px "Noto Sans TC", sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText('穿透!', pos.x, pos.y - sz * 1.2 + fy);
+          ctx.shadowBlur = 0;
           break;
         }
         case 'crit': { // 紅色暴擊文字+光暈
