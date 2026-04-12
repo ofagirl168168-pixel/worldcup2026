@@ -1276,342 +1276,289 @@
     ctx.fillText('開始遊戲', W / 2, btnY + 33);
   }
 
-  // ─── 卡片圖標繪製系統 ────────────────────────────────────
-  // 迷你足球（共用圖標元素）
-  function drawMiniBall(x, y, r) {
-    const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.05, x, y, r);
-    g.addColorStop(0, '#fff'); g.addColorStop(1, '#bbb');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#333';
-    ctx.beginPath(); ctx.arc(x, y, r * 0.35, 0, Math.PI * 2); ctx.fill();
-  }
+  // ─── SVG 卡片圖標系統 ─────────────────────────────────────
+  // 精緻 SVG 圖標：預載為 Image，drawIcon 直接 drawImage
+  const ICON_SVGS = {
+    dmg20: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="22" cy="38" r="14" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M22 38l-4-3 2-5 4 1 4-1 2 5z" fill="#555" opacity="0.3"/>
+      <g filter="url(#gl1)"><path d="M34 14c2-3 8-6 12-4s5 6 4 10c-1 3-3 5-6 6l-4 8-6-2 2-8c-3-2-4-6-2-10z" fill="#ef5350"/>
+      <path d="M46 20c1-3 0-6-2-8" stroke="#c62828" stroke-width="1.5" fill="none"/>
+      <path d="M36 30l-2 4" stroke="#ffcdd2" stroke-width="1.5" stroke-linecap="round"/></g>
+      <path d="M30 28l6-8" stroke="#ef5350" stroke-width="2" stroke-linecap="round" opacity="0.5"/></svg>`,
+
+    dmg30: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="20" cy="44" r="12" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M20 44l-3-2 1-4 3 1 3-1 1 4z" fill="#555" opacity="0.3"/>
+      <g filter="url(#gl1)"><path d="M48 40c0 0-2 6-8 6s-8-4-10-10c-2-6-1-14 4-18s10-2 12 2c2 5 0 8-2 10" stroke="#ff7043" stroke-width="6" stroke-linecap="round" fill="none"/>
+      <ellipse cx="40" cy="16" rx="7" ry="5" fill="#ff7043"/></g>
+      <line x1="38" y1="12" x2="42" y2="8" stroke="#ffab91" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="42" y1="14" x2="48" y2="10" stroke="#ffab91" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+
+    spd20: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="s1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#42a5f5"/><stop offset="100%" stop-color="#1565c0"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)"><path d="M20 12L28 12L30 32L48 36L48 50L14 50L14 36L18 30Z" fill="url(#s1)"/>
+      <rect x="14" y="44" width="34" height="6" rx="2" fill="#0d47a1"/>
+      <path d="M22 18h4v8h-4z" fill="#1565c0" opacity="0.4"/>
+      <line x1="36" y1="38" x2="44" y2="40" stroke="#90caf9" stroke-width="1"/></g>
+      <g stroke="#42a5f5" stroke-width="2.5" stroke-linecap="round" opacity="0.7">
+      <line x1="2" y1="20" x2="12" y2="20"/><line x1="4" y1="30" x2="12" y2="30"/><line x1="2" y1="40" x2="10" y2="40"/></g></svg>`,
+
+    spd40: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="l1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff176"/><stop offset="100%" stop-color="#f57f17"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)"><polygon points="36,2 22,28 32,28 26,62 44,24 34,24" fill="url(#l1)"/>
+      <polygon points="36,2 22,28 32,28 26,62 44,24 34,24" fill="none" stroke="#fff" stroke-width="1" opacity="0.4"/></g>
+      <line x1="30" y1="18" x2="34" y2="10" stroke="#fff" stroke-width="1.5" opacity="0.6"/></svg>`,
+
+    bigball: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <radialGradient id="g2" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#ccc"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="16" cy="46" r="9" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M16 46l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
+      <path d="M24 38l8-10" stroke="#ab47bc" stroke-width="3" stroke-linecap="round" marker-end="url(#arr)"/>
+      <polygon points="34,26 30,32 36,30" fill="#ab47bc"/>
+      <circle cx="42" cy="22" r="16" fill="url(#g2)" filter="url(#gl1)"/>
+      <path d="M42 22l-5-4 2-7 5 1 5-1 2 7z" fill="#555" opacity="0.3"/>
+      <circle cx="42" cy="22" r="16" fill="none" stroke="#ab47bc" stroke-width="1.5" opacity="0.4"/></svg>`,
+
+    bigball2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#ccc"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="32" cy="32" r="28" fill="none" stroke="#7e57c2" stroke-width="2" opacity="0.35" filter="url(#gl1)"/>
+      <circle cx="32" cy="32" r="24" fill="none" stroke="#b39ddb" stroke-width="1" opacity="0.3"/>
+      <circle cx="32" cy="32" r="22" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M32 32l-7-5 3-10 7 2 7-2 3 10z" fill="#555" opacity="0.25"/>
+      <path d="M32 10v6M32 48v6M10 32h6M48 32h6" stroke="#7e57c2" stroke-width="1.5" opacity="0.3"/></svg>`,
+
+    rapid: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="16" cy="32" r="11" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M16 32l-3-2 1-4 3 0 3 0 1 4z" fill="#555" opacity="0.3"/>
+      <g stroke="#26c6da" stroke-width="3" stroke-linecap="round" filter="url(#gl1)">
+      <line x1="32" y1="16" x2="48" y2="16"/><line x1="32" y1="32" x2="52" y2="32"/><line x1="32" y1="48" x2="48" y2="48"/></g>
+      <g fill="#26c6da" filter="url(#gl1)"><polygon points="48,10 56,16 48,22"/><polygon points="52,26 60,32 52,38"/><polygon points="48,42 56,48 48,54"/></g></svg>`,
+
+    rapid2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="16" cy="32" r="11" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M16 32l-3-2 1-4 3 0 3 0 1 4z" fill="#555" opacity="0.3"/>
+      <g stroke="#80deea" stroke-width="2.5" stroke-linecap="round" filter="url(#gl1)">
+      <line x1="32" y1="22" x2="46" y2="22"/><line x1="34" y1="32" x2="50" y2="32"/><line x1="32" y1="42" x2="46" y2="42"/></g>
+      <g fill="#80deea"><polygon points="46,17 52,22 46,27"/><polygon points="50,27 56,32 50,37"/><polygon points="46,37 52,42 46,47"/></g></svg>`,
+
+    multi1: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="38%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="20" cy="32" r="14" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M20 32l-4-3 2-5 4 1 4-1 2 5z" fill="#555" opacity="0.3"/>
+      <circle cx="44" cy="32" r="14" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M44 32l-4-3 2-5 4 1 4-1 2 5z" fill="#555" opacity="0.3"/>
+      <text x="32" y="58" text-anchor="middle" font-size="10" font-weight="bold" fill="#aaa">×2</text></svg>`,
+
+    multi2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="38%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="32" cy="16" r="11" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M32 16l-3-2 1-4 3 0 3 0 1 4z" fill="#555" opacity="0.3"/>
+      <circle cx="16" cy="44" r="11" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M16 44l-3-2 1-4 3 0 3 0 1 4z" fill="#555" opacity="0.3"/>
+      <circle cx="48" cy="44" r="11" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M48 44l-3-2 1-4 3 0 3 0 1 4z" fill="#555" opacity="0.3"/>
+      <text x="32" y="62" text-anchor="middle" font-size="9" font-weight="bold" fill="#aaa">×3</text></svg>`,
+
+    ironleg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="l1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#b0bec5"/><stop offset="50%" stop-color="#78909c"/><stop offset="100%" stop-color="#546e7a"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)"><path d="M18 4h12v30l18 6v4l-18 4v8H14v-8l-2-4v-4l8-6z" fill="url(#l1)"/>
+      <rect x="12" y="48" width="38" height="8" rx="3" fill="#455a64"/>
+      <path d="M30 4h0v30" stroke="#90a4ae" stroke-width="1.5" opacity="0.4"/>
+      <rect x="14" y="52" width="4" height="4" rx="1" fill="#37474f"/>
+      <rect x="22" y="52" width="4" height="4" rx="1" fill="#37474f"/>
+      <rect x="30" y="52" width="4" height="4" rx="1" fill="#37474f"/></g></svg>`,
+
+    magnet: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)">
+      <rect x="6" y="4" width="14" height="18" rx="3" fill="#e53935"/>
+      <rect x="44" y="4" width="14" height="18" rx="3" fill="#1565c0"/>
+      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#999" stroke-width="8" fill="none"/>
+      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#ccc" stroke-width="4" fill="none"/></g>
+      <g stroke="#e53935" stroke-width="1.5" opacity="0.5" stroke-linecap="round">
+      <path d="M24 36c-4-2-6 2-2 4"/><path d="M40 36c4-2 6 2 2 4"/><path d="M30 42c-2 2 0 4 4 2"/></g></svg>`,
+
+    burn: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="f1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff6d00"/><stop offset="50%" stop-color="#ff9100"/><stop offset="100%" stop-color="#ffd600"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)"><path d="M32 2C38 14 50 22 48 38c-1 8-6 14-12 16-2-4-1-10 2-14-4 4-10 6-12 14C20 50 16 42 18 32c1-6 4-10 8-16 2-4 4-10 6-14z" fill="url(#f1)"/>
+      <path d="M32 60c-4-6-2-14 2-18 0 6 4 10 6 14-2 2-5 4-8 4z" fill="#fff9c4" opacity="0.7"/></g></svg>`,
+
+    freeze: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g stroke="#4fc3f7" stroke-linecap="round" filter="url(#gl1)">
+      <line x1="32" y1="4" x2="32" y2="60" stroke-width="3"/>
+      <line x1="7" y1="18" x2="57" y2="46" stroke-width="3"/>
+      <line x1="7" y1="46" x2="57" y2="18" stroke-width="3"/>
+      <g stroke-width="2"><line x1="32" y1="14" x2="26" y2="10"/><line x1="32" y1="14" x2="38" y2="10"/>
+      <line x1="32" y1="50" x2="26" y2="54"/><line x1="32" y1="50" x2="38" y2="54"/>
+      <line x1="14" y1="22" x2="10" y2="28"/><line x1="14" y1="22" x2="12" y2="16"/>
+      <line x1="50" y1="42" x2="54" y2="36"/><line x1="50" y1="42" x2="52" y2="48"/>
+      <line x1="14" y1="42" x2="10" y2="36"/><line x1="14" y1="42" x2="12" y2="48"/>
+      <line x1="50" y1="22" x2="54" y2="28"/><line x1="50" y1="22" x2="52" y2="16"/></g></g>
+      <circle cx="32" cy="32" r="4" fill="#e1f5fe"/></svg>`,
+
+    explode: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="e1" cx="50%" cy="50%"><stop offset="0%" stop-color="#fff"/><stop offset="30%" stop-color="#ffd600"/><stop offset="70%" stop-color="#ff6d00"/><stop offset="100%" stop-color="#e65100"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)"><polygon points="32,2 37,22 56,10 42,26 62,32 42,38 56,54 37,42 32,62 27,42 8,54 22,38 2,32 22,26 8,10 27,22" fill="url(#e1)"/></g>
+      <circle cx="32" cy="32" r="8" fill="#fff" opacity="0.8"/></svg>`,
+
+    sniper: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g stroke="#e53935" stroke-width="2.5" filter="url(#gl1)">
+      <circle cx="32" cy="32" r="22" fill="none"/>
+      <line x1="32" y1="2" x2="32" y2="18"/><line x1="32" y1="46" x2="32" y2="62"/>
+      <line x1="2" y1="32" x2="18" y2="32"/><line x1="46" y1="32" x2="62" y2="32"/></g>
+      <circle cx="32" cy="32" r="10" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M32 32l-3-2 1-4 3 0 3 0 1 4z" fill="#555" opacity="0.3"/></svg>`,
+
+    bounce: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <rect x="4" y="52" width="56" height="6" rx="2" fill="#666"/>
+      <path d="M10 14L32 50L54 14" stroke="#66bb6a" stroke-width="2.5" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
+      <circle cx="32" cy="50" r="3" fill="#66bb6a" opacity="0.6"/>
+      <circle cx="50" cy="16" r="9" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M50 16l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
+      <path d="M46 20l-4 4" stroke="#66bb6a" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/></svg>`,
+
+    crit: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="c1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff5252"/><stop offset="100%" stop-color="#b71c1c"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)"><polygon points="36,2 20,28 30,28 24,62 46,22 36,22" fill="url(#c1)"/>
+      <polygon points="36,2 20,28 30,28 24,62 46,22 36,22" fill="none" stroke="#ffcdd2" stroke-width="1" opacity="0.5"/></g>
+      <text x="32" y="52" text-anchor="middle" font-size="14" font-weight="bold" fill="#ff8a80" opacity="0.8">!</text></svg>`,
+
+    gkSlow: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="gk1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffa726"/><stop offset="100%" stop-color="#e65100"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)">
+      <path d="M12 10C12 6 18 2 32 2s20 4 20 8v20c0 8-8 16-20 16S12 38 12 30z" fill="url(#gk1)"/>
+      <path d="M16 14h6v10h-6zM42 14h6v10h-6z" fill="#ffcc80" rx="2"/>
+      <path d="M22 18h20v8H22z" fill="#fff3e0" opacity="0.3"/></g>
+      <g filter="url(#gl1)"><polygon points="32,46 40,46 32,60 24,46" fill="#e65100"/>
+      <line x1="32" y1="50" x2="32" y2="58" stroke="#ff6d00" stroke-width="1.5"/></g></svg>`,
+
+    extraLife: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="sh1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd54f"/><stop offset="100%" stop-color="#f9a825"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)"><path d="M32 4L54 16L50 44L32 58L14 44L10 16Z" fill="url(#sh1)" stroke="#f57f17" stroke-width="2"/>
+      <path d="M32 4L54 16L50 44L32 58L14 44L10 16Z" fill="none" stroke="#fff" stroke-width="1" opacity="0.3"/></g>
+      <line x1="32" y1="18" x2="32" y2="44" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+      <line x1="22" y1="31" x2="42" y2="31" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+      <path d="M32 12l4 8h-8z" fill="#fff" opacity="0.3"/></svg>`,
+
+    guard: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#66bb6a"/><stop offset="100%" stop-color="#2e7d32"/></linearGradient>
+      <linearGradient id="s1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd54f"/><stop offset="100%" stop-color="#f9a825"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)"><circle cx="32" cy="12" r="9" fill="url(#g1)"/>
+      <rect x="22" y="20" width="20" height="24" rx="4" fill="url(#g1)"/>
+      <rect x="16" y="24" width="8" height="6" rx="3" fill="#43a047"/>
+      <rect x="40" y="24" width="8" height="6" rx="3" fill="#43a047"/></g>
+      <g filter="url(#gl1)"><path d="M32 34L42 40L40 52L32 56L24 52L22 40Z" fill="url(#s1)" stroke="#f57f17" stroke-width="1.5"/></g>
+      <line x1="32" y1="40" x2="32" y2="50" stroke="#fff" stroke-width="2" opacity="0.6"/>
+      <line x1="27" y1="45" x2="37" y2="45" stroke="#fff" stroke-width="2" opacity="0.6"/></svg>`,
+
+    power2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="22" cy="24" r="13" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M22 24l-4-3 2-5 4 1 4-1 2 5z" fill="#555" opacity="0.3"/>
+      <g filter="url(#gl1)" stroke="#ff5252" stroke-width="2" fill="none" opacity="0.6">
+      <path d="M38 24a4 4 0 0 1 4-8"/><path d="M42 24a6 6 0 0 1 6-12"/><path d="M46 24a8 8 0 0 1 8-16"/></g>
+      <text x="40" y="54" text-anchor="middle" font-size="18" font-weight="bold" fill="#ff5252" filter="url(#gl1)">×2</text></svg>`,
+
+    split: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="32" cy="14" r="11" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M32 14l-3-2 1-4 3 0 3 0 1 4z" fill="#555" opacity="0.3"/>
+      <g stroke="#ba68c8" stroke-width="2" stroke-dasharray="3,2"><line x1="28" y1="24" x2="18" y2="38"/><line x1="36" y1="24" x2="46" y2="38"/></g>
+      <circle cx="14" cy="48" r="9" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M14 48l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
+      <circle cx="50" cy="48" r="9" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M50 48l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
+      <circle cx="32" cy="22" r="2" fill="#ba68c8" opacity="0.6"/></svg>`,
+
+    timeSlow: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="t1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e3f2fd"/><stop offset="100%" stop-color="#90caf9"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="32" cy="34" r="24" fill="none" stroke="#90caf9" stroke-width="3" filter="url(#gl1)"/>
+      <circle cx="32" cy="34" r="22" fill="none" stroke="#bbdefb" stroke-width="1"/>
+      <rect x="29" y="6" width="6" height="6" rx="2" fill="#90caf9"/>
+      <line x1="32" y1="34" x2="32" y2="18" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      <line x1="32" y1="34" x2="44" y2="38" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="32" cy="34" r="3" fill="#e3f2fd"/>
+      <g fill="#90caf9" font-size="7" text-anchor="middle" opacity="0.5">
+      <text x="32" y="17">12</text><text x="52" y="37">3</text><text x="32" y="57">6</text><text x="13" y="37">9</text></g></svg>`,
+
+    ghost: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="gh1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d1c4e9"/><stop offset="100%" stop-color="#7c4dff"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)" opacity="0.75"><path d="M32 6C20 6 12 16 12 26v24l6-6 6 8 8-8 8 8 6-8 6 6V26C52 16 44 6 32 6z" fill="url(#gh1)"/>
+      <path d="M32 6C20 6 12 16 12 26v24l6-6 6 8 8-8 8 8 6-8 6 6V26C52 16 44 6 32 6z" fill="none" stroke="#b388ff" stroke-width="1"/></g>
+      <ellipse cx="24" cy="24" rx="5" ry="6" fill="#fff"/>
+      <ellipse cx="40" cy="24" rx="5" ry="6" fill="#fff"/>
+      <circle cx="25" cy="25" r="2.5" fill="#311b92"/>
+      <circle cx="41" cy="25" r="2.5" fill="#311b92"/></svg>`,
+
+    vampire: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="v1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef5350"/><stop offset="100%" stop-color="#b71c1c"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)"><path d="M32 4C36 16 48 22 46 36c-1 8-6 14-14 18C24 50 19 44 18 36 16 22 28 16 32 4z" fill="url(#v1)"/>
+      <path d="M32 4C36 16 48 22 46 36c-1 8-6 14-14 18" stroke="#ffcdd2" stroke-width="1" fill="none" opacity="0.3"/></g>
+      <path d="M26 34l2 10 4-2 4 2 2-10" stroke="#fff" stroke-width="1.5" fill="none"/>
+      <polygon points="28,34 30,42 32,36" fill="#fff"/>
+      <polygon points="36,34 34,42 32,36" fill="#fff"/>
+      <circle cx="26" cy="28" r="2" fill="#fff" opacity="0.3"/>
+      <circle cx="38" cy="28" r="2" fill="#fff" opacity="0.3"/></svg>`,
+  };
+
+  // 預載 SVG → Image 快取
+  const _iconCache = {};
+  (function preloadIcons() {
+    for (const [id, svg] of Object.entries(ICON_SVGS)) {
+      const img = new Image();
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      _iconCache[id] = img;
+    }
+  })();
 
   function drawIcon(c, cx, cy, sz) {
     const id = typeof c === 'string' ? c : c.id;
-    const r = sz / 2;
-    ctx.save();
-    ctx.translate(cx, cy);
-
-    switch (id) {
-      case 'dmg20': // 射門強化 — 足球 + 拳頭
-        ctx.shadowColor = '#ef5350'; ctx.shadowBlur = sz * 0.3;
-        drawMiniBall(-r * 0.35, r * 0.15, r * 0.32);
-        // 拳頭形狀
-        ctx.fillStyle = '#ef5350';
-        ctx.beginPath();
-        ctx.moveTo(r * 0.05, -r * 0.1); ctx.lineTo(r * 0.75, -r * 0.6);
-        ctx.lineTo(r * 0.85, -r * 0.35); ctx.lineTo(r * 0.6, -r * 0.2);
-        ctx.lineTo(r * 0.7, r * 0.1); ctx.lineTo(r * 0.3, r * 0.25);
-        ctx.lineTo(r * 0.05, r * 0.15);
-        ctx.closePath(); ctx.fill();
-        break;
-      case 'dmg30': // 力量訓練 — 足球 + 肌肉手臂
-        ctx.shadowColor = '#ff7043'; ctx.shadowBlur = sz * 0.3;
-        drawMiniBall(-r * 0.4, r * 0.25, r * 0.28);
-        // 彎曲手臂（肌肉）
-        ctx.strokeStyle = '#ff7043'; ctx.lineWidth = sz * 0.13; ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(r * 0.6, r * 0.4);
-        ctx.quadraticCurveTo(r * 0.65, -r * 0.1, r * 0.2, -r * 0.4);
-        ctx.quadraticCurveTo(-r * 0.1, -r * 0.7, -r * 0.15, -r * 0.5);
-        ctx.stroke();
-        // 肌肉鼓起
-        ctx.fillStyle = '#ff7043';
-        ctx.beginPath(); ctx.arc(r * 0.25, -r * 0.45, r * 0.2, 0, Math.PI * 2); ctx.fill();
-        break;
-      case 'spd20': // 速度鞋 — 球鞋 + 風線
-        ctx.shadowColor = '#42a5f5'; ctx.shadowBlur = sz * 0.3;
-        // 球鞋
-        ctx.fillStyle = '#42a5f5';
-        ctx.beginPath();
-        ctx.moveTo(-r * 0.1, -r * 0.5); ctx.lineTo(r * 0.2, -r * 0.5);
-        ctx.lineTo(r * 0.2, r * 0.1); ctx.lineTo(r * 0.7, r * 0.2);
-        ctx.lineTo(r * 0.7, r * 0.6); ctx.lineTo(-r * 0.3, r * 0.6);
-        ctx.lineTo(-r * 0.3, r * 0.1); ctx.lineTo(-r * 0.1, -r * 0.05);
-        ctx.closePath(); ctx.fill();
-        // 鞋底
-        ctx.fillStyle = '#1565c0';
-        ctx.fillRect(-r * 0.3, r * 0.4, r * 1.0, r * 0.2);
-        // 速度風線
-        ctx.strokeStyle = 'rgba(66,165,245,0.6)'; ctx.lineWidth = sz * 0.06; ctx.lineCap = 'round';
-        for (let i = 0; i < 3; i++) {
-          const ly = -r * 0.3 + i * r * 0.35;
-          ctx.beginPath(); ctx.moveTo(-r * 0.9, ly); ctx.lineTo(-r * 0.45, ly); ctx.stroke();
-        }
-        break;
-      case 'spd40': // 閃電射門 — 閃電
-        ctx.fillStyle = '#ffca28';
-        ctx.shadowColor = '#ffca28'; ctx.shadowBlur = sz * 0.4;
-        ctx.beginPath(); ctx.moveTo(r * 0.1, -r); ctx.lineTo(-r * 0.5, r * 0.05);
-        ctx.lineTo(-r * 0.05, r * 0.05); ctx.lineTo(-r * 0.2, r);
-        ctx.lineTo(r * 0.5, -r * 0.1); ctx.lineTo(r * 0.05, -r * 0.1);
-        ctx.closePath(); ctx.fill();
-        break;
-      case 'bigball': // 大力丸 — 小足球→大足球
-        ctx.shadowColor = '#ab47bc'; ctx.shadowBlur = sz * 0.3;
-        // 小球（左下）
-        drawMiniBall(-r * 0.45, r * 0.25, r * 0.22);
-        // 箭頭
-        ctx.fillStyle = '#ab47bc';
-        ctx.beginPath(); ctx.moveTo(-r * 0.1, r * 0.05); ctx.lineTo(r * 0.15, -r * 0.2);
-        ctx.lineTo(r * 0.05, r * 0.05); ctx.closePath(); ctx.fill();
-        // 大球（右上）
-        drawMiniBall(r * 0.3, -r * 0.2, r * 0.42);
-        break;
-      case 'bigball2': // 巨型足球 — 超大足球+光環
-        ctx.shadowColor = '#7e57c2'; ctx.shadowBlur = sz * 0.5;
-        // 光環
-        ctx.strokeStyle = 'rgba(126,87,194,0.4)'; ctx.lineWidth = sz * 0.06;
-        ctx.beginPath(); ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2); ctx.stroke();
-        // 大足球
-        drawMiniBall(0, 0, r * 0.65);
-        break;
-      case 'rapid': // 快速連射 — 足球+連射箭頭
-      case 'rapid2': {
-        const rc = id === 'rapid' ? '#26c6da' : '#80deea';
-        ctx.shadowColor = rc; ctx.shadowBlur = sz * 0.3;
-        // 足球在左側
-        drawMiniBall(-r * 0.45, 0, r * 0.28);
-        // 三條短橫線（連射線）
-        ctx.strokeStyle = rc; ctx.lineWidth = sz * 0.09; ctx.lineCap = 'round';
-        for (let i = -1; i <= 1; i++) {
-          const ly = i * r * 0.35;
-          ctx.beginPath(); ctx.moveTo(r * 0.0, ly); ctx.lineTo(r * 0.55, ly); ctx.stroke();
-          // 箭頭尖
-          ctx.fillStyle = rc;
-          ctx.beginPath(); ctx.moveTo(r * 0.55, ly - r * 0.12);
-          ctx.lineTo(r * 0.78, ly); ctx.lineTo(r * 0.55, ly + r * 0.12);
-          ctx.closePath(); ctx.fill();
-        }
-        break;
-      }
-      case 'multi1': // 雙重射擊 — 兩顆足球
-        ctx.shadowColor = '#fff'; ctx.shadowBlur = sz * 0.2;
-        drawMiniBall(-r * 0.35, 0, r * 0.32);
-        drawMiniBall(r * 0.35, 0, r * 0.32);
-        break;
-      case 'ironleg': // 鐵腿 — 靴子形
-        ctx.fillStyle = '#78909c';
-        ctx.shadowColor = '#90a4ae'; ctx.shadowBlur = sz * 0.3;
-        ctx.beginPath(); ctx.moveTo(-r * 0.3, -r); ctx.lineTo(r * 0.1, -r);
-        ctx.lineTo(r * 0.1, r * 0.3); ctx.lineTo(r * 0.7, r * 0.5);
-        ctx.lineTo(r * 0.7, r); ctx.lineTo(-r * 0.5, r);
-        ctx.lineTo(-r * 0.5, r * 0.3); ctx.lineTo(-r * 0.3, r * 0.1);
-        ctx.closePath(); ctx.fill();
-        ctx.fillStyle = '#546e7a';
-        ctx.fillRect(-r * 0.5, r * 0.6, r * 1.2, r * 0.4);
-        break;
-      case 'magnet': // 磁力門框 — U型磁鐵
-        ctx.lineWidth = sz * 0.14; ctx.lineCap = 'round';
-        ctx.shadowColor = '#e53935'; ctx.shadowBlur = sz * 0.3;
-        ctx.strokeStyle = '#e53935';
-        ctx.beginPath(); ctx.moveTo(-r * 0.55, -r * 0.6); ctx.lineTo(-r * 0.55, r * 0.1);
-        ctx.arc(0, r * 0.1, r * 0.55, Math.PI, 0, true);
-        ctx.lineTo(r * 0.55, -r * 0.6); ctx.stroke();
-        ctx.strokeStyle = '#1565c0';
-        ctx.beginPath(); ctx.moveTo(-r * 0.55, -r * 0.6); ctx.lineTo(-r * 0.55, -r * 0.9); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(r * 0.55, -r * 0.6); ctx.lineTo(r * 0.55, -r * 0.9); ctx.stroke();
-        break;
-      case 'burn': // 火焰 — 火苗形
-        ctx.shadowColor = '#ff6d00'; ctx.shadowBlur = sz * 0.4;
-        const fg = ctx.createLinearGradient(0, -r, 0, r);
-        fg.addColorStop(0, '#ff6d00'); fg.addColorStop(0.6, '#ff9100'); fg.addColorStop(1, '#ffd600');
-        ctx.fillStyle = fg;
-        ctx.beginPath(); ctx.moveTo(0, -r);
-        ctx.bezierCurveTo(r * 0.6, -r * 0.3, r * 0.7, r * 0.3, r * 0.2, r);
-        ctx.lineTo(0, r * 0.5);
-        ctx.lineTo(-r * 0.2, r);
-        ctx.bezierCurveTo(-r * 0.7, r * 0.3, -r * 0.6, -r * 0.3, 0, -r);
-        ctx.fill();
-        break;
-      case 'freeze': // 冰凍 — 六角雪花
-        ctx.strokeStyle = '#4fc3f7'; ctx.lineWidth = sz * 0.08; ctx.lineCap = 'round';
-        ctx.shadowColor = '#4fc3f7'; ctx.shadowBlur = sz * 0.4;
-        for (let i = 0; i < 6; i++) {
-          const a = (Math.PI / 3) * i;
-          const ex = Math.cos(a) * r * 0.85, ey = Math.sin(a) * r * 0.85;
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(ex, ey); ctx.stroke();
-          // 分支
-          const mx = ex * 0.55, my = ey * 0.55;
-          const pa = a + Math.PI / 6, pb = a - Math.PI / 6;
-          ctx.beginPath(); ctx.moveTo(mx, my);
-          ctx.lineTo(mx + Math.cos(pa) * r * 0.25, my + Math.sin(pa) * r * 0.25); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(mx, my);
-          ctx.lineTo(mx + Math.cos(pb) * r * 0.25, my + Math.sin(pb) * r * 0.25); ctx.stroke();
-        }
-        break;
-      case 'explode': // 爆裂 — 星芒放射
-        ctx.shadowColor = '#ff6d00'; ctx.shadowBlur = sz * 0.4;
-        ctx.fillStyle = '#ff6d00';
-        ctx.beginPath();
-        for (let i = 0; i < 8; i++) {
-          const a = (Math.PI / 4) * i - Math.PI / 2;
-          const or = (i % 2 === 0) ? r * 0.9 : r * 0.4;
-          const px = Math.cos(a) * or, py = Math.sin(a) * or;
-          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-        }
-        ctx.closePath(); ctx.fill();
-        ctx.fillStyle = '#ffd600';
-        ctx.beginPath(); ctx.arc(0, 0, r * 0.25, 0, Math.PI * 2); ctx.fill();
-        break;
-      case 'sniper': // 狙擊 — 準星內足球
-        ctx.strokeStyle = '#e53935'; ctx.lineWidth = sz * 0.07;
-        ctx.shadowColor = '#e53935'; ctx.shadowBlur = sz * 0.3;
-        ctx.beginPath(); ctx.arc(0, 0, r * 0.7, 0, Math.PI * 2); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, -r * 0.9); ctx.lineTo(0, -r * 0.4); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, r * 0.4); ctx.lineTo(0, r * 0.9); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(-r * 0.9, 0); ctx.lineTo(-r * 0.4, 0); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(r * 0.4, 0); ctx.lineTo(r * 0.9, 0); ctx.stroke();
-        drawMiniBall(0, 0, r * 0.28);
-        break;
-      case 'multi2': // 三重射擊 — 三顆足球
-        ctx.shadowColor = '#fff'; ctx.shadowBlur = sz * 0.2;
-        drawMiniBall(-r * 0.45, r * 0.1, r * 0.26);
-        drawMiniBall(0, -r * 0.25, r * 0.26);
-        drawMiniBall(r * 0.45, r * 0.1, r * 0.26);
-        break;
-      case 'bounce': // 反彈 — 足球+反彈軌跡+牆
-        ctx.shadowColor = '#66bb6a'; ctx.shadowBlur = sz * 0.3;
-        // 牆壁（底部橫線）
-        ctx.strokeStyle = '#888'; ctx.lineWidth = sz * 0.08; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(-r * 0.8, r * 0.5); ctx.lineTo(r * 0.8, r * 0.5); ctx.stroke();
-        // 反彈軌跡（V形虛線）
-        ctx.strokeStyle = '#66bb6a'; ctx.lineWidth = sz * 0.06;
-        ctx.setLineDash([sz * 0.06, sz * 0.04]);
-        ctx.beginPath(); ctx.moveTo(-r * 0.6, -r * 0.7);
-        ctx.lineTo(0, r * 0.4); ctx.lineTo(r * 0.6, -r * 0.7); ctx.stroke();
-        ctx.setLineDash([]);
-        // 足球在反彈出去的位置
-        drawMiniBall(r * 0.55, -r * 0.6, r * 0.22);
-        break;
-      case 'crit': // 暴擊 — 閃電（紅）
-        ctx.fillStyle = '#ff1744';
-        ctx.shadowColor = '#ff1744'; ctx.shadowBlur = sz * 0.5;
-        ctx.beginPath(); ctx.moveTo(r * 0.1, -r); ctx.lineTo(-r * 0.5, r * 0.05);
-        ctx.lineTo(-r * 0.05, r * 0.05); ctx.lineTo(-r * 0.2, r);
-        ctx.lineTo(r * 0.5, -r * 0.1); ctx.lineTo(r * 0.05, -r * 0.1);
-        ctx.closePath(); ctx.fill();
-        break;
-      case 'gkSlow': // 守門員削弱 — 手套+向下箭頭
-        ctx.fillStyle = '#ff8f00';
-        ctx.shadowColor = '#ff8f00'; ctx.shadowBlur = sz * 0.3;
-        ctx.beginPath(); ctx.arc(0, -r * 0.2, r * 0.45, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#e65100';
-        ctx.beginPath(); ctx.moveTo(0, r * 0.3); ctx.lineTo(r * 0.4, r * 0.3);
-        ctx.lineTo(0, r); ctx.lineTo(-r * 0.4, r * 0.3); ctx.closePath(); ctx.fill();
-        break;
-      case 'extraLife': // 鋼鐵防線 — 盾牌
-        ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = sz * 0.4;
-        const sg = ctx.createLinearGradient(0, -r, 0, r);
-        sg.addColorStop(0, '#ffd54f'); sg.addColorStop(1, '#f9a825');
-        ctx.fillStyle = sg;
-        ctx.beginPath(); ctx.moveTo(0, -r * 0.85);
-        ctx.lineTo(r * 0.75, -r * 0.45); ctx.lineTo(r * 0.65, r * 0.3);
-        ctx.lineTo(0, r * 0.9); ctx.lineTo(-r * 0.65, r * 0.3);
-        ctx.lineTo(-r * 0.75, -r * 0.45); ctx.closePath(); ctx.fill();
-        ctx.strokeStyle = '#f57f17'; ctx.lineWidth = sz * 0.06;
-        ctx.stroke();
-        // 十字
-        ctx.strokeStyle = '#fff'; ctx.lineWidth = sz * 0.08;
-        ctx.beginPath(); ctx.moveTo(0, -r * 0.35); ctx.lineTo(0, r * 0.35); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(-r * 0.3, 0); ctx.lineTo(r * 0.3, 0); ctx.stroke();
-        break;
-      case 'guard': // 後衛守衛 — 人形盾
-        ctx.fillStyle = '#43a047';
-        ctx.shadowColor = '#43a047'; ctx.shadowBlur = sz * 0.3;
-        // 頭
-        ctx.beginPath(); ctx.arc(0, -r * 0.55, r * 0.28, 0, Math.PI * 2); ctx.fill();
-        // 身體
-        ctx.fillRect(-r * 0.3, -r * 0.28, r * 0.6, r * 0.7);
-        // 盾
-        ctx.fillStyle = '#ffd54f';
-        ctx.beginPath(); ctx.arc(0, r * 0.1, r * 0.35, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#f57f17'; ctx.lineWidth = sz * 0.05;
-        ctx.stroke();
-        break;
-      case 'power2': // 重砲 — 足球+衝擊波+×2
-        ctx.shadowColor = '#ff5252'; ctx.shadowBlur = sz * 0.5;
-        // 足球
-        drawMiniBall(-r * 0.3, -r * 0.15, r * 0.3);
-        // 衝擊波紋
-        ctx.strokeStyle = 'rgba(255,82,82,0.5)'; ctx.lineWidth = sz * 0.05;
-        for (let i = 1; i <= 3; i++) {
-          ctx.beginPath();
-          ctx.arc(-r * 0.3, -r * 0.15, r * 0.3 + i * r * 0.15, -0.6, 0.6);
-          ctx.stroke();
-        }
-        // ×2 文字
-        ctx.fillStyle = '#ff5252';
-        ctx.font = `bold ${sz * 0.32}px sans-serif`;
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('×2', r * 0.4, r * 0.45);
-        break;
-      case 'split': // 分裂 — 一球分裂成三球
-        ctx.shadowColor = '#ba68c8'; ctx.shadowBlur = sz * 0.3;
-        // 上方主球
-        drawMiniBall(0, -r * 0.35, r * 0.28);
-        // 分裂連線
-        ctx.strokeStyle = 'rgba(186,104,200,0.5)'; ctx.lineWidth = sz * 0.05;
-        ctx.beginPath(); ctx.moveTo(0, -r * 0.1); ctx.lineTo(-r * 0.3, r * 0.15); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, -r * 0.1); ctx.lineTo(r * 0.3, r * 0.15); ctx.stroke();
-        // 下方兩顆小球
-        drawMiniBall(-r * 0.4, r * 0.35, r * 0.22);
-        drawMiniBall(r * 0.4, r * 0.35, r * 0.22);
-        break;
-      case 'timeSlow': // 時間壓迫 — 時鐘
-        ctx.strokeStyle = '#90caf9'; ctx.lineWidth = sz * 0.08;
-        ctx.shadowColor = '#90caf9'; ctx.shadowBlur = sz * 0.4;
-        ctx.beginPath(); ctx.arc(0, 0, r * 0.7, 0, Math.PI * 2); ctx.stroke();
-        ctx.strokeStyle = '#fff'; ctx.lineWidth = sz * 0.07;
-        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -r * 0.45); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(r * 0.3, r * 0.1); ctx.stroke();
-        ctx.fillStyle = '#fff';
-        ctx.beginPath(); ctx.arc(0, 0, r * 0.08, 0, Math.PI * 2); ctx.fill();
-        break;
-      case 'ghost': // 幽靈 — 半透明飄浮體
-        ctx.shadowColor = '#b388ff'; ctx.shadowBlur = sz * 0.5;
-        ctx.fillStyle = 'rgba(179,136,255,0.6)';
-        ctx.beginPath(); ctx.arc(0, -r * 0.15, r * 0.55, Math.PI, 0);
-        ctx.lineTo(r * 0.55, r * 0.5);
-        // 波浪底
-        ctx.lineTo(r * 0.35, r * 0.3); ctx.lineTo(r * 0.15, r * 0.55);
-        ctx.lineTo(-r * 0.1, r * 0.3); ctx.lineTo(-r * 0.35, r * 0.55);
-        ctx.lineTo(-r * 0.55, r * 0.3);
-        ctx.closePath(); ctx.fill();
-        // 眼睛
-        ctx.fillStyle = '#fff';
-        ctx.beginPath(); ctx.arc(-r * 0.2, -r * 0.2, r * 0.12, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(r * 0.15, -r * 0.2, r * 0.12, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#311b92';
-        ctx.beginPath(); ctx.arc(-r * 0.18, -r * 0.18, r * 0.06, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(r * 0.17, -r * 0.18, r * 0.06, 0, Math.PI * 2); ctx.fill();
-        break;
-      case 'vampire': // 吸血 — 血滴 + 牙
-        ctx.shadowColor = '#d50000'; ctx.shadowBlur = sz * 0.4;
-        const vg = ctx.createLinearGradient(0, -r, 0, r);
-        vg.addColorStop(0, '#f44336'); vg.addColorStop(1, '#b71c1c');
-        ctx.fillStyle = vg;
-        ctx.beginPath(); ctx.moveTo(0, -r * 0.85);
-        ctx.bezierCurveTo(r * 0.7, -r * 0.1, r * 0.6, r * 0.6, 0, r * 0.85);
-        ctx.bezierCurveTo(-r * 0.6, r * 0.6, -r * 0.7, -r * 0.1, 0, -r * 0.85);
-        ctx.fill();
-        // 牙
-        ctx.fillStyle = '#fff';
-        ctx.beginPath(); ctx.moveTo(-r * 0.15, -r * 0.05); ctx.lineTo(-r * 0.08, r * 0.25);
-        ctx.lineTo(-r * 0.01, -r * 0.05); ctx.closePath(); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(r * 0.01, -r * 0.05); ctx.lineTo(r * 0.08, r * 0.25);
-        ctx.lineTo(r * 0.15, -r * 0.05); ctx.closePath(); ctx.fill();
-        break;
-      default:
-        // fallback：圓形+問號
-        ctx.fillStyle = '#666';
-        ctx.beginPath(); ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.font = `bold ${sz * 0.4}px sans-serif`;
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('?', 0, 0);
+    const img = _iconCache[id];
+    if (img && img.complete && img.naturalWidth > 0) {
+      ctx.drawImage(img, cx - sz / 2, cy - sz / 2, sz, sz);
+    } else {
+      // fallback：圓形+問號
+      ctx.save();
+      ctx.fillStyle = '#666';
+      ctx.beginPath(); ctx.arc(cx, cy, sz * 0.3, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = `bold ${sz * 0.4}px sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('?', cx, cy);
+      ctx.restore();
     }
-    ctx.restore();
   }
 
   // ─── 選牌畫面 ────────────────────────────────────────────
