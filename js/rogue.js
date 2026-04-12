@@ -365,8 +365,14 @@
       for (const d of G.defs) {
         if (d.hp <= 0) continue;
         if (Math.abs(b.x - d.x) < b.r + d.w * 0.4 && Math.abs(b.z - d.z) < d.h * 0.5) {
-          // ghost 穿過
-          if (G.ghostPct > 0 && Math.random() < G.ghostPct) { addPart(d.x, d.z, '穿透!', 0.6, 'ghost'); continue; }
+          // ghost 穿過（記錄已穿透的敵人，避免重複碰撞）
+          if (!b._ghosted) b._ghosted = new Set();
+          if (b._ghosted.has(d)) continue; // 已穿透過此敵人，直接跳過
+          if (G.ghostPct > 0 && Math.random() < G.ghostPct) {
+            b._ghosted.add(d);
+            addPart(d.x, d.z, '穿透!', 0.6, 'ghost');
+            continue;
+          }
           // 傷害 = 基礎 × 倍率 × 球大小 × 暴擊
           let dmg = Math.ceil(BASE_DMG * G.dmgMul * G.ballScale);
           const isCrit = G.critPct > 0 && Math.random() < G.critPct;
@@ -1479,14 +1485,14 @@
     bounce: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
       <filter id="gl1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <g opacity="0.8"><circle cx="30" cy="16" r="7" fill="#4fc3f7"/><rect x="22" y="22" width="16" height="18" rx="3" fill="#4fc3f7"/></g>
-      <path d="M8 10L28 26" stroke="#66bb6a" stroke-width="2" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
-      <circle cx="28" cy="26" r="3" fill="#ffd600" opacity="0.7"/>
-      <path d="M28 26L52 52" stroke="#66bb6a" stroke-width="2.5" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
-      <circle cx="8" cy="10" r="7" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M8 10l-2-1 1-3 1 0 2 0 1 3z" fill="#555" opacity="0.3"/>
-      <circle cx="52" cy="52" r="8" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M52 52l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/></svg>`,
+      <g opacity="0.8"><circle cx="32" cy="14" r="7" fill="#4fc3f7"/><rect x="24" y="20" width="16" height="18" rx="3" fill="#4fc3f7"/></g>
+      <path d="M8 56L30 30" stroke="#66bb6a" stroke-width="2" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
+      <circle cx="30" cy="30" r="3" fill="#ffd600" opacity="0.7"/>
+      <path d="M30 30L56 56" stroke="#66bb6a" stroke-width="2.5" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
+      <circle cx="8" cy="56" r="7" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M8 56l-2-1 1-3 1 0 2 0 1 3z" fill="#555" opacity="0.3"/>
+      <circle cx="56" cy="56" r="7" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M56 56l-2-1 1-3 1 0 2 0 1 3z" fill="#555" opacity="0.3"/></svg>`,
 
     crit: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><linearGradient id="c1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff5252"/><stop offset="100%" stop-color="#b71c1c"/></linearGradient>
