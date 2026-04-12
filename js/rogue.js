@@ -3349,10 +3349,10 @@
       ctx.fillText('點擊畫面射門', W / 2, H - 16);
     }
 
-    // 音效/音樂開關按鈕（右上角）
+    // 音效/音樂開關按鈕（左上角，避開右上角關閉按鈕）
     const btnSz = 20, btnY = 8, btnGap = 6;
-    const sfxBtnX = W - btnSz - btnGap - btnSz - btnGap - 8;
-    const bgmBtnX = W - btnSz - btnGap - 8;
+    const bgmBtnX = W - btnSz * 3 - btnGap * 2 - 50;
+    const sfxBtnX = bgmBtnX + btnSz + btnGap + 10;
     // 音效按鈕
     ctx.fillStyle = sfxOn ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)';
     ctx.font = `${btnSz - 4}px sans-serif`;
