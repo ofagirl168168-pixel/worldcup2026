@@ -1209,7 +1209,7 @@
     for (const c of crowd) {
       const p = proj(c.side * margin, c.z);
       if (p.s < 0.04) continue;
-      const s = p.s * Math.min(1, W / 500);
+      const s = p.s * Math.min(1, W / 500) * 3.5;
       const x = p.x, y = p.y;
       switch (c.type) {
         case 'fan':       drawCrowdFan(x, y, s, c.color, c.item); break;
