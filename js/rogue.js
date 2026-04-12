@@ -1212,45 +1212,154 @@
     },
   };
 
+  // ─── 左上/右上三角空地 ─────────────────────────────────────
+  function drawCornerAreas(cfg) {
+    // 三角區域：螢幕上角 → 邊線遠端 → 邊線近端的外側
+    // 左側三角：(0,0) → (0, H) → 邊線各點
+    // 先算邊線投影路徑
+    const pts = [];
+    for (let z = 0; z <= FIELD_DEPTH; z += 40) {
+      pts.push(proj(-FIELD_HW, z));
+    }
+    const name = curScene.name;
+
+    for (const side of [-1, 1]) {
+      const edgePts = [];
+      for (let z = 0; z <= FIELD_DEPTH; z += 40) {
+        edgePts.push(proj(side * FIELD_HW, z));
+      }
+
+      // 填充三角區域底色（場外地面）
+      ctx.beginPath();
+      if (side === -1) {
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, H);
+        for (let i = 0; i < edgePts.length; i++) ctx.lineTo(edgePts[i].x, edgePts[i].y);
+        ctx.lineTo(edgePts[0].x, 0);
+      } else {
+        ctx.moveTo(W, 0);
+        ctx.lineTo(W, H);
+        for (let i = 0; i < edgePts.length; i++) ctx.lineTo(edgePts[i].x, edgePts[i].y);
+        ctx.lineTo(edgePts[0].x, 0);
+      }
+      ctx.closePath();
+
+      // 底色依場景
+      const cornerColors = {
+        '夜間球場': '#0a1020',
+        '夕陽球場': '#2a1510',
+        '正午豔陽': '#1a4a20',
+        '陰天球場': '#2a3038',
+        '暴風雨夜': '#0e0e1a',
+        '極光球場': '#0a1820',
+        '金色決賽': '#0e0a00',
+      };
+      ctx.fillStyle = cornerColors[name] || '#111';
+      ctx.fill();
+
+      // 場外質感（跑道/看台/地面紋理）
+      const cornerTextures = {
+        '夜間球場': () => {
+          // 跑道紋理
+          ctx.strokeStyle = 'rgba(100,80,60,0.15)';
+          ctx.lineWidth = 2;
+          for (let z = 100; z < FIELD_DEPTH; z += 150) {
+            const p = proj(side * (FIELD_HW + 40), z);
+            const p2 = proj(side * (FIELD_HW + 120), z);
+            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+          }
+        },
+        '夕陽球場': () => {
+          // 沙地質感
+          ctx.fillStyle = 'rgba(120,90,50,0.08)';
+          for (let z = 50; z < FIELD_DEPTH; z += 120) {
+            const p = proj(side * (FIELD_HW + 80), z);
+            ctx.beginPath(); ctx.arc(p.x, p.y, 15 * p.s * 3, 0, Math.PI * 2); ctx.fill();
+          }
+        },
+        '正午豔陽': () => {
+          // 草地延伸
+          ctx.fillStyle = 'rgba(40,100,40,0.1)';
+          for (let z = 50; z < FIELD_DEPTH; z += 100) {
+            const p = proj(side * (FIELD_HW + 60), z);
+            ctx.beginPath(); ctx.arc(p.x, p.y, 12 * p.s * 3, 0, Math.PI * 2); ctx.fill();
+          }
+        },
+        '陰天球場': () => {
+          // 濕地
+          ctx.fillStyle = 'rgba(60,70,80,0.08)';
+          for (let z = 80; z < FIELD_DEPTH; z += 130) {
+            const p = proj(side * (FIELD_HW + 70), z);
+            ctx.beginPath(); ctx.ellipse(p.x, p.y, 18 * p.s * 3, 8 * p.s * 3, 0, 0, Math.PI * 2); ctx.fill();
+          }
+        },
+        '暴風雨夜': () => {}, // 純暗
+        '極光球場': () => {
+          // 雪地
+          ctx.fillStyle = 'rgba(200,220,240,0.06)';
+          for (let z = 60; z < FIELD_DEPTH; z += 100) {
+            const p = proj(side * (FIELD_HW + 70), z);
+            ctx.beginPath(); ctx.arc(p.x, p.y, 14 * p.s * 3, 0, Math.PI * 2); ctx.fill();
+          }
+        },
+        '金色決賽': () => {
+          // 金色跑道線
+          ctx.strokeStyle = 'rgba(200,170,0,0.08)';
+          ctx.lineWidth = 1.5;
+          for (let z = 100; z < FIELD_DEPTH; z += 150) {
+            const p = proj(side * (FIELD_HW + 40), z);
+            const p2 = proj(side * (FIELD_HW + 130), z);
+            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+          }
+        },
+      };
+      ctx.save();
+      ctx.clip(); // clip 到三角區域內
+      if (cornerTextures[name]) cornerTextures[name]();
+      ctx.restore();
+    }
+  }
+
   function drawSideCrowd() {
     const cfg = SCENE_SIDE[curScene.name];
     if (!cfg) return;
     const margin = FIELD_HW + 60;
     ctx.save();
 
-    // 兩側護欄（沿透視的連續條帶）
+    // ── 左上/右上三角空地填充 ──
+    drawCornerAreas(cfg);
+
+    // 兩側護欄（沿透視邊線）
     for (const side of [-1, 1]) {
-      for (let z = 0; z < FIELD_DEPTH; z += 50) {
-        const p0 = proj(side * margin, z);
-        const p1 = proj(side * margin, z + 50);
-        if (p0.s < 0.03) continue;
-        const bh = 5 * p0.s * 3;
-        // 護欄
-        ctx.fillStyle = z % 100 === 0 ? cfg.barrier : cfg.barrierH;
-        const x0 = Math.min(p0.x, p1.x), x1 = Math.max(p0.x, p1.x);
-        ctx.fillRect(x0, p0.y - bh, x1 - x0 + 1, bh);
+      // 護欄用線段沿邊線繪製
+      ctx.beginPath();
+      for (let z = 0; z <= FIELD_DEPTH; z += 30) {
+        const p = proj(side * margin, z);
+        if (z === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
       }
+      ctx.strokeStyle = cfg.barrier;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.strokeStyle = cfg.barrierH;
+      ctx.lineWidth = 1;
+      ctx.stroke();
     }
 
-    // 觀眾剪影（沿護欄後方的半圓人頭群）
+    // 觀眾剪影（沿邊線排列，隨透視由近到遠縮小）
     for (const side of [-1, 1]) {
-      for (let z = 30; z < FIELD_DEPTH - 50; z += 80) {
-        const p = proj(side * (margin + 30), z);
+      for (let z = 20; z < FIELD_DEPTH - 30; z += 55) {
+        const p = proj(side * (margin + 20), z);
         if (p.s < 0.04) continue;
         const s = p.s * 3;
-        const headR = 4 * s;
-        const bodyH = 6 * s;
-        // 3 人一組
-        for (let i = -1; i <= 1; i++) {
-          const ox = i * 8 * s;
-          const oh = (i === 0 ? -2 : 0) * s; // 中間的稍高
-          ctx.fillStyle = cfg.crowd;
-          ctx.fillRect(p.x + ox - 4 * s, p.y - bodyH + oh, 8 * s, bodyH);
-          ctx.fillStyle = cfg.crowdH;
-          ctx.beginPath();
-          ctx.arc(p.x + ox, p.y - bodyH - headR * 0.6 + oh, headR, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        const headR = 3.5 * s;
+        const bodyH = 5 * s;
+        const oh = ((z % 110) < 55 ? -1.5 : 0) * s; // 交錯高低
+        ctx.fillStyle = cfg.crowd;
+        ctx.fillRect(p.x - 3.5 * s, p.y - bodyH + oh, 7 * s, bodyH);
+        ctx.fillStyle = cfg.crowdH;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y - bodyH - headR * 0.5 + oh, headR, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
 
