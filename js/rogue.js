@@ -1141,354 +1141,293 @@
     ctx.strokeRect(x - bw / 2, baseY - bh, bw, bh);
   }
 
-  // ─── 球場兩側觀眾 ────────────────────────────────────────
-  // 觀眾配置：每個場景有固定的 z 位置 + 角色類型
-  const SCENE_CROWD = {
-    '夜間球場': [
-      { z: 200, side: -1, type: 'fan', color: '#e53935', item: 'scarf' },
-      { z: 450, side: -1, type: 'fan', color: '#1e88e5', item: 'flag' },
-      { z: 700, side: -1, type: 'camera', color: '#fdd835' },
-      { z: 350, side: 1, type: 'fan', color: '#43a047', item: 'foam' },
-      { z: 600, side: 1, type: 'fan', color: '#e53935', item: 'scarf' },
-      { z: 850, side: 1, type: 'camera', color: '#fdd835' },
-    ],
-    '夕陽球場': [
-      { z: 200, side: -1, type: 'tourist', color: '#fff176' },
-      { z: 500, side: -1, type: 'fan', color: '#ff7043', item: 'drink' },
-      { z: 800, side: -1, type: 'parrot' },
-      { z: 300, side: 1, type: 'tourist', color: '#80cbc4' },
-      { z: 600, side: 1, type: 'fan', color: '#ffb74d', item: 'flag' },
-      { z: 900, side: 1, type: 'parrot' },
-    ],
-    '正午豔陽': [
-      { z: 200, side: -1, type: 'fan', color: '#e53935', item: 'foam' },
-      { z: 500, side: -1, type: 'vendor', color: '#ff8f00' },
-      { z: 750, side: -1, type: 'kid', color: '#42a5f5' },
-      { z: 300, side: 1, type: 'kid', color: '#66bb6a' },
-      { z: 550, side: 1, type: 'fan', color: '#1565c0', item: 'flag' },
-      { z: 850, side: 1, type: 'vendor', color: '#ff8f00' },
-    ],
-    '陰天球場': [
-      { z: 250, side: -1, type: 'umbrella', color: '#546e7a' },
-      { z: 550, side: -1, type: 'fan', color: '#78909c', item: 'scarf' },
-      { z: 800, side: -1, type: 'umbrella', color: '#37474f' },
-      { z: 350, side: 1, type: 'umbrella', color: '#455a64' },
-      { z: 650, side: 1, type: 'fan', color: '#90a4ae', item: 'scarf' },
-      { z: 900, side: 1, type: 'dog' },
-    ],
-    '暴風雨夜': [
-      { z: 300, side: -1, type: 'umbrella', color: '#263238' },
-      { z: 600, side: -1, type: 'hardcorefan', color: '#c62828' },
-      { z: 400, side: 1, type: 'umbrella', color: '#37474f' },
-      { z: 700, side: 1, type: 'hardcorefan', color: '#1565c0' },
-    ],
-    '極光球場': [
-      { z: 200, side: -1, type: 'penguin' },
-      { z: 500, side: -1, type: 'penguin' },
-      { z: 750, side: -1, type: 'eskimo', color: '#b3e5fc' },
-      { z: 300, side: 1, type: 'penguin' },
-      { z: 600, side: 1, type: 'eskimo', color: '#e1bee7' },
-      { z: 850, side: 1, type: 'penguin' },
-    ],
-    '金色決賽': [
-      { z: 200, side: -1, type: 'vip', color: '#ffd600' },
-      { z: 450, side: -1, type: 'fan', color: '#ffd600', item: 'flag' },
-      { z: 700, side: -1, type: 'camera', color: '#ffd600' },
-      { z: 900, side: -1, type: 'vip', color: '#ffab00' },
-      { z: 300, side: 1, type: 'vip', color: '#ffab00' },
-      { z: 550, side: 1, type: 'fan', color: '#ffd600', item: 'foam' },
-      { z: 800, side: 1, type: 'camera', color: '#ffd600' },
-    ],
+  // ─── 球場兩側場景 ──────────────────────────────────────────
+  // 場景邊線配置：護欄、觀眾剪影、特殊物件
+  const SCENE_SIDE = {
+    '夜間球場': {
+      barrier: '#1a237e', barrierH: '#283593',
+      crowd: '#0d1440', crowdH: '#162060',
+      specials: [
+        { z: 300, side: -1, type: 'banner' },
+        { z: 700, side: 1, type: 'banner' },
+      ]
+    },
+    '夕陽球場': {
+      barrier: '#5d4037', barrierH: '#6d4c41',
+      crowd: '#3e2723', crowdH: '#4e342e',
+      specials: [
+        { z: 250, side: -1, type: 'palm' },
+        { z: 600, side: 1, type: 'palm' },
+        { z: 800, side: -1, type: 'bird' },
+      ]
+    },
+    '正午豔陽': {
+      barrier: '#1565c0', barrierH: '#1976d2',
+      crowd: '#0d47a1', crowdH: '#1565c0',
+      specials: [
+        { z: 200, side: -1, type: 'balloon' },
+        { z: 500, side: 1, type: 'balloon' },
+        { z: 800, side: -1, type: 'flag' },
+        { z: 400, side: 1, type: 'flag' },
+      ]
+    },
+    '陰天球場': {
+      barrier: '#455a64', barrierH: '#546e7a',
+      crowd: '#37474f', crowdH: '#455a64',
+      specials: [
+        { z: 300, side: -1, type: 'umbrella' },
+        { z: 600, side: -1, type: 'umbrella' },
+        { z: 450, side: 1, type: 'umbrella' },
+        { z: 750, side: 1, type: 'dog' },
+      ]
+    },
+    '暴風雨夜': {
+      barrier: '#1a1a2e', barrierH: '#252540',
+      crowd: '#121225', crowdH: '#1a1a35',
+      specials: [
+        { z: 400, side: -1, type: 'umbrella' },
+        { z: 700, side: 1, type: 'umbrella' },
+      ]
+    },
+    '極光球場': {
+      barrier: '#1a3040', barrierH: '#203848',
+      crowd: '#0f2030', crowdH: '#152838',
+      specials: [
+        { z: 200, side: -1, type: 'penguin' },
+        { z: 500, side: -1, type: 'penguin' },
+        { z: 350, side: 1, type: 'penguin' },
+        { z: 700, side: 1, type: 'penguin' },
+        { z: 850, side: -1, type: 'snowman' },
+      ]
+    },
+    '金色決賽': {
+      barrier: '#4a3800', barrierH: '#5a4400',
+      crowd: '#2a1e00', crowdH: '#3a2800',
+      specials: [
+        { z: 250, side: -1, type: 'vipflag' },
+        { z: 550, side: 1, type: 'vipflag' },
+        { z: 800, side: -1, type: 'trophy' },
+        { z: 400, side: 1, type: 'camera' },
+      ]
+    },
   };
 
   function drawSideCrowd() {
-    const crowd = SCENE_CROWD[curScene.name];
-    if (!crowd) return;
-    const margin = FIELD_HW + 80; // 邊線外側
+    const cfg = SCENE_SIDE[curScene.name];
+    if (!cfg) return;
+    const margin = FIELD_HW + 60;
     ctx.save();
-    for (const c of crowd) {
-      const p = proj(c.side * margin, c.z);
-      if (p.s < 0.04) continue;
-      const s = p.s * Math.min(1, W / 500) * 3.5;
-      const x = p.x, y = p.y;
-      switch (c.type) {
-        case 'fan':       drawCrowdFan(x, y, s, c.color, c.item); break;
-        case 'camera':    drawCrowdCamera(x, y, s, c.color); break;
-        case 'tourist':   drawCrowdTourist(x, y, s, c.color); break;
-        case 'parrot':    drawCrowdParrot(x, y, s); break;
-        case 'kid':       drawCrowdKid(x, y, s, c.color); break;
-        case 'vendor':    drawCrowdVendor(x, y, s, c.color); break;
-        case 'umbrella':  drawCrowdUmbrella(x, y, s, c.color); break;
-        case 'dog':       drawCrowdDog(x, y, s); break;
-        case 'hardcorefan': drawCrowdHardcore(x, y, s, c.color); break;
-        case 'penguin':   drawCrowdPenguin(x, y, s); break;
-        case 'eskimo':    drawCrowdEskimo(x, y, s, c.color); break;
-        case 'vip':       drawCrowdVIP(x, y, s, c.color); break;
+
+    // 兩側護欄（沿透視的連續條帶）
+    for (const side of [-1, 1]) {
+      for (let z = 0; z < FIELD_DEPTH; z += 50) {
+        const p0 = proj(side * margin, z);
+        const p1 = proj(side * margin, z + 50);
+        if (p0.s < 0.03) continue;
+        const bh = 5 * p0.s * 3;
+        // 護欄
+        ctx.fillStyle = z % 100 === 0 ? cfg.barrier : cfg.barrierH;
+        const x0 = Math.min(p0.x, p1.x), x1 = Math.max(p0.x, p1.x);
+        ctx.fillRect(x0, p0.y - bh, x1 - x0 + 1, bh);
       }
     }
+
+    // 觀眾剪影（沿護欄後方的半圓人頭群）
+    for (const side of [-1, 1]) {
+      for (let z = 30; z < FIELD_DEPTH - 50; z += 80) {
+        const p = proj(side * (margin + 30), z);
+        if (p.s < 0.04) continue;
+        const s = p.s * 3;
+        const headR = 4 * s;
+        const bodyH = 6 * s;
+        // 3 人一組
+        for (let i = -1; i <= 1; i++) {
+          const ox = i * 8 * s;
+          const oh = (i === 0 ? -2 : 0) * s; // 中間的稍高
+          ctx.fillStyle = cfg.crowd;
+          ctx.fillRect(p.x + ox - 4 * s, p.y - bodyH + oh, 8 * s, bodyH);
+          ctx.fillStyle = cfg.crowdH;
+          ctx.beginPath();
+          ctx.arc(p.x + ox, p.y - bodyH - headR * 0.6 + oh, headR, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    // 特殊物件
+    for (const sp of cfg.specials) {
+      const p = proj(sp.side * (margin + 15), sp.z);
+      if (p.s < 0.04) continue;
+      const s = p.s * 3.5;
+      switch (sp.type) {
+        case 'banner': _drawBanner(p.x, p.y, s, cfg.barrier); break;
+        case 'palm': _drawSidePalm(p.x, p.y, s); break;
+        case 'bird': _drawBird(p.x, p.y, s); break;
+        case 'balloon': _drawBalloon(p.x, p.y, s); break;
+        case 'flag': _drawSideFlag(p.x, p.y, s); break;
+        case 'umbrella': _drawSideUmbrella(p.x, p.y, s); break;
+        case 'dog': _drawSideDog(p.x, p.y, s); break;
+        case 'penguin': _drawSidePenguin(p.x, p.y, s); break;
+        case 'snowman': _drawSnowman(p.x, p.y, s); break;
+        case 'vipflag': _drawVIPFlag(p.x, p.y, s); break;
+        case 'trophy': _drawSideTrophy(p.x, p.y, s); break;
+        case 'camera': _drawSideCamera(p.x, p.y, s); break;
+      }
+    }
+
     ctx.restore();
   }
 
-  // ── 觀眾角色繪製 ──────────────────────────────────────────
-  function _head(x, y, s, skin) {
-    ctx.fillStyle = skin || '#ffcc80';
-    ctx.beginPath(); ctx.arc(x, y - 18 * s, 5 * s, 0, Math.PI * 2); ctx.fill();
-  }
-  function _body(x, y, s, color) {
+  // ── 場邊特殊物件（簡約單/雙色） ────────────────────────────
+  function _drawBanner(x, y, s, color) {
+    ctx.fillStyle = '#607d8b';
+    ctx.fillRect(x - 0.8 * s, y - 22 * s, 1.6 * s, 22 * s);
     ctx.fillStyle = color;
-    ctx.fillRect(x - 4 * s, y - 13 * s, 8 * s, 12 * s);
+    ctx.fillRect(x + 0.8 * s, y - 20 * s, 10 * s, 6 * s);
   }
 
-  function drawCrowdFan(x, y, s, color, item) {
-    _body(x, y, s, color);
-    _head(x, y, s);
-    if (item === 'scarf') {
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(x - 6 * s, y - 14 * s, 12 * s, 2 * s);
-    } else if (item === 'flag') {
-      ctx.fillStyle = '#78909c';
-      ctx.fillRect(x + 5 * s, y - 26 * s, 1.5 * s, 14 * s);
-      ctx.fillStyle = color;
-      ctx.fillRect(x + 6.5 * s, y - 26 * s, 8 * s, 5 * s);
-    } else if (item === 'foam') {
-      // 泡沫手指
-      ctx.fillStyle = '#fdd835';
+  function _drawSidePalm(x, y, s) {
+    ctx.fillStyle = '#4e342e';
+    ctx.fillRect(x - 1 * s, y - 20 * s, 2 * s, 20 * s);
+    ctx.fillStyle = '#2e5a1e';
+    for (let i = 0; i < 4; i++) {
+      const ang = -Math.PI * 0.7 + i * 0.47;
       ctx.beginPath();
-      ctx.moveTo(x + 5 * s, y - 22 * s);
-      ctx.lineTo(x + 3 * s, y - 12 * s);
-      ctx.lineTo(x + 9 * s, y - 12 * s);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#f9a825';
-      ctx.fillRect(x + 5 * s, y - 28 * s, 2 * s, 7 * s);
-    } else if (item === 'drink') {
-      ctx.fillStyle = '#e0e0e0';
-      ctx.fillRect(x + 5 * s, y - 15 * s, 4 * s, 8 * s);
-      ctx.fillStyle = '#ff7043';
-      ctx.fillRect(x + 5 * s, y - 15 * s, 4 * s, 3 * s);
+      ctx.moveTo(x, y - 20 * s);
+      ctx.quadraticCurveTo(x + Math.cos(ang) * 10 * s, y - 20 * s + Math.sin(ang) * 5 * s - 4 * s, x + Math.cos(ang) * 14 * s, y - 20 * s + Math.sin(ang) * 8 * s + 2 * s);
+      ctx.lineWidth = 2 * s;
+      ctx.strokeStyle = '#2e5a1e';
+      ctx.stroke();
     }
+    ctx.lineWidth = 1;
   }
 
-  function drawCrowdCamera(x, y, s) {
-    _body(x, y, s, '#424242');
-    _head(x, y, s);
-    // 相機
-    ctx.fillStyle = '#212121';
-    ctx.fillRect(x + 4 * s, y - 18 * s, 7 * s, 5 * s);
-    ctx.fillStyle = '#90caf9';
-    ctx.beginPath(); ctx.arc(x + 7.5 * s, y - 15.5 * s, 2 * s, 0, Math.PI * 2); ctx.fill();
-  }
-
-  function drawCrowdTourist(x, y, s, color) {
-    _body(x, y, s, color);
-    _head(x, y, s);
-    // 太陽帽
-    ctx.fillStyle = '#fff9c4';
-    ctx.fillRect(x - 7 * s, y - 23 * s, 14 * s, 2 * s);
-    ctx.fillRect(x - 4 * s, y - 26 * s, 8 * s, 4 * s);
-  }
-
-  function drawCrowdParrot(x, y, s) {
-    // 鸚鵡
-    const ps = s * 1.2;
-    ctx.fillStyle = '#f44336';
-    ctx.beginPath(); ctx.arc(x, y - 8 * ps, 4 * ps, 0, Math.PI * 2); ctx.fill(); // 身體
-    ctx.fillStyle = '#4caf50';
-    ctx.beginPath(); ctx.arc(x, y - 13 * ps, 3 * ps, 0, Math.PI * 2); ctx.fill(); // 頭
-    ctx.fillStyle = '#fdd835';
-    // 嘴
+  function _drawBird(x, y, s) {
+    // V 字鳥剪影
+    ctx.strokeStyle = '#4e342e';
+    ctx.lineWidth = 1.5 * s;
     ctx.beginPath();
-    ctx.moveTo(x + 3 * ps, y - 13 * ps);
-    ctx.lineTo(x + 7 * ps, y - 12 * ps);
-    ctx.lineTo(x + 3 * ps, y - 11 * ps);
-    ctx.closePath(); ctx.fill();
-    // 尾巴
-    ctx.fillStyle = '#2196f3';
-    ctx.beginPath();
-    ctx.moveTo(x - 2 * ps, y - 5 * ps);
-    ctx.lineTo(x - 5 * ps, y + 3 * ps);
-    ctx.lineTo(x + 1 * ps, y - 3 * ps);
-    ctx.closePath(); ctx.fill();
-    // 眼
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(x + 1.5 * ps, y - 14 * ps, 1 * ps, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.arc(x + 1.8 * ps, y - 14 * ps, 0.5 * ps, 0, Math.PI * 2); ctx.fill();
+    ctx.moveTo(x - 5 * s, y - 16 * s);
+    ctx.quadraticCurveTo(x, y - 20 * s, x, y - 18 * s);
+    ctx.quadraticCurveTo(x, y - 20 * s, x + 5 * s, y - 16 * s);
+    ctx.stroke();
+    ctx.lineWidth = 1;
   }
 
-  function drawCrowdKid(x, y, s, color) {
-    const ks = s * 0.8;
-    ctx.fillStyle = color;
-    ctx.fillRect(x - 3 * ks, y - 9 * ks, 6 * ks, 8 * ks);
-    ctx.fillStyle = '#ffcc80';
-    ctx.beginPath(); ctx.arc(x, y - 13 * ks, 4 * ks, 0, Math.PI * 2); ctx.fill();
-    // 氣球
-    ctx.fillStyle = '#e91e63';
-    ctx.beginPath(); ctx.arc(x + 3 * ks, y - 28 * ks, 4 * ks, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#bbb';
+  function _drawBalloon(x, y, s) {
+    ctx.strokeStyle = 'rgba(150,150,150,0.4)';
     ctx.lineWidth = 0.5;
-    ctx.beginPath(); ctx.moveTo(x + 3 * ks, y - 24 * ks); ctx.lineTo(x + 2 * ks, y - 10 * ks); ctx.stroke();
-  }
-
-  function drawCrowdVendor(x, y, s, color) {
-    _body(x, y, s, '#fff');
-    _head(x, y, s);
-    // 帽子
-    ctx.fillStyle = color;
-    ctx.fillRect(x - 6 * s, y - 23 * s, 12 * s, 3 * s);
-    ctx.fillRect(x - 4 * s, y - 26 * s, 8 * s, 4 * s);
-    // 食物托盤
-    ctx.fillStyle = '#8d6e63';
-    ctx.fillRect(x - 8 * s, y - 14 * s, 16 * s, 2 * s);
-    // 小杯子
-    ctx.fillStyle = '#e0e0e0';
-    [-5, -1, 3].forEach(dx => {
-      ctx.fillRect(x + dx * s, y - 18 * s, 3 * s, 4 * s);
-    });
-  }
-
-  function drawCrowdUmbrella(x, y, s, color) {
-    _body(x, y, s, '#455a64');
-    _head(x, y, s);
-    // 雨傘
-    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.arc(x, y - 30 * s, 10 * s, Math.PI, 0);
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + 1 * s, y - 22 * s);
+    ctx.stroke();
+    ctx.fillStyle = '#e53935';
+    ctx.beginPath();
+    ctx.arc(x + 1 * s, y - 26 * s, 4 * s, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 1;
+  }
+
+  function _drawSideFlag(x, y, s) {
+    ctx.fillStyle = '#78909c';
+    ctx.fillRect(x - 0.6 * s, y - 20 * s, 1.2 * s, 20 * s);
+    ctx.fillStyle = '#c62828';
+    ctx.beginPath();
+    ctx.moveTo(x + 0.6 * s, y - 20 * s);
+    ctx.lineTo(x + 8 * s, y - 17 * s);
+    ctx.lineTo(x + 0.6 * s, y - 14 * s);
     ctx.closePath();
     ctx.fill();
-    ctx.fillStyle = '#78909c';
-    ctx.fillRect(x - 0.8 * s, y - 30 * s, 1.6 * s, 12 * s);
   }
 
-  function drawCrowdDog(x, y, s) {
-    const ds = s * 1.1;
+  function _drawSideUmbrella(x, y, s) {
+    // 傘剪影
+    ctx.fillStyle = '#546e7a';
+    ctx.beginPath();
+    ctx.arc(x, y - 18 * s, 8 * s, Math.PI, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillRect(x - 0.6 * s, y - 18 * s, 1.2 * s, 14 * s);
+  }
+
+  function _drawSideDog(x, y, s) {
+    ctx.fillStyle = '#5d4037';
     // 身體
-    ctx.fillStyle = '#8d6e63';
-    ctx.fillRect(x - 5 * ds, y - 6 * ds, 10 * ds, 5 * ds);
+    ctx.fillRect(x - 5 * s, y - 5 * s, 10 * s, 4 * s);
     // 頭
-    ctx.beginPath(); ctx.arc(x + 6 * ds, y - 7 * ds, 4 * ds, 0, Math.PI * 2); ctx.fill();
-    // 耳朵
-    ctx.fillStyle = '#6d4c41';
-    ctx.beginPath(); ctx.arc(x + 9 * ds, y - 10 * ds, 2 * ds, 0, Math.PI * 2); ctx.fill();
-    // 尾巴（翹起）
-    ctx.strokeStyle = '#8d6e63';
-    ctx.lineWidth = 1.5 * ds;
+    ctx.beginPath(); ctx.arc(x + 6 * s, y - 6 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill();
+    // 尾
+    ctx.strokeStyle = '#5d4037';
+    ctx.lineWidth = 1.5 * s;
     ctx.beginPath();
-    ctx.moveTo(x - 5 * ds, y - 6 * ds);
-    ctx.quadraticCurveTo(x - 8 * ds, y - 14 * ds, x - 6 * ds, y - 16 * ds);
+    ctx.moveTo(x - 5 * s, y - 5 * s);
+    ctx.quadraticCurveTo(x - 8 * s, y - 12 * s, x - 6 * s, y - 13 * s);
     ctx.stroke();
     ctx.lineWidth = 1;
-    // 眼
-    ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.arc(x + 8 * ds, y - 8 * ds, 0.8 * ds, 0, Math.PI * 2); ctx.fill();
-    // 腿
-    ctx.fillStyle = '#8d6e63';
-    [-3, 3].forEach(dx => {
-      ctx.fillRect(x + dx * ds - 1 * ds, y - 1 * ds, 2 * ds, 4 * ds);
-    });
   }
 
-  function drawCrowdHardcore(x, y, s, color) {
-    _body(x, y, s, color);
-    _head(x, y, s);
-    // 大旗 + 揮舞感（斜）
-    ctx.fillStyle = '#78909c';
-    ctx.save();
-    ctx.translate(x + 5 * s, y - 14 * s);
-    ctx.rotate(-0.3);
-    ctx.fillRect(0, -20 * s, 1.5 * s, 20 * s);
-    ctx.fillStyle = color;
-    ctx.fillRect(1.5 * s, -20 * s, 12 * s, 7 * s);
-    ctx.fillStyle = '#fff';
-    ctx.font = `bold ${3 * s}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.fillText('GO', 7.5 * s, -15 * s);
-    ctx.restore();
-  }
-
-  function drawCrowdPenguin(x, y, s) {
-    const ps = s * 1.3;
-    // 身體（黑白）
-    ctx.fillStyle = '#263238';
-    ctx.beginPath(); ctx.ellipse(x, y - 7 * ps, 5 * ps, 8 * ps, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#eceff1';
-    ctx.beginPath(); ctx.ellipse(x, y - 5 * ps, 3 * ps, 6 * ps, 0, 0, Math.PI * 2); ctx.fill();
+  function _drawSidePenguin(x, y, s) {
+    // 雙色企鵝剪影
+    ctx.fillStyle = '#1a2030';
+    ctx.beginPath(); ctx.ellipse(x, y - 6 * s, 4 * s, 7 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#c0c8d0';
+    ctx.beginPath(); ctx.ellipse(x, y - 4.5 * s, 2.5 * s, 5 * s, 0, 0, Math.PI * 2); ctx.fill();
     // 頭
-    ctx.fillStyle = '#263238';
-    ctx.beginPath(); ctx.arc(x, y - 15 * ps, 4 * ps, 0, Math.PI * 2); ctx.fill();
-    // 眼睛
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(x - 1.5 * ps, y - 16 * ps, 1.2 * ps, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(x + 1.5 * ps, y - 16 * ps, 1.2 * ps, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.arc(x - 1.2 * ps, y - 16 * ps, 0.6 * ps, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(x + 1.8 * ps, y - 16 * ps, 0.6 * ps, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1a2030';
+    ctx.beginPath(); ctx.arc(x, y - 13 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill();
     // 嘴
-    ctx.fillStyle = '#ff8f00';
+    ctx.fillStyle = '#e68a00';
     ctx.beginPath();
-    ctx.moveTo(x - 1.5 * ps, y - 14 * ps);
-    ctx.lineTo(x, y - 12 * ps);
-    ctx.lineTo(x + 1.5 * ps, y - 14 * ps);
+    ctx.moveTo(x - 1.2 * s, y - 12 * s);
+    ctx.lineTo(x, y - 10 * s);
+    ctx.lineTo(x + 1.2 * s, y - 12 * s);
     ctx.closePath(); ctx.fill();
-    // 小翅膀
+  }
+
+  function _drawSnowman(x, y, s) {
+    ctx.fillStyle = '#cfd8dc';
+    ctx.beginPath(); ctx.arc(x, y - 4 * s, 5 * s, 0, Math.PI * 2); ctx.fill(); // 底
+    ctx.beginPath(); ctx.arc(x, y - 12 * s, 4 * s, 0, Math.PI * 2); ctx.fill(); // 中
+    ctx.beginPath(); ctx.arc(x, y - 18 * s, 3 * s, 0, Math.PI * 2); ctx.fill(); // 頭
+    // 眼+嘴
     ctx.fillStyle = '#37474f';
+    ctx.beginPath(); ctx.arc(x - 1 * s, y - 19 * s, 0.6 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 1 * s, y - 19 * s, 0.6 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#e68a00';
     ctx.beginPath();
-    ctx.ellipse(x - 5 * ps, y - 8 * ps, 2 * ps, 5 * ps, 0.3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(x + 5 * ps, y - 8 * ps, 2 * ps, 5 * ps, -0.3, 0, Math.PI * 2);
-    ctx.fill();
-    // 腳
-    ctx.fillStyle = '#ff8f00';
-    ctx.fillRect(x - 3 * ps, y + 0.5 * ps, 2.5 * ps, 1.5 * ps);
-    ctx.fillRect(x + 0.5 * ps, y + 0.5 * ps, 2.5 * ps, 1.5 * ps);
-  }
-
-  function drawCrowdEskimo(x, y, s, color) {
-    // 厚大衣身體
-    ctx.fillStyle = color;
-    ctx.fillRect(x - 5 * s, y - 13 * s, 10 * s, 14 * s);
-    // 頭（被毛帽包住）
-    ctx.fillStyle = '#ffcc80';
-    ctx.beginPath(); ctx.arc(x, y - 18 * s, 5 * s, 0, Math.PI * 2); ctx.fill();
-    // 毛帽
-    ctx.fillStyle = '#5c6bc0';
-    ctx.beginPath();
-    ctx.arc(x, y - 18 * s, 5.5 * s, Math.PI, 0);
+    ctx.moveTo(x, y - 17.5 * s);
+    ctx.lineTo(x + 3 * s, y - 17 * s);
+    ctx.lineTo(x, y - 16.5 * s);
     ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#7986cb';
-    ctx.beginPath(); ctx.arc(x, y - 24 * s, 2.5 * s, 0, Math.PI * 2); ctx.fill(); // 毛球
-    // 毛邊
-    ctx.fillStyle = '#e0e0e0';
-    ctx.fillRect(x - 6 * s, y - 18 * s, 12 * s, 2 * s);
-    // 手拿熱飲
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(x + 6 * s, y - 16 * s, 3.5 * s, 5 * s);
-    ctx.fillStyle = '#ff5722';
-    ctx.fillRect(x + 6 * s, y - 16 * s, 3.5 * s, 2 * s);
-    // 蒸氣
-    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-    ctx.lineWidth = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(x + 7.5 * s, y - 17 * s);
-    ctx.quadraticCurveTo(x + 9 * s, y - 20 * s, x + 7 * s, y - 23 * s);
-    ctx.stroke();
-    ctx.lineWidth = 1;
   }
 
-  function drawCrowdVIP(x, y, s, color) {
-    // 西裝
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(x - 4 * s, y - 13 * s, 8 * s, 12 * s);
-    _head(x, y, s);
-    // 墨鏡
-    ctx.fillStyle = '#000';
-    ctx.fillRect(x - 4 * s, y - 19 * s, 3.5 * s, 2 * s);
-    ctx.fillRect(x + 0.5 * s, y - 19 * s, 3.5 * s, 2 * s);
-    // 金色圍巾
-    ctx.fillStyle = color;
-    ctx.fillRect(x - 5 * s, y - 14 * s, 10 * s, 2 * s);
-    ctx.fillRect(x + 3 * s, y - 14 * s, 2 * s, 6 * s);
+  function _drawVIPFlag(x, y, s) {
+    ctx.fillStyle = '#5a4400';
+    ctx.fillRect(x - 0.6 * s, y - 22 * s, 1.2 * s, 22 * s);
+    ctx.fillStyle = '#ffd600';
+    ctx.fillRect(x + 0.6 * s, y - 22 * s, 9 * s, 6 * s);
+  }
+
+  function _drawSideTrophy(x, y, s) {
+    ctx.fillStyle = '#ffd600';
+    ctx.beginPath();
+    ctx.moveTo(x - 3 * s, y - 14 * s);
+    ctx.quadraticCurveTo(x - 4 * s, y - 6 * s, x - 2 * s, y - 5 * s);
+    ctx.lineTo(x + 2 * s, y - 5 * s);
+    ctx.quadraticCurveTo(x + 4 * s, y - 6 * s, x + 3 * s, y - 14 * s);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillRect(x - 2 * s, y - 5 * s, 4 * s, 1.5 * s);
+    ctx.fillRect(x - 3 * s, y - 3.5 * s, 6 * s, 1.5 * s);
+  }
+
+  function _drawSideCamera(x, y, s) {
+    // 攝影機剪影
+    ctx.fillStyle = '#37474f';
+    ctx.fillRect(x - 0.8 * s, y - 16 * s, 1.6 * s, 16 * s); // 腳架
+    ctx.fillRect(x - 4 * s, y - 20 * s, 8 * s, 5 * s); // 機身
+    ctx.fillStyle = '#546e7a';
+    ctx.beginPath(); ctx.arc(x + 4 * s, y - 17.5 * s, 2 * s, 0, Math.PI * 2); ctx.fill(); // 鏡頭
   }
 
   // ─── 球門 ────────────────────────────────────────────────
