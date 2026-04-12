@@ -246,6 +246,7 @@
 
     waveFlash = 1800;
     generateCornerProps(); // 每波隨機更換角落物件
+    generateBgEggs();     // 每波隨機更換背景彩蛋
     // 守門員速度：每 5 波才提升一次
     const gkTier = Math.floor(G.wave / 5); // wave5=1, wave10=2, wave15=3...
     G.gk.spd = (GK_BASE_SPD + gkTier * 1.0) * (G.gkSlowMul || 1);
@@ -704,6 +705,7 @@
     if (G.phase === 'title') { drawTitle(); ctx.restore(); return; }
 
     drawField();
+    drawBgEggs();
     drawGoal();
 
     // 依 z 排序繪製（遠→近）
@@ -1225,20 +1227,20 @@
     '金色決賽': ['vipchair','speaker','vipchair','speaker','vipchair'],
   };
 
-  // 彩蛋物件：wave 越高越多，越稀有
+  // 彩蛋物件：每次 WARNING（每5波）解鎖新彩蛋
   const EGGS = [
-    { minWave: 3,  weight: 5, type: 'cat' },       // 貓咪打盹
-    { minWave: 3,  weight: 5, type: 'bird_nest' },  // 鳥巢
+    { minWave: 5,  weight: 5, type: 'cat' },       // 貓咪打盹
+    { minWave: 5,  weight: 5, type: 'bird_nest' },  // 鳥巢
     { minWave: 5,  weight: 4, type: 'football' },   // 被遺忘的足球
-    { minWave: 5,  weight: 4, type: 'campfire' },   // 營火
-    { minWave: 7,  weight: 3, type: 'ufo' },        // UFO
-    { minWave: 7,  weight: 3, type: 'mushroom' },   // 蘑菇
-    { minWave: 10, weight: 2, type: 'treasure' },   // 寶箱
-    { minWave: 10, weight: 2, type: 'robot' },      // 小機器人
-    { minWave: 13, weight: 1, type: 'dragon' },     // 小龍
-    { minWave: 15, weight: 1, type: 'unicorn' },    // 獨角獸
-    { minWave: 18, weight: 1, type: 'rocket' },     // 火箭
-    { minWave: 20, weight: 1, type: 'crown' },      // 皇冠
+    { minWave: 10, weight: 4, type: 'campfire' },   // 營火
+    { minWave: 10, weight: 3, type: 'ufo' },        // UFO
+    { minWave: 10, weight: 3, type: 'mushroom' },   // 蘑菇
+    { minWave: 15, weight: 2, type: 'treasure' },   // 寶箱
+    { minWave: 15, weight: 2, type: 'robot' },      // 小機器人
+    { minWave: 20, weight: 1, type: 'dragon' },     // 小龍
+    { minWave: 20, weight: 1, type: 'unicorn' },    // 獨角獸
+    { minWave: 25, weight: 1, type: 'rocket' },     // 火箭
+    { minWave: 30, weight: 1, type: 'crown' },      // 皇冠
   ];
 
   let _cornerProps = []; // 當前波的角落物件
@@ -1258,8 +1260,8 @@
       { zMin: 0.15, zMax: 0.3, xMin: 60, xMax: 150 },
     ];
 
-    // 計算這波可出現的彩蛋數量（wave 越高越多）
-    const eggCount = Math.min(6, Math.floor(wave / 3));
+    // 計算這波可出現的彩蛋數量（每過一次 WARNING 多 1 個）
+    const eggCount = Math.min(8, Math.floor(wave / 5));
     // 篩選可用彩蛋
     const available = EGGS.filter(e => wave >= e.minWave);
 
@@ -1355,7 +1357,7 @@
         for (let z = 50; z < FIELD_DEPTH; z += 100) {
           const p = proj(side * (FIELD_HW + 80), z);
           if (p.y < topY) continue;
-          ctx.beginPath(); ctx.arc(p.x, p.y, 14 * p.s * 3, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(p.x, p.y, 14 * p.s * 5, 0, Math.PI * 2); ctx.fill();
         }
       }
 
@@ -1366,7 +1368,7 @@
           const z = FIELD_DEPTH * pr.zPct;
           const p = proj(pr.side * (FIELD_HW + pr.xOff), z);
           if (p.y < topY) continue;
-          const s = p.s * 3;
+          const s = p.s * 5;
           switch (pr.type) {
             case 'bench': _drawCornerBench(p.x, p.y, s); break;
             case 'cone': _drawCornerCone(p.x, p.y, s); break;
@@ -1702,6 +1704,66 @@
     ctx.beginPath(); ctx.arc(x, y - 4 * s, 12 * s, 0, Math.PI * 2); ctx.fill();
   }
 
+  // ─── 背景彩蛋（球場上緣～技能條下緣） ─────────────────────
+  let _bgEggs = [];
+
+  function generateBgEggs() {
+    _bgEggs = [];
+    if (!G) return;
+    const wave = G.wave;
+    const available = EGGS.filter(e => wave >= e.minWave);
+    if (!available.length) return;
+    const count = Math.min(4, Math.floor(wave / 5));
+    if (count <= 0) return;
+    const total = available.reduce((s, e) => s + e.weight, 0);
+    for (let i = 0; i < count; i++) {
+      let r = Math.random() * total;
+      let type = available[available.length - 1].type;
+      for (const e of available) { r -= e.weight; if (r <= 0) { type = e.type; break; } }
+      _bgEggs.push({
+        type,
+        xPct: 0.08 + Math.random() * 0.84, // 水平 8%~92%
+        yPct: 0.1 + Math.random() * 0.8,    // 在區間內的比例
+        scale: 0.5 + Math.random() * 0.4,
+        alpha: 0.15 + Math.random() * 0.15,  // 半透明，不干擾遊戲
+      });
+    }
+  }
+
+  function drawBgEggs() {
+    if (!_bgEggs.length || !G) return;
+    const goalY = proj(0, FIELD_DEPTH).y;
+    const barBottom = 70; // 技能條下緣
+    const zoneTop = barBottom;
+    const zoneH = goalY - barBottom;
+    if (zoneH <= 10) return;
+
+    ctx.save();
+    for (const egg of _bgEggs) {
+      const x = W * egg.xPct;
+      const y = zoneTop + zoneH * egg.yPct;
+      const s = egg.scale * Math.min(1, W / 500) * 2;
+      ctx.globalAlpha = egg.alpha;
+      // 重用角落彩蛋繪製函數
+      switch (egg.type) {
+        case 'cat': _drawEggCat(x, y, s); break;
+        case 'bird_nest': _drawEggNest(x, y, s); break;
+        case 'football': _drawEggFootball(x, y, s); break;
+        case 'campfire': _drawEggCampfire(x, y, s); break;
+        case 'ufo': _drawEggUFO(x, y, s); break;
+        case 'mushroom': _drawEggMushroom(x, y, s); break;
+        case 'treasure': _drawEggTreasure(x, y, s); break;
+        case 'robot': _drawEggRobot(x, y, s); break;
+        case 'dragon': _drawEggDragon(x, y, s); break;
+        case 'unicorn': _drawEggUnicorn(x, y, s); break;
+        case 'rocket': _drawEggRocket(x, y, s); break;
+        case 'crown': _drawEggCrown(x, y, s); break;
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
   function drawSideCrowd() {
     const cfg = SCENE_SIDE[curScene.name];
     if (!cfg) return;
@@ -1732,7 +1794,7 @@
       for (let z = 20; z < FIELD_DEPTH - 30; z += 55) {
         const p = proj(side * (margin + 20), z);
         if (p.s < 0.04) continue;
-        const s = p.s * 3;
+        const s = p.s * 5;
         const headR = 3.5 * s;
         const bodyH = 5 * s;
         const oh = ((z % 110) < 55 ? -1.5 : 0) * s; // 交錯高低
@@ -1749,7 +1811,7 @@
     for (const sp of cfg.specials) {
       const p = proj(sp.side * (margin + 15), sp.z);
       if (p.s < 0.04) continue;
-      const s = p.s * 3.5;
+      const s = p.s * 5;
       switch (sp.type) {
         case 'banner': _drawBanner(p.x, p.y, s, cfg.barrier); break;
         case 'palm': _drawSidePalm(p.x, p.y, s); break;
