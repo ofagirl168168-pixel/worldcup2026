@@ -448,8 +448,8 @@
       const sp = Math.min(rawSp, 0.8);
       if (d.frozen > 0) d.frozen -= dt;
       const step = dt / 16;
-      // 判定線：z < FIELD_DEPTH * 0.4 後直接朝中心點(0,0)直線前進
-      if (d.z < FIELD_DEPTH * 0.4) {
+      // 判定線：z < FIELD_DEPTH * 0.3 後直接朝中心點(0,0)直線前進
+      if (d.z < FIELD_DEPTH * 0.3) {
         const dist = Math.sqrt(d.x * d.x + d.z * d.z);
         if (dist > 1) {
           d.z -= (d.z / dist) * sp * step;
@@ -1047,16 +1047,29 @@
 
   // ─── 粒子 ────────────────────────────────────────────────
   // ─── 紅心 ──────────────────────────────────────────────────
+  // SVG 愛心預載
+  const _heartImg = new Image();
+  _heartImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+    <defs><linearGradient id="h1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff5252"/><stop offset="100%" stop-color="#b71c1c"/></linearGradient>
+    <filter id="hg"><feGaussianBlur stdDeviation="1.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <g filter="url(#hg)"><path d="M16 28C8 20 2 15 2 10 2 5 6 2 10 2c3 0 5 2 6 4 1-2 3-4 6-4 4 0 8 3 8 8 0 5-6 10-14 18z" fill="url(#h1)"/>
+    <path d="M10 4c-3 0-6 2-6 6 0 1 0 2 1 3" stroke="#ff8a80" stroke-width="1.2" fill="none" opacity="0.5" stroke-linecap="round"/></g></svg>`
+  );
+
   function drawHeart(cx, cy, sz) {
-    ctx.save();
-    ctx.fillStyle = '#e53935';
-    ctx.shadowColor = '#e53935'; ctx.shadowBlur = sz * 0.4;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy + sz * 0.6);
-    ctx.bezierCurveTo(cx - sz, cy, cx - sz, cy - sz * 0.8, cx, cy - sz * 0.35);
-    ctx.bezierCurveTo(cx + sz, cy - sz * 0.8, cx + sz, cy, cx, cy + sz * 0.6);
-    ctx.fill();
-    ctx.restore();
+    if (_heartImg.complete && _heartImg.naturalWidth > 0) {
+      ctx.drawImage(_heartImg, cx - sz, cy - sz, sz * 2, sz * 2);
+    } else {
+      ctx.save();
+      ctx.fillStyle = '#e53935';
+      ctx.beginPath();
+      ctx.moveTo(cx, cy + sz * 0.6);
+      ctx.bezierCurveTo(cx - sz, cy, cx - sz, cy - sz * 0.8, cx, cy - sz * 0.35);
+      ctx.bezierCurveTo(cx + sz, cy - sz * 0.8, cx + sz, cy, cx, cy + sz * 0.6);
+      ctx.fill();
+      ctx.restore();
+    }
   }
 
   // ─── 獎盃 ──────────────────────────────────────────────────
@@ -1342,8 +1355,8 @@
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
       <radialGradient id="g2" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#ccc"/></radialGradient>
       <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <g stroke="#ab47bc" stroke-width="2" opacity="0.5" stroke-linecap="round">
-      <line x1="17" y1="44" x2="26" y2="38"/><line x1="12" y1="42" x2="24" y2="32"/></g>
+      <g stroke="#ab47bc" stroke-width="1.5" opacity="0.45" fill="none">
+      <line x1="15" y1="44" x2="26" y2="12"/><line x1="17" y1="55" x2="50" y2="35"/></g>
       <circle cx="10" cy="50" r="8" fill="url(#g1)" filter="url(#gl1)"/>
       <g fill="#444" opacity="0.3"><path d="M10 47l-2-1-1-2 1-2 3 0 1 2-1 2z"/></g>
       <circle cx="38" cy="24" r="18" fill="url(#g2)" filter="url(#gl1)"/>
