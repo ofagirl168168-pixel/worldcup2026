@@ -448,13 +448,18 @@
       const sp = Math.min(rawSp, 0.8);
       if (d.frozen > 0) d.frozen -= dt;
       const step = dt / 16;
-      d.z -= sp * step;
-      d.x += (d.vx || 0) * (G.globalSlow || 1) * step;
-      // 越靠近主角，越往中間收攏（模擬包夾）— 很早就開始
-      const closeness = 1 - Math.max(0, d.z) / FIELD_DEPTH; // 0=球門端, 1=玩家端
-      if (closeness > 0.4) {
-        const pullStrength = (closeness - 0.4) * 0.2;
-        d.x += (d.x > 0 ? -pullStrength : pullStrength) * step;
+      // 判定線：z < FIELD_DEPTH * 0.4 後直接朝中心點(0,0)直線前進
+      if (d.z < FIELD_DEPTH * 0.4) {
+        const dist = Math.sqrt(d.x * d.x + d.z * d.z);
+        if (dist > 1) {
+          d.z -= (d.z / dist) * sp * step;
+          d.x -= (d.x / dist) * sp * step;
+        } else {
+          d.z -= sp * step;
+        }
+      } else {
+        d.z -= sp * step;
+        d.x += (d.vx || 0) * (G.globalSlow || 1) * step;
       }
       // 碰牆反彈 x 方向（限制在可視範圍內）
       const xBound = FIELD_HW * 0.85;
@@ -1297,31 +1302,24 @@
   // 精緻 SVG 圖標：預載為 Image，drawIcon 直接 drawImage
   const ICON_SVGS = {
     dmg20: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
-      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <circle cx="24" cy="36" r="13" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M24 36l-3-2 1-4 3 1 3-1 1 4z" fill="#555" opacity="0.3"/>
+      <defs><filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
       <g filter="url(#gl1)">
-      <polygon points="46,6 52,22 48,24 50,28 44,30 42,26 38,28 36,12" fill="#ef5350"/>
-      <polygon points="46,6 52,22 48,24 50,28 44,30 42,26 38,28 36,12" fill="none" stroke="#c62828" stroke-width="1"/>
-      <rect x="42" y="28" width="6" height="16" rx="2" fill="#8d6e63" transform="rotate(10,45,36)"/>
-      </g>
-      <path d="M34 30l4-6" stroke="#ff8a80" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-      <text x="50" y="56" text-anchor="middle" font-size="12" font-weight="bold" fill="#ef5350" filter="url(#gl1)">+</text></svg>`,
+      <circle cx="32" cy="32" r="22" fill="none" stroke="#ef5350" stroke-width="3" opacity="0.3"/>
+      <path d="M32 10 L32 6 M32 54 L32 58 M10 32 L6 32 M54 32 L58 32" stroke="#ef5350" stroke-width="2" opacity="0.3"/>
+      <text x="32" y="40" text-anchor="middle" font-size="28" font-weight="bold" fill="#ef5350" font-family="sans-serif">+20</text>
+      <text x="32" y="52" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffcdd2" font-family="sans-serif">ATK</text>
+      </g></svg>`,
 
     dmg30: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
-      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <circle cx="20" cy="42" r="12" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M20 42l-3-2 1-4 3 1 3-1 1 4z" fill="#555" opacity="0.3"/>
+      <defs><filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
       <g filter="url(#gl1)">
-      <polygon points="46,4 54,20 50,22 52,28 46,30 44,24 40,26 38,10" fill="#ff7043"/>
-      <polygon points="46,4 54,20 50,22 52,28 46,30 44,24 40,26 38,10" fill="none" stroke="#e64a19" stroke-width="1"/>
-      <rect x="44" y="28" width="6" height="18" rx="2" fill="#8d6e63" transform="rotate(8,47,37)"/>
+      <circle cx="32" cy="32" r="22" fill="none" stroke="#ff7043" stroke-width="3" opacity="0.3"/>
+      <path d="M32 10 L32 6 M32 54 L32 58 M10 32 L6 32 M54 32 L58 32" stroke="#ff7043" stroke-width="2" opacity="0.3"/>
+      <text x="32" y="40" text-anchor="middle" font-size="28" font-weight="bold" fill="#ff7043" font-family="sans-serif">+30</text>
+      <text x="32" y="52" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffab91" font-family="sans-serif">ATK</text>
       </g>
-      <g filter="url(#gl1)" stroke="#ff7043" stroke-width="2.5" stroke-linecap="round" opacity="0.6">
-      <line x1="36" y1="44" x2="30" y2="50"/><line x1="40" y1="48" x2="34" y2="54"/><line x1="44" y1="44" x2="40" y2="52"/></g>
-      <text x="50" y="58" text-anchor="middle" font-size="11" font-weight="bold" fill="#ff7043" filter="url(#gl1)">++</text></svg>`,
+      <g stroke="#ff7043" stroke-width="2" stroke-linecap="round" opacity="0.5">
+      <line x1="8" y1="12" x2="14" y2="18"/><line x1="50" y1="12" x2="56" y2="6"/><line x1="50" y1="52" x2="56" y2="58"/></g></svg>`,
 
     spd20: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><linearGradient id="s1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#42a5f5"/><stop offset="100%" stop-color="#1565c0"/></linearGradient>
