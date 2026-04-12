@@ -1213,111 +1213,235 @@
   };
 
   // ─── 左上/右上三角空地 ─────────────────────────────────────
+  const CORNER_PROPS = {
+    '夜間球場': [
+      { side: -1, zPct: 0.3, type: 'bench' },
+      { side: 1, zPct: 0.4, type: 'bench' },
+      { side: -1, zPct: 0.7, type: 'cone' },
+      { side: 1, zPct: 0.7, type: 'cone' },
+    ],
+    '夕陽球場': [
+      { side: -1, zPct: 0.3, type: 'rock' },
+      { side: 1, zPct: 0.5, type: 'rock' },
+      { side: -1, zPct: 0.6, type: 'cactus' },
+      { side: 1, zPct: 0.3, type: 'cactus' },
+    ],
+    '正午豔陽': [
+      { side: -1, zPct: 0.3, type: 'bush' },
+      { side: 1, zPct: 0.3, type: 'bush' },
+      { side: -1, zPct: 0.6, type: 'cooler' },
+      { side: 1, zPct: 0.6, type: 'bench' },
+    ],
+    '陰天球場': [
+      { side: -1, zPct: 0.4, type: 'puddle' },
+      { side: 1, zPct: 0.3, type: 'puddle' },
+      { side: -1, zPct: 0.7, type: 'bin' },
+      { side: 1, zPct: 0.6, type: 'bench' },
+    ],
+    '暴風雨夜': [
+      { side: -1, zPct: 0.4, type: 'cone' },
+      { side: 1, zPct: 0.4, type: 'cone' },
+      { side: -1, zPct: 0.7, type: 'puddle' },
+      { side: 1, zPct: 0.7, type: 'puddle' },
+    ],
+    '極光球場': [
+      { side: -1, zPct: 0.3, type: 'igloo' },
+      { side: 1, zPct: 0.5, type: 'snowpile' },
+      { side: -1, zPct: 0.6, type: 'snowpile' },
+      { side: 1, zPct: 0.3, type: 'igloo' },
+    ],
+    '金色決賽': [
+      { side: -1, zPct: 0.3, type: 'speaker' },
+      { side: 1, zPct: 0.3, type: 'speaker' },
+      { side: -1, zPct: 0.6, type: 'vipchair' },
+      { side: 1, zPct: 0.6, type: 'vipchair' },
+    ],
+  };
+
   function drawCornerAreas(cfg) {
-    // 三角區域：螢幕上角 → 邊線遠端 → 邊線近端的外側
-    // 左側三角：(0,0) → (0, H) → 邊線各點
-    // 先算邊線投影路徑
-    const pts = [];
-    for (let z = 0; z <= FIELD_DEPTH; z += 40) {
-      pts.push(proj(-FIELD_HW, z));
-    }
     const name = curScene.name;
+    const topY = proj(0, FIELD_DEPTH).y; // 場地上緣 y（水平截止線）
 
     for (const side of [-1, 1]) {
+      // 沿邊線的投影點
       const edgePts = [];
       for (let z = 0; z <= FIELD_DEPTH; z += 40) {
         edgePts.push(proj(side * FIELD_HW, z));
       }
 
-      // 填充三角區域底色（場外地面）
+      // 三角區域：水平頂邊 → 邊線 → 底邊，不超過 topY
       ctx.beginPath();
-      if (side === -1) {
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, H);
-        for (let i = 0; i < edgePts.length; i++) ctx.lineTo(edgePts[i].x, edgePts[i].y);
-        ctx.lineTo(edgePts[0].x, 0);
-      } else {
-        ctx.moveTo(W, 0);
-        ctx.lineTo(W, H);
-        for (let i = 0; i < edgePts.length; i++) ctx.lineTo(edgePts[i].x, edgePts[i].y);
-        ctx.lineTo(edgePts[0].x, 0);
+      const farX = side === -1 ? 0 : W;
+      ctx.moveTo(farX, topY);
+      // 沿邊線從遠到近
+      for (let i = edgePts.length - 1; i >= 0; i--) {
+        if (edgePts[i].y < topY) continue; // 跳過超出上緣的
+        ctx.lineTo(edgePts[i].x, edgePts[i].y);
       }
+      ctx.lineTo(farX, H);
       ctx.closePath();
 
-      // 底色依場景
+      // 底色
       const cornerColors = {
-        '夜間球場': '#0a1020',
-        '夕陽球場': '#2a1510',
-        '正午豔陽': '#1a4a20',
-        '陰天球場': '#2a3038',
-        '暴風雨夜': '#0e0e1a',
-        '極光球場': '#0a1820',
+        '夜間球場': '#0a1020', '夕陽球場': '#2a1510',
+        '正午豔陽': '#1a4a20', '陰天球場': '#2a3038',
+        '暴風雨夜': '#0e0e1a', '極光球場': '#0a1820',
         '金色決賽': '#0e0a00',
       };
       ctx.fillStyle = cornerColors[name] || '#111';
       ctx.fill();
 
-      // 場外質感（跑道/看台/地面紋理）
-      const cornerTextures = {
-        '夜間球場': () => {
-          // 跑道紋理
-          ctx.strokeStyle = 'rgba(100,80,60,0.15)';
-          ctx.lineWidth = 2;
-          for (let z = 100; z < FIELD_DEPTH; z += 150) {
-            const p = proj(side * (FIELD_HW + 40), z);
-            const p2 = proj(side * (FIELD_HW + 120), z);
-            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-          }
-        },
-        '夕陽球場': () => {
-          // 沙地質感
-          ctx.fillStyle = 'rgba(120,90,50,0.08)';
-          for (let z = 50; z < FIELD_DEPTH; z += 120) {
-            const p = proj(side * (FIELD_HW + 80), z);
-            ctx.beginPath(); ctx.arc(p.x, p.y, 15 * p.s * 3, 0, Math.PI * 2); ctx.fill();
-          }
-        },
-        '正午豔陽': () => {
-          // 草地延伸
-          ctx.fillStyle = 'rgba(40,100,40,0.1)';
-          for (let z = 50; z < FIELD_DEPTH; z += 100) {
-            const p = proj(side * (FIELD_HW + 60), z);
-            ctx.beginPath(); ctx.arc(p.x, p.y, 12 * p.s * 3, 0, Math.PI * 2); ctx.fill();
-          }
-        },
-        '陰天球場': () => {
-          // 濕地
-          ctx.fillStyle = 'rgba(60,70,80,0.08)';
-          for (let z = 80; z < FIELD_DEPTH; z += 130) {
-            const p = proj(side * (FIELD_HW + 70), z);
-            ctx.beginPath(); ctx.ellipse(p.x, p.y, 18 * p.s * 3, 8 * p.s * 3, 0, 0, Math.PI * 2); ctx.fill();
-          }
-        },
-        '暴風雨夜': () => {}, // 純暗
-        '極光球場': () => {
-          // 雪地
-          ctx.fillStyle = 'rgba(200,220,240,0.06)';
-          for (let z = 60; z < FIELD_DEPTH; z += 100) {
-            const p = proj(side * (FIELD_HW + 70), z);
-            ctx.beginPath(); ctx.arc(p.x, p.y, 14 * p.s * 3, 0, Math.PI * 2); ctx.fill();
-          }
-        },
-        '金色決賽': () => {
-          // 金色跑道線
-          ctx.strokeStyle = 'rgba(200,170,0,0.08)';
-          ctx.lineWidth = 1.5;
-          for (let z = 100; z < FIELD_DEPTH; z += 150) {
-            const p = proj(side * (FIELD_HW + 40), z);
-            const p2 = proj(side * (FIELD_HW + 130), z);
-            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-          }
-        },
-      };
+      // 質感 + 物件（clip 到三角內）
       ctx.save();
-      ctx.clip(); // clip 到三角區域內
-      if (cornerTextures[name]) cornerTextures[name]();
+      ctx.clip();
+
+      // 場外地面質感
+      const tints = {
+        '夜間球場': 'rgba(100,80,60,0.08)',
+        '夕陽球場': 'rgba(120,90,50,0.06)',
+        '正午豔陽': 'rgba(40,100,40,0.08)',
+        '陰天球場': 'rgba(60,70,80,0.06)',
+        '暴風雨夜': 'rgba(30,30,50,0.05)',
+        '極光球場': 'rgba(200,220,240,0.04)',
+        '金色決賽': 'rgba(200,170,0,0.05)',
+      };
+      if (tints[name]) {
+        ctx.fillStyle = tints[name];
+        for (let z = 50; z < FIELD_DEPTH; z += 100) {
+          const p = proj(side * (FIELD_HW + 80), z);
+          if (p.y < topY) continue;
+          ctx.beginPath(); ctx.arc(p.x, p.y, 14 * p.s * 3, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+
+      // 角落物件
+      const props = CORNER_PROPS[name];
+      if (props) {
+        for (const pr of props) {
+          if (pr.side !== side) continue;
+          const z = FIELD_DEPTH * pr.zPct;
+          const p = proj(pr.side * (FIELD_HW + 100), z);
+          if (p.y < topY) continue;
+          const s = p.s * 3;
+          switch (pr.type) {
+            case 'bench': _drawCornerBench(p.x, p.y, s); break;
+            case 'cone': _drawCornerCone(p.x, p.y, s); break;
+            case 'rock': _drawCornerRock(p.x, p.y, s); break;
+            case 'cactus': _drawCornerCactus(p.x, p.y, s); break;
+            case 'bush': _drawCornerBush(p.x, p.y, s); break;
+            case 'cooler': _drawCornerCooler(p.x, p.y, s); break;
+            case 'puddle': _drawCornerPuddle(p.x, p.y, s); break;
+            case 'bin': _drawCornerBin(p.x, p.y, s); break;
+            case 'igloo': _drawCornerIgloo(p.x, p.y, s); break;
+            case 'snowpile': _drawCornerSnowpile(p.x, p.y, s); break;
+            case 'speaker': _drawCornerSpeaker(p.x, p.y, s); break;
+            case 'vipchair': _drawCornerVIPChair(p.x, p.y, s); break;
+          }
+        }
+      }
+
       ctx.restore();
     }
+  }
+
+  // ── 角落物件（簡約單/雙色） ────────────────────────────────
+  function _drawCornerBench(x, y, s) {
+    ctx.fillStyle = '#5d4037';
+    ctx.fillRect(x - 8 * s, y - 3 * s, 16 * s, 2 * s); // 座面
+    ctx.fillRect(x - 7 * s, y - 1 * s, 2 * s, 3 * s);   // 左腳
+    ctx.fillRect(x + 5 * s, y - 1 * s, 2 * s, 3 * s);   // 右腳
+  }
+
+  function _drawCornerCone(x, y, s) {
+    ctx.fillStyle = '#e65100';
+    ctx.beginPath();
+    ctx.moveTo(x, y - 8 * s);
+    ctx.lineTo(x - 3 * s, y);
+    ctx.lineTo(x + 3 * s, y);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x - 2 * s, y - 4 * s, 4 * s, 1.5 * s);
+  }
+
+  function _drawCornerRock(x, y, s) {
+    ctx.fillStyle = '#5d4037';
+    ctx.beginPath();
+    ctx.moveTo(x - 6 * s, y);
+    ctx.lineTo(x - 4 * s, y - 5 * s);
+    ctx.lineTo(x + 2 * s, y - 6 * s);
+    ctx.lineTo(x + 6 * s, y - 3 * s);
+    ctx.lineTo(x + 5 * s, y);
+    ctx.closePath(); ctx.fill();
+  }
+
+  function _drawCornerCactus(x, y, s) {
+    ctx.fillStyle = '#2e7d32';
+    ctx.fillRect(x - 1.5 * s, y - 12 * s, 3 * s, 12 * s);
+    ctx.fillRect(x + 1.5 * s, y - 10 * s, 5 * s, 2 * s);
+    ctx.fillRect(x + 4.5 * s, y - 14 * s, 2 * s, 6 * s);
+    ctx.fillRect(x - 6.5 * s, y - 8 * s, 5 * s, 2 * s);
+    ctx.fillRect(x - 6.5 * s, y - 12 * s, 2 * s, 6 * s);
+  }
+
+  function _drawCornerBush(x, y, s) {
+    ctx.fillStyle = '#2e7d32';
+    ctx.beginPath(); ctx.arc(x, y - 3 * s, 5 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1b5e20';
+    ctx.beginPath(); ctx.arc(x - 3 * s, y - 2 * s, 4 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 4 * s, y - 2 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawCornerCooler(x, y, s) {
+    ctx.fillStyle = '#1565c0';
+    ctx.fillRect(x - 5 * s, y - 5 * s, 10 * s, 5 * s);
+    ctx.fillStyle = '#e0e0e0';
+    ctx.fillRect(x - 5 * s, y - 6 * s, 10 * s, 1.5 * s);
+  }
+
+  function _drawCornerPuddle(x, y, s) {
+    ctx.fillStyle = 'rgba(100,130,160,0.25)';
+    ctx.beginPath(); ctx.ellipse(x, y - 1 * s, 8 * s, 3 * s, 0, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawCornerBin(x, y, s) {
+    ctx.fillStyle = '#455a64';
+    ctx.fillRect(x - 3 * s, y - 7 * s, 6 * s, 7 * s);
+    ctx.fillStyle = '#546e7a';
+    ctx.fillRect(x - 3.5 * s, y - 8 * s, 7 * s, 1.5 * s);
+  }
+
+  function _drawCornerIgloo(x, y, s) {
+    ctx.fillStyle = '#cfd8dc';
+    ctx.beginPath();
+    ctx.arc(x, y, 7 * s, Math.PI, 0);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#90a4ae';
+    ctx.beginPath();
+    ctx.arc(x, y, 3 * s, Math.PI, 0);
+    ctx.closePath(); ctx.fill();
+  }
+
+  function _drawCornerSnowpile(x, y, s) {
+    ctx.fillStyle = '#cfd8dc';
+    ctx.beginPath(); ctx.arc(x, y - 2 * s, 6 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#eceff1';
+    ctx.beginPath(); ctx.arc(x + 2 * s, y - 3 * s, 4 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawCornerSpeaker(x, y, s) {
+    ctx.fillStyle = '#212121';
+    ctx.fillRect(x - 4 * s, y - 8 * s, 8 * s, 8 * s);
+    ctx.fillStyle = '#424242';
+    ctx.beginPath(); ctx.arc(x, y - 4 * s, 3 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawCornerVIPChair(x, y, s) {
+    ctx.fillStyle = '#4a3800';
+    ctx.fillRect(x - 4 * s, y - 3 * s, 8 * s, 3 * s); // 座墊
+    ctx.fillRect(x - 4 * s, y - 8 * s, 1.5 * s, 8 * s); // 椅背左
+    ctx.fillRect(x + 2.5 * s, y - 8 * s, 1.5 * s, 8 * s); // 椅背右
+    ctx.fillStyle = '#ffd600';
+    ctx.fillRect(x - 3.5 * s, y - 3.5 * s, 7 * s, 1 * s); // 金邊
   }
 
   function drawSideCrowd() {
