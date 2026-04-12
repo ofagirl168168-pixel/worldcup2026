@@ -23,23 +23,26 @@
   //  卡牌
   // ═══════════════════════════════════════════════════════════
   // 稀有度權重：common 出現最多，legendary 最少
-  const RARITY_WEIGHT = { common: 50, rare: 25, epic: 10, legendary: 3 };
+  const RARITY_WEIGHT = { common: 50, uncommon: 35, rare: 25, epic: 10, legendary: 3 };
 
   const CARDS = [
-    // ── 基礎數值卡 (common) ─────────────────
+    // ── 基礎數值卡 (common 白色) ────────────
     { id:'dmg20',    name:'射門強化',   desc:'傷害 +20%',                rarity:'common',    apply(s){ s.dmgMul *= 1.2; }},
-    { id:'dmg30',    name:'力量訓練',   desc:'傷害 +30%',                rarity:'common',    apply(s){ s.dmgMul *= 1.3; }},
     { id:'spd20',    name:'速度鞋',     desc:'球速 +20%',                rarity:'common',    apply(s){ s.spdMul *= 1.2; }},
-    { id:'spd40',    name:'閃電射門',   desc:'球速 +40%',                rarity:'common',    apply(s){ s.spdMul *= 1.4; }},
     { id:'bigball',  name:'大力丸',     desc:'球體+20%（增大也提升傷害，上限3倍）', rarity:'common', apply(s){ s.ballScale = Math.min(3, s.ballScale * 1.2); }},
-    { id:'bigball2', name:'巨型足球',   desc:'球體+40%（增大也提升傷害，上限3倍）', rarity:'common', apply(s){ s.ballScale = Math.min(3, s.ballScale * 1.4); }},
-    { id:'rapid',    name:'快速連射',   desc:'射門冷卻 -30%',            rarity:'common',    apply(s){ s.cdMul *= 0.7; }},
     { id:'rapid2',   name:'輕量化',     desc:'射門冷卻 -20%',            rarity:'common',    apply(s){ s.cdMul *= 0.8; }},
     { id:'multi1',   name:'雙重射擊',   desc:'連續射球數量 +1',          rarity:'common',    apply(s){ s.multiShot += 1; }},
-    { id:'ironleg',  name:'鐵腿',       desc:'傷害 +50%，球速 -15%',     rarity:'common',    apply(s){ s.dmgMul *= 1.5; s.spdMul *= 0.85; }},
     { id:'magnet',   name:'磁力門框',   desc:'球門判定寬度 +20%',        rarity:'common',    apply(s){ s.goalBonus = (s.goalBonus||0) + 0.2; }},
 
-    // ── 能力卡 (rare) ──────────────────────
+    // ── 進階數值卡 (uncommon 綠色) ──────────
+    { id:'dmg30',    name:'力量訓練',   desc:'傷害 +30%',                rarity:'uncommon',  apply(s){ s.dmgMul *= 1.3; }},
+    { id:'spd40',    name:'閃電射門',   desc:'球速 +40%',                rarity:'uncommon',  apply(s){ s.spdMul *= 1.4; }},
+    { id:'bigball2', name:'巨型足球',   desc:'球體+40%（增大也提升傷害，上限3倍）', rarity:'uncommon', apply(s){ s.ballScale = Math.min(3, s.ballScale * 1.4); }},
+    { id:'rapid',    name:'快速連射',   desc:'射門冷卻 -30%',            rarity:'uncommon',  apply(s){ s.cdMul *= 0.7; }},
+    { id:'ironleg',  name:'鐵腿',       desc:'傷害 +50%，球速 -15%',     rarity:'uncommon',  apply(s){ s.dmgMul *= 1.5; s.spdMul *= 0.85; }},
+    { id:'critG',    name:'銳利直覺',   desc:'每次射門 10% 機率暴擊 ×3', rarity:'uncommon',  apply(s){ s.critPct = Math.min(0.6, (s.critPct||0) + 0.1); }},
+
+    // ── 能力卡 (rare 藍色) ──────────────────
     { id:'burn',     name:'火焰射擊',   desc:'命中附帶灼燒（每秒 1 傷害）', rarity:'rare',  apply(s){ s.burn = true; }},
     { id:'freeze',   name:'冰凍射擊',   desc:'命中後敵人減速 50%',       rarity:'rare',    apply(s){ s.freeze = true; }},
     { id:'explode',  name:'爆裂射擊',   desc:'命中時爆炸傷害周圍',       rarity:'rare',    apply(s){ s.explode = true; }},
@@ -573,8 +576,8 @@
 
   // 可無限疊加的純數值卡
   const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','rapid2','multi1','multi2','power2','ironleg','magnet','guard']);
-  // 有次數上限的疊加卡
-  const STACK_LIMIT = { ghost: 3, bounce: 4, crit: 3 };
+  // 有次數上限的疊加卡（critG 和 crit 共用暴擊率上限 60%，分開計數）
+  const STACK_LIMIT = { ghost: 3, bounce: 4, crit: 3, critG: 6 };
 
   function pickCards(n) {
     // 過濾卡池：純數值無限疊、ghost 限 3 次、其餘能力卡選過就移除
@@ -1094,11 +1097,13 @@
           ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, gr, 0, Math.PI * 2); ctx.fill();
           break;
         }
-        case 'crit': { // 紅色 CRIT 文字（簡潔白底風+紅色）
-          ctx.font = `bold ${Math.max(14, 22 * pos.s)}px sans-serif`;
-          ctx.textAlign = 'center';
+        case 'crit': { // 紅色暴擊文字+光暈
           ctx.fillStyle = '#ff1744';
-          ctx.fillText('CRIT!', pos.x, pos.y - 25 * pos.s + fy);
+          ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 12;
+          ctx.font = `bold ${sz * 1.3}px "Noto Sans TC", sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText('暴擊!', pos.x, pos.y - sz * 1.5 + fy);
+          ctx.shadowBlur = 0;
           break;
         }
         case 'block': { // 黃色擋球光環
@@ -1339,14 +1344,13 @@
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
       <radialGradient id="g2" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#ccc"/></radialGradient>
       <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <circle cx="12" cy="50" r="8" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M12 50l-2-1 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
-      <circle cx="40" cy="26" r="18" fill="url(#g2)" filter="url(#gl1)"/>
-      <path d="M40 26l-5-4 2-7 5 1 5-1 2 7z" fill="#555" opacity="0.3"/>
-      <g stroke="#ab47bc" stroke-width="2" opacity="0.6" stroke-linecap="round">
-      <line x1="18" y1="44" x2="24" y2="38"/><line x1="20" y1="48" x2="28" y2="40"/>
-      <line x1="56" y1="16" x2="60" y2="10"/><line x1="56" y1="22" x2="62" y2="20"/>
-      <line x1="56" y1="30" x2="60" y2="36"/></g></svg>`,
+      <g stroke="#ab47bc" stroke-width="2" opacity="0.5" stroke-linecap="round">
+      <line x1="17" y1="44" x2="26" y2="38"/><line x1="12" y1="42" x2="24" y2="32"/></g>
+      <circle cx="10" cy="50" r="8" fill="url(#g1)" filter="url(#gl1)"/>
+      <g fill="#444" opacity="0.3"><path d="M10 47l-2-1-1-2 1-2 3 0 1 2-1 2z"/></g>
+      <circle cx="38" cy="24" r="18" fill="url(#g2)" filter="url(#gl1)"/>
+      <g fill="#444" opacity="0.3"><path d="M38 18l-4-2-2-5 3-3 6 0 3 3-2 5z"/><path d="M28 26l-2-4 3-2 4 3 1 4-3 2z"/><path d="M48 26l2-4-3-2-4 3-1 4 3 2z"/><path d="M32 35l1-3 4 0 3 2-1 4-4 1z"/><path d="M44 35l-1-3-4 0-3 2 1 4 4 1z"/></g>
+      <g stroke="#555" stroke-width="0.6" fill="none" opacity="0.2"><line x1="34" y1="18" x2="28" y2="22"/><line x1="42" y1="18" x2="48" y2="22"/><line x1="28" y1="30" x2="32" y2="35"/><line x1="48" y1="30" x2="44" y2="35"/></g></svg>`,
 
     bigball2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#ccc"/></radialGradient>
@@ -1354,8 +1358,8 @@
       <circle cx="32" cy="32" r="28" fill="none" stroke="#7e57c2" stroke-width="2" opacity="0.35" filter="url(#gl1)"/>
       <circle cx="32" cy="32" r="24" fill="none" stroke="#b39ddb" stroke-width="1" opacity="0.3"/>
       <circle cx="32" cy="32" r="22" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M32 32l-7-5 3-10 7 2 7-2 3 10z" fill="#555" opacity="0.25"/>
-      <path d="M32 10v6M32 48v6M10 32h6M48 32h6" stroke="#7e57c2" stroke-width="1.5" opacity="0.3"/></svg>`,
+      <g fill="#444" opacity="0.3"><path d="M32 25l-5-2-2-5 3-3 7 0 3 3-2 5z"/><path d="M21 33l-2-5 3-2 5 3 1 5-3 2z"/><path d="M43 33l2-5-3-2-5 3-1 5 3 2z"/><path d="M24 44l2-4 5 0 3 3-1 5-5 1z"/><path d="M40 44l-2-4-5 0-3 3 1 5 5 1z"/></g>
+      <g stroke="#555" stroke-width="0.7" fill="none" opacity="0.2"><line x1="27" y1="25" x2="21" y2="28"/><line x1="37" y1="25" x2="43" y2="28"/><line x1="21" y1="36" x2="24" y2="40"/><line x1="43" y1="36" x2="40" y2="40"/><line x1="32" y1="18" x2="32" y2="25"/><line x1="29" y1="44" x2="32" y2="50"/><line x1="35" y1="44" x2="32" y2="50"/></g></svg>`,
 
     rapid: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
@@ -1379,9 +1383,11 @@
       <defs><radialGradient id="g1" cx="38%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
       <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
       <circle cx="20" cy="32" r="14" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M20 32l-4-3 2-5 4 1 4-1 2 5z" fill="#555" opacity="0.3"/>
+      <g fill="#444" opacity="0.35"><path d="M20 28l-3-1-1-3 2-2 4 0 2 2-1 3z"/><path d="M13 35l-1-3 2-1 3 2 0 3-2 1z"/><path d="M27 35l1-3-2-1-3 2 0 3 2 1z"/><path d="M16 41l1-2 3 0 2 2-1 3-3 0z"/><path d="M24 41l-1-2-3 0-2 2 1 3 3 0z"/></g>
+      <g stroke="#555" stroke-width="0.5" fill="none" opacity="0.2"><line x1="17" y1="28" x2="13" y2="32"/><line x1="23" y1="28" x2="27" y2="32"/><line x1="13" y1="38" x2="17" y2="41"/><line x1="27" y1="38" x2="23" y2="41"/><line x1="20" y1="24" x2="20" y2="28"/></g>
       <circle cx="44" cy="32" r="14" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M44 32l-4-3 2-5 4 1 4-1 2 5z" fill="#555" opacity="0.3"/>
+      <g fill="#444" opacity="0.35" transform="translate(24,0)"><path d="M20 28l-3-1-1-3 2-2 4 0 2 2-1 3z"/><path d="M13 35l-1-3 2-1 3 2 0 3-2 1z"/><path d="M27 35l1-3-2-1-3 2 0 3 2 1z"/><path d="M16 41l1-2 3 0 2 2-1 3-3 0z"/><path d="M24 41l-1-2-3 0-2 2 1 3 3 0z"/></g>
+      <g stroke="#555" stroke-width="0.5" fill="none" opacity="0.2" transform="translate(24,0)"><line x1="17" y1="28" x2="13" y2="32"/><line x1="23" y1="28" x2="27" y2="32"/><line x1="13" y1="38" x2="17" y2="41"/><line x1="27" y1="38" x2="23" y2="41"/><line x1="20" y1="24" x2="20" y2="28"/></g>
       <text x="32" y="58" text-anchor="middle" font-size="10" font-weight="bold" fill="#aaa">×2</text></svg>`,
 
     multi2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
@@ -1469,6 +1475,13 @@
       <g filter="url(#gl1)"><polygon points="36,2 20,28 30,28 24,62 46,22 36,22" fill="url(#c1)"/>
       <polygon points="36,2 20,28 30,28 24,62 46,22 36,22" fill="none" stroke="#ffcdd2" stroke-width="1" opacity="0.5"/></g>
       <text x="32" y="52" text-anchor="middle" font-size="14" font-weight="bold" fill="#ff8a80" opacity="0.8">!</text></svg>`,
+
+    critG: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="c1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#66bb6a"/><stop offset="100%" stop-color="#2e7d32"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)"><polygon points="36,2 20,28 30,28 24,62 46,22 36,22" fill="url(#c1)"/>
+      <polygon points="36,2 20,28 30,28 24,62 46,22 36,22" fill="none" stroke="#c8e6c9" stroke-width="1" opacity="0.5"/></g>
+      <text x="32" y="52" text-anchor="middle" font-size="14" font-weight="bold" fill="#a5d6a7" opacity="0.8">!</text></svg>`,
 
     gkSlow: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><linearGradient id="gk1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffa726"/><stop offset="100%" stop-color="#e65100"/></linearGradient>
@@ -1607,8 +1620,8 @@
 
     G._cardR = [];
 
-    const rarCol = { common:'#4a5568', rare:'#2563eb', epic:'#7c3aed', legendary:'#d97706' };
-    const rarName = { common:'普通', rare:'稀有', epic:'史詩', legendary:'傳說' };
+    const rarCol = { common:'#4a5568', uncommon:'#16a34a', rare:'#2563eb', epic:'#7c3aed', legendary:'#d97706' };
+    const rarName = { common:'普通', uncommon:'進階', rare:'稀有', epic:'史詩', legendary:'傳說' };
 
     G.cardPick.forEach((c, i) => {
       const cardStart = i * CARD_REVEAL_EACH;
