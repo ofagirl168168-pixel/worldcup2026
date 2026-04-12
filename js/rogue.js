@@ -245,8 +245,6 @@
     G.spawnTimer = 1500;
 
     waveFlash = 1800;
-    // 每波隨機場景
-    curScene = SCENES[Math.floor(Math.random() * SCENES.length)];
     // 守門員速度：每 5 波才提升一次
     const gkTier = Math.floor(G.wave / 5); // wave5=1, wave10=2, wave15=3...
     G.gk.spd = (GK_BASE_SPD + gkTier * 1.0) * (G.gkSlowMul || 1);
@@ -2001,7 +1999,7 @@
     cvs.style.width = W + 'px';
     cvs.style.height = H + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);  // 所有繪製自動縮放
-    horizY = H * 0.08;
+    horizY = H * 0.25;
   }
 
   function startGame() {
@@ -2010,6 +2008,7 @@
     document.body.style.overflow = 'hidden';
 
     G = freshState();
+    curScene = SCENES[Math.floor(Math.random() * SCENES.length)];
     prevTs = performance.now();
     if (rafId) cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(loop);
