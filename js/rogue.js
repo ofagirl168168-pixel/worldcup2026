@@ -19,6 +19,42 @@
   const BALL_TTL    = 8000;  // 球最長存活 ms
   const GK_BASE_SPD = 1.2;
 
+  // ─── 場景系統 ──────────────────────────────────────────────
+  const SCENES = [
+    { name:'夜間球場',
+      sky: ['#0a1628','#16243a'],
+      grass: ['#2d7a3a','#268f35'],
+      line: 'rgba(255,255,255,0.35)' },
+    { name:'夕陽球場',
+      sky: ['#1a0a2e','#4a1942','#c0392b','#e67e22'],
+      grass: ['#3d6b2e','#4a7a2e'],
+      line: 'rgba(255,240,200,0.3)' },
+    { name:'正午豔陽',
+      sky: ['#4a90d9','#87ceeb','#d4efff'],
+      grass: ['#34a040','#2ecc40'],
+      line: 'rgba(255,255,255,0.4)' },
+    { name:'陰天球場',
+      sky: ['#3a4a5c','#5a6a7c','#7a8a9c'],
+      grass: ['#2a6830','#266030'],
+      line: 'rgba(255,255,255,0.25)' },
+    { name:'暴風雨夜',
+      sky: ['#1a1030','#2d2045','#3a2860'],
+      grass: ['#1e5528','#1a4d24'],
+      line: 'rgba(200,200,255,0.25)',
+      lightning: true },
+    { name:'極光球場',
+      sky: ['#0a1628','#0d2040','#162850'],
+      grass: ['#1e5a3a','#1a5535'],
+      line: 'rgba(200,255,220,0.3)',
+      aurora: true },
+    { name:'金色決賽',
+      sky: ['#0a0a0a','#1a1200','#2a1e00'],
+      grass: ['#1e5528','#1a5024'],
+      line: 'rgba(255,215,0,0.3)',
+      golden: true },
+  ];
+  let curScene = SCENES[0];
+
   // ═══════════════════════════════════════════════════════════
   //  卡牌
   // ═══════════════════════════════════════════════════════════
@@ -209,6 +245,8 @@
     G.spawnTimer = 1500;
 
     waveFlash = 1800;
+    // 每波隨機場景
+    curScene = SCENES[Math.floor(Math.random() * SCENES.length)];
     // 守門員速度：每 5 波才提升一次
     const gkTier = Math.floor(G.wave / 5); // wave5=1, wave10=2, wave15=3...
     G.gk.spd = (GK_BASE_SPD + gkTier * 1.0) * (G.gkSlowMul || 1);
@@ -694,6 +732,10 @@
       ctx.font = `bold ${Math.min(48, W * 0.08)}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
       ctx.fillText(`Wave ${G.wave}`, W / 2, H * 0.38);
+      // 場景名稱
+      ctx.font = `${Math.min(16, W * 0.03)}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fillText(curScene.name, W / 2, H * 0.44);
       ctx.globalAlpha = 1;
     }
 
@@ -739,12 +781,56 @@
 
   // ─── 球場 ────────────────────────────────────────────────
   function drawField() {
+    const sc = curScene;
+
     // 天空
     const skyGrad = ctx.createLinearGradient(0, 0, 0, horizY);
-    skyGrad.addColorStop(0, '#0a1628');
-    skyGrad.addColorStop(1, '#16243a');
+    const skyStops = sc.sky;
+    skyStops.forEach((c, i) => skyGrad.addColorStop(i / (skyStops.length - 1), c));
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, W, horizY);
+
+    // 極光效果（低調波紋）
+    if (sc.aurora) {
+      const t = performance.now() * 0.0003;
+      ctx.save();
+      ctx.globalAlpha = 0.08;
+      for (let i = 0; i < 3; i++) {
+        const y0 = horizY * (0.15 + i * 0.2);
+        const grad = ctx.createLinearGradient(0, y0 - 20, 0, y0 + 20);
+        grad.addColorStop(0, 'transparent');
+        grad.addColorStop(0.5, i % 2 === 0 ? '#66ffaa' : '#aa66ff');
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(0, y0);
+        for (let x = 0; x <= W; x += 20) {
+          ctx.lineTo(x, y0 + Math.sin(x * 0.008 + t + i * 2) * 12);
+        }
+        ctx.lineTo(W, y0 + 30);
+        ctx.lineTo(0, y0 + 30);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // 閃電效果（低頻閃爍）
+    if (sc.lightning && Math.random() < 0.006) {
+      ctx.save();
+      ctx.globalAlpha = 0.06;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, W, horizY);
+      ctx.restore();
+    }
+
+    // 金色光暈（從上方微弱散射）
+    if (sc.golden) {
+      const gGrad = ctx.createRadialGradient(W / 2, horizY * 0.3, 0, W / 2, horizY * 0.3, W * 0.5);
+      gGrad.addColorStop(0, 'rgba(255,200,50,0.06)');
+      gGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = gGrad;
+      ctx.fillRect(0, 0, W, horizY);
+    }
 
     // 草地條紋
     const N = 24;
@@ -753,11 +839,11 @@
       const z1 = ((i + 1) / N) * FIELD_DEPTH;
       const p0 = proj(0, z0);
       const p1 = proj(0, z1);
-      ctx.fillStyle = i % 2 === 0 ? '#2d7a3a' : '#268f35';
+      ctx.fillStyle = i % 2 === 0 ? sc.grass[0] : sc.grass[1];
       ctx.fillRect(0, p1.y, W, p0.y - p1.y + 1);
     }
 
-    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.strokeStyle = sc.line;
     ctx.lineWidth = 1.5;
 
     // 邊線
