@@ -112,6 +112,160 @@
   };
 
   // ═══════════════════════════════════════════════════════════
+  //  音效系統（Web Audio API）
+  // ═══════════════════════════════════════════════════════════
+  let audioCtx = null;
+  let sfxOn = true, bgmOn = true;
+  let bgmGain = null, sfxGain = null;
+  let _bgmTimer = null, _bgmPlaying = false;
+
+  function ensureAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    bgmGain = audioCtx.createGain(); bgmGain.gain.value = 0.18; bgmGain.connect(audioCtx.destination);
+    sfxGain = audioCtx.createGain(); sfxGain.gain.value = 0.25; sfxGain.connect(audioCtx.destination);
+  }
+
+  function playNote(freq, dur, type, dest, delay) {
+    if (!audioCtx) return;
+    const t = audioCtx.currentTime + (delay || 0);
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.3, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(dest || sfxGain);
+    o.start(t); o.stop(t + dur);
+  }
+
+  function playNoise(dur, dest, delay) {
+    if (!audioCtx) return;
+    const t = audioCtx.currentTime + (delay || 0);
+    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * dur, audioCtx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.25, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    src.connect(g); g.connect(dest || sfxGain);
+    src.start(t); src.stop(t + dur);
+  }
+
+  // ── 音效 ──
+  function sfxShoot() {
+    if (!sfxOn) return; ensureAudio();
+    playNote(220, 0.08, 'square');
+    playNote(330, 0.06, 'square', sfxGain, 0.03);
+    playNoise(0.05);
+  }
+  function sfxHit() {
+    if (!sfxOn) return; ensureAudio();
+    playNote(180, 0.1, 'sawtooth');
+    playNoise(0.08);
+  }
+  function sfxGoal() {
+    if (!sfxOn) return; ensureAudio();
+    [523, 659, 784, 1047].forEach((f, i) => playNote(f, 0.3, 'sine', sfxGain, i * 0.1));
+    playNoise(0.4, sfxGain, 0.05);
+  }
+  function sfxBlock() {
+    if (!sfxOn) return; ensureAudio();
+    playNote(120, 0.15, 'sawtooth');
+    playNoise(0.1);
+  }
+  function sfxWarning() {
+    if (!sfxOn) return; ensureAudio();
+    [440, 330, 440, 330].forEach((f, i) => playNote(f, 0.15, 'square', sfxGain, i * 0.18));
+  }
+  function sfxCard() {
+    if (!sfxOn) return; ensureAudio();
+    playNote(660, 0.1, 'sine');
+    playNote(880, 0.15, 'sine', sfxGain, 0.08);
+  }
+  function sfxLoseLife() {
+    if (!sfxOn) return; ensureAudio();
+    [330, 260, 200].forEach((f, i) => playNote(f, 0.2, 'sawtooth', sfxGain, i * 0.15));
+  }
+  function sfxGameOver() {
+    if (!sfxOn) return; ensureAudio();
+    [400, 350, 300, 250, 200].forEach((f, i) => playNote(f, 0.3, 'sawtooth', sfxGain, i * 0.2));
+  }
+
+  // ── BGM：每個國家專屬旋律循環 ──
+  const COUNTRY_MUSIC = {
+    '巴西': {
+      scale: [262, 294, 330, 392, 440, 523, 587, 659], // 大調
+      tempo: 180, type: 'sine',
+      pattern: [0,2,4,5,4,2,0,2, 4,5,6,7,6,5,4,2], // 森巴節奏感
+    },
+    '阿根廷': {
+      scale: [262, 294, 311, 370, 415, 466, 523, 554], // 小調（探戈）
+      tempo: 130, type: 'triangle',
+      pattern: [0,1,2,3,4,3,2,1, 4,5,6,7,6,5,4,3],
+    },
+    '德國': {
+      scale: [262, 294, 330, 349, 392, 440, 494, 523], // 大調（進行曲）
+      tempo: 140, type: 'square',
+      pattern: [0,0,4,4,5,5,4,4, 3,3,2,2,1,1,0,0],
+    },
+    '義大利': {
+      scale: [330, 370, 415, 440, 494, 523, 587, 659], // 明亮大調
+      tempo: 120, type: 'sine',
+      pattern: [0,2,4,6,7,6,4,2, 1,3,5,7,6,4,2,0],
+    },
+    '英格蘭': {
+      scale: [262, 294, 330, 349, 392, 440, 494, 523], // 大調（國歌感）
+      tempo: 110, type: 'triangle',
+      pattern: [0,0,1,2,2,3,4,4, 5,5,4,3,2,1,0,0],
+    },
+    '法國': {
+      scale: [330, 370, 440, 494, 523, 587, 659, 698], // 明亮（手風琴華爾滋）
+      tempo: 150, type: 'sine',
+      pattern: [0,4,2,4,0,4,2,4, 1,5,3,5,1,5,3,5], // 3/4拍感
+    },
+    '日本': {
+      scale: [262, 294, 349, 392, 466, 523, 587, 698], // 日本五聲音階
+      tempo: 100, type: 'sine',
+      pattern: [0,2,3,4,3,2,0,2, 4,6,7,6,4,3,2,0],
+    },
+  };
+
+  function startBGM(sceneName) {
+    stopBGM();
+    if (!bgmOn) return;
+    ensureAudio();
+    const music = COUNTRY_MUSIC[sceneName];
+    if (!music) return;
+    _bgmPlaying = true;
+    let step = 0;
+    const beatMs = 60000 / music.tempo;
+
+    function playStep() {
+      if (!_bgmPlaying || !bgmOn) return;
+      const idx = music.pattern[step % music.pattern.length];
+      const freq = music.scale[idx];
+      playNote(freq, beatMs / 1000 * 0.8, music.type, bgmGain);
+      // 加和弦底音（低八度，弱）
+      if (step % 4 === 0) {
+        const bassG = audioCtx.createGain();
+        bassG.gain.value = 0.08; bassG.connect(bgmGain);
+        playNote(freq / 2, beatMs / 1000 * 1.5, 'triangle', bassG);
+      }
+      step++;
+      _bgmTimer = setTimeout(playStep, beatMs);
+    }
+    playStep();
+  }
+
+  function stopBGM() {
+    _bgmPlaying = false;
+    if (_bgmTimer) { clearTimeout(_bgmTimer); _bgmTimer = null; }
+  }
+
+  // ═══════════════════════════════════════════════════════════
   //  執行期變數
   // ═══════════════════════════════════════════════════════════
   let overlay, cvs, ctx;
@@ -281,6 +435,7 @@
     // 每 5 波警告
     if (G.wave >= 5 && G.wave % 5 === 0) {
       G._warning = { timer: 3000, tier: gkTier };
+      sfxWarning();
     }
   }
 
@@ -325,6 +480,7 @@
         G.balls.push(b);
       }, delay);
     }
+    sfxShoot();
     G.canShoot = false;
     G.shootCD = SHOOT_CD * G.cdMul + (n - 1) * 120; // 冷卻包含連射時間
   }
@@ -446,6 +602,7 @@
           // 分裂小球傷害減半
           if (b._split) dmg = Math.max(1, Math.ceil(dmg * 0.5));
           d.hp -= dmg;
+          sfxHit();
           addPart(d.x, d.z, isCrit ? `-${dmg}!` : `-${dmg}`, 0.5);
           if (G.burn)   d.burning = 3000;
           if (G.freeze) d.frozen  = 3000;
@@ -487,6 +644,7 @@
       if (b.z > gk.z - 20 && b.z < gk.z + 20 && Math.abs(b.x - gk.x) < gk.w * 0.55) {
         b.alive = false;
         addPart(gk.x, gk.z, '', 0.8, 'block');
+        sfxBlock();
         shakeAmt = 4;
         continue;
       }
@@ -564,8 +722,9 @@
         G.lives--;
         d.hp = 0;
         shakeAmt = 12;
+        sfxLoseLife();
         addPart(d.x, 30, '', 1.2, 'breach');
-        if (G.lives <= 0) { G.phase = 'gameover'; G._gameoverStart = performance.now(); saveResult(); return; }
+        if (G.lives <= 0) { G.phase = 'gameover'; G._gameoverStart = performance.now(); sfxGameOver(); stopBGM(); saveResult(); return; }
       }
     }
     G.defs = G.defs.filter(d => d.hp > 0);
@@ -645,6 +804,7 @@
     G.spawnQueue = [];
     G.balls = [];          // 清除場上所有球
     shakeAmt = 10;
+    sfxGoal();
     addPart(0, GOAL_Z - 50, 'GOAL!', 1.5, 'goal');
     G.phase = 'cards';
     G.cardPick = pickCards(3);
@@ -687,6 +847,7 @@
   }
 
   function selectCard(idx) {
+    sfxCard();
     const c = G.cardPick[idx];
     c.apply(G);
     G.collected.push(c.id);
@@ -918,72 +1079,46 @@
     const name = curScene.name;
 
     if (name === '巴西') {
-      // 基督像（偏左）
-      drawCristoRedentor(W * 0.18, baseY, u);
-      // 棕櫚樹
-      [0.06, 0.82, 0.94].forEach(xp => drawPalmTree(W * xp, baseY, u));
-      // 糖麵包山剪影（偏右）
-      drawSugarloaf(W * 0.8, baseY, u);
-      // 燈柱
-      [0.4, 0.6].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.8, true));
+      drawCristoRedentor(W * 0.5, baseY, u);
+      [0.06, 0.18, 0.82, 0.94].forEach(xp => drawPalmTree(W * xp, baseY, u));
+      drawSugarloaf(W * 0.12, baseY, u);
     }
 
     else if (name === '阿根廷') {
-      // 方尖碑（偏左）
-      drawObelisco(W * 0.15, baseY, u);
-      // 燈柱（含中央）
-      [0.35, 0.5, 0.65, 0.9].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.8, true));
-      // 阿根廷國旗
-      [0.25, 0.78].forEach(xp => drawFlag(W * xp, baseY, u, '#75aadb'));
+      drawObelisco(W * 0.5, baseY, u);
+      [0.1, 0.3, 0.7, 0.9].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.8, true));
+      [0.22, 0.78].forEach(xp => drawFlag(W * xp, baseY, u, '#75aadb'));
     }
 
     else if (name === '德國') {
-      // 布蘭登堡門（偏右）
-      drawBrandenburgGate(W * 0.78, baseY, u);
-      // 啤酒桶（偏左）
-      drawBeerBarrel(W * 0.1, baseY, u);
-      // 燈柱
-      [0.3, 0.5, 0.7].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
+      drawBrandenburgGate(W * 0.5, baseY, u);
+      drawBeerBarrel(W * 0.12, baseY, u);
+      drawBeerBarrel(W * 0.88, baseY, u);
+      [0.25, 0.75].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
     }
 
     else if (name === '義大利') {
-      // 比薩斜塔（偏左）
-      drawPisaTower(W * 0.12, baseY, u);
-      // 羅馬競技場（偏右）
+      drawPisaTower(W * 0.5, baseY, u);
       drawColosseum(W * 0.82, baseY, u);
-      // 柏樹
-      [0.28, 0.72].forEach(xp => drawCypressTree(W * xp, baseY, u));
-      // 燈柱
-      drawStadiumLight(W * 0.5, baseY, u * 0.7, true);
+      [0.06, 0.22, 0.94].forEach(xp => drawCypressTree(W * xp, baseY, u));
     }
 
     else if (name === '英格蘭') {
-      // 大笨鐘（偏左）
-      drawBigBen(W * 0.1, baseY, u);
-      // 倫敦眼（偏右）
+      drawBigBen(W * 0.5, baseY, u);
       drawLondonEye(W * 0.88, baseY, u);
-      // 路燈
-      [0.35, 0.5, 0.65].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.8, true));
+      [0.15, 0.35, 0.7].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.8, true));
     }
 
     else if (name === '法國') {
-      // 艾菲爾鐵塔（偏左）
-      drawEiffelTower(W * 0.15, baseY, u);
-      // 凱旋門（偏右）
-      drawArcDeTriomphe(W * 0.85, baseY, u);
-      // 路燈
-      [0.38, 0.5, 0.65].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
+      drawEiffelTower(W * 0.5, baseY, u);
+      drawArcDeTriomphe(W * 0.15, baseY, u);
+      [0.35, 0.65, 0.85].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
     }
 
     else if (name === '日本') {
-      // 鳥居（偏左）
-      drawTorii(W * 0.18, baseY, u);
-      // 富士山（偏右）
+      drawTorii(W * 0.5, baseY, u);
       drawFujiSan(W * 0.85, baseY, u);
-      // 櫻花樹
-      [0.06, 0.7].forEach(xp => drawSakuraTree(W * xp, baseY, u));
-      // 燈柱
-      [0.4, 0.55].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
+      [0.06, 0.3, 0.7].forEach(xp => drawSakuraTree(W * xp, baseY, u));
     }
 
     ctx.restore();
@@ -3213,6 +3348,32 @@
       ctx.textAlign = 'center';
       ctx.fillText('點擊畫面射門', W / 2, H - 16);
     }
+
+    // 音效/音樂開關按鈕（右上角）
+    const btnSz = 20, btnY = 8, btnGap = 6;
+    const sfxBtnX = W - btnSz - btnGap - btnSz - btnGap - 8;
+    const bgmBtnX = W - btnSz - btnGap - 8;
+    // 音效按鈕
+    ctx.fillStyle = sfxOn ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)';
+    ctx.font = `${btnSz - 4}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(sfxOn ? 'SFX' : 'SFX', sfxBtnX + btnSz / 2, btnY + btnSz - 4);
+    if (!sfxOn) {
+      ctx.strokeStyle = 'rgba(255,80,80,0.7)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(sfxBtnX, btnY); ctx.lineTo(sfxBtnX + btnSz, btnY + btnSz); ctx.stroke();
+      ctx.lineWidth = 1;
+    }
+    // 音樂按鈕
+    ctx.fillStyle = bgmOn ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)';
+    ctx.fillText(bgmOn ? 'BGM' : 'BGM', bgmBtnX + btnSz / 2, btnY + btnSz - 4);
+    if (!bgmOn) {
+      ctx.strokeStyle = 'rgba(255,80,80,0.7)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(bgmBtnX, btnY); ctx.lineTo(bgmBtnX + btnSz, btnY + btnSz); ctx.stroke();
+      ctx.lineWidth = 1;
+    }
+    // 儲存按鈕區域供點擊判斷
+    G._sfxBtn = { x: sfxBtnX, y: btnY, w: btnSz, h: btnSz };
+    G._bgmBtn = { x: bgmBtnX, y: btnY, w: btnSz, h: btnSz };
   }
 
   // ─── 標題畫面 ────────────────────────────────────────────
@@ -3808,6 +3969,18 @@
     const x = (e.clientX - rect.left) * (W / rect.width);
     const y = (e.clientY - rect.top) * (H / rect.height);
 
+    // 音效/音樂開關判定
+    if (G._sfxBtn && x >= G._sfxBtn.x && x <= G._sfxBtn.x + G._sfxBtn.w &&
+        y >= G._sfxBtn.y && y <= G._sfxBtn.y + G._sfxBtn.h) {
+      sfxOn = !sfxOn; return;
+    }
+    if (G._bgmBtn && x >= G._bgmBtn.x && x <= G._bgmBtn.x + G._bgmBtn.w &&
+        y >= G._bgmBtn.y && y <= G._bgmBtn.y + G._bgmBtn.h) {
+      bgmOn = !bgmOn;
+      if (bgmOn) startBGM(curScene.name); else stopBGM();
+      return;
+    }
+
     if (G.phase === 'title') {
       if (hitTest(x, y, G._startR)) {
         G.phase = 'playing';
@@ -3879,6 +4052,8 @@
 
     G = freshState();
     curScene = SCENES[Math.floor(Math.random() * SCENES.length)];
+    ensureAudio();
+    startBGM(curScene.name);
     prevTs = performance.now();
     if (rafId) cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(loop);
@@ -3888,6 +4063,7 @@
     if (overlay) overlay.classList.remove('active');
     document.body.style.overflow = '';
     if (rafId) cancelAnimationFrame(rafId);
+    stopBGM();
     G = null;
   }
 
