@@ -174,17 +174,37 @@
   //  Wave 管理
   // ═══════════════════════════════════════════════════════════
   function waveConfig(w) {
-    const count = Math.min(3 + w, 16);
+    // 防守員數量：每階段上限 +1
+    let maxCount;
+    if (w <= 15)      maxCount = 16;
+    else if (w <= 30) maxCount = 17;
+    else if (w <= 50) maxCount = 18;
+    else              maxCount = 19;
+    const count = Math.min(3 + w, maxCount);
     const types = ['normal'];
     if (w >= 1) types.push('sentry');  // 每波都有中路守衛擋住直射
     if (w >= 2) types.push('fast');
     if (w >= 3) { types.push('tank'); types.push('captain'); }
-    // 確保至少 1~2 個 sentry 擋中路
-    const sentryCount = Math.min(1 + Math.floor(w / 2), 4);
-    // 保底紫色攔截者數量（wave3 起）
-    const captainCount = w >= 3 ? Math.min(1 + Math.floor((w - 2) / 2), 3) : 0;
-    // 血量成長（緩和）
-    const hpMul  = Math.pow(1.20, w - 1);        // wave3=1.44x, wave5=2.07x, wave8=3.58x, wave10=5.16x
+    // 中路守衛數量：每階段 +1
+    let maxSentry;
+    if (w <= 15)      maxSentry = 4;
+    else if (w <= 30) maxSentry = 5;
+    else if (w <= 50) maxSentry = 6;
+    else              maxSentry = 7;
+    const sentryCount = Math.min(1 + Math.floor(w / 2), maxSentry);
+    // 攔截者數量：每階段 +1
+    let maxCaptain;
+    if (w <= 15)      maxCaptain = 3;
+    else if (w <= 30) maxCaptain = 4;
+    else if (w <= 50) maxCaptain = 5;
+    else              maxCaptain = 6;
+    const captainCount = w >= 3 ? Math.min(1 + Math.floor((w - 2) / 2), maxCaptain) : 0;
+    // 血量成長：後期加速
+    let hpMul;
+    if (w <= 15)      hpMul = Math.pow(1.20, w - 1);                                    // 前期 1.2x
+    else if (w <= 30) hpMul = Math.pow(1.20, 14) * Math.pow(1.25, w - 15);              // 中期 1.25x
+    else if (w <= 50) hpMul = Math.pow(1.20, 14) * Math.pow(1.25, 15) * Math.pow(1.30, w - 30);  // 後期 1.30x
+    else              hpMul = Math.pow(1.20, 14) * Math.pow(1.25, 15) * Math.pow(1.30, 20) * Math.pow(1.35, w - 50); // 極後期 1.35x
     const spdMul = 1 + (w - 1) * 0.12;           // wave1=1x, wave5=1.48x, wave10=2.08x
     return { count, types, hpMul, spdMul, sentryCount, captainCount };
   }
@@ -247,9 +267,16 @@
     waveFlash = 1800;
     generateCornerProps(); // 每波隨機更換角落物件
     generateBgEggs();     // 每波隨機更換背景彩蛋
-    // 守門員速度：每 5 波才提升一次
+    // 守門員速度：每 5 波提升，後期加速更快
     const gkTier = Math.floor(G.wave / 5); // wave5=1, wave10=2, wave15=3...
-    G.gk.spd = (GK_BASE_SPD + gkTier * 1.0) * (G.gkSlowMul || 1);
+    let gkBonus = 0;
+    for (let t = 1; t <= gkTier; t++) {
+      if (t <= 3)       gkBonus += 1.0;  // wave 5-15：每階 +1.0
+      else if (t <= 6)  gkBonus += 1.5;  // wave 20-30：每階 +1.5
+      else if (t <= 10) gkBonus += 2.5;  // wave 35-50：每階 +2.5
+      else              gkBonus += 4.0;  // wave 55+：每階 +4.0（接近瞬移）
+    }
+    G.gk.spd = (GK_BASE_SPD + gkBonus) * (G.gkSlowMul || 1);
     G.gk.tracking = G.wave >= 5; // wave5 起才追蹤球
 
     // 每 5 波警告
