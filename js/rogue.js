@@ -918,69 +918,72 @@
     const name = curScene.name;
 
     if (name === '巴西') {
-      // 基督像（中央）
-      drawCristoRedentor(W * 0.5, baseY, u);
+      // 基督像（偏左）
+      drawCristoRedentor(W * 0.18, baseY, u);
       // 棕櫚樹
-      [0.06, 0.18, 0.82, 0.94].forEach(xp => drawPalmTree(W * xp, baseY, u));
-      // 糖麵包山剪影
-      drawSugarloaf(W * 0.12, baseY, u);
-      drawSugarloaf(W * 0.88, baseY, u);
+      [0.06, 0.82, 0.94].forEach(xp => drawPalmTree(W * xp, baseY, u));
+      // 糖麵包山剪影（偏右）
+      drawSugarloaf(W * 0.8, baseY, u);
+      // 燈柱
+      [0.4, 0.6].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.8, true));
     }
 
     else if (name === '阿根廷') {
-      // 方尖碑（中央）
-      drawObelisco(W * 0.5, baseY, u);
-      // 燈柱
-      [0.1, 0.3, 0.7, 0.9].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.8, true));
+      // 方尖碑（偏左）
+      drawObelisco(W * 0.15, baseY, u);
+      // 燈柱（含中央）
+      [0.35, 0.5, 0.65, 0.9].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.8, true));
       // 阿根廷國旗
-      [0.22, 0.78].forEach(xp => drawFlag(W * xp, baseY, u, '#75aadb'));
+      [0.25, 0.78].forEach(xp => drawFlag(W * xp, baseY, u, '#75aadb'));
     }
 
     else if (name === '德國') {
-      // 布蘭登堡門（中央）
-      drawBrandenburgGate(W * 0.5, baseY, u);
-      // 啤酒桶
-      drawBeerBarrel(W * 0.12, baseY, u);
-      drawBeerBarrel(W * 0.88, baseY, u);
+      // 布蘭登堡門（偏右）
+      drawBrandenburgGate(W * 0.78, baseY, u);
+      // 啤酒桶（偏左）
+      drawBeerBarrel(W * 0.1, baseY, u);
       // 燈柱
-      [0.25, 0.75].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
+      [0.3, 0.5, 0.7].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
     }
 
     else if (name === '義大利') {
-      // 比薩斜塔
-      drawPisaTower(W * 0.2, baseY, u);
-      // 羅馬競技場剪影
-      drawColosseum(W * 0.5, baseY, u);
+      // 比薩斜塔（偏左）
+      drawPisaTower(W * 0.12, baseY, u);
+      // 羅馬競技場（偏右）
+      drawColosseum(W * 0.82, baseY, u);
       // 柏樹
-      [0.06, 0.8, 0.94].forEach(xp => drawCypressTree(W * xp, baseY, u));
+      [0.28, 0.72].forEach(xp => drawCypressTree(W * xp, baseY, u));
+      // 燈柱
+      drawStadiumLight(W * 0.5, baseY, u * 0.7, true);
     }
 
     else if (name === '英格蘭') {
-      // 大笨鐘
-      drawBigBen(W * 0.15, baseY, u);
-      // 倫敦眼
-      drawLondonEye(W * 0.85, baseY, u);
+      // 大笨鐘（偏左）
+      drawBigBen(W * 0.1, baseY, u);
+      // 倫敦眼（偏右）
+      drawLondonEye(W * 0.88, baseY, u);
       // 路燈
       [0.35, 0.5, 0.65].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.8, true));
     }
 
     else if (name === '法國') {
-      // 艾菲爾鐵塔（中央）
-      drawEiffelTower(W * 0.5, baseY, u);
-      // 凱旋門
-      drawArcDeTriomphe(W * 0.15, baseY, u);
+      // 艾菲爾鐵塔（偏左）
+      drawEiffelTower(W * 0.15, baseY, u);
+      // 凱旋門（偏右）
+      drawArcDeTriomphe(W * 0.85, baseY, u);
       // 路燈
-      [0.35, 0.65, 0.85].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
+      [0.38, 0.5, 0.65].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
     }
 
     else if (name === '日本') {
-      // 鳥居（中央）
-      drawTorii(W * 0.5, baseY, u);
-      // 富士山剪影
-      drawFujiSan(W * 0.15, baseY, u);
+      // 鳥居（偏左）
+      drawTorii(W * 0.18, baseY, u);
+      // 富士山（偏右）
       drawFujiSan(W * 0.85, baseY, u);
       // 櫻花樹
-      [0.3, 0.7].forEach(xp => drawSakuraTree(W * xp, baseY, u));
+      [0.06, 0.7].forEach(xp => drawSakuraTree(W * xp, baseY, u));
+      // 燈柱
+      [0.4, 0.55].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
     }
 
     ctx.restore();
@@ -2128,7 +2131,7 @@
       _bgEggs.push({
         type,
         xPct: Math.random(),
-        yPct: 0.05 + Math.random() * 0.9,
+        yPct: 0.05 + Math.random() * 0.5,  // 限制在上半部，不要飛太低
         scale: 0.5 + Math.random() * 0.5,
         alpha: 0.2 + Math.random() * 0.15,
         spd: 0.08 + Math.random() * 0.12,   // 飛行速度（加快）
