@@ -32,7 +32,7 @@
     { id:'bigball',  name:'大力丸',     desc:'球體+20%（增大也提升傷害，上限3倍）', rarity:'common', apply(s){ s.ballScale = Math.min(3, s.ballScale * 1.2); }},
     { id:'rapid2',   name:'輕量化',     desc:'射門冷卻 -20%',            rarity:'common',    apply(s){ s.cdMul *= 0.8; }},
     { id:'multi1',   name:'雙重射擊',   desc:'連續射球數量 +1',          rarity:'common',    apply(s){ s.multiShot += 1; }},
-    { id:'magnet',   name:'磁力門框',   desc:'球門判定寬度 +20%',        rarity:'common',    apply(s){ s.goalBonus = (s.goalBonus||0) + 0.2; }},
+    { id:'magnet',   name:'磁力門框',   desc:'球門判定寬度 +20%',        rarity:'rare',      apply(s){ s.goalBonus = (s.goalBonus||0) + 0.2; }},
 
     // ── 進階數值卡 (uncommon 綠色) ──────────
     { id:'dmg30',    name:'力量訓練',   desc:'傷害 +30%',                rarity:'uncommon',  apply(s){ s.dmgMul *= 1.3; }},
