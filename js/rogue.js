@@ -781,12 +781,13 @@
   function drawField() {
     const sc = curScene;
 
-    // 天空
-    const skyGrad = ctx.createLinearGradient(0, 0, 0, horizY);
+    // 天空（延伸到球門投影位置，覆蓋 horizY 以下的透視空隙）
+    const skyBottom = proj(0, FIELD_DEPTH).y + 10;
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, skyBottom);
     const skyStops = sc.sky;
     skyStops.forEach((c, i) => skyGrad.addColorStop(i / (skyStops.length - 1), c));
     ctx.fillStyle = skyGrad;
-    ctx.fillRect(0, 0, W, horizY);
+    ctx.fillRect(0, 0, W, skyBottom);
 
     // 極光效果（低調波紋）
     if (sc.aurora) {
@@ -794,7 +795,7 @@
       ctx.save();
       ctx.globalAlpha = 0.08;
       for (let i = 0; i < 3; i++) {
-        const y0 = horizY * (0.15 + i * 0.2);
+        const y0 = skyBottom * (0.2 + i * 0.25);
         const grad = ctx.createLinearGradient(0, y0 - 20, 0, y0 + 20);
         grad.addColorStop(0, 'transparent');
         grad.addColorStop(0.5, i % 2 === 0 ? '#66ffaa' : '#aa66ff');
@@ -817,17 +818,17 @@
       ctx.save();
       ctx.globalAlpha = 0.06;
       ctx.fillStyle = '#fff';
-      ctx.fillRect(0, 0, W, horizY);
+      ctx.fillRect(0, 0, W, skyBottom);
       ctx.restore();
     }
 
     // 金色光暈（從上方微弱散射）
     if (sc.golden) {
-      const gGrad = ctx.createRadialGradient(W / 2, horizY * 0.3, 0, W / 2, horizY * 0.3, W * 0.5);
+      const gGrad = ctx.createRadialGradient(W / 2, skyBottom * 0.3, 0, W / 2, skyBottom * 0.3, W * 0.5);
       gGrad.addColorStop(0, 'rgba(255,200,50,0.06)');
       gGrad.addColorStop(1, 'transparent');
       ctx.fillStyle = gGrad;
-      ctx.fillRect(0, 0, W, horizY);
+      ctx.fillRect(0, 0, W, skyBottom);
     }
 
     // 草地條紋
@@ -1999,7 +2000,7 @@
     cvs.style.width = W + 'px';
     cvs.style.height = H + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);  // 所有繪製自動縮放
-    horizY = H * 0.25;
+    horizY = H * 0.08;
   }
 
   function startGame() {
