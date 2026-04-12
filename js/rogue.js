@@ -1285,24 +1285,64 @@
     ctx.textAlign = 'center';
 
     // 標題
+    const titleSz = Math.min(42, W * 0.08);
     ctx.fillStyle = '#ffd700';
-    ctx.font = `bold ${Math.min(42, W * 0.08)}px "Noto Sans TC", sans-serif`;
+    ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 18;
+    ctx.font = `bold ${titleSz}px "Noto Sans TC", sans-serif`;
     ctx.fillText('射門挑戰', W / 2, H * 0.25);
+    ctx.shadowBlur = 0;
+    // 標題兩側足球
+    const titleW = ctx.measureText('射門挑戰').width;
+    const ballDeco = Math.min(24, W * 0.045);
+    drawIcon('multi1', W / 2 - titleW / 2 - ballDeco - 4, H * 0.25 - titleSz * 0.3, ballDeco);
+    drawIcon('multi1', W / 2 + titleW / 2 + ballDeco + 4, H * 0.25 - titleSz * 0.3, ballDeco);
 
     ctx.fillStyle = '#fff';
     ctx.font = `${Math.min(18, W * 0.035)}px "Noto Sans TC", sans-serif`;
     ctx.fillText('足球肉鴿生存遊戲', W / 2, H * 0.32);
 
-    // 說明
-    ctx.fillStyle = 'rgba(255,255,255,0.65)';
-    ctx.font = `${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
+    // 裝飾分隔線
+    const lineW = Math.min(180, W * 0.35);
+    ctx.strokeStyle = 'rgba(255,215,0,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - lineW / 2, H * 0.35);
+    ctx.lineTo(W / 2 + lineW / 2, H * 0.35);
+    ctx.stroke();
+
+    // 說明（帶圖示）
+    const ruleIconSize = Math.min(22, W * 0.042);
+    const ruleFontSz = Math.min(14, W * 0.028);
+    const ruleLineH = Math.min(28, W * 0.052);
+    const ruleStartY = H * 0.40;
+    const ruleIcons = ['multi1', 'bounce', 'guard', 'crit'];
     const rules = [
       '點擊畫面踢出足球，射進球門得分',
       '防守球員會向你逼近，踢球擊退他們',
       '防守員突破底線會失去生命（共 3 條）',
       '每次進球可選一張強化卡強化你的射門',
     ];
-    rules.forEach((r, i) => ctx.fillText(r, W / 2, H * 0.42 + i * (Math.min(24, W * 0.045))));
+    ctx.font = `${ruleFontSz}px "Noto Sans TC", sans-serif`;
+    rules.forEach((r, i) => {
+      const y = ruleStartY + i * ruleLineH;
+      const textW = ctx.measureText(r).width;
+      const totalW = ruleIconSize + 6 + textW;
+      const startX = W / 2 - totalW / 2;
+      // 圖示
+      const iconId = ruleIcons[i];
+      if (i === 2) {
+        // 第三條用 SVG 愛心
+        drawHeart(startX + ruleIconSize / 2, y - ruleFontSz * 0.3, ruleIconSize * 0.45);
+      } else {
+        drawIcon(iconId, startX + ruleIconSize / 2, y - ruleFontSz * 0.3, ruleIconSize);
+      }
+      // 文字
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.font = `${ruleFontSz}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.fillText(r, startX + ruleIconSize + 6, y);
+      ctx.textAlign = 'center';
+    });
 
     // 最高紀錄
     const best = JSON.parse(localStorage.getItem('rogue_best') || '{}');
@@ -1486,13 +1526,11 @@
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
       <filter id="gl1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
       <g opacity="0.8"><circle cx="32" cy="14" r="7" fill="#4fc3f7"/><rect x="24" y="20" width="16" height="18" rx="3" fill="#4fc3f7"/></g>
-      <path d="M8 56L30 30" stroke="#66bb6a" stroke-width="2" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
+      <path d="M10 56L30 30" stroke="#66bb6a" stroke-width="2" stroke-dasharray="4,3" fill="none" opacity="0.5"/>
       <circle cx="30" cy="30" r="3" fill="#ffd600" opacity="0.7"/>
-      <path d="M30 30L56 56" stroke="#66bb6a" stroke-width="2.5" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
-      <circle cx="8" cy="56" r="7" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M8 56l-2-1 1-3 1 0 2 0 1 3z" fill="#555" opacity="0.3"/>
-      <circle cx="56" cy="56" r="7" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M56 56l-2-1 1-3 1 0 2 0 1 3z" fill="#555" opacity="0.3"/></svg>`,
+      <path d="M30 30L54 56" stroke="#66bb6a" stroke-width="2.5" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
+      <circle cx="54" cy="56" r="7" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M54 56l-2-1 1-3 1 0 2 0 1 3z" fill="#555" opacity="0.3"/></svg>`,
 
     crit: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><linearGradient id="c1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff5252"/><stop offset="100%" stop-color="#b71c1c"/></linearGradient>
