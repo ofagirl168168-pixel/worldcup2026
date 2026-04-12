@@ -68,7 +68,8 @@
     { id:'bigball',  name:'大力丸',     desc:'球體+20%（增大也提升傷害，上限3倍）', rarity:'common', apply(s){ s.ballScale = Math.min(3, s.ballScale * 1.2); }},
     { id:'rapid2',   name:'輕量化',     desc:'射門冷卻 -20%',            rarity:'common',    apply(s){ s.cdMul *= 0.8; }},
     { id:'multi1',   name:'雙重射擊',   desc:'連續射球數量 +1',          rarity:'common',    apply(s){ s.multiShot += 1; }},
-    { id:'magnet',   name:'磁力門框',   desc:'球門判定寬度 +20%',        rarity:'rare',      apply(s){ s.goalBonus = (s.goalBonus||0) + 0.2; }},
+    { id:'magnet',   name:'磁力門框',   desc:'球門判定寬度 +10%',        rarity:'rare',      apply(s){ s.goalBonus = (s.goalBonus||0) + 0.1; }},
+    { id:'magnet2',  name:'強力磁場',   desc:'球門判定寬度 +20%',        rarity:'epic',      apply(s){ s.goalBonus = (s.goalBonus||0) + 0.2; }},
 
     // ── 進階數值卡 (uncommon 綠色) ──────────
     { id:'dmg30',    name:'力量訓練',   desc:'傷害 +30%',                rarity:'uncommon',  apply(s){ s.dmgMul *= 1.3; }},
@@ -199,12 +200,11 @@
     else if (w <= 50) maxCaptain = 5;
     else              maxCaptain = 6;
     const captainCount = w >= 3 ? Math.min(1 + Math.floor((w - 2) / 2), maxCaptain) : 0;
-    // 血量成長：後期加速
+    // 血量成長：wave 50 前維持原幅度，50 後加速
     let hpMul;
-    if (w <= 15)      hpMul = Math.pow(1.20, w - 1);                                    // 前期 1.2x
-    else if (w <= 30) hpMul = Math.pow(1.20, 14) * Math.pow(1.25, w - 15);              // 中期 1.25x
-    else if (w <= 50) hpMul = Math.pow(1.20, 14) * Math.pow(1.25, 15) * Math.pow(1.30, w - 30);  // 後期 1.30x
-    else              hpMul = Math.pow(1.20, 14) * Math.pow(1.25, 15) * Math.pow(1.30, 20) * Math.pow(1.35, w - 50); // 極後期 1.35x
+    if (w <= 50)      hpMul = Math.pow(1.20, w - 1);                                    // 前~中期 1.2x
+    else if (w <= 65) hpMul = Math.pow(1.20, 49) * Math.pow(1.28, w - 50);              // 後期 1.28x
+    else              hpMul = Math.pow(1.20, 49) * Math.pow(1.28, 15) * Math.pow(1.35, w - 65); // 極後期 1.35x
     const spdMul = 1 + (w - 1) * 0.12;           // wave1=1x, wave5=1.48x, wave10=2.08x
     return { count, types, hpMul, spdMul, sentryCount, captainCount };
   }
@@ -652,7 +652,7 @@
   }
 
   // 可無限疊加的純數值卡
-  const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','rapid2','multi1','multi2','power2','ironleg','magnet','guard']);
+  const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','rapid2','multi1','multi2','power2','ironleg','magnet','magnet2','guard']);
   // 有次數上限的疊加卡（critG 和 crit 共用暴擊率上限 60%，分開計數）
   const STACK_LIMIT = { ghost: 3, bounce: 5, crit: 3, critG: 6 };
 
@@ -660,7 +660,7 @@
     // 過濾卡池：純數值無限疊、ghost 限 3 次、其餘能力卡選過就移除
     const pool = CARDS.filter(c => {
       // 磁鐵達到球門寬度上限就不再出現
-      if (c.id === 'magnet' && (G.goalBonus || 0) >= 0.6) return false;
+      if ((c.id === 'magnet' || c.id === 'magnet2') && (G.goalBonus || 0) >= 0.6) return false;
       if (STACKABLE.has(c.id)) return true;
       if (STACK_LIMIT[c.id]) {
         const count = G.collected.filter(id => id === c.id).length;
@@ -2014,20 +2014,19 @@
     const count = Math.min(5, Math.floor(wave / 5));
     if (count <= 0) return;
     const total = available.reduce((s, e) => s + e.weight, 0);
-    const flyDir = Math.random() < 0.5 ? 1 : -1; // 整波統一飛行方向
     for (let i = 0; i < count; i++) {
       let r = Math.random() * total;
       let type = available[available.length - 1].type;
       for (const e of available) { r -= e.weight; if (r <= 0) { type = e.type; break; } }
       _bgEggs.push({
         type,
-        xPct: Math.random(), // 初始位置隨機分布
+        xPct: Math.random(),
         yPct: 0.05 + Math.random() * 0.9,
         scale: 0.5 + Math.random() * 0.5,
         alpha: 0.2 + Math.random() * 0.15,
-        spd: 0.015 + Math.random() * 0.03, // 水平飛行速度
-        dir: flyDir,                         // 統一方向持續飛行
-        phase: Math.random() * Math.PI * 2,  // 動畫相位
+        spd: 0.08 + Math.random() * 0.12,   // 飛行速度（加快）
+        dir: Math.random() < 0.5 ? 1 : -1,  // 隨機左或右
+        phase: Math.random() * Math.PI * 2,
       });
     }
   }
@@ -2043,10 +2042,10 @@
 
     ctx.save();
     for (const egg of _bgEggs) {
-      // 動畫位移
-      egg.xPct += egg.spd * egg.dir * 0.001;
-      if (egg.xPct < -0.05) egg.xPct = 1.05;
-      if (egg.xPct > 1.05) egg.xPct = -0.05;
+      // 持續飛行位移
+      egg.xPct += egg.spd * egg.dir * 0.0005;
+      if (egg.xPct < -0.1) egg.xPct = 1.1;
+      if (egg.xPct > 1.1) egg.xPct = -0.1;
 
       const x = W * egg.xPct;
       const baseY = zoneTop + zoneH * egg.yPct;
@@ -2102,16 +2101,52 @@
   }
 
   function _drawSkyPlane(x, y, s, dir) {
-    ctx.fillStyle = '#b0bec5';
+    ctx.save();
+    ctx.translate(x, y);
+    if (dir < 0) ctx.scale(-1, 1);
     // 機身
-    ctx.fillRect(x - 8 * s * dir, y - 1.5 * s, 16 * s, 3 * s);
-    // 機翼
-    ctx.fillRect(x - 3 * s, y - 5 * s, 6 * s, 2 * s);
+    ctx.fillStyle = '#e0e0e0';
+    ctx.beginPath();
+    ctx.moveTo(10 * s, 0);
+    ctx.quadraticCurveTo(12 * s, -1.5 * s, 8 * s, -1.5 * s);
+    ctx.lineTo(-8 * s, -1.5 * s);
+    ctx.lineTo(-10 * s, -0.5 * s);
+    ctx.lineTo(-10 * s, 1 * s);
+    ctx.lineTo(-8 * s, 1.5 * s);
+    ctx.lineTo(8 * s, 1.5 * s);
+    ctx.quadraticCurveTo(12 * s, 1.5 * s, 10 * s, 0);
+    ctx.closePath(); ctx.fill();
+    // 主翼
+    ctx.fillStyle = '#bdbdbd';
+    ctx.beginPath();
+    ctx.moveTo(2 * s, -1.5 * s); ctx.lineTo(0, -7 * s);
+    ctx.lineTo(-3 * s, -7 * s); ctx.lineTo(-1 * s, -1.5 * s);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(2 * s, 1.5 * s); ctx.lineTo(0, 7 * s);
+    ctx.lineTo(-3 * s, 7 * s); ctx.lineTo(-1 * s, 1.5 * s);
+    ctx.closePath(); ctx.fill();
     // 尾翼
-    ctx.fillRect(x - 7 * s * dir, y - 4 * s, 3 * s, 2.5 * s);
-    // 窗
+    ctx.fillStyle = '#e53935';
+    ctx.beginPath();
+    ctx.moveTo(-8 * s, -1.5 * s); ctx.lineTo(-10 * s, -4 * s);
+    ctx.lineTo(-11 * s, -4 * s); ctx.lineTo(-10 * s, -1.5 * s);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-8 * s, 1.5 * s); ctx.lineTo(-10 * s, 4 * s);
+    ctx.lineTo(-11 * s, 4 * s); ctx.lineTo(-10 * s, 1.5 * s);
+    ctx.closePath(); ctx.fill();
+    // 窗戶
     ctx.fillStyle = '#42a5f5';
-    for (let i = -2; i <= 2; i++) ctx.fillRect(x + i * 2 * s, y - 0.5 * s, 1 * s, 1 * s);
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.arc((5 - i * 3) * s, -0.3 * s, 0.7 * s, 0, Math.PI * 2); ctx.fill();
+    }
+    // 駕駛艙
+    ctx.fillStyle = '#64b5f6';
+    ctx.beginPath();
+    ctx.ellipse(9 * s, 0, 2 * s, 1.2 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
   }
 
   function _drawSkyKite(x, y, s, t) {
@@ -3277,12 +3312,23 @@
     magnet: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
       <g filter="url(#gl1)">
-      <rect x="6" y="4" width="14" height="18" rx="3" fill="#e53935"/>
-      <rect x="44" y="4" width="14" height="18" rx="3" fill="#1565c0"/>
+      <rect x="6" y="4" width="14" height="18" rx="3" fill="#1565c0"/>
+      <rect x="44" y="4" width="14" height="18" rx="3" fill="#0d47a1"/>
       <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#999" stroke-width="8" fill="none"/>
       <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#ccc" stroke-width="4" fill="none"/></g>
-      <g stroke="#e53935" stroke-width="1.5" opacity="0.5" stroke-linecap="round">
+      <g stroke="#42a5f5" stroke-width="1.5" opacity="0.5" stroke-linecap="round">
       <path d="M24 36c-4-2-6 2-2 4"/><path d="M40 36c4-2 6 2 2 4"/><path d="M30 42c-2 2 0 4 4 2"/></g></svg>`,
+
+    magnet2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)">
+      <rect x="6" y="4" width="14" height="18" rx="3" fill="#7b1fa2"/>
+      <rect x="44" y="4" width="14" height="18" rx="3" fill="#4a148c"/>
+      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#999" stroke-width="8" fill="none"/>
+      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#ce93d8" stroke-width="4" fill="none"/></g>
+      <g stroke="#ab47bc" stroke-width="1.5" opacity="0.6" stroke-linecap="round">
+      <path d="M24 36c-4-2-6 2-2 4"/><path d="M40 36c4-2 6 2 2 4"/><path d="M30 42c-2 2 0 4 4 2"/></g>
+      <text x="32" y="60" text-anchor="middle" font-size="9" font-weight="bold" fill="#ce93d8">+20%</text></svg>`,
 
     burn: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><linearGradient id="f1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff6d00"/><stop offset="50%" stop-color="#ff9100"/><stop offset="100%" stop-color="#ffd600"/></linearGradient>
