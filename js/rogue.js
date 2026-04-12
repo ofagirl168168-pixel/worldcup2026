@@ -245,6 +245,7 @@
     G.spawnTimer = 1500;
 
     waveFlash = 1800;
+    generateCornerProps(); // 每波隨機更換角落物件
     // 守門員速度：每 5 波才提升一次
     const gkTier = Math.floor(G.wave / 5); // wave5=1, wave10=2, wave15=3...
     G.gk.spd = (GK_BASE_SPD + gkTier * 1.0) * (G.gkSlowMul || 1);
@@ -1213,91 +1214,46 @@
   };
 
   // ─── 左上/右上三角空地 ─────────────────────────────────────
-  // xOff: 離邊線的距離（越大越往外），近端(低z)可以放遠一點
-  const CORNER_PROPS = {
-    '夜間球場': [
-      { side: -1, zPct: 0.15, xOff: 350, type: 'bench' },
-      { side: -1, zPct: 0.3,  xOff: 150, type: 'cone' },
-      { side: -1, zPct: 0.45, xOff: 250, type: 'bench' },
-      { side: -1, zPct: 0.6,  xOff: 100, type: 'cone' },
-      { side: -1, zPct: 0.75, xOff: 80,  type: 'cone' },
-      { side: 1,  zPct: 0.2,  xOff: 300, type: 'cone' },
-      { side: 1,  zPct: 0.35, xOff: 150, type: 'bench' },
-      { side: 1,  zPct: 0.5,  xOff: 250, type: 'cone' },
-      { side: 1,  zPct: 0.65, xOff: 100, type: 'bench' },
-      { side: 1,  zPct: 0.8,  xOff: 70,  type: 'cone' },
-    ],
-    '夕陽球場': [
-      { side: -1, zPct: 0.1,  xOff: 400, type: 'cactus' },
-      { side: -1, zPct: 0.25, xOff: 200, type: 'rock' },
-      { side: -1, zPct: 0.4,  xOff: 350, type: 'rock' },
-      { side: -1, zPct: 0.55, xOff: 120, type: 'cactus' },
-      { side: -1, zPct: 0.7,  xOff: 80,  type: 'rock' },
-      { side: 1,  zPct: 0.15, xOff: 350, type: 'rock' },
-      { side: 1,  zPct: 0.3,  xOff: 180, type: 'cactus' },
-      { side: 1,  zPct: 0.5,  xOff: 280, type: 'rock' },
-      { side: 1,  zPct: 0.65, xOff: 100, type: 'cactus' },
-      { side: 1,  zPct: 0.8,  xOff: 70,  type: 'rock' },
-    ],
-    '正午豔陽': [
-      { side: -1, zPct: 0.1,  xOff: 380, type: 'bush' },
-      { side: -1, zPct: 0.25, xOff: 180, type: 'cooler' },
-      { side: -1, zPct: 0.4,  xOff: 300, type: 'bush' },
-      { side: -1, zPct: 0.55, xOff: 120, type: 'bench' },
-      { side: -1, zPct: 0.75, xOff: 80,  type: 'bush' },
-      { side: 1,  zPct: 0.15, xOff: 320, type: 'bench' },
-      { side: 1,  zPct: 0.3,  xOff: 200, type: 'bush' },
-      { side: 1,  zPct: 0.5,  xOff: 280, type: 'cooler' },
-      { side: 1,  zPct: 0.65, xOff: 100, type: 'bush' },
-      { side: 1,  zPct: 0.8,  xOff: 70,  type: 'bench' },
-    ],
-    '陰天球場': [
-      { side: -1, zPct: 0.1,  xOff: 380, type: 'puddle' },
-      { side: -1, zPct: 0.25, xOff: 150, type: 'bin' },
-      { side: -1, zPct: 0.4,  xOff: 300, type: 'puddle' },
-      { side: -1, zPct: 0.6,  xOff: 120, type: 'bench' },
-      { side: -1, zPct: 0.75, xOff: 80,  type: 'puddle' },
-      { side: 1,  zPct: 0.15, xOff: 350, type: 'bench' },
-      { side: 1,  zPct: 0.35, xOff: 200, type: 'puddle' },
-      { side: 1,  zPct: 0.55, xOff: 250, type: 'bin' },
-      { side: 1,  zPct: 0.7,  xOff: 100, type: 'puddle' },
-      { side: 1,  zPct: 0.85, xOff: 70,  type: 'bench' },
-    ],
-    '暴風雨夜': [
-      { side: -1, zPct: 0.15, xOff: 350, type: 'puddle' },
-      { side: -1, zPct: 0.3,  xOff: 150, type: 'cone' },
-      { side: -1, zPct: 0.5,  xOff: 280, type: 'puddle' },
-      { side: -1, zPct: 0.7,  xOff: 90,  type: 'cone' },
-      { side: 1,  zPct: 0.2,  xOff: 300, type: 'cone' },
-      { side: 1,  zPct: 0.4,  xOff: 180, type: 'puddle' },
-      { side: 1,  zPct: 0.6,  xOff: 250, type: 'puddle' },
-      { side: 1,  zPct: 0.75, xOff: 80,  type: 'cone' },
-    ],
-    '極光球場': [
-      { side: -1, zPct: 0.1,  xOff: 400, type: 'snowpile' },
-      { side: -1, zPct: 0.25, xOff: 180, type: 'igloo' },
-      { side: -1, zPct: 0.4,  xOff: 320, type: 'snowpile' },
-      { side: -1, zPct: 0.55, xOff: 120, type: 'snowpile' },
-      { side: -1, zPct: 0.75, xOff: 80,  type: 'igloo' },
-      { side: 1,  zPct: 0.15, xOff: 350, type: 'igloo' },
-      { side: 1,  zPct: 0.35, xOff: 200, type: 'snowpile' },
-      { side: 1,  zPct: 0.5,  xOff: 300, type: 'snowpile' },
-      { side: 1,  zPct: 0.65, xOff: 100, type: 'igloo' },
-      { side: 1,  zPct: 0.8,  xOff: 70,  type: 'snowpile' },
-    ],
-    '金色決賽': [
-      { side: -1, zPct: 0.1,  xOff: 380, type: 'vipchair' },
-      { side: -1, zPct: 0.25, xOff: 160, type: 'speaker' },
-      { side: -1, zPct: 0.4,  xOff: 300, type: 'vipchair' },
-      { side: -1, zPct: 0.6,  xOff: 120, type: 'speaker' },
-      { side: -1, zPct: 0.75, xOff: 80,  type: 'vipchair' },
-      { side: 1,  zPct: 0.15, xOff: 340, type: 'speaker' },
-      { side: 1,  zPct: 0.3,  xOff: 200, type: 'vipchair' },
-      { side: 1,  zPct: 0.5,  xOff: 280, type: 'speaker' },
-      { side: 1,  zPct: 0.7,  xOff: 100, type: 'vipchair' },
-      { side: 1,  zPct: 0.85, xOff: 70,  type: 'speaker' },
-    ],
+  // 每場景可用的物件類型池，每波隨機生成
+  const CORNER_TYPES = {
+    '夜間球場': ['bench','cone','cone','bench','cone'],
+    '夕陽球場': ['rock','cactus','rock','cactus','rock'],
+    '正午豔陽': ['bush','cooler','bench','bush','bush'],
+    '陰天球場': ['puddle','bin','bench','puddle','puddle'],
+    '暴風雨夜': ['puddle','cone','puddle','cone','puddle'],
+    '極光球場': ['snowpile','igloo','snowpile','igloo','snowpile'],
+    '金色決賽': ['vipchair','speaker','vipchair','speaker','vipchair'],
   };
+
+  let _cornerProps = []; // 當前波的角落物件
+
+  function generateCornerProps() {
+    const types = CORNER_TYPES[curScene.name];
+    if (!types) { _cornerProps = []; return; }
+    const props = [];
+    // 上半部（高z，遠端）三角更寬，多放物件且 xOff 大
+    // 下半部（低z，近端）三角窄，少放且 xOff 小
+    const slots = [
+      // 上半部密集（z 0.5~0.95），xOff 大
+      { zMin: 0.85, zMax: 0.95, xMin: 200, xMax: 600 },
+      { zMin: 0.75, zMax: 0.85, xMin: 180, xMax: 500 },
+      { zMin: 0.65, zMax: 0.75, xMin: 150, xMax: 450 },
+      { zMin: 0.55, zMax: 0.65, xMin: 130, xMax: 380 },
+      { zMin: 0.45, zMax: 0.55, xMin: 110, xMax: 300 },
+      // 下半部稀疏
+      { zMin: 0.3, zMax: 0.45, xMin: 80, xMax: 200 },
+      { zMin: 0.15, zMax: 0.3, xMin: 60, xMax: 150 },
+    ];
+    for (const side of [-1, 1]) {
+      for (const slot of slots) {
+        const zPct = slot.zMin + Math.random() * (slot.zMax - slot.zMin);
+        const xOff = slot.xMin + Math.random() * (slot.xMax - slot.xMin);
+        const type = types[Math.floor(Math.random() * types.length)];
+        props.push({ side, zPct, xOff, type });
+      }
+    }
+    _cornerProps = props;
+  }
 
   function drawCornerAreas(cfg) {
     const name = curScene.name;
@@ -1356,12 +1312,11 @@
       }
 
       // 角落物件
-      const props = CORNER_PROPS[name];
-      if (props) {
-        for (const pr of props) {
+      if (_cornerProps.length) {
+        for (const pr of _cornerProps) {
           if (pr.side !== side) continue;
           const z = FIELD_DEPTH * pr.zPct;
-          const p = proj(pr.side * (FIELD_HW + (pr.xOff || 100)), z);
+          const p = proj(pr.side * (FIELD_HW + pr.xOff), z);
           if (p.y < topY) continue;
           const s = p.s * 3;
           switch (pr.type) {
