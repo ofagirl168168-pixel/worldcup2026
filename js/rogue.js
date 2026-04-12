@@ -45,7 +45,7 @@
     { id:'explode',  name:'爆裂射擊',   desc:'命中時爆炸傷害周圍',       rarity:'rare',    apply(s){ s.explode = true; }},
     { id:'sniper',   name:'狙擊射門',   desc:'傷害 ×2.5，球變小',        rarity:'rare',    apply(s){ s.dmgMul *= 2.5; s.ballScale *= 0.65; }},
     { id:'multi2',   name:'三重射擊',   desc:'連續射球數量 +2',          rarity:'rare',     apply(s){ s.multiShot += 2; }},
-    { id:'bounce',   name:'反彈射擊',   desc:'球碰敵人後反彈+1次（上限4）', rarity:'rare', apply(s){ s.bounce = Math.min(4, (s.bounce||0) + 1); }},
+    { id:'bounce',   name:'反彈射擊',   desc:'球碰到敵人後反彈繼續飛+1次（上限4）', rarity:'rare', apply(s){ s.bounce = Math.min(4, (s.bounce||0) + 1); }},
     { id:'crit',     name:'致命一擊',   desc:'每次射門 20% 機率暴擊 ×3', rarity:'rare',     apply(s){ s.critPct = Math.min(0.6, (s.critPct||0) + 0.2); }},
     { id:'gkSlow',   name:'守門員削弱', desc:'守門員移速 -30%',          rarity:'rare',     apply(s){ s.gkSlowMul = (s.gkSlowMul||1) * 0.7; }},
     { id:'extraLife', name:'鋼鐵防線', desc:'+1 條命（上限 5）',         rarity:'rare',    apply(s){ if(s.lives < 5) s.lives++; }},
@@ -57,8 +57,9 @@
     { id:'timeSlow', name:'時間壓迫',   desc:'敵人全體速度永久 -20%',    rarity:'epic',     apply(s){ s.globalSlow = (s.globalSlow||1) * 0.8; }},
 
     // ── 傳說卡 (legendary) ─────────────────
-    { id:'ghost',    name:'幽靈球',     desc:'+10% 機率穿過敵人（上限30%）', rarity:'legendary', apply(s){ s.ghostPct = Math.min(0.3, (s.ghostPct||0) + 0.1); }},
-    { id:'vampire',  name:'吸血足球',   desc:'擊殺敵人回復 1 條命',      rarity:'legendary', apply(s){ s.vampire = true; }},
+    { id:'ghost',      name:'幽靈球',     desc:'+10% 機率穿過敵人（上限30%）', rarity:'legendary', apply(s){ s.ghostPct = Math.min(0.3, (s.ghostPct||0) + 0.1); }},
+    { id:'vampire',    name:'吸血足球',   desc:'擊殺敵人回復 1 條命',      rarity:'legendary', apply(s){ s.vampire = true; }},
+    { id:'wallBounce', name:'銅牆鐵壁',   desc:'球碰到邊界會反彈回來',    rarity:'legendary', apply(s){ s.wallBounce = true; }},
   ];
 
   // ═══════════════════════════════════════════════════════════
@@ -97,7 +98,7 @@
       dmgMul: 1, spdMul: 1, ballScale: 1, multiShot: 1, cdMul: 1,
       pierce: false, burn: false, freeze: false,
       explode: false, ghostPct: 0, vampire: false,
-      bounce: 0, split: false,
+      bounce: 0, split: false, wallBounce: false,
       critPct: 0, goalBonus: 0, gkSlowMul: 1, globalSlow: 1,
       _spawnGuard: 0,
       collected: [],            // card ids
@@ -307,11 +308,14 @@
         // 預測球到球門 z 時的 x 位置（考慮牆壁反彈）
         const timeToGoal = (GOAL_Z - b.z) / b.vz; // frames
         let predictX = b.x + b.vx * timeToGoal;
-        // 簡易牆壁反彈預測
-        while (predictX < -FIELD_HW || predictX > FIELD_HW) {
-          if (predictX < -FIELD_HW) predictX = -2 * FIELD_HW - predictX;
-          if (predictX > FIELD_HW) predictX = 2 * FIELD_HW - predictX;
+        // 簡易牆壁反彈預測（只在有銅牆鐵壁時才考慮反彈）
+        if (G.wallBounce) {
+          while (predictX < -FIELD_HW || predictX > FIELD_HW) {
+            if (predictX < -FIELD_HW) predictX = -2 * FIELD_HW - predictX;
+            if (predictX > FIELD_HW) predictX = 2 * FIELD_HW - predictX;
+          }
         }
+        predictX = Math.max(-FIELD_HW, Math.min(FIELD_HW, predictX));
         // 威脅度 = z 越高越危險
         const threat = b.z;
         if (threat > bestThreat) { bestThreat = threat; targetX = predictX; }
@@ -352,9 +356,15 @@
       b.x += b.vx * step;
       b.z += b.vz * step;
 
-      // 牆壁反彈
-      if (b.x < -FIELD_HW + b.r) { b.x = -FIELD_HW + b.r; b.vx = Math.abs(b.vx); }
-      if (b.x > FIELD_HW - b.r)  { b.x = FIELD_HW - b.r;  b.vx = -Math.abs(b.vx); }
+      // 牆壁反彈（需要銅牆鐵壁卡）
+      if (b.x < -FIELD_HW + b.r) {
+        b.x = -FIELD_HW + b.r;
+        if (G.wallBounce) { b.vx = Math.abs(b.vx); } else { b.vx = 0; }
+      }
+      if (b.x > FIELD_HW - b.r) {
+        b.x = FIELD_HW - b.r;
+        if (G.wallBounce) { b.vx = -Math.abs(b.vx); } else { b.vx = 0; }
+      }
 
       // 碰防守員
       let hitDef = false;
@@ -571,9 +581,9 @@
   }
 
   // 可無限疊加的純數值卡
-  const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','rapid2','multi1','multi2','power2','ironleg','magnet','crit','bounce','guard']);
+  const STACKABLE = new Set(['dmg20','dmg30','spd20','spd40','bigball','bigball2','rapid','rapid2','multi1','multi2','power2','ironleg','magnet','guard']);
   // 有次數上限的疊加卡
-  const STACK_LIMIT = { ghost: 3 };
+  const STACK_LIMIT = { ghost: 3, bounce: 4, crit: 3 };
 
   function pickCards(n) {
     // 過濾卡池：純數值無限疊、ghost 限 3 次、其餘能力卡選過就移除
@@ -1092,13 +1102,11 @@
           ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, gr, 0, Math.PI * 2); ctx.fill();
           break;
         }
-        case 'crit': { // 紅色閃電+文字
-          ctx.fillStyle = '#ff1744';
-          ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 12;
-          ctx.font = `bold ${sz * 1.3}px "Noto Sans TC", sans-serif`;
+        case 'crit': { // 紅色 CRIT 文字（簡潔白底風+紅色）
+          ctx.font = `bold ${Math.max(14, 22 * pos.s)}px sans-serif`;
           ctx.textAlign = 'center';
-          ctx.fillText('CRIT!', pos.x, pos.y - sz * 1.5 + fy);
-          ctx.shadowBlur = 0;
+          ctx.fillStyle = '#ff1744';
+          ctx.fillText('CRIT!', pos.x, pos.y - 25 * pos.s + fy);
           break;
         }
         case 'block': { // 黃色擋球光環
@@ -1434,12 +1442,14 @@
     bounce: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
       <filter id="gl1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <rect x="4" y="52" width="56" height="6" rx="2" fill="#666"/>
-      <path d="M10 14L32 50L54 14" stroke="#66bb6a" stroke-width="2.5" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
-      <circle cx="32" cy="50" r="3" fill="#66bb6a" opacity="0.6"/>
-      <circle cx="50" cy="16" r="9" fill="url(#g1)" filter="url(#gl1)"/>
-      <path d="M50 16l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
-      <path d="M46 20l-4 4" stroke="#66bb6a" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/></svg>`,
+      <g opacity="0.8"><circle cx="36" cy="22" r="7" fill="#4fc3f7"/><rect x="28" y="28" width="16" height="18" rx="3" fill="#4fc3f7"/></g>
+      <path d="M12 50L34 32" stroke="#66bb6a" stroke-width="2" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
+      <circle cx="34" cy="32" r="3" fill="#ffd600" opacity="0.7"/>
+      <path d="M34 32L54 12" stroke="#66bb6a" stroke-width="2.5" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
+      <circle cx="54" cy="12" r="8" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M54 12l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
+      <circle cx="12" cy="50" r="7" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M12 50l-2-1 1-3 1 0 2 0 1 3z" fill="#555" opacity="0.3"/></svg>`,
 
     crit: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><linearGradient id="c1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff5252"/><stop offset="100%" stop-color="#b71c1c"/></linearGradient>
@@ -1532,6 +1542,24 @@
       <polygon points="36,34 34,42 32,36" fill="#fff"/>
       <circle cx="26" cy="28" r="2" fill="#fff" opacity="0.3"/>
       <circle cx="38" cy="28" r="2" fill="#fff" opacity="0.3"/></svg>`,
+
+    wallBounce: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><radialGradient id="g1" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#bbb"/></radialGradient>
+      <linearGradient id="w1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8d6e63"/><stop offset="50%" stop-color="#a1887f"/><stop offset="100%" stop-color="#6d4c41"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <rect x="2" y="2" width="10" height="60" rx="1" fill="url(#w1)"/>
+      <g opacity="0.4"><rect x="3" y="4" width="8" height="8" rx="1" stroke="#5d4037" stroke-width="0.5" fill="none"/>
+      <rect x="3" y="14" width="8" height="8" rx="1" stroke="#5d4037" stroke-width="0.5" fill="none"/>
+      <rect x="3" y="24" width="8" height="8" rx="1" stroke="#5d4037" stroke-width="0.5" fill="none"/>
+      <rect x="3" y="34" width="8" height="8" rx="1" stroke="#5d4037" stroke-width="0.5" fill="none"/>
+      <rect x="3" y="44" width="8" height="8" rx="1" stroke="#5d4037" stroke-width="0.5" fill="none"/></g>
+      <path d="M36 52L14 32" stroke="#ffd54f" stroke-width="2" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
+      <circle cx="14" cy="32" r="3" fill="#ffd600" opacity="0.8"/>
+      <path d="M14 32L42 10" stroke="#ffd54f" stroke-width="2.5" stroke-dasharray="4,3" fill="none" filter="url(#gl1)"/>
+      <circle cx="42" cy="10" r="9" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M42 10l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/>
+      <circle cx="36" cy="52" r="8" fill="url(#g1)" filter="url(#gl1)"/>
+      <path d="M36 52l-2-2 1-3 2 0 2 0 1 3z" fill="#555" opacity="0.3"/></svg>`,
   };
 
   // 預載 SVG → Image 快取
