@@ -115,7 +115,7 @@
   //  音效系統（音檔 + Web Audio API 備援）
   // ═══════════════════════════════════════════════════════════
   let audioCtx = null;
-  let sfxOn = true, bgmOn = true;
+  let sfxOn = false, bgmOn = false;
   let bgmGain = null, sfxGain = null;
   let _bgmTimer = null, _bgmPlaying = false;
 
@@ -3382,31 +3382,28 @@
       ctx.fillText('點擊畫面射門', W / 2, H - 16);
     }
 
-    // 音效/音樂開關按鈕（左上角，避開右上角關閉按鈕）
-    const btnSz = 20, btnY = 8, btnGap = 6;
-    const bgmBtnX = W - btnSz * 3 - btnGap * 2 - 50;
-    const sfxBtnX = bgmBtnX + btnSz + btnGap + 10;
-    // 音效按鈕
-    ctx.fillStyle = sfxOn ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)';
-    ctx.font = `${btnSz - 4}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.fillText(sfxOn ? 'SFX' : 'SFX', sfxBtnX + btnSz / 2, btnY + btnSz - 4);
-    if (!sfxOn) {
-      ctx.strokeStyle = 'rgba(255,80,80,0.7)'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(sfxBtnX, btnY); ctx.lineTo(sfxBtnX + btnSz, btnY + btnSz); ctx.stroke();
-      ctx.lineWidth = 1;
-    }
-    // 音樂按鈕
-    ctx.fillStyle = bgmOn ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)';
-    ctx.fillText(bgmOn ? 'BGM' : 'BGM', bgmBtnX + btnSz / 2, btnY + btnSz - 4);
-    if (!bgmOn) {
-      ctx.strokeStyle = 'rgba(255,80,80,0.7)'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(bgmBtnX, btnY); ctx.lineTo(bgmBtnX + btnSz, btnY + btnSz); ctx.stroke();
-      ctx.lineWidth = 1;
-    }
-    // 儲存按鈕區域供點擊判斷
-    G._sfxBtn = { x: sfxBtnX, y: btnY, w: btnSz, h: btnSz };
-    G._bgmBtn = { x: bgmBtnX, y: btnY, w: btnSz, h: btnSz };
+    // 音效/音樂開關按鈕（暫時隱藏，等音檔備齊後再開放）
+    // const btnSz = 20, btnY = 8, btnGap = 6;
+    // const bgmBtnX = W - btnSz * 3 - btnGap * 2 - 50;
+    // const sfxBtnX = bgmBtnX + btnSz + btnGap + 10;
+    // ctx.fillStyle = sfxOn ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)';
+    // ctx.font = `${btnSz - 4}px sans-serif`;
+    // ctx.textAlign = 'center';
+    // ctx.fillText(sfxOn ? 'SFX' : 'SFX', sfxBtnX + btnSz / 2, btnY + btnSz - 4);
+    // if (!sfxOn) {
+    //   ctx.strokeStyle = 'rgba(255,80,80,0.7)'; ctx.lineWidth = 2;
+    //   ctx.beginPath(); ctx.moveTo(sfxBtnX, btnY); ctx.lineTo(sfxBtnX + btnSz, btnY + btnSz); ctx.stroke();
+    //   ctx.lineWidth = 1;
+    // }
+    // ctx.fillStyle = bgmOn ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)';
+    // ctx.fillText(bgmOn ? 'BGM' : 'BGM', bgmBtnX + btnSz / 2, btnY + btnSz - 4);
+    // if (!bgmOn) {
+    //   ctx.strokeStyle = 'rgba(255,80,80,0.7)'; ctx.lineWidth = 2;
+    //   ctx.beginPath(); ctx.moveTo(bgmBtnX, btnY); ctx.lineTo(bgmBtnX + btnSz, btnY + btnSz); ctx.stroke();
+    //   ctx.lineWidth = 1;
+    // }
+    G._sfxBtn = null;
+    G._bgmBtn = null;
   }
 
   // ─── 標題畫面 ────────────────────────────────────────────
