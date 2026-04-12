@@ -377,7 +377,7 @@
       // wave1~4：左右巡邏
       gk.x += gk.dir * gkEffSpd * (dt / 16);
     }
-    const gkPatrolHW = Math.min(FIELD_HW * 0.7, GOAL_HW * (1 + (G.goalBonus || 0)));
+    const gkPatrolHW = Math.min(GOAL_HW * 1.6, GOAL_HW * (1 + (G.goalBonus || 0)));
     if (gk.x > gkPatrolHW - gk.w / 2) { gk.x = gkPatrolHW - gk.w / 2; gk.dir = -1; }
     if (gk.x < -gkPatrolHW + gk.w / 2) { gk.x = -gkPatrolHW + gk.w / 2; gk.dir = 1; }
 
@@ -468,7 +468,7 @@
       // 進球判定（同一波只算一次）
       if (b.z >= GOAL_Z) {
         b.alive = false;
-        const effectiveGoalHW = Math.min(FIELD_HW * 0.7, GOAL_HW * (1 + (G.goalBonus || 0)));
+        const effectiveGoalHW = Math.min(GOAL_HW * 1.6, GOAL_HW * (1 + (G.goalBonus || 0)));
         if (Math.abs(b.x) < effectiveGoalHW && G.phase === 'playing') { onGoal(); return; }
       }
       // 飛出場外
@@ -492,8 +492,8 @@
       const sp = Math.min(rawSp, 0.8);
       if (d.frozen > 0) d.frozen -= dt;
       const step = dt / 16;
-      // 判定線：z < FIELD_DEPTH * 0.15 後直接朝中心點(0,0)直線前進（不減速）
-      if (d.z < FIELD_DEPTH * 0.15) {
+      // 判定線：z < FIELD_DEPTH * 0.20 後直接朝中心點(0,0)直線前進（不減速）
+      if (d.z < FIELD_DEPTH * 0.20) {
         const dx = -d.x, dz = -d.z;
         const dist = Math.sqrt(dx * dx + dz * dz);
         if (dist > 1) {
@@ -632,6 +632,8 @@
   function pickCards(n) {
     // 過濾卡池：純數值無限疊、ghost 限 3 次、其餘能力卡選過就移除
     const pool = CARDS.filter(c => {
+      // 磁鐵達到球門寬度上限就不再出現
+      if (c.id === 'magnet' && (G.goalBonus || 0) >= 0.6) return false;
       if (STACKABLE.has(c.id)) return true;
       if (STACK_LIMIT[c.id]) {
         const count = G.collected.filter(id => id === c.id).length;
@@ -666,7 +668,7 @@
       G._spawnGuard--;
       G.allies.push({
         x: (Math.random() - 0.5) * FIELD_HW * 0.6,
-        z: FIELD_DEPTH * 0.15,
+        z: FIELD_DEPTH * 0.20,
         alive: true, grabbing: false, blockTimer: 5000,
       });
     }
@@ -1229,47 +1231,47 @@
 
   // 地面彩蛋：每次 WARNING（每5波）解鎖
   const EGGS = [
-    { minWave: 5,  weight: 5, type: 'cat' },
-    { minWave: 5,  weight: 5, type: 'bird_nest' },
-    { minWave: 5,  weight: 4, type: 'football' },
-    { minWave: 10, weight: 4, type: 'campfire' },
-    { minWave: 10, weight: 3, type: 'mushroom' },
-    { minWave: 15, weight: 3, type: 'treasure' },
-    { minWave: 15, weight: 2, type: 'robot' },
-    { minWave: 20, weight: 2, type: 'dragon' },
-    { minWave: 20, weight: 2, type: 'unicorn' },
-    { minWave: 25, weight: 1, type: 'rocket' },
-    { minWave: 30, weight: 1, type: 'crown' },
-    { minWave: 35, weight: 2, type: 'tent' },       // 帳篷
-    { minWave: 40, weight: 2, type: 'portal' },     // 傳送門
-    { minWave: 45, weight: 1, type: 'tank' },       // 玩具坦克
-    { minWave: 50, weight: 1, type: 'crystal' },    // 水晶
-    { minWave: 55, weight: 1, type: 'totem' },      // 圖騰柱
-    { minWave: 60, weight: 1, type: 'alien' },      // 外星人
-    { minWave: 65, weight: 1, type: 'phoenix_nest' }, // 鳳凰巢
-    { minWave: 70, weight: 1, type: 'blackhole' },  // 黑洞
-    { minWave: 75, weight: 1, type: 'worldcup' },   // 世界盃
+    { minWave: 5,  weight: 10, type: 'cat' },
+    { minWave: 5,  weight: 10, type: 'bird_nest' },
+    { minWave: 5,  weight: 8,  type: 'football' },
+    { minWave: 10, weight: 7,  type: 'campfire' },
+    { minWave: 10, weight: 6,  type: 'mushroom' },
+    { minWave: 15, weight: 5,  type: 'treasure' },
+    { minWave: 15, weight: 5,  type: 'robot' },
+    { minWave: 20, weight: 4,  type: 'dragon' },
+    { minWave: 20, weight: 4,  type: 'unicorn' },
+    { minWave: 25, weight: 3,  type: 'rocket' },
+    { minWave: 30, weight: 3,  type: 'crown' },
+    { minWave: 35, weight: 3,  type: 'tent' },       // 帳篷
+    { minWave: 40, weight: 2,  type: 'portal' },     // 傳送門
+    { minWave: 45, weight: 2,  type: 'tank' },       // 玩具坦克
+    { minWave: 50, weight: 2,  type: 'crystal' },    // 水晶
+    { minWave: 55, weight: 1,  type: 'totem' },      // 圖騰柱
+    { minWave: 60, weight: 1,  type: 'alien' },      // 外星人
+    { minWave: 65, weight: 1,  type: 'phoenix_nest' }, // 鳳凰巢
+    { minWave: 70, weight: 1,  type: 'blackhole' },  // 黑洞
+    { minWave: 75, weight: 1,  type: 'worldcup' },   // 世界盃
   ];
 
   // 天空彩蛋：專屬天空的物件，有動畫
   const SKY_EGGS = [
-    { minWave: 5,  weight: 5, type: 'sky_bird' },       // 飛鳥群
-    { minWave: 5,  weight: 4, type: 'sky_cloud' },      // 小雲朵
-    { minWave: 10, weight: 4, type: 'sky_plane' },      // 小飛機
-    { minWave: 10, weight: 3, type: 'sky_kite' },       // 風箏
-    { minWave: 15, weight: 3, type: 'sky_balloon' },    // 熱氣球
-    { minWave: 20, weight: 2, type: 'sky_ufo' },        // UFO（緩飄）
-    { minWave: 25, weight: 2, type: 'sky_blimp' },      // 飛船
-    { minWave: 30, weight: 2, type: 'sky_firework' },   // 煙火
-    { minWave: 35, weight: 1, type: 'sky_santa' },      // 聖誕老人雪橇
-    { minWave: 40, weight: 1, type: 'sky_witch' },      // 騎掃帚巫師
-    { minWave: 45, weight: 1, type: 'sky_pegasus' },    // 飛馬
-    { minWave: 50, weight: 1, type: 'sky_rocket' },     // 飛行火箭（噴焰）
-    { minWave: 55, weight: 1, type: 'sky_dragon' },     // 飛龍
-    { minWave: 60, weight: 1, type: 'sky_whale' },      // 天空鯨魚
-    { minWave: 65, weight: 1, type: 'sky_castle' },     // 天空之城
-    { minWave: 70, weight: 1, type: 'sky_phoenix' },    // 鳳凰
-    { minWave: 75, weight: 1, type: 'sky_star' },       // 流星雨
+    { minWave: 5,  weight: 10, type: 'sky_bird' },      // 飛鳥群
+    { minWave: 5,  weight: 8,  type: 'sky_cloud' },     // 小雲朵
+    { minWave: 10, weight: 7,  type: 'sky_plane' },     // 小飛機
+    { minWave: 10, weight: 6,  type: 'sky_kite' },      // 風箏
+    { minWave: 15, weight: 5,  type: 'sky_balloon' },   // 熱氣球
+    { minWave: 20, weight: 4,  type: 'sky_ufo' },       // UFO（緩飄）
+    { minWave: 25, weight: 4,  type: 'sky_blimp' },     // 飛船
+    { minWave: 30, weight: 3,  type: 'sky_firework' },  // 煙火
+    { minWave: 35, weight: 2,  type: 'sky_santa' },     // 聖誕老人雪橇
+    { minWave: 40, weight: 2,  type: 'sky_witch' },     // 騎掃帚巫師
+    { minWave: 45, weight: 2,  type: 'sky_pegasus' },   // 飛馬
+    { minWave: 50, weight: 2,  type: 'sky_rocket' },    // 飛行火箭（噴焰）
+    { minWave: 55, weight: 1,  type: 'sky_dragon' },    // 飛龍
+    { minWave: 60, weight: 1,  type: 'sky_whale' },     // 天空鯨魚
+    { minWave: 65, weight: 1,  type: 'sky_castle' },    // 天空之城
+    { minWave: 70, weight: 1,  type: 'sky_phoenix' },   // 鳳凰
+    { minWave: 75, weight: 1,  type: 'sky_star' },      // 流星雨
   ];
 
   let _cornerProps = []; // 當前波的角落物件
@@ -1985,19 +1987,20 @@
     const count = Math.min(5, Math.floor(wave / 5));
     if (count <= 0) return;
     const total = available.reduce((s, e) => s + e.weight, 0);
+    const flyDir = Math.random() < 0.5 ? 1 : -1; // 整波統一飛行方向
     for (let i = 0; i < count; i++) {
       let r = Math.random() * total;
       let type = available[available.length - 1].type;
       for (const e of available) { r -= e.weight; if (r <= 0) { type = e.type; break; } }
       _bgEggs.push({
         type,
-        xPct: 0.05 + Math.random() * 0.9,
+        xPct: Math.random(), // 初始位置隨機分布
         yPct: 0.05 + Math.random() * 0.9,
         scale: 0.5 + Math.random() * 0.5,
         alpha: 0.2 + Math.random() * 0.15,
-        spd: 0.02 + Math.random() * 0.04, // 水平漂移速度
-        dir: Math.random() < 0.5 ? 1 : -1,
-        phase: Math.random() * Math.PI * 2, // 動畫相位
+        spd: 0.015 + Math.random() * 0.03, // 水平飛行速度
+        dir: flyDir,                         // 統一方向持續飛行
+        phase: Math.random() * Math.PI * 2,  // 動畫相位
       });
     }
   }
@@ -2529,7 +2532,7 @@
 
   // ─── 球門 ────────────────────────────────────────────────
   function drawGoal() {
-    const effectiveGoalHW = Math.min(FIELD_HW * 0.7, GOAL_HW * (1 + (G.goalBonus || 0)));
+    const effectiveGoalHW = Math.min(GOAL_HW * 1.6, GOAL_HW * (1 + (G.goalBonus || 0)));
     const pL = proj(-effectiveGoalHW, GOAL_Z);
     const pR = proj(effectiveGoalHW, GOAL_Z);
     const gh = 55 * pL.s;
@@ -2626,10 +2629,37 @@
     ctx.fillStyle = headGrad;
     ctx.beginPath(); ctx.arc(p.x, headY, headR, 0, Math.PI * 2); ctx.fill();
 
-    // 灼燒效果
+    // 灼燒效果 — 沿身體輪廓的火焰
     if (d.burning > 0) {
-      ctx.fillStyle = 'rgba(255,80,0,0.25)';
-      rr(ctx, bx - 2, by, w + 4, h, w * 0.1); ctx.fill();
+      const ft = Date.now() * 0.006;
+      const flames = [
+        { ox: -w * 0.3, oy: h * 0.1 },
+        { ox: 0,        oy: 0 },
+        { ox: w * 0.3,  oy: h * 0.15 },
+        { ox: -w * 0.15, oy: h * 0.5 },
+        { ox: w * 0.15,  oy: h * 0.45 },
+        { ox: 0,         oy: h * 0.7 },
+      ];
+      for (let fi = 0; fi < flames.length; fi++) {
+        const f = flames[fi];
+        const fx = p.x + f.ox;
+        const fy = by + f.oy;
+        const fh = (6 + Math.sin(ft + fi * 1.7) * 4) * p.s;
+        const fw = (3 + Math.sin(ft * 1.3 + fi * 2.1) * 1.5) * p.s;
+        // 外焰（橘紅）
+        ctx.fillStyle = `rgba(255,${60 + Math.floor(Math.sin(ft + fi) * 30)},0,${0.35 + Math.sin(ft * 2 + fi) * 0.1})`;
+        ctx.beginPath();
+        ctx.moveTo(fx - fw, fy);
+        ctx.quadraticCurveTo(fx - fw * 0.5, fy - fh * 0.6, fx, fy - fh);
+        ctx.quadraticCurveTo(fx + fw * 0.5, fy - fh * 0.6, fx + fw, fy);
+        ctx.closePath(); ctx.fill();
+        // 內焰（黃色）
+        ctx.fillStyle = `rgba(255,220,0,${0.25 + Math.sin(ft * 2.5 + fi) * 0.1})`;
+        ctx.beginPath();
+        ctx.moveTo(fx - fw * 0.4, fy);
+        ctx.quadraticCurveTo(fx, fy - fh * 0.7, fx + fw * 0.4, fy);
+        ctx.closePath(); ctx.fill();
+      }
     }
 
     // ── 血條 ──
