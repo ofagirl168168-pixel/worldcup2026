@@ -21,33 +21,32 @@
 
   // ─── 場景系統 ──────────────────────────────────────────────
   const SCENES = [
-    { name:'夜間球場',
-      sky: ['#0a1628','#16243a'],
-      grass: ['#2d7a3a','#268f35'],
-      line: 'rgba(255,255,255,0.35)' },
-    { name:'夕陽球場',
+    { name:'巴西',
       sky: ['#1a0a2e','#4a1942','#8e2424','#b35418'],
-      grass: ['#3d6b2e','#4a7a2e'],
+      grass: ['#2a8a30','#22a028'],
       line: 'rgba(255,240,200,0.3)' },
-    { name:'正午豔陽',
+    { name:'阿根廷',
       sky: ['#2a6ab0','#4a8ac0','#6aa0cc'],
       grass: ['#2a7a35','#258a30'],
       line: 'rgba(255,255,255,0.35)' },
-    { name:'陰天球場',
+    { name:'德國',
       sky: ['#3a4a5c','#5a6a7c','#7a8a9c'],
       grass: ['#2a6830','#266030'],
       line: 'rgba(255,255,255,0.25)' },
-    { name:'暴風雨夜',
+    { name:'義大利',
+      sky: ['#1a3a6a','#3a6a9a','#5a8aba'],
+      grass: ['#2d7a3a','#268f35'],
+      line: 'rgba(255,255,255,0.35)' },
+    { name:'英格蘭',
       sky: ['#1a1030','#2d2045','#3a2860'],
       grass: ['#1e5528','#1a4d24'],
       line: 'rgba(200,200,255,0.25)',
       lightning: true },
-    { name:'極光球場',
-      sky: ['#0a1628','#0d2040','#162850'],
+    { name:'法國',
+      sky: ['#0a1628','#16243a','#1e3050'],
       grass: ['#1e5a3a','#1a5535'],
-      line: 'rgba(200,255,220,0.3)',
-      aurora: true },
-    { name:'金色決賽',
+      line: 'rgba(200,220,255,0.3)' },
+    { name:'日本',
       sky: ['#0a0a0a','#1a1200','#2a1e00'],
       grass: ['#1e5528','#1a5024'],
       line: 'rgba(255,215,0,0.3)',
@@ -519,15 +518,16 @@
       const sp = Math.min(rawSp, 0.8);
       if (d.frozen > 0) d.frozen -= dt;
       const step = dt / 16;
-      // 判定線：z < FIELD_DEPTH * 0.20 後直接朝中心點(0,0)直線前進（不減速）
+      // 判定線：z < FIELD_DEPTH * 0.20 後直接朝中心點(0,0)直線前進（不減速，用原始速度）
       if (d.z < FIELD_DEPTH * 0.20) {
+        const rushSp = rawSp; // 不受 0.8 上限，全速衝刺
         const dx = -d.x, dz = -d.z;
         const dist = Math.sqrt(dx * dx + dz * dz);
         if (dist > 1) {
-          d.x += (dx / dist) * sp * step;
-          d.z += (dz / dist) * sp * step;
+          d.x += (dx / dist) * rushSp * step;
+          d.z += (dz / dist) * rushSp * step;
         } else {
-          d.z -= sp * step;
+          d.z -= rushSp * step;
         }
       } else {
         d.z -= sp * step;
@@ -912,76 +912,75 @@
   function drawSceneProps() {
     const goalP = proj(0, FIELD_DEPTH);
     const baseY = goalP.y;
-    const u = Math.min(1, W / 500); // 響應式縮放單位
+    const u = Math.min(1, W / 500);
     ctx.save();
 
     const name = curScene.name;
 
-    if (name === '夜間球場') {
-      // 四盞對稱大燈照向球場
-      [0.08, 0.28, 0.72, 0.92].forEach(xp => {
-        drawStadiumLight(W * xp, baseY, u, true);
-      });
-      // 兩側低矮廣告板
-      drawAdBoard(W * 0.15, baseY, u * 0.8, '#1a237e');
-      drawAdBoard(W * 0.85, baseY, u * 0.8, '#1a237e');
+    if (name === '巴西') {
+      // 基督像（中央）
+      drawCristoRedentor(W * 0.5, baseY, u);
+      // 棕櫚樹
+      [0.06, 0.18, 0.82, 0.94].forEach(xp => drawPalmTree(W * xp, baseY, u));
+      // 糖麵包山剪影
+      drawSugarloaf(W * 0.12, baseY, u);
+      drawSugarloaf(W * 0.88, baseY, u);
     }
 
-    else if (name === '夕陽球場') {
-      // 棕櫚樹剪影
-      [0.05, 0.18, 0.82, 0.95].forEach(xp => {
-        drawPalmTree(W * xp, baseY, u);
-      });
-      // 中間兩盞矮燈
-      drawStadiumLight(W * 0.38, baseY, u * 0.7, false);
-      drawStadiumLight(W * 0.62, baseY, u * 0.7, false);
+    else if (name === '阿根廷') {
+      // 方尖碑（中央）
+      drawObelisco(W * 0.5, baseY, u);
+      // 燈柱
+      [0.1, 0.3, 0.7, 0.9].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.8, true));
+      // 阿根廷國旗
+      [0.22, 0.78].forEach(xp => drawFlag(W * xp, baseY, u, '#75aadb'));
     }
 
-    else if (name === '正午豔陽') {
-      // 綠樹 + 旗幟
-      [0.06, 0.2, 0.8, 0.94].forEach(xp => {
-        drawRoundTree(W * xp, baseY, u, '#2e7d32', '#1b5e20');
-      });
-      [0.35, 0.5, 0.65].forEach(xp => {
-        drawFlag(W * xp, baseY, u);
-      });
+    else if (name === '德國') {
+      // 布蘭登堡門（中央）
+      drawBrandenburgGate(W * 0.5, baseY, u);
+      // 啤酒桶
+      drawBeerBarrel(W * 0.12, baseY, u);
+      drawBeerBarrel(W * 0.88, baseY, u);
+      // 燈柱
+      [0.25, 0.75].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
     }
 
-    else if (name === '陰天球場') {
-      // 禿樹 + 看台剪影
-      [0.07, 0.22, 0.78, 0.93].forEach(xp => {
-        drawBareTree(W * xp, baseY, u);
-      });
-      drawStand(W * 0.5, baseY, u);
+    else if (name === '義大利') {
+      // 比薩斜塔
+      drawPisaTower(W * 0.2, baseY, u);
+      // 羅馬競技場剪影
+      drawColosseum(W * 0.5, baseY, u);
+      // 柏樹
+      [0.06, 0.8, 0.94].forEach(xp => drawCypressTree(W * xp, baseY, u));
     }
 
-    else if (name === '暴風雨夜') {
-      // 高燈柱（微弱光）+ 搖擺旗
-      [0.1, 0.35, 0.65, 0.9].forEach(xp => {
-        drawStadiumLight(W * xp, baseY, u * 1.1, true);
-      });
-      [0.22, 0.78].forEach(xp => {
-        drawFlag(W * xp, baseY, u, '#546e7a');
-      });
+    else if (name === '英格蘭') {
+      // 大笨鐘
+      drawBigBen(W * 0.15, baseY, u);
+      // 倫敦眼
+      drawLondonEye(W * 0.85, baseY, u);
+      // 路燈
+      [0.35, 0.5, 0.65].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.8, true));
     }
 
-    else if (name === '極光球場') {
-      // 針葉松
-      [0.04, 0.14, 0.24, 0.76, 0.86, 0.96].forEach(xp => {
-        drawPineTree(W * xp, baseY, u);
-      });
-      // 兩盞小燈
-      drawStadiumLight(W * 0.42, baseY, u * 0.6, true);
-      drawStadiumLight(W * 0.58, baseY, u * 0.6, true);
+    else if (name === '法國') {
+      // 艾菲爾鐵塔（中央）
+      drawEiffelTower(W * 0.5, baseY, u);
+      // 凱旋門
+      drawArcDeTriomphe(W * 0.15, baseY, u);
+      // 路燈
+      [0.35, 0.65, 0.85].forEach(xp => drawStadiumLight(W * xp, baseY, u * 0.7, true));
     }
 
-    else if (name === '金色決賽') {
-      // 大型聚光燈對稱排列，照向球場
-      [0.06, 0.22, 0.38, 0.62, 0.78, 0.94].forEach(xp => {
-        drawSpotlight(W * xp, baseY, u);
-      });
-      // 金色獎盃裝飾（球場中央上方）
-      drawTrophyDeco(W * 0.5, baseY, u);
+    else if (name === '日本') {
+      // 鳥居（中央）
+      drawTorii(W * 0.5, baseY, u);
+      // 富士山剪影
+      drawFujiSan(W * 0.15, baseY, u);
+      drawFujiSan(W * 0.85, baseY, u);
+      // 櫻花樹
+      [0.3, 0.7].forEach(xp => drawSakuraTree(W * xp, baseY, u));
     }
 
     ctx.restore();
@@ -1003,9 +1002,7 @@
     }
     ctx.fillStyle = glow ? '#fff3b0' : '#b0bec5';
     [-0.3, 0, 0.3].forEach(off => {
-      ctx.beginPath();
-      ctx.arc(x + armW * off, baseY - pH - 1.5 * u, 1.8 * u, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(x + armW * off, baseY - pH - 1.5 * u, 1.8 * u, 0, Math.PI * 2); ctx.fill();
     });
   }
 
@@ -1013,69 +1010,15 @@
     const tH = 26 * u;
     ctx.fillStyle = '#4e342e';
     ctx.fillRect(x - 1.5 * u, baseY - tH, 3 * u, tH);
-    // 棕櫚葉（扇形弧線）
-    ctx.strokeStyle = '#2e5a1e';
-    ctx.lineWidth = 2 * u;
+    ctx.strokeStyle = '#2e5a1e'; ctx.lineWidth = 2 * u;
     for (let i = 0; i < 5; i++) {
       const ang = -Math.PI * 0.8 + i * Math.PI * 0.4 / 4;
-      ctx.beginPath();
-      ctx.moveTo(x, baseY - tH);
-      ctx.quadraticCurveTo(
-        x + Math.cos(ang) * 14 * u,
-        baseY - tH + Math.sin(ang) * 6 * u - 6 * u,
-        x + Math.cos(ang) * 18 * u,
-        baseY - tH + Math.sin(ang) * 10 * u + 2 * u
-      );
+      ctx.beginPath(); ctx.moveTo(x, baseY - tH);
+      ctx.quadraticCurveTo(x + Math.cos(ang) * 14 * u, baseY - tH + Math.sin(ang) * 6 * u - 6 * u,
+        x + Math.cos(ang) * 18 * u, baseY - tH + Math.sin(ang) * 10 * u + 2 * u);
       ctx.stroke();
     }
     ctx.lineWidth = 1;
-  }
-
-  function drawRoundTree(x, baseY, u, c1, c2) {
-    const tH = 16 * u;
-    ctx.fillStyle = '#5d4037';
-    ctx.fillRect(x - 2 * u, baseY - tH, 4 * u, tH);
-    ctx.fillStyle = c1;
-    ctx.beginPath(); ctx.arc(x, baseY - tH - 7 * u, 9 * u, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = c2;
-    ctx.beginPath(); ctx.arc(x - 4 * u, baseY - tH - 3 * u, 7 * u, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(x + 4 * u, baseY - tH - 4 * u, 6 * u, 0, Math.PI * 2); ctx.fill();
-  }
-
-  function drawBareTree(x, baseY, u) {
-    const tH = 20 * u;
-    ctx.strokeStyle = '#5d4037';
-    ctx.lineWidth = 2 * u;
-    // 主幹
-    ctx.beginPath(); ctx.moveTo(x, baseY); ctx.lineTo(x, baseY - tH); ctx.stroke();
-    // 分支
-    ctx.lineWidth = 1.2 * u;
-    [[-6, -5], [5, -7], [-8, -2], [7, -3]].forEach(([dx, dy]) => {
-      const by = baseY - tH * 0.55 + dy * u;
-      ctx.beginPath();
-      ctx.moveTo(x, by);
-      ctx.lineTo(x + dx * u, by - 6 * u);
-      ctx.stroke();
-    });
-    ctx.lineWidth = 1;
-  }
-
-  function drawPineTree(x, baseY, u) {
-    const tH = 8 * u;
-    ctx.fillStyle = '#4e342e';
-    ctx.fillRect(x - 1.5 * u, baseY - tH, 3 * u, tH);
-    // 三層三角形
-    ctx.fillStyle = '#1b5e20';
-    [0, 1, 2].forEach(i => {
-      const ty = baseY - tH - i * 7 * u;
-      const tw = (10 - i * 2) * u;
-      ctx.beginPath();
-      ctx.moveTo(x - tw, ty);
-      ctx.lineTo(x, ty - 9 * u);
-      ctx.lineTo(x + tw, ty);
-      ctx.closePath();
-      ctx.fill();
-    });
   }
 
   function drawFlag(x, baseY, u, color) {
@@ -1084,162 +1027,326 @@
     ctx.fillRect(x - 1 * u, baseY - pH, 2 * u, pH);
     ctx.fillStyle = color || '#c62828';
     ctx.beginPath();
-    ctx.moveTo(x + 1 * u, baseY - pH);
-    ctx.lineTo(x + 10 * u, baseY - pH + 3 * u);
-    ctx.lineTo(x + 1 * u, baseY - pH + 7 * u);
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(x + 1 * u, baseY - pH); ctx.lineTo(x + 10 * u, baseY - pH + 3 * u);
+    ctx.lineTo(x + 1 * u, baseY - pH + 7 * u); ctx.closePath(); ctx.fill();
   }
 
-  function drawStand(cx, baseY, u) {
-    // 簡易看台剪影
-    const sw = W * 0.3, sh = 10 * u;
-    ctx.fillStyle = 'rgba(50,50,60,0.5)';
-    ctx.fillRect(cx - sw / 2, baseY - sh, sw, sh);
-    ctx.fillStyle = 'rgba(60,60,70,0.4)';
-    ctx.fillRect(cx - sw / 2 + 4 * u, baseY - sh - 5 * u, sw - 8 * u, 5 * u);
-    // 人頭點綴
-    ctx.fillStyle = 'rgba(180,180,180,0.25)';
-    for (let i = 0; i < 12; i++) {
-      const px = cx - sw / 2 + 8 * u + i * (sw - 16 * u) / 11;
-      ctx.beginPath();
-      ctx.arc(px, baseY - sh - 2 * u, 1.5 * u, 0, Math.PI * 2);
-      ctx.fill();
+  // ── 國家地標繪製 ────────────────────────────────────────────
+
+  // 巴西：基督像
+  function drawCristoRedentor(x, baseY, u) {
+    const h = 40 * u;
+    ctx.fillStyle = '#6d4c41';
+    ctx.beginPath();
+    ctx.moveTo(x - 8 * u, baseY); ctx.lineTo(x - 5 * u, baseY - 8 * u);
+    ctx.lineTo(x + 5 * u, baseY - 8 * u); ctx.lineTo(x + 8 * u, baseY);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#e0e0e0';
+    ctx.fillRect(x - 2 * u, baseY - 8 * u - h * 0.65, 4 * u, h * 0.65);
+    ctx.fillRect(x - 18 * u, baseY - 8 * u - h * 0.6, 36 * u, 3 * u);
+    ctx.beginPath(); ctx.arc(x, baseY - 8 * u - h * 0.7, 3 * u, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // 巴西：糖麵包山
+  function drawSugarloaf(x, baseY, u) {
+    ctx.fillStyle = '#3e2723';
+    ctx.beginPath();
+    ctx.moveTo(x - 14 * u, baseY);
+    ctx.quadraticCurveTo(x - 4 * u, baseY - 28 * u, x, baseY - 30 * u);
+    ctx.quadraticCurveTo(x + 4 * u, baseY - 28 * u, x + 14 * u, baseY);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.beginPath();
+    ctx.moveTo(x - 4 * u, baseY);
+    ctx.quadraticCurveTo(x - 2 * u, baseY - 24 * u, x, baseY - 30 * u);
+    ctx.quadraticCurveTo(x + 1 * u, baseY - 26 * u, x + 2 * u, baseY);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // 阿根廷：方尖碑
+  function drawObelisco(x, baseY, u) {
+    const h = 45 * u;
+    ctx.fillStyle = '#e0e0e0';
+    ctx.beginPath();
+    ctx.moveTo(x, baseY - h);
+    ctx.lineTo(x - 4 * u, baseY - h + 8 * u);
+    ctx.lineTo(x - 3 * u, baseY); ctx.lineTo(x + 3 * u, baseY);
+    ctx.lineTo(x + 4 * u, baseY - h + 8 * u);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.1)';
+    ctx.beginPath();
+    ctx.moveTo(x, baseY - h);
+    ctx.lineTo(x + 4 * u, baseY - h + 8 * u);
+    ctx.lineTo(x + 3 * u, baseY); ctx.lineTo(x, baseY);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // 德國：布蘭登堡門
+  function drawBrandenburgGate(x, baseY, u) {
+    const gw = 36 * u, gh = 32 * u;
+    ctx.fillStyle = '#bdb76b';
+    for (let i = 0; i < 6; i++) {
+      const px = x - gw / 2 + i * gw / 5;
+      ctx.fillRect(px - 1.2 * u, baseY - gh, 2.4 * u, gh);
+    }
+    ctx.fillStyle = '#a0975a';
+    ctx.fillRect(x - gw / 2 - 2 * u, baseY - gh - 3 * u, gw + 4 * u, 3 * u);
+    ctx.fillRect(x - gw / 2, baseY - gh - 6 * u, gw, 3 * u);
+    ctx.fillStyle = '#8a7e40';
+    ctx.beginPath();
+    ctx.moveTo(x - 5 * u, baseY - gh - 6 * u);
+    ctx.lineTo(x - 3 * u, baseY - gh - 12 * u);
+    ctx.lineTo(x + 3 * u, baseY - gh - 12 * u);
+    ctx.lineTo(x + 5 * u, baseY - gh - 6 * u);
+    ctx.closePath(); ctx.fill();
+    ctx.fillRect(x - 7 * u, baseY - gh - 9 * u, 14 * u, 2 * u);
+  }
+
+  // 德國：啤酒桶
+  function drawBeerBarrel(x, baseY, u) {
+    ctx.fillStyle = '#8d6e46';
+    ctx.beginPath(); ctx.ellipse(x, baseY - 8 * u, 7 * u, 8 * u, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#5d4037'; ctx.lineWidth = 1.5 * u;
+    ctx.beginPath(); ctx.ellipse(x, baseY - 12 * u, 6 * u, 2 * u, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(x, baseY - 4 * u, 6 * u, 2 * u, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#ffd600';
+    ctx.fillRect(x - 3 * u, baseY - 22 * u, 6 * u, 8 * u);
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(x, baseY - 22 * u, 3.5 * u, 1.5 * u, 0, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // 義大利：比薩斜塔
+  function drawPisaTower(x, baseY, u) {
+    const h = 42 * u, lean = 4 * u;
+    ctx.save(); ctx.translate(x, baseY);
+    ctx.fillStyle = '#e8e0d0';
+    ctx.beginPath();
+    ctx.moveTo(-4 * u + lean, -h); ctx.lineTo(4 * u + lean, -h);
+    ctx.lineTo(4 * u, 0); ctx.lineTo(-4 * u, 0);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 0.5;
+    for (let i = 1; i <= 6; i++) {
+      const y = -i * h / 7, lx = lean * (i / 7);
+      ctx.beginPath(); ctx.moveTo(-4 * u + lx, y); ctx.lineTo(4 * u + lx, y); ctx.stroke();
+    }
+    ctx.beginPath(); ctx.ellipse(lean, -h - 2 * u, 3 * u, 2 * u, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#d8d0c0'; ctx.fill();
+    ctx.restore();
+  }
+
+  // 義大利：羅馬競技場
+  function drawColosseum(x, baseY, u) {
+    const w = 30 * u, h = 22 * u;
+    ctx.fillStyle = '#c4a87c';
+    ctx.beginPath(); ctx.ellipse(x, baseY - h * 0.4, w, h * 0.6, 0, Math.PI, 0); ctx.fill();
+    ctx.fillRect(x - w, baseY - h * 0.4, w * 2, h * 0.4);
+    ctx.fillStyle = '#8b7355';
+    for (let i = -3; i <= 3; i++) {
+      const ax = x + i * 7 * u;
+      ctx.beginPath(); ctx.arc(ax, baseY - h * 0.55, 2.5 * u, Math.PI, 0); ctx.fill();
+      ctx.fillRect(ax - 2.5 * u, baseY - h * 0.55, 5 * u, 4 * u);
+      ctx.beginPath(); ctx.arc(ax, baseY - h * 0.2, 2.5 * u, Math.PI, 0); ctx.fill();
+      ctx.fillRect(ax - 2.5 * u, baseY - h * 0.2, 5 * u, 4 * u);
     }
   }
 
-  function drawSpotlight(x, baseY, u) {
-    const pH = 34 * u, pW = 3 * u;
-    ctx.fillStyle = '#5d4037';
-    ctx.fillRect(x - pW / 2, baseY - pH, pW, pH);
-    // 聚光燈頭
-    ctx.fillStyle = '#ffd600';
-    ctx.beginPath();
-    ctx.arc(x, baseY - pH - 2 * u, 4 * u, 0, Math.PI * 2);
-    ctx.fill();
-    // 光束向下
-    const g = ctx.createLinearGradient(x, baseY - pH, x, baseY + 5 * u);
-    g.addColorStop(0, 'rgba(255,215,0,0.12)');
-    g.addColorStop(1, 'transparent');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.moveTo(x - 3 * u, baseY - pH);
-    ctx.lineTo(x - 16 * u, baseY + 5 * u);
-    ctx.lineTo(x + 16 * u, baseY + 5 * u);
-    ctx.lineTo(x + 3 * u, baseY - pH);
-    ctx.closePath();
-    ctx.fill();
+  // 義大利：柏樹
+  function drawCypressTree(x, baseY, u) {
+    ctx.fillStyle = '#4e342e';
+    ctx.fillRect(x - 1 * u, baseY - 8 * u, 2 * u, 8 * u);
+    ctx.fillStyle = '#2e5a1e';
+    ctx.beginPath(); ctx.ellipse(x, baseY - 8 * u - 12 * u, 4 * u, 14 * u, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1b4e15';
+    ctx.beginPath(); ctx.ellipse(x + 1 * u, baseY - 8 * u - 10 * u, 3 * u, 12 * u, 0, 0, Math.PI * 2); ctx.fill();
   }
 
-  function drawTrophyDeco(x, baseY, u) {
-    const s = u * 1.2;
-    const ty = baseY - 36 * u;
-    // 獎盃杯身
-    ctx.fillStyle = '#ffd600';
+  // 英格蘭：大笨鐘
+  function drawBigBen(x, baseY, u) {
+    const h = 48 * u;
+    ctx.fillStyle = '#c4a87c';
+    ctx.fillRect(x - 5 * u, baseY - h, 10 * u, h);
+    ctx.fillStyle = '#f5f5dc';
+    ctx.beginPath(); ctx.arc(x, baseY - h * 0.7, 4 * u, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#333'; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.arc(x, baseY - h * 0.7, 4 * u, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = '#333'; ctx.lineWidth = 1 * u;
+    ctx.beginPath(); ctx.moveTo(x, baseY - h * 0.7); ctx.lineTo(x, baseY - h * 0.7 - 3 * u); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, baseY - h * 0.7); ctx.lineTo(x + 2 * u, baseY - h * 0.7); ctx.stroke();
+    ctx.fillStyle = '#8a7e40';
     ctx.beginPath();
-    ctx.moveTo(x - 5 * s, ty);
-    ctx.quadraticCurveTo(x - 6 * s, ty + 10 * s, x - 3 * s, ty + 12 * s);
-    ctx.lineTo(x + 3 * s, ty + 12 * s);
-    ctx.quadraticCurveTo(x + 6 * s, ty + 10 * s, x + 5 * s, ty);
-    ctx.closePath();
-    ctx.fill();
-    // 底座
-    ctx.fillRect(x - 3 * s, ty + 12 * s, 6 * s, 2 * s);
-    ctx.fillRect(x - 5 * s, ty + 14 * s, 10 * s, 2 * s);
-    // 把手
-    ctx.strokeStyle = '#ffd600';
-    ctx.lineWidth = 1.5 * s;
-    ctx.beginPath();
-    ctx.arc(x - 6 * s, ty + 5 * s, 3 * s, -Math.PI * 0.5, Math.PI * 0.5);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(x + 6 * s, ty + 5 * s, 3 * s, Math.PI * 0.5, -Math.PI * 0.5);
-    ctx.stroke();
+    ctx.moveTo(x, baseY - h - 8 * u);
+    ctx.lineTo(x - 4 * u, baseY - h); ctx.lineTo(x + 4 * u, baseY - h);
+    ctx.closePath(); ctx.fill();
     ctx.lineWidth = 1;
-    // 光暈
-    const g = ctx.createRadialGradient(x, ty + 6 * s, 0, x, ty + 6 * s, 20 * s);
-    g.addColorStop(0, 'rgba(255,215,0,0.1)');
-    g.addColorStop(1, 'transparent');
-    ctx.fillStyle = g;
-    ctx.fillRect(x - 22 * s, ty - 10 * s, 44 * s, 36 * s);
   }
 
-  function drawAdBoard(x, baseY, u, color) {
-    const bw = 28 * u, bh = 6 * u;
-    ctx.fillStyle = color;
-    ctx.fillRect(x - bw / 2, baseY - bh, bw, bh);
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 0.5;
-    ctx.strokeRect(x - bw / 2, baseY - bh, bw, bh);
+  // 英格蘭：倫敦眼
+  function drawLondonEye(x, baseY, u) {
+    const r = 20 * u;
+    ctx.strokeStyle = '#78909c'; ctx.lineWidth = 1.5 * u;
+    ctx.beginPath(); ctx.moveTo(x, baseY); ctx.lineTo(x, baseY - r - 5 * u); ctx.stroke();
+    ctx.strokeStyle = '#90a4ae'; ctx.lineWidth = 1.5 * u;
+    ctx.beginPath(); ctx.arc(x, baseY - r - 5 * u, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(144,164,174,0.4)'; ctx.lineWidth = 0.5;
+    for (let i = 0; i < 8; i++) {
+      const a = i * Math.PI / 4;
+      ctx.beginPath(); ctx.moveTo(x, baseY - r - 5 * u);
+      ctx.lineTo(x + Math.cos(a) * r, baseY - r - 5 * u + Math.sin(a) * r); ctx.stroke();
+    }
+    ctx.fillStyle = '#42a5f5';
+    for (let i = 0; i < 8; i++) {
+      const a = i * Math.PI / 4;
+      ctx.beginPath(); ctx.arc(x + Math.cos(a) * r, baseY - r - 5 * u + Math.sin(a) * r, 2 * u, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.lineWidth = 1;
+  }
+
+  // 法國：艾菲爾鐵塔
+  function drawEiffelTower(x, baseY, u) {
+    const h = 50 * u;
+    ctx.fillStyle = '#5d4037';
+    ctx.beginPath();
+    ctx.moveTo(x - 12 * u, baseY); ctx.lineTo(x - 2 * u, baseY - h * 0.65);
+    ctx.lineTo(x + 2 * u, baseY - h * 0.65); ctx.lineTo(x + 12 * u, baseY);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x - 2 * u, baseY - h * 0.65); ctx.lineTo(x - 0.5 * u, baseY - h);
+    ctx.lineTo(x + 0.5 * u, baseY - h); ctx.lineTo(x + 2 * u, baseY - h * 0.65);
+    ctx.closePath(); ctx.fill();
+    ctx.fillRect(x - 0.3 * u, baseY - h - 5 * u, 0.6 * u, 5 * u);
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.beginPath(); ctx.arc(x, baseY, 6 * u, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = '#4e342e';
+    ctx.fillRect(x - 8 * u, baseY - h * 0.35, 16 * u, 1.5 * u);
+    ctx.fillRect(x - 3 * u, baseY - h * 0.65, 6 * u, 1.5 * u);
+  }
+
+  // 法國：凱旋門
+  function drawArcDeTriomphe(x, baseY, u) {
+    const w = 20 * u, h = 28 * u;
+    ctx.fillStyle = '#c4a87c';
+    ctx.fillRect(x - w / 2, baseY - h, w, h);
+    ctx.fillStyle = '#5d4037';
+    ctx.beginPath(); ctx.arc(x, baseY - h * 0.35, 5 * u, Math.PI, 0); ctx.fill();
+    ctx.fillRect(x - 5 * u, baseY - h * 0.35, 10 * u, h * 0.35);
+    ctx.fillStyle = '#a0975a';
+    ctx.fillRect(x - w / 2 - 1 * u, baseY - h - 2 * u, w + 2 * u, 2 * u);
+    ctx.fillRect(x - w / 2 + 2 * u, baseY - h - 4 * u, w - 4 * u, 2 * u);
+  }
+
+  // 日本：鳥居
+  function drawTorii(x, baseY, u) {
+    const h = 35 * u;
+    ctx.fillStyle = '#c62828';
+    ctx.fillRect(x - 12 * u, baseY - h, 3 * u, h);
+    ctx.fillRect(x + 9 * u, baseY - h, 3 * u, h);
+    ctx.beginPath();
+    ctx.moveTo(x - 16 * u, baseY - h + 1 * u);
+    ctx.quadraticCurveTo(x, baseY - h - 3 * u, x + 16 * u, baseY - h + 1 * u);
+    ctx.lineTo(x + 16 * u, baseY - h + 3 * u);
+    ctx.quadraticCurveTo(x, baseY - h - 1 * u, x - 16 * u, baseY - h + 3 * u);
+    ctx.closePath(); ctx.fill();
+    ctx.fillRect(x - 13 * u, baseY - h + 6 * u, 26 * u, 2 * u);
+  }
+
+  // 日本：富士山
+  function drawFujiSan(x, baseY, u) {
+    ctx.fillStyle = '#3949ab';
+    ctx.beginPath();
+    ctx.moveTo(x - 20 * u, baseY); ctx.lineTo(x, baseY - 32 * u); ctx.lineTo(x + 20 * u, baseY);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(x - 5 * u, baseY - 24 * u); ctx.lineTo(x, baseY - 32 * u); ctx.lineTo(x + 5 * u, baseY - 24 * u);
+    ctx.quadraticCurveTo(x + 2 * u, baseY - 22 * u, x, baseY - 25 * u);
+    ctx.quadraticCurveTo(x - 2 * u, baseY - 22 * u, x - 5 * u, baseY - 24 * u);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // 日本：櫻花樹
+  function drawSakuraTree(x, baseY, u) {
+    const tH = 14 * u;
+    ctx.fillStyle = '#5d4037';
+    ctx.fillRect(x - 1.5 * u, baseY - tH, 3 * u, tH);
+    ctx.strokeStyle = '#5d4037'; ctx.lineWidth = 1.5 * u;
+    ctx.beginPath(); ctx.moveTo(x, baseY - tH); ctx.lineTo(x - 8 * u, baseY - tH - 6 * u); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, baseY - tH); ctx.lineTo(x + 8 * u, baseY - tH - 5 * u); ctx.stroke();
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#f8bbd0';
+    ctx.beginPath(); ctx.arc(x, baseY - tH - 6 * u, 7 * u, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x - 7 * u, baseY - tH - 5 * u, 5 * u, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 7 * u, baseY - tH - 4 * u, 5 * u, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#f48fb1';
+    ctx.beginPath(); ctx.arc(x - 3 * u, baseY - tH - 8 * u, 4 * u, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 4 * u, baseY - tH - 7 * u, 4 * u, 0, Math.PI * 2); ctx.fill();
   }
 
   // ─── 球場兩側場景 ──────────────────────────────────────────
   // 場景邊線配置：護欄、觀眾剪影、特殊物件
   const SCENE_SIDE = {
-    '夜間球場': {
-      barrier: '#1a237e', barrierH: '#283593',
-      crowd: '#0d1440', crowdH: '#162060',
+    '巴西': {
+      barrier: '#1a6b30', barrierH: '#228b3a',
+      crowd: '#0d4020', crowdH: '#165028',
       specials: [
-        { z: 300, side: -1, type: 'banner' },
-        { z: 700, side: 1, type: 'banner' },
+        { z: 300, side: -1, type: 'palm' },
+        { z: 700, side: 1, type: 'palm' },
+        { z: 500, side: -1, type: 'bird' },
       ]
     },
-    '夕陽球場': {
-      barrier: '#5d4037', barrierH: '#6d4c41',
-      crowd: '#3e2723', crowdH: '#4e342e',
-      specials: [
-        { z: 250, side: -1, type: 'palm' },
-        { z: 600, side: 1, type: 'palm' },
-        { z: 800, side: -1, type: 'bird' },
-      ]
-    },
-    '正午豔陽': {
+    '阿根廷': {
       barrier: '#1565c0', barrierH: '#1976d2',
       crowd: '#0d47a1', crowdH: '#1565c0',
       specials: [
-        { z: 200, side: -1, type: 'balloon' },
-        { z: 500, side: 1, type: 'balloon' },
-        { z: 800, side: -1, type: 'flag' },
-        { z: 400, side: 1, type: 'flag' },
+        { z: 200, side: -1, type: 'flag' },
+        { z: 500, side: 1, type: 'flag' },
+        { z: 800, side: -1, type: 'balloon' },
+        { z: 400, side: 1, type: 'balloon' },
       ]
     },
-    '陰天球場': {
+    '德國': {
       barrier: '#455a64', barrierH: '#546e7a',
       crowd: '#37474f', crowdH: '#455a64',
       specials: [
-        { z: 300, side: -1, type: 'umbrella' },
-        { z: 600, side: -1, type: 'umbrella' },
-        { z: 450, side: 1, type: 'umbrella' },
-        { z: 750, side: 1, type: 'dog' },
+        { z: 300, side: -1, type: 'banner' },
+        { z: 600, side: 1, type: 'banner' },
+        { z: 450, side: 1, type: 'flag' },
       ]
     },
-    '暴風雨夜': {
+    '義大利': {
+      barrier: '#1a237e', barrierH: '#283593',
+      crowd: '#0d1440', crowdH: '#162060',
+      specials: [
+        { z: 250, side: -1, type: 'flag' },
+        { z: 550, side: 1, type: 'flag' },
+        { z: 800, side: -1, type: 'banner' },
+      ]
+    },
+    '英格蘭': {
       barrier: '#1a1a2e', barrierH: '#252540',
       crowd: '#121225', crowdH: '#1a1a35',
       specials: [
         { z: 400, side: -1, type: 'umbrella' },
         { z: 700, side: 1, type: 'umbrella' },
+        { z: 250, side: 1, type: 'banner' },
       ]
     },
-    '極光球場': {
-      barrier: '#1a3040', barrierH: '#203848',
-      crowd: '#0f2030', crowdH: '#152838',
+    '法國': {
+      barrier: '#1a2840', barrierH: '#203248',
+      crowd: '#0f1830', crowdH: '#152038',
       specials: [
-        { z: 200, side: -1, type: 'penguin' },
-        { z: 500, side: -1, type: 'penguin' },
-        { z: 350, side: 1, type: 'penguin' },
-        { z: 700, side: 1, type: 'penguin' },
-        { z: 850, side: -1, type: 'snowman' },
+        { z: 300, side: -1, type: 'flag' },
+        { z: 600, side: 1, type: 'flag' },
+        { z: 800, side: -1, type: 'balloon' },
       ]
     },
-    '金色決賽': {
+    '日本': {
       barrier: '#4a3800', barrierH: '#5a4400',
       crowd: '#2a1e00', crowdH: '#3a2800',
       specials: [
         { z: 250, side: -1, type: 'vipflag' },
         { z: 550, side: 1, type: 'vipflag' },
-        { z: 800, side: -1, type: 'trophy' },
-        { z: 400, side: 1, type: 'camera' },
+        { z: 800, side: -1, type: 'camera' },
       ]
     },
   };
@@ -1247,13 +1354,13 @@
   // ─── 左上/右上三角空地 ─────────────────────────────────────
   // 每場景可用的物件類型池，每波隨機生成
   const CORNER_TYPES = {
-    '夜間球場': ['bench','cone','cone','bench','cone'],
-    '夕陽球場': ['rock','cactus','rock','cactus','rock'],
-    '正午豔陽': ['bush','cooler','bench','bush','bush'],
-    '陰天球場': ['puddle','bin','bench','puddle','puddle'],
-    '暴風雨夜': ['puddle','cone','puddle','cone','puddle'],
-    '極光球場': ['snowpile','igloo','snowpile','igloo','snowpile'],
-    '金色決賽': ['vipchair','speaker','vipchair','speaker','vipchair'],
+    '巴西': ['rock','bush','cone','bush','rock'],
+    '阿根廷': ['bench','cooler','bench','cone','bush'],
+    '德國': ['bench','bin','cone','bench','cone'],
+    '義大利': ['rock','bush','bench','rock','bush'],
+    '英格蘭': ['puddle','cone','puddle','bin','puddle'],
+    '法國': ['bench','bush','cone','bench','bush'],
+    '日本': ['vipchair','speaker','vipchair','speaker','vipchair'],
   };
 
   // 地面彩蛋：每次 WARNING（每5波）解鎖
@@ -1388,10 +1495,10 @@
 
       // 底色
       const cornerColors = {
-        '夜間球場': '#0a1020', '夕陽球場': '#2a1510',
-        '正午豔陽': '#1a4a20', '陰天球場': '#2a3038',
-        '暴風雨夜': '#0e0e1a', '極光球場': '#0a1820',
-        '金色決賽': '#0e0a00',
+        '巴西': '#1a1510', '阿根廷': '#1a3a20',
+        '德國': '#2a3038', '義大利': '#0a1020',
+        '英格蘭': '#0e0e1a', '法國': '#0a1820',
+        '日本': '#0e0a00',
       };
       ctx.fillStyle = cornerColors[name] || '#111';
       ctx.fill();
@@ -1402,13 +1509,13 @@
 
       // 場外地面質感
       const tints = {
-        '夜間球場': 'rgba(100,80,60,0.08)',
-        '夕陽球場': 'rgba(120,90,50,0.06)',
-        '正午豔陽': 'rgba(40,100,40,0.08)',
-        '陰天球場': 'rgba(60,70,80,0.06)',
-        '暴風雨夜': 'rgba(30,30,50,0.05)',
-        '極光球場': 'rgba(200,220,240,0.04)',
-        '金色決賽': 'rgba(200,170,0,0.05)',
+        '巴西': 'rgba(120,90,50,0.06)',
+        '阿根廷': 'rgba(40,100,40,0.08)',
+        '德國': 'rgba(60,70,80,0.06)',
+        '義大利': 'rgba(100,80,60,0.08)',
+        '英格蘭': 'rgba(30,30,50,0.05)',
+        '法國': 'rgba(200,220,240,0.04)',
+        '日本': 'rgba(200,170,0,0.05)',
       };
       if (tints[name]) {
         ctx.fillStyle = tints[name];
