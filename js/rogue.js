@@ -1227,20 +1227,49 @@
     '金色決賽': ['vipchair','speaker','vipchair','speaker','vipchair'],
   };
 
-  // 彩蛋物件：每次 WARNING（每5波）解鎖新彩蛋
+  // 地面彩蛋：每次 WARNING（每5波）解鎖
   const EGGS = [
-    { minWave: 5,  weight: 5, type: 'cat' },       // 貓咪打盹
-    { minWave: 5,  weight: 5, type: 'bird_nest' },  // 鳥巢
-    { minWave: 5,  weight: 4, type: 'football' },   // 被遺忘的足球
-    { minWave: 10, weight: 4, type: 'campfire' },   // 營火
-    { minWave: 10, weight: 3, type: 'ufo' },        // UFO
-    { minWave: 10, weight: 3, type: 'mushroom' },   // 蘑菇
-    { minWave: 15, weight: 2, type: 'treasure' },   // 寶箱
-    { minWave: 15, weight: 2, type: 'robot' },      // 小機器人
-    { minWave: 20, weight: 1, type: 'dragon' },     // 小龍
-    { minWave: 20, weight: 1, type: 'unicorn' },    // 獨角獸
-    { minWave: 25, weight: 1, type: 'rocket' },     // 火箭
-    { minWave: 30, weight: 1, type: 'crown' },      // 皇冠
+    { minWave: 5,  weight: 5, type: 'cat' },
+    { minWave: 5,  weight: 5, type: 'bird_nest' },
+    { minWave: 5,  weight: 4, type: 'football' },
+    { minWave: 10, weight: 4, type: 'campfire' },
+    { minWave: 10, weight: 3, type: 'mushroom' },
+    { minWave: 15, weight: 3, type: 'treasure' },
+    { minWave: 15, weight: 2, type: 'robot' },
+    { minWave: 20, weight: 2, type: 'dragon' },
+    { minWave: 20, weight: 2, type: 'unicorn' },
+    { minWave: 25, weight: 1, type: 'rocket' },
+    { minWave: 30, weight: 1, type: 'crown' },
+    { minWave: 35, weight: 2, type: 'tent' },       // 帳篷
+    { minWave: 40, weight: 2, type: 'portal' },     // 傳送門
+    { minWave: 45, weight: 1, type: 'tank' },       // 玩具坦克
+    { minWave: 50, weight: 1, type: 'crystal' },    // 水晶
+    { minWave: 55, weight: 1, type: 'totem' },      // 圖騰柱
+    { minWave: 60, weight: 1, type: 'alien' },      // 外星人
+    { minWave: 65, weight: 1, type: 'phoenix_nest' }, // 鳳凰巢
+    { minWave: 70, weight: 1, type: 'blackhole' },  // 黑洞
+    { minWave: 75, weight: 1, type: 'worldcup' },   // 世界盃
+  ];
+
+  // 天空彩蛋：專屬天空的物件，有動畫
+  const SKY_EGGS = [
+    { minWave: 5,  weight: 5, type: 'sky_bird' },       // 飛鳥群
+    { minWave: 5,  weight: 4, type: 'sky_cloud' },      // 小雲朵
+    { minWave: 10, weight: 4, type: 'sky_plane' },      // 小飛機
+    { minWave: 10, weight: 3, type: 'sky_kite' },       // 風箏
+    { minWave: 15, weight: 3, type: 'sky_balloon' },    // 熱氣球
+    { minWave: 20, weight: 2, type: 'sky_ufo' },        // UFO（緩飄）
+    { minWave: 25, weight: 2, type: 'sky_blimp' },      // 飛船
+    { minWave: 30, weight: 2, type: 'sky_firework' },   // 煙火
+    { minWave: 35, weight: 1, type: 'sky_santa' },      // 聖誕老人雪橇
+    { minWave: 40, weight: 1, type: 'sky_witch' },      // 騎掃帚巫師
+    { minWave: 45, weight: 1, type: 'sky_pegasus' },    // 飛馬
+    { minWave: 50, weight: 1, type: 'sky_rocket' },     // 飛行火箭（噴焰）
+    { minWave: 55, weight: 1, type: 'sky_dragon' },     // 飛龍
+    { minWave: 60, weight: 1, type: 'sky_whale' },      // 天空鯨魚
+    { minWave: 65, weight: 1, type: 'sky_castle' },     // 天空之城
+    { minWave: 70, weight: 1, type: 'sky_phoenix' },    // 鳳凰
+    { minWave: 75, weight: 1, type: 'sky_star' },       // 流星雨
   ];
 
   let _cornerProps = []; // 當前波的角落物件
@@ -1395,6 +1424,15 @@
             case 'unicorn': _drawEggUnicorn(p.x, p.y, s); break;
             case 'rocket': _drawEggRocket(p.x, p.y, s); break;
             case 'crown': _drawEggCrown(p.x, p.y, s); break;
+            case 'tent': _drawEggTent(p.x, p.y, s); break;
+            case 'portal': _drawEggPortal(p.x, p.y, s); break;
+            case 'tank': _drawEggTank(p.x, p.y, s); break;
+            case 'crystal': _drawEggCrystal(p.x, p.y, s); break;
+            case 'totem': _drawEggTotem(p.x, p.y, s); break;
+            case 'alien': _drawEggAlien(p.x, p.y, s); break;
+            case 'phoenix_nest': _drawEggPhoenixNest(p.x, p.y, s); break;
+            case 'blackhole': _drawEggBlackhole(p.x, p.y, s); break;
+            case 'worldcup': _drawEggWorldcup(p.x, p.y, s); break;
           }
         }
       }
@@ -1704,16 +1742,247 @@
     ctx.beginPath(); ctx.arc(x, y - 4 * s, 12 * s, 0, Math.PI * 2); ctx.fill();
   }
 
-  // ─── 背景彩蛋（球場上緣～技能條下緣） ─────────────────────
+  function _drawEggTent(x, y, s) {
+    // 帳篷
+    ctx.fillStyle = '#e67e22';
+    ctx.beginPath();
+    ctx.moveTo(x, y - 12 * s);
+    ctx.lineTo(x - 8 * s, y);
+    ctx.lineTo(x + 8 * s, y);
+    ctx.closePath(); ctx.fill();
+    // 門
+    ctx.fillStyle = '#2c3e50';
+    ctx.beginPath();
+    ctx.moveTo(x, y - 2 * s);
+    ctx.lineTo(x - 3 * s, y);
+    ctx.lineTo(x + 3 * s, y);
+    ctx.closePath(); ctx.fill();
+    // 旗子
+    ctx.strokeStyle = '#8b4513'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, y - 12 * s); ctx.lineTo(x, y - 16 * s); ctx.stroke();
+    ctx.fillStyle = '#e74c3c';
+    ctx.beginPath();
+    ctx.moveTo(x, y - 16 * s); ctx.lineTo(x + 4 * s, y - 14.5 * s); ctx.lineTo(x, y - 13 * s);
+    ctx.closePath(); ctx.fill();
+  }
+
+  function _drawEggPortal(x, y, s) {
+    // 傳送門 — 旋轉光環
+    const t = Date.now() * 0.003;
+    ctx.save();
+    ctx.translate(x, y - 6 * s);
+    // 外環光暈
+    ctx.fillStyle = 'rgba(138,43,226,0.12)';
+    ctx.beginPath(); ctx.ellipse(0, 0, 10 * s, 12 * s, 0, 0, Math.PI * 2); ctx.fill();
+    // 旋轉環
+    for (let i = 0; i < 3; i++) {
+      const a = t + i * Math.PI * 2 / 3;
+      ctx.strokeStyle = `hsla(${270 + i * 30}, 80%, 60%, 0.6)`;
+      ctx.lineWidth = 1.5 * s;
+      ctx.beginPath(); ctx.ellipse(0, 0, 7 * s, 9 * s, a, 0, Math.PI * 2); ctx.stroke();
+    }
+    // 中心
+    ctx.fillStyle = '#1a0a2e';
+    ctx.beginPath(); ctx.ellipse(0, 0, 3 * s, 4 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function _drawEggTank(x, y, s) {
+    // 迷你坦克
+    // 履帶
+    ctx.fillStyle = '#444';
+    ctx.fillRect(x - 7 * s, y - 3 * s, 14 * s, 3 * s);
+    // 車身
+    ctx.fillStyle = '#5a6e3a';
+    ctx.fillRect(x - 5 * s, y - 7 * s, 10 * s, 4 * s);
+    // 砲塔
+    ctx.fillStyle = '#4a5e2a';
+    ctx.beginPath(); ctx.arc(x, y - 8 * s, 3 * s, 0, Math.PI * 2); ctx.fill();
+    // 砲管
+    ctx.strokeStyle = '#3a4e1a'; ctx.lineWidth = 1.5 * s;
+    ctx.beginPath(); ctx.moveTo(x + 3 * s, y - 8 * s); ctx.lineTo(x + 9 * s, y - 9 * s); ctx.stroke();
+    // 星星標記
+    ctx.fillStyle = '#c0392b';
+    ctx.beginPath(); ctx.arc(x, y - 5 * s, 1.2 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawEggCrystal(x, y, s) {
+    // 水晶
+    const t = Date.now() * 0.002;
+    const glow = 0.3 + Math.sin(t) * 0.15;
+    // 光暈
+    ctx.fillStyle = `rgba(100,200,255,${glow * 0.3})`;
+    ctx.beginPath(); ctx.arc(x, y - 7 * s, 10 * s, 0, Math.PI * 2); ctx.fill();
+    // 主體
+    ctx.fillStyle = `rgba(130,220,255,${0.7 + glow * 0.3})`;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 14 * s);
+    ctx.lineTo(x - 4 * s, y - 5 * s);
+    ctx.lineTo(x - 2 * s, y);
+    ctx.lineTo(x + 2 * s, y);
+    ctx.lineTo(x + 4 * s, y - 5 * s);
+    ctx.closePath(); ctx.fill();
+    // 高光
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.beginPath();
+    ctx.moveTo(x - 1 * s, y - 12 * s);
+    ctx.lineTo(x - 3 * s, y - 5 * s);
+    ctx.lineTo(x - 1 * s, y - 4 * s);
+    ctx.closePath(); ctx.fill();
+  }
+
+  function _drawEggTotem(x, y, s) {
+    // 圖騰柱
+    // 柱身
+    ctx.fillStyle = '#8b5e3c';
+    ctx.fillRect(x - 3 * s, y - 16 * s, 6 * s, 16 * s);
+    // 第一層臉
+    ctx.fillStyle = '#e74c3c';
+    ctx.fillRect(x - 4 * s, y - 16 * s, 8 * s, 5 * s);
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(x - 1.5 * s, y - 14 * s, 1 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 1.5 * s, y - 14 * s, 1 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.arc(x - 1.5 * s, y - 14 * s, 0.5 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 1.5 * s, y - 14 * s, 0.5 * s, 0, Math.PI * 2); ctx.fill();
+    // 第二層臉
+    ctx.fillStyle = '#2ecc71';
+    ctx.fillRect(x - 4 * s, y - 10 * s, 8 * s, 5 * s);
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(x - 1.5 * s, y - 8 * s, 1 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 1.5 * s, y - 8 * s, 1 * s, 0, Math.PI * 2); ctx.fill();
+    // 翅膀
+    ctx.fillStyle = '#f39c12';
+    ctx.beginPath();
+    ctx.moveTo(x - 4 * s, y - 8 * s); ctx.lineTo(x - 7 * s, y - 10 * s); ctx.lineTo(x - 4 * s, y - 6 * s);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x + 4 * s, y - 8 * s); ctx.lineTo(x + 7 * s, y - 10 * s); ctx.lineTo(x + 4 * s, y - 6 * s);
+    ctx.closePath(); ctx.fill();
+  }
+
+  function _drawEggAlien(x, y, s) {
+    // 外星人
+    // 身體
+    ctx.fillStyle = '#7dcea0';
+    ctx.beginPath(); ctx.ellipse(x, y - 4 * s, 3 * s, 4 * s, 0, 0, Math.PI * 2); ctx.fill();
+    // 頭
+    ctx.fillStyle = '#7dcea0';
+    ctx.beginPath(); ctx.ellipse(x, y - 11 * s, 4 * s, 3.5 * s, 0, 0, Math.PI * 2); ctx.fill();
+    // 大眼睛
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.ellipse(x - 2 * s, y - 11 * s, 1.5 * s, 2 * s, -0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + 2 * s, y - 11 * s, 1.5 * s, 2 * s, 0.2, 0, Math.PI * 2); ctx.fill();
+    // 眼睛高光
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(x - 2.3 * s, y - 11.5 * s, 0.5 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 1.7 * s, y - 11.5 * s, 0.5 * s, 0, Math.PI * 2); ctx.fill();
+    // 觸角
+    ctx.strokeStyle = '#7dcea0'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x - 2 * s, y - 14 * s); ctx.lineTo(x - 3 * s, y - 17 * s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + 2 * s, y - 14 * s); ctx.lineTo(x + 3 * s, y - 17 * s); ctx.stroke();
+    ctx.fillStyle = '#abebc6';
+    ctx.beginPath(); ctx.arc(x - 3 * s, y - 17 * s, 0.8 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 3 * s, y - 17 * s, 0.8 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawEggPhoenixNest(x, y, s) {
+    // 鳳凰巢
+    const t = Date.now() * 0.003;
+    // 巢
+    ctx.fillStyle = '#8b4513';
+    ctx.beginPath();
+    ctx.ellipse(x, y - 1 * s, 7 * s, 3 * s, 0, 0, Math.PI); ctx.fill();
+    // 枝條紋理
+    ctx.strokeStyle = '#6d3a0a'; ctx.lineWidth = 0.8;
+    for (let i = -3; i <= 3; i++) {
+      ctx.beginPath();
+      ctx.moveTo(x + i * 2 * s, y - 1 * s);
+      ctx.quadraticCurveTo(x + i * 1.5 * s, y - 3 * s, x + i * 2.5 * s, y - 2 * s);
+      ctx.stroke();
+    }
+    // 火焰蛋
+    const flicker = Math.sin(t) * 0.2;
+    ctx.fillStyle = `rgba(255,${100 + Math.sin(t * 1.3) * 50},0,${0.7 + flicker})`;
+    ctx.beginPath(); ctx.ellipse(x, y - 5 * s, 3 * s, 4 * s, 0, 0, Math.PI * 2); ctx.fill();
+    // 火焰
+    ctx.fillStyle = `rgba(255,200,0,${0.4 + flicker})`;
+    ctx.beginPath();
+    ctx.moveTo(x - 2 * s, y - 7 * s);
+    ctx.quadraticCurveTo(x, y - 13 * s, x + 2 * s, y - 7 * s);
+    ctx.closePath(); ctx.fill();
+    // 火花
+    ctx.fillStyle = 'rgba(255,255,100,0.5)';
+    ctx.beginPath(); ctx.arc(x + Math.sin(t * 2) * 2 * s, y - 10 * s, 0.8 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawEggBlackhole(x, y, s) {
+    // 黑洞
+    const t = Date.now() * 0.002;
+    ctx.save();
+    ctx.translate(x, y - 6 * s);
+    // 吸積盤光暈
+    for (let i = 3; i >= 0; i--) {
+      const r = (6 + i * 3) * s;
+      ctx.fillStyle = `rgba(${100 + i * 40},${50 + i * 20},${200 - i * 30},${0.1 + i * 0.03})`;
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+    }
+    // 旋轉吸積盤
+    ctx.strokeStyle = 'rgba(200,150,255,0.4)'; ctx.lineWidth = 1.5 * s;
+    ctx.beginPath(); ctx.ellipse(0, 0, 8 * s, 3 * s, t, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,200,100,0.3)'; ctx.lineWidth = 1 * s;
+    ctx.beginPath(); ctx.ellipse(0, 0, 6 * s, 2 * s, t + 0.5, 0, Math.PI * 2); ctx.stroke();
+    // 核心黑洞
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(0, 0, 3 * s, 0, Math.PI * 2); ctx.fill();
+    // 事件視界光環
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.arc(0, 0, 3.5 * s, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+
+  function _drawEggWorldcup(x, y, s) {
+    // 世界盃獎盃
+    // 光暈
+    const t = Date.now() * 0.002;
+    const glow = 0.2 + Math.sin(t) * 0.1;
+    ctx.fillStyle = `rgba(255,215,0,${glow})`;
+    ctx.beginPath(); ctx.arc(x, y - 8 * s, 12 * s, 0, Math.PI * 2); ctx.fill();
+    // 底座
+    ctx.fillStyle = '#8b6914';
+    ctx.fillRect(x - 4 * s, y - 2 * s, 8 * s, 2 * s);
+    ctx.fillRect(x - 3 * s, y - 3 * s, 6 * s, 1 * s);
+    // 柱子
+    ctx.fillStyle = '#daa520';
+    ctx.fillRect(x - 1.5 * s, y - 7 * s, 3 * s, 4 * s);
+    // 杯身
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.moveTo(x - 5 * s, y - 14 * s);
+    ctx.quadraticCurveTo(x - 6 * s, y - 8 * s, x - 1.5 * s, y - 7 * s);
+    ctx.lineTo(x + 1.5 * s, y - 7 * s);
+    ctx.quadraticCurveTo(x + 6 * s, y - 8 * s, x + 5 * s, y - 14 * s);
+    ctx.closePath(); ctx.fill();
+    // 杯口
+    ctx.beginPath(); ctx.ellipse(x, y - 14 * s, 5 * s, 1.5 * s, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffc800'; ctx.fill();
+    // 地球圖案
+    ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.arc(x, y - 10 * s, 2 * s, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x - 2 * s, y - 10 * s); ctx.lineTo(x + 2 * s, y - 10 * s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, y - 12 * s); ctx.lineTo(x, y - 8 * s); ctx.stroke();
+  }
+
+  // ─── 天空彩蛋（球場上緣～技能條下緣） ─────────────────────
   let _bgEggs = [];
 
   function generateBgEggs() {
     _bgEggs = [];
     if (!G) return;
     const wave = G.wave;
-    const available = EGGS.filter(e => wave >= e.minWave);
+    const available = SKY_EGGS.filter(e => wave >= e.minWave);
     if (!available.length) return;
-    const count = Math.min(4, Math.floor(wave / 5));
+    const count = Math.min(5, Math.floor(wave / 5));
     if (count <= 0) return;
     const total = available.reduce((s, e) => s + e.weight, 0);
     for (let i = 0; i < count; i++) {
@@ -1722,10 +1991,13 @@
       for (const e of available) { r -= e.weight; if (r <= 0) { type = e.type; break; } }
       _bgEggs.push({
         type,
-        xPct: 0.08 + Math.random() * 0.84, // 水平 8%~92%
-        yPct: 0.1 + Math.random() * 0.8,    // 在區間內的比例
-        scale: 0.5 + Math.random() * 0.4,
-        alpha: 0.15 + Math.random() * 0.15,  // 半透明，不干擾遊戲
+        xPct: 0.05 + Math.random() * 0.9,
+        yPct: 0.05 + Math.random() * 0.9,
+        scale: 0.5 + Math.random() * 0.5,
+        alpha: 0.2 + Math.random() * 0.15,
+        spd: 0.02 + Math.random() * 0.04, // 水平漂移速度
+        dir: Math.random() < 0.5 ? 1 : -1,
+        phase: Math.random() * Math.PI * 2, // 動畫相位
       });
     }
   }
@@ -1733,35 +2005,307 @@
   function drawBgEggs() {
     if (!_bgEggs.length || !G) return;
     const goalY = proj(0, FIELD_DEPTH).y;
-    const barBottom = 70; // 技能條下緣
+    const barBottom = 70;
     const zoneTop = barBottom;
     const zoneH = goalY - barBottom;
     if (zoneH <= 10) return;
+    const t = performance.now() * 0.001;
 
     ctx.save();
     for (const egg of _bgEggs) {
+      // 動畫位移
+      egg.xPct += egg.spd * egg.dir * 0.001;
+      if (egg.xPct < -0.05) egg.xPct = 1.05;
+      if (egg.xPct > 1.05) egg.xPct = -0.05;
+
       const x = W * egg.xPct;
-      const y = zoneTop + zoneH * egg.yPct;
+      const baseY = zoneTop + zoneH * egg.yPct;
+      const bob = Math.sin(t * 1.5 + egg.phase) * 3; // 上下浮動
+      const y = baseY + bob;
       const s = egg.scale * Math.min(1, W / 500) * 2;
       ctx.globalAlpha = egg.alpha;
-      // 重用角落彩蛋繪製函數
+
       switch (egg.type) {
-        case 'cat': _drawEggCat(x, y, s); break;
-        case 'bird_nest': _drawEggNest(x, y, s); break;
-        case 'football': _drawEggFootball(x, y, s); break;
-        case 'campfire': _drawEggCampfire(x, y, s); break;
-        case 'ufo': _drawEggUFO(x, y, s); break;
-        case 'mushroom': _drawEggMushroom(x, y, s); break;
-        case 'treasure': _drawEggTreasure(x, y, s); break;
-        case 'robot': _drawEggRobot(x, y, s); break;
-        case 'dragon': _drawEggDragon(x, y, s); break;
-        case 'unicorn': _drawEggUnicorn(x, y, s); break;
-        case 'rocket': _drawEggRocket(x, y, s); break;
-        case 'crown': _drawEggCrown(x, y, s); break;
+        case 'sky_bird': _drawSkyBird(x, y, s, t + egg.phase); break;
+        case 'sky_cloud': _drawSkyCloud(x, y, s); break;
+        case 'sky_plane': _drawSkyPlane(x, y, s, egg.dir); break;
+        case 'sky_kite': _drawSkyKite(x, y, s, t + egg.phase); break;
+        case 'sky_balloon': _drawSkyBalloon(x, y, s); break;
+        case 'sky_ufo': _drawSkyUFO(x, y, s, t + egg.phase); break;
+        case 'sky_blimp': _drawSkyBlimp(x, y, s, egg.dir); break;
+        case 'sky_firework': _drawSkyFirework(x, y, s, t + egg.phase); break;
+        case 'sky_santa': _drawSkySanta(x, y, s, egg.dir); break;
+        case 'sky_witch': _drawSkyWitch(x, y, s, egg.dir); break;
+        case 'sky_pegasus': _drawSkyPegasus(x, y, s, egg.dir, t + egg.phase); break;
+        case 'sky_rocket': _drawSkyRocket(x, y, s, t + egg.phase); break;
+        case 'sky_dragon': _drawSkyDragon(x, y, s, egg.dir, t + egg.phase); break;
+        case 'sky_whale': _drawSkyWhale(x, y, s, egg.dir); break;
+        case 'sky_castle': _drawSkyCastle(x, y, s); break;
+        case 'sky_phoenix': _drawSkyPhoenix(x, y, s, t + egg.phase); break;
+        case 'sky_star': _drawSkyStar(x, y, s, t + egg.phase); break;
       }
     }
     ctx.globalAlpha = 1;
     ctx.restore();
+  }
+
+  // ── 天空彩蛋繪製 ──────────────────────────────────────────
+  function _drawSkyBird(x, y, s, t) {
+    // V字鳥群（3隻）
+    ctx.strokeStyle = '#37474f'; ctx.lineWidth = 1.2 * s;
+    for (let i = -1; i <= 1; i++) {
+      const bx = x + i * 8 * s, by = y + Math.abs(i) * 3 * s;
+      const flap = Math.sin(t * 6 + i) * 3 * s;
+      ctx.beginPath();
+      ctx.moveTo(bx - 4 * s, by + flap); ctx.lineTo(bx, by); ctx.lineTo(bx + 4 * s, by + flap);
+      ctx.stroke();
+    }
+    ctx.lineWidth = 1;
+  }
+
+  function _drawSkyCloud(x, y, s) {
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.beginPath(); ctx.arc(x, y, 6 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x - 5 * s, y + 1 * s, 4 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 5 * s, y + 1 * s, 5 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 2 * s, y - 2 * s, 4 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawSkyPlane(x, y, s, dir) {
+    ctx.fillStyle = '#b0bec5';
+    // 機身
+    ctx.fillRect(x - 8 * s * dir, y - 1.5 * s, 16 * s, 3 * s);
+    // 機翼
+    ctx.fillRect(x - 3 * s, y - 5 * s, 6 * s, 2 * s);
+    // 尾翼
+    ctx.fillRect(x - 7 * s * dir, y - 4 * s, 3 * s, 2.5 * s);
+    // 窗
+    ctx.fillStyle = '#42a5f5';
+    for (let i = -2; i <= 2; i++) ctx.fillRect(x + i * 2 * s, y - 0.5 * s, 1 * s, 1 * s);
+  }
+
+  function _drawSkyKite(x, y, s, t) {
+    // 菱形風箏
+    ctx.fillStyle = '#e53935';
+    ctx.beginPath();
+    ctx.moveTo(x, y - 6 * s); ctx.lineTo(x + 4 * s, y); ctx.lineTo(x, y + 6 * s); ctx.lineTo(x - 4 * s, y);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#fdd835';
+    ctx.beginPath();
+    ctx.moveTo(x, y - 6 * s); ctx.lineTo(x + 4 * s, y); ctx.lineTo(x, y); ctx.lineTo(x - 4 * s, y);
+    ctx.closePath(); ctx.fill();
+    // 飄帶尾巴
+    ctx.strokeStyle = '#e53935'; ctx.lineWidth = 1 * s;
+    ctx.beginPath(); ctx.moveTo(x, y + 6 * s);
+    for (let i = 1; i <= 4; i++) ctx.lineTo(x + Math.sin(t * 3 + i) * 3 * s, y + 6 * s + i * 4 * s);
+    ctx.stroke(); ctx.lineWidth = 1;
+  }
+
+  function _drawSkyBalloon(x, y, s) {
+    // 熱氣球
+    ctx.fillStyle = '#e53935';
+    ctx.beginPath(); ctx.arc(x, y - 5 * s, 7 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fdd835';
+    ctx.beginPath(); ctx.arc(x, y - 5 * s, 7 * s, Math.PI * 0.3, Math.PI * 0.7); ctx.lineTo(x, y - 5 * s); ctx.fill();
+    // 籃子
+    ctx.strokeStyle = '#5d4037'; ctx.lineWidth = 0.8 * s;
+    ctx.beginPath(); ctx.moveTo(x - 4 * s, y + 2 * s); ctx.lineTo(x - 2 * s, y + 5 * s);
+    ctx.lineTo(x + 2 * s, y + 5 * s); ctx.lineTo(x + 4 * s, y + 2 * s); ctx.stroke();
+    ctx.fillStyle = '#8d6e63';
+    ctx.fillRect(x - 2.5 * s, y + 4 * s, 5 * s, 3 * s);
+    ctx.lineWidth = 1;
+  }
+
+  function _drawSkyUFO(x, y, s, t) {
+    ctx.fillStyle = '#78909c';
+    ctx.beginPath(); ctx.ellipse(x, y, 10 * s, 3 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#b0bec5';
+    ctx.beginPath(); ctx.arc(x, y - 3 * s, 5 * s, Math.PI, 0); ctx.fill();
+    // 旋轉燈
+    const blink = Math.sin(t * 8) > 0;
+    ctx.fillStyle = blink ? '#76ff03' : '#00e5ff';
+    [-4, 0, 4].forEach(dx => {
+      ctx.beginPath(); ctx.arc(x + dx * s, y, 1 * s, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+
+  function _drawSkyBlimp(x, y, s, dir) {
+    ctx.fillStyle = '#546e7a';
+    ctx.beginPath(); ctx.ellipse(x, y, 14 * s, 5 * s, 0, 0, Math.PI * 2); ctx.fill();
+    // 吊艙
+    ctx.fillStyle = '#37474f';
+    ctx.fillRect(x - 4 * s, y + 5 * s, 8 * s, 3 * s);
+    // 文字
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = `bold ${3 * s}px sans-serif`; ctx.textAlign = 'center';
+    ctx.fillText('GOAL', x, y + 1.5 * s);
+  }
+
+  function _drawSkyFirework(x, y, s, t) {
+    const phase = (t * 2) % 3;
+    if (phase < 1.5) {
+      // 上升
+      ctx.fillStyle = '#ffd600';
+      ctx.beginPath(); ctx.arc(x, y + (1.5 - phase) * 10 * s, 1.5 * s, 0, Math.PI * 2); ctx.fill();
+    } else {
+      // 爆開
+      const expand = (phase - 1.5) / 1.5;
+      const colors = ['#e53935','#fdd835','#42a5f5','#66bb6a','#ff7043','#ab47bc'];
+      for (let i = 0; i < 8; i++) {
+        const ang = i * Math.PI * 2 / 8;
+        const r = expand * 12 * s;
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.globalAlpha *= (1 - expand);
+        ctx.beginPath(); ctx.arc(x + Math.cos(ang) * r, y + Math.sin(ang) * r, 1.5 * s, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha /= Math.max(0.01, 1 - expand);
+      }
+    }
+  }
+
+  function _drawSkySanta(x, y, s, dir) {
+    // 雪橇
+    ctx.fillStyle = '#5d4037';
+    ctx.fillRect(x - 6 * s, y + 2 * s, 12 * s, 2 * s);
+    // 聖誕老人
+    ctx.fillStyle = '#c62828';
+    ctx.fillRect(x - 2 * s, y - 4 * s, 5 * s, 6 * s);
+    ctx.fillStyle = '#ffcc80';
+    ctx.beginPath(); ctx.arc(x + 0.5 * s, y - 6 * s, 2.5 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#c62828';
+    ctx.beginPath(); ctx.arc(x + 0.5 * s, y - 6 * s, 2.5 * s, Math.PI, 0); ctx.fill();
+    // 馴鹿剪影
+    ctx.fillStyle = '#5d4037';
+    const rx = x + dir * 12 * s;
+    ctx.beginPath(); ctx.ellipse(rx, y - 1 * s, 4 * s, 2.5 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(rx + dir * 4 * s, y - 3 * s, 2 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawSkyWitch(x, y, s, dir) {
+    // 掃帚
+    ctx.fillStyle = '#8d6e63';
+    ctx.fillRect(x - 8 * s, y + 1 * s, 16 * s, 1.5 * s);
+    ctx.fillStyle = '#fdd835';
+    ctx.beginPath(); ctx.moveTo(x - 8 * s * dir, y); ctx.lineTo(x - 12 * s * dir, y - 2 * s);
+    ctx.lineTo(x - 12 * s * dir, y + 4 * s); ctx.lineTo(x - 8 * s * dir, y + 2.5 * s); ctx.fill();
+    // 巫師
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(x - 2 * s, y - 5 * s, 4 * s, 6 * s);
+    // 尖帽
+    ctx.beginPath(); ctx.moveTo(x, y - 12 * s); ctx.lineTo(x - 3 * s, y - 5 * s); ctx.lineTo(x + 3 * s, y - 5 * s); ctx.fill();
+  }
+
+  function _drawSkyPegasus(x, y, s, dir, t) {
+    ctx.fillStyle = '#e0e0e0';
+    // 身體
+    ctx.beginPath(); ctx.ellipse(x, y, 7 * s, 4 * s, 0, 0, Math.PI * 2); ctx.fill();
+    // 頭
+    ctx.beginPath(); ctx.arc(x + dir * 7 * s, y - 3 * s, 3 * s, 0, Math.PI * 2); ctx.fill();
+    // 翅膀（拍動）
+    const flap = Math.sin(t * 5) * 4 * s;
+    ctx.fillStyle = 'rgba(224,224,224,0.7)';
+    ctx.beginPath();
+    ctx.moveTo(x - 2 * s, y - 3 * s); ctx.lineTo(x, y - 10 * s + flap); ctx.lineTo(x + 4 * s, y - 3 * s);
+    ctx.fill();
+  }
+
+  function _drawSkyRocket(x, y, s, t) {
+    // 火箭飛行
+    ctx.fillStyle = '#e0e0e0';
+    ctx.fillRect(x - 2 * s, y - 8 * s, 4 * s, 10 * s);
+    ctx.fillStyle = '#e53935';
+    ctx.beginPath(); ctx.moveTo(x, y - 12 * s); ctx.lineTo(x - 2 * s, y - 8 * s); ctx.lineTo(x + 2 * s, y - 8 * s); ctx.fill();
+    // 噴焰（動畫閃爍）
+    const fl = 4 + Math.sin(t * 12) * 2;
+    ctx.fillStyle = '#ff6d00';
+    ctx.beginPath(); ctx.moveTo(x - 1.5 * s, y + 2 * s); ctx.lineTo(x, y + (2 + fl) * s); ctx.lineTo(x + 1.5 * s, y + 2 * s); ctx.fill();
+    ctx.fillStyle = '#fdd835';
+    ctx.beginPath(); ctx.moveTo(x - 0.8 * s, y + 2 * s); ctx.lineTo(x, y + (2 + fl * 0.6) * s); ctx.lineTo(x + 0.8 * s, y + 2 * s); ctx.fill();
+  }
+
+  function _drawSkyDragon(x, y, s, dir, t) {
+    ctx.fillStyle = '#4caf50';
+    // 身體蛇形
+    ctx.beginPath();
+    ctx.moveTo(x - dir * 10 * s, y + Math.sin(t * 3) * 3 * s);
+    ctx.quadraticCurveTo(x, y + Math.sin(t * 3 + 1) * 3 * s, x + dir * 10 * s, y + Math.sin(t * 3 + 2) * 3 * s);
+    ctx.lineWidth = 4 * s; ctx.strokeStyle = '#4caf50'; ctx.stroke(); ctx.lineWidth = 1;
+    // 頭
+    ctx.beginPath(); ctx.arc(x + dir * 10 * s, y + Math.sin(t * 3 + 2) * 3 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill();
+    // 翅膀
+    const flap = Math.sin(t * 5) * 3 * s;
+    ctx.fillStyle = 'rgba(76,175,80,0.5)';
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 3 * s, y - 8 * s + flap); ctx.lineTo(x + 5 * s, y); ctx.fill();
+    // 火焰
+    ctx.fillStyle = '#ff6d00';
+    const fx = x + dir * 13 * s, fy = y + Math.sin(t * 3 + 2) * 3 * s;
+    ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(fx + dir * 6 * s, fy - 1 * s); ctx.lineTo(fx + dir * 4 * s, fy + 1 * s); ctx.fill();
+  }
+
+  function _drawSkyWhale(x, y, s, dir) {
+    ctx.fillStyle = '#1565c0';
+    ctx.beginPath(); ctx.ellipse(x, y, 14 * s, 6 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#90caf9';
+    ctx.beginPath(); ctx.ellipse(x + dir * 2 * s, y + 2 * s, 10 * s, 4 * s, 0, 0, Math.PI * 2); ctx.fill();
+    // 尾
+    ctx.fillStyle = '#1565c0';
+    ctx.beginPath();
+    ctx.moveTo(x - dir * 14 * s, y); ctx.lineTo(x - dir * 20 * s, y - 5 * s); ctx.lineTo(x - dir * 20 * s, y + 5 * s);
+    ctx.closePath(); ctx.fill();
+    // 眼
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(x + dir * 10 * s, y - 2 * s, 1.5 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawSkyCastle(x, y, s) {
+    ctx.fillStyle = 'rgba(200,200,220,0.6)';
+    // 主體
+    ctx.fillRect(x - 8 * s, y - 6 * s, 16 * s, 10 * s);
+    // 塔
+    ctx.fillRect(x - 10 * s, y - 12 * s, 5 * s, 16 * s);
+    ctx.fillRect(x + 5 * s, y - 12 * s, 5 * s, 16 * s);
+    // 塔頂
+    ctx.fillStyle = 'rgba(180,180,200,0.7)';
+    ctx.beginPath(); ctx.moveTo(x - 10 * s, y - 12 * s); ctx.lineTo(x - 7.5 * s, y - 16 * s); ctx.lineTo(x - 5 * s, y - 12 * s); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x + 5 * s, y - 12 * s); ctx.lineTo(x + 7.5 * s, y - 16 * s); ctx.lineTo(x + 10 * s, y - 12 * s); ctx.fill();
+    // 雲底
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.beginPath(); ctx.ellipse(x, y + 5 * s, 14 * s, 3 * s, 0, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawSkyPhoenix(x, y, s, t) {
+    const flap = Math.sin(t * 4) * 5 * s;
+    // 身體
+    ctx.fillStyle = '#ff6d00';
+    ctx.beginPath(); ctx.ellipse(x, y, 5 * s, 3 * s, 0, 0, Math.PI * 2); ctx.fill();
+    // 翅膀（展開+火焰）
+    ctx.fillStyle = '#ffd600';
+    ctx.beginPath(); ctx.moveTo(x - 3 * s, y); ctx.lineTo(x - 12 * s, y - 6 * s + flap); ctx.lineTo(x - 5 * s, y + 2 * s); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x + 3 * s, y); ctx.lineTo(x + 12 * s, y - 6 * s + flap); ctx.lineTo(x + 5 * s, y + 2 * s); ctx.fill();
+    // 尾焰
+    ctx.fillStyle = '#ff6d00';
+    ctx.beginPath(); ctx.moveTo(x - 4 * s, y + 1 * s);
+    ctx.quadraticCurveTo(x - 8 * s, y + 8 * s + Math.sin(t * 6) * 2 * s, x - 2 * s, y + 12 * s);
+    ctx.quadraticCurveTo(x, y + 6 * s, x + 2 * s, y + 12 * s);
+    ctx.quadraticCurveTo(x + 8 * s, y + 8 * s + Math.sin(t * 6 + 1) * 2 * s, x + 4 * s, y + 1 * s);
+    ctx.fill();
+    // 頭
+    ctx.fillStyle = '#e53935';
+    ctx.beginPath(); ctx.arc(x, y - 4 * s, 2.5 * s, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function _drawSkyStar(x, y, s, t) {
+    // 流星（多條）
+    for (let i = 0; i < 3; i++) {
+      const sx = x + i * 12 * s;
+      const sy = y + i * 5 * s;
+      const trail = (t * 4 + i * 2) % 5;
+      if (trail > 3) continue;
+      ctx.strokeStyle = '#ffd600'; ctx.lineWidth = 1.5 * s;
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx - 10 * s, sy + 5 * s); ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(sx, sy, 1.5 * s, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.lineWidth = 1;
   }
 
   function drawSideCrowd() {
