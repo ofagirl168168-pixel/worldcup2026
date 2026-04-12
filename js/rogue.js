@@ -112,12 +112,59 @@
   };
 
   // ═══════════════════════════════════════════════════════════
-  //  音效系統（Web Audio API）
+  //  音效系統（音檔 + Web Audio API 備援）
   // ═══════════════════════════════════════════════════════════
   let audioCtx = null;
   let sfxOn = true, bgmOn = true;
   let bgmGain = null, sfxGain = null;
   let _bgmTimer = null, _bgmPlaying = false;
+
+  // ── 預載音效檔 ──
+  const SFX_FILES = {
+    shoot:    'audio/sfx/shoot.mp3',
+    hit:      'audio/sfx/hit.ogg',
+    goal:     'audio/sfx/goal.mp3',
+    block:    'audio/sfx/block.ogg',
+    warning:  'audio/sfx/warning.mp3',
+    card:     'audio/sfx/card.wav',
+    loselife: 'audio/sfx/loselife.mp3',
+    gameover: 'audio/sfx/gameover.mp3',
+  };
+  const sfxPool = {};   // { name: [Audio, Audio, ...] }
+  const SFX_POOL_SIZE = 3;
+  let sfxLoaded = false;
+
+  function preloadSFX() {
+    if (sfxLoaded) return;
+    sfxLoaded = true;
+    for (const [name, src] of Object.entries(SFX_FILES)) {
+      sfxPool[name] = [];
+      for (let i = 0; i < SFX_POOL_SIZE; i++) {
+        const a = new Audio(src);
+        a.preload = 'auto';
+        a.volume = 0.4;
+        sfxPool[name].push(a);
+      }
+    }
+  }
+
+  function playSFX(name) {
+    if (!sfxOn) return;
+    preloadSFX();
+    const pool = sfxPool[name];
+    if (!pool) return;
+    // 找到一個空閒的 Audio 元素
+    for (const a of pool) {
+      if (a.paused || a.ended) {
+        a.currentTime = 0;
+        a.play().catch(() => {});
+        return;
+      }
+    }
+    // 全部忙碌：強制重用第一個
+    pool[0].currentTime = 0;
+    pool[0].play().catch(() => {});
+  }
 
   function ensureAudio() {
     if (audioCtx) return;
@@ -139,95 +186,62 @@
     o.start(t); o.stop(t + dur);
   }
 
-  function playNoise(dur, dest, delay) {
-    if (!audioCtx) return;
-    const t = audioCtx.currentTime + (delay || 0);
-    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * dur, audioCtx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf;
-    const g = audioCtx.createGain();
-    g.gain.setValueAtTime(0.25, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    src.connect(g); g.connect(dest || sfxGain);
-    src.start(t); src.stop(t + dur);
-  }
-
   // ── 音效 ──
-  function sfxShoot() {
-    if (!sfxOn) return; ensureAudio();
-    playNote(220, 0.08, 'square');
-    playNote(330, 0.06, 'square', sfxGain, 0.03);
-    playNoise(0.05);
-  }
-  function sfxHit() {
-    if (!sfxOn) return; ensureAudio();
-    playNote(180, 0.1, 'sawtooth');
-    playNoise(0.08);
-  }
-  function sfxGoal() {
-    if (!sfxOn) return; ensureAudio();
-    [523, 659, 784, 1047].forEach((f, i) => playNote(f, 0.3, 'sine', sfxGain, i * 0.1));
-    playNoise(0.4, sfxGain, 0.05);
-  }
-  function sfxBlock() {
-    if (!sfxOn) return; ensureAudio();
-    playNote(120, 0.15, 'sawtooth');
-    playNoise(0.1);
-  }
-  function sfxWarning() {
-    if (!sfxOn) return; ensureAudio();
-    [440, 330, 440, 330].forEach((f, i) => playNote(f, 0.15, 'square', sfxGain, i * 0.18));
-  }
-  function sfxCard() {
-    if (!sfxOn) return; ensureAudio();
-    playNote(660, 0.1, 'sine');
-    playNote(880, 0.15, 'sine', sfxGain, 0.08);
-  }
-  function sfxLoseLife() {
-    if (!sfxOn) return; ensureAudio();
-    [330, 260, 200].forEach((f, i) => playNote(f, 0.2, 'sawtooth', sfxGain, i * 0.15));
-  }
-  function sfxGameOver() {
-    if (!sfxOn) return; ensureAudio();
-    [400, 350, 300, 250, 200].forEach((f, i) => playNote(f, 0.3, 'sawtooth', sfxGain, i * 0.2));
-  }
+  function sfxShoot()    { playSFX('shoot'); }
+  function sfxHit()      { playSFX('hit'); }
+  function sfxGoal()     { playSFX('goal'); }
+  function sfxBlock()    { playSFX('block'); }
+  function sfxWarning()  { playSFX('warning'); }
+  function sfxCard()     { playSFX('card'); }
+  function sfxLoseLife() { playSFX('loselife'); }
+  function sfxGameOver() { playSFX('gameover'); }
 
-  // ── BGM：每個國家專屬旋律循環 ──
+  // ── BGM：先嘗試載入音檔，無檔案則用程式生成旋律 ──
+  let _bgmAudio = null;  // 音檔 BGM 用
+
+  const COUNTRY_BGM_FILES = {
+    '巴西': 'audio/bgm-brazil.mp3',
+    '阿根廷': 'audio/bgm-argentina.mp3',
+    '德國': 'audio/bgm-germany.mp3',
+    '義大利': 'audio/bgm-italy.mp3',
+    '英格蘭': 'audio/bgm-england.mp3',
+    '法國': 'audio/bgm-france.mp3',
+    '日本': 'audio/bgm-japan.mp3',
+  };
+
   const COUNTRY_MUSIC = {
     '巴西': {
-      scale: [262, 294, 330, 392, 440, 523, 587, 659], // 大調
+      scale: [262, 294, 330, 392, 440, 523, 587, 659],
       tempo: 180, type: 'sine',
-      pattern: [0,2,4,5,4,2,0,2, 4,5,6,7,6,5,4,2], // 森巴節奏感
+      pattern: [0,2,4,5,4,2,0,2, 4,5,6,7,6,5,4,2],
     },
     '阿根廷': {
-      scale: [262, 294, 311, 370, 415, 466, 523, 554], // 小調（探戈）
+      scale: [262, 294, 311, 370, 415, 466, 523, 554],
       tempo: 130, type: 'triangle',
       pattern: [0,1,2,3,4,3,2,1, 4,5,6,7,6,5,4,3],
     },
     '德國': {
-      scale: [262, 294, 330, 349, 392, 440, 494, 523], // 大調（進行曲）
+      scale: [262, 294, 330, 349, 392, 440, 494, 523],
       tempo: 140, type: 'square',
       pattern: [0,0,4,4,5,5,4,4, 3,3,2,2,1,1,0,0],
     },
     '義大利': {
-      scale: [330, 370, 415, 440, 494, 523, 587, 659], // 明亮大調
+      scale: [330, 370, 415, 440, 494, 523, 587, 659],
       tempo: 120, type: 'sine',
       pattern: [0,2,4,6,7,6,4,2, 1,3,5,7,6,4,2,0],
     },
     '英格蘭': {
-      scale: [262, 294, 330, 349, 392, 440, 494, 523], // 大調（國歌感）
+      scale: [262, 294, 330, 349, 392, 440, 494, 523],
       tempo: 110, type: 'triangle',
       pattern: [0,0,1,2,2,3,4,4, 5,5,4,3,2,1,0,0],
     },
     '法國': {
-      scale: [330, 370, 440, 494, 523, 587, 659, 698], // 明亮（手風琴華爾滋）
+      scale: [330, 370, 440, 494, 523, 587, 659, 698],
       tempo: 150, type: 'sine',
-      pattern: [0,4,2,4,0,4,2,4, 1,5,3,5,1,5,3,5], // 3/4拍感
+      pattern: [0,4,2,4,0,4,2,4, 1,5,3,5,1,5,3,5],
     },
     '日本': {
-      scale: [262, 294, 349, 392, 466, 523, 587, 698], // 日本五聲音階
+      scale: [262, 294, 349, 392, 466, 523, 587, 698],
       tempo: 100, type: 'sine',
       pattern: [0,2,3,4,3,2,0,2, 4,6,7,6,4,3,2,0],
     },
@@ -236,6 +250,25 @@
   function startBGM(sceneName) {
     stopBGM();
     if (!bgmOn) return;
+
+    // 嘗試載入音檔
+    const filePath = COUNTRY_BGM_FILES[sceneName];
+    if (filePath) {
+      const audio = new Audio(filePath);
+      audio.loop = true;
+      audio.volume = 0.25;
+      audio.play().then(() => {
+        _bgmAudio = audio;
+      }).catch(() => {
+        // 音檔不存在或無法播放，改用程式生成
+        startProceduralBGM(sceneName);
+      });
+      return;
+    }
+    startProceduralBGM(sceneName);
+  }
+
+  function startProceduralBGM(sceneName) {
     ensureAudio();
     const music = COUNTRY_MUSIC[sceneName];
     if (!music) return;
@@ -248,7 +281,6 @@
       const idx = music.pattern[step % music.pattern.length];
       const freq = music.scale[idx];
       playNote(freq, beatMs / 1000 * 0.8, music.type, bgmGain);
-      // 加和弦底音（低八度，弱）
       if (step % 4 === 0) {
         const bassG = audioCtx.createGain();
         bassG.gain.value = 0.08; bassG.connect(bgmGain);
@@ -263,6 +295,7 @@
   function stopBGM() {
     _bgmPlaying = false;
     if (_bgmTimer) { clearTimeout(_bgmTimer); _bgmTimer = null; }
+    if (_bgmAudio) { _bgmAudio.pause(); _bgmAudio = null; }
   }
 
   // ═══════════════════════════════════════════════════════════
