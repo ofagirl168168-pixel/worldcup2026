@@ -434,6 +434,8 @@ function calcXPLevel() {
     // 預測結算獎勵 XP
     xp += parseInt(localStorage.getItem(p + 'bonus_xp')||'0') || 0;
   });
+  // 射門遊戲累積 XP
+  xp += parseInt(localStorage.getItem('rogue_total_xp') || '0') || 0;
   const xpPerLv = 100;
   const level   = Math.floor(xp / xpPerLv) + 1;
   const xpInLv  = xp % xpPerLv;
@@ -2295,7 +2297,47 @@ function renderBadges() {
           </div>`;
         }).join('')}
       </div>
+    </div>
+    ${_renderRogueBadgeSection()}`;
+}
+
+// ── 射門遊戲徽章區塊 ──
+function _renderRogueBadgeSection() {
+  const rBadges = typeof ROGUE_BADGES !== 'undefined' ? ROGUE_BADGES : [];
+  const rWeekly = typeof ROGUE_WEEKLY_BADGES !== 'undefined' ? ROGUE_WEEKLY_BADGES : [];
+  if (rBadges.length === 0) return '';
+  const earned = typeof loadRogueBadges === 'function' ? loadRogueBadges() : {};
+  const weeklyEarned = typeof loadRogueWeeklyBadges === 'function'
+    ? loadRogueWeeklyBadges().filter(b => (Date.now() - new Date(b.date).getTime()) / 86400000 < 7)
+    : [];
+
+  let html = `<div class="badges-section" style="margin-top:20px">
+    <div class="badges-title">🎮 射門遊戲成就</div>
+    <div class="badges-grid">`;
+  rBadges.forEach((b, i) => {
+    const e = !!earned[b.id];
+    html += `<div class="badge-card ${e ? 'rarity-common' : 'locked'}" onclick="showBadgeDetail('rogue',${i})">
+      <div class="badge-card-icon" style="${e ? '' : 'filter:grayscale(1);opacity:0.4'}">${b.icon}</div>
+      <div class="badge-card-name">${b.name}</div>
+      ${e ? `<div class="badge-rarity-label" style="color:#66bb6a">遊戲</div>` : ''}
     </div>`;
+  });
+  html += `</div></div>`;
+
+  if (weeklyEarned.length > 0) {
+    html += `<div class="badges-section" style="margin-top:20px">
+      <div class="badges-title">🔥 週排名限定（7天）</div>
+      <div class="badges-grid">`;
+    weeklyEarned.forEach((wb, i) => {
+      html += `<div class="badge-card" style="border-color:${wb.color}" onclick="showBadgeDetail('rogue_weekly',${i})">
+        <div class="badge-card-icon" style="filter:drop-shadow(0 0 8px ${wb.color})">${wb.icon}</div>
+        <div class="badge-card-name" style="color:${wb.color}">${wb.name}</div>
+        <div class="badge-rarity-label" style="color:${wb.color}">限定</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+  return html;
 }
 
 // ── 點擊徽章顯示詳情 ────────────────────────────────────
@@ -2328,7 +2370,7 @@ function showBadgeDetail(type, idx) {
         </button>` : ''}
         <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;margin-top:${e ? '8' : '24'}px">關閉</button>
       </div>`;
-  } else {
+  } else if (type === 'tiered') {
     const badge = TIERED_BADGES[idx];
     const vals = getTieredValues();
     const currentVal = vals[badge.id] || 0;
@@ -2376,8 +2418,64 @@ function showBadgeDetail(type, idx) {
         })() : ''}
         <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;margin-top:8px">關閉</button>
       </div>`;
+  } else if (type === 'rogue') {
+    const rBadges = typeof ROGUE_BADGES !== 'undefined' ? ROGUE_BADGES : [];
+    const b = rBadges[idx];
+    if (!b) return;
+    const earned = typeof loadRogueBadges === 'function' ? loadRogueBadges() : {};
+    const e = !!earned[b.id];
+    const currentShowcase2 = localStorage.getItem('wc26_showcase_badge_2') || '';
+    const isShowcased2 = currentShowcase2 === b.icon;
+    mc.innerHTML = `
+      <div style="text-align:center;padding:10px 0">
+        <div style="font-size:56px;margin-bottom:8px;${e ? '' : 'filter:grayscale(1);opacity:0.4'}">${b.icon}</div>
+        <div style="font-size:20px;font-weight:900;margin-bottom:4px">${b.name}</div>
+        <div style="font-size:12px;font-weight:700;color:#66bb6a;margin-bottom:8px">🎮 遊戲成就</div>
+        <div style="font-size:14px;color:var(--text-muted);margin-bottom:20px">${b.desc}</div>
+        <div style="display:inline-block;padding:6px 18px;border-radius:999px;font-size:13px;font-weight:700;${e ? 'background:rgba(34,197,94,0.15);color:#86efac' : 'background:rgba(255,255,255,0.06);color:var(--text-muted)'}">
+          ${e ? '✅ 已達成（' + earned[b.id] + '）' : '🔒 尚未達成'}
+        </div>
+        ${e ? `<button onclick="setShowcaseBadge2('${b.icon}')" style="width:100%;padding:12px;border-radius:12px;background:${isShowcased2 ? 'rgba(255,255,255,0.06)' : '#66bb6a'};color:${isShowcased2 ? 'var(--text-muted)' : '#000'};font-size:13px;font-weight:700;border:1px solid ${isShowcased2 ? 'rgba(255,255,255,0.1)' : '#66bb6a'};cursor:pointer;margin-top:16px">
+          ${isShowcased2 ? '✅ 展示中（第二欄）' : '🏷️ 展示在排行榜（第二欄）'}
+        </button>` : ''}
+        <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;margin-top:8px">關閉</button>
+      </div>`;
+  } else if (type === 'rogue_weekly') {
+    const weeklyEarned = typeof loadRogueWeeklyBadges === 'function'
+      ? loadRogueWeeklyBadges().filter(b => (Date.now() - new Date(b.date).getTime()) / 86400000 < 7)
+      : [];
+    const wb = weeklyEarned[idx];
+    if (!wb) return;
+    const currentShowcase2 = localStorage.getItem('wc26_showcase_badge_2') || '';
+    const isShowcased2 = currentShowcase2 === wb.icon;
+    const daysLeft = Math.max(0, Math.ceil(7 - (Date.now() - new Date(wb.date).getTime()) / 86400000));
+    mc.innerHTML = `
+      <div style="text-align:center;padding:10px 0">
+        <div style="font-size:56px;margin-bottom:8px;filter:drop-shadow(0 0 12px ${wb.color})">${wb.icon}</div>
+        <div style="font-size:20px;font-weight:900;margin-bottom:4px;color:${wb.color}">${wb.name}</div>
+        <div style="font-size:12px;font-weight:700;color:#ffa726;margin-bottom:8px">🔥 限定徽章</div>
+        <div style="font-size:14px;color:var(--text-muted);margin-bottom:20px">剩餘 ${daysLeft} 天</div>
+        <button onclick="setShowcaseBadge2('${wb.icon}')" style="width:100%;padding:12px;border-radius:12px;background:${isShowcased2 ? 'rgba(255,255,255,0.06)' : wb.color};color:${isShowcased2 ? 'var(--text-muted)' : '#000'};font-size:13px;font-weight:700;border:1px solid ${isShowcased2 ? 'rgba(255,255,255,0.1)' : wb.color};cursor:pointer">
+          ${isShowcased2 ? '✅ 展示中（第二欄）' : '🏷️ 展示在排行榜（第二欄）'}
+        </button>
+        <button onclick="closeModal()" style="width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text-muted);font-size:13px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;margin-top:8px">關閉</button>
+      </div>`;
   }
   document.getElementById('team-modal').classList.add('open');
+}
+
+// ── 設定展示徽章（第二欄，遊戲徽章用）────────────────────
+function setShowcaseBadge2(icon) {
+  const current = localStorage.getItem('wc26_showcase_badge_2') || '';
+  if (current === icon) {
+    localStorage.removeItem('wc26_showcase_badge_2');
+    showToast('已取消第二欄展示徽章');
+  } else {
+    localStorage.setItem('wc26_showcase_badge_2', icon);
+    showToast(`${icon} 已設為排行榜第二欄展示！`);
+  }
+  syncXPToProfile?.();
+  closeModal();
 }
 
 // ── 設定展示徽章 ──────────────────────────────────────────

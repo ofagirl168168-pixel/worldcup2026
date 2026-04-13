@@ -276,6 +276,7 @@ async function syncXPToProfile() {
     }
 
     const showcaseBadge = localStorage.getItem('wc26_showcase_badge') || null;
+    const showcaseBadge2 = localStorage.getItem('wc26_showcase_badge_2') || null;
     await DB.from('profiles').update({
       xp:             xpData.xp,
       correct_answers: correct,
@@ -284,6 +285,7 @@ async function syncXPToProfile() {
       pred_exact_score: predExact,
       pred_total_settled: predTotal,
       showcase_badge:  showcaseBadge,
+      showcase_badge_2: showcaseBadge2,
       updated_at:     new Date().toISOString()
     }).eq('id', currentUser.id)
   } catch (e) {
@@ -422,6 +424,12 @@ function _lookupBadgeInfo(icon) {
     const tierCls = ['lb-badge-bronze', 'lb-badge-silver', 'lb-badge-gold'][tier] || 'lb-badge-common';
     return { name, cls: tierCls };
   }
+  // 搜尋射門遊戲徽章
+  const rogue = (typeof ROGUE_BADGES !== 'undefined' ? ROGUE_BADGES : []).find(b => b.icon === icon);
+  if (rogue) return { name: rogue.name, cls: 'lb-badge-game' };
+  // 搜尋週冠軍限定徽章
+  const weekly = (typeof ROGUE_WEEKLY_BADGES !== 'undefined' ? ROGUE_WEEKLY_BADGES : []).find(b => b.icon === icon);
+  if (weekly) return { name: weekly.name, cls: 'lb-badge-weekly' };
   return null;
 }
 
@@ -470,13 +478,15 @@ async function renderLeaderboard(containerId) {
     const title = getPredTitle(row);
     const badgeIcon = row.showcase_badge || '';
     const badgeInfo = badgeIcon ? _lookupBadgeInfo(badgeIcon) : null;
+    const badgeIcon2 = row.showcase_badge_2 || '';
+    const badgeInfo2 = badgeIcon2 ? _lookupBadgeInfo(badgeIcon2) : null;
 
     return `
       <div class="lb-row ${isMe ? 'lb-me' : ''}">
         <div class="lb-rank">${medals[i] ?? `#${i + 1}`}</div>
         <div class="lb-flag">${flagImg(flag)}</div>
         <div class="lb-name">
-          ${row.nickname}${badgeInfo ? ` <span class="lb-badge ${badgeInfo.cls}">${badgeIcon} ${badgeInfo.name}</span>` : ''}${isMe ? ' <span class="lb-you">你</span>' : ''}
+          ${row.nickname}${badgeInfo ? ` <span class="lb-badge ${badgeInfo.cls}">${badgeIcon} ${badgeInfo.name}</span>` : ''}${badgeInfo2 ? ` <span class="lb-badge ${badgeInfo2.cls}">${badgeIcon2} ${badgeInfo2.name}</span>` : ''}${isMe ? ' <span class="lb-you">你</span>' : ''}
           ${title ? `<span class="lb-title ${title.cls}">${title.icon} ${title.name}</span>` : ''}
         </div>
         <div class="lb-stats">

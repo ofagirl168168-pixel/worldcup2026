@@ -999,6 +999,14 @@
       localStorage.setItem('rogue_best', JSON.stringify(best));
     }
 
+    // 累積遊戲 XP（score/50 + wave*2）
+    const gameXP = Math.floor(G.score / 50) + G.wave * 2;
+    const prevXP = parseInt(localStorage.getItem('rogue_total_xp') || '0') || 0;
+    localStorage.setItem('rogue_total_xp', String(prevXP + gameXP));
+    // 更新排行榜 XP
+    if (typeof updateNavXP === 'function') updateNavXP();
+    if (typeof syncXPToProfile === 'function') syncXPToProfile();
+
     // 檢查並頒發遊戲徽章
     const newBadges = checkBadges(G.score, G.wave, G.collected.length, G._revived);
     if (newBadges.length > 0) {
@@ -4345,11 +4353,11 @@
   //  生涯里程碑 & 成就徽章系統
   // ═══════════════════════════════════════════════════════════
   const MILESTONES = [
-    { score: 4000,  gems: 3,  chest: 'chest_bronze',    tier: '銅', color: '#d4a574' },
-    { score: 6000,  gems: 5,  chest: 'chest_silver',    tier: '銀', color: '#c0c0c0' },
-    { score: 8000,  gems: 8,  chest: 'chest_gold',      tier: '金', color: '#ffd700' },
-    { score: 10000, gems: 12, chest: 'chest_diamond',   tier: '鑽石', color: '#64b5f6' },
-    { score: 12000, gems: 18, chest: 'chest_legendary', tier: '傳說', color: '#e040fb' },
+    { score: 4000,  gems: 1, chest: 'chest_bronze',    tier: '銅', color: '#d4a574' },
+    { score: 6000,  gems: 1, chest: 'chest_silver',    tier: '銀', color: '#c0c0c0' },
+    { score: 8000,  gems: 2, chest: 'chest_gold',      tier: '金', color: '#ffd700' },
+    { score: 10000, gems: 2, chest: 'chest_diamond',   tier: '鑽石', color: '#64b5f6' },
+    { score: 12000, gems: 3, chest: 'chest_legendary', tier: '傳說', color: '#e040fb' },
   ];
 
   const BADGES = [
@@ -5399,6 +5407,10 @@
   // 公開 API
   window.startRogueGame = startGame;
   window.renderRogueLeaderboard = renderHomeLeaderboard;
+  window.ROGUE_BADGES = BADGES;
+  window.ROGUE_WEEKLY_BADGES = WEEKLY_BADGES;
+  window.loadRogueBadges = _loadBadges;
+  window.loadRogueWeeklyBadges = _loadWeeklyBadges;
 
   // ?play=rogue → 自動開啟遊戲（支援分享連結）
   function checkAutoPlay() {

@@ -35,11 +35,11 @@ const AWARD_RULES: Record<string, { amount: number; unique: boolean; dailyLimit?
   streak_30_wc:     { amount: 10, unique: false, dailyLimit: true },  // 連勝 30 天 — 世界盃
   streak_30_ucl:    { amount: 10, unique: false, dailyLimit: true },  // 連勝 30 天 — 歐冠
   streak_30_epl:    { amount: 10, unique: false, dailyLimit: true },  // 連勝 30 天 — 英超
-  rogue_milestone_4000:  { amount: 3,  unique: true },                  // 射門遊戲里程碑 4000 分
-  rogue_milestone_6000:  { amount: 5,  unique: true },                  // 射門遊戲里程碑 6000 分
-  rogue_milestone_8000:  { amount: 8,  unique: true },                  // 射門遊戲里程碑 8000 分
-  rogue_milestone_10000: { amount: 12, unique: true },                  // 射門遊戲里程碑 10000 分
-  rogue_milestone_12000: { amount: 18, unique: true },                  // 射門遊戲里程碑 12000 分
+  rogue_milestone_4000:  { amount: 1,  unique: true },                  // 射門遊戲里程碑 4000 分
+  rogue_milestone_6000:  { amount: 1,  unique: true },                  // 射門遊戲里程碑 6000 分
+  rogue_milestone_8000:  { amount: 2,  unique: true },                  // 射門遊戲里程碑 8000 分
+  rogue_milestone_10000: { amount: 2,  unique: true },                  // 射門遊戲里程碑 10000 分
+  rogue_milestone_12000: { amount: 3,  unique: true },                  // 射門遊戲里程碑 12000 分
   referral_invite:  { amount: 3,  unique: false },                    // 邀請好友成功
   referral_joined:  { amount: 3,  unique: true },                     // 被邀請者首次登入
   level_2:          { amount: 2,  unique: true },                     // 升到 Lv.2

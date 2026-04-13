@@ -1992,6 +1992,10 @@ img.flag-img {
 .lb-badge-bronze { background: rgba(205,127,50,0.15); border-color: rgba(205,127,50,0.4); color: #cd7f32; }
 .lb-badge-silver { background: rgba(192,192,192,0.15); border-color: rgba(192,192,192,0.4); color: #c0c0c0; }
 .lb-badge-gold { background: rgba(255,215,0,0.15); border-color: rgba(255,215,0,0.45); color: #ffd700; box-shadow: 0 0 6px rgba(255,215,0,0.3); }
+/* 射門遊戲成就 */
+.lb-badge-game { background: rgba(76,175,80,0.15); border-color: rgba(76,175,80,0.4); color: #66bb6a; }
+/* 週冠軍限定 */
+.lb-badge-weekly { background: rgba(255,152,0,0.15); border-color: rgba(255,152,0,0.45); color: #ffa726; box-shadow: 0 0 6px rgba(255,152,0,0.3); }
 
 /* ========== 徽章卡片可點擊 ========== */
 .badge-card { cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
