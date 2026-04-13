@@ -2219,7 +2219,61 @@ img.flag-img {
   .fx-fog, .fx-target-layer { display: none !important; }
 }
 
-/* ========== 肉鴿射門挑戰 Overlay ========== */
+/* ========== 射門挑戰首頁 Banner ========== */
+.rogue-home-banner {
+  position: relative; overflow: hidden; cursor: pointer;
+  border-radius: 16px; padding: 24px 22px;
+  border: 1px solid rgba(76,175,80,0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.rogue-home-banner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(76,175,80,0.25);
+}
+.rogue-home-banner-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(20,80,30,0.85), rgba(10,40,20,0.9)),
+              url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" x="10" font-size="50">⚽</text></svg>');
+  background-size: cover;
+  opacity: 0.95;
+}
+.rogue-home-banner-content {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.rogue-home-banner-left h3 {
+  font-size: 18px; font-weight: 800; color: #fff; margin: 0 0 6px;
+}
+.rogue-home-banner-left p {
+  font-size: 12px; color: rgba(255,255,255,0.6); margin: 0 0 10px; line-height: 1.6;
+}
+.rogue-home-banner-badge {
+  display: inline-block; font-size: 10px; font-weight: 800;
+  padding: 2px 8px; border-radius: 5px; margin-bottom: 8px;
+  background: rgba(255,70,70,0.25); color: #ff6b6b;
+}
+.rogue-home-banner-rewards {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  font-size: 12px; color: rgba(255,215,0,0.8); font-weight: 600;
+}
+.rogue-home-banner-action {
+  font-size: 14px; font-weight: 800; color: #4caf50;
+  white-space: nowrap; flex-shrink: 0;
+  padding: 10px 18px; border-radius: 10px;
+  background: rgba(76,175,80,0.15); border: 1px solid rgba(76,175,80,0.3);
+  transition: background 0.2s;
+}
+.rogue-home-banner:hover .rogue-home-banner-action {
+  background: rgba(76,175,80,0.3);
+}
+@media (max-width: 600px) {
+  .rogue-home-banner { padding: 18px 16px; }
+  .rogue-home-banner-left h3 { font-size: 15px; }
+  .rogue-home-banner-content { flex-direction: column; text-align: center; }
+  .rogue-home-banner-rewards { justify-content: center; }
+}
+
+/* ========== 射門挑戰 Overlay ========== */
 #rogue-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   width: 100%; height: 100%;
