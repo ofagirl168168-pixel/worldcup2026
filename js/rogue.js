@@ -605,7 +605,9 @@
       // wave1~4：左右巡邏
       gk.x += gk.dir * gkEffSpd * (dt / 16);
     }
-    const gkPatrolHW = Math.min(GOAL_HW * 1.6, GOAL_HW * (1 + (G.goalBonus || 0)));
+    // 守門員巡邏範圍 = 球門判定寬度
+    const effectiveGoalHW_ = Math.min(GOAL_HW * 1.6, GOAL_HW * (1 + (G.goalBonus || 0)));
+    const gkPatrolHW = effectiveGoalHW_;
     if (gk.x > gkPatrolHW - gk.w / 2) { gk.x = gkPatrolHW - gk.w / 2; gk.dir = -1; }
     if (gk.x < -gkPatrolHW + gk.w / 2) { gk.x = -gkPatrolHW + gk.w / 2; gk.dir = 1; }
 
@@ -706,11 +708,11 @@
         }
       }
 
-      // 進球判定（同一波只算一次）
+      // 進球判定（同一波只算一次）— 球中心必須在球門框內才算
       if (b.z >= GOAL_Z) {
         b.alive = false;
         const effectiveGoalHW = Math.min(GOAL_HW * 1.6, GOAL_HW * (1 + (G.goalBonus || 0)));
-        if (Math.abs(b.x) < effectiveGoalHW && G.phase === 'playing') { onGoal(); return; }
+        if (Math.abs(b.x) < effectiveGoalHW - b.r && G.phase === 'playing') { onGoal(); return; }
       }
       // 飛出場外
       if (b.z < -50) b.alive = false;
