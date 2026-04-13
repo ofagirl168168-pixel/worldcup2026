@@ -1552,18 +1552,18 @@ img.flag-img {
 /* ========== UCL 淘汰賽對陣圖 ========== */
 .ucl-bracket {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;
   padding: 20px;
   overflow-x: auto;
 }
 .bracket-round {
   display: flex;
   flex-direction: column;
-  gap: 24px;
   min-width: 200px;
   justify-content: space-around;
+  gap: 12px;
 }
 .bracket-round-title {
   text-align: center;
@@ -1573,9 +1573,9 @@ img.flag-img {
   padding: 6px 16px;
   background: rgba(255,255,255,0.04);
   border-radius: var(--radius-sm);
-  margin-bottom: 4px;
+  flex-shrink: 0;
 }
-.bracket-final { align-self: center; }
+.bracket-final { justify-content: center; }
 .bracket-match {
   background: var(--bg-card);
   border: 1px solid var(--border);
