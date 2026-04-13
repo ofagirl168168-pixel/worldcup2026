@@ -433,6 +433,19 @@ function _lookupBadgeInfo(icon) {
   return null;
 }
 
+// 第二欄徽章查詢（優先搜尋遊戲/週限定，避免 emoji 撞名）
+function _lookupBadgeInfo2(icon) {
+  if (!icon) return null;
+  // 優先：週冠軍限定
+  const weekly = (typeof ROGUE_WEEKLY_BADGES !== 'undefined' ? ROGUE_WEEKLY_BADGES : []).find(b => b.icon === icon);
+  if (weekly) return { name: weekly.name, cls: 'lb-badge-weekly' };
+  // 次優先：射門遊戲徽章
+  const rogue = (typeof ROGUE_BADGES !== 'undefined' ? ROGUE_BADGES : []).find(b => b.icon === icon);
+  if (rogue) return { name: rogue.name, cls: 'lb-badge-game' };
+  // 最後 fallback 到一般徽章
+  return _lookupBadgeInfo(icon);
+}
+
 async function renderLeaderboard(containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
@@ -479,14 +492,16 @@ async function renderLeaderboard(containerId) {
     const badgeIcon = row.showcase_badge || '';
     const badgeInfo = badgeIcon ? _lookupBadgeInfo(badgeIcon) : null;
     const badgeIcon2 = row.showcase_badge_2 || '';
-    const badgeInfo2 = badgeIcon2 ? _lookupBadgeInfo(badgeIcon2) : null;
+    const badgeInfo2 = badgeIcon2 ? _lookupBadgeInfo2(badgeIcon2) : null;
+
+    const badgesHtml = (badgeInfo || badgeInfo2) ? `<div class="lb-badges">${badgeInfo ? `<span class="lb-badge ${badgeInfo.cls}">${badgeIcon} ${badgeInfo.name}</span>` : ''}${badgeInfo2 ? `<span class="lb-badge ${badgeInfo2.cls}">${badgeIcon2} ${badgeInfo2.name}</span>` : ''}</div>` : '';
 
     return `
       <div class="lb-row ${isMe ? 'lb-me' : ''}">
         <div class="lb-rank">${medals[i] ?? `#${i + 1}`}</div>
         <div class="lb-flag">${flagImg(flag)}</div>
         <div class="lb-name">
-          ${row.nickname}${badgeInfo ? ` <span class="lb-badge ${badgeInfo.cls}">${badgeIcon} ${badgeInfo.name}</span>` : ''}${badgeInfo2 ? ` <span class="lb-badge ${badgeInfo2.cls}">${badgeIcon2} ${badgeInfo2.name}</span>` : ''}${isMe ? ' <span class="lb-you">你</span>' : ''}
+          ${row.nickname}${badgesHtml}${isMe ? ' <span class="lb-you">你</span>' : ''}
           ${title ? `<span class="lb-title ${title.cls}">${title.icon} ${title.name}</span>` : ''}
         </div>
         <div class="lb-stats">
