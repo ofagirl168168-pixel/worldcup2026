@@ -1953,6 +1953,37 @@ function updateHero() {
   tick(); setInterval(tick, 1000);
 })();
 
+// 賽程頁：自動滑動到即將進行的比賽
+function _scrollToUpcoming(container) {
+  if (!container) return;
+  requestAnimationFrame(() => {
+    // 優先找 live 比賽
+    let target = container.querySelector('.match-card[data-match-status="live"]');
+    if (!target) {
+      // 找第一場 scheduled 比賽
+      target = container.querySelector('.match-card[data-match-status="scheduled"]');
+    }
+    if (!target) {
+      // 所有比賽都結束了，找最後一場 finished
+      const all = container.querySelectorAll('.match-card[data-match-status="finished"]');
+      target = all.length ? all[all.length - 1] : null;
+    }
+    if (!target) return;
+
+    // 找到對應的日期 header（前一個兄弟元素）
+    const header = target.previousElementSibling?.classList.contains('schedule-day-header')
+      ? target.previousElementSibling : target;
+
+    // 計算滾動位置：目標元素距離頁面頂部，減去 header 高度和一些間距
+    const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 68;
+    const y = header.getBoundingClientRect().top + window.scrollY - headerH - 20;
+
+    setTimeout(() => {
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    }, 100);
+  });
+}
+
 // 賽程頁
 function renderSchedule(phaseFilter, groupFilter) {
   const el = document.getElementById('schedule-list');
@@ -1998,7 +2029,7 @@ function renderSchedule(phaseFilter, groupFilter) {
       const eplPredTag = (m.status === 'finished' || m.status === 'live') ? '' : eplMine
         ? `<div class="match-pred-tag predicted">${eplMine.h}-${eplMine.a} 已預測</div>`
         : `<div class="match-pred-tag">🎯 預測比分</div>`;
-      return header + `<div class="match-card${isLive ? ' match-live' : ''}" onclick="openPredModal('${m.id}')">
+      return header + `<div class="match-card${isLive ? ' match-live' : ''}" data-match-status="${m.status||'scheduled'}" data-match-date="${m.date||''}" onclick="openPredModal('${m.id}')">
         ${isLive ? '<div class="live-badge"><span class="live-dot"></span>LIVE</div>' : ''}
         <div class="match-team">
           <div class="match-team-flag">${flagImg(ht.flag)}</div>
@@ -2019,6 +2050,7 @@ function renderSchedule(phaseFilter, groupFilter) {
         </div>
       </div>`;
     }).join('');
+    _scrollToUpcoming(el);
     return;
   }
 
@@ -2072,7 +2104,7 @@ function renderSchedule(phaseFilter, groupFilter) {
       const uclPredTag = (m.status === 'finished' || m.status === 'live') ? '' : uclMine
         ? `<div class="match-pred-tag predicted">${uclMine.h}-${uclMine.a} 已預測</div>`
         : `<div class="match-pred-tag" data-pred-cd="${uclKo}">🎯 預測比分</div>`;
-      return header + `<div class="match-card${isLive ? ' match-live' : ''}" onclick="openPredModal('${m.id}')">
+      return header + `<div class="match-card${isLive ? ' match-live' : ''}" data-match-status="${m.status||'scheduled'}" data-match-date="${m.date||''}" onclick="openPredModal('${m.id}')">
         ${isLive ? '<div class="live-badge"><span class="live-dot"></span>LIVE</div>' : ''}
         <div class="match-team">
           <div class="match-team-flag">${flagImg(ht.flag)}</div>
@@ -2094,6 +2126,7 @@ function renderSchedule(phaseFilter, groupFilter) {
         </div>
       </div>`;
     }).join('');
+    _scrollToUpcoming(el);
     return;
   }
 
@@ -2136,7 +2169,7 @@ function renderSchedule(phaseFilter, groupFilter) {
     const wcPredTag = wcStarted ? '' : wcMine
       ? `<div class="match-pred-tag predicted">${wcMine.h}-${wcMine.a} 已預測</div>`
       : `<div class="match-pred-tag" data-pred-cd="${wcKo}">🎯 預測比分</div>`;
-    return header + `<div class="match-card" onclick="openPredModal('${m.id}')">
+    return header + `<div class="match-card" data-match-status="${m.status||'scheduled'}" data-match-date="${m.twDate||''}" onclick="openPredModal('${m.id}')">
       <div class="match-team">
         <div class="match-team-flag">${flagImg(ht.flag)}</div>
         <div><div class="match-team-name">${ht.nameCN}</div><div class="match-team-sub">FIFA #${ht.fifaRank}</div></div>
@@ -2157,6 +2190,7 @@ function renderSchedule(phaseFilter, groupFilter) {
       </div>
     </div>`;
   }).join('');
+  _scrollToUpcoming(el);
 }
 
 // 歐冠賽程篩選器
