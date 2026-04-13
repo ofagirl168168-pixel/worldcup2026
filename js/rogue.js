@@ -466,18 +466,17 @@
     G.gk.spd = (GK_BASE_SPD + gkBonus) * (G.gkSlowMul || 1);
     G.gk.tracking = G.wave >= 5; // wave5 起才追蹤球
 
-    // 守門員加寬：wave 35 和 wave 50 各加寬一次
-    if (G.wave === 35) G.gk.w = 62;
-    if (G.wave === 50) G.gk.w = 74;
+    // 守門員加寬：wave 35、50 大幅加寬，55+ 每階微幅加寬（上限 110）
+    if (G.wave === 35) G.gk.w = 65;
+    else if (G.wave === 50) G.gk.w = 80;
+    else if (G.wave >= 55 && G.wave % 5 === 0) G.gk.w = Math.min(110, G.gk.w + 3);
 
-    // 每 5 波警告（標明強化內容）
+    // 每 5 波警告
     if (G.wave >= 5 && G.wave % 5 === 0) {
-      let warnMsg = '';
-      if (G.wave === 35)      warnMsg = '守門員加寬！';
-      else if (G.wave === 50) warnMsg = '守門員再次加寬！';
-      else if (G.wave >= 55)  warnMsg = '守門員加速！';
-      else                    warnMsg = '守門員強化！';
-      G._warning = { timer: 3000, tier: gkTier, msg: warnMsg };
+      let extraMsg = '';
+      if (G.wave === 35) extraMsg = '⚠ 守門員體型加寬！封鎖角度增加';
+      else if (G.wave === 50) extraMsg = '⚠ 守門員再次加寬！射門空間大幅縮小';
+      G._warning = { timer: 3000, tier: gkTier, extraMsg };
       sfxWarning();
     }
   }
@@ -648,7 +647,7 @@
           // 反彈球傷害減半
           if (b._bounced) dmg = Math.max(1, Math.ceil(dmg * 0.5));
           // 分裂小球傷害減半
-          if (b._split) dmg = Math.max(1, Math.ceil(dmg * 0.5));
+          if (b._split) dmg = Math.max(1, Math.ceil(dmg * 0.2));
           d.hp -= dmg;
           sfxHit();
           addPart(d.x, d.z, isCrit ? `-${dmg}!` : `-${dmg}`, 0.5);
@@ -1043,27 +1042,32 @@
       ctx.font = `bold ${Math.min(36, W * 0.065)}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
       ctx.fillText('WARNING', W / 2, H * 0.50);
-      // 顯示具體強化內容
-      ctx.fillStyle = '#ffd700';
-      ctx.font = `bold ${Math.min(20, W * 0.038)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText(G._warning.msg || '守門員強化！', W / 2, H * 0.56);
-      // 詳細描述
-      ctx.fillStyle = '#fff';
-      ctx.font = `bold ${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
+      // 中二台詞
       const tier = G._warning.tier;
-      const wave = G.wave;
-      const details = [];
-      if (wave === 5) details.push('守門員覺醒！開始自動追蹤球路');
-      else if (wave === 35) details.push('守門員體型加寬，封鎖更多角度');
-      else if (wave === 50) details.push('守門員再次加寬，射門空間更小');
-      else if (wave >= 55) details.push('守門員速度大幅提升，接近瞬移');
-      else details.push(`守門員移動速度提升（階段 ${tier}）`);
-      // 同時提示敵人強化
-      if (wave === 31) details.push('防守員血量成長加速（×1.28）');
-      else if (wave === 51) details.push('防守員血量成長再加速（×1.35）');
-      else if (wave === 66) details.push('防守員血量成長極速（×1.45）');
-      for (let di = 0; di < details.length; di++) {
-        ctx.fillText(details[di], W / 2, H * 0.61 + di * Math.min(18, W * 0.034));
+      const msgs = [
+        '守門員覺醒！開始自動追蹤球路',
+        '守門員強化！移動速度大幅提升',
+        '守門員狂暴！反應速度接近極限',
+        '守門員究極體！幾乎無法突破',
+        '守門員超越極限！已進入神域',
+        '守門員異次元反應！球路無所遁形',
+        '守門員時間靜止！射門窗口趨近於零',
+        '守門員已成神！你確定要繼續嗎？',
+        '傳說守門員降臨！放棄抵抗吧',
+        '守門員：「你的射門...我全都看得見」',
+        '守門員突破次元壁！物理法則已不適用',
+        '守門員：「這片球門，是我的領域」',
+        '守門員進入永恆模式！時間在此靜止',
+      ];
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${Math.min(16, W * 0.032)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText(msgs[Math.min(tier - 1, msgs.length - 1)], W / 2, H * 0.56);
+      // 加寬特殊提示
+      const extraMsg = G._warning.extraMsg;
+      if (extraMsg) {
+        ctx.fillStyle = '#ffd700';
+        ctx.font = `bold ${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
+        ctx.fillText(extraMsg, W / 2, H * 0.61);
       }
       ctx.globalAlpha = 1;
     }
