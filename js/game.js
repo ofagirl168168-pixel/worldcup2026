@@ -693,7 +693,7 @@ function renderArena() {
       <div class="rogue-arena-banner-bg"></div>
       <div class="rogue-arena-banner-content">
         <div class="rogue-arena-banner-left">
-          <div class="rogue-arena-banner-icon">⚽</div>
+          <div class="rogue-arena-banner-icon"><span class="rogue-kick-ball">⚽</span></div>
           <div>
             <div class="rogue-arena-banner-title">射門挑戰：前進世界盃</div>
             <div class="rogue-arena-banner-desc">射門 × 卡牌 Build × 無盡生存｜週排行前三名贏寶石</div>

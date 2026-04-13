@@ -2316,6 +2316,19 @@ img.flag-img {
   background: rgba(255,255,255,0.08);
   border-radius: 14px; flex-shrink: 0;
   border: 1px solid rgba(76,175,80,0.25);
+  overflow: hidden; position: relative;
+}
+.rogue-arena-banner-icon .rogue-kick-ball {
+  position: absolute;
+  animation: rogueKick 2s ease-in-out infinite;
+}
+@keyframes rogueKick {
+  0%   { transform: scale(0.15) translateY(30px) rotate(0deg); opacity: 0; }
+  15%  { opacity: 1; }
+  50%  { transform: scale(1) translateY(0) rotate(360deg); opacity: 1; }
+  70%  { transform: scale(1.15) translateY(-2px) rotate(400deg); opacity: 1; }
+  85%  { transform: scale(1.05) translateY(0) rotate(420deg); opacity: 0.8; }
+  100% { transform: scale(0.15) translateY(30px) rotate(720deg); opacity: 0; }
 }
 .rogue-arena-banner-title {
   font-size: 16px; font-weight: 900; color: #fff;
