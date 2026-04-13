@@ -686,13 +686,24 @@
       }
       if (hitDef) continue;
 
-      // 碰守門員
-      if (b.z > gk.z - 20 && b.z < gk.z + 20 && Math.abs(b.x - gk.x) < gk.w * 0.55) {
-        b.alive = false;
-        addPart(gk.x, gk.z, '', 0.8, 'block');
-        sfxBlock();
-        shakeAmt = 4;
-        continue;
+      // 碰守門員（連續碰撞檢測：檢查球路徑是否穿過守門員 z）
+      const prevZ = b.z - b.vz * step;
+      const gkZmin = gk.z - 25, gkZmax = gk.z + 25;
+      const crossedGK = (prevZ < gkZmax && b.z >= gkZmin) || (b.z >= gkZmin && b.z <= gkZmax);
+      if (crossedGK) {
+        // 計算球在守門員 z 位置時的 x（線性插值）
+        let bxAtGK = b.x;
+        if (Math.abs(b.vz) > 0.01) {
+          const t = (gk.z - prevZ) / (b.vz * step);
+          if (t >= 0 && t <= 1) bxAtGK = (b.x - b.vx * step) + b.vx * step * t;
+        }
+        if (Math.abs(bxAtGK - gk.x) < gk.w * 0.55) {
+          b.alive = false;
+          addPart(gk.x, gk.z, '', 0.8, 'block');
+          sfxBlock();
+          shakeAmt = 4;
+          continue;
+        }
       }
 
       // 進球判定（同一波只算一次）
