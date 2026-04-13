@@ -709,9 +709,24 @@
 
       // 進球判定（同一波只算一次）— 球中心必須在球門框內才算
       if (b.z >= GOAL_Z) {
-        b.alive = false;
         const effectiveGoalHW = Math.min(GOAL_HW * 1.6, GOAL_HW * (1 + (G.goalBonus || 0)));
-        if (Math.abs(b.x) < effectiveGoalHW - b.r && G.phase === 'playing') { onGoal(); return; }
+        if (Math.abs(b.x) < effectiveGoalHW - b.r && G.phase === 'playing') {
+          b.alive = false;
+          onGoal(); return;
+        }
+        // 打到門柱：球反彈飛走 + 門柱特效（只觸發一次）
+        if (!b._postHit && Math.abs(b.x) >= effectiveGoalHW - b.r - 15 && Math.abs(b.x) < effectiveGoalHW + 20) {
+          const postX = Math.sign(b.x) * effectiveGoalHW;
+          addPart(postX, GOAL_Z, '門柱！', 0.8, 'post_hit');
+          shakeAmt = 6;
+          b.vx = -b.vx * 0.6 + (Math.random() - 0.5) * 2;
+          b.vz = -Math.abs(b.vz) * 0.4;
+          b.z = GOAL_Z - 5;
+          b._postHit = true;
+          continue;
+        }
+        // 完全偏離球門外 或 門柱反彈後再次飛出
+        b.alive = false;
       }
       // 飛出場外
       if (b.z < -50) b.alive = false;
@@ -3343,6 +3358,26 @@
           ctx.textAlign = 'center';
           ctx.fillText('暴擊!', pos.x, pos.y - sz * 1.5 + fy);
           ctx.shadowBlur = 0;
+          break;
+        }
+        case 'post_hit': { // 門柱撞擊火花
+          // 白色閃光
+          const pr = sz * (0.6 + t * 2);
+          ctx.fillStyle = `rgba(255,255,255,${a * 0.8})`;
+          ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, pr * 0.3, 0, Math.PI * 2); ctx.fill();
+          // 金屬火花擴散
+          ctx.strokeStyle = `rgba(255,200,50,${a})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(pos.x, pos.y + fy, pr, 0, Math.PI * 2); ctx.stroke();
+          // 碎片粒子
+          for (let si = 0; si < 6; si++) {
+            const ang = (Math.PI * 2 / 6) * si + t * 2;
+            const sd = pr * (0.5 + t * 0.8);
+            const sx2 = pos.x + Math.cos(ang) * sd;
+            const sy2 = pos.y + fy + Math.sin(ang) * sd;
+            ctx.fillStyle = `rgba(255,${180 + si * 10},0,${a * 0.7})`;
+            ctx.fillRect(sx2 - 2, sy2 - 2, 4, 4);
+          }
           break;
         }
         case 'block': { // 黃色擋球光環
