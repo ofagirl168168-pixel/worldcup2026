@@ -4286,7 +4286,7 @@
   function buildOverlay() {
     overlay = document.createElement('div');
     overlay.id = 'rogue-overlay';
-    overlay.innerHTML = '<canvas id="rogue-cvs"></canvas><button id="rogue-x" title="關閉">✕</button>';
+    overlay.innerHTML = '<div id="rogue-wrap"><canvas id="rogue-cvs"></canvas><button id="rogue-x" title="關閉">✕</button></div>';
     document.body.appendChild(overlay);
 
     cvs = document.getElementById('rogue-cvs');
@@ -4302,12 +4302,16 @@
   function resize() {
     if (!cvs) return;
     const dpr = window.devicePixelRatio || 1;
-    W = window.innerWidth;
     H = window.innerHeight;
+    // PC 版限制最大寬度（約 9:16 比例），保持畫面緊湊
+    const maxW = Math.round(H * 0.65);
+    W = Math.min(window.innerWidth, maxW);
     cvs.width = W * dpr;
     cvs.height = H * dpr;
     cvs.style.width = W + 'px';
     cvs.style.height = H + 'px';
+    const wrap = document.getElementById('rogue-wrap');
+    if (wrap) wrap.style.width = W + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);  // 所有繪製自動縮放
     horizY = H * 0.08;
   }
