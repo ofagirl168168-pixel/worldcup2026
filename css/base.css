@@ -350,15 +350,16 @@ ul { list-style: none; }
 
 /* ---------- RWD ---------- */
 @media (max-width: 768px) {
-  .header-inner { gap: 10px; padding: 0 12px; }
-  .logo-title { font-size: 12px; }
+  .header-inner { gap: 8px; padding: 0 10px; }
+  .logo-title { font-size: 11px; }
+  .logo-svg { width: 30px; height: 34px; }
   .logo-sub { display: none; }
   .main-nav { display: none; }
-  .hamburger { display: flex; margin-left: auto; flex-shrink: 0; }
-  .tournament-switcher { flex-shrink: 0; min-width: 0; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 3px; }
-  .tournament-btn { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+  .hamburger { display: flex; margin-left: auto; flex-shrink: 0; z-index: 10; }
+  .tournament-switcher { flex: 1 1 auto; min-width: 0; justify-content: center; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 2px; }
+  .tournament-btn { padding: 5px 8px; font-size: 12px; border-radius: 8px; }
   .tournament-btn .t-label { display: none; }
-  .tournament-btn .t-logo { height: 22px; width: 22px; }
+  .tournament-btn .t-logo { height: 20px; width: 20px; }
   .tournament-btn.active { box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
   .mobile-nav.open { display: flex; flex-direction: column; }
   .hero-stats { flex-wrap: wrap; }

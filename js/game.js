@@ -14,11 +14,25 @@ const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
 // 同步 GK 鍵值前綴：確保讀寫的 localStorage key 對應當前賽事
 function _syncGK() {
-  const p = (window.Tournament?.isUCL?.()) ? 'ucl26_' : 'wc26_';
+  const tid = window.Tournament?.current?.() || 'wc';
+  const p = {wc:'wc26_', ucl:'ucl26_', epl:'epl26_'}[tid] || 'wc26_';
   GK.team = p + 'team';
   GK.champion = p + 'champion';
   GK.groups = p + 'groups';
   GK.daily = p + 'daily';
+}
+
+// 遊戲通用：取得當前賽事資訊
+function _gameCtx() {
+  const tid = window.Tournament?.current?.() || 'wc';
+  const isUcl = tid === 'ucl', isEpl = tid === 'epl', isClub = isUcl || isEpl;
+  const _T = isEpl ? (window.EPL_TEAMS||{}) : isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
+  const label = isEpl ? '英超' : isUcl ? '歐冠' : '世界盃';
+  const fullName = isEpl ? '2025/26 英超' : isUcl ? '2025/26 歐冠' : '2026 世界盃';
+  const platformName = isEpl ? '英超預測平台 2025/26' : isUcl ? '歐冠預測平台 2025/26' : '世界盃預測平台 2026';
+  const teamWord = isClub ? '球會' : '球隊';
+  const prefix = {wc:'wc26_', ucl:'ucl26_', epl:'epl26_'}[tid] || 'wc26_';
+  return { tid, isUcl, isEpl, isClub, _T, label, fullName, platformName, teamWord, prefix };
 }
 
 // ── 每日題庫 ─────────────────────────────────────────────
@@ -288,7 +302,7 @@ const LEVEL_GEM_REWARDS = { 2:2, 3:2, 5:3, 7:3, 10:5, 15:5, 20:10 };
 // ── 預測結算系統 ──────────────────────────────────────────
 function settlePredictions() {
   const newlySettled = [];
-  ['wc26_', 'ucl26_'].forEach(p => {
+  ['wc26_', 'ucl26_', 'epl26_'].forEach(p => {
     const predsKey = p + 'my_preds';
     const settledKey = p + 'settled';
     const bonusKey = p + 'bonus_xp';
@@ -296,7 +310,7 @@ function settlePredictions() {
     const settled = (() => { try { return JSON.parse(localStorage.getItem(settledKey))||{}; } catch { return {}; } })();
     let bonusXP = parseInt(localStorage.getItem(bonusKey)||'0') || 0;
 
-    const matches = p === 'ucl26_' ? (window.UCL_MATCHES||[]) : (typeof SCHEDULE!=='undefined' ? SCHEDULE : []);
+    const matches = p === 'epl26_' ? (window.EPL_MATCHES||[]) : p === 'ucl26_' ? (window.UCL_MATCHES||[]) : (typeof SCHEDULE!=='undefined' ? SCHEDULE : []);
 
     for (const [matchId, pred] of Object.entries(myPreds)) {
       if (settled[matchId]) continue; // 已結算過
@@ -343,7 +357,8 @@ function settlePredictions() {
 
 // ── 賽後結算彈窗 ──────────────────────────────────────────
 function showSettlementPopups(settled) {
-  const shownKey = (_isUCL?.() ? 'ucl26_' : 'wc26_') + 'settled_shown';
+  const { prefix } = _gameCtx();
+  const shownKey = prefix + 'settled_shown';
   const shown = (() => { try { return JSON.parse(localStorage.getItem(shownKey))||[]; } catch { return []; } })();
   const shownSet = new Set(shown);
   const queue = settled.filter(s => !shownSet.has(s.matchId));
@@ -352,8 +367,8 @@ function showSettlementPopups(settled) {
   function showNext(idx) {
     if (idx >= queue.length) return;
     const s = queue[idx];
-    const _T = s.prefix === 'ucl26_' ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
-    const matches = s.prefix === 'ucl26_' ? (window.UCL_MATCHES||[]) : (typeof SCHEDULE!=='undefined' ? SCHEDULE : []);
+    const _T = s.prefix === 'epl26_' ? (window.EPL_TEAMS||{}) : s.prefix === 'ucl26_' ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
+    const matches = s.prefix === 'epl26_' ? (window.EPL_MATCHES||[]) : s.prefix === 'ucl26_' ? (window.UCL_MATCHES||[]) : (typeof SCHEDULE!=='undefined' ? SCHEDULE : []);
     const match = matches.find(m => m.id === s.matchId);
     const ht = _T[match?.home], at = _T[match?.away];
     const hFlag = ht ? flagImg(ht.flag) : '', aFlag = at ? flagImg(at.flag) : '';
@@ -573,7 +588,8 @@ function showArenaWelcomeIfNeeded() {
   // 從遊戲分享連結進來不彈歡迎窗
   if (new URLSearchParams(window.location.search).get('play')) return;
   _syncGK();
-  const KEY = 'wc26_welcome_shown';
+  const { isUcl: _isUcl, isEpl: _isEpl, isClub: _isClub, label: _tournamentLabel } = _gameCtx();
+  const KEY = (_gameCtx().prefix) + 'welcome_shown';
   const last = localStorage.getItem(KEY);
   const now  = Date.now();
   if (last && now - parseInt(last) < 7 * 86400000) return; // 7 天內不重複
@@ -590,11 +606,11 @@ function showArenaWelcomeIfNeeded() {
     overlay.innerHTML = `
       <div style="background:var(--bg-card);border-radius:20px;padding:32px 28px;max-width:380px;width:100%;text-align:center;border:1px solid var(--border)">
         <div style="font-size:48px;margin-bottom:12px">🏆</div>
-        <div style="font-size:20px;font-weight:900;margin-bottom:8px">歡迎來到世界盃預測競技場</div>
+        <div style="font-size:20px;font-weight:900;margin-bottom:8px">歡迎來到${_tournamentLabel}預測競技場</div>
         <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:24px">
-          現在就開始預測冠軍、填寫分組賽結果<br>
+          現在就開始預測冠軍、${_isClub ? '挑選你支持的球會' : '填寫分組賽結果'}<br>
           每天答題累積連勝天數<br>
-          <strong style="color:var(--accent)">6月11日開賽，一起見證你的預測！</strong>
+          <strong style="color:var(--accent)">${_isEpl ? '英超賽季火熱進行中！' : _isUcl ? '歐冠淘汰賽激戰中！' : '6月11日開賽，一起見證你的預測！'}</strong>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <button class="btn-primary" onclick="document.getElementById('arena-welcome-overlay').remove();showSection('arena');renderArena()">
@@ -637,8 +653,13 @@ function renderArena() {
   const nextRewardGem = nextRewardLv ? LEVEL_GEM_REWARDS[nextRewardLv] : null;
 
   // Champion display
-  const _isUcl = window.Tournament?.isUCL?.() ?? false;
-  const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
+  const _tid = window.Tournament?.current?.() || 'wc';
+  const _isUcl = _tid === 'ucl';
+  const _isEpl = _tid === 'epl';
+  const _isClub = _isUcl || _isEpl;
+  const _T = _isEpl ? (window.EPL_TEAMS||{}) : _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
+  const _tournamentLabel = _isEpl ? '英超' : _isUcl ? '歐冠' : '世界盃';
+  const _teamLabel = _isClub ? '球會' : '球隊';
   const champC1  = myChampion ? _T[myChampion.c1] : null;
   const champFlag = champC1 ? `${flagImg(champC1.flag)} ${champC1.nameCN}` : '—';
 
@@ -684,7 +705,7 @@ function renderArena() {
       </div>
       <div class="arena-stat-card">
         <div class="arena-stat-icon">🎯</div>
-        <div class="arena-stat-num">${(_isUcl ? [myChampion,myTeam,dailyDone] : [myChampion,groupsDone,myTeam,dailyDone]).filter(Boolean).length}/${_isUcl ? 3 : 4}</div>
+        <div class="arena-stat-num">${(_isClub ? [myChampion,myTeam,dailyDone] : [myChampion,groupsDone,myTeam,dailyDone]).filter(Boolean).length}/${_isClub ? 3 : 4}</div>
         <div class="arena-stat-label">任務完成</div>
       </div>
     </div>
@@ -696,7 +717,7 @@ function renderArena() {
         <div class="rogue-arena-banner-left">
           <div class="rogue-arena-banner-icon"><span class="rogue-kick-ball">⚽</span></div>
           <div>
-            <div class="rogue-arena-banner-title">射門挑戰：前進世界盃</div>
+            <div class="rogue-arena-banner-title">射門挑戰：前進${_tournamentLabel}</div>
             <div class="rogue-arena-banner-desc">射門 × 卡牌 Build × 無盡生存｜週排行前三名贏寶石</div>
           </div>
         </div>
@@ -712,7 +733,7 @@ function renderArena() {
         <div class="arena-card-badge">${dailyDone ? '✅ 今日已完成' : '🔔 待作答'}</div>
         <span class="arena-card-icon">❓</span>
         <div class="arena-card-title">每日一題</div>
-        <div class="arena-card-desc">每天一個${_isUcl ? '歐冠' : '世界盃'}話題，累積連勝天數，展現你的足球智慧</div>
+        <div class="arena-card-desc">每天一個${_tournamentLabel}話題，累積連勝天數，展現你的足球智慧</div>
         ${dailyState.streak > 0 ? `<div class="arena-card-streak">🔥 ${dailyState.streak} 天連勝</div>` : ''}
         <div class="arena-card-footer">
           <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.3)">
@@ -751,8 +772,8 @@ function renderArena() {
         </div>` : ''}
       </div>
 
-      <!-- ③ 分組賽預測（歐冠聯賽階段已結束，不顯示）-->
-      ${_isUcl ? '' : `<div class="arena-card ${groupsDone ? 'done' : ''}" onclick="openGroupPicks()">
+      <!-- ③ 分組賽預測（歐冠/英超無分組賽，不顯示）-->
+      ${_isClub ? '' : `<div class="arena-card ${groupsDone ? 'done' : ''}" onclick="openGroupPicks()">
         <div class="arena-card-badge">${groupsDone ? '✅ 全部填完' : `${groupCount}/12 組`}</div>
         <span class="arena-card-icon">📋</span>
         <div class="arena-card-title">分組賽預測</div>
@@ -782,11 +803,11 @@ function renderArena() {
       <div class="arena-card ${myTeam ? 'done' : ''}" onclick="openTeamSupport()">
         <div class="arena-card-badge">${myTeam ? '✅ 已宣示' : '尚未選擇'}</div>
         <span class="arena-card-icon" style="font-size:44px">${myTeam && _T[myTeam]?.flag ? flagImg(_T[myTeam].flag) : '⚽'}</span>
-        <div class="arena-card-title">宣示支持${_isUcl ? '球會' : '球隊'}</div>
+        <div class="arena-card-title">宣示支持${_teamLabel}</div>
         <div class="arena-card-desc">
           ${myTeam
             ? `你支持 <strong style="color:#e91e63">${_T[myTeam]?.nameCN||myTeam}</strong>，全力加油！`
-            : `選定一支你要整個${_isUcl ? '歐冠' : '世界盃'}陪伴的${_isUcl ? '球會' : '球隊'}`}
+            : `選定一支你要整個${_tournamentLabel}陪伴的${_teamLabel}`}
         </div>
         ${myTeam ? `<div id="social-team" class="arena-social-proof"></div>` : ''}
         <div class="arena-card-footer">
@@ -984,11 +1005,12 @@ function openChampionPick() {
   _syncGK();
   const current = load(GK.champion);
   const { votes, total } = getSimVotes();
-  const _isUcl = window.Tournament?.isUCL?.() ?? false;
-  const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
-  const allCodes = _isUcl
-    ? Object.keys(_T).sort((a,b) => (_T[b].uefaCoeff||0) - (_T[a].uefaCoeff||0))
-    : Object.keys(_T).sort((a,b) => (_T[a].fifaRank||99) - (_T[b].fifaRank||99));
+  const { isClub, isEpl, _T } = _gameCtx();
+  const allCodes = isEpl
+    ? Object.keys(_T).sort((a,b) => (_T[a].eplRank||99) - (_T[b].eplRank||99))
+    : isClub
+      ? Object.keys(_T).sort((a,b) => (_T[b].uefaCoeff||0) - (_T[a].uefaCoeff||0))
+      : Object.keys(_T).sort((a,b) => (_T[a].fifaRank||99) - (_T[b].fifaRank||99));
 
   const teamOpt = (code, role, selected) => {
     const t = _T[code];
@@ -1188,8 +1210,8 @@ async function shareDailyImage() {
   ctx.fillStyle = '#f0c040'
   ctx.font = `800 22px "Noto Sans TC", sans-serif`
   ctx.textBaseline = 'middle'
-  const _dailyIsUcl = window.Tournament?.isUCL?.() ?? false
-  ctx.fillText(_dailyIsUcl ? '歐冠預測平台 2025/26' : '世界盃預測平台 2026', PAD + s + 12, 24 + s * 0.5)
+  const _ctx = _gameCtx()
+  ctx.fillText(_ctx.platformName, PAD + s + 12, 24 + s * 0.5)
   ctx.fillStyle = 'rgba(255,255,255,0.35)'
   ctx.font = `500 13px "Noto Sans TC", sans-serif`
   ctx.fillText(window.location.host, PAD + s + 12, 24 + s * 0.5 + 22)
@@ -1301,7 +1323,7 @@ async function shareDailyImage() {
   ctx.fillText('掃碼來答題！', ctaX, ctaY)
   ctx.fillStyle = 'rgba(255,255,255,0.6)'
   ctx.font = `500 14px "Noto Sans TC", sans-serif`
-  ctx.fillText(_dailyIsUcl ? '每天一題歐冠知識挑戰' : '每天一題世界盃知識挑戰', ctaX, ctaY + 38)
+  ctx.fillText(`每天一題${_ctx.label}知識挑戰`, ctaX, ctaY + 38)
   ctx.fillText('看誰的足球 IQ 最高！', ctaX, ctaY + 60)
 
   ctx.fillStyle = 'rgba(255,255,255,0.25)'
@@ -1312,7 +1334,7 @@ async function shareDailyImage() {
   canvas.toBlob(async blob => {
     const file = new File([blob], 'daily-challenge.png', { type: 'image/png' })
     const link = await getMyRefLink?.() || _shareBaseUrl()
-    const shareText = `🧠 今日${_dailyIsUcl ? '歐冠' : '世界盃'}挑戰題，你知道答案嗎？快來挑戰！\n${link}`
+    const shareText = `🧠 今日${_ctx.label}挑戰題，你知道答案嗎？快來挑戰！\n${link}`
     if (_isMobile() && navigator.share) {
       // LINE 等 App 在有 files 時不顯示 text，所以先複製文字到剪貼簿
       try { await navigator.clipboard.writeText(shareText) } catch {}
@@ -1429,11 +1451,11 @@ function showDesktopShareModal({ blob, text, link, title, filename }) {
 async function shareChampionText() {
   const champion = load(GK.champion)
   if (!champion) return
-  const _isUcl = window.Tournament?.isUCL?.() ?? false
-  const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {})
+  const _ctx = _gameCtx()
+  const _T = _ctx._T
   const t1 = _T[champion.c1], t2 = _T[champion.c2], t3 = _T[champion.c3]
   const link = await getMyRefLink?.() || _shareBaseUrl()
-  const eventName = _isUcl ? '2025/26 歐冠' : '2026 世界盃'
+  const eventName = _ctx.fullName
   const shareText = `🏆 我的${eventName}冠軍預測\n🥇 冠軍：${t1?.nameCN||champion.c1}\n🥈 亞軍：${t2?.nameCN||champion.c2}\n🥉 季軍：${t3?.nameCN||champion.c3}\n\n你猜對了嗎？來挑戰我的眼光！\n${link}`
 
   // QR Code
@@ -1464,7 +1486,7 @@ async function shareChampionText() {
   drawShield(ctx, PAD + s/2, 24 + s/2, s, shieldFill)
   ctx.fillStyle = '#f0c040'; ctx.font = `800 22px "Noto Sans TC", sans-serif`
   ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
-  ctx.fillText(_isUcl ? '歐冠預測平台 2025/26' : '世界盃預測平台 2026', PAD + s + 12, 24 + s * 0.5)
+  ctx.fillText(_ctx.platformName, PAD + s + 12, 24 + s * 0.5)
   ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 13px "Noto Sans TC", sans-serif`
   ctx.fillText(window.location.host, PAD + s + 12, 24 + s * 0.5 + 22)
   ctx.strokeStyle = 'rgba(240,192,64,0.25)'; ctx.lineWidth = 1
@@ -1538,12 +1560,12 @@ async function shareChampionText() {
 async function shareTeamText() {
   const teamCode = load(GK.team)
   if (!teamCode) return
-  const _isUcl = window.Tournament?.isUCL?.() ?? false
-  const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {})
+  const _ctx = _gameCtx()
+  const _T = _ctx._T
   const t = _T[teamCode]
   if (!t) return
   const link = await getMyRefLink?.() || _shareBaseUrl()
-  const eventName = _isUcl ? '2025/26 歐冠' : '2026 世界盃'
+  const eventName = _ctx.fullName
   const shareText = `⚽ ${eventName}，我宣示支持 ${t.nameCN}！\n整個賽事我都陪著他們！\n一起來預測吧👇\n${link}`
 
   const [qrImg, flagImg2] = await Promise.all([
@@ -1571,7 +1593,7 @@ async function shareTeamText() {
   drawShield(ctx, PAD + s/2, 20 + s/2, s, shieldFill)
   ctx.fillStyle = '#f0c040'; ctx.font = `800 20px "Noto Sans TC", sans-serif`
   ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
-  ctx.fillText(_isUcl ? '歐冠預測平台 2025/26' : '世界盃預測平台 2026', PAD + s + 10, 20 + s * 0.5)
+  ctx.fillText(_ctx.platformName, PAD + s + 10, 20 + s * 0.5)
   ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 12px "Noto Sans TC", sans-serif`
   ctx.fillText(window.location.host, PAD + s + 10, 20 + s * 0.5 + 20)
   ctx.strokeStyle = 'rgba(240,192,64,0.25)'; ctx.lineWidth = 1
@@ -1592,7 +1614,7 @@ async function shareTeamText() {
 
   // 宣言
   ctx.fillStyle = '#f0c040'; ctx.font = `800 20px "Noto Sans TC", sans-serif`
-  ctx.fillText(`⚽ 整個${_isUcl?'歐冠':'世界盃'}賽事，我只挺這隊！`, W/2, 350)
+  ctx.fillText(`⚽ 整個${_ctx.label}賽事，我只挺這隊！`, W/2, 350)
   ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = `500 15px "Noto Sans TC", sans-serif`
   ctx.fillText('你支持誰？掃碼來宣示你的主隊！', W/2, 382)
 
@@ -1715,9 +1737,9 @@ async function shareGroupImage() {
   if (currentUser) {
     try {
       const { data } = await DB.from('profiles').select('ref_code').eq('id', currentUser.id).maybeSingle()
-      const isUcl = window.Tournament?.isUCL?.() ?? false
-      if (data?.ref_code) shareLink = isUcl
-        ? `${window.location.origin}?t=ucl&ref=${data.ref_code}`
+      const _grpTid = window.Tournament?.current?.() || 'wc'
+      if (data?.ref_code) shareLink = _grpTid !== 'wc'
+        ? `${window.location.origin}?t=${_grpTid}&ref=${data.ref_code}`
         : `${window.location.origin}?ref=${data.ref_code}`
     } catch {}
   }
@@ -1800,13 +1822,15 @@ async function shareGroupImage() {
   ctx.fillStyle = '#f0c040'
   ctx.font = 'bold 30px sans-serif'
   ctx.textAlign = 'center'
-  const _grpIsUcl = window.Tournament?.isUCL?.() ?? false
-  ctx.fillText(_grpIsUcl ? '我的歐冠聯賽階段預測' : '我的世界盃分組晉級預測', W / 2, 136)
+  const _grpCtx = _gameCtx()
+  const _grpTitle = _grpCtx.isEpl ? '我的英超賽季預測' : _grpCtx.isUcl ? '我的歐冠聯賽階段預測' : '我的世界盃分組晉級預測'
+  ctx.fillText(_grpTitle, W / 2, 136)
 
   // 副標題
   ctx.fillStyle = 'rgba(255,255,255,0.45)'
   ctx.font = '15px sans-serif'
-  ctx.fillText(_grpIsUcl ? 'UEFA Champions League 2025/26 · League Phase' : 'FIFA World Cup 2026 · Group Stage Predictions', W / 2, 164)
+  const _grpSub = _grpCtx.isEpl ? 'English Premier League 2025/26' : _grpCtx.isUcl ? 'UEFA Champions League 2025/26 · League Phase' : 'FIFA World Cup 2026 · Group Stage Predictions'
+  ctx.fillText(_grpSub, W / 2, 164)
 
   // 分隔線
   const divGrad = ctx.createLinearGradient(PAD, 0, W - PAD, 0)
@@ -1941,7 +1965,7 @@ async function shareGroupImage() {
 
   ctx.fillStyle = 'rgba(255,255,255,0.35)'
   ctx.font = '13px sans-serif'
-  ctx.fillText(_grpIsUcl ? 'AI 驅動 · 歐冠預測分析平台' : 'AI 驅動 · 世界盃預測分析平台', ctaX, footerY + 102)
+  ctx.fillText(`AI 驅動 · ${_grpCtx.label}預測分析平台`, ctaX, footerY + 102)
 
   // 網址
   ctx.fillStyle = 'rgba(240,192,64,0.8)'
@@ -1960,16 +1984,14 @@ async function shareGroupImage() {
   // ── 輸出 ──────────────────────────────────────────────
   canvas.toBlob(async blob => {
     if (!blob) { showToast('❌ 圖片產生失敗'); return }
-    const fname = _grpIsUcl ? 'ucl-league-prediction.png' : 'wc2026-group-prediction.png'
+    const fname = _grpCtx.isEpl ? 'epl-prediction.png' : _grpCtx.isUcl ? 'ucl-league-prediction.png' : 'wc2026-group-prediction.png'
     const file = new File([blob], fname, { type: 'image/png' })
-    const grpShareText = _grpIsUcl
-      ? `📊 我的 2025/26 歐冠聯賽階段預測出爐！來挑戰我的選隊眼光！\n${shareLink}`
-      : `📊 我的 2026 世界盃分組晉級預測出爐！來挑戰我的選隊眼光！\n${shareLink}`
+    const grpShareText = `📊 我的${_grpCtx.fullName}預測出爐！來挑戰我的選隊眼光！\n${shareLink}`
     if (_isMobile() && navigator.share && navigator.canShare?.({ files: [file] })) {
       try { await navigator.clipboard.writeText(grpShareText) } catch {}
       showToast('📋 文字已複製！分享圖片後可在聊天室貼上文字')
       try {
-        await navigator.share({ title: _grpIsUcl ? '我的歐冠聯賽階段預測' : '我的 2026 世界盃分組晉級預測', text: grpShareText, files: [file] })
+        await navigator.share({ title: `我的${_grpCtx.fullName}預測`, text: grpShareText, files: [file] })
         return
       } catch {}
     }
@@ -1996,19 +2018,20 @@ function roundRect(ctx, x, y, w, h, r) {
 function openTeamSupport() {
   _syncGK();
   const current = load(GK.team);
-  const _isUcl = window.Tournament?.isUCL?.() ?? false;
-  const _T = _isUcl ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
-  const sorted = _isUcl
-    ? Object.entries(_T).sort((a,b) => (b[1].uefaCoeff||0) - (a[1].uefaCoeff||0))
-    : Object.entries(_T).sort((a,b) => (a[1].fifaRank||99) - (b[1].fifaRank||99));
+  const { isClub, isEpl, _T, label, teamWord } = _gameCtx();
+  const sorted = isEpl
+    ? Object.entries(_T).sort((a,b) => (a[1].eplRank||99) - (b[1].eplRank||99))
+    : isClub
+      ? Object.entries(_T).sort((a,b) => (b[1].uefaCoeff||0) - (a[1].uefaCoeff||0))
+      : Object.entries(_T).sort((a,b) => (a[1].fifaRank||99) - (b[1].fifaRank||99));
   const { votes, total } = getSimVotes();
 
   const mc = document.getElementById('modal-content');
   mc.innerHTML = `
     <div style="text-align:center;margin-bottom:20px">
       <div style="font-size:32px;margin-bottom:8px">⚽</div>
-      <div style="font-size:18px;font-weight:800">宣示支持${_isUcl ? '球會' : '球隊'}</div>
-      <div style="font-size:12px;color:var(--text-muted);margin-top:4px">選一支你要在整個${_isUcl ? '歐冠' : '世界盃'}陪伴的${_isUcl ? '球會' : '隊伍'}</div>
+      <div style="font-size:18px;font-weight:800">宣示支持${teamWord}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:4px">選一支你要在整個${label}陪伴的${isClub ? '球會' : '隊伍'}</div>
     </div>
     <div class="support-team-grid" id="support-team-grid">
       ${sorted.map(([code, t]) => {
