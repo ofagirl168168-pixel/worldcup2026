@@ -2323,14 +2323,17 @@ img.flag-img {
   animation: rogueKick 2s ease-in-out infinite;
 }
 @keyframes rogueKick {
-  0%   { transform: scale(2.5) translateY(40px) rotate(0deg); opacity: 0; }
-  8%   { opacity: 1; }
-  35%  { transform: scale(1) translateY(0) rotate(360deg); opacity: 1; }
-  45%  { transform: scale(0.95) translateY(2px) rotate(380deg); opacity: 1; }
-  55%  { transform: scale(1) translateY(0) rotate(400deg); opacity: 1; }
-  65%  { transform: scale(1) translateY(0) rotate(400deg); opacity: 1; }
-  80%  { transform: scale(0.8) translateY(40px) rotate(440deg); opacity: 0.5; }
-  100% { transform: scale(0.5) translateY(60px) rotate(500deg); opacity: 0; }
+  0%   { transform: scale(2.8) translateY(45px) rotate(0deg); opacity: 0; }
+  5%   { opacity: 1; }
+  20%  { transform: scale(1) translateY(0) rotate(360deg); opacity: 1; }
+  22%  { transform: scale(1.1) translateX(3px) rotate(365deg); opacity: 1; }
+  24%  { transform: scale(0.95) translateX(-3px) rotate(370deg); opacity: 1; }
+  26%  { transform: scale(1.05) translateX(2px) rotate(373deg); opacity: 1; }
+  28%  { transform: scale(0.98) translateX(-1px) rotate(375deg); opacity: 1; }
+  30%  { transform: scale(1) translateX(0) rotate(376deg); opacity: 1; }
+  60%  { transform: scale(1) translateY(0) rotate(376deg); opacity: 1; }
+  80%  { transform: scale(0.7) translateY(45px) rotate(420deg); opacity: 0.4; }
+  100% { transform: scale(0.4) translateY(65px) rotate(480deg); opacity: 0; }
 }
 .rogue-arena-banner-title {
   font-size: 16px; font-weight: 900; color: #fff;
