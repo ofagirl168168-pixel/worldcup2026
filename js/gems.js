@@ -143,22 +143,24 @@ async function initGems() {
   }
 }
 
-// ── 一次性任務觸發點 ──────────────────────────────────────
+// ── 一次性任務觸發點（每個賽事各自獨立）─────────────────────
 async function onFirstAccount()   { const r = await awardGem('first_account');  if (r) showToast(`💎 首次綁定帳號！+${r.awarded} 寶石（餘額 ${r.balance}）`) }
-async function onFirstChampion()  { const r = await awardGem('first_champion'); if (r) showToast(`💎 首次冠軍預測！+${r.awarded} 寶石（餘額 ${r.balance}）`) }
-async function onFirstGroups()    { const r = await awardGem('first_groups');   if (r) showToast(`💎 首次分組預測！+${r.awarded} 寶石（餘額 ${r.balance}）`) }
-async function onFirstTeam()      { const r = await awardGem('first_team');     if (r) showToast(`💎 首次支持球隊！+${r.awarded} 寶石（餘額 ${r.balance}）`) }
+async function onFirstChampion()  { const tid = window.Tournament?.current?.() || 'wc'; const r = await awardGem(`first_champion_${tid}`); if (r) showToast(`💎 首次冠軍預測！+${r.awarded} 寶石（餘額 ${r.balance}）`) }
+async function onFirstGroups()    { const tid = window.Tournament?.current?.() || 'wc'; const r = await awardGem(`first_groups_${tid}`);  if (r) showToast(`💎 首次分組預測！+${r.awarded} 寶石（餘額 ${r.balance}）`) }
+async function onFirstTeam()      { const tid = window.Tournament?.current?.() || 'wc'; const r = await awardGem(`first_team_${tid}`);    if (r) showToast(`💎 首次支持球隊！+${r.awarded} 寶石（餘額 ${r.balance}）`) }
 
-// 連勝里程碑
+// 連勝里程碑（每個賽事各自獨立）
 async function checkStreakGem(streak) {
-  if (streak === 7)  { const r = await awardGem('streak_7');  if (r) showToast(`🔥 連勝 7 天！+${r.awarded} 寶石`) }
-  if (streak === 14) { const r = await awardGem('streak_14'); if (r) showToast(`🔥 連勝 14 天！+${r.awarded} 寶石`) }
-  if (streak === 30) { const r = await awardGem('streak_30'); if (r) showToast(`🔥 連勝 30 天！+${r.awarded} 寶石`) }
+  const tid = window.Tournament?.current?.() || 'wc'
+  if (streak === 7)  { const r = await awardGem(`streak_7_${tid}`);  if (r) showToast(`🔥 連勝 7 天！+${r.awarded} 寶石`) }
+  if (streak === 14) { const r = await awardGem(`streak_14_${tid}`); if (r) showToast(`🔥 連勝 14 天！+${r.awarded} 寶石`) }
+  if (streak === 30) { const r = await awardGem(`streak_30_${tid}`); if (r) showToast(`🔥 連勝 30 天！+${r.awarded} 寶石`) }
 }
 
-// 每日答對
+// 每日答對（每個賽事各自獨立領取）
 async function onDailyCorrect() {
-  const r = await awardGem('daily_correct')
+  const tid = window.Tournament?.current?.() || 'wc'
+  const r = await awardGem(`daily_correct_${tid}`)
   if (r) showToast(`💎 答對！+${r.awarded} 寶石（餘額 ${r.balance}）`)
 }
 

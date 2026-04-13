@@ -6,14 +6,35 @@ const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
 // 每種類型的規則
 const AWARD_RULES: Record<string, { amount: number; unique: boolean; dailyLimit?: boolean }> = {
-  daily_correct:    { amount: 1,  unique: false, dailyLimit: true },  // 每日答對
+  daily_correct:    { amount: 1,  unique: false, dailyLimit: true },  // 每日答對（舊版相容）
+  daily_correct_wc: { amount: 1,  unique: false, dailyLimit: true },  // 每日答對 — 世界盃
+  daily_correct_ucl:{ amount: 1,  unique: false, dailyLimit: true },  // 每日答對 — 歐冠
+  daily_correct_epl:{ amount: 1,  unique: false, dailyLimit: true },  // 每日答對 — 英超
   first_account:    { amount: 3,  unique: true },                     // 首次綁定帳號
-  first_champion:   { amount: 2,  unique: true },                     // 首次冠軍預測
-  first_groups:     { amount: 2,  unique: true },                     // 首次分組賽預測
-  first_team:       { amount: 1,  unique: true },                     // 首次支持球隊
-  streak_7:         { amount: 3,  unique: false, dailyLimit: true },  // 連勝 7 天
-  streak_14:        { amount: 5,  unique: false, dailyLimit: true },  // 連勝 14 天
-  streak_30:        { amount: 10, unique: false, dailyLimit: true },  // 連勝 30 天
+  first_champion:     { amount: 2,  unique: true },                     // 首次冠軍預測（舊版相容）
+  first_groups:       { amount: 2,  unique: true },                     // 首次分組賽預測（舊版相容）
+  first_team:         { amount: 1,  unique: true },                     // 首次支持球隊（舊版相容）
+  first_champion_wc:  { amount: 2,  unique: true },                     // 首次冠軍預測 — 世界盃
+  first_champion_ucl: { amount: 2,  unique: true },                     // 首次冠軍預測 — 歐冠
+  first_champion_epl: { amount: 2,  unique: true },                     // 首次冠軍預測 — 英超
+  first_groups_wc:    { amount: 2,  unique: true },                     // 首次分組預測 — 世界盃
+  first_groups_ucl:   { amount: 2,  unique: true },                     // 首次分組預測 — 歐冠
+  first_groups_epl:   { amount: 2,  unique: true },                     // 首次分組預測 — 英超
+  first_team_wc:      { amount: 1,  unique: true },                     // 首次支持球隊 — 世界盃
+  first_team_ucl:     { amount: 1,  unique: true },                     // 首次支持球會 — 歐冠
+  first_team_epl:     { amount: 1,  unique: true },                     // 首次支持球會 — 英超
+  streak_7:         { amount: 3,  unique: false, dailyLimit: true },  // 連勝 7 天（舊版相容）
+  streak_14:        { amount: 5,  unique: false, dailyLimit: true },  // 連勝 14 天（舊版相容）
+  streak_30:        { amount: 10, unique: false, dailyLimit: true },  // 連勝 30 天（舊版相容）
+  streak_7_wc:      { amount: 3,  unique: false, dailyLimit: true },  // 連勝 7 天 — 世界盃
+  streak_7_ucl:     { amount: 3,  unique: false, dailyLimit: true },  // 連勝 7 天 — 歐冠
+  streak_7_epl:     { amount: 3,  unique: false, dailyLimit: true },  // 連勝 7 天 — 英超
+  streak_14_wc:     { amount: 5,  unique: false, dailyLimit: true },  // 連勝 14 天 — 世界盃
+  streak_14_ucl:    { amount: 5,  unique: false, dailyLimit: true },  // 連勝 14 天 — 歐冠
+  streak_14_epl:    { amount: 5,  unique: false, dailyLimit: true },  // 連勝 14 天 — 英超
+  streak_30_wc:     { amount: 10, unique: false, dailyLimit: true },  // 連勝 30 天 — 世界盃
+  streak_30_ucl:    { amount: 10, unique: false, dailyLimit: true },  // 連勝 30 天 — 歐冠
+  streak_30_epl:    { amount: 10, unique: false, dailyLimit: true },  // 連勝 30 天 — 英超
   referral_invite:  { amount: 3,  unique: false },                    // 邀請好友成功
   referral_joined:  { amount: 3,  unique: true },                     // 被邀請者首次登入
   level_2:          { amount: 2,  unique: true },                     // 升到 Lv.2
