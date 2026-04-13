@@ -1,4 +1,4 @@
-/* rogue.js — ⚽ 足球肉鴿射門挑戰 */
+/* rogue.js — ⚽ 足球射門挑戰：前進世界盃 */
 (function () {
   'use strict';
 
@@ -902,6 +902,7 @@
   //  紀錄
   // ═══════════════════════════════════════════════════════════
   function saveResult() {
+    // 舊格式相容
     const best = JSON.parse(localStorage.getItem('rogue_best') || '{}');
     if (!best.score || G.score > best.score) {
       best.score = G.score;
@@ -909,6 +910,16 @@
       best.date  = new Date().toISOString().slice(0, 10);
       localStorage.setItem('rogue_best', JSON.stringify(best));
     }
+    // 排行榜（前 10 名）
+    const board = JSON.parse(localStorage.getItem('rogue_leaderboard') || '[]');
+    board.push({
+      score: G.score,
+      wave:  G.wave,
+      date:  new Date().toISOString().slice(0, 10),
+    });
+    board.sort((a, b) => b.score - a.score);
+    if (board.length > 10) board.length = 10;
+    localStorage.setItem('rogue_leaderboard', JSON.stringify(board));
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -2969,37 +2980,58 @@
     ctx.fillStyle = headGrad;
     ctx.beginPath(); ctx.arc(p.x, headY, headR, 0, Math.PI * 2); ctx.fill();
 
-    // 灼燒效果 — 沿身體輪廓的火焰
+    // 灼燒效果 — 沿身體輪廓的火焰（強化版）
     if (d.burning > 0) {
-      const ft = Date.now() * 0.006;
+      const ft = Date.now() * 0.008;
       const flames = [
-        { ox: -w * 0.3, oy: h * 0.1 },
-        { ox: 0,        oy: 0 },
-        { ox: w * 0.3,  oy: h * 0.15 },
-        { ox: -w * 0.15, oy: h * 0.5 },
-        { ox: w * 0.15,  oy: h * 0.45 },
-        { ox: 0,         oy: h * 0.7 },
+        { ox: -w * 0.35, oy: h * 0.05 },
+        { ox: 0,         oy: -h * 0.05 },
+        { ox: w * 0.35,  oy: h * 0.1 },
+        { ox: -w * 0.2,  oy: h * 0.35 },
+        { ox: w * 0.2,   oy: h * 0.3 },
+        { ox: 0,         oy: h * 0.55 },
+        { ox: -w * 0.1,  oy: h * 0.7 },
+        { ox: w * 0.1,   oy: h * 0.65 },
       ];
+      // 底層光暈
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const glowR = Math.max(w, h) * 0.7;
+      const glow = ctx.createRadialGradient(p.x, by + h * 0.4, 0, p.x, by + h * 0.4, glowR);
+      glow.addColorStop(0, 'rgba(255,120,0,0.25)');
+      glow.addColorStop(0.5, 'rgba(255,60,0,0.1)');
+      glow.addColorStop(1, 'rgba(255,0,0,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(p.x - glowR, by + h * 0.4 - glowR, glowR * 2, glowR * 2);
+
       for (let fi = 0; fi < flames.length; fi++) {
         const f = flames[fi];
-        const fx = p.x + f.ox;
+        const sway = Math.sin(ft * 1.5 + fi * 2.3) * 2 * p.s;
+        const fx = p.x + f.ox + sway;
         const fy = by + f.oy;
-        const fh = (6 + Math.sin(ft + fi * 1.7) * 4) * p.s;
-        const fw = (3 + Math.sin(ft * 1.3 + fi * 2.1) * 1.5) * p.s;
+        const fh = (10 + Math.sin(ft + fi * 1.7) * 5) * p.s;
+        const fw = (5 + Math.sin(ft * 1.3 + fi * 2.1) * 2) * p.s;
         // 外焰（橘紅）
-        ctx.fillStyle = `rgba(255,${60 + Math.floor(Math.sin(ft + fi) * 30)},0,${0.35 + Math.sin(ft * 2 + fi) * 0.1})`;
+        ctx.fillStyle = `rgba(255,${50 + Math.floor(Math.sin(ft + fi) * 30)},0,${0.7 + Math.sin(ft * 2 + fi) * 0.15})`;
         ctx.beginPath();
         ctx.moveTo(fx - fw, fy);
-        ctx.quadraticCurveTo(fx - fw * 0.5, fy - fh * 0.6, fx, fy - fh);
-        ctx.quadraticCurveTo(fx + fw * 0.5, fy - fh * 0.6, fx + fw, fy);
+        ctx.quadraticCurveTo(fx - fw * 0.3, fy - fh * 0.5, fx + sway * 0.3, fy - fh);
+        ctx.quadraticCurveTo(fx + fw * 0.3, fy - fh * 0.5, fx + fw, fy);
         ctx.closePath(); ctx.fill();
-        // 內焰（黃色）
-        ctx.fillStyle = `rgba(255,220,0,${0.25 + Math.sin(ft * 2.5 + fi) * 0.1})`;
+        // 中焰（亮橘）
+        ctx.fillStyle = `rgba(255,160,20,${0.6 + Math.sin(ft * 2.2 + fi) * 0.1})`;
         ctx.beginPath();
-        ctx.moveTo(fx - fw * 0.4, fy);
-        ctx.quadraticCurveTo(fx, fy - fh * 0.7, fx + fw * 0.4, fy);
+        ctx.moveTo(fx - fw * 0.55, fy);
+        ctx.quadraticCurveTo(fx, fy - fh * 0.75, fx + fw * 0.55, fy);
+        ctx.closePath(); ctx.fill();
+        // 內焰（亮黃白）
+        ctx.fillStyle = `rgba(255,240,100,${0.55 + Math.sin(ft * 3 + fi) * 0.15})`;
+        ctx.beginPath();
+        ctx.moveTo(fx - fw * 0.25, fy);
+        ctx.quadraticCurveTo(fx, fy - fh * 0.55, fx + fw * 0.25, fy);
         ctx.closePath(); ctx.fill();
       }
+      ctx.restore();
     }
 
     // ── 血條 ──
@@ -3423,17 +3455,17 @@
     ctx.fillStyle = '#ffd700';
     ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 18;
     ctx.font = `bold ${titleSz}px "Noto Sans TC", sans-serif`;
-    ctx.fillText('射門挑戰', W / 2, H * 0.25);
+    ctx.fillText('射門挑戰：前進世界盃', W / 2, H * 0.25);
     ctx.shadowBlur = 0;
     // 標題兩側足球
-    const titleW = ctx.measureText('射門挑戰').width;
+    const titleW = ctx.measureText('射門挑戰：前進世界盃').width;
     const ballDeco = Math.min(24, W * 0.045);
     drawIcon('multi1', W / 2 - titleW / 2 - ballDeco - 4, H * 0.25 - titleSz * 0.3, ballDeco);
     drawIcon('multi1', W / 2 + titleW / 2 + ballDeco + 4, H * 0.25 - titleSz * 0.3, ballDeco);
 
     ctx.fillStyle = '#fff';
     ctx.font = `${Math.min(18, W * 0.035)}px "Noto Sans TC", sans-serif`;
-    ctx.fillText('足球肉鴿生存遊戲', W / 2, H * 0.32);
+    ctx.fillText('足球生存射門遊戲', W / 2, H * 0.32);
 
     // 裝飾分隔線
     const lineW = Math.min(180, W * 0.35);
@@ -3478,24 +3510,55 @@
       ctx.textAlign = 'center';
     });
 
-    // 最高紀錄
-    const best = JSON.parse(localStorage.getItem('rogue_best') || '{}');
-    if (best.score) {
-      ctx.fillStyle = 'rgba(255,215,0,0.6)';
-      ctx.font = `${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
-      drawTrophy(W / 2 - ctx.measureText(`最高紀錄：${best.score} 分（Wave ${best.wave}）`).width / 2 - 16, H * 0.68 - 6, 12);
-      ctx.fillText(`最高紀錄：${best.score} 分（Wave ${best.wave}）`, W / 2, H * 0.68);
+    // 排行榜
+    const board = JSON.parse(localStorage.getItem('rogue_leaderboard') || '[]');
+    if (board.length > 0) {
+      const lbY = H * 0.58;
+      const lbFontSz = Math.min(12, W * 0.023);
+      const lbLineH = Math.min(18, W * 0.034);
+      const lbHeaderSz = Math.min(14, W * 0.028);
+
+      // 標題
+      ctx.fillStyle = '#ffd700';
+      ctx.font = `bold ${lbHeaderSz}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'center';
+      drawTrophy(W / 2 - ctx.measureText('排行榜').width / 2 - 16, lbY - 6, 12);
+      ctx.fillText('排行榜', W / 2, lbY);
+
+      // 表頭
+      const colRank = W * 0.32, colScore = W * 0.5, colWave = W * 0.68;
+      const headerY = lbY + lbLineH + 2;
+      ctx.fillStyle = 'rgba(255,215,0,0.5)';
+      ctx.font = `bold ${lbFontSz}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('名次', colRank, headerY);
+      ctx.fillText('分數', colScore, headerY);
+      ctx.fillText('Wave', colWave, headerY);
+
+      // 列表（最多顯示 5 筆）
+      const showCount = Math.min(board.length, 5);
+      ctx.font = `${lbFontSz}px "Noto Sans TC", sans-serif`;
+      for (let i = 0; i < showCount; i++) {
+        const entry = board[i];
+        const ey = headerY + (i + 1) * lbLineH;
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+        ctx.fillStyle = i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.6)';
+        ctx.fillText(`${medal} ${i + 1}`, colRank, ey);
+        ctx.fillText(`${entry.score}`, colScore, ey);
+        ctx.fillText(`${entry.wave}`, colWave, ey);
+      }
     }
 
     // 開始按鈕
     const btnW = Math.min(220, W * 0.45), btnH = 50;
-    const btnX = W / 2 - btnW / 2, btnY = H * 0.75;
+    const btnX = W / 2 - btnW / 2, btnY = H * 0.88;
     G._startR = { x: btnX, y: btnY, w: btnW, h: btnH };
 
     ctx.fillStyle = '#4caf50';
     rr(ctx, btnX, btnY, btnW, btnH, 14); ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.font = `bold ${Math.min(20, W * 0.04)}px "Noto Sans TC", sans-serif`;
+    ctx.textAlign = 'center';
     ctx.fillText('開始遊戲', W / 2, btnY + 33);
   }
 
@@ -3922,12 +3985,36 @@
       ctx.fillText(`收集了 ${G.collected.length} 張強化卡`, W / 2, H * 0.50);
     }
 
-    const best = JSON.parse(localStorage.getItem('rogue_best') || '{}');
-    if (best.score) {
+    // 排行榜（精簡版）
+    const board = JSON.parse(localStorage.getItem('rogue_leaderboard') || '[]');
+    if (board.length > 0) {
+      const lbFontSz = Math.min(12, W * 0.023);
+      const lbLineH = Math.min(16, W * 0.03);
+      const lbY = H * 0.53;
       ctx.fillStyle = '#ffd700';
-      ctx.font = `${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
-      drawTrophy(W / 2 - ctx.measureText(`最高紀錄：${best.score} 分`).width / 2 - 16, H * 0.56 - 6, 12);
-      ctx.fillText(`最高紀錄：${best.score} 分`, W / 2, H * 0.56);
+      ctx.font = `bold ${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('排行榜', W / 2, lbY);
+
+      const colRank = W * 0.32, colScore = W * 0.5, colWave = W * 0.68;
+      ctx.fillStyle = 'rgba(255,215,0,0.5)';
+      ctx.font = `bold ${lbFontSz}px "Noto Sans TC", sans-serif`;
+      const hY = lbY + lbLineH;
+      ctx.fillText('名次', colRank, hY);
+      ctx.fillText('分數', colScore, hY);
+      ctx.fillText('Wave', colWave, hY);
+
+      const showCount = Math.min(board.length, 5);
+      ctx.font = `${lbFontSz}px "Noto Sans TC", sans-serif`;
+      for (let i = 0; i < showCount; i++) {
+        const entry = board[i];
+        const ey = hY + (i + 1) * lbLineH;
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+        ctx.fillStyle = i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.6)';
+        ctx.fillText(`${medal} ${i + 1}`, colRank, ey);
+        ctx.fillText(`${entry.score}`, colScore, ey);
+        ctx.fillText(`${entry.wave}`, colWave, ey);
+      }
     }
 
     // 按鈕（漸入完成才顯示）
@@ -3935,7 +4022,7 @@
       const btnW = Math.min(200, W * 0.4), btnH = 46;
       const bx = W / 2 - btnW / 2;
 
-      const y1 = H * 0.63;
+      const y1 = H * 0.82;
       G._restartR = { x: bx, y: y1, w: btnW, h: btnH };
       ctx.fillStyle = '#4caf50';
       rr(ctx, bx, y1, btnW, btnH, 12); ctx.fill();
