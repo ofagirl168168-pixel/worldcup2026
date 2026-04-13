@@ -4249,20 +4249,216 @@
     return { text: '別氣餒，再來一次！', color: '#aaa' };
   }
 
-  // 分享遊戲成績
-  function shareScore(score, wave) {
+  // 分享遊戲成績（生成圖片）
+  async function shareScore(score, wave) {
     const praise = scorePraise(score, wave);
     const url = window.location.origin + '?play=rogue';
-    const text = `⚽ 射門挑戰：前進世界盃\n🏅 分數 ${score}｜Wave ${wave}\n${praise.text}\n你能超越我嗎？來挑戰！\n${url}`;
+    const shareText = `⚽ 射門挑戰：前進世界盃\n🏅 分數 ${score}｜Wave ${wave}\n${praise.text}\n你能打敗我嗎？來挑戰！👇\n${url}`;
 
-    if (navigator.share) {
-      navigator.share({ title: '射門挑戰：前進世界盃', text, url }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(text).then(() => {
-        G._shareToast = performance.now();
-      }).catch(() => {});
+    // 載入 QR Code
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}&color=0a0f1e&bgcolor=ffffff&margin=8`;
+    const qrImg = await loadImg?.(qrUrl).catch(() => null);
+
+    // ── 生成分享圖片 ──
+    const IW = 720, IH = 1000;
+    const sc = document.createElement('canvas');
+    sc.width = IW; sc.height = IH;
+    const c = c2d(sc);
+
+    // 背景
+    const bg = c.createLinearGradient(0, 0, IW, IH);
+    bg.addColorStop(0, '#050810'); bg.addColorStop(0.4, '#0d1030'); bg.addColorStop(1, '#050810');
+    c.fillStyle = bg; c.fillRect(0, 0, IW, IH);
+    // 光暈
+    const glow = c.createRadialGradient(IW/2, 280, 0, IW/2, 280, 350);
+    glow.addColorStop(0, 'rgba(255,215,0,0.12)'); glow.addColorStop(1, 'transparent');
+    c.fillStyle = glow; c.fillRect(0, 0, IW, IH);
+
+    const PAD = 36;
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+
+    // ── 頂部標題 ──
+    c.fillStyle = '#ffd700';
+    c.font = `900 28px "Noto Sans TC", sans-serif`;
+    c.fillText('⚽ 射門挑戰：前進世界盃', IW/2, 48);
+    c.fillStyle = 'rgba(255,255,255,0.3)';
+    c.font = `500 14px "Noto Sans TC", sans-serif`;
+    c.fillText(window.location.host, IW/2, 78);
+
+    // 分隔線
+    const divGrad = c.createLinearGradient(PAD, 0, IW-PAD, 0);
+    divGrad.addColorStop(0, 'transparent'); divGrad.addColorStop(0.5, 'rgba(255,215,0,0.4)'); divGrad.addColorStop(1, 'transparent');
+    c.strokeStyle = divGrad; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(PAD, 100); c.lineTo(IW-PAD, 100); c.stroke();
+
+    // ── 評語（帶光暈）──
+    c.fillStyle = praise.color;
+    c.shadowColor = praise.color; c.shadowBlur = 20;
+    c.font = `900 30px "Noto Sans TC", sans-serif`;
+    c.fillText(praise.text, IW/2, 148);
+    c.shadowBlur = 0;
+
+    // ── 分數大字 ──
+    c.fillStyle = '#ffd700';
+    c.shadowColor = '#ffd700'; c.shadowBlur = 30;
+    c.font = `900 96px "Noto Sans TC", sans-serif`;
+    c.fillText(`${score}`, IW/2, 250);
+    c.shadowBlur = 0;
+    c.fillStyle = 'rgba(255,215,0,0.5)';
+    c.font = `600 16px "Noto Sans TC", sans-serif`;
+    c.fillText('SCORE', IW/2, 300);
+
+    // ── Wave + 強化卡 數量 ──
+    const statY = 345;
+    const statW = 180, statH = 64, statGap = 24;
+    const stats = [
+      { label: 'WAVE', value: `${wave}`, color: '#4fc3f7' },
+      { label: '強化卡', value: `${G.collected.length} 張`, color: '#ab47bc' },
+    ];
+    stats.forEach((s, i) => {
+      const sx = IW/2 - (stats.length * statW + (stats.length-1) * statGap) / 2 + i * (statW + statGap);
+      rr(c, sx, statY, statW, statH, 12);
+      c.fillStyle = 'rgba(255,255,255,0.06)'; c.fill();
+      c.strokeStyle = `${s.color}44`; c.lineWidth = 1; c.stroke();
+      c.fillStyle = s.color;
+      c.font = `900 26px "Noto Sans TC", sans-serif`;
+      c.fillText(s.value, sx + statW/2, statY + 28);
+      c.fillStyle = 'rgba(255,255,255,0.4)';
+      c.font = `500 12px "Noto Sans TC", sans-serif`;
+      c.fillText(s.label, sx + statW/2, statY + 52);
+    });
+
+    // ── 卡牌 Build 展示（去重，顯示數量）──
+    const cardY = 430;
+    const rarCol = { common:'#4a5568', uncommon:'#16a34a', rare:'#2563eb', epic:'#7c3aed', legendary:'#d97706' };
+    const rarBorder = { common:'#6b7280', uncommon:'#22c55e', rare:'#3b82f6', epic:'#8b5cf6', legendary:'#f59e0b' };
+    // 統計卡牌
+    const cardCount = {};
+    G.collected.forEach(id => { cardCount[id] = (cardCount[id]||0) + 1; });
+    const uniqueCards = [...new Set(G.collected)].map(id => {
+      const card = CARDS.find(c2 => c2.id === id);
+      return card ? { ...card, count: cardCount[id] } : null;
+    }).filter(Boolean);
+    // 按稀有度排序：legendary > epic > rare > uncommon > common
+    const rarOrder = { legendary:0, epic:1, rare:2, uncommon:3, common:4 };
+    uniqueCards.sort((a,b) => (rarOrder[a.rarity]||9) - (rarOrder[b.rarity]||9));
+
+    if (uniqueCards.length > 0) {
+      c.fillStyle = 'rgba(255,255,255,0.3)';
+      c.font = `600 14px "Noto Sans TC", sans-serif`;
+      c.fillText('🃏 我的 Build', IW/2, cardY);
+
+      const maxPerRow = 6;
+      const cw = 90, ch = 36, cGap = 8;
+      const rows = Math.ceil(uniqueCards.length / maxPerRow);
+      uniqueCards.forEach((card, i) => {
+        const row = Math.floor(i / maxPerRow);
+        const col = i % maxPerRow;
+        const rowCount = Math.min(maxPerRow, uniqueCards.length - row * maxPerRow);
+        const rowW = rowCount * cw + (rowCount-1) * cGap;
+        const cx = IW/2 - rowW/2 + col * (cw + cGap);
+        const cy = cardY + 16 + row * (ch + cGap);
+
+        rr(c, cx, cy, cw, ch, 6);
+        c.fillStyle = rarCol[card.rarity] || '#4a5568'; c.fill();
+        c.strokeStyle = rarBorder[card.rarity] || '#666'; c.lineWidth = 1; c.stroke();
+        c.fillStyle = '#fff';
+        c.font = `bold 11px "Noto Sans TC", sans-serif`;
+        const label = card.count > 1 ? `${card.name}×${card.count}` : card.name;
+        c.fillText(label, cx + cw/2, cy + ch/2 + 1);
+      });
     }
+
+    // ── 挑戰宣言（裂變核心）──
+    const ctaY = uniqueCards.length > 6 ? 610 : uniqueCards.length > 0 ? 560 : 460;
+    // 挑釁框
+    const ctaW = IW - PAD*2, ctaH = 100;
+    rr(c, PAD, ctaY, ctaW, ctaH, 16);
+    c.fillStyle = 'rgba(255,152,0,0.08)'; c.fill();
+    c.strokeStyle = 'rgba(255,152,0,0.4)'; c.lineWidth = 2; c.stroke();
+
+    c.fillStyle = '#ffa726';
+    c.font = `900 26px "Noto Sans TC", sans-serif`;
+    c.fillText('🔥 你能超越我嗎？', IW/2, ctaY + 38);
+    c.fillStyle = 'rgba(255,255,255,0.6)';
+    c.font = `500 16px "Noto Sans TC", sans-serif`;
+    c.fillText(`我在 Wave ${wave} 拿下 ${score} 分，你敢來挑戰嗎？`, IW/2, ctaY + 72);
+
+    // ── 週排行榜位置 ──
+    const board = _rogueWeeklyBoard || [];
+    let rankText = '';
+    if (board.length > 0) {
+      const myRank = board.findIndex(e => e.score <= score);
+      if (myRank === 0) rankText = '👑 本週第 1 名！';
+      else if (myRank === 1) rankText = '🥈 本週第 2 名';
+      else if (myRank === 2) rankText = '🥉 本週第 3 名';
+      else if (myRank >= 0) rankText = `📊 本週第 ${myRank + 1} 名`;
+      else rankText = `📊 超越 ${board.filter(e => score > e.score).length} 位玩家`;
+    }
+    if (rankText) {
+      c.fillStyle = '#ffd700';
+      c.font = `bold 18px "Noto Sans TC", sans-serif`;
+      c.fillText(rankText, IW/2, ctaY + ctaH + 30);
+    }
+
+    // ── QR Code + 掃碼文字 ──
+    const qrSize = 120;
+    const qrX = IW - PAD - qrSize - 10;
+    const footerY = IH - 180;
+    // 左側文字
+    c.textAlign = 'left';
+    c.fillStyle = '#ffd700';
+    c.font = `900 22px "Noto Sans TC", sans-serif`;
+    c.fillText('掃碼立即挑戰！', PAD, footerY + 20);
+    c.fillStyle = 'rgba(255,255,255,0.5)';
+    c.font = `500 14px "Noto Sans TC", sans-serif`;
+    c.fillText('射門 × 卡牌 Build × 無盡生存', PAD, footerY + 48);
+    c.fillText('打敗我，你就是最強射手！', PAD, footerY + 70);
+    c.fillStyle = 'rgba(255,215,0,0.6)';
+    c.font = `bold 13px "Noto Sans TC", sans-serif`;
+    c.fillText(url.replace('https://',''), PAD, footerY + 96);
+
+    // QR Code
+    c.textAlign = 'center';
+    if (qrImg) {
+      c.fillStyle = '#fff';
+      rr(c, qrX - 6, footerY - 6, qrSize + 12, qrSize + 12, 10); c.fill();
+      c.drawImage(qrImg, qrX, footerY, qrSize, qrSize);
+      c.fillStyle = 'rgba(255,255,255,0.4)';
+      c.font = `500 11px "Noto Sans TC", sans-serif`;
+      c.fillText('掃碼開打', qrX + qrSize/2, footerY + qrSize + 18);
+    }
+
+    // 底部金條
+    const bar = c.createLinearGradient(0, 0, IW, 0);
+    bar.addColorStop(0, 'transparent'); bar.addColorStop(0.3, '#ffd700'); bar.addColorStop(0.7, '#ffd700'); bar.addColorStop(1, 'transparent');
+    c.fillStyle = bar; c.fillRect(0, IH - 3, IW, 3);
+
+    // ── 輸出圖片 ──
+    sc.toBlob(async blob => {
+      if (!blob) { G._shareToast = performance.now(); return; }
+      const file = new File([blob], 'rogue-score.png', { type: 'image/png' });
+      if (typeof _isMobile === 'function' && _isMobile() && navigator.share) {
+        try { await navigator.clipboard.writeText(shareText); } catch {}
+        const shareData = navigator.canShare?.({ files: [file], text: shareText })
+          ? { files: [file], title: '⚽ 射門挑戰', text: shareText }
+          : navigator.canShare?.({ files: [file] })
+            ? { files: [file] }
+            : { title: '⚽ 射門挑戰', text: shareText };
+        G._shareToast = performance.now();
+        try { await navigator.share(shareData); } catch {}
+      } else if (typeof showDesktopShareModal === 'function') {
+        showDesktopShareModal({ blob, link: url, filename: 'rogue-score.png', title: '⚽ 射門挑戰成績', text: shareText });
+        // 關閉遊戲 overlay 讓分享 modal 可見
+        if (overlay) overlay.classList.remove('active');
+      } else {
+        navigator.clipboard.writeText(shareText).then(() => { G._shareToast = performance.now(); }).catch(() => {});
+      }
+    }, 'image/png');
   }
+
+  // 分享圖用的 2d context 取得器
+  function c2d(canvas) { return canvas.getContext('2d'); }
 
   function drawGameOver() {
     const elapsed = performance.now() - (G._gameoverStart || 0);
