@@ -2747,7 +2747,7 @@ function renderFocus() {
   if (!main || !grid) return;
 
   if (_isClub()) {
-    const arts = _articles();
+    const arts = [..._articles()].sort((a, b) => b.date.localeCompare(a.date));
     if (!arts.length) { main.innerHTML = ''; grid.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">暫無文章</div>'; return; }
     const [first, ...rest] = arts;
     main.innerHTML = `<div class="focus-main-card" onclick="openUCLArticle('${first.id}')">
@@ -2769,7 +2769,7 @@ function renderFocus() {
     return;
   }
 
-  const [first, ...rest] = ARTICLES;
+  const [first, ...rest] = [...ARTICLES].sort((a, b) => b.date.localeCompare(a.date));
   main.innerHTML = `<div class="focus-main-card" onclick="openArticle(${first.id})">
     <div class="focus-cat">📌 ${first.cat}</div>
     <div class="focus-main-title">${first.title}</div>

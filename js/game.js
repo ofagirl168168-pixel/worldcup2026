@@ -231,8 +231,9 @@ function getTodayQuestion() {
   const dayIdx = Math.floor((new Date(today) - new Date('2026-01-01')) / 86400000);
 
   // 根據賽事選擇題庫
-  const qBank = (window.Tournament?.isUCL?.() && window.UCL_DAILY_QUESTIONS)
-    ? window.UCL_DAILY_QUESTIONS
+  const tid = window.Tournament?.current?.() || 'wc';
+  const qBank = tid === 'epl' && window.EPL_DAILY_QUESTIONS ? window.EPL_DAILY_QUESTIONS
+    : tid === 'ucl' && window.UCL_DAILY_QUESTIONS ? window.UCL_DAILY_QUESTIONS
     : DAILY_QUESTIONS;
 
   const normals = qBank.filter(q => q.type === 'normal');
@@ -501,11 +502,11 @@ function renderHomeDailyChallenge() {
     return 'dimmed';
   }
 
-  const _isUcl = window.Tournament?.isUCL?.() ?? false;
+  const _isClub = window.Tournament?.isUCL?.() || window.Tournament?.isEPL?.() || false;
   const pendingItems = [];
-  if (!champDone)            pendingItems.push({ icon:'🏆', label:'冠軍預測', action:"openChampionPick()" });
-  if (!groupsDone && !_isUcl) pendingItems.push({ icon:'📋', label:'分組賽預測', action:"openGroupPicks()" });
-  if (!teamDone)             pendingItems.push({ icon:'⚽', label:`選擇支持${_isUcl?'球會':'球隊'}`, action:"openTeamSupport()" });
+  if (!champDone)              pendingItems.push({ icon:'🏆', label:'冠軍預測', action:"openChampionPick()" });
+  if (!groupsDone && !_isClub) pendingItems.push({ icon:'📋', label:'分組賽預測', action:"openGroupPicks()" });
+  if (!teamDone)               pendingItems.push({ icon:'⚽', label:`選擇支持${_isClub?'球會':'球隊'}`, action:"openTeamSupport()" });
 
   el.innerHTML = `
     <div class="section-header">

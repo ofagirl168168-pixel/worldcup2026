@@ -355,9 +355,11 @@ ul { list-style: none; }
   .logo-sub { display: none; }
   .main-nav { display: none; }
   .hamburger { display: flex; margin-left: auto; flex-shrink: 0; }
-  .tournament-switcher { flex-shrink: 1; min-width: 0; }
-  .tournament-btn { padding: 4px 8px; font-size: 12px; }
+  .tournament-switcher { flex-shrink: 0; min-width: 0; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 3px; }
+  .tournament-btn { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
   .tournament-btn .t-label { display: none; }
+  .tournament-btn .t-logo { height: 22px; width: 22px; }
+  .tournament-btn.active { box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
   .mobile-nav.open { display: flex; flex-direction: column; }
   .hero-stats { flex-wrap: wrap; }
   .hero-stat { padding: 16px 20px; flex: 1 1 40%; }
