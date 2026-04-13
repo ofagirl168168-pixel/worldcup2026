@@ -2108,6 +2108,41 @@ function renderStats(tab) {
     return;
   }
 
+  if (_isUCL() && (tab === 'ucl-scorers' || tab === 'ucl-assists')) {
+    // 歐冠：射手榜 / 助攻榜（從 API 即時取得）
+    const isScorers = tab === 'ucl-scorers';
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
+      <div style="font-size:24px;margin-bottom:8px">⏳</div>載入中...</div>`;
+    fetch('/api/ucl-scorers').then(r => r.json()).then(data => {
+      if (!data.ok || (!data.topScorers?.length && !data.topAssists?.length)) {
+        el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
+          <div style="font-size:24px;margin-bottom:8px">📊</div>暫無數據（賽季尚未開始或 API 無資料）</div>`;
+        return;
+      }
+      const list = isScorers ? data.topScorers : data.topAssists;
+      const valKey = isScorers ? 'goals' : 'assists';
+      const unit = isScorers ? '球' : '助攻';
+      const title = isScorers ? '⚽ 歐冠射手榜' : '🅰️ 歐冠助攻榜';
+      el.innerHTML = `
+        <div style="margin-bottom:12px;color:#4caf50;font-size:13px">🟢 即時數據（football-data.org）</div>
+        <h3 style="margin-bottom:16px">${title}</h3>
+        <div class="scorers-list">${(list || []).slice(0, 15).map((p, i) => `
+          <div class="scorer-card">
+            <div class="scorer-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div>
+            <div class="scorer-flag">${p.teamCrest ? `<img src="${p.teamCrest}" style="height:20px;width:20px;object-fit:contain" alt="">` : ''}</div>
+            <div class="scorer-info">
+              <div class="scorer-name">${p.name}</div>
+              <div class="scorer-sub">${p.team}${p.playedMatches ? ` · ${p.playedMatches}場` : ''}${isScorers && p.assists ? ` · ${p.assists}助攻` : ''}${!isScorers && p.goals ? ` · ${p.goals}球` : ''}</div>
+            </div>
+            <div class="scorer-stat">${p[valKey]} ${unit}</div>
+          </div>`).join('')}</div>`;
+    }).catch(() => {
+      el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
+        <div style="font-size:24px;margin-bottom:8px">⚠️</div>載入失敗，請稍後再試</div>`;
+    });
+    return;
+  }
+
   if (_isUCL() && tab === 'rankings') {
     // 歐冠：UEFA 係數排名
     const _T = _teams();

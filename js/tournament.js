@@ -189,6 +189,8 @@
       tabsEl.innerHTML = `
         <button class="stats-tab active" data-stats="standings">聯賽積分榜</button>
         <button class="stats-tab" data-stats="bracket">淘汰賽對陣</button>
+        <button class="stats-tab" data-stats="ucl-scorers">射手榜</button>
+        <button class="stats-tab" data-stats="ucl-assists">助攻榜</button>
         <button class="stats-tab" data-stats="rankings">UEFA係數排名</button>`;
     } else {
       tabsEl.innerHTML = `
