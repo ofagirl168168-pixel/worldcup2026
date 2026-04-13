@@ -3639,7 +3639,8 @@
       if (!G._lbTab) G._lbTab = 'weekly';
       const curBoard = G._lbTab === 'weekly' ? weeklyBoard : allTimeBoard;
       const showCount = Math.min(curBoard.length, 5);
-      const panelH = tabH + headerH + showCount * rowH + (G._lbTab === 'weekly' ? 28 : 14);
+      const tipExtra = G._lbTab === 'weekly' ? rowH + 10 : 10;
+      const panelH = tabH + headerH + (showCount + 1) * rowH + tipExtra;
 
       ctx.save();
 
@@ -3761,12 +3762,15 @@
 
       // ── 獎勵提示（僅週排行） ──
       if (G._lbTab === 'weekly') {
-        const tipY = hdrY + (showCount + 1) * rowH + 4;
-        const tipFz = Math.min(10, W * 0.019);
+        const tipY = hdrY + (showCount + 1) * rowH + 12;
+        const tipFz = Math.min(11, W * 0.022);
         ctx.font = `${tipFz}px "Noto Sans TC", sans-serif`;
-        ctx.fillStyle = 'rgba(255,215,0,0.4)';
+        ctx.fillStyle = 'rgba(255,215,0,0.5)';
         ctx.textAlign = 'center';
-        ctx.fillText('🏆 1st +3💎  2nd +2💎  3rd +1💎（每週日結算）', W / 2, tipY);
+        ctx.fillText('🏆 1st +3💎  2nd +2💎  3rd +1💎', W / 2, tipY);
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = `${Math.min(10, W * 0.018)}px "Noto Sans TC", sans-serif`;
+        ctx.fillText('每週日結算', W / 2, tipY + tipFz + 4);
       }
 
       ctx.restore();
