@@ -901,8 +901,37 @@
   // ═══════════════════════════════════════════════════════════
   //  紀錄
   // ═══════════════════════════════════════════════════════════
+  // 射門挑戰排行榜快取
+  let _rogueWeeklyBoard = null;
+  let _rogueAllTimeBoard = null;
+  let _rogueBoardLoaded = false;
+
+  async function loadRogueBoards() {
+    if (_rogueBoardLoaded) return;
+    _rogueBoardLoaded = true;
+    try {
+      if (typeof DB === 'undefined') return;
+      const [{ data: weekly }, { data: allTime }] = await Promise.all([
+        DB.from('rogue_weekly_leaderboard').select('*').order('score', { ascending: false }).limit(10),
+        DB.from('rogue_alltime_leaderboard').select('*').order('score', { ascending: false }).limit(10),
+      ]);
+      _rogueWeeklyBoard = weekly ?? [];
+      _rogueAllTimeBoard = allTime ?? [];
+    } catch (e) { console.warn('loadRogueBoards:', e); }
+  }
+
+  // 嘗試觸發週結算（任何人載入遊戲時，若已過週日則呼叫）
+  async function tryWeeklySettle() {
+    try {
+      if (typeof FUNC_URL === 'undefined') return;
+      await fetch(`${FUNC_URL}/rogue-weekly-settle`, { method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}' });
+    } catch (_) {}
+  }
+
   function saveResult() {
-    // 舊格式相容
+    // localStorage 備份（離線用）
     const best = JSON.parse(localStorage.getItem('rogue_best') || '{}');
     if (!best.score || G.score > best.score) {
       best.score = G.score;
@@ -910,16 +939,16 @@
       best.date  = new Date().toISOString().slice(0, 10);
       localStorage.setItem('rogue_best', JSON.stringify(best));
     }
-    // 排行榜（前 10 名）
-    const board = JSON.parse(localStorage.getItem('rogue_leaderboard') || '[]');
-    board.push({
-      score: G.score,
-      wave:  G.wave,
-      date:  new Date().toISOString().slice(0, 10),
-    });
-    board.sort((a, b) => b.score - a.score);
-    if (board.length > 10) board.length = 10;
-    localStorage.setItem('rogue_leaderboard', JSON.stringify(board));
+
+    // 上傳 Supabase（已登入時）
+    if (typeof currentUser !== 'undefined' && currentUser && typeof callEdge === 'function') {
+      callEdge('submit-rogue-score', { score: G.score, wave: G.wave }).then(res => {
+        if (res.error) console.warn('submit-rogue-score:', res.error);
+        // 重新載入排行榜
+        _rogueBoardLoaded = false;
+        loadRogueBoards();
+      });
+    }
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -3510,42 +3539,70 @@
       ctx.textAlign = 'center';
     });
 
-    // 排行榜
-    const board = JSON.parse(localStorage.getItem('rogue_leaderboard') || '[]');
-    if (board.length > 0) {
-      const lbY = H * 0.58;
-      const lbFontSz = Math.min(12, W * 0.023);
-      const lbLineH = Math.min(18, W * 0.034);
-      const lbHeaderSz = Math.min(14, W * 0.028);
+    // 排行榜（週排行 + 歷史排行，來自 Supabase）
+    const weeklyBoard = _rogueWeeklyBoard || [];
+    const allTimeBoard = _rogueAllTimeBoard || [];
+    const hasBoard = weeklyBoard.length > 0 || allTimeBoard.length > 0;
 
-      // 標題
-      ctx.fillStyle = '#ffd700';
-      ctx.font = `bold ${lbHeaderSz}px "Noto Sans TC", sans-serif`;
-      ctx.textAlign = 'center';
-      drawTrophy(W / 2 - ctx.measureText('排行榜').width / 2 - 16, lbY - 6, 12);
-      ctx.fillText('排行榜', W / 2, lbY);
+    if (hasBoard) {
+      const lbY = H * 0.56;
+      const lbFontSz = Math.min(11, W * 0.021);
+      const lbLineH = Math.min(16, W * 0.03);
+      const lbHeaderSz = Math.min(13, W * 0.026);
+      const colRank = W * 0.18, colName = W * 0.4, colScore = W * 0.65, colWave = W * 0.82;
 
-      // 表頭
-      const colRank = W * 0.32, colScore = W * 0.5, colWave = W * 0.68;
-      const headerY = lbY + lbLineH + 2;
-      ctx.fillStyle = 'rgba(255,215,0,0.5)';
-      ctx.font = `bold ${lbFontSz}px "Noto Sans TC", sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillText('名次', colRank, headerY);
-      ctx.fillText('分數', colScore, headerY);
-      ctx.fillText('Wave', colWave, headerY);
+      function drawBoard(title, board, startY) {
+        ctx.fillStyle = '#ffd700';
+        ctx.font = `bold ${lbHeaderSz}px "Noto Sans TC", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(title, W / 2, startY);
 
-      // 列表（最多顯示 5 筆）
-      const showCount = Math.min(board.length, 5);
-      ctx.font = `${lbFontSz}px "Noto Sans TC", sans-serif`;
-      for (let i = 0; i < showCount; i++) {
-        const entry = board[i];
-        const ey = headerY + (i + 1) * lbLineH;
-        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
-        ctx.fillStyle = i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.6)';
-        ctx.fillText(`${medal} ${i + 1}`, colRank, ey);
-        ctx.fillText(`${entry.score}`, colScore, ey);
-        ctx.fillText(`${entry.wave}`, colWave, ey);
+        const headerY = startY + lbLineH;
+        ctx.fillStyle = 'rgba(255,215,0,0.45)';
+        ctx.font = `bold ${lbFontSz}px "Noto Sans TC", sans-serif`;
+        ctx.fillText('#', colRank, headerY);
+        ctx.fillText('玩家', colName, headerY);
+        ctx.fillText('分數', colScore, headerY);
+        ctx.fillText('Wave', colWave, headerY);
+
+        const showCount = Math.min(board.length, 5);
+        ctx.font = `${lbFontSz}px "Noto Sans TC", sans-serif`;
+        for (let i = 0; i < showCount; i++) {
+          const entry = board[i];
+          const ey = headerY + (i + 1) * lbLineH;
+          const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+          ctx.fillStyle = i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.6)';
+          ctx.fillText(`${medal}${i + 1}`, colRank, ey);
+          const nick = (entry.nickname || '???').length > 6 ? (entry.nickname || '???').slice(0, 6) + '…' : (entry.nickname || '???');
+          ctx.fillText(nick, colName, ey);
+          ctx.fillText(`${entry.score}`, colScore, ey);
+          ctx.fillText(`${entry.wave}`, colWave, ey);
+        }
+        // 週排行前 3 名提示寶石獎勵
+        if (title.includes('週') && showCount > 0) {
+          ctx.fillStyle = 'rgba(255,215,0,0.35)';
+          ctx.font = `${Math.min(10, W * 0.019)}px "Noto Sans TC", sans-serif`;
+          ctx.fillText('🏆 週排行 1st +3💎  2nd +2💎  3rd +1💎（每週日結算）', W / 2, headerY + (showCount + 1) * lbLineH + 2);
+        }
+        return headerY + (showCount + 1) * lbLineH + (title.includes('週') ? lbLineH + 4 : 4);
+      }
+
+      let nextY = lbY;
+      if (weeklyBoard.length > 0) {
+        nextY = drawBoard('⚡ 本週排行', weeklyBoard, nextY);
+      }
+      if (allTimeBoard.length > 0) {
+        drawBoard('👑 歷史排行', allTimeBoard, nextY + 6);
+      }
+    } else {
+      // 無 Supabase 資料時顯示本地最高紀錄
+      const best = JSON.parse(localStorage.getItem('rogue_best') || '{}');
+      if (best.score) {
+        ctx.fillStyle = 'rgba(255,215,0,0.6)';
+        ctx.font = `${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
+        ctx.textAlign = 'center';
+        drawTrophy(W / 2 - ctx.measureText(`最高紀錄：${best.score} 分（Wave ${best.wave}）`).width / 2 - 16, H * 0.60 - 6, 12);
+        ctx.fillText(`最高紀錄：${best.score} 分（Wave ${best.wave}）`, W / 2, H * 0.60);
       }
     }
 
@@ -3982,36 +4039,46 @@
     if (G.collected.length) {
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
       ctx.font = `${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText(`收集了 ${G.collected.length} 張強化卡`, W / 2, H * 0.50);
+      ctx.fillText(`收集了 ${G.collected.length} 張強化卡`, W / 2, H * 0.48);
     }
 
-    // 排行榜（精簡版）
-    const board = JSON.parse(localStorage.getItem('rogue_leaderboard') || '[]');
-    if (board.length > 0) {
-      const lbFontSz = Math.min(12, W * 0.023);
-      const lbLineH = Math.min(16, W * 0.03);
-      const lbY = H * 0.53;
+    // 未登入提示
+    if (typeof currentUser === 'undefined' || !currentUser) {
+      ctx.fillStyle = 'rgba(255,200,0,0.5)';
+      ctx.font = `${Math.min(12, W * 0.023)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('💡 登入後分數會自動上傳排行榜', W / 2, H * 0.52);
+    }
+
+    // 週排行榜（精簡版）
+    const goBoard = _rogueWeeklyBoard || [];
+    if (goBoard.length > 0) {
+      const lbFontSz = Math.min(11, W * 0.021);
+      const lbLineH = Math.min(15, W * 0.028);
+      const lbY = H * 0.52;
       ctx.fillStyle = '#ffd700';
       ctx.font = `bold ${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText('排行榜', W / 2, lbY);
+      ctx.fillText('⚡ 本週排行', W / 2, lbY);
 
-      const colRank = W * 0.32, colScore = W * 0.5, colWave = W * 0.68;
-      ctx.fillStyle = 'rgba(255,215,0,0.5)';
+      const colRank = W * 0.18, colName = W * 0.4, colScore = W * 0.65, colWave = W * 0.82;
+      ctx.fillStyle = 'rgba(255,215,0,0.45)';
       ctx.font = `bold ${lbFontSz}px "Noto Sans TC", sans-serif`;
       const hY = lbY + lbLineH;
-      ctx.fillText('名次', colRank, hY);
+      ctx.fillText('#', colRank, hY);
+      ctx.fillText('玩家', colName, hY);
       ctx.fillText('分數', colScore, hY);
       ctx.fillText('Wave', colWave, hY);
 
-      const showCount = Math.min(board.length, 5);
+      const showCount = Math.min(goBoard.length, 5);
       ctx.font = `${lbFontSz}px "Noto Sans TC", sans-serif`;
       for (let i = 0; i < showCount; i++) {
-        const entry = board[i];
+        const entry = goBoard[i];
         const ey = hY + (i + 1) * lbLineH;
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
         ctx.fillStyle = i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.6)';
-        ctx.fillText(`${medal} ${i + 1}`, colRank, ey);
+        ctx.fillText(`${medal}${i + 1}`, colRank, ey);
+        const nick = (entry.nickname || '???').length > 6 ? (entry.nickname || '???').slice(0, 6) + '…' : (entry.nickname || '???');
+        ctx.fillText(nick, colName, ey);
         ctx.fillText(`${entry.score}`, colScore, ey);
         ctx.fillText(`${entry.wave}`, colWave, ey);
       }
@@ -4166,6 +4233,10 @@
     if (!overlay) buildOverlay();
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // 載入排行榜 & 嘗試週結算
+    loadRogueBoards();
+    tryWeeklySettle();
 
     G = freshState();
     curScene = SCENES[Math.floor(Math.random() * SCENES.length)];
