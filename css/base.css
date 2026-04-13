@@ -150,6 +150,7 @@ ul { list-style: none; }
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .tournament-btn .t-label { pointer-events: none; }
+.tournament-btn .t-logo { height: 20px; width: 20px; object-fit: contain; vertical-align: middle; pointer-events: none; }
 
 .main-nav {
   display: flex; gap: 4px; margin-left: auto;
