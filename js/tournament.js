@@ -37,6 +37,21 @@
       hasKnockout: true,
       hasLeaguePhase: true,     // 聯賽階段
       description: 'UEFA Champions League 2025/26'
+    },
+    epl: {
+      id: 'epl',
+      name: '2025/26 英超',
+      shortName: '英超',
+      emoji: '🦁',
+      color: '#3d195b',        // 英超紫
+      colorAccent: '#00ff87',   // 英超綠
+      lsPrefix: 'epl26_',
+      hasGroups: false,
+      hasKnockout: false,
+      hasLeaguePhase: true,
+      hasMatchweeks: true,      // 38 輪聯賽
+      apiCompetition: 'PL',
+      description: 'English Premier League 2025/26'
     }
   };
 
@@ -45,6 +60,8 @@
   function getTournamentConfig(t) { return TOURNAMENT_CONFIG[t || _current]; }
   function isUCL() { return _current === 'ucl'; }
   function isWC() { return _current === 'wc'; }
+  function isEPL() { return _current === 'epl'; }
+  function is(id) { return _current === id; }
 
   // ── localStorage 鍵值產生器 ──────────────────────
   function gk(key) {
@@ -138,13 +155,16 @@
   // ── 切換全域資料指標 ─────────────────────────────
   function _swapGlobalData(t) {
     if (t === 'ucl') {
-      // 歐冠資料 → 全域
       if (window.UCL_TEAMS)    window._activeTeams = window.UCL_TEAMS;
       if (window.UCL_MATCHES)  window._activeMatches = window.UCL_MATCHES;
       if (window.UCL_DAILY_QUESTIONS) window._activeDailyQ = window.UCL_DAILY_QUESTIONS;
       if (window.UCL_ARTICLES) window._activeArticles = window.UCL_ARTICLES;
+    } else if (t === 'epl') {
+      if (window.EPL_TEAMS)    window._activeTeams = window.EPL_TEAMS;
+      if (window.EPL_MATCHES)  window._activeMatches = window.EPL_MATCHES;
+      if (window.EPL_DAILY_QUESTIONS) window._activeDailyQ = window.EPL_DAILY_QUESTIONS;
+      if (window.EPL_ARTICLES) window._activeArticles = window.EPL_ARTICLES;
     } else {
-      // 世界盃資料 → 全域（const 宣告不在 window 上，需用 typeof 檢查）
       if (typeof TEAMS !== 'undefined')           window._activeTeams = TEAMS;
       if (typeof SCHEDULE !== 'undefined')        window._activeMatches = SCHEDULE;
       if (typeof DAILY_QUESTIONS !== 'undefined') window._activeDailyQ = DAILY_QUESTIONS;
@@ -172,7 +192,9 @@
     document.documentElement.style.setProperty('--tournament-color', cfg.color);
     document.documentElement.style.setProperty('--tournament-accent', cfg.colorAccent);
     // body class 切換（供 CSS 主題用）
-    document.body.classList.toggle('ucl-mode', t === 'ucl');
+    document.body.classList.remove('ucl-mode', 'epl-mode');
+    if (t === 'ucl') document.body.classList.add('ucl-mode');
+    if (t === 'epl') document.body.classList.add('epl-mode');
     document.documentElement.setAttribute('data-tournament-active', t);
     // 更新數據頁 tabs
     _updateStatsTabs(t);
@@ -185,7 +207,13 @@
   function _updateStatsTabs(t) {
     const tabsEl = document.querySelector('.stats-tabs');
     if (!tabsEl) return;
-    if (t === 'ucl') {
+    if (t === 'epl') {
+      tabsEl.innerHTML = `
+        <button class="stats-tab active" data-stats="standings">聯賽積分榜</button>
+        <button class="stats-tab" data-stats="epl-scorers">射手榜</button>
+        <button class="stats-tab" data-stats="epl-assists">助攻榜</button>
+        <button class="stats-tab" data-stats="rankings">球隊實力排名</button>`;
+    } else if (t === 'ucl') {
       tabsEl.innerHTML = `
         <button class="stats-tab active" data-stats="standings">聯賽積分榜</button>
         <button class="stats-tab" data-stats="bracket">淘汰賽對陣</button>
@@ -242,7 +270,7 @@
     switch: switchTournament,
     current: getCurrentTournament,
     config: getTournamentConfig,
-    isUCL, isWC, gk,
+    isUCL, isWC, isEPL, is, gk,
     CONFIG: TOURNAMENT_CONFIG
   };
 

@@ -50,28 +50,90 @@ if (window.Tournament) {
     const titleEl = document.querySelector('.logo-title');
     const subEl = document.querySelector('.logo-sub');
     if (cfg && titleEl) {
-      titleEl.textContent = cfg.id === 'ucl' ? '歐冠預測' : '世界盃預測';
-      subEl.textContent = cfg.id === 'ucl' ? 'AI 分析平台 2025/26' : 'AI 分析平台 2026';
+      const titles = { wc:'世界盃預測', ucl:'歐冠預測', epl:'英超預測' };
+      const subs = { wc:'AI 分析平台 2026', ucl:'AI 分析平台 2025/26', epl:'AI 分析平台 2025/26' };
+      titleEl.textContent = titles[cfg.id] || '足球預測';
+      subEl.textContent = subs[cfg.id] || 'AI 分析平台';
     }
   });
 }
 
 /* ── 賽事感知資料取得器 ───────────────────────────── */
-// 注意：WC 資料用 const 宣告（不在 window 上），UCL 資料有 window 導出
 function _isUCL() { return window.Tournament?.isUCL?.() ?? false; }
-function _teams() { return _isUCL() ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {}); }
+function _isEPL() { return window.Tournament?.isEPL?.() ?? false; }
+function _tid() { return window.Tournament?.current?.() || 'wc'; }
+function _teams() {
+  const t = _tid();
+  if (t === 'ucl') return (window.UCL_TEAMS||{});
+  if (t === 'epl') return (window.EPL_TEAMS||{});
+  return (typeof TEAMS!=='undefined' ? TEAMS : {});
+}
 function _matches() {
-  if (_isUCL()) return (window.UCL_MATCHES||[]);
+  const t = _tid();
+  if (t === 'ucl') return (window.UCL_MATCHES||[]);
+  if (t === 'epl') return (window.EPL_MATCHES||[]);
   return (typeof SCHEDULE!=='undefined' && SCHEDULE.length) ? SCHEDULE : [];
 }
-function _articles() { return _isUCL() ? (window.UCL_ARTICLES||[]) : (typeof ARTICLES!=='undefined' ? ARTICLES : []); }
-function _dailyQ() { return _isUCL() ? (window.UCL_DAILY_QUESTIONS||[]) : (typeof DAILY_QUESTIONS!=='undefined' ? DAILY_QUESTIONS : []); }
+function _articles() {
+  const t = _tid();
+  if (t === 'ucl') return (window.UCL_ARTICLES||[]);
+  if (t === 'epl') return (window.EPL_ARTICLES||[]);
+  return (typeof ARTICLES!=='undefined' ? ARTICLES : []);
+}
+function _dailyQ() {
+  const t = _tid();
+  if (t === 'ucl') return (window.UCL_DAILY_QUESTIONS||[]);
+  if (t === 'epl') return (window.EPL_DAILY_QUESTIONS||[]);
+  return (typeof DAILY_QUESTIONS!=='undefined' ? DAILY_QUESTIONS : []);
+}
+// 是否為俱樂部賽事（非國家隊）
+function _isClub() { return _isUCL() || _isEPL(); }
+
+// 比賽元資料（modal 共用）
+function _matchMeta(m) {
+  const t = _tid();
+  const isClub = _isClub();
+  const _T = _teams();
+  const ht = _T[m.home], at = _T[m.away];
+  let phaseLabel, matchTag, matchTime, matchVenue, hRankLabel, aRankLabel;
+
+  if (t === 'epl') {
+    phaseLabel = m.matchday ? `第${m.matchday}輪` : '';
+    matchTag = phaseLabel;
+    matchTime = `🕒 ${(m.date||'').slice(5).replace('-','/')} ${m.time||''}`;
+    matchVenue = '';
+    hRankLabel = `英超 #${ht?.eplRank||'?'}`;
+    aRankLabel = `英超 #${at?.eplRank||'?'}`;
+  } else if (t === 'ucl') {
+    phaseLabel = {league:'聯賽階段',playoff:'附加賽',r16:'十六強',qf:'八強',sf:'四強',final:'決賽'}[m.stage]||'';
+    matchTag = `${phaseLabel}${m.md ? ' MD'+m.md : ''}${m.leg ? ' Leg'+m.leg : ''}`;
+    matchTime = `🕒 ${(m.date||'').slice(5).replace('-','/')} ${m.time||''}`;
+    matchVenue = m.venue ? `📍 ${m.venue}` : '';
+    hRankLabel = `UEFA 係數 ${ht?.uefaCoeff||'?'}`;
+    aRankLabel = `UEFA 係數 ${at?.uefaCoeff||'?'}`;
+  } else {
+    phaseLabel = {group:'小組賽',r32:'32強',r16:'16強',qf:'八強',sf:'四強',final:'決賽'}[m.phase]||'';
+    matchTag = `${GROUPS[m.group]?.name||''} · ${phaseLabel}`;
+    matchTime = `🕒 ${m.twDate?.slice(5).replace('-','/')} ${m.twTime} 台灣時間`;
+    matchVenue = `📍 ${m.venue||''}, ${m.city||''}`;
+    hRankLabel = `FIFA #${ht?.fifaRank||'?'}`;
+    aRankLabel = `FIFA #${at?.fifaRank||'?'}`;
+  }
+  return { phaseLabel, matchTag, matchTime, matchVenue, hRankLabel, aRankLabel, isClub };
+}
 
 /* app.js — 導覽 + 倒計時 + 首頁 */
 
 // 首頁：冠軍預測
 function renderChampions() {
-  const top5 = _isUCL() ? [
+  const t = _tid();
+  const top5 = t === 'epl' ? [
+    {code:'ARS', prob:'35%', desc:'Arteta體系成熟，Saka+Ødegaard黃金搭檔，防守英超最穩'},
+    {code:'LIV', prob:'30%', desc:'Slot第二季穩定輸出，Salah持續高效，中場全面升級'},
+    {code:'MCI', prob:'20%', desc:'Haaland進球機器，Guardiola戰術無人能敵，但Rodri傷缺影響大'},
+    {code:'CHE', prob:'8%',  desc:'Cole Palmer率領年輕軍團，Maresca體系漸入佳境'},
+    {code:'NEW', prob:'7%',  desc:'Isak+Gordon攻擊組合犀利，Howe帶隊穩步上升'}
+  ] : t === 'ucl' ? [
     {code:'BAR', prob:'23%', desc:'Yamal+Pedri黃金世代，Flick體系第二年更成熟'},
     {code:'RMA', prob:'20%', desc:'歐冠之王DNA，Mbappé+Bellingham雙核驅動'},
     {code:'LIV', prob:'18%', desc:'Slot體系穩定輸出，英超+歐冠雙線爭冠'},
@@ -145,9 +207,9 @@ function renderUpcoming() {
   const schedule = _matches();
   if (!schedule.length) { el.innerHTML = ''; return; }
 
-  // UCL: 進行中優先，再取尚未結束的比賽；WC: 直接取前6場
+  // 俱樂部賽事: 進行中優先，再取尚未結束的比賽；WC: 直接取前6場
   let upcoming;
-  if (_isUCL()) {
+  if (_isClub()) {
     const live = schedule.filter(m => m.home && m.away && m.home !== 'TBD' && m.status === 'live');
     const sched = schedule.filter(m => m.home && m.away && m.home !== 'TBD' && m.status === 'scheduled');
     upcoming = [...live, ...sched].slice(0, 6);
@@ -162,12 +224,14 @@ function renderUpcoming() {
     const pred = calcPred(ht, at);
     const stageLabel = _isUCL()
       ? {league:'聯賽階段',playoff:'附加賽',r16:'十六強',qf:'八強',sf:'四強',final:'決賽'}[m.stage] || ''
-      : '';
-    const dateStr = _isUCL() ? (m.date||'').slice(5).replace('-','/') : (m.twDate||'').slice(5).replace('-','/');
-    const timeStr = _isUCL() ? (m.time||'') : (m.twTime||'');
-    const subInfo = _isUCL()
-      ? `${dateStr} · ${stageLabel}${m.md ? ' MD'+m.md : ''}`
-      : `${dateStr} · ${GROUPS[m.group]?.name||''}`;
+      : _isEPL() ? (m.matchday ? `第${m.matchday}輪` : '') : '';
+    const dateStr = _isClub() ? (m.date||'').slice(5).replace('-','/') : (m.twDate||'').slice(5).replace('-','/');
+    const timeStr = _isClub() ? (m.time||'') : (m.twTime||'');
+    const subInfo = _isEPL()
+      ? `${dateStr} · ${stageLabel}`
+      : _isUCL()
+        ? `${dateStr} · ${stageLabel}${m.md ? ' MD'+m.md : ''}`
+        : `${dateStr} · ${GROUPS[m.group]?.name||''}`;
     const isLive = m.status === 'live';
     const liveScore = isLive && m.score ? `${m.score.h} - ${m.score.a}` : null;
     const minuteText = isLive && m.minute ? `${m.minute}'` : '';
@@ -180,7 +244,7 @@ function renderUpcoming() {
       </div>
       <div class="upcoming-info">
         <div>
-          <div class="upcoming-time">${isLive ? '⚽ 比賽進行中' : timeStr}${!isLive && !_isUCL() ? ' 台灣時間' : ''}</div>
+          <div class="upcoming-time">${isLive ? '⚽ 比賽進行中' : timeStr}${!isLive && !_isClub() ? ' 台灣時間' : ''}</div>
           <div style="font-size:12px;color:${isLive ? 'var(--accent)' : 'var(--text-muted)'}">${subInfo}</div>
         </div>
       </div>
@@ -201,6 +265,7 @@ function renderHomeBracket() {
   if (!section || !el) return;
 
   if (!_isUCL()) { section.style.display = 'none'; return; }
+  // EPL 沒有淘汰賽樹（由上面條件已處理）
   section.style.display = '';
 
   const T = _teams(), M = window.UCL_MATCHES || [];
@@ -338,6 +403,57 @@ function renderDeathGroups() {
   const header = document.getElementById('death-section-header');
   if (!el) return;
 
+  if (_isEPL()) {
+    // 英超：顯示即時積分榜前8名
+    if (header) header.innerHTML = `<h2><i class="fas fa-table"></i> 聯賽積分榜</h2><span class="section-badge">即時排名</span>`;
+    el.style.display = 'block';
+    const standings = window._eplStandings || [];
+    const _T = _teams();
+    if (!standings.length) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">⏳ 載入積分榜中...</div>';
+      return;
+    }
+    const top8 = standings.slice(0, 8);
+    const cols = 'grid-template-columns:36px 32px 1fr 50px 50px 50px 60px 60px';
+    const zoneColor = (pos) => pos <= 4 ? '#4caf50' : pos <= 6 ? '#ff9800' : pos <= 7 ? '#2196f3' : 'var(--text-muted)';
+    const zoneLabel = (pos) => pos <= 4 ? 'UCL' : pos <= 6 ? 'UEL' : pos <= 7 ? 'UECL' : '';
+    el.innerHTML = `
+      <div style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px">
+        <span style="color:#4caf50">● 1-4 歐冠</span>
+        <span style="color:#ff9800">● 5-6 歐霸</span>
+        <span style="color:#2196f3">● 7 歐協聯</span>
+        <span style="color:#ef5350">● 18-20 降級</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
+        <div style="display:grid;${cols};gap:0;padding:10px 16px;font-size:11px;color:var(--text-muted);font-weight:600;border-bottom:1px solid var(--border)">
+          <span>#</span><span></span><span>球隊</span><span style="text-align:center">賽</span><span style="text-align:center">勝</span><span style="text-align:center">負</span><span style="text-align:center">淨勝球</span><span style="text-align:right">積分</span>
+        </div>
+        ${top8.map((row, i) => {
+          const code = row.teamTla;
+          const t = _T[code];
+          const crest = t?.flag || row.teamCrest || '';
+          const name = t?.nameCN || row.team;
+          const gd = row.goalDifference;
+          return `<div style="display:grid;${cols};gap:0;padding:12px 16px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.04);${i%2?'':'background:rgba(255,255,255,0.02)'}">
+            <span style="font-size:16px;font-weight:800;color:${zoneColor(row.position)}">${row.position}</span>
+            <span style="font-size:22px">${flagImg(crest)}</span>
+            <div><div style="font-weight:700;font-size:14px">${name}</div></div>
+            <span style="text-align:center;font-size:13px;color:var(--text-secondary)">${row.playedGames}</span>
+            <span style="text-align:center;font-size:13px;font-weight:700;color:#4caf50">${row.won}</span>
+            <span style="text-align:center;font-size:13px;color:#f44336">${row.lost}</span>
+            <span style="text-align:center;font-size:13px;font-weight:600;color:${gd>0?'#4caf50':gd<0?'#f44336':'var(--text-muted)'}">${gd>0?'+':''}${gd}</span>
+            <div style="text-align:right"><span style="font-size:18px;font-weight:900;color:var(--accent)">${row.points}</span></div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="text-align:center;margin-top:12px">
+        <button onclick="showSection('stats')" style="padding:8px 20px;border-radius:999px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:var(--text-secondary);font-size:13px;cursor:pointer">
+          查看完整積分榜 →
+        </button>
+      </div>`;
+    return;
+  }
+
   if (_isUCL()) {
     // 更新標題
     if (header) header.innerHTML = `<h2><i class="fas fa-trophy"></i> 聯賽階段排名</h2><span class="section-badge">前8名直接晉級</span>`;
@@ -445,7 +561,20 @@ function renderHighlights() {
     {title:'VAR 與半自動越位技術',desc:'科技持續改變歐冠判罰，爭議是否因此減少？'}
   ];
 
-  const items = _isUCL() ? uclItems : wcItems;
+  const eplItems = [
+    {title:'兵工廠能否終結20年聯賽荒？',desc:'Arteta打造的兵工廠已連續多季挑戰冠軍，今年能否終於圓夢？'},
+    {title:'Salah的紅軍告別季？',desc:'合約即將到期的Salah能否用英超冠軍為利物浦生涯畫下完美句點？'},
+    {title:'曼城王朝是否終結？',desc:'Rodri長期傷缺、陣容老化，Guardiola的曼城還能維持統治嗎？'},
+    {title:'Cold Palmer統治英超',desc:'Cole Palmer連續兩季數據爆炸，他已經是英超最佳球員嗎？'},
+    {title:'紐卡索的歐冠夢',desc:'沙特入主後穩步上升，Isak+Gordon組合帶隊重返歐洲之巔'},
+    {title:'Amorim能拯救曼聯嗎？',desc:'三後衛體系改造進行中，曼聯能否重返英超前四？'},
+    {title:'升班馬的生存戰',desc:'每年升班馬都面臨殘酷考驗，今年誰能在英超站穩腳跟？'},
+    {title:'英超金靴之爭',desc:'Haaland vs Isak vs Salah，三方混戰的金靴競爭白熱化'},
+    {title:'VAR持續引發爭議',desc:'影像助理裁判是否讓比賽更公平？球迷、教練意見兩極'},
+    {title:'英超的全球化浪潮',desc:'日本、韓國、美國球員在英超大放異彩，全球化趨勢不可逆'}
+  ];
+
+  const items = _isEPL() ? eplItems : _isUCL() ? uclItems : wcItems;
   el.innerHTML = items.map((item,i) => `
     <div class="highlight-card">
       <div class="highlight-num">${String(i+1).padStart(2,'0')}</div>
@@ -531,7 +660,21 @@ function renderPredictions() {
   const schedule = _matches();
 
   let featuredMatches;
-  if (_isUCL()) {
+  if (_isEPL()) {
+    // 英超：精選德比和Big Six對決
+    const eplFeatPairs = [['ARS','LIV'],['MCI','ARS'],['LIV','MCI'],['CHE','TOT'],['MUN','LIV'],['NEW','ARS']];
+    featuredMatches = eplFeatPairs.map(([h,a]) =>
+      schedule.find(m => m.home===h && m.away===a) ||
+      schedule.find(m => m.home===a && m.away===h)
+    ).filter(Boolean).slice(0,6);
+    // 補滿：取最近的比賽
+    const fill = schedule.filter(m => m.home && m.away && m.home !== 'TBD');
+    while (featuredMatches.length < 6 && fill.length > featuredMatches.length) {
+      const m = fill[fill.length - 1 - featuredMatches.length];
+      if (m && !featuredMatches.find(x => x.id === m.id)) featuredMatches.push(m);
+      else break;
+    }
+  } else if (_isUCL()) {
     // 歐冠：挑選即將進行的 or 最近的精選比賽
     const uclFeatPairs = [['BAR','BAY'],['LIV','INT'],['RMA','ATM'],['LEV','ARS'],['PSG','BAY'],['BAR','RMA']];
     featuredMatches = uclFeatPairs.map(([h,a]) =>
@@ -560,9 +703,11 @@ function renderPredictions() {
     const ht = _T[m.home], at = _T[m.away];
     if (!ht||!at) return '';
     const p = calcPred(ht,at);
-    const tagLabel = _isUCL()
-      ? ({league:'聯賽階段',playoff:'附加賽',r16:'十六強',qf:'八強',sf:'四強',final:'決賽'}[m.stage]||'')
-      : (GROUPS[m.group]?.name||'');
+    const tagLabel = _isEPL()
+      ? (m.matchday ? `第${m.matchday}輪` : '')
+      : _isUCL()
+        ? ({league:'聯賽階段',playoff:'附加賽',r16:'十六強',qf:'八強',sf:'四強',final:'決賽'}[m.stage]||'')
+        : (GROUPS[m.group]?.name||'');
     return `<div class="featured-pred-card" onclick="openPredModal('${m.id}')">
       <div class="featured-pred-header">
         <span class="match-tag group">${tagLabel}</span>
@@ -604,7 +749,7 @@ function renderPredictions() {
           ? `<div style="font-size:16px;font-weight:800;color:#4caf50">${m.score.h} – ${m.score.a}</div>
              <div style="font-size:10px;color:#4caf50;margin-top:1px">已結束</div>`
           : `<div style="font-size:16px;font-weight:800;color:var(--accent);${window.unlockedMatchSet?.has(m.id) ? '' : 'filter:blur(7px);user-select:none'}">${p.score}</div>`}
-        <div style="font-size:11px;color:var(--text-muted)">${_isUCL() ? (m.date||'').slice(5).replace('-','/') + ' ' + (m.time||'') : (m.twDate?.slice(5).replace('-','/')||'') + ' ' + (m.twTime||'')}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${_isClub() ? (m.date||'').slice(5).replace('-','/') + ' ' + (m.time||'') : (m.twDate?.slice(5).replace('-','/')||'') + ' ' + (m.twTime||'')}</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
         <span style="font-weight:700">${at.nameCN}</span>
@@ -619,7 +764,7 @@ function renderPredictions() {
 async function openPredModal(id) {
   const schedule = _matches();
   const match = schedule.find(x => x.id === id);
-  const isKnockout = _isUCL()
+  const isKnockout = _isClub()
     ? false
     : (match && match.phase && match.phase !== 'group');
   const spendType = isKnockout ? 'unlock_knockout' : 'unlock_match'
@@ -658,21 +803,8 @@ async function openPredModal(id) {
   // ── 已完成比賽：顯示賽果 + 數據 + 預測比較 ──────────────
   const isFinished = m.status === 'finished' && m.score;
   if (isFinished) {
-    const isUcl = _isUCL();
-    const phaseLabel = isUcl
-      ? ({league:'聯賽階段',playoff:'附加賽',r16:'十六強',qf:'八強',sf:'四強',final:'決賽'}[m.stage]||'')
-      : ({group:'小組賽',r32:'32強',r16:'16強',qf:'八強',sf:'四強',final:'決賽'}[m.phase]||'');
-    const matchTag = isUcl
-      ? `${phaseLabel}${m.md ? ' MD'+m.md : ''}${m.leg ? ' Leg'+m.leg : ''}`
-      : `${GROUPS[m.group]?.name||''} · ${phaseLabel}`;
-    const matchTime = isUcl
-      ? `🕒 ${(m.date||'').slice(5).replace('-','/')} ${m.time||''}`
-      : `🕒 ${m.twDate?.slice(5).replace('-','/')} ${m.twTime} 台灣時間`;
-    const matchVenue = isUcl
-      ? (m.venue ? `📍 ${m.venue}` : '')
-      : `📍 ${m.venue||''}, ${m.city||''}`;
-    const hRankLabel = isUcl ? `UEFA 係數 ${ht.uefaCoeff}` : `FIFA #${ht.fifaRank}`;
-    const aRankLabel = isUcl ? `UEFA 係數 ${at.uefaCoeff}` : `FIFA #${at.fifaRank}`;
+    const meta = _matchMeta(m);
+    const { matchTag, matchTime, matchVenue, hRankLabel, aRankLabel } = meta;
 
     // 判斷勝負
     const hGoal = m.score.h, aGoal = m.score.a;
@@ -883,18 +1015,8 @@ async function openPredModal(id) {
   // ── 進行中比賽：即時比分 + 進球 + 數據 ──────────────
   const isLive = m.status === 'live';
   if (isLive) {
-    const isUcl = _isUCL();
-    const phaseLabel = isUcl
-      ? ({league:'聯賽階段',playoff:'附加賽',r16:'十六強',qf:'八強',sf:'四強',final:'決賽'}[m.stage]||'')
-      : ({group:'小組賽',r32:'32強',r16:'16強',qf:'八強',sf:'四強',final:'決賽'}[m.phase]||'');
-    const matchTag = isUcl
-      ? `${phaseLabel}${m.md ? ' MD'+m.md : ''}${m.leg ? ' Leg'+m.leg : ''}`
-      : `${GROUPS[m.group]?.name||''} · ${phaseLabel}`;
-    const matchVenue = isUcl
-      ? (m.venue ? `📍 ${m.venue}` : '')
-      : `📍 ${m.venue||''}, ${m.city||''}`;
-    const hRankLabel = isUcl ? `UEFA 係數 ${ht.uefaCoeff}` : `FIFA #${ht.fifaRank}`;
-    const aRankLabel = isUcl ? `UEFA 係數 ${at.uefaCoeff}` : `FIFA #${at.fifaRank}`;
+    const meta = _matchMeta(m);
+    const { matchTag, matchVenue, hRankLabel, aRankLabel } = meta;
     const hGoal = m.score?.h ?? 0, aGoal = m.score?.a ?? 0;
     const minuteText = m.minute ? `${m.minute}'` : '進行中';
 
@@ -993,7 +1115,7 @@ async function openPredModal(id) {
       </div>
 
       <div style="text-align:center;padding:12px;font-size:12px;color:var(--text-muted);border-top:1px solid rgba(255,255,255,0.06)">
-        即時數據每 60 秒自動更新 · <a href="javascript:void(0)" onclick="UCLLive.refresh().then(()=>openPredModal('${m.id}'))" style="color:var(--accent);text-decoration:none">🔄 手動刷新</a>
+        即時數據每 60 秒自動更新 · <a href="javascript:void(0)" onclick="(_isEPL()?EPLLive:UCLLive).refresh().then(()=>openPredModal('${m.id}'))" style="color:var(--accent);text-decoration:none">🔄 手動刷新</a>
       </div>
     `;
     modal.scrollTop = 0;
@@ -1024,21 +1146,8 @@ async function openPredModal(id) {
       </div>
     </div>`;
 
-  const isUcl = _isUCL();
-  const phaseLabel = isUcl
-    ? ({league:'聯賽階段',playoff:'附加賽',r16:'十六強',qf:'八強',sf:'四強',final:'決賽'}[m.stage]||'')
-    : ({group:'小組賽',r32:'32強',r16:'16強',qf:'八強',sf:'四強',final:'決賞'}[m.phase]||'');
-  const matchTag = isUcl
-    ? `${phaseLabel}${m.md ? ' MD'+m.md : ''}${m.leg ? ' Leg'+m.leg : ''}`
-    : `${GROUPS[m.group]?.name||''} · ${phaseLabel}`;
-  const matchTime = isUcl
-    ? `🕒 ${(m.date||'').slice(5).replace('-','/')} ${m.time||''}`
-    : `🕒 ${m.twDate?.slice(5).replace('-','/')} ${m.twTime} 台灣時間`;
-  const matchVenue = isUcl
-    ? (m.venue ? `📍 ${m.venue}` : '')
-    : `📍 ${m.venue||''}, ${m.city||''}`;
-  const hRankLabel = isUcl ? `UEFA 係數 ${ht.uefaCoeff}` : `FIFA #${ht.fifaRank}`;
-  const aRankLabel = isUcl ? `UEFA 係數 ${at.uefaCoeff}` : `FIFA #${at.fifaRank}`;
+  const meta = _matchMeta(m);
+  const { matchTag, matchTime, matchVenue, hRankLabel, aRankLabel } = meta;
 
   document.getElementById('modal-content').innerHTML = `
     <!-- 頂部：賽事資訊 -->
@@ -1074,11 +1183,11 @@ async function openPredModal(id) {
 
     <!-- 你的預測（含鎖定倒數）— 移到最上方 -->
     ${(()=>{
-      const _predPrefix = _isUCL() ? 'ucl26_my_preds' : 'wc26_my_preds';
+      const _predPrefix = {ucl:'ucl26_my_preds',epl:'epl26_my_preds',wc:'wc26_my_preds'}[_tid()] || 'wc26_my_preds';
       const myPreds = (() => { try { return JSON.parse(localStorage.getItem(_predPrefix))||{}; } catch { return {}; } })();
       const mine = myPreds[m.id];
       let kickoffMs = 0;
-      if (_isUCL() && m.date && m.time) kickoffMs = new Date(m.date+'T'+m.time+':00+08:00').getTime();
+      if (_isClub() && m.date && m.time) kickoffMs = new Date(m.date+'T'+m.time+':00+08:00').getTime();
       else if (m.twDate && m.twTime) kickoffMs = new Date(m.twDate+'T'+m.twTime+':00+08:00').getTime();
       const now = Date.now();
       const matchStatus = m.status || (kickoffMs > 0 && now >= kickoffMs ? 'started' : 'scheduled');
@@ -1646,7 +1755,13 @@ function calcPred(ht, at) {
 
   // 排名/係數修正
   let rankAdj, rankGap;
-  if (_isUCL()) {
+  if (_isEPL()) {
+    // 英超：用 eplRank 差（排名越低=越強，用客隊-主隊 + 主場優勢）
+    const rankDiff = (at.eplRank||10) - (ht.eplRank||10);
+    rankAdj = Math.min(20, Math.max(-20, rankDiff * 1.2));
+    rankAdj += 3; // 英超主場優勢加成
+    rankGap = Math.abs(rankDiff);
+  } else if (_isUCL()) {
     // 歐冠：用 UEFA 係數差（正值=主隊強，係數越高越強）
     const coeffDiff = (ht.uefaCoeff||50) - (at.uefaCoeff||50);
     rankAdj = Math.min(20, Math.max(-20, coeffDiff * 0.15));
@@ -1785,19 +1900,25 @@ function closeModal() {
 
 // ── 首頁 Hero 區塊切換 ──────────────────────────────────
 function updateHero() {
-  const isUcl = _isUCL();
+  const t = _tid();
+  const isUcl = t === 'ucl', isEpl = t === 'epl';
   const badge = document.getElementById('hero-badge');
   const title = document.getElementById('hero-title');
   const desc  = document.getElementById('hero-desc');
   const date  = document.getElementById('countdown-date');
   const stats = document.getElementById('hero-stats');
   const label = document.querySelector('.countdown-label');
-  if (badge) badge.textContent = isUcl ? '🏆 UEFA CHAMPIONS LEAGUE 2025/26' : '🏆 2026 FIFA WORLD CUP';
-  if (title) title.innerHTML   = isUcl ? '歐冠<br><span class="hero-highlight">預測分析平台</span>' : '世界盃<br><span class="hero-highlight">預測分析平台</span>';
-  if (desc)  desc.textContent  = isUcl ? '結合AI數據分析，帶你深入解讀2025/26歐冠聯賽每一場對決' : '結合AI數據分析與專家洞察，帶你深入解讀2026美加墨世界盃每一場賽事';
-  if (date)  date.textContent  = isUcl ? '2025年9月17日 開幕 · 歐洲各地' : '2026年6月11日 開幕 · 美國 / 加拿大 / 墨西哥';
-  if (label) label.textContent = isUcl ? '歐冠賽季進行中' : '距離開幕還有';
-  if (stats) stats.innerHTML   = isUcl
+  if (badge) badge.textContent = isEpl ? '🦁 PREMIER LEAGUE 2025/26' : isUcl ? '🏆 UEFA CHAMPIONS LEAGUE 2025/26' : '🏆 2026 FIFA WORLD CUP';
+  if (title) title.innerHTML   = isEpl ? '英超<br><span class="hero-highlight">預測分析平台</span>' : isUcl ? '歐冠<br><span class="hero-highlight">預測分析平台</span>' : '世界盃<br><span class="hero-highlight">預測分析平台</span>';
+  if (desc)  desc.textContent  = isEpl ? '結合AI數據分析，帶你深入解讀2025/26英格蘭超級聯賽每一場對決' : isUcl ? '結合AI數據分析，帶你深入解讀2025/26歐冠聯賽每一場對決' : '結合AI數據分析與專家洞察，帶你深入解讀2026美加墨世界盃每一場賽事';
+  if (date)  date.textContent  = isEpl ? '2025年8月16日 開幕 · 英格蘭' : isUcl ? '2025年9月17日 開幕 · 歐洲各地' : '2026年6月11日 開幕 · 美國 / 加拿大 / 墨西哥';
+  if (label) label.textContent = isEpl ? '英超賽季進行中' : isUcl ? '歐冠賽季進行中' : '距離開幕還有';
+  if (stats) stats.innerHTML   = isEpl
+    ? `<div class="hero-stat"><span class="hero-stat-num">20</span><span class="hero-stat-label">參賽球會</span></div>
+       <div class="hero-stat"><span class="hero-stat-num">380</span><span class="hero-stat-label">場比賽</span></div>
+       <div class="hero-stat"><span class="hero-stat-num">38</span><span class="hero-stat-label">比賽週</span></div>
+       <div class="hero-stat"><span class="hero-stat-num">${window._eplCurrentMatchday || '—'}</span><span class="hero-stat-label">目前輪次</span></div>`
+    : isUcl
     ? `<div class="hero-stat"><span class="hero-stat-num">36</span><span class="hero-stat-label">參賽球會</span></div>
        <div class="hero-stat"><span class="hero-stat-num">189</span><span class="hero-stat-label">場比賽</span></div>
        <div class="hero-stat"><span class="hero-stat-num">8</span><span class="hero-stat-label">聯賽輪次</span></div>
@@ -1811,12 +1932,14 @@ function updateHero() {
 // 倒計時
 (function countdown() {
   function tick() {
-    const isUcl = _isUCL();
-    const target = isUcl
+    const t = _tid();
+    const target = t === 'epl'
+      ? new Date('2025-08-16T12:30:00+01:00')  // EPL 2025/26 開幕
+      : t === 'ucl'
       ? new Date('2025-09-17T21:00:00+02:00')  // UCL 2025/26 開幕
       : new Date('2026-06-11T19:00:00-06:00');   // WC 2026 開幕
     const diff = target - Date.now();
-    const openLabel = isUcl ? '🏆 歐冠賽季進行中！' : '🏆 世界盃已開幕！';
+    const openLabel = t === 'epl' ? '🦁 英超賽季進行中！' : t === 'ucl' ? '🏆 歐冠賽季進行中！' : '🏆 世界盃已開幕！';
     if (diff <= 0) { document.querySelector('.countdown-container').innerHTML = `<div class="countdown-label">${openLabel}</div>`; return; }
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
@@ -1835,6 +1958,69 @@ function renderSchedule(phaseFilter, groupFilter) {
   const el = document.getElementById('schedule-list');
   if (!el) return;
   const _T = _teams();
+
+  if (_isEPL()) {
+    // ── 英超賽程 ──
+    _renderEPLFilters();
+    const mdFilter = groupFilter || 'all';
+    let list = (window.EPL_MATCHES||[]).filter(m => {
+      if (mdFilter !== 'all') {
+        const mdNum = parseInt(mdFilter.replace('mw',''));
+        if (m.matchday && m.matchday !== mdNum) return false;
+      }
+      return true;
+    }).sort((a, b) => (a.date+a.time) < (b.date+b.time) ? -1 : 1);
+
+    if (!list.length) {
+      el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px">⏳</div>載入英超賽程中...<br><small>資料從 football-data.org 即時取得</small></div>';
+      return;
+    }
+
+    let lastDate = '';
+    el.innerHTML = list.map(m => {
+      let header = '';
+      if (m.date && m.date !== lastDate) {
+        lastDate = m.date;
+        const d = new Date(m.date);
+        const days = ['日','一','二','三','四','五','六'];
+        header = `<div class="schedule-day-header">📅 ${m.date.replace(/-/g,'/')} （週${days[d.getDay()]}）</div>`;
+      }
+      const ht = _T[m.home], at = _T[m.away];
+      if (!ht || !at) return header;
+      const isLive = m.status === 'live';
+      const scoreDisplay = isLive && m.score
+        ? `<div class="match-vs live-score" style="font-size:20px;font-weight:800">${m.score.h} - ${m.score.a}</div>${m.minute ? `<div class="live-minute">${m.minute}'</div>` : ''}`
+        : m.status === 'finished' && m.score
+          ? `<div class="match-vs" style="font-size:20px;font-weight:800">${m.score.h} - ${m.score.a}</div>`
+          : `<div class="match-vs">VS</div>`;
+      const eplPreds = (() => { try { return JSON.parse(localStorage.getItem('epl26_my_preds'))||{}; } catch { return {}; } })();
+      const eplMine = eplPreds[m.id];
+      const eplPredTag = (m.status === 'finished' || m.status === 'live') ? '' : eplMine
+        ? `<div class="match-pred-tag predicted">${eplMine.h}-${eplMine.a} 已預測</div>`
+        : `<div class="match-pred-tag">🎯 預測比分</div>`;
+      return header + `<div class="match-card${isLive ? ' match-live' : ''}" onclick="openPredModal('${m.id}')">
+        ${isLive ? '<div class="live-badge"><span class="live-dot"></span>LIVE</div>' : ''}
+        <div class="match-team">
+          <div class="match-team-flag">${flagImg(ht.flag)}</div>
+          <div><div class="match-team-name">${ht.nameCN}</div><div class="match-team-sub">英超 #${ht.eplRank||''}</div></div>
+        </div>
+        <div class="match-center">
+          ${scoreDisplay}
+          <div class="match-time">${isLive ? '⚽ 進行中' : m.time||''}</div>
+          <div class="match-date">${m.date?.slice(5).replace('-','/')||''}</div>
+          <div class="match-meta">
+            <span class="match-tag group">${m.matchday ? '第'+m.matchday+'輪' : ''}</span>
+          </div>
+          ${eplPredTag}
+        </div>
+        <div class="match-team away">
+          <div class="match-team-flag">${flagImg(at.flag)}</div>
+          <div><div class="match-team-name">${at.nameCN}</div><div class="match-team-sub">英超 #${at.eplRank||''}</div></div>
+        </div>
+      </div>`;
+    }).join('');
+    return;
+  }
 
   if (_isUCL()) {
     // ── 歐冠賽程 ──
@@ -1974,6 +2160,23 @@ function renderSchedule(phaseFilter, groupFilter) {
 }
 
 // 歐冠賽程篩選器
+function _renderEPLFilters() {
+  const phaseEl = document.getElementById('phase-filter');
+  const groupEl = document.getElementById('group-filter');
+  if (phaseEl) {
+    phaseEl.innerHTML = '<button class="filter-tab active" data-phase="all">全部</button>';
+  }
+  if (groupEl) {
+    // 顯示比賽週篩選器（取得已有的 matchday）
+    const matchdays = [...new Set((window.EPL_MATCHES||[]).map(m => m.matchday).filter(Boolean))].sort((a,b) => a-b);
+    const currentMD = window._eplCurrentMatchday || matchdays[matchdays.length - 1] || 1;
+    groupEl.innerHTML = '<button class="filter-tab active" data-group="all">全部</button>' +
+      matchdays.slice(-10).map(d => `<button class="filter-tab${d===currentMD?' highlight':''}" data-group="mw${d}">第${d}輪</button>`).join('');
+    const label = groupEl.closest('.filter-group')?.querySelector('label');
+    if (label) label.textContent = '比賽週';
+  }
+}
+
 function _renderUCLFilters() {
   const phaseEl = document.getElementById('phase-filter');
   const groupEl = document.getElementById('group-filter');
@@ -2013,6 +2216,28 @@ function renderTeams(confFilter, search) {
   if (!el) return;
   const _T = _teams();
 
+  if (_isEPL()) {
+    _renderEPLTeamFilters();
+    let list = Object.entries(_T).filter(([code, t]) => {
+      if (confFilter && confFilter !== 'all') {
+        if (confFilter === 'top6' && (t.eplRank||99) > 6) return false;
+        if (confFilter === 'mid' && ((t.eplRank||0) <= 6 || (t.eplRank||0) > 14)) return false;
+        if (confFilter === 'bottom' && (t.eplRank||0) <= 14) return false;
+      }
+      if (search && !t.nameCN.includes(search) && !t.name.toLowerCase().includes(search.toLowerCase())) return false;
+      return true;
+    }).sort((a,b) => (a[1].eplRank||99) - (b[1].eplRank||99));
+    el.innerHTML = list.map(([code, t]) => `
+      <div class="team-card" onclick="openTeamModal('${code}')">
+        <div class="team-card-flag">${flagImg(t.flag)}</div>
+        <div class="team-card-name">${t.nameCN}</div>
+        <div class="team-card-conf">英超</div>
+        <div class="team-card-rank">排名 #${t.eplRank||'?'}</div>
+        <div class="team-card-group">${t.coach||''}</div>
+      </div>`).join('');
+    return;
+  }
+
   if (_isUCL()) {
     // 更新篩選器為 Pot
     _renderUCLTeamFilters();
@@ -2049,6 +2274,15 @@ function renderTeams(confFilter, search) {
     </div>`).join('');
 }
 
+function _renderEPLTeamFilters() {
+  const confEl = document.getElementById('conf-filter');
+  if (confEl) {
+    confEl.innerHTML = [['all','全部'],['top6','前六'],['mid','中游'],['bottom','後段']].map(([v,l]) =>
+      `<button class="filter-tab${v==='all'?' active':''}" data-conf="${v}">${l}</button>`
+    ).join('');
+  }
+}
+
 function _renderUCLTeamFilters() {
   const confEl = document.getElementById('conf-filter');
   if (confEl) {
@@ -2075,6 +2309,112 @@ function _renderWCTeamFilters() {
 function renderStats(tab) {
   const el = document.getElementById('stats-content');
   if (!el) return;
+
+  // ── 英超數據頁 ──
+  if (_isEPL() && tab === 'standings') {
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
+      <div style="font-size:24px;margin-bottom:8px">⏳</div>載入積分榜中...</div>`;
+    fetch('/api/epl-standings').then(r => r.json()).then(data => {
+      if (!data.ok || !data.standings?.length) {
+        el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
+          <div style="font-size:24px;margin-bottom:8px">📊</div>暫無數據</div>`;
+        return;
+      }
+      window._eplStandings = data.standings;
+      window._eplCurrentMatchday = data.matchday;
+      const _T = _teams();
+      const rows = data.standings.map((row, i) => {
+        const code = row.teamTla;
+        const t = _T[code];
+        const crest = t?.flag || row.teamCrest || '';
+        const name = t?.nameCN || row.team;
+        const zone = row.position <= 4 ? 'standings-qualify' : row.position >= 18 ? 'standings-elim' : '';
+        return `<tr class="${zone}">
+          <td class="standings-pos">${row.position}</td>
+          <td>${flagImg(crest)} ${name}</td>
+          <td>${row.playedGames}</td><td>${row.won}</td><td>${row.draw}</td><td>${row.lost}</td>
+          <td>${row.goalsFor}</td><td>${row.goalsAgainst}</td><td>${row.goalDifference>0?'+':''}${row.goalDifference}</td>
+          <td><strong>${row.points}</strong></td>
+          <td style="font-size:11px;letter-spacing:1px">${(row.form||'').split(',').map(f => f === 'W' ? '<span style="color:#4caf50">W</span>' : f === 'L' ? '<span style="color:#ef5350">L</span>' : '<span style="color:#ff9800">D</span>').join('')}</td>
+        </tr>`;
+      }).join('');
+      el.innerHTML = `
+        <div style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px">
+          <span style="color:#4caf50">● 1-4 歐冠資格</span>
+          <span style="color:#ff9800">● 5-6 歐霸</span>
+          <span style="color:#ef5350">● 18-20 降級區</span>
+          <span style="color:var(--text-muted)">🟢 即時數據（football-data.org）· 第 ${data.matchday||'?'} 輪</span>
+        </div>
+        <div class="standings-group">
+          <h3>🦁 2025/26 英超積分榜</h3>
+          <table class="standings-table">
+            <thead><tr><th>#</th><th>球隊</th><th>賽</th><th>勝</th><th>平</th><th>負</th><th>進</th><th>失</th><th>淨</th><th>積分</th><th>狀態</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }).catch(() => {
+      el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
+        <div style="font-size:24px;margin-bottom:8px">⚠️</div>載入失敗，請稍後再試</div>`;
+    });
+    return;
+  }
+
+  if (_isEPL() && (tab === 'epl-scorers' || tab === 'epl-assists')) {
+    const isScorers = tab === 'epl-scorers';
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
+      <div style="font-size:24px;margin-bottom:8px">⏳</div>載入中...</div>`;
+    fetch('/api/epl-scorers').then(r => r.json()).then(data => {
+      if (!data.ok || (!data.topScorers?.length && !data.topAssists?.length)) {
+        el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
+          <div style="font-size:24px;margin-bottom:8px">📊</div>暫無數據</div>`;
+        return;
+      }
+      const list = isScorers ? data.topScorers : data.topAssists;
+      const valKey = isScorers ? 'goals' : 'assists';
+      const unit = isScorers ? '球' : '助攻';
+      const title = isScorers ? '⚽ 英超射手榜' : '🅰️ 英超助攻榜';
+      el.innerHTML = `
+        <div style="margin-bottom:12px;color:#4caf50;font-size:13px">🟢 即時數據（football-data.org）</div>
+        <h3 style="margin-bottom:16px">${title}</h3>
+        <div class="scorers-list">${(list || []).slice(0, 15).map((p, i) => `
+          <div class="scorer-card">
+            <div class="scorer-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div>
+            <div class="scorer-flag">${p.teamCrest ? `<img src="${p.teamCrest}" style="height:20px;width:20px;object-fit:contain" alt="">` : ''}</div>
+            <div class="scorer-info">
+              <div class="scorer-name">${p.name}</div>
+              <div class="scorer-sub">${p.team}${p.playedMatches ? ` · ${p.playedMatches}場` : ''}${isScorers && p.assists ? ` · ${p.assists}助攻` : ''}${!isScorers && p.goals ? ` · ${p.goals}球` : ''}</div>
+            </div>
+            <div class="scorer-stat">${p[valKey]} ${unit}</div>
+          </div>`).join('')}</div>`;
+    }).catch(() => {
+      el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
+        <div style="font-size:24px;margin-bottom:8px">⚠️</div>載入失敗，請稍後再試</div>`;
+    });
+    return;
+  }
+
+  if (_isEPL() && tab === 'rankings') {
+    const _T = _teams();
+    const sorted = Object.entries(_T).sort((a,b) => {
+      const ra = a[1].radar, rb = b[1].radar;
+      const sa = ra.attack + ra.defense + ra.midfield + ra.speed + ra.experience;
+      const sb = rb.attack + rb.defense + rb.midfield + rb.speed + rb.experience;
+      return sb - sa;
+    });
+    el.innerHTML = `<div class="scorers-list">${sorted.map(([code,t],i) => {
+      const total = t.radar.attack + t.radar.defense + t.radar.midfield + t.radar.speed + t.radar.experience;
+      return `<div class="scorer-card">
+        <div class="scorer-rank ${i<3?['gold','silver','bronze'][i]:''}">${i+1}</div>
+        <div class="scorer-flag">${flagImg(t.flag)}</div>
+        <div class="scorer-info">
+          <div class="scorer-name">${t.nameCN}</div>
+          <div class="scorer-sub">${t.coach} · ${t.formation}</div>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:var(--accent)">實力 ${total}</div>
+      </div>`;
+    }).join('')}</div>`;
+    return;
+  }
 
   if (_isUCL() && tab === 'standings') {
     // 歐冠：聯賽階段完整積分表
@@ -2406,7 +2746,7 @@ function renderFocus() {
   const grid = document.getElementById('focus-articles');
   if (!main || !grid) return;
 
-  if (_isUCL()) {
+  if (_isClub()) {
     const arts = _articles();
     if (!arts.length) { main.innerHTML = ''; grid.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">暫無文章</div>'; return; }
     const [first, ...rest] = arts;
@@ -2517,9 +2857,13 @@ function openTeamModal(code) {
   const strengths = (t.strengths||[]).map(s => `<div class="strength-item">${s}</div>`).join('');
   const weaknesses = (t.weaknesses||[]).map(w => `<div class="weakness-item">${w}</div>`).join('');
 
-  const isUcl = _isUCL();
-  const subLine = isUcl ? `${t.name} · ${t.league}` : `${t.name} · ${CONF_LABELS[t.conf]||t.conf}`;
-  const badges = isUcl
+  const tid = _tid();
+  const subLine = _isClub() ? `${t.name} · ${t.league||''}` : `${t.name} · ${CONF_LABELS[t.conf]||t.conf}`;
+  const badges = tid === 'epl'
+    ? `<span class="match-tag group">英超 #${t.eplRank||'?'}</span>
+       <span class="match-tag">主帥：${t.coach}</span>
+       <span class="match-tag">${t.formation}</span>`
+    : tid === 'ucl'
     ? `<span class="match-tag group">第${t.pot}檔</span>
        <span class="match-tag">UEFA 係數 ${t.uefaCoeff}</span>
        <span class="match-tag">主帥：${t.coach}</span>
@@ -2741,7 +3085,7 @@ function saveMyPred(matchId) {
   const match = _matches().find(m => m.id === matchId);
   if (match) {
     let ko = 0;
-    if (_isUCL() && match.date && match.time) ko = new Date(match.date+'T'+match.time+':00+08:00').getTime();
+    if (_isClub() && match.date && match.time) ko = new Date(match.date+'T'+match.time+':00+08:00').getTime();
     else if (match.twDate && match.twTime) ko = new Date(match.twDate+'T'+match.twTime+':00+08:00').getTime();
     const started = (match.status && match.status !== 'scheduled') || (ko > 0 && Date.now() >= ko);
     if (started) {
@@ -2752,7 +3096,7 @@ function saveMyPred(matchId) {
   }
   const h = parseInt(document.getElementById('my-pred-h')?.textContent || 0);
   const a = parseInt(document.getElementById('my-pred-a')?.textContent || 0);
-  const predKey = _isUCL() ? 'ucl26_my_preds' : 'wc26_my_preds';
+  const predKey = {ucl:'ucl26_my_preds',epl:'epl26_my_preds',wc:'wc26_my_preds'}[_tid()] || 'wc26_my_preds';
   const myPreds = (() => { try { return JSON.parse(localStorage.getItem(predKey))||{}; } catch { return {}; } })();
   myPreds[matchId] = { h, a, savedAt: new Date().toISOString() };
   localStorage.setItem(predKey, JSON.stringify(myPreds));

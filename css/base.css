@@ -57,6 +57,22 @@
   --border-accent:  rgba(26,115,232,0.40);
 }
 
+/* ---------- 英超主題色覆蓋 ---------- */
+[data-tournament-active="epl"] {
+  --accent:         #00ff87;
+  --accent-dk:      #00cc6a;
+  --accent-glow:    rgba(0,255,135,0.30);
+  --accent-bg:      rgba(0,255,135,0.10);
+  --accent-bg-deep: rgba(0,255,135,0.05);
+  --accent-border:  rgba(0,255,135,0.40);
+  --accent-gradient: linear-gradient(90deg, #00ff87, #04f5ff);
+  --hero-gradient:  linear-gradient(160deg, rgba(61,25,91,0.15) 0%, transparent 40%),
+                    linear-gradient(220deg, rgba(0,255,135,0.08) 0%, transparent 40%);
+  --particle-a:     rgba(0,255,135,0.06);
+  --particle-b:     rgba(61,25,91,0.08);
+  --border-accent:  rgba(0,255,135,0.40);
+}
+
 /* ---------- 重置 ---------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
