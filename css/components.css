@@ -2323,12 +2323,14 @@ img.flag-img {
   animation: rogueKick 2s ease-in-out infinite;
 }
 @keyframes rogueKick {
-  0%   { transform: scale(0.15) translateY(30px) rotate(0deg); opacity: 0; }
-  15%  { opacity: 1; }
-  50%  { transform: scale(1) translateY(0) rotate(360deg); opacity: 1; }
-  70%  { transform: scale(1.15) translateY(-2px) rotate(400deg); opacity: 1; }
-  85%  { transform: scale(1.05) translateY(0) rotate(420deg); opacity: 0.8; }
-  100% { transform: scale(0.15) translateY(30px) rotate(720deg); opacity: 0; }
+  0%   { transform: scale(2.5) translateY(40px) rotate(0deg); opacity: 0; }
+  8%   { opacity: 1; }
+  35%  { transform: scale(1) translateY(0) rotate(360deg); opacity: 1; }
+  45%  { transform: scale(0.95) translateY(2px) rotate(380deg); opacity: 1; }
+  55%  { transform: scale(1) translateY(0) rotate(400deg); opacity: 1; }
+  65%  { transform: scale(1) translateY(0) rotate(400deg); opacity: 1; }
+  80%  { transform: scale(0.8) translateY(40px) rotate(440deg); opacity: 0.5; }
+  100% { transform: scale(0.5) translateY(60px) rotate(500deg); opacity: 0; }
 }
 .rogue-arena-banner-title {
   font-size: 16px; font-weight: 900; color: #fff;
