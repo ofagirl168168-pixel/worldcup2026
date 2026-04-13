@@ -2273,6 +2273,80 @@ img.flag-img {
   .rogue-home-banner-rewards { justify-content: center; }
 }
 
+/* ========== 競技場射門挑戰橫幅 ========== */
+.rogue-arena-banner {
+  position: relative; overflow: hidden; cursor: pointer;
+  margin: 0 auto 24px; max-width: 600px;
+  border-radius: 16px;
+  border: 1px solid rgba(76,175,80,0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.rogue-arena-banner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(76,175,80,0.3);
+}
+.rogue-arena-banner-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #0d3b15 0%, #1a5c28 40%, #0a2e10 100%);
+}
+.rogue-arena-banner-bg::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 18px,
+    rgba(255,255,255,0.02) 18px, rgba(255,255,255,0.02) 19px
+  );
+}
+.rogue-arena-banner-bg::after {
+  content: ''; position: absolute; right: -20px; top: -20px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(76,175,80,0.15) 0%, transparent 70%);
+}
+.rogue-arena-banner-content {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px; gap: 14px;
+}
+.rogue-arena-banner-left {
+  display: flex; align-items: center; gap: 14px;
+}
+.rogue-arena-banner-icon {
+  font-size: 32px;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.08);
+  border-radius: 14px; flex-shrink: 0;
+  border: 1px solid rgba(76,175,80,0.25);
+}
+.rogue-arena-banner-title {
+  font-size: 16px; font-weight: 900; color: #fff;
+  margin-bottom: 4px;
+}
+.rogue-arena-banner-desc {
+  font-size: 11px; color: rgba(255,255,255,0.5);
+  line-height: 1.5;
+}
+.rogue-arena-banner-btn {
+  flex-shrink: 0;
+  font-size: 13px; font-weight: 800; color: #fff;
+  padding: 10px 20px; border-radius: 10px;
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  box-shadow: 0 3px 12px rgba(76,175,80,0.35);
+  transition: box-shadow 0.2s, transform 0.15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.rogue-arena-banner-btn span {
+  font-size: 10px; opacity: 0.8;
+}
+.rogue-arena-banner:hover .rogue-arena-banner-btn {
+  box-shadow: 0 4px 18px rgba(76,175,80,0.5);
+  transform: scale(1.03);
+}
+@media (max-width: 480px) {
+  .rogue-arena-banner-content { flex-direction: column; text-align: center; }
+  .rogue-arena-banner-left { flex-direction: column; }
+  .rogue-arena-banner-btn { width: 100%; justify-content: center; }
+}
+
 /* ========== 射門挑戰首頁排行榜 ========== */
 .rogue-home-lb {
   margin-top: 12px;

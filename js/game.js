@@ -689,12 +689,18 @@ function renderArena() {
     </div>
 
     <!-- 射門挑戰入口 -->
-    <div style="margin:0 auto 24px;max-width:600px;padding:14px 18px;border-radius:12px;background:linear-gradient(135deg,rgba(45,122,58,0.25),rgba(0,0,0,0.3));border:1px solid rgba(76,175,80,0.3);display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="startRogueGame()">
-      <div>
-        <div style="font-size:15px;font-weight:800;color:#fff">⚽ 射門挑戰 <span style="font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(255,70,70,0.2);color:#ff6b6b;margin-left:5px">NEW</span></div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:3px">第一人稱射門 × 卡牌 Build × 無盡生存</div>
+    <div class="rogue-arena-banner" onclick="startRogueGame()">
+      <div class="rogue-arena-banner-bg"></div>
+      <div class="rogue-arena-banner-content">
+        <div class="rogue-arena-banner-left">
+          <div class="rogue-arena-banner-icon">⚽</div>
+          <div>
+            <div class="rogue-arena-banner-title">射門挑戰：前進世界盃</div>
+            <div class="rogue-arena-banner-desc">射門 × 卡牌 Build × 無盡生存｜週排行前三名贏寶石</div>
+          </div>
+        </div>
+        <div class="rogue-arena-banner-btn">開始遊戲<span>▶</span></div>
       </div>
-      <div style="font-size:12px;font-weight:700;color:#4caf50;white-space:nowrap">開始遊戲 →</div>
     </div>
 
     <!-- 四大功能卡 -->
