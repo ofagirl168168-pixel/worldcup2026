@@ -988,12 +988,18 @@
 
     // 上傳 Supabase（已登入時）
     if (typeof currentUser !== 'undefined' && currentUser && typeof callEdge === 'function') {
-      callEdge('submit-rogue-score', { score: G.score, wave: G.wave }).then(res => {
-        if (res.error) console.warn('submit-rogue-score:', res.error);
-        // 重新載入排行榜
+      const _score = G.score, _wave = G.wave;
+      callEdge('submit-rogue-score', { score: _score, wave: _wave }).then(res => {
+        if (res.error) { console.warn('submit-rogue-score:', res.error); return; }
+        console.log('分數已上傳:', _score, 'wave:', _wave);
+        // 重新載入排行榜（遊戲內+首頁）
         _rogueBoardLoaded = false;
-        loadRogueBoards();
+        loadRogueBoards().then(() => {
+          if (typeof renderRogueLeaderboard === 'function') renderRogueLeaderboard();
+        });
       });
+    } else {
+      console.log('未登入，分數未上傳');
     }
   }
 
