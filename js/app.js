@@ -72,11 +72,11 @@ function _dailyQ() { return _isUCL() ? (window.UCL_DAILY_QUESTIONS||[]) : (typeo
 // 首頁：冠軍預測
 function renderChampions() {
   const top5 = _isUCL() ? [
-    {code:'BAR', prob:'22%', desc:'Yamal+Pedri黃金組合，Flick高壓成型'},
-    {code:'LIV', prob:'20%', desc:'Slot首季帶隊勢如破竹'},
-    {code:'RMA', prob:'18%', desc:'歐冠DNA，Mbappé加持'},
-    {code:'MCI', prob:'15%', desc:'Haaland+Guardiola體系成熟'},
-    {code:'BAY', prob:'10%', desc:'Kane進球機器，渴望歐冠金盃'}
+    {code:'BAR', prob:'23%', desc:'Yamal+Pedri黃金世代，Flick體系第二年更成熟'},
+    {code:'RMA', prob:'20%', desc:'歐冠之王DNA，Mbappé+Bellingham雙核驅動'},
+    {code:'LIV', prob:'18%', desc:'Slot體系穩定輸出，英超+歐冠雙線爭冠'},
+    {code:'ARS', prob:'14%', desc:'Saka+Rice領軍，槍手劍指隊史第二座歐冠'},
+    {code:'BAY', prob:'10%', desc:'Kane+Musiala組合，拜仁渴望重返歐洲之巔'}
   ] : [
     {code:'FRA', prob:'29%', desc:'陣容最均衡，Mbappé狀態巔峰'},
     {code:'BRA', prob:'24%', desc:'雙翼最強，渴望第六星'},
@@ -433,16 +433,16 @@ function renderHighlights() {
   ];
 
   const uclItems = [
-    {title:'新制歐冠元年',desc:'36隊瑞士制取代傳統小組賽，8場聯賽階段讓每輪都充滿懸念'},
-    {title:'皇馬王朝能否延續？',desc:'15冠豪門加入 Mbappé 後火力全開，劍指史無前例的連霸'},
-    {title:'巴薩 Yamal 世代崛起',desc:'17歲的 Lamine Yamal 領軍，巴薩青春風暴席捲歐冠'},
-    {title:'曼城的衛冕挑戰',desc:'Haaland+De Bruyne 組合能否再次征服歐洲，Guardiola 續寫傳奇？'},
-    {title:'Arsenal 的歐冠回歸',desc:'闊別多年重返歐冠淘汰賽，Saka 領軍的槍手能走多遠？'},
-    {title:'拜仁慕尼黑的復仇之路',desc:'去年準決賽出局，Kane+Musiala 組合誓言捲土重來'},
-    {title:'PSG 後 Mbappé 時代',desc:'失去頭號球星後，Dembélé 能否扛起巴黎的歐冠夢？'},
-    {title:'國際米蘭衛冕之路',desc:'意甲霸主再戰歐冠，Lautaro 領銜的藍黑軍團實力不容小覷'},
-    {title:'多特蒙德黃牆再響',desc:'去年闖入決賽的黑馬能否再創奇蹟？黃牆威力依舊震撼'},
-    {title:'VAR 與新越位技術',desc:'半自動越位系統全面啟用，科技如何改變歐冠的判罰爭議？'}
+    {title:'瑞士制第二年更精彩',desc:'新賽制經過首年磨合，36隊混戰格局讓排名懸念延續到最後一輪'},
+    {title:'巴薩 Yamal 世代全面爆發',desc:'Lamine Yamal 率領巴薩青年軍，Flick 體系第二年劍指歐冠冠軍'},
+    {title:'皇馬 Mbappé 磨合完成',desc:'Mbappé 融入皇馬第二季，與 Bellingham、Vinícius 三叉戟全面開火'},
+    {title:'Arsenal 的歐冠野心',desc:'連續征戰歐冠的槍手越來越成熟，Saka+Rice 帶隊衝擊四強'},
+    {title:'拜仁重返巔峰之路',desc:'Kane+Musiala 組合火力全開，拜仁能否重現歐冠榮光？'},
+    {title:'國際米蘭再戰歐洲',desc:'Lautaro 領銜的藍黑軍團，意甲霸主力爭歐冠突破'},
+    {title:'利物浦 Slot 體系成熟',desc:'Slot 執教第二季戰術更穩定，紅軍瞄準第七座歐冠獎盃'},
+    {title:'巴黎聖日耳曼重建進行式',desc:'後 Mbappé 時代的巴黎，新陣容能否在歐冠證明自己？'},
+    {title:'決賽在布達佩斯',desc:'2025/26 歐冠決賽移師匈牙利普斯卡什球場，中歐足球盛宴'},
+    {title:'VAR 與半自動越位技術',desc:'科技持續改變歐冠判罰，爭議是否因此減少？'}
   ];
 
   const items = _isUCL() ? uclItems : wcItems;
