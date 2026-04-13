@@ -72,6 +72,15 @@ async function unlockDeepAnalysis(matchId) {
   return await spendGemForMatch(matchId, 'unlock_deep')
 }
 
+// ── 遊戲內消費寶石（射門挑戰等）──────────────────────────
+async function spendGemForGame(spendType) {
+  if (!currentUser) return { error: '未登入' }
+  const result = await callEdge('spend-gem', { spend_type: spendType })
+  if (result.error) return result
+  updateGemUI(result.balance)
+  return result
+}
+
 // ── 取得目前寶石餘額 ──────────────────────────────────────
 async function fetchGemBalance() {
   if (!currentUser) return 0

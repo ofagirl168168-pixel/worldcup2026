@@ -10,7 +10,12 @@ const COSTS: Record<string, number> = {
   unlock_knockout:    2,  // 淘汰賽預測
   unlock_deep:        2,  // 深度分析
   first_free:         0,  // 首次免費（每用戶限一次）
+  rogue_revive:       3,  // 射門挑戰：復活
+  rogue_reroll:       1,  // 射門挑戰：重新抽卡
 }
+
+// 遊戲類消費不需要檢查重複解鎖
+const GAME_TYPES = new Set(['rogue_revive', 'rogue_reroll'])
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -26,10 +31,13 @@ Deno.serve(async (req) => {
     if (authErr || !user) return errorRes('驗證失敗', 401)
 
     const { match_id, spend_type } = await req.json()
-    if (!match_id) return errorRes('缺少 match_id', 400)
 
     const txType = spend_type && COSTS[spend_type] !== undefined ? spend_type : 'unlock_match'
     const cost = COSTS[txType]
+    const isGame = GAME_TYPES.has(txType)
+
+    // 非遊戲類消費需要 match_id
+    if (!isGame && !match_id) return errorRes('缺少 match_id', 400)
 
     // first_free：每位用戶全站只能用一次
     if (txType === 'first_free') {
@@ -42,18 +50,21 @@ Deno.serve(async (req) => {
       if (alreadyUsed) return errorRes('首次免費已使用', 409)
     }
 
-    // 檢查是否已解鎖（不重複扣）— 深度分析與比賽解鎖分開計算
-    const typesToCheck = txType === 'unlock_deep'
-      ? ['unlock_deep']
-      : ['unlock_match', 'unlock_knockout', 'first_free']
-    const { data: unlocked } = await db
-      .from('gem_transactions')
-      .select('id')
-      .eq('user_id', user.id)
-      .in('type', typesToCheck)
-      .eq('ref_id', match_id)
-      .maybeSingle()
-    if (unlocked) return okRes({ already_unlocked: true, balance: await getBalance(db, user.id) })
+    // 遊戲類消費不檢查重複（每次都是新消費）
+    if (!isGame) {
+      // 檢查是否已解鎖（不重複扣）— 深度分析與比賽解鎖分開計算
+      const typesToCheck = txType === 'unlock_deep'
+        ? ['unlock_deep']
+        : ['unlock_match', 'unlock_knockout', 'first_free']
+      const { data: unlocked } = await db
+        .from('gem_transactions')
+        .select('id')
+        .eq('user_id', user.id)
+        .in('type', typesToCheck)
+        .eq('ref_id', match_id)
+        .maybeSingle()
+      if (unlocked) return okRes({ already_unlocked: true, balance: await getBalance(db, user.id) })
+    }
 
     // 檢查餘額（first_free 費用為 0，直接通過）
     const balance = await getBalance(db, user.id)
@@ -64,12 +75,12 @@ Deno.serve(async (req) => {
       user_id: user.id,
       type: txType,
       amount: -cost,
-      ref_id: match_id,
+      ref_id: isGame ? null : match_id,
       date: today,
     })
     if (spendErr) throw spendErr
 
-    return okRes({ unlocked: true, cost, balance: balance - cost })
+    return okRes({ success: true, cost, balance: balance - cost })
 
   } catch (e) {
     console.error(e)

@@ -342,8 +342,15 @@
       // cards UI
       cardPick: [],
       _cardR: [],               // click rects
+      _rerollR: null,           // reroll 按鈕區域
+      _rerollsLeft: 2,          // 本波剩餘 reroll 次數
+      _rerolling: false,        // reroll 請求中
       _restartR: null,
       _closeR: null,
+      _reviveR: null,           // 復活按鈕區域
+      _revived: false,          // 本局是否已復活
+      _reviving: false,         // 復活請求中
+      _resultSaved: false,      // 本局成績是否已儲存
 
       // wave spawn
       spawnQueue: [],
@@ -803,7 +810,7 @@
         shakeAmt = 12;
         sfxLoseLife();
         addPart(d.x, 30, '', 1.2, 'breach');
-        if (G.lives <= 0) { G.phase = 'gameover'; G._gameoverStart = performance.now(); sfxGameOver(); stopBGM(); saveResult(); return; }
+        if (G.lives <= 0) { G.phase = 'gameover'; G._gameoverStart = performance.now(); sfxGameOver(); stopBGM(); G._resultSaved = false; return; }
       }
     }
     G.defs = G.defs.filter(d => d.hp > 0);
@@ -887,6 +894,7 @@
     addPart(0, GOAL_Z - 50, 'GOAL!', 1.5, 'goal');
     G.phase = 'cards';
     G.cardPick = pickCards(3);
+    G._rerollsLeft = 2;  // 每波重置 reroll 次數
     G._cardRevealStart = performance.now(); // 卡片逐張進場計時
   }
 
@@ -4188,12 +4196,44 @@
       ctx.globalAlpha = 1;
     });
 
-    // 提示文字（全部翻完才顯示）
+    // 提示文字 + Reroll 按鈕（全部翻完才顯示）
     if (allRevealed) {
       ctx.fillStyle = 'rgba(255,255,255,0.4)';
       ctx.font = `${Math.min(14, W * 0.03)}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText('點擊卡片選擇', W / 2, H * 0.88);
+      ctx.fillText('點擊卡片選擇', W / 2, H * 0.85);
+
+      // Reroll 按鈕
+      const hasLogin = typeof currentUser !== 'undefined' && !!currentUser;
+      const canReroll = hasLogin && G._rerollsLeft > 0;
+      const rbtnW = Math.min(220, W * 0.5), rbtnH = 38;
+      const rbtnX = W / 2 - rbtnW / 2, rbtnY = H * 0.89;
+      G._rerollR = canReroll ? { x: rbtnX, y: rbtnY, w: rbtnW, h: rbtnH } : null;
+
+      if (canReroll) {
+        rr(ctx, rbtnX, rbtnY, rbtnW, rbtnH, 10);
+        ctx.fillStyle = G._rerolling ? 'rgba(156,39,176,0.3)' : 'rgba(156,39,176,0.6)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(156,39,176,0.8)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
+        ctx.fillText(G._rerolling ? '處理中...' : `🔄 重新抽卡（💎1）剩 ${G._rerollsLeft} 次`, W / 2, rbtnY + 25);
+      }
+
+      // Reroll toast
+      if (G._rerollToast && performance.now() - (G._rerollToastT || 0) < 2000) {
+        const ta = Math.min(1, (2000 - (performance.now() - G._rerollToastT)) / 500);
+        ctx.globalAlpha = ta;
+        const tw = Math.min(200, W * 0.5);
+        rr(ctx, W / 2 - tw / 2, H * 0.06, tw, 32, 8);
+        ctx.fillStyle = 'rgba(0,0,0,0.85)'; ctx.fill();
+        ctx.fillStyle = '#ff5252';
+        ctx.font = `bold ${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
+        ctx.fillText(G._rerollToast, W / 2, H * 0.06 + 22);
+        ctx.globalAlpha = 1;
+      }
     }
   }
 
@@ -4360,6 +4400,54 @@
       nextY += lbPanelH + 8;
     }
 
+    // ── 復活按鈕 ──
+    const hasLogin = typeof currentUser !== 'undefined' && !!currentUser;
+    const canRevive = hasLogin && !G._revived && !G._reviving;
+    if (canRevive && fade >= 1) {
+      const rvW = Math.min(240, W * 0.5), rvH = 46;
+      const rvX = W / 2 - rvW / 2, rvY = nextY + 4;
+      G._reviveR = { x: rvX, y: rvY, w: rvW, h: rvH };
+
+      // 閃光背景
+      const pulse = 0.6 + 0.4 * Math.sin(performance.now() / 300);
+      rr(ctx, rvX, rvY, rvW, rvH, 12);
+      ctx.fillStyle = `rgba(255,152,0,${0.15 * pulse})`;
+      ctx.fill();
+      ctx.strokeStyle = `rgba(255,152,0,${0.7 * pulse})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffa726';
+      ctx.font = `bold ${Math.min(16, W * 0.032)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('💎 復活繼續（3 寶石）', W / 2, rvY + 20);
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = `${Math.min(11, W * 0.021)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('保留所有卡牌，復活 2 條命', W / 2, rvY + 38);
+
+      nextY = rvY + rvH + 8;
+    } else {
+      G._reviveR = null;
+      if (G._reviving) {
+        ctx.fillStyle = '#ffa726';
+        ctx.font = `bold ${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
+        ctx.fillText('復活中...', W / 2, nextY + 20);
+        nextY += 40;
+      }
+    }
+
+    // 復活 toast
+    if (G._reviveToast && performance.now() - (G._reviveToastT || 0) < 2500) {
+      const ta = Math.min(1, (2500 - (performance.now() - G._reviveToastT)) / 500);
+      ctx.globalAlpha = ta;
+      const tw = Math.min(220, W * 0.55);
+      rr(ctx, W / 2 - tw / 2, H * 0.06, tw, 32, 8);
+      ctx.fillStyle = 'rgba(0,0,0,0.85)'; ctx.fill();
+      ctx.fillStyle = '#ff5252';
+      ctx.font = `bold ${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText(G._reviveToast, W / 2, H * 0.06 + 22);
+      ctx.globalAlpha = 1;
+    }
+
     // ── 按鈕區 ──
     if (fade >= 1) {
       const btnW = Math.min(200, W * 0.4), btnH = 42;
@@ -4485,6 +4573,21 @@
       const CARD_REVEAL_EACH = 500;
       const elapsed = performance.now() - (G._cardRevealStart || 0);
       if (elapsed < G.cardPick.length * CARD_REVEAL_EACH) return;
+      // Reroll 按鈕
+      if (hitTest(x, y, G._rerollR) && G._rerollsLeft > 0 && !G._rerolling) {
+        G._rerolling = true;
+        (async () => {
+          const result = await spendGemForGame?.('rogue_reroll');
+          G._rerolling = false;
+          if (result?.error === '寶石不足') { G._rerollToast = '寶石不足'; G._rerollToastT = performance.now(); return; }
+          if (result?.error) { G._rerollToast = result.error; G._rerollToastT = performance.now(); return; }
+          // 成功：重新抽卡
+          G._rerollsLeft--;
+          G.cardPick = pickCards(3);
+          G._cardRevealStart = performance.now();
+        })();
+        return;
+      }
       for (const r of (G._cardR || [])) {
         if (hitTest(x, y, r)) { selectCard(r.idx); return; }
       }
@@ -4493,10 +4596,27 @@
     if (G.phase === 'gameover') {
       // 死亡 1 秒內不能點
       if (performance.now() - (G._gameoverStart || 0) < 1000) return;
-      if (hitTest(x, y, G._shareR))   { shareScore(G.score, G.wave); return; }
+      // 復活按鈕
+      if (hitTest(x, y, G._reviveR) && !G._revived && !G._reviving) {
+        G._reviving = true;
+        (async () => {
+          const result = await spendGemForGame?.('rogue_revive');
+          G._reviving = false;
+          if (result?.error === '寶石不足') { G._reviveToast = '寶石不足'; G._reviveToastT = performance.now(); return; }
+          if (result?.error) { G._reviveToast = result.error; G._reviveToastT = performance.now(); return; }
+          // 復活成功
+          G._revived = true;
+          G.lives = 2;
+          G.phase = 'playing';
+          G.defs = G.defs.filter(d => d.z > 100); // 清除靠近底線的敵人
+          startBGM(curScene.name);
+        })();
+        return;
+      }
+      if (hitTest(x, y, G._shareR))   { if (!G._resultSaved) { saveResult(); G._resultSaved = true; } shareScore(G.score, G.wave); return; }
       if (hitTest(x, y, G._loginR) && typeof loginWithGoogle === 'function') { loginWithGoogle(); return; }
-      if (hitTest(x, y, G._restartR)) { startGame(); return; }
-      if (hitTest(x, y, G._closeR))   { closeGame(); return; }
+      if (hitTest(x, y, G._restartR)) { if (!G._resultSaved) { saveResult(); G._resultSaved = true; } startGame(); return; }
+      if (hitTest(x, y, G._closeR))   { if (!G._resultSaved) { saveResult(); G._resultSaved = true; } closeGame(); return; }
     }
   }
 
