@@ -3762,12 +3762,12 @@
     });
 
     const curBoard = G._lbTab === 'weekly' ? weeklyBoard : allTimeBoard;
-    const rowH = Math.min(24, W * 0.044);
-    const headerH = Math.min(20, W * 0.038);
-    const startY = py + 6 + subTabH + 8;
+    const rowH = Math.min(32, W * 0.060);
+    const headerH = Math.min(26, W * 0.048);
+    const startY = py + 6 + subTabH + 12;
 
     // 表頭
-    const hdrFz = Math.min(11, W * 0.021);
+    const hdrFz = Math.min(12, W * 0.024);
     const colRank = px + pw * 0.10;
     const colName = px + pw * 0.38;
     const colScore = px + pw * 0.66;
@@ -3782,7 +3782,7 @@
 
     // 排行列表
     const showCount = Math.min(curBoard.length, 5);
-    const bodyFz = Math.min(12, W * 0.024);
+    const bodyFz = Math.min(13, W * 0.026);
     const medals = ['🥇', '🥈', '🥉'];
     const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
     for (let i = 0; i < showCount; i++) {
