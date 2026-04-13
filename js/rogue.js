@@ -614,6 +614,11 @@
     for (const b of G.balls) {
       if (!b.alive) continue;
       b.age += dt;
+      // 門柱反彈球倒數消失
+      if (b._postHitTimer !== undefined) {
+        b._postHitTimer -= dt;
+        if (b._postHitTimer <= 0) { b.alive = false; continue; }
+      }
 
       b.trail.push({ x: b.x, z: b.z });
       if (b.trail.length > 8) b.trail.shift();
@@ -723,6 +728,7 @@
           b.vz = -Math.abs(b.vz) * 0.4;
           b.z = GOAL_Z - 5;
           b._postHit = true;
+          b._postHitTimer = 400; // 400ms 後消失
           continue;
         }
         // 完全偏離球門外 或 門柱反彈後再次飛出
