@@ -3731,22 +3731,23 @@
       <rect x="30" y="52" width="4" height="4" rx="1" fill="#37474f"/></g></svg>`,
 
     magnet: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-      <defs><filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <g filter="url(#gl1)">
-      <rect x="6" y="4" width="14" height="18" rx="3" fill="#1565c0"/>
-      <rect x="44" y="4" width="14" height="18" rx="3" fill="#0d47a1"/>
-      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#999" stroke-width="8" fill="none"/>
-      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#ccc" stroke-width="4" fill="none"/></g>
-      <g stroke="#42a5f5" stroke-width="1.5" opacity="0.5" stroke-linecap="round">
-      <path d="M24 36c-4-2-6 2-2 4"/><path d="M40 36c4-2 6 2 2 4"/><path d="M30 42c-2 2 0 4 4 2"/></g></svg>`,
+      <rect x="6" y="4" width="14" height="18" rx="3" fill="#e53935"/>
+      <rect x="44" y="4" width="14" height="18" rx="3" fill="#c62828"/>
+      <rect x="6" y="16" width="14" height="6" fill="#1565c0"/>
+      <rect x="44" y="16" width="14" height="6" fill="#0d47a1"/>
+      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#b0bec5" stroke-width="8" fill="none"/>
+      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#e0e0e0" stroke-width="4" fill="none"/>
+      <g stroke="#42a5f5" stroke-width="1.5" opacity="0.6" stroke-linecap="round">
+      <path d="M24 36c-4-2-6 2-2 4"/><path d="M40 36c4-2 6 2 2 4"/><path d="M30 42c-2 2 0 4 4 2"/></g>
+      <text x="32" y="60" text-anchor="middle" font-size="9" font-weight="bold" fill="#42a5f5">+10%</text></svg>`,
 
     magnet2: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-      <defs><filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <g filter="url(#gl1)">
-      <rect x="6" y="4" width="14" height="18" rx="3" fill="#7b1fa2"/>
-      <rect x="44" y="4" width="14" height="18" rx="3" fill="#4a148c"/>
-      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#999" stroke-width="8" fill="none"/>
-      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#ce93d8" stroke-width="4" fill="none"/></g>
+      <rect x="6" y="4" width="14" height="18" rx="3" fill="#e53935"/>
+      <rect x="44" y="4" width="14" height="18" rx="3" fill="#c62828"/>
+      <rect x="6" y="16" width="14" height="6" fill="#7b1fa2"/>
+      <rect x="44" y="16" width="14" height="6" fill="#4a148c"/>
+      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#9e9e9e" stroke-width="8" fill="none"/>
+      <path d="M13 22v14a19 19 0 0 0 38 0V22" stroke="#ce93d8" stroke-width="4" fill="none"/>
       <g stroke="#ab47bc" stroke-width="1.5" opacity="0.6" stroke-linecap="round">
       <path d="M24 36c-4-2-6 2-2 4"/><path d="M40 36c4-2 6 2 2 4"/><path d="M30 42c-2 2 0 4 4 2"/></g>
       <text x="32" y="60" text-anchor="middle" font-size="9" font-weight="bold" fill="#ce93d8">+20%</text></svg>`,
