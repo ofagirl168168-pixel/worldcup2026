@@ -351,6 +351,7 @@
       _revived: false,          // 本局是否已復活
       _reviving: false,         // 復活請求中
       _resultSaved: false,      // 本局成績是否已儲存
+      _deathFrame: null,        // 死亡瞬間的遊戲截圖 (dataURL)
 
       // wave spawn
       spawnQueue: [],
@@ -810,7 +811,11 @@
         shakeAmt = 12;
         sfxLoseLife();
         addPart(d.x, 30, '', 1.2, 'breach');
-        if (G.lives <= 0) { G.phase = 'gameover'; G._gameoverStart = performance.now(); sfxGameOver(); stopBGM(); G._resultSaved = false; return; }
+        if (G.lives <= 0) {
+          // 先繪製死亡瞬間的遊戲畫面（不含 gameover overlay）作為分享截圖
+          try { G._deathFrame = cvs.toDataURL('image/png'); } catch(e) { G._deathFrame = null; }
+          G.phase = 'gameover'; G._gameoverStart = performance.now(); sfxGameOver(); stopBGM(); G._resultSaved = false; return;
+        }
       }
     }
     G.defs = G.defs.filter(d => d.hp > 0);
@@ -4259,8 +4264,21 @@
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}&color=0a0f1e&bgcolor=ffffff&margin=8`;
     const qrImg = await loadImg?.(qrUrl).catch(() => null);
 
+    // 載入死亡截圖
+    let deathImg = null;
+    if (G._deathFrame) {
+      try {
+        deathImg = await new Promise((res, rej) => {
+          const img = new Image();
+          img.onload = () => res(img);
+          img.onerror = rej;
+          img.src = G._deathFrame;
+        });
+      } catch(e) { deathImg = null; }
+    }
+
     // ── 生成分享圖片 ──
-    const IW = 720, IH = 1000;
+    const IW = 720, IH = 1280;
     const sc = document.createElement('canvas');
     sc.width = IW; sc.height = IH;
     const c = c2d(sc);
@@ -4269,10 +4287,6 @@
     const bg = c.createLinearGradient(0, 0, IW, IH);
     bg.addColorStop(0, '#050810'); bg.addColorStop(0.4, '#0d1030'); bg.addColorStop(1, '#050810');
     c.fillStyle = bg; c.fillRect(0, 0, IW, IH);
-    // 光暈
-    const glow = c.createRadialGradient(IW/2, 280, 0, IW/2, 280, 350);
-    glow.addColorStop(0, 'rgba(255,215,0,0.12)'); glow.addColorStop(1, 'transparent');
-    c.fillStyle = glow; c.fillRect(0, 0, IW, IH);
 
     const PAD = 36;
     c.textAlign = 'center'; c.textBaseline = 'middle';
@@ -4291,25 +4305,72 @@
     c.strokeStyle = divGrad; c.lineWidth = 1;
     c.beginPath(); c.moveTo(PAD, 100); c.lineTo(IW-PAD, 100); c.stroke();
 
+    // ── 遊戲截圖區域 ──
+    const ssY = 116;
+    const ssH = 340;
+    const ssW = IW - PAD*2;
+    // 圓角裁剪框
+    c.save();
+    rr(c, PAD, ssY, ssW, ssH, 12); c.clip();
+    if (deathImg) {
+      // 將死亡截圖等比填滿區域（cover）
+      const imgRatio = deathImg.width / deathImg.height;
+      const boxRatio = ssW / ssH;
+      let sx = 0, sy = 0, sw = deathImg.width, sh = deathImg.height;
+      if (imgRatio > boxRatio) {
+        sw = deathImg.height * boxRatio;
+        sx = (deathImg.width - sw) / 2;
+      } else {
+        sh = deathImg.width / boxRatio;
+        sy = (deathImg.height - sh) / 2;
+      }
+      c.drawImage(deathImg, sx, sy, sw, sh, PAD, ssY, ssW, ssH);
+      // 底部漸層遮罩
+      const mask = c.createLinearGradient(0, ssY + ssH - 80, 0, ssY + ssH);
+      mask.addColorStop(0, 'transparent'); mask.addColorStop(1, 'rgba(5,8,16,0.9)');
+      c.fillStyle = mask; c.fillRect(PAD, ssY, ssW, ssH);
+    } else {
+      // 無截圖時顯示遊戲風格佔位
+      const glow = c.createRadialGradient(IW/2, ssY + ssH/2, 0, IW/2, ssY + ssH/2, ssH);
+      glow.addColorStop(0, 'rgba(255,215,0,0.08)'); glow.addColorStop(1, 'rgba(5,8,16,0.3)');
+      c.fillStyle = glow; c.fillRect(PAD, ssY, ssW, ssH);
+      c.fillStyle = 'rgba(255,255,255,0.15)';
+      c.font = `900 48px "Noto Sans TC", sans-serif`;
+      c.fillText('⚽', IW/2, ssY + ssH/2);
+    }
+    c.restore();
+    // 截圖邊框
+    rr(c, PAD, ssY, ssW, ssH, 12);
+    c.strokeStyle = 'rgba(255,215,0,0.25)'; c.lineWidth = 2; c.stroke();
+    // 截圖上角標 GAME OVER
+    if (deathImg) {
+      c.fillStyle = 'rgba(255,0,0,0.85)';
+      rr(c, PAD + 12, ssY + 12, 130, 30, 6); c.fill();
+      c.fillStyle = '#fff';
+      c.font = `900 14px "Noto Sans TC", sans-serif`;
+      c.fillText('GAME OVER', PAD + 12 + 65, ssY + 28);
+    }
+
     // ── 評語（帶光暈）──
+    const praiseY = ssY + ssH + 40;
     c.fillStyle = praise.color;
     c.shadowColor = praise.color; c.shadowBlur = 20;
     c.font = `900 30px "Noto Sans TC", sans-serif`;
-    c.fillText(praise.text, IW/2, 148);
+    c.fillText(praise.text, IW/2, praiseY);
     c.shadowBlur = 0;
 
     // ── 分數大字 ──
     c.fillStyle = '#ffd700';
     c.shadowColor = '#ffd700'; c.shadowBlur = 30;
-    c.font = `900 96px "Noto Sans TC", sans-serif`;
-    c.fillText(`${score}`, IW/2, 250);
+    c.font = `900 86px "Noto Sans TC", sans-serif`;
+    c.fillText(`${score}`, IW/2, praiseY + 90);
     c.shadowBlur = 0;
     c.fillStyle = 'rgba(255,215,0,0.5)';
     c.font = `600 16px "Noto Sans TC", sans-serif`;
-    c.fillText('SCORE', IW/2, 300);
+    c.fillText('SCORE', IW/2, praiseY + 132);
 
     // ── Wave + 強化卡 數量 ──
-    const statY = 345;
+    const statY = praiseY + 160;
     const statW = 180, statH = 64, statGap = 24;
     const stats = [
       { label: 'WAVE', value: `${wave}`, color: '#4fc3f7' },
@@ -4328,50 +4389,61 @@
       c.fillText(s.label, sx + statW/2, statY + 52);
     });
 
-    // ── 卡牌 Build 展示（去重，顯示數量）──
-    const cardY = 430;
+    // ── 卡牌 Build 展示（帶圖示）──
+    const cardY = statY + statH + 30;
     const rarCol = { common:'#4a5568', uncommon:'#16a34a', rare:'#2563eb', epic:'#7c3aed', legendary:'#d97706' };
     const rarBorder = { common:'#6b7280', uncommon:'#22c55e', rare:'#3b82f6', epic:'#8b5cf6', legendary:'#f59e0b' };
-    // 統計卡牌
     const cardCount = {};
     G.collected.forEach(id => { cardCount[id] = (cardCount[id]||0) + 1; });
     const uniqueCards = [...new Set(G.collected)].map(id => {
       const card = CARDS.find(c2 => c2.id === id);
       return card ? { ...card, count: cardCount[id] } : null;
     }).filter(Boolean);
-    // 按稀有度排序：legendary > epic > rare > uncommon > common
     const rarOrder = { legendary:0, epic:1, rare:2, uncommon:3, common:4 };
     uniqueCards.sort((a,b) => (rarOrder[a.rarity]||9) - (rarOrder[b.rarity]||9));
 
+    let cardEndY = cardY;
     if (uniqueCards.length > 0) {
       c.fillStyle = 'rgba(255,255,255,0.3)';
       c.font = `600 14px "Noto Sans TC", sans-serif`;
       c.fillText('🃏 我的 Build', IW/2, cardY);
 
-      const maxPerRow = 6;
-      const cw = 90, ch = 36, cGap = 8;
-      const rows = Math.ceil(uniqueCards.length / maxPerRow);
+      const maxPerRow = 5;
+      const cw = 110, ch = 48, cGap = 10;
+      const iconSz = 30;
       uniqueCards.forEach((card, i) => {
         const row = Math.floor(i / maxPerRow);
         const col = i % maxPerRow;
         const rowCount = Math.min(maxPerRow, uniqueCards.length - row * maxPerRow);
         const rowW = rowCount * cw + (rowCount-1) * cGap;
         const cx = IW/2 - rowW/2 + col * (cw + cGap);
-        const cy = cardY + 16 + row * (ch + cGap);
+        const cy = cardY + 20 + row * (ch + cGap);
 
-        rr(c, cx, cy, cw, ch, 6);
+        // 卡牌背景
+        rr(c, cx, cy, cw, ch, 8);
         c.fillStyle = rarCol[card.rarity] || '#4a5568'; c.fill();
         c.strokeStyle = rarBorder[card.rarity] || '#666'; c.lineWidth = 1; c.stroke();
+
+        // 卡牌圖示
+        const iconImg = _iconCache[card.id];
+        if (iconImg && iconImg.complete && iconImg.naturalWidth > 0) {
+          c.drawImage(iconImg, cx + 6, cy + (ch - iconSz) / 2, iconSz, iconSz);
+        }
+
+        // 卡牌名稱（圖示右側）
         c.fillStyle = '#fff';
         c.font = `bold 11px "Noto Sans TC", sans-serif`;
+        c.textAlign = 'left';
         const label = card.count > 1 ? `${card.name}×${card.count}` : card.name;
-        c.fillText(label, cx + cw/2, cy + ch/2 + 1);
+        c.fillText(label, cx + 6 + iconSz + 4, cy + ch/2 + 1);
+        c.textAlign = 'center';
+
+        cardEndY = cy + ch + cGap;
       });
     }
 
     // ── 挑戰宣言（裂變核心）──
-    const ctaY = uniqueCards.length > 6 ? 610 : uniqueCards.length > 0 ? 560 : 460;
-    // 挑釁框
+    const ctaY = uniqueCards.length > 0 ? cardEndY + 10 : cardY + 10;
     const ctaW = IW - PAD*2, ctaH = 100;
     rr(c, PAD, ctaY, ctaW, ctaH, 16);
     c.fillStyle = 'rgba(255,152,0,0.08)'; c.fill();
@@ -4405,7 +4477,6 @@
     const qrSize = 120;
     const qrX = IW - PAD - qrSize - 10;
     const footerY = IH - 180;
-    // 左側文字
     c.textAlign = 'left';
     c.fillStyle = '#ffd700';
     c.font = `900 22px "Noto Sans TC", sans-serif`;
@@ -4418,7 +4489,6 @@
     c.font = `bold 13px "Noto Sans TC", sans-serif`;
     c.fillText(url.replace('https://',''), PAD, footerY + 96);
 
-    // QR Code
     c.textAlign = 'center';
     if (qrImg) {
       c.fillStyle = '#fff';
