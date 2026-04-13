@@ -999,8 +999,8 @@
       localStorage.setItem('rogue_best', JSON.stringify(best));
     }
 
-    // 累積遊戲 XP（score/50 + wave*2）
-    const gameXP = Math.floor(G.score / 50) + G.wave * 2;
+    // 累積遊戲 XP（score/500 + wave/5）
+    const gameXP = Math.floor(G.score / 500) + Math.floor(G.wave / 5);
     const prevXP = parseInt(localStorage.getItem('rogue_total_xp') || '0') || 0;
     localStorage.setItem('rogue_total_xp', String(prevXP + gameXP));
     // 更新排行榜 XP
