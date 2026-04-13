@@ -3607,14 +3607,35 @@
     drawIcon('multi1', W / 2 - titleW / 2 - ballDeco - 4, H * 0.06 + titleSz - titleSz * 0.3, ballDeco);
     drawIcon('multi1', W / 2 + titleW / 2 + ballDeco + 4, H * 0.06 + titleSz - titleSz * 0.3, ballDeco);
 
-    // ── 個人最高紀錄 ──
+    // ── 個人最高紀錄 + 本週最高 ──
     const best = JSON.parse(localStorage.getItem('rogue_best') || '{}');
-    const bestY = H * 0.06 + titleSz + 28;
-    if (best.score) {
-      ctx.fillStyle = 'rgba(255,215,0,0.7)';
-      ctx.font = `bold ${Math.min(16, W * 0.032)}px "Noto Sans TC", sans-serif`;
-      drawTrophy(W / 2 - ctx.measureText(`最高紀錄 ${best.score} 分 · Wave ${best.wave}`).width / 2 - 14, bestY - 5, 10);
-      ctx.fillText(`最高紀錄 ${best.score} 分 · Wave ${best.wave}`, W / 2, bestY);
+    const bestY = H * 0.06 + titleSz + 24;
+    const recFz = Math.min(13, W * 0.026);
+
+    // 從週排行榜找自己的本週最高
+    let weeklyBest = null;
+    if (_rogueWeeklyBoard?.length && typeof currentUser !== 'undefined' && currentUser) {
+      weeklyBest = _rogueWeeklyBoard.find(e => e.user_id === currentUser.id);
+    }
+
+    if (best.score || weeklyBest) {
+      ctx.font = `bold ${recFz}px "Noto Sans TC", sans-serif`;
+      // 歷史最高
+      if (best.score) {
+        ctx.fillStyle = 'rgba(255,215,0,0.7)';
+        const allText = `🏆 歷史最高 ${best.score} 分 · W${best.wave}`;
+        ctx.fillText(allText, W / 2, bestY);
+      }
+      // 本週最高
+      if (weeklyBest) {
+        ctx.fillStyle = 'rgba(79,195,247,0.8)';
+        const weekText = `⚡ 本週最高 ${weeklyBest.score} 分 · W${weeklyBest.wave}`;
+        ctx.fillText(weekText, W / 2, bestY + recFz + 4);
+      } else if (best.score) {
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = `${Math.min(11, W * 0.022)}px "Noto Sans TC", sans-serif`;
+        ctx.fillText('本週尚無紀錄', W / 2, bestY + recFz + 4);
+      }
     } else {
       ctx.fillStyle = 'rgba(255,255,255,0.4)';
       ctx.font = `${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
@@ -3625,7 +3646,7 @@
     if (!G._titleTab) G._titleTab = 'board';
     const panelW = Math.min(W * 0.92, 400);
     const panelX = (W - panelW) / 2;
-    const tabStartY = bestY + 24;
+    const tabStartY = bestY + recFz * 2 + 16;
     const tabH = Math.min(32, W * 0.06);
     const pr = 10;
     const tabKeys = [
@@ -4354,10 +4375,10 @@
   // ═══════════════════════════════════════════════════════════
   const MILESTONES = [
     { score: 4000,  gems: 1, chest: 'chest_bronze',    tier: '銅', color: '#d4a574' },
-    { score: 6000,  gems: 1, chest: 'chest_silver',    tier: '銀', color: '#c0c0c0' },
-    { score: 8000,  gems: 2, chest: 'chest_gold',      tier: '金', color: '#ffd700' },
-    { score: 10000, gems: 2, chest: 'chest_diamond',   tier: '鑽石', color: '#64b5f6' },
-    { score: 12000, gems: 3, chest: 'chest_legendary', tier: '傳說', color: '#e040fb' },
+    { score: 6000,  gems: 2, chest: 'chest_silver',    tier: '銀', color: '#c0c0c0' },
+    { score: 8000,  gems: 3, chest: 'chest_gold',      tier: '金', color: '#ffd700' },
+    { score: 10000, gems: 4, chest: 'chest_diamond',   tier: '鑽石', color: '#64b5f6' },
+    { score: 12000, gems: 5, chest: 'chest_legendary', tier: '傳說', color: '#e040fb' },
   ];
 
   const BADGES = [
