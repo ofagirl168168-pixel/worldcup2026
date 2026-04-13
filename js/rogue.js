@@ -999,6 +999,17 @@
       localStorage.setItem('rogue_best', JSON.stringify(best));
     }
 
+    // 檢查並頒發遊戲徽章
+    const newBadges = checkBadges(G.score, G.wave, G.collected.length, G._revived);
+    if (newBadges.length > 0) {
+      const names = newBadges.map(b => `${b.icon} ${b.name}`).join('、');
+      G._badgeToast = `🎉 新徽章：${names}`;
+      G._badgeToastT = performance.now();
+    }
+
+    // 檢查週排名徽章
+    checkWeeklyBadges();
+
     // 上傳 Supabase（已登入時）
     if (typeof currentUser !== 'undefined' && currentUser && typeof callEdge === 'function') {
       const _score = G.score, _wave = G.wave;
@@ -1009,6 +1020,8 @@
         _rogueBoardLoaded = false;
         loadRogueBoards().then(() => {
           if (typeof renderRogueLeaderboard === 'function') renderRogueLeaderboard();
+          // 排行榜載入後再檢查週徽章
+          checkWeeklyBadges();
         });
       });
     } else {
@@ -3574,234 +3587,108 @@
 
     ctx.textAlign = 'center';
 
-    // 標題
-    const titleSz = Math.min(42, W * 0.08);
+    // ── 標題 ──
+    const titleSz = Math.min(36, W * 0.07);
     ctx.fillStyle = '#ffd700';
     ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 18;
     ctx.font = `bold ${titleSz}px "Noto Sans TC", sans-serif`;
-    ctx.fillText('射門挑戰：前進世界盃', W / 2, H * 0.25);
+    ctx.fillText('射門挑戰：前進世界盃', W / 2, H * 0.06 + titleSz);
     ctx.shadowBlur = 0;
-    // 標題兩側足球
     const titleW = ctx.measureText('射門挑戰：前進世界盃').width;
-    const ballDeco = Math.min(24, W * 0.045);
-    drawIcon('multi1', W / 2 - titleW / 2 - ballDeco - 4, H * 0.25 - titleSz * 0.3, ballDeco);
-    drawIcon('multi1', W / 2 + titleW / 2 + ballDeco + 4, H * 0.25 - titleSz * 0.3, ballDeco);
+    const ballDeco = Math.min(20, W * 0.04);
+    drawIcon('multi1', W / 2 - titleW / 2 - ballDeco - 4, H * 0.06 + titleSz - titleSz * 0.3, ballDeco);
+    drawIcon('multi1', W / 2 + titleW / 2 + ballDeco + 4, H * 0.06 + titleSz - titleSz * 0.3, ballDeco);
 
-    ctx.fillStyle = '#fff';
-    ctx.font = `${Math.min(18, W * 0.035)}px "Noto Sans TC", sans-serif`;
-    ctx.fillText('足球生存射門遊戲', W / 2, H * 0.32);
-
-    // 裝飾分隔線
-    const lineW = Math.min(180, W * 0.35);
-    ctx.strokeStyle = 'rgba(255,215,0,0.3)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(W / 2 - lineW / 2, H * 0.35);
-    ctx.lineTo(W / 2 + lineW / 2, H * 0.35);
-    ctx.stroke();
-
-    // 說明（帶圖示）
-    const ruleIconSize = Math.min(22, W * 0.042);
-    const ruleFontSz = Math.min(14, W * 0.028);
-    const ruleLineH = Math.min(28, W * 0.052);
-    const ruleStartY = H * 0.40;
-    const ruleIcons = ['multi1', 'bounce', 'guard', 'crit'];
-    const rules = [
-      '點擊畫面踢出足球，射進球門得分',
-      '防守球員會向你逼近，踢球擊退他們',
-      '防守員突破底線會失去生命（共 3 條）',
-      '每次進球可選一張強化卡強化你的射門',
-    ];
-    ctx.font = `${ruleFontSz}px "Noto Sans TC", sans-serif`;
-    rules.forEach((r, i) => {
-      const y = ruleStartY + i * ruleLineH;
-      const textW = ctx.measureText(r).width;
-      const totalW = ruleIconSize + 6 + textW;
-      const startX = W / 2 - totalW / 2;
-      // 圖示
-      const iconId = ruleIcons[i];
-      if (i === 2) {
-        // 第三條用 SVG 愛心
-        drawHeart(startX + ruleIconSize / 2, y - ruleFontSz * 0.3, ruleIconSize * 0.45);
-      } else {
-        drawIcon(iconId, startX + ruleIconSize / 2, y - ruleFontSz * 0.3, ruleIconSize);
-      }
-      // 文字
-      ctx.fillStyle = 'rgba(255,255,255,0.75)';
-      ctx.font = `${ruleFontSz}px "Noto Sans TC", sans-serif`;
-      ctx.textAlign = 'left';
-      ctx.fillText(r, startX + ruleIconSize + 6, y);
-      ctx.textAlign = 'center';
-    });
-
-    // ── 遊戲風排行榜面板 ──────────────────────────────────────
-    const weeklyBoard = _rogueWeeklyBoard || [];
-    const allTimeBoard = _rogueAllTimeBoard || [];
-    const hasBoard = weeklyBoard.length > 0 || allTimeBoard.length > 0;
-
-    if (hasBoard) {
-      // 面板參數
-      const panelW = Math.min(W * 0.88, 380);
-      const panelX = (W - panelW) / 2;
-      const panelY = H * 0.53;
-      const rowH = Math.min(26, W * 0.048);
-      const tabH = Math.min(30, W * 0.055);
-      const headerH = Math.min(22, W * 0.04);
-
-      // 切換 tab（點擊時在 onClick 中處理）
-      if (!G._lbTab) G._lbTab = 'weekly';
-      const curBoard = G._lbTab === 'weekly' ? weeklyBoard : allTimeBoard;
-      const showCount = Math.min(curBoard.length, 5);
-      const tipExtra = G._lbTab === 'weekly' ? rowH + 10 : 10;
-      const panelH = tabH + headerH + (showCount + 1) * rowH + tipExtra;
-
-      ctx.save();
-
-      // 面板背景（深色半透明 + 圓角）
-      const pr = 12;
-      rr(ctx, panelX, panelY, panelW, panelH, pr);
-      ctx.fillStyle = 'rgba(0,0,0,0.55)';
-      ctx.fill();
-      // 邊框光暈
-      rr(ctx, panelX, panelY, panelW, panelH, pr);
-      ctx.strokeStyle = 'rgba(255,215,0,0.3)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // ── Tab 按鈕 ──
-      const tabW = panelW / 2;
-      const tabY = panelY;
-      const tabs = [
-        { key: 'weekly', label: '⚡ 本週排行' },
-        { key: 'alltime', label: '👑 歷史排行' },
-      ];
-      tabs.forEach((tab, ti) => {
-        const tx = panelX + ti * tabW;
-        const active = G._lbTab === tab.key;
-        // tab 背景
-        ctx.save();
-        ctx.beginPath();
-        if (ti === 0) {
-          ctx.moveTo(tx + pr, tabY); ctx.arcTo(tx + tabW, tabY, tx + tabW, tabY + tabH, 0);
-          ctx.lineTo(tx + tabW, tabY + tabH); ctx.lineTo(tx, tabY + tabH);
-          ctx.arcTo(tx, tabY, tx + pr, tabY, pr);
-        } else {
-          ctx.moveTo(tx, tabY); ctx.arcTo(tx + tabW, tabY, tx + tabW, tabY + tabH, pr);
-          ctx.arcTo(tx + tabW, tabY + tabH, tx, tabY + tabH, 0);
-          ctx.lineTo(tx, tabY + tabH);
-          ctx.lineTo(tx, tabY);
-        }
-        ctx.closePath();
-        ctx.fillStyle = active ? 'rgba(255,215,0,0.15)' : 'rgba(0,0,0,0.2)';
-        ctx.fill();
-        ctx.restore();
-        // tab 文字
-        const tabFz = Math.min(13, W * 0.026);
-        ctx.font = `${active ? 'bold' : ''} ${tabFz}px "Noto Sans TC", sans-serif`;
-        ctx.fillStyle = active ? '#ffd700' : 'rgba(255,255,255,0.4)';
-        ctx.textAlign = 'center';
-        ctx.fillText(tab.label, tx + tabW / 2, tabY + tabH * 0.68);
-        // active 底線
-        if (active) {
-          ctx.fillStyle = '#ffd700';
-          ctx.fillRect(tx + tabW * 0.15, tabY + tabH - 2, tabW * 0.7, 2);
-        }
-        // 儲存 tab 點擊區域
-        if (!G._lbTabR) G._lbTabR = [];
-        G._lbTabR[ti] = { x: tx, y: tabY, w: tabW, h: tabH, key: tab.key };
-      });
-
-      // 分隔線
-      ctx.fillStyle = 'rgba(255,215,0,0.15)';
-      ctx.fillRect(panelX + 8, tabY + tabH, panelW - 16, 1);
-
-      // ── 表頭 ──
-      const hdrY = tabY + tabH + headerH;
-      const hdrFz = Math.min(11, W * 0.021);
-      const colRank = panelX + panelW * 0.12;
-      const colName = panelX + panelW * 0.38;
-      const colScore = panelX + panelW * 0.66;
-      const colWave = panelX + panelW * 0.88;
-      ctx.font = `bold ${hdrFz}px "Noto Sans TC", sans-serif`;
-      ctx.fillStyle = 'rgba(255,215,0,0.5)';
-      ctx.textAlign = 'center';
-      ctx.fillText('#', colRank, hdrY);
-      ctx.fillText('玩家', colName, hdrY);
-      ctx.fillText('分數', colScore, hdrY);
-      ctx.fillText('Wave', colWave, hdrY);
-
-      // ── 排行列表 ──
-      const bodyFz = Math.min(12, W * 0.024);
-      for (let i = 0; i < showCount; i++) {
-        const entry = curBoard[i];
-        const ey = hdrY + (i + 1) * rowH;
-
-        // 前三名背景高亮條
-        if (i < 3) {
-          const barColors = ['rgba(255,215,0,0.1)', 'rgba(192,192,192,0.07)', 'rgba(205,127,50,0.06)'];
-          ctx.fillStyle = barColors[i];
-          rr(ctx, panelX + 6, ey - rowH * 0.72, panelW - 12, rowH - 2, 4);
-          ctx.fill();
-        }
-
-        // 排名（獎牌）
-        const medals = ['🥇', '🥈', '🥉'];
-        const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
-        ctx.font = `bold ${bodyFz}px "Noto Sans TC", sans-serif`;
-        if (i < 3) {
-          ctx.fillStyle = rankColors[i];
-          ctx.fillText(medals[i], colRank, ey);
-        } else {
-          ctx.fillStyle = 'rgba(255,255,255,0.45)';
-          ctx.fillText(`${i + 1}`, colRank, ey);
-        }
-
-        // 玩家名
-        ctx.font = `${bodyFz}px "Noto Sans TC", sans-serif`;
-        ctx.fillStyle = i < 3 ? rankColors[i] : 'rgba(255,255,255,0.65)';
-        const nick = entry.nickname || '???';
-        ctx.fillText(nick, colName, ey);
-
-        // 分數（粗體亮色）
-        ctx.font = `bold ${bodyFz}px "Noto Sans TC", sans-serif`;
-        ctx.fillStyle = i === 0 ? '#fff' : i < 3 ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.6)';
-        ctx.fillText(`${entry.score}`, colScore, ey);
-
-        // Wave
-        ctx.font = `${bodyFz}px "Noto Sans TC", sans-serif`;
-        ctx.fillStyle = 'rgba(255,255,255,0.45)';
-        ctx.fillText(`${entry.wave}`, colWave, ey);
-      }
-
-      // ── 獎勵提示（僅週排行） ──
-      if (G._lbTab === 'weekly') {
-        const tipY = hdrY + (showCount + 1) * rowH + 12;
-        const tipFz = Math.min(11, W * 0.022);
-        ctx.font = `${tipFz}px "Noto Sans TC", sans-serif`;
-        ctx.fillStyle = 'rgba(255,215,0,0.5)';
-        ctx.textAlign = 'center';
-        ctx.fillText('🏆 1st +3💎  2nd +2💎  3rd +1💎', W / 2, tipY);
-        ctx.fillStyle = 'rgba(255,255,255,0.3)';
-        ctx.font = `${Math.min(10, W * 0.018)}px "Noto Sans TC", sans-serif`;
-        ctx.fillText('每週日結算', W / 2, tipY + tipFz + 4);
-      }
-
-      ctx.restore();
+    // ── 個人最高紀錄 ──
+    const best = JSON.parse(localStorage.getItem('rogue_best') || '{}');
+    const bestY = H * 0.06 + titleSz + 28;
+    if (best.score) {
+      ctx.fillStyle = 'rgba(255,215,0,0.7)';
+      ctx.font = `bold ${Math.min(16, W * 0.032)}px "Noto Sans TC", sans-serif`;
+      drawTrophy(W / 2 - ctx.measureText(`最高紀錄 ${best.score} 分 · Wave ${best.wave}`).width / 2 - 14, bestY - 5, 10);
+      ctx.fillText(`最高紀錄 ${best.score} 分 · Wave ${best.wave}`, W / 2, bestY);
     } else {
-      // 無 Supabase 資料時顯示本地最高紀錄
-      const best = JSON.parse(localStorage.getItem('rogue_best') || '{}');
-      if (best.score) {
-        ctx.fillStyle = 'rgba(255,215,0,0.6)';
-        ctx.font = `${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
-        ctx.textAlign = 'center';
-        drawTrophy(W / 2 - ctx.measureText(`最高紀錄：${best.score} 分（Wave ${best.wave}）`).width / 2 - 16, H * 0.60 - 6, 12);
-        ctx.fillText(`最高紀錄：${best.score} 分（Wave ${best.wave}）`, W / 2, H * 0.60);
-      }
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = `${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('尚無紀錄，開始你的第一場挑戰！', W / 2, bestY);
     }
 
-    // 開始按鈕
-    const btnW = Math.min(220, W * 0.45), btnH = 50;
-    const btnX = W / 2 - btnW / 2, btnY = H * 0.88;
+    // ── 三頁 Tab：排行 | 里程碑 | 徽章 ──
+    if (!G._titleTab) G._titleTab = 'board';
+    const panelW = Math.min(W * 0.92, 400);
+    const panelX = (W - panelW) / 2;
+    const tabStartY = bestY + 24;
+    const tabH = Math.min(32, W * 0.06);
+    const pr = 10;
+    const tabKeys = [
+      { key: 'board',  label: '⚡ 排行' },
+      { key: 'miles',  label: '🎁 里程碑' },
+      { key: 'badge',  label: '🏅 徽章' },
+    ];
+    const tabW = panelW / tabKeys.length;
+    if (!G._titleTabR) G._titleTabR = [];
+    tabKeys.forEach((tab, ti) => {
+      const tx = panelX + ti * tabW;
+      const active = G._titleTab === tab.key;
+      ctx.save();
+      ctx.beginPath();
+      if (ti === 0) {
+        ctx.moveTo(tx + pr, tabStartY); ctx.arcTo(tx + tabW, tabStartY, tx + tabW, tabStartY + tabH, 0);
+        ctx.lineTo(tx + tabW, tabStartY + tabH); ctx.lineTo(tx, tabStartY + tabH);
+        ctx.arcTo(tx, tabStartY, tx + pr, tabStartY, pr);
+      } else if (ti === tabKeys.length - 1) {
+        ctx.moveTo(tx, tabStartY); ctx.arcTo(tx + tabW, tabStartY, tx + tabW, tabStartY + tabH, pr);
+        ctx.arcTo(tx + tabW, tabStartY + tabH, tx, tabStartY + tabH, 0);
+        ctx.lineTo(tx, tabStartY + tabH); ctx.lineTo(tx, tabStartY);
+      } else {
+        ctx.rect(tx, tabStartY, tabW, tabH);
+      }
+      ctx.closePath();
+      ctx.fillStyle = active ? 'rgba(255,215,0,0.15)' : 'rgba(0,0,0,0.3)';
+      ctx.fill();
+      ctx.restore();
+      const tabFz = Math.min(13, W * 0.026);
+      ctx.font = `${active ? 'bold' : ''} ${tabFz}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = active ? '#ffd700' : 'rgba(255,255,255,0.4)';
+      ctx.textAlign = 'center';
+      ctx.fillText(tab.label, tx + tabW / 2, tabStartY + tabH * 0.68);
+      if (active) {
+        ctx.fillStyle = '#ffd700';
+        ctx.fillRect(tx + tabW * 0.1, tabStartY + tabH - 2, tabW * 0.8, 2);
+      }
+      G._titleTabR[ti] = { x: tx, y: tabStartY, w: tabW, h: tabH, key: tab.key };
+    });
+
+    // ── 內容面板區域 ──
+    const contentY = tabStartY + tabH + 2;
+    const btnH = 50;
+    const btnY = H - btnH - Math.min(H * 0.04, 20);
+    const contentH = btnY - contentY - 12;
+
+    // 面板背景
+    rr(ctx, panelX, contentY, panelW, contentH, pr);
+    ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill();
+    rr(ctx, panelX, contentY, panelW, contentH, pr);
+    ctx.strokeStyle = 'rgba(255,215,0,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+
+    // 裁剪面板區域
+    ctx.save();
+    rr(ctx, panelX, contentY, panelW, contentH, pr);
+    ctx.clip();
+
+    if (G._titleTab === 'board') {
+      _drawBoardTab(panelX, contentY, panelW, contentH);
+    } else if (G._titleTab === 'miles') {
+      _drawMilesTab(panelX, contentY, panelW, contentH, best);
+    } else if (G._titleTab === 'badge') {
+      _drawBadgeTab(panelX, contentY, panelW, contentH);
+    }
+
+    ctx.restore();
+
+    // ── 開始按鈕 ──
+    const btnW = Math.min(220, W * 0.45);
+    const btnX = W / 2 - btnW / 2;
     G._startR = { x: btnX, y: btnY, w: btnW, h: btnH };
 
     ctx.fillStyle = '#4caf50';
@@ -3810,6 +3697,302 @@
     ctx.font = `bold ${Math.min(20, W * 0.04)}px "Noto Sans TC", sans-serif`;
     ctx.textAlign = 'center';
     ctx.fillText('開始遊戲', W / 2, btnY + 33);
+  }
+
+  // ── 排行榜 Tab ──
+  function _drawBoardTab(px, py, pw, ph) {
+    const weeklyBoard = _rogueWeeklyBoard || [];
+    const allTimeBoard = _rogueAllTimeBoard || [];
+    if (weeklyBoard.length === 0 && allTimeBoard.length === 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.font = `${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('尚無排行資料', px + pw / 2, py + ph / 2);
+      return;
+    }
+
+    // 排行子 Tab（週排行 / 歷史排行）
+    if (!G._lbTab) G._lbTab = 'weekly';
+    const subTabH = Math.min(26, W * 0.048);
+    const subTabs = [
+      { key: 'weekly', label: '本週' },
+      { key: 'alltime', label: '歷史' },
+    ];
+    const subTabW = pw * 0.35;
+    if (!G._lbTabR) G._lbTabR = [];
+    subTabs.forEach((st, si) => {
+      const sx = px + pw / 2 - subTabs.length * subTabW / 2 + si * subTabW;
+      const active = G._lbTab === st.key;
+      rr(ctx, sx, py + 6, subTabW - 4, subTabH, 6);
+      ctx.fillStyle = active ? 'rgba(255,215,0,0.2)' : 'rgba(255,255,255,0.05)'; ctx.fill();
+      ctx.font = `${active ? 'bold' : ''} ${Math.min(12, W * 0.024)}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = active ? '#ffd700' : 'rgba(255,255,255,0.4)';
+      ctx.textAlign = 'center';
+      ctx.fillText(st.label, sx + (subTabW - 4) / 2, py + 6 + subTabH * 0.65);
+      G._lbTabR[si] = { x: sx, y: py + 6, w: subTabW - 4, h: subTabH, key: st.key };
+    });
+
+    const curBoard = G._lbTab === 'weekly' ? weeklyBoard : allTimeBoard;
+    const rowH = Math.min(24, W * 0.044);
+    const headerH = Math.min(20, W * 0.038);
+    const startY = py + 6 + subTabH + 8;
+
+    // 表頭
+    const hdrFz = Math.min(11, W * 0.021);
+    const colRank = px + pw * 0.10;
+    const colName = px + pw * 0.38;
+    const colScore = px + pw * 0.66;
+    const colWave = px + pw * 0.88;
+    ctx.font = `bold ${hdrFz}px "Noto Sans TC", sans-serif`;
+    ctx.fillStyle = 'rgba(255,215,0,0.5)';
+    ctx.textAlign = 'center';
+    ctx.fillText('#', colRank, startY);
+    ctx.fillText('玩家', colName, startY);
+    ctx.fillText('分數', colScore, startY);
+    ctx.fillText('Wave', colWave, startY);
+
+    // 排行列表
+    const showCount = Math.min(curBoard.length, 5);
+    const bodyFz = Math.min(12, W * 0.024);
+    const medals = ['🥇', '🥈', '🥉'];
+    const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
+    for (let i = 0; i < showCount; i++) {
+      const entry = curBoard[i];
+      const ey = startY + headerH + i * rowH;
+      if (i < 3) {
+        ctx.fillStyle = ['rgba(255,215,0,0.1)', 'rgba(192,192,192,0.07)', 'rgba(205,127,50,0.06)'][i];
+        rr(ctx, px + 6, ey - rowH * 0.6, pw - 12, rowH - 2, 4); ctx.fill();
+      }
+      ctx.font = `bold ${bodyFz}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'center';
+      if (i < 3) { ctx.fillStyle = rankColors[i]; ctx.fillText(medals[i], colRank, ey); }
+      else { ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.fillText(`${i + 1}`, colRank, ey); }
+      ctx.font = `${bodyFz}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = i < 3 ? rankColors[i] : 'rgba(255,255,255,0.65)';
+      ctx.fillText(entry.nickname || '???', colName, ey);
+      ctx.font = `bold ${bodyFz}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = i === 0 ? '#fff' : i < 3 ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.6)';
+      ctx.fillText(`${entry.score}`, colScore, ey);
+      ctx.font = `${bodyFz}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.fillText(`${entry.wave}`, colWave, ey);
+    }
+
+    // 週排行獎勵提示
+    if (G._lbTab === 'weekly') {
+      const tipY = startY + headerH + showCount * rowH + 12;
+      const tipFz = Math.min(11, W * 0.022);
+      ctx.font = `${tipFz}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = 'rgba(255,215,0,0.5)';
+      ctx.textAlign = 'center';
+      ctx.fillText('🏆 1st +3💎  2nd +2💎  3rd +1💎', px + pw / 2, tipY);
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.font = `${Math.min(10, W * 0.018)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('每週日結算', px + pw / 2, tipY + tipFz + 4);
+    }
+  }
+
+  // ── 里程碑 Tab ──
+  function _drawMilesTab(px, py, pw, ph, best) {
+    const claimed = _loadMilestones();
+    const bestScore = best.score || 0;
+    const rowH = Math.min(58, ph / 5.5);
+    const pad = 10;
+    const iconSz = Math.min(38, rowH - 12);
+    G._milestoneR = [];
+
+    ctx.textAlign = 'left';
+
+    MILESTONES.forEach((ms, i) => {
+      const ry = py + 8 + i * (rowH + 4);
+      const isClaimed = claimed.includes(ms.score);
+      const canClaim = bestScore >= ms.score && !isClaimed;
+      const progress = Math.min(1, bestScore / ms.score);
+
+      // 行背景
+      rr(ctx, px + pad, ry, pw - pad * 2, rowH, 8);
+      ctx.fillStyle = canClaim ? 'rgba(255,215,0,0.08)' : 'rgba(255,255,255,0.03)'; ctx.fill();
+      ctx.strokeStyle = canClaim ? 'rgba(255,215,0,0.3)' : 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1; ctx.stroke();
+
+      // 寶箱圖示
+      const chestX = px + pad + 6 + iconSz / 2;
+      const chestY = ry + rowH / 2;
+      const chestImg = _iconCache[ms.chest];
+      if (chestImg && chestImg.complete && chestImg.naturalWidth > 0) {
+        ctx.globalAlpha = isClaimed ? 0.35 : 1;
+        ctx.drawImage(chestImg, chestX - iconSz / 2, chestY - iconSz / 2, iconSz, iconSz);
+        ctx.globalAlpha = 1;
+      }
+
+      // 目標文字
+      const textX = px + pad + iconSz + 18;
+      const nameFz = Math.min(13, W * 0.026);
+      ctx.font = `bold ${nameFz}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = isClaimed ? 'rgba(255,255,255,0.35)' : ms.color;
+      ctx.fillText(`${ms.tier}寶箱 — ${ms.score.toLocaleString()} 分`, textX, ry + 18);
+
+      // 寶石獎勵
+      const gemFz = Math.min(11, W * 0.022);
+      ctx.font = `${gemFz}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = isClaimed ? 'rgba(255,255,255,0.25)' : 'rgba(255,215,0,0.7)';
+      ctx.fillText(`💎 ×${ms.gems}`, textX, ry + 34);
+
+      // 進度條
+      const barX = textX;
+      const barW = pw - pad * 2 - iconSz - 80;
+      const barH = 8;
+      const barY = ry + rowH - barH - 8;
+
+      // 進度條背景
+      rr(ctx, barX, barY, barW, barH, 4);
+      ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fill();
+      // 進度條填充
+      if (progress > 0) {
+        rr(ctx, barX, barY, barW * progress, barH, 4);
+        ctx.fillStyle = isClaimed ? 'rgba(255,255,255,0.15)' : ms.color;
+        ctx.globalAlpha = isClaimed ? 0.4 : 0.8;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+      // 進度文字
+      ctx.font = `${Math.min(10, W * 0.019)}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.textAlign = 'right';
+      ctx.fillText(`${Math.min(bestScore, ms.score).toLocaleString()}/${ms.score.toLocaleString()}`, px + pw - pad - 6, barY + barH - 1);
+      ctx.textAlign = 'left';
+
+      // 領取按鈕 / 已領取標記
+      const btnW2 = 52, btnH2 = 22;
+      const btnX2 = px + pw - pad - btnW2 - 6;
+      const btnY2 = ry + 6;
+      if (isClaimed) {
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        ctx.font = `${Math.min(11, W * 0.022)}px "Noto Sans TC", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('✓ 已領', btnX2 + btnW2 / 2, btnY2 + btnH2 / 2 + 4);
+        ctx.textAlign = 'left';
+      } else if (canClaim) {
+        rr(ctx, btnX2, btnY2, btnW2, btnH2, 6);
+        // 脈動光效
+        const pulse = Math.sin(performance.now() * 0.004) * 0.15 + 0.85;
+        ctx.fillStyle = `rgba(255,215,0,${pulse * 0.9})`;
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.font = `bold ${Math.min(11, W * 0.022)}px "Noto Sans TC", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('領取', btnX2 + btnW2 / 2, btnY2 + btnH2 / 2 + 4);
+        ctx.textAlign = 'left';
+        G._milestoneR.push({ x: btnX2, y: btnY2, w: btnW2, h: btnH2, idx: i });
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        rr(ctx, btnX2, btnY2, btnW2, btnH2, 6); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = `${Math.min(10, W * 0.02)}px "Noto Sans TC", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('🔒', btnX2 + btnW2 / 2, btnY2 + btnH2 / 2 + 4);
+        ctx.textAlign = 'left';
+      }
+    });
+
+    ctx.textAlign = 'center';
+  }
+
+  // ── 徽章 Tab ──
+  function _drawBadgeTab(px, py, pw, ph) {
+    const badges = _loadBadges();
+    const weeklyBadges = _loadWeeklyBadges().filter(b => {
+      return (Date.now() - new Date(b.date).getTime()) / 86400000 < 7;
+    });
+
+    const pad = 10;
+    let curY = py + 12;
+    const sectionFz = Math.min(13, W * 0.026);
+
+    // ── 限定徽章（週冠軍～季軍）──
+    if (weeklyBadges.length > 0) {
+      ctx.fillStyle = '#ffd700';
+      ctx.font = `bold ${sectionFz}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('🔥 限定徽章（7天）', px + pw / 2, curY);
+      curY += 20;
+
+      const wbSize = Math.min(56, (pw - pad * 2) / 4);
+      const wbGap = 10;
+      const totalW = weeklyBadges.length * wbSize + (weeklyBadges.length - 1) * wbGap;
+      weeklyBadges.forEach((wb, i) => {
+        const bx = px + pw / 2 - totalW / 2 + i * (wbSize + wbGap);
+        const by = curY;
+        // 光圈
+        ctx.save();
+        ctx.shadowColor = wb.color; ctx.shadowBlur = 12;
+        rr(ctx, bx, by, wbSize, wbSize, 12);
+        ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fill();
+        ctx.strokeStyle = wb.border || wb.color; ctx.lineWidth = 2; ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.restore();
+        // 圖示
+        ctx.font = `${Math.min(24, wbSize * 0.45)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(wb.icon, bx + wbSize / 2, by + wbSize * 0.45);
+        // 名稱
+        ctx.font = `bold ${Math.min(10, W * 0.02)}px "Noto Sans TC", sans-serif`;
+        ctx.fillStyle = wb.color;
+        ctx.fillText(wb.name, bx + wbSize / 2, by + wbSize - 6);
+      });
+      curY += wbSize + 16;
+    }
+
+    // ── 遊戲成就徽章 ──
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = `bold ${sectionFz}px "Noto Sans TC", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('🏅 遊戲成就', px + pw / 2, curY);
+    curY += 16;
+
+    const cols = 3;
+    const badgeW = Math.min(100, (pw - pad * 2 - (cols - 1) * 8) / cols);
+    const badgeH = badgeW + 16;
+    const gap = 8;
+
+    BADGES.forEach((b, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const bx = px + pad + col * (badgeW + gap);
+      const by = curY + row * (badgeH + gap);
+      const earned = !!badges[b.id];
+
+      // 徽章卡背景
+      rr(ctx, bx, by, badgeW, badgeH, 10);
+      ctx.fillStyle = earned ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.3)'; ctx.fill();
+      ctx.strokeStyle = earned ? b.color + '88' : 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = earned ? 1.5 : 0.5; ctx.stroke();
+
+      // 圖示
+      ctx.globalAlpha = earned ? 1 : 0.25;
+      ctx.font = `${Math.min(28, badgeW * 0.32)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(b.icon, bx + badgeW / 2, by + badgeW * 0.4);
+
+      // 名稱
+      ctx.font = `bold ${Math.min(11, W * 0.022)}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = earned ? b.color : 'rgba(255,255,255,0.3)';
+      ctx.fillText(b.name, bx + badgeW / 2, by + badgeW * 0.65);
+
+      // 描述
+      ctx.font = `${Math.min(9, W * 0.017)}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = earned ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.15)';
+      ctx.fillText(b.desc, bx + badgeW / 2, by + badgeW * 0.65 + 14);
+
+      // 日期（已獲得時）
+      if (earned) {
+        ctx.font = `${Math.min(8, W * 0.015)}px "Noto Sans TC", sans-serif`;
+        ctx.fillStyle = 'rgba(255,255,255,0.25)';
+        ctx.fillText(badges[b.id], bx + badgeW / 2, by + badgeH - 4);
+      }
+
+      ctx.globalAlpha = 1;
+    });
   }
 
   // ─── SVG 卡片圖標系統 ─────────────────────────────────────
@@ -4090,6 +4273,45 @@
       <circle cx="26" cy="28" r="2" fill="#fff" opacity="0.3"/>
       <circle cx="38" cy="28" r="2" fill="#fff" opacity="0.3"/></svg>`,
 
+    // ── 寶箱圖示（5 階級）──
+    chest_bronze: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="cb1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4a574"/><stop offset="100%" stop-color="#8b5e3c"/></linearGradient></defs>
+      <rect x="8" y="28" width="48" height="28" rx="4" fill="url(#cb1)" stroke="#6d4c2a" stroke-width="2"/>
+      <rect x="8" y="28" width="48" height="12" rx="4" fill="#c49660"/>
+      <path d="M8 22 Q32 10 56 22 L56 32 Q32 20 8 32Z" fill="#d4a574" stroke="#6d4c2a" stroke-width="1.5"/>
+      <rect x="27" y="34" width="10" height="10" rx="2" fill="#6d4c2a"/><circle cx="32" cy="39" r="3" fill="#ffd700"/></svg>`,
+    chest_silver: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="cs1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e8e8e8"/><stop offset="100%" stop-color="#a0a0a0"/></linearGradient></defs>
+      <rect x="8" y="28" width="48" height="28" rx="4" fill="url(#cs1)" stroke="#707070" stroke-width="2"/>
+      <rect x="8" y="28" width="48" height="12" rx="4" fill="#d0d0d0"/>
+      <path d="M8 22 Q32 10 56 22 L56 32 Q32 20 8 32Z" fill="#e0e0e0" stroke="#888" stroke-width="1.5"/>
+      <rect x="27" y="34" width="10" height="10" rx="2" fill="#707070"/><circle cx="32" cy="39" r="3" fill="#fff"/>
+      <g opacity="0.3"><line x1="14" y1="44" x2="22" y2="44" stroke="#fff" stroke-width="1"/><line x1="42" y1="44" x2="50" y2="44" stroke="#fff" stroke-width="1"/></g></svg>`,
+    chest_gold: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="cg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd700"/><stop offset="100%" stop-color="#b8860b"/></linearGradient>
+      <filter id="cgl"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <rect x="8" y="28" width="48" height="28" rx="4" fill="url(#cg1)" stroke="#8b6914" stroke-width="2"/>
+      <rect x="8" y="28" width="48" height="12" rx="4" fill="#ffe066"/>
+      <path d="M8 22 Q32 10 56 22 L56 32 Q32 20 8 32Z" fill="#ffd700" stroke="#b8860b" stroke-width="1.5"/>
+      <rect x="27" y="34" width="10" height="10" rx="2" fill="#8b6914"/><circle cx="32" cy="39" r="3" fill="#fff" filter="url(#cgl)"/>
+      <g opacity="0.4"><circle cx="18" cy="20" r="2" fill="#fff"/><circle cx="46" cy="20" r="2" fill="#fff"/><circle cx="32" cy="14" r="1.5" fill="#fff"/></g></svg>`,
+    chest_diamond: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="cd1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#64b5f6"/><stop offset="100%" stop-color="#1565c0"/></linearGradient>
+      <filter id="cdl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <rect x="8" y="28" width="48" height="28" rx="4" fill="url(#cd1)" stroke="#0d47a1" stroke-width="2"/>
+      <rect x="8" y="28" width="48" height="12" rx="4" fill="#90caf9"/>
+      <path d="M8 22 Q32 10 56 22 L56 32 Q32 20 8 32Z" fill="#64b5f6" stroke="#1565c0" stroke-width="1.5"/>
+      <rect x="27" y="34" width="10" height="10" rx="2" fill="#0d47a1"/><polygon points="32,36 35,39 32,42 29,39" fill="#e0f7fa" filter="url(#cdl)"/>
+      <g opacity="0.5"><circle cx="16" cy="18" r="2" fill="#e0f7fa"/><circle cx="48" cy="18" r="2" fill="#e0f7fa"/><circle cx="32" cy="12" r="2.5" fill="#e0f7fa"/></g></svg>`,
+    chest_legendary: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <defs><linearGradient id="cl1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e040fb"/><stop offset="50%" stop-color="#7c4dff"/><stop offset="100%" stop-color="#ff6d00"/></linearGradient>
+      <filter id="cll"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <rect x="8" y="28" width="48" height="28" rx="4" fill="url(#cl1)" stroke="#4a148c" stroke-width="2"/>
+      <rect x="8" y="28" width="48" height="12" rx="4" fill="#ce93d8"/>
+      <path d="M8 22 Q32 10 56 22 L56 32 Q32 20 8 32Z" fill="#e040fb" stroke="#7c4dff" stroke-width="1.5"/>
+      <rect x="27" y="34" width="10" height="10" rx="2" fill="#4a148c"/><circle cx="32" cy="39" r="3.5" fill="#ffd700" filter="url(#cll)"/>
+      <g opacity="0.6"><circle cx="14" cy="16" r="2.5" fill="#ffd740"/><circle cx="50" cy="16" r="2.5" fill="#ffd740"/><circle cx="32" cy="10" r="3" fill="#fff"/><circle cx="22" cy="13" r="1.5" fill="#e0f7fa"/><circle cx="42" cy="13" r="1.5" fill="#e0f7fa"/></g></svg>`,
+
   };
 
   // 預載 SVG → Image 快取
@@ -4117,6 +4339,136 @@
       ctx.fillText('?', cx, cy);
       ctx.restore();
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  生涯里程碑 & 成就徽章系統
+  // ═══════════════════════════════════════════════════════════
+  const MILESTONES = [
+    { score: 4000,  gems: 3,  chest: 'chest_bronze',    tier: '銅', color: '#d4a574' },
+    { score: 6000,  gems: 5,  chest: 'chest_silver',    tier: '銀', color: '#c0c0c0' },
+    { score: 8000,  gems: 8,  chest: 'chest_gold',      tier: '金', color: '#ffd700' },
+    { score: 10000, gems: 12, chest: 'chest_diamond',   tier: '鑽石', color: '#64b5f6' },
+    { score: 12000, gems: 18, chest: 'chest_legendary', tier: '傳說', color: '#e040fb' },
+  ];
+
+  const BADGES = [
+    { id: 'first_game',   name: '初試身手',   desc: '完成第一場遊戲',          icon: '⚽', color: '#4caf50' },
+    { id: 'wave_10',      name: '小有實力',   desc: '單局達到 Wave 10',        icon: '⚡', color: '#2196f3' },
+    { id: 'wave_20',      name: '射門高手',   desc: '單局達到 Wave 20',        icon: '🔥', color: '#ff9800' },
+    { id: 'wave_30',      name: '傳奇射手',   desc: '單局達到 Wave 30',        icon: '💀', color: '#f44336' },
+    { id: 'wave_50',      name: '不可阻擋',   desc: '單局達到 Wave 50',        icon: '👑', color: '#ffd700' },
+    { id: 'cards_15',     name: '卡牌收藏家', desc: '單局收集 15 張強化卡',    icon: '🃏', color: '#ab47bc' },
+    { id: 'cards_25',     name: '全副武裝',   desc: '單局收集 25 張強化卡',    icon: '💎', color: '#7c4dff' },
+    { id: 'score_5000',   name: '五千分俱樂部', desc: '單局得分超過 5000',     icon: '🏅', color: '#ff6d00' },
+    { id: 'phoenix',      name: '不死鳥',     desc: '復活後仍達到 Wave 15+',   icon: '🔄', color: '#e91e63' },
+    { id: 'games_10',     name: '常客',       desc: '累計遊玩 10 場',          icon: '🎮', color: '#009688' },
+    { id: 'games_50',     name: '射門狂人',   desc: '累計遊玩 50 場',          icon: '🏟️', color: '#3f51b5' },
+  ];
+
+  const WEEKLY_BADGES = [
+    { rank: 1, id: 'weekly_1st', name: '週冠軍', icon: '🏆', color: '#ffd700', border: '#b8860b' },
+    { rank: 2, id: 'weekly_2nd', name: '週亞軍', icon: '🥈', color: '#c0c0c0', border: '#888' },
+    { rank: 3, id: 'weekly_3rd', name: '週季軍', icon: '🥉', color: '#cd7f32', border: '#8b5e3c' },
+  ];
+
+  // localStorage 存取
+  function _loadMilestones() {
+    try { return JSON.parse(localStorage.getItem('rogue_milestones') || '[]'); } catch { return []; }
+  }
+  function _saveMilestones(arr) { localStorage.setItem('rogue_milestones', JSON.stringify(arr)); }
+
+  function _loadBadges() {
+    try { return JSON.parse(localStorage.getItem('rogue_badges') || '{}'); } catch { return {}; }
+  }
+  function _saveBadges(obj) { localStorage.setItem('rogue_badges', JSON.stringify(obj)); }
+
+  function _loadGameCount() {
+    return parseInt(localStorage.getItem('rogue_game_count') || '0', 10);
+  }
+  function _incGameCount() {
+    const c = _loadGameCount() + 1;
+    localStorage.setItem('rogue_game_count', String(c));
+    return c;
+  }
+
+  function _loadWeeklyBadges() {
+    try { return JSON.parse(localStorage.getItem('rogue_weekly_badges') || '[]'); } catch { return []; }
+  }
+  function _saveWeeklyBadges(arr) { localStorage.setItem('rogue_weekly_badges', JSON.stringify(arr)); }
+
+  // 領取里程碑寶箱
+  async function claimMilestone(ms) {
+    const claimed = _loadMilestones();
+    if (claimed.includes(ms.score)) return;
+    // 先嘗試伺服器發放寶石
+    if (typeof awardGem === 'function') {
+      const r = await awardGem(`rogue_milestone_${ms.score}`);
+      if (r) {
+        if (typeof showToast === 'function') showToast(`💎 里程碑 ${ms.score} 分！+${r.awarded} 寶石`);
+      }
+    }
+    claimed.push(ms.score);
+    _saveMilestones(claimed);
+  }
+
+  // 遊戲結束時檢查並頒發徽章
+  function checkBadges(score, wave, cardsCount, revived) {
+    const badges = _loadBadges();
+    const gameCount = _incGameCount();
+    let newBadges = [];
+
+    const checks = [
+      { id: 'first_game',   cond: true },
+      { id: 'wave_10',      cond: wave >= 10 },
+      { id: 'wave_20',      cond: wave >= 20 },
+      { id: 'wave_30',      cond: wave >= 30 },
+      { id: 'wave_50',      cond: wave >= 50 },
+      { id: 'cards_15',     cond: cardsCount >= 15 },
+      { id: 'cards_25',     cond: cardsCount >= 25 },
+      { id: 'score_5000',   cond: score >= 5000 },
+      { id: 'phoenix',      cond: revived && wave >= 15 },
+      { id: 'games_10',     cond: gameCount >= 10 },
+      { id: 'games_50',     cond: gameCount >= 50 },
+    ];
+
+    for (const { id, cond } of checks) {
+      if (cond && !badges[id]) {
+        badges[id] = new Date().toISOString().slice(0, 10);
+        newBadges.push(BADGES.find(b => b.id === id));
+      }
+    }
+    _saveBadges(badges);
+    return newBadges;
+  }
+
+  // 檢查週排名徽章（從排行榜資料）
+  function checkWeeklyBadges() {
+    if (!currentUser || !_rogueWeeklyBoard?.length) return;
+    const uid = currentUser.id;
+    const existing = _loadWeeklyBadges().filter(b => {
+      // 只保留 7 天內的
+      const diff = (Date.now() - new Date(b.date).getTime()) / 86400000;
+      return diff < 7;
+    });
+    for (let i = 0; i < Math.min(3, _rogueWeeklyBoard.length); i++) {
+      const entry = _rogueWeeklyBoard[i];
+      if (entry.user_id === uid) {
+        const wb = WEEKLY_BADGES[i];
+        if (!existing.find(e => e.id === wb.id && e.week === _weekKey())) {
+          existing.push({ ...wb, date: new Date().toISOString(), week: _weekKey() });
+        }
+      }
+    }
+    _saveWeeklyBadges(existing);
+    return existing;
+  }
+
+  function _weekKey() {
+    const d = new Date();
+    const jan1 = new Date(d.getFullYear(), 0, 1);
+    const wk = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+    return `${d.getFullYear()}-W${wk}`;
   }
 
   // ─── 選牌畫面 ────────────────────────────────────────────
@@ -4760,6 +5112,19 @@
       ctx.fillText('已複製到剪貼簿！', W / 2, H * 0.08 + 22);
     }
 
+    // ── 新徽章 Toast ──
+    if (G._badgeToast && performance.now() - (G._badgeToastT || 0) < 4000) {
+      const ta = Math.min(1, (4000 - (performance.now() - G._badgeToastT)) / 800);
+      ctx.globalAlpha = ta;
+      ctx.font = `bold ${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
+      const tw2 = Math.min(ctx.measureText(G._badgeToast).width + 32, W * 0.9);
+      rr(ctx, W / 2 - tw2 / 2, H * 0.14, tw2, 34, 8);
+      ctx.fillStyle = 'rgba(0,0,0,0.85)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,215,0,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = '#ffd700';
+      ctx.fillText(G._badgeToast, W / 2, H * 0.14 + 22);
+    }
+
     ctx.globalAlpha = 1;
   }
 
@@ -4821,10 +5186,26 @@
     }
 
     if (G.phase === 'title') {
-      // 排行榜 Tab 切換
-      if (G._lbTabR) {
+      // 主 Tab 切換（排行 / 里程碑 / 徽章）
+      if (G._titleTabR) {
+        for (const tr of G._titleTabR) {
+          if (tr && hitTest(x, y, tr)) { G._titleTab = tr.key; return; }
+        }
+      }
+      // 排行榜子 Tab 切換
+      if (G._titleTab === 'board' && G._lbTabR) {
         for (const tr of G._lbTabR) {
           if (tr && hitTest(x, y, tr)) { G._lbTab = tr.key; return; }
+        }
+      }
+      // 里程碑領取
+      if (G._titleTab === 'miles' && G._milestoneR) {
+        for (const mr of G._milestoneR) {
+          if (mr && hitTest(x, y, mr)) {
+            const ms = MILESTONES[mr.idx];
+            claimMilestone(ms);
+            return;
+          }
         }
       }
       if (hitTest(x, y, G._startR)) {
