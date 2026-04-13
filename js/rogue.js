@@ -3754,7 +3754,7 @@
         // 玩家名
         ctx.font = `${bodyFz}px "Noto Sans TC", sans-serif`;
         ctx.fillStyle = i < 3 ? rankColors[i] : 'rgba(255,255,255,0.65)';
-        const nick = (entry.nickname || '???').length > 6 ? (entry.nickname || '???').slice(0, 6) + '…' : (entry.nickname || '???');
+        const nick = entry.nickname || '???';
         ctx.fillText(nick, colName, ey);
 
         // 分數（粗體亮色）
@@ -4588,7 +4588,7 @@
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
         ctx.fillStyle = i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.6)';
         ctx.fillText(`${medal}${i + 1}`, colRank, ey);
-        const nick = (entry.nickname || '???').length > 6 ? (entry.nickname || '???').slice(0, 6) + '…' : (entry.nickname || '???');
+        const nick = entry.nickname || '???';
         ctx.fillText(nick, colName, ey);
         ctx.fillText(`${entry.score}`, colScore, ey);
         ctx.fillText(`${entry.wave}`, colWave, ey);
