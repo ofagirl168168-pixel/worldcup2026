@@ -2273,6 +2273,59 @@ img.flag-img {
   .rogue-home-banner-rewards { justify-content: center; }
 }
 
+/* ========== 射門挑戰首頁排行榜 ========== */
+.rogue-home-lb {
+  margin-top: 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.rogue-home-lb:empty { display: none; }
+.rogue-home-lb-empty {
+  text-align: center; padding: 20px;
+  color: var(--text-muted); font-size: 13px;
+}
+.rogue-lb-tabs {
+  display: flex; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.rogue-lb-tab {
+  flex: 1; padding: 10px; text-align: center;
+  font-size: 13px; font-weight: 700;
+  color: var(--text-muted); background: none; border: none;
+  cursor: pointer; transition: color 0.2s, background 0.2s;
+}
+.rogue-lb-tab:hover { background: rgba(255,255,255,0.03); }
+.rogue-lb-tab.active {
+  color: #ffd700;
+  background: rgba(255,215,0,0.06);
+  box-shadow: inset 0 -2px 0 #ffd700;
+}
+.rogue-lb-panel { padding: 6px 0; }
+.rogue-lb-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 16px; font-size: 13px;
+  transition: background 0.15s;
+}
+.rogue-lb-row:hover { background: rgba(255,255,255,0.03); }
+.rogue-lb-top3 { font-weight: 600; }
+.rogue-lb-rank {
+  width: 32px; text-align: center; flex-shrink: 0;
+  font-size: 14px;
+}
+.rogue-lb-name {
+  flex: 1; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rogue-lb-score {
+  color: #ffd700; font-weight: 700; font-size: 13px;
+  white-space: nowrap;
+}
+.rogue-lb-wave {
+  color: var(--text-muted); font-size: 11px;
+  white-space: nowrap; min-width: 55px; text-align: right;
+}
+
 /* ========== 射門挑戰 Overlay ========== */
 #rogue-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;

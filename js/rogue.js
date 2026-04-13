@@ -4255,6 +4255,68 @@
     G = null;
   }
 
+  // ── 首頁排行榜渲染 ──────────────────────────────────────
+  async function renderHomeLeaderboard() {
+    const el = document.getElementById('rogue-home-leaderboard');
+    if (!el) return;
+    if (typeof DB === 'undefined') return;
+
+    try {
+      const [{ data: weekly }, { data: allTime }] = await Promise.all([
+        DB.from('rogue_weekly_leaderboard').select('*').order('score', { ascending: false }).limit(5),
+        DB.from('rogue_alltime_leaderboard').select('*').order('score', { ascending: false }).limit(5),
+      ]);
+
+      const wRows = weekly ?? [];
+      const aRows = allTime ?? [];
+      if (wRows.length === 0 && aRows.length === 0) {
+        el.innerHTML = `<div class="rogue-home-lb-empty">
+          <span>🏅</span> 還沒有人上榜，成為第一個挑戰者！
+        </div>`;
+        return;
+      }
+
+      const medals = ['🥇','🥈','🥉'];
+      function buildTable(rows) {
+        return rows.map((r, i) => `
+          <div class="rogue-lb-row ${i < 3 ? 'rogue-lb-top3' : ''}">
+            <span class="rogue-lb-rank">${medals[i] ?? '#' + (i+1)}</span>
+            <span class="rogue-lb-name">${r.nickname || '???'}</span>
+            <span class="rogue-lb-score">${r.score} 分</span>
+            <span class="rogue-lb-wave">Wave ${r.wave}</span>
+          </div>`).join('');
+      }
+
+      let html = '<div class="rogue-lb-tabs">';
+      html += '<button class="rogue-lb-tab active" data-tab="weekly">⚡ 本週排行</button>';
+      html += '<button class="rogue-lb-tab" data-tab="alltime">👑 歷史排行</button>';
+      html += '</div>';
+      html += `<div class="rogue-lb-panel" id="rogue-lb-weekly">${wRows.length ? buildTable(wRows) : '<div class="rogue-home-lb-empty">本週還沒有紀錄</div>'}</div>`;
+      html += `<div class="rogue-lb-panel" id="rogue-lb-alltime" style="display:none">${aRows.length ? buildTable(aRows) : '<div class="rogue-home-lb-empty">還沒有紀錄</div>'}</div>`;
+
+      el.innerHTML = html;
+
+      // Tab 切換
+      el.querySelectorAll('.rogue-lb-tab').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          el.querySelectorAll('.rogue-lb-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('rogue-lb-weekly').style.display = btn.dataset.tab === 'weekly' ? '' : 'none';
+          document.getElementById('rogue-lb-alltime').style.display = btn.dataset.tab === 'alltime' ? '' : 'none';
+        });
+      });
+    } catch (e) { console.warn('renderHomeLeaderboard:', e); }
+  }
+
+  // 頁面載入後自動渲染首頁排行榜
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(renderHomeLeaderboard, 500));
+  } else {
+    setTimeout(renderHomeLeaderboard, 500);
+  }
+
   // 公開 API
   window.startRogueGame = startGame;
+  window.renderRogueLeaderboard = renderHomeLeaderboard;
 })();
