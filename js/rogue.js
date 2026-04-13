@@ -567,18 +567,19 @@
     const gkEffSpd = gk.spd * (G.globalSlow || 1);
     if (gk.tracking) {
       // 找最具威脅的球：預判球到達球門線時的 x 位置
+      const effectiveGHW = Math.min(GOAL_HW * 1.6, GOAL_HW * (1 + (G.goalBonus || 0)));
+      const smartGK = G.wave >= 40; // wave40+ 守門員只追會進球門的球
       let targetX = null, bestThreat = -Infinity;
       for (const b of G.balls) {
-        if (!b.alive || b.vz <= 0) continue; // 只追正在飛向球門的球
-        // 預測球到球門 z 時的 x 位置（考慮牆壁反彈）
-        const timeToGoal = (GOAL_Z - b.z) / b.vz; // frames
+        if (!b.alive || b.vz <= 0) continue;
+        const timeToGoal = (GOAL_Z - b.z) / b.vz;
         let predictX = b.x + b.vx * timeToGoal;
-        // 簡易牆壁反彈預測
         while (predictX < -FIELD_HW || predictX > FIELD_HW) {
           if (predictX < -FIELD_HW) predictX = -2 * FIELD_HW - predictX;
           if (predictX > FIELD_HW) predictX = 2 * FIELD_HW - predictX;
         }
-        // 威脅度 = z 越高越危險
+        // wave40+：預測落點不在球門範圍內的球直接忽略
+        if (smartGK && Math.abs(predictX) > effectiveGHW + 20) continue;
         const threat = b.z;
         if (threat > bestThreat) { bestThreat = threat; targetX = predictX; }
       }
@@ -587,6 +588,8 @@
         for (const b of G.balls) {
           if (!b.alive) continue;
           if (b.z > FIELD_DEPTH * 0.4) {
+            // wave40+：不在球門範圍內的也忽略
+            if (smartGK && Math.abs(b.x) > effectiveGHW + 30) continue;
             const threat = b.z;
             if (threat > bestThreat) { bestThreat = threat; targetX = b.x; }
           }
