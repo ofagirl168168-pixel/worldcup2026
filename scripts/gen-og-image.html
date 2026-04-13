@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>OG Image Generator</title></head>
+<body style="margin:0;background:#111">
+<canvas id="c" width="1200" height="630"></canvas>
+<br><button onclick="save()">下載 og-cover.png</button>
+<script>
+const c = document.getElementById('c'), ctx = c.getContext('2d');
+
+// 背景漸層
+const bg = ctx.createLinearGradient(0, 0, 1200, 630);
+bg.addColorStop(0, '#0a1628');
+bg.addColorStop(0.5, '#1a3a1a');
+bg.addColorStop(1, '#2d7a3a');
+ctx.fillStyle = bg;
+ctx.fillRect(0, 0, 1200, 630);
+
+// 網格裝飾
+ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+ctx.lineWidth = 1;
+for (let x = 0; x < 1200; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 630); ctx.stroke(); }
+for (let y = 0; y < 630; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1200, y); ctx.stroke(); }
+
+// 足球場線條裝飾
+ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+ctx.lineWidth = 2;
+ctx.strokeRect(80, 80, 1040, 470);
+ctx.beginPath();
+ctx.moveTo(600, 80);
+ctx.lineTo(600, 550);
+ctx.stroke();
+ctx.beginPath();
+ctx.arc(600, 315, 80, 0, Math.PI * 2);
+ctx.stroke();
+
+ctx.textAlign = 'center';
+
+// 徽章
+ctx.fillStyle = '#ffd700';
+ctx.font = '28px sans-serif';
+ctx.fillText('🏆 2026 FIFA WORLD CUP 🏆', 600, 160);
+
+// 主標題
+ctx.fillStyle = '#ffd700';
+ctx.shadowColor = '#ffd700';
+ctx.shadowBlur = 30;
+ctx.font = 'bold 72px "Noto Sans TC", "Microsoft JhengHei", sans-serif';
+ctx.fillText('世界盃預測平台', 600, 280);
+ctx.shadowBlur = 0;
+
+// 副標題
+ctx.fillStyle = '#fff';
+ctx.font = 'bold 36px "Noto Sans TC", "Microsoft JhengHei", sans-serif';
+ctx.fillText('AI預測分析 ⚽ 射門挑戰小遊戲 ⚽ 寶石獎勵', 600, 360);
+
+// 說明
+ctx.fillStyle = 'rgba(255,255,255,0.7)';
+ctx.font = '24px "Noto Sans TC", "Microsoft JhengHei", sans-serif';
+ctx.fillText('免費遊玩 · 即時比分 · 排行榜競爭 · 每週獎勵', 600, 430);
+
+// 底部 URL
+ctx.fillStyle = 'rgba(255,215,0,0.5)';
+ctx.font = '20px sans-serif';
+ctx.fillText('worldcup2026-predictor.netlify.app', 600, 560);
+
+// 左右足球 emoji
+ctx.font = '80px sans-serif';
+ctx.fillText('⚽', 120, 320);
+ctx.fillText('⚽', 1080, 320);
+
+function save() {
+  const a = document.createElement('a');
+  a.download = 'og-cover.png';
+  a.href = c.toDataURL('image/png');
+  a.click();
+}
+</script>
+</body></html>

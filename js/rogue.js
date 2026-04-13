@@ -4198,59 +4198,153 @@
   }
 
   // ─── 結算畫面 ────────────────────────────────────────────
+  // 成績評語
+  function scorePraise(score, wave) {
+    if (wave >= 50) return { text: '傳說級射手！你已突破極限！', color: '#ff4081' };
+    if (wave >= 35) return { text: '世界級表現！守門員都怕你！', color: '#ffd700' };
+    if (wave >= 25) return { text: '太強了！職業級的射門！', color: '#ff9800' };
+    if (wave >= 15) return { text: '很不錯！潛力無限！', color: '#4fc3f7' };
+    if (wave >= 8)  return { text: '不錯的開始，繼續加油！', color: '#81c784' };
+    if (wave >= 3)  return { text: '初試身手，下次會更好！', color: '#aaa' };
+    return { text: '別氣餒，再來一次！', color: '#aaa' };
+  }
+
+  // 分享遊戲成績
+  function shareScore(score, wave) {
+    const praise = scorePraise(score, wave);
+    const url = window.location.origin + '?play=rogue';
+    const text = `⚽ 射門挑戰：前進世界盃\n🏅 分數 ${score}｜Wave ${wave}\n${praise.text}\n你能超越我嗎？來挑戰！\n${url}`;
+
+    if (navigator.share) {
+      navigator.share({ title: '射門挑戰：前進世界盃', text, url }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).then(() => {
+        G._shareToast = performance.now();
+      }).catch(() => {});
+    }
+  }
+
   function drawGameOver() {
     const elapsed = performance.now() - (G._gameoverStart || 0);
-    const fade = Math.min(1, elapsed / 1000); // 1 秒漸入
+    const fade = Math.min(1, elapsed / 1000);
 
     ctx.globalAlpha = fade;
-    ctx.fillStyle = 'rgba(0,0,0,0.82)';
+    ctx.fillStyle = 'rgba(0,0,0,0.85)';
     ctx.fillRect(0, 0, W, H);
-
     ctx.textAlign = 'center';
 
-    ctx.fillStyle = '#f44336';
-    ctx.font = `bold ${Math.min(36, W * 0.07)}px "Noto Sans TC", sans-serif`;
-    ctx.fillText('終場哨響！', W / 2, H * 0.25);
+    const isGuest = typeof currentUser === 'undefined' || !currentUser;
+    const praise = scorePraise(G.score, G.wave);
 
+    // ── 評語 ──
+    ctx.fillStyle = praise.color;
+    ctx.shadowColor = praise.color; ctx.shadowBlur = 12;
+    ctx.font = `bold ${Math.min(22, W * 0.042)}px "Noto Sans TC", sans-serif`;
+    ctx.fillText(praise.text, W / 2, H * 0.15);
+    ctx.shadowBlur = 0;
+
+    // ── 成績面板 ──
+    const panelW = Math.min(W * 0.85, 340);
+    const panelX = (W - panelW) / 2;
+    const panelY = H * 0.19;
+    const panelH = 120;
+    rr(ctx, panelX, panelY, panelW, panelH, 14);
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,215,0,0.25)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // 分數（大字）
+    ctx.fillStyle = '#ffd700';
+    ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 10;
+    ctx.font = `bold ${Math.min(44, W * 0.085)}px "Noto Sans TC", sans-serif`;
+    ctx.fillText(`${G.score}`, W / 2, panelY + 52);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,215,0,0.5)';
+    ctx.font = `${Math.min(12, W * 0.023)}px "Noto Sans TC", sans-serif`;
+    ctx.fillText('SCORE', W / 2, panelY + 70);
+
+    // Wave + 強化卡
     ctx.fillStyle = '#fff';
-    ctx.font = `bold ${Math.min(24, W * 0.045)}px "Noto Sans TC", sans-serif`;
-    ctx.fillText(`最終分數：${G.score}`, W / 2, H * 0.36);
-    ctx.fillText(`到達 Wave ${G.wave}`, W / 2, H * 0.43);
+    ctx.font = `bold ${Math.min(18, W * 0.035)}px "Noto Sans TC", sans-serif`;
+    const infoY = panelY + 100;
+    const infoLeft = W / 2 - panelW * 0.22;
+    const infoRight = W / 2 + panelW * 0.22;
+    ctx.fillText(`Wave ${G.wave}`, infoLeft, infoY);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font = `${Math.min(14, W * 0.027)}px "Noto Sans TC", sans-serif`;
+    ctx.fillText(`${G.collected.length} 張強化卡`, infoRight, infoY);
 
-    if (G.collected.length) {
-      ctx.fillStyle = 'rgba(255,255,255,0.5)';
-      ctx.font = `${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText(`收集了 ${G.collected.length} 張強化卡`, W / 2, H * 0.48);
+    // ── 未登入：引導登入區塊 ──
+    let nextY = panelY + panelH + 16;
+    if (isGuest) {
+      const promptW = panelW;
+      const promptX = panelX;
+      const promptH = 82;
+      rr(ctx, promptX, nextY, promptW, promptH, 10);
+      ctx.fillStyle = 'rgba(255,200,0,0.08)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,200,0,0.25)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffd700';
+      ctx.font = `bold ${Math.min(14, W * 0.027)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('登入即可上排行榜！', W / 2, nextY + 24);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = `${Math.min(11, W * 0.021)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('與其他玩家競爭，週排行前三名可獲得寶石', W / 2, nextY + 42);
+
+      // 登入按鈕
+      if (fade >= 1) {
+        const lbtnW = promptW * 0.6;
+        const lbtnH = 30;
+        const lbtnX = W / 2 - lbtnW / 2;
+        const lbtnY = nextY + 50;
+        G._loginR = { x: lbtnX, y: lbtnY, w: lbtnW, h: lbtnH };
+        rr(ctx, lbtnX, lbtnY, lbtnW, lbtnH, 8);
+        ctx.fillStyle = '#f4b400';
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.font = `bold ${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
+        ctx.fillText('Google 登入', W / 2, lbtnY + 21);
+      }
+      nextY += promptH + 10;
+    } else {
+      G._loginR = null;
     }
 
-    // 未登入提示
-    if (typeof currentUser === 'undefined' || !currentUser) {
-      ctx.fillStyle = 'rgba(255,200,0,0.5)';
-      ctx.font = `${Math.min(12, W * 0.023)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText('💡 登入後分數會自動上傳排行榜', W / 2, H * 0.52);
-    }
-
-    // 週排行榜（精簡版）
+    // ── 週排行榜（精簡版） ──
     const goBoard = _rogueWeeklyBoard || [];
     if (goBoard.length > 0) {
       const lbFontSz = Math.min(11, W * 0.021);
       const lbLineH = Math.min(15, W * 0.028);
-      const lbY = H * 0.52;
-      ctx.fillStyle = '#ffd700';
-      ctx.font = `bold ${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillText('⚡ 本週排行', W / 2, lbY);
+      const lbPanelW = panelW;
+      const lbPanelX = panelX;
+      const showCount = Math.min(goBoard.length, 5);
+      const lbPanelH = 18 + lbLineH * (showCount + 1) + 6;
 
-      const colRank = W * 0.18, colName = W * 0.4, colScore = W * 0.65, colWave = W * 0.82;
-      ctx.fillStyle = 'rgba(255,215,0,0.45)';
+      rr(ctx, lbPanelX, nextY, lbPanelW, lbPanelH, 10);
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fill();
+
+      ctx.fillStyle = '#ffd700';
+      ctx.font = `bold ${Math.min(12, W * 0.023)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('⚡ 本週排行', W / 2, nextY + 14);
+
+      const colRank = lbPanelX + lbPanelW * 0.12;
+      const colName = lbPanelX + lbPanelW * 0.38;
+      const colScore = lbPanelX + lbPanelW * 0.66;
+      const colWave = lbPanelX + lbPanelW * 0.88;
+      const hY = nextY + 14 + lbLineH;
+      ctx.fillStyle = 'rgba(255,215,0,0.4)';
       ctx.font = `bold ${lbFontSz}px "Noto Sans TC", sans-serif`;
-      const hY = lbY + lbLineH;
       ctx.fillText('#', colRank, hY);
       ctx.fillText('玩家', colName, hY);
       ctx.fillText('分數', colScore, hY);
       ctx.fillText('Wave', colWave, hY);
 
-      const showCount = Math.min(goBoard.length, 5);
       ctx.font = `${lbFontSz}px "Noto Sans TC", sans-serif`;
       for (let i = 0; i < showCount; i++) {
         const entry = goBoard[i];
@@ -4263,27 +4357,53 @@
         ctx.fillText(`${entry.score}`, colScore, ey);
         ctx.fillText(`${entry.wave}`, colWave, ey);
       }
+      nextY += lbPanelH + 8;
     }
 
-    // 按鈕（漸入完成才顯示）
+    // ── 按鈕區 ──
     if (fade >= 1) {
-      const btnW = Math.min(200, W * 0.4), btnH = 46;
+      const btnW = Math.min(200, W * 0.4), btnH = 42;
+      const btnGap = 10;
       const bx = W / 2 - btnW / 2;
 
-      const y1 = H * 0.82;
+      // 分享按鈕
+      const shareY = Math.max(nextY + 4, H * 0.78);
+      G._shareR = { x: bx, y: shareY, w: btnW, h: btnH };
+      rr(ctx, bx, shareY, btnW, btnH, 10);
+      ctx.fillStyle = '#1da1f2';
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('📤 分享成績', W / 2, shareY + 27);
+
+      // 再來一局
+      const y1 = shareY + btnH + btnGap;
       G._restartR = { x: bx, y: y1, w: btnW, h: btnH };
       ctx.fillStyle = '#4caf50';
-      rr(ctx, bx, y1, btnW, btnH, 12); ctx.fill();
+      rr(ctx, bx, y1, btnW, btnH, 10); ctx.fill();
       ctx.fillStyle = '#fff';
-      ctx.font = `bold ${Math.min(17, W * 0.033)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText('再來一局', W / 2, y1 + 30);
+      ctx.fillText('再來一局', W / 2, y1 + 27);
 
-      const y2 = y1 + btnH + 14;
+      // 返回網站
+      const y2 = y1 + btnH + btnGap;
       G._closeR = { x: bx, y: y2, w: btnW, h: btnH };
       ctx.fillStyle = '#555';
-      rr(ctx, bx, y2, btnW, btnH, 12); ctx.fill();
+      rr(ctx, bx, y2, btnW, btnH, 10); ctx.fill();
       ctx.fillStyle = '#fff';
-      ctx.fillText('返回網站', W / 2, y2 + 30);
+      ctx.fillText('返回網站', W / 2, y2 + 27);
+    }
+
+    // ── 分享 Toast ──
+    if (G._shareToast && performance.now() - G._shareToast < 2000) {
+      const ta = Math.min(1, (2000 - (performance.now() - G._shareToast)) / 500);
+      ctx.globalAlpha = ta;
+      const tw = Math.min(200, W * 0.5);
+      rr(ctx, W / 2 - tw / 2, H * 0.08, tw, 32, 8);
+      ctx.fillStyle = 'rgba(0,0,0,0.8)';
+      ctx.fill();
+      ctx.fillStyle = '#4caf50';
+      ctx.font = `bold ${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('已複製到剪貼簿！', W / 2, H * 0.08 + 22);
     }
 
     ctx.globalAlpha = 1;
@@ -4373,6 +4493,8 @@
     if (G.phase === 'gameover') {
       // 死亡 1 秒內不能點
       if (performance.now() - (G._gameoverStart || 0) < 1000) return;
+      if (hitTest(x, y, G._shareR))   { shareScore(G.score, G.wave); return; }
+      if (hitTest(x, y, G._loginR) && typeof loginWithGoogle === 'function') { loginWithGoogle(); return; }
       if (hitTest(x, y, G._restartR)) { startGame(); return; }
       if (hitTest(x, y, G._closeR))   { closeGame(); return; }
     }
@@ -4510,4 +4632,19 @@
   // 公開 API
   window.startRogueGame = startGame;
   window.renderRogueLeaderboard = renderHomeLeaderboard;
+
+  // ?play=rogue → 自動開啟遊戲（支援分享連結）
+  function checkAutoPlay() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('play') === 'rogue') {
+      // 移除 URL 參數（避免重整再次觸發）
+      window.history.replaceState({}, '', window.location.pathname + window.location.hash);
+      startGame();
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(checkAutoPlay, 300));
+  } else {
+    setTimeout(checkAutoPlay, 300);
+  }
 })();
