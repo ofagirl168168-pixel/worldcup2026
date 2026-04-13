@@ -61,6 +61,11 @@ function transformMatch(m) {
   let score = null;
   if (m.score?.fullTime?.home !== null && m.score?.fullTime?.home !== undefined) {
     score = { h: m.score.fullTime.home, a: m.score.fullTime.away };
+  } else if (m.score?.home !== null && m.score?.home !== undefined) {
+    // 比賽進行中：fullTime 尚未有值，改用 score 根層級
+    score = { h: m.score.home, a: m.score.away };
+  } else if (m.score?.halfTime?.home !== null && m.score?.halfTime?.home !== undefined) {
+    score = { h: m.score.halfTime.home, a: m.score.halfTime.away };
   }
 
   const goals = (m.goals || []).map(g => ({
@@ -79,8 +84,9 @@ function transformMatch(m) {
   }
 
   let minute = null;
-  if (status === 'live' && m.minute !== undefined && m.minute !== null) {
-    minute = m.minute;
+  if (status === 'live') {
+    // football-data.org v4 不同方案提供的欄位可能不同
+    minute = m.minute ?? m.matchMinute ?? null;
   }
 
   return {

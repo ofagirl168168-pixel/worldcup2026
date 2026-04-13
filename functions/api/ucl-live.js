@@ -97,6 +97,9 @@ function transformMatch(m) {
   let score = null;
   if (m.score && m.score.fullTime && m.score.fullTime.home !== null) {
     score = { h: m.score.fullTime.home, a: m.score.fullTime.away };
+  } else if (m.score && m.score.home !== null && m.score.home !== undefined) {
+    // 比賽進行中：fullTime 尚無值，用 score 根層級
+    score = { h: m.score.home, a: m.score.away };
   }
 
   // 進球（如果 API 有提供）
