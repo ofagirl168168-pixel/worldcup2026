@@ -569,6 +569,8 @@ function submitDailyPickHome(idx) {
 
 // ── 首次進站提示（每 7 天出現一次）──────────────────────────
 function showArenaWelcomeIfNeeded() {
+  // 從遊戲分享連結進來不彈歡迎窗
+  if (new URLSearchParams(window.location.search).get('play')) return;
   _syncGK();
   const KEY = 'wc26_welcome_shown';
   const last = localStorage.getItem(KEY);
