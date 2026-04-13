@@ -361,37 +361,38 @@
   //  Wave 管理
   // ═══════════════════════════════════════════════════════════
   function waveConfig(w) {
-    // 防守員數量：每階段上限 +1
+    // 防守員數量：每階段上限 +2
     let maxCount;
     if (w <= 15)      maxCount = 16;
-    else if (w <= 30) maxCount = 17;
-    else if (w <= 50) maxCount = 18;
-    else              maxCount = 19;
+    else if (w <= 30) maxCount = 18;
+    else if (w <= 50) maxCount = 20;
+    else              maxCount = 22;
     const count = Math.min(3 + w, maxCount);
     const types = ['normal'];
-    if (w >= 1) types.push('sentry');  // 每波都有中路守衛擋住直射
+    if (w >= 1) types.push('sentry');
     if (w >= 2) types.push('fast');
     if (w >= 3) { types.push('tank'); types.push('captain'); }
-    // 中路守衛數量：每階段 +1
+    // 中路守衛數量
     let maxSentry;
     if (w <= 15)      maxSentry = 4;
     else if (w <= 30) maxSentry = 5;
     else if (w <= 50) maxSentry = 6;
     else              maxSentry = 7;
     const sentryCount = Math.min(1 + Math.floor(w / 2), maxSentry);
-    // 攔截者數量：每階段 +1
+    // 攔截者數量
     let maxCaptain;
     if (w <= 15)      maxCaptain = 3;
     else if (w <= 30) maxCaptain = 4;
     else if (w <= 50) maxCaptain = 5;
     else              maxCaptain = 6;
     const captainCount = w >= 3 ? Math.min(1 + Math.floor((w - 2) / 2), maxCaptain) : 0;
-    // 血量成長：wave 50 前維持原幅度，50 後加速
+    // 血量成長：四階段加速
     let hpMul;
-    if (w <= 50)      hpMul = Math.pow(1.20, w - 1);                                    // 前~中期 1.2x
-    else if (w <= 65) hpMul = Math.pow(1.20, 49) * Math.pow(1.28, w - 50);              // 後期 1.28x
-    else              hpMul = Math.pow(1.20, 49) * Math.pow(1.28, 15) * Math.pow(1.35, w - 65); // 極後期 1.35x
-    const spdMul = 1 + (w - 1) * 0.12;           // wave1=1x, wave5=1.48x, wave10=2.08x
+    if (w <= 30)      hpMul = Math.pow(1.20, w - 1);
+    else if (w <= 50) hpMul = Math.pow(1.20, 29) * Math.pow(1.28, w - 30);
+    else if (w <= 65) hpMul = Math.pow(1.20, 29) * Math.pow(1.28, 20) * Math.pow(1.35, w - 50);
+    else              hpMul = Math.pow(1.20, 29) * Math.pow(1.28, 20) * Math.pow(1.35, 15) * Math.pow(1.45, w - 65);
+    const spdMul = 1 + (w - 1) * 0.12;
     return { count, types, hpMul, spdMul, sentryCount, captainCount };
   }
 
@@ -465,9 +466,18 @@
     G.gk.spd = (GK_BASE_SPD + gkBonus) * (G.gkSlowMul || 1);
     G.gk.tracking = G.wave >= 5; // wave5 起才追蹤球
 
-    // 每 5 波警告
+    // 守門員加寬：wave 35 和 wave 50 各加寬一次
+    if (G.wave === 35) G.gk.w = 62;
+    if (G.wave === 50) G.gk.w = 74;
+
+    // 每 5 波警告（標明強化內容）
     if (G.wave >= 5 && G.wave % 5 === 0) {
-      G._warning = { timer: 3000, tier: gkTier };
+      let warnMsg = '';
+      if (G.wave === 35)      warnMsg = '守門員加寬！';
+      else if (G.wave === 50) warnMsg = '守門員再次加寬！';
+      else if (G.wave >= 55)  warnMsg = '守門員加速！';
+      else                    warnMsg = '守門員強化！';
+      G._warning = { timer: 3000, tier: gkTier, msg: warnMsg };
       sfxWarning();
     }
   }
@@ -1017,23 +1027,28 @@
       ctx.font = `bold ${Math.min(36, W * 0.065)}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
       ctx.fillText('WARNING', W / 2, H * 0.50);
+      // 顯示具體強化內容
+      ctx.fillStyle = '#ffd700';
+      ctx.font = `bold ${Math.min(20, W * 0.038)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText(G._warning.msg || '守門員強化！', W / 2, H * 0.56);
+      // 詳細描述
       ctx.fillStyle = '#fff';
-      ctx.font = `bold ${Math.min(18, W * 0.035)}px "Noto Sans TC", sans-serif`;
+      ctx.font = `bold ${Math.min(14, W * 0.028)}px "Noto Sans TC", sans-serif`;
       const tier = G._warning.tier;
-      const msgs = [
-        '守門員覺醒！開始自動追蹤球路',
-        '守門員強化！移動速度大幅提升',
-        '守門員狂暴！反應速度接近極限',
-        '守門員究極體！幾乎無法突破',
-        '守門員超越極限！已進入神域',
-        '守門員異次元反應！球路無所遁形',
-        '守門員時間靜止！射門窗口趨近於零',
-        '守門員已成神！你確定要繼續嗎？',
-        '傳說守門員降臨！放棄抵抗吧',
-        '守門員：「你的射門...我全都看得見」',
-      ];
-      const msg = msgs[Math.min(tier - 1, msgs.length - 1)];
-      ctx.fillText(msg, W / 2, H * 0.56);
+      const wave = G.wave;
+      const details = [];
+      if (wave === 5) details.push('守門員覺醒！開始自動追蹤球路');
+      else if (wave === 35) details.push('守門員體型加寬，封鎖更多角度');
+      else if (wave === 50) details.push('守門員再次加寬，射門空間更小');
+      else if (wave >= 55) details.push('守門員速度大幅提升，接近瞬移');
+      else details.push(`守門員移動速度提升（階段 ${tier}）`);
+      // 同時提示敵人強化
+      if (wave === 31) details.push('防守員血量成長加速（×1.28）');
+      else if (wave === 51) details.push('防守員血量成長再加速（×1.35）');
+      else if (wave === 66) details.push('防守員血量成長極速（×1.45）');
+      for (let di = 0; di < details.length; di++) {
+        ctx.fillText(details[di], W / 2, H * 0.61 + di * Math.min(18, W * 0.034));
+      }
       ctx.globalAlpha = 1;
     }
 
