@@ -619,14 +619,14 @@ function showArenaWelcomeIfNeeded() {
             <i class="fas fa-gamepad"></i> 前往競技場
           </button>
           <button onclick="document.getElementById('arena-welcome-overlay').remove()"
-            style="background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;padding:8px">
+            style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:var(--text-secondary);font-size:14px;cursor:pointer;padding:10px 20px;width:100%">
             稍後再說
           </button>
         </div>
       </div>`;
     overlay.addEventListener('click', e => { if (e.target===overlay) overlay.remove(); });
     document.body.appendChild(overlay);
-  }, 3000); // 頁面載入 3 秒後出現
+  }, 30000); // 頁面載入 30 秒後出現
 }
 
 // ── 競技場主頁面 ──────────────────────────────────────────
