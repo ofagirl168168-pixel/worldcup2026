@@ -1105,18 +1105,17 @@
       localStorage.setItem('rogue_best', JSON.stringify(best));
     }
 
-    // 累積遊戲 XP（score/500 + wave/5）
-    const gameXP = Math.floor(G.score / 500) + Math.floor(G.wave / 5);
-    const prevXP = parseInt(localStorage.getItem('rogue_total_xp') || '0') || 0;
-    localStorage.setItem('rogue_total_xp', String(prevXP + gameXP));
-    // 更新排行榜 XP
-    if (typeof updateNavXP === 'function') updateNavXP();
-    if (typeof syncXPToProfile === 'function') syncXPToProfile();
-
-    // 檢查並頒發遊戲徽章
+    // 檢查並頒發遊戲徽章（徽章附帶 XP）
     const newBadges = checkBadges(G.score, G.wave, G.collected.length, G._revived);
     if (newBadges.length > 0) {
-      const names = newBadges.map(b => `${b.icon} ${b.name}`).join('、');
+      const badgeXP = newBadges.reduce((sum, b) => sum + (b.xp || 0), 0);
+      if (badgeXP > 0) {
+        const prevXP = parseInt(localStorage.getItem('rogue_total_xp') || '0') || 0;
+        localStorage.setItem('rogue_total_xp', String(prevXP + badgeXP));
+        if (typeof updateNavXP === 'function') updateNavXP();
+        if (typeof syncXPToProfile === 'function') syncXPToProfile();
+      }
+      const names = newBadges.map(b => `${b.icon} ${b.name}${b.xp ? ` (+${b.xp}XP)` : ''}`).join('、');
       G._badgeToast = `🎉 新徽章：${names}`;
       G._badgeToastT = performance.now();
     }
@@ -4283,6 +4282,13 @@
       ctx.fillStyle = earned ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.15)';
       ctx.fillText(b.desc, bx + badgeW / 2, by + badgeW * 0.65 + 14);
 
+      // XP 獎勵
+      if (b.xp) {
+        ctx.font = `bold ${Math.min(8, W * 0.015)}px "Noto Sans TC", sans-serif`;
+        ctx.fillStyle = earned ? 'rgba(255,215,0,0.4)' : 'rgba(255,215,0,0.2)';
+        ctx.fillText(`+${b.xp} XP`, bx + badgeW / 2, by + badgeW * 0.65 + 26);
+      }
+
       // 日期（已獲得時）
       if (earned) {
         ctx.font = `${Math.min(8, W * 0.015)}px "Noto Sans TC", sans-serif`;
@@ -4649,17 +4655,17 @@
   ];
 
   const BADGES = [
-    { id: 'first_game',   name: '初試身手',   desc: '完成第一場遊戲',          icon: '⚽', color: '#4caf50' },
-    { id: 'wave_10',      name: '小有實力',   desc: '單局達到 Wave 10',        icon: '⚡', color: '#2196f3' },
-    { id: 'wave_20',      name: '射門高手',   desc: '單局達到 Wave 20',        icon: '🔥', color: '#ff9800' },
-    { id: 'wave_30',      name: '傳奇射手',   desc: '單局達到 Wave 30',        icon: '💀', color: '#f44336' },
-    { id: 'wave_50',      name: '不可阻擋',   desc: '單局達到 Wave 50',        icon: '👑', color: '#ffd700' },
-    { id: 'cards_15',     name: '卡牌收藏家', desc: '單局收集 15 張強化卡',    icon: '🃏', color: '#ab47bc' },
-    { id: 'cards_25',     name: '全副武裝',   desc: '單局收集 25 張強化卡',    icon: '💎', color: '#7c4dff' },
-    { id: 'score_5000',   name: '五千分俱樂部', desc: '單局得分超過 5000',     icon: '🏅', color: '#ff6d00' },
-    { id: 'phoenix',      name: '不死鳥',     desc: '復活後仍達到 Wave 15+',   icon: '🔄', color: '#e91e63' },
-    { id: 'games_10',     name: '常客',       desc: '累計遊玩 10 場',          icon: '🎮', color: '#009688' },
-    { id: 'games_50',     name: '射門狂人',   desc: '累計遊玩 50 場',          icon: '🏟️', color: '#3f51b5' },
+    { id: 'first_game',   name: '初試身手',   desc: '完成第一場遊戲',          icon: '⚽', color: '#4caf50', xp: 5 },
+    { id: 'wave_10',      name: '小有實力',   desc: '單局達到 Wave 10',        icon: '⚡', color: '#2196f3', xp: 10 },
+    { id: 'wave_20',      name: '射門高手',   desc: '單局達到 Wave 20',        icon: '🔥', color: '#ff9800', xp: 20 },
+    { id: 'wave_30',      name: '傳奇射手',   desc: '單局達到 Wave 30',        icon: '💀', color: '#f44336', xp: 35 },
+    { id: 'wave_50',      name: '不可阻擋',   desc: '單局達到 Wave 50',        icon: '👑', color: '#ffd700', xp: 50 },
+    { id: 'cards_15',     name: '卡牌收藏家', desc: '單局收集 15 張強化卡',    icon: '🃏', color: '#ab47bc', xp: 15 },
+    { id: 'cards_25',     name: '全副武裝',   desc: '單局收集 25 張強化卡',    icon: '💎', color: '#7c4dff', xp: 30 },
+    { id: 'score_5000',   name: '五千分俱樂部', desc: '單局得分超過 5000',     icon: '🏅', color: '#ff6d00', xp: 25 },
+    { id: 'phoenix',      name: '不死鳥',     desc: '復活後仍達到 Wave 15+',   icon: '🔄', color: '#e91e63', xp: 20 },
+    { id: 'games_10',     name: '常客',       desc: '累計遊玩 10 場',          icon: '🎮', color: '#009688', xp: 15 },
+    { id: 'games_50',     name: '射門狂人',   desc: '累計遊玩 50 場',          icon: '🏟️', color: '#3f51b5', xp: 30 },
   ];
 
   const WEEKLY_BADGES = [
