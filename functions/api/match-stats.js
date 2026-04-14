@@ -131,43 +131,61 @@ export async function onRequestGet(context) {
     }), { status: 400, headers });
   }
 
+  // API-Sports 認證：直接註冊用 x-apisports-key，RapidAPI 用 x-rapidapi-key
   const apiHeaders = {
     'x-apisports-key': apiKey,
-    'x-rapidapi-host': 'v3.football.api-sports.io',
   };
+
+  // 搜尋比賽的輔助函式
+  async function findFixture(searchDate) {
+    const fixturesUrl = `https://v3.football.api-sports.io/fixtures?league=${leagueId}&season=${seasonYear}&date=${searchDate}`;
+    const fixRes = await fetch(fixturesUrl, { headers: apiHeaders });
+    if (!fixRes.ok) return { error: fixRes.status, fixtures: [] };
+    const fixData = await fixRes.json();
+    return { fixtures: fixData.response || [], errors: fixData.errors };
+  }
 
   try {
     // Step 1: 找到比賽 fixture ID
-    const season = date.slice(0, 4); // e.g. '2025' from '2025-08-16' or '2026' from '2026-04-13'
-    // EPL 2025/26 season = 2025
-    const seasonYear = league === 'epl' ? '2025' : league === 'ucl' ? '2025' : season;
+    // EPL/UCL 2025/26 season = 2025
+    const seasonYear = (league === 'epl' || league === 'ucl') ? '2025' : date.slice(0, 4);
 
-    const fixturesUrl = `https://v3.football.api-sports.io/fixtures?league=${leagueId}&season=${seasonYear}&date=${date}`;
-    const fixRes = await fetch(fixturesUrl, { headers: apiHeaders });
+    // 我們的日期是台灣時間（UTC+8），API-Football 用 UTC 日期
+    // 所以也嘗試前一天的日期
+    const prevDate = new Date(new Date(date + 'T00:00:00Z').getTime() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-    if (!fixRes.ok) {
-      const text = await fixRes.text();
+    let result = await findFixture(date);
+
+    // 檢查 API 錯誤（認證等）
+    if (result.errors && Object.keys(result.errors).length > 0) {
       return new Response(JSON.stringify({
         ok: false, stats: null,
-        error: `API-Football fixtures ${fixRes.status}: ${text.slice(0, 200)}`
+        error: `API-Football error: ${JSON.stringify(result.errors)}`
       }), { status: 502, headers });
     }
 
-    const fixData = await fixRes.json();
-    const fixtures = fixData.response || [];
-
-    // 找到匹配的比賽
-    const match = fixtures.find(f => {
+    // 找匹配的比賽
+    let match = result.fixtures.find(f => {
       const hName = f.teams?.home?.name || '';
       const aName = f.teams?.away?.name || '';
       return matchTeam(hName, home) && matchTeam(aName, away);
     });
 
+    // 如果找不到，嘗試前一天（台灣時間 → UTC 日期差）
+    if (!match) {
+      const result2 = await findFixture(prevDate);
+      match = (result2.fixtures || []).find(f => {
+        const hName = f.teams?.home?.name || '';
+        const aName = f.teams?.away?.name || '';
+        return matchTeam(hName, home) && matchTeam(aName, away);
+      });
+    }
+
     if (!match) {
       return new Response(JSON.stringify({
         ok: false, stats: null,
-        error: `No fixture found for ${home} vs ${away} on ${date} (league ${league}). Found ${fixtures.length} fixtures that day.`,
-        debug: fixtures.map(f => `${f.teams?.home?.name} vs ${f.teams?.away?.name}`).slice(0, 10)
+        error: `No fixture found for ${home} vs ${away} on ${date} or ${prevDate} (league ${league}).`,
+        debug: result.fixtures.map(f => `${f.teams?.home?.name} vs ${f.teams?.away?.name}`).slice(0, 10)
       }), { headers });
     }
 

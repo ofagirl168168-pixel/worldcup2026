@@ -140,12 +140,16 @@ function _fetchMatchStats(home, away, date) {
   if (el.querySelector('.modal-section-title')) return;
 
   fetch(`/api/match-stats?home=${home}&away=${away}&date=${date}&league=${league}`)
-    .then(r => r.json())
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    })
     .then(data => {
+      console.log('[MatchStats]', home, 'vs', away, data.ok ? 'OK' : data.error);
       const el2 = document.getElementById('modal-match-stats');
       if (!el2) return; // modal 已關閉
       if (!data.ok || !data.stats) {
-        el2.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-muted);font-size:13px">賽事數據暫無提供</div>';
+        el2.innerHTML = '';  // 靜默移除（無數據時不顯示任何東西）
         return;
       }
       // 從 data attributes 取得隊伍資訊
@@ -157,9 +161,10 @@ function _fetchMatchStats(home, away, date) {
       const at = { nameCN: awayCN, flag: awayFlag };
       el2.innerHTML = _renderStatsHTML(data.stats, ht, at);
     })
-    .catch(() => {
+    .catch(e => {
+      console.warn('[MatchStats] fetch failed:', e.message);
       const el2 = document.getElementById('modal-match-stats');
-      if (el2) el2.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-muted);font-size:13px">賽事數據載入失敗</div>';
+      if (el2) el2.innerHTML = '';  // 靜默移除
     });
 }
 
