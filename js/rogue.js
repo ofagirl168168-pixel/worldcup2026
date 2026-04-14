@@ -4096,7 +4096,7 @@
       ctx.font = `${tipFz}px "Noto Sans TC", sans-serif`;
       ctx.fillStyle = 'rgba(255,215,0,0.5)';
       ctx.textAlign = 'center';
-      ctx.fillText('🏆 1st +3💎  2nd +2💎  3rd +1💎', px + pw / 2, tipY);
+      ctx.fillText('🏆1st +5💎  🥈2nd +3💎  🥉3rd +2💎  4~6th +1💎', px + pw / 2, tipY);
       ctx.fillStyle = 'rgba(255,255,255,0.3)';
       ctx.font = `${Math.min(10, W * 0.018)}px "Noto Sans TC", sans-serif`;
       ctx.fillText('每週日結算', px + pw / 2, tipY + tipFz + 4);
