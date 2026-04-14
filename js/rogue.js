@@ -4319,13 +4319,10 @@
       <line x1="32" y1="50" x2="32" y2="58" stroke="#ff6d00" stroke-width="1.5"/></g></svg>`,
 
     extraLife: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-      <defs><linearGradient id="sh1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd54f"/><stop offset="100%" stop-color="#f9a825"/></linearGradient>
-      <filter id="gl1"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      <g filter="url(#gl1)"><path d="M32 4L54 16L50 44L32 58L14 44L10 16Z" fill="url(#sh1)" stroke="#f57f17" stroke-width="2"/>
-      <path d="M32 4L54 16L50 44L32 58L14 44L10 16Z" fill="none" stroke="#fff" stroke-width="1" opacity="0.3"/></g>
-      <line x1="32" y1="18" x2="32" y2="44" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-      <line x1="22" y1="31" x2="42" y2="31" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-      <path d="M32 12l4 8h-8z" fill="#fff" opacity="0.3"/></svg>`,
+      <defs><filter id="gl1"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g filter="url(#gl1)"><path d="M32 56 C6 36 6 16 20 12 C28 9 32 18 32 18 C32 18 36 9 44 12 C58 16 58 36 32 56Z" fill="#ef5350" stroke="#c62828" stroke-width="1.5"/></g>
+      <path d="M20 16 C24 13 28 16 32 22 C28 16 22 14 20 16Z" fill="#fff" opacity="0.35"/>
+      <text x="50" y="20" font-family="sans-serif" font-weight="bold" font-size="22" fill="#fff" stroke="#c62828" stroke-width="1">+1</text></svg>`,
 
     guard: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
       <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#66bb6a"/><stop offset="100%" stop-color="#2e7d32"/></linearGradient>
