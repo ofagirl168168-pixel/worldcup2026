@@ -2243,7 +2243,7 @@ img.flag-img {
 /* ========== 射門挑戰首頁 Banner ========== */
 .rogue-home-banner {
   position: relative; overflow: hidden; cursor: pointer;
-  border-radius: 16px; padding: 24px 22px;
+  border-radius: 16px; padding: 22px 22px 50px;
   border: 1px solid rgba(76,175,80,0.35);
   transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
   animation: rogueBannerGlow 3s ease-in-out infinite;
@@ -2272,13 +2272,13 @@ img.flag-img {
 }
 /* 像素風插圖 */
 .rogue-banner-art {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: 60%; max-width: 460px; height: auto;
-  opacity: 0.4; pointer-events: none; z-index: 0;
+  position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+  width: 55%; max-width: 420px; height: auto;
+  opacity: 0.35; pointer-events: none; z-index: 0;
   transition: opacity 0.4s;
   image-rendering: pixelated;
 }
-.rogue-home-banner:hover .rogue-banner-art { opacity: 0.6; }
+.rogue-home-banner:hover .rogue-banner-art { opacity: 0.55; }
 /* 紅隊帶球往右移動 */
 .art-runner { animation: artRun 0.45s steps(2) infinite, artDrift 4s linear infinite; }
 @keyframes artRun {
