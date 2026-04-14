@@ -356,6 +356,103 @@ const EPL_TEAMS = {
 // 導出到 window
 window.EPL_TEAMS = EPL_TEAMS;
 
-// 聯賽沒有固定賽程表 — 比賽資料由 API 即時取得
-// EPL_MATCHES 初始為空陣列，由 epl-live-loader.js 填入
-window.EPL_MATCHES = [];
+// EPL_MATCHES：已完賽比賽手動補充進球等詳情（API 免費方案不提供）
+// API 即時資料由 epl-live-loader.js 合併，不會覆蓋已有的 goals
+// 資料來源：ESPN、Sky Sports、BBC Sport（人工驗證）
+window.EPL_MATCHES = [
+
+  // ===== 第 32 輪 (2026-04-10 ~ 04-14 台灣時間) =====
+
+  // 西漢姆 4-0 狼隊 | 04/11 01:30 台灣時間 | 裁判 Sam Barrott
+  {id:'EPL-MW32-WHU-WOL', matchday:32, date:'2026-04-11', time:'01:30', home:'WHU', away:'WOL', stage:'league',
+   status:'finished', score:{h:4,a:0}, halfTime:{h:1,a:0},
+   goals:[
+     {min:'42',player:'Konstantinos Mavropanos',side:'h'},
+     {min:'66',player:'Valentín Castellanos',side:'h'},
+     {min:'68',player:'Valentín Castellanos',side:'h'},
+     {min:'83',player:'Konstantinos Mavropanos',side:'h'}
+   ]},
+
+  // 兵工廠 1-2 伯恩茅斯 | 04/11 04:00 台灣時間
+  {id:'EPL-MW32-ARS-BOU', matchday:32, date:'2026-04-11', time:'04:00', home:'ARS', away:'BOU', stage:'league',
+   status:'finished', score:{h:1,a:2}, halfTime:{h:1,a:1},
+   goals:[
+     {min:'17',player:'Junior Kroupi',side:'a'},
+     {min:'35',player:'Viktor Gyökeres',side:'h',type:'pen'},
+     {min:'74',player:'Alex Scott',side:'a'}
+   ]},
+
+  // 布倫特福德 2-2 愛華頓 | 04/11 04:00 台灣時間
+  {id:'EPL-MW32-BRE-EVE', matchday:32, date:'2026-04-11', time:'04:00', home:'BRE', away:'EVE', stage:'league',
+   status:'finished', score:{h:2,a:2}, halfTime:{h:1,a:1},
+   goals:[
+     {min:'3',player:'Igor Thiago',side:'h',type:'pen'},
+     {min:'26',player:'Beto',side:'a'},
+     {min:'76',player:'Igor Thiago',side:'h'},
+     {min:'90+1',player:'Kiernan Dewsbury-Hall',side:'a'}
+   ]},
+
+  // 伯恩利 0-2 布萊頓 | 04/11 04:00 台灣時間
+  {id:'EPL-MW32-BUR-BHA', matchday:32, date:'2026-04-11', time:'04:00', home:'BUR', away:'BHA', stage:'league',
+   status:'finished', score:{h:0,a:2}, halfTime:{h:0,a:1},
+   goals:[
+     {min:'43',player:'Mats Wieffer',side:'a'},
+     {min:'89',player:'Mats Wieffer',side:'a'}
+   ]},
+
+  // 利物浦 2-0 富勒姆 | 04/12 00:30 台灣時間
+  {id:'EPL-MW32-LIV-FUL', matchday:32, date:'2026-04-12', time:'00:30', home:'LIV', away:'FUL', stage:'league',
+   status:'finished', score:{h:2,a:0}, halfTime:{h:2,a:0},
+   goals:[
+     {min:'36',player:'Rio Ngumoha',side:'h'},
+     {min:'40',player:'Mohamed Salah',side:'h'}
+   ]},
+
+  // 桑德蘭 1-0 熱刺 | 04/12 03:00 台灣時間
+  {id:'EPL-MW32-SUN-TOT', matchday:32, date:'2026-04-12', time:'03:00', home:'SUN', away:'TOT', stage:'league',
+   status:'finished', score:{h:1,a:0}, halfTime:{h:0,a:0},
+   goals:[
+     {min:'61',player:'Nordi Mukiele',side:'h'}
+   ]},
+
+  // 水晶宮 2-1 紐卡索 | 04/12 03:00 台灣時間
+  {id:'EPL-MW32-CRY-NEW', matchday:32, date:'2026-04-12', time:'03:00', home:'CRY', away:'NEW', stage:'league',
+   status:'finished', score:{h:2,a:1}, halfTime:{h:0,a:1},
+   goals:[
+     {min:'43',player:'William Osula',side:'a'},
+     {min:'80',player:'Jean-Philippe Mateta',side:'h'},
+     {min:'90+4',player:'Jean-Philippe Mateta',side:'h',type:'pen'}
+   ]},
+
+  // 諾丁漢森林 1-1 阿斯頓維拉 | 04/12 03:00 台灣時間
+  {id:'EPL-MW32-NFO-AVL', matchday:32, date:'2026-04-12', time:'03:00', home:'NFO', away:'AVL', stage:'league',
+   status:'finished', score:{h:1,a:1}, halfTime:{h:1,a:1},
+   goals:[
+     {min:'23',player:'Murillo',side:'a',type:'og'},
+     {min:'38',player:'Neco Williams',side:'h'}
+   ]},
+
+  // 乙爾西 0-3 曼城 | 04/12 23:30 台灣時間
+  {id:'EPL-MW32-CHE-MCI', matchday:32, date:'2026-04-12', time:'23:30', home:'CHE', away:'MCI', stage:'league',
+   status:'finished', score:{h:0,a:3}, halfTime:{h:0,a:0},
+   goals:[
+     {min:'51',player:'Nico O\'Reilly',side:'a'},
+     {min:'57',player:'Marc Guéhi',side:'a'},
+     {min:'68',player:'Jérémy Doku',side:'a'}
+   ]},
+
+  // 曼聯 1-2 里茲聯 | 04/14 03:00 台灣時間 | 裁判 Paul Tierney
+  {id:'EPL-MW32-MUN-LEE', matchday:32, date:'2026-04-14', time:'03:00', home:'MUN', away:'LEE', stage:'league',
+   status:'finished', score:{h:1,a:2}, halfTime:{h:0,a:2}, referee:'Paul Tierney',
+   goals:[
+     {min:'5',player:'Noah Okafor',side:'a'},
+     {min:'29',player:'Noah Okafor',side:'a'},
+     {min:'69',player:'Casemiro',side:'h'}
+   ],
+   bookings:[
+     {min:'26',player:'Matheus Cunha',side:'h',card:'yellow'},
+     {min:'56',player:'Lisandro Martínez',side:'h',card:'red'}
+   ]},
+
+];
+
