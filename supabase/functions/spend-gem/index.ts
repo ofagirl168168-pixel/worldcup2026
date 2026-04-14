@@ -12,10 +12,12 @@ const COSTS: Record<string, number> = {
   first_free:         0,  // 首次免費（每用戶限一次）
   rogue_revive:       3,  // 射門挑戰：復活
   rogue_reroll:       1,  // 射門挑戰：重新抽卡
+  rogue_stamina_1:    1,  // 射門挑戰：體力 +1
+  rogue_stamina_full: 3,  // 射門挑戰：體力補滿
 }
 
 // 遊戲類消費不需要檢查重複解鎖
-const GAME_TYPES = new Set(['rogue_revive', 'rogue_reroll'])
+const GAME_TYPES = new Set(['rogue_revive', 'rogue_reroll', 'rogue_stamina_1', 'rogue_stamina_full'])
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {

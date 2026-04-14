@@ -19,6 +19,88 @@
   const BALL_TTL    = 8000;  // 球最長存活 ms
   const GK_BASE_SPD = 1.2;
 
+  // ─── 體力系統 ──────────────────────────────────────────────
+  const STAMINA_MAX = 5;
+  const STAMINA_REGEN_MS = 30 * 60 * 1000; // 30 分鐘回 1 點
+  const STAMINA_KEY = 'rogue_stamina';
+  const STAMINA_TS_KEY = 'rogue_stamina_ts'; // 上次更新時間
+
+  function _loadStamina() {
+    const saved = parseInt(localStorage.getItem(STAMINA_KEY));
+    const ts = parseInt(localStorage.getItem(STAMINA_TS_KEY));
+    if (isNaN(saved) || isNaN(ts)) {
+      // 首次：給滿體力
+      _saveStamina(STAMINA_MAX);
+      return { stamina: STAMINA_MAX, updatedAt: Date.now() };
+    }
+    // 計算自然回復
+    const elapsed = Date.now() - ts;
+    const regen = Math.floor(elapsed / STAMINA_REGEN_MS);
+    const cur = Math.min(STAMINA_MAX, saved + regen);
+    // 更新時間戳（只推進已回復的量）
+    const newTs = cur >= STAMINA_MAX ? Date.now() : ts + regen * STAMINA_REGEN_MS;
+    if (regen > 0) {
+      localStorage.setItem(STAMINA_KEY, cur);
+      localStorage.setItem(STAMINA_TS_KEY, newTs);
+    }
+    return { stamina: cur, updatedAt: newTs };
+  }
+
+  function _saveStamina(val) {
+    localStorage.setItem(STAMINA_KEY, Math.min(STAMINA_MAX, Math.max(0, val)));
+    localStorage.setItem(STAMINA_TS_KEY, Date.now());
+  }
+
+  function getStamina() { return _loadStamina().stamina; }
+
+  function useStamina() {
+    const { stamina } = _loadStamina();
+    if (stamina <= 0) return false;
+    _saveStamina(stamina - 1);
+    return true;
+  }
+
+  function addStamina(amount) {
+    const { stamina } = _loadStamina();
+    _saveStamina(Math.min(STAMINA_MAX, stamina + amount));
+  }
+
+  /** 下一點回復的剩餘毫秒（已滿則返回 0） */
+  function staminaNextRegenMs() {
+    const { stamina, updatedAt } = _loadStamina();
+    if (stamina >= STAMINA_MAX) return 0;
+    const elapsed = Date.now() - updatedAt;
+    return Math.max(0, STAMINA_REGEN_MS - (elapsed % STAMINA_REGEN_MS));
+  }
+
+  /** 寶石補充體力（amount: 1 或 STAMINA_MAX） */
+  let _refilling = false;
+  async function _refillStamina(amount) {
+    if (_refilling) return;
+    const isMax = amount >= STAMINA_MAX;
+    const cost = isMax ? 3 : 1;
+    const spendType = isMax ? 'rogue_stamina_full' : 'rogue_stamina_1';
+
+    // 已登入：走寶石扣款
+    if (typeof currentUser !== 'undefined' && currentUser) {
+      _refilling = true;
+      const result = await spendGemForGame?.(spendType);
+      _refilling = false;
+      if (result?.error === '寶石不足') {
+        G._staminaToast = '寶石不足'; G._staminaToastT = performance.now(); return;
+      }
+      if (result?.error) {
+        G._staminaToast = result.error; G._staminaToastT = performance.now(); return;
+      }
+    } else {
+      // 訪客：無法用寶石，提示登入
+      G._staminaToast = '登入後可用寶石補充'; G._staminaToastT = performance.now(); return;
+    }
+
+    addStamina(isMax ? STAMINA_MAX : 1);
+    G._staminaToast = `⚡ 體力 +${isMax ? '滿' : '1'}！`; G._staminaToastT = performance.now();
+  }
+
   // ─── 場景系統 ──────────────────────────────────────────────
   const SCENES = [
     { name:'巴西',
@@ -3753,7 +3835,7 @@
     const contentY = tabStartY + tabH + 2;
     const btnH = 50;
     const btnY = H - btnH - Math.min(H * 0.04, 20);
-    const contentH = btnY - contentY - 12;
+    const contentH = btnY - contentY - 66; // 留空間給體力顯示
 
     // 面板背景
     rr(ctx, panelX, contentY, panelW, contentH, pr);
@@ -3776,45 +3858,136 @@
 
     ctx.restore();
 
+    // ── 體力顯示 ──
+    const stCur = getStamina();
+    const stFull = stCur >= STAMINA_MAX;
+    const stEmpty = stCur <= 0;
+    const stY = btnY - 52;
+    const stFz = Math.min(14, W * 0.028);
+
+    // 體力圖示 ⚡ N/5
+    ctx.textAlign = 'center';
+    ctx.font = `bold ${stFz}px "Noto Sans TC", sans-serif`;
+    const stText = `⚡ ${stCur}/${STAMINA_MAX}`;
+    ctx.fillStyle = stEmpty ? '#ef5350' : '#ffd740';
+    ctx.fillText(stText, W / 2, stY + stFz);
+
+    // 體力條
+    const barW = Math.min(180, W * 0.36);
+    const barH = 8;
+    const barX = W / 2 - barW / 2;
+    const barY = stY + stFz + 6;
+    rr(ctx, barX, barY, barW, barH, 4);
+    ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fill();
+    if (stCur > 0) {
+      rr(ctx, barX, barY, barW * (stCur / STAMINA_MAX), barH, 4);
+      ctx.fillStyle = stEmpty ? '#ef5350' : '#ffd740'; ctx.fill();
+    }
+
+    // 倒數計時
+    if (!stFull) {
+      const regenMs = staminaNextRegenMs();
+      const regenMin = Math.floor(regenMs / 60000);
+      const regenSec = Math.floor((regenMs % 60000) / 1000);
+      const pad = regenSec < 10 ? '0' : '';
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = `${Math.min(11, W * 0.022)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText(`下一點 ${regenMin}:${pad}${regenSec}`, W / 2, barY + barH + 14);
+    }
+
+    // 體力不足時：寶石補充按鈕
+    G._staminaRefill1R = null;
+    G._staminaRefillFullR = null;
+    if (stEmpty) {
+      const rfBtnW = Math.min(130, W * 0.28);
+      const rfBtnH = 32;
+      const rfGap = 8;
+      const rfY = barY + barH + 24;
+      const rfX1 = W / 2 - rfBtnW - rfGap / 2;
+      const rfX2 = W / 2 + rfGap / 2;
+
+      // 1💎 +1
+      rr(ctx, rfX1, rfY, rfBtnW, rfBtnH, 8);
+      ctx.fillStyle = 'rgba(33,150,243,0.3)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(33,150,243,0.6)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = '#90caf9';
+      ctx.font = `bold ${Math.min(12, W * 0.024)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('💎1 → ⚡+1', rfX1 + rfBtnW / 2, rfY + 21);
+      G._staminaRefill1R = { x: rfX1, y: rfY, w: rfBtnW, h: rfBtnH };
+
+      // 3💎 補滿
+      rr(ctx, rfX2, rfY, rfBtnW, rfBtnH, 8);
+      ctx.fillStyle = 'rgba(255,152,0,0.3)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,152,0,0.6)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = '#ffcc80';
+      ctx.fillText('💎3 → ⚡滿', rfX2 + rfBtnW / 2, rfY + 21);
+      G._staminaRefillFullR = { x: rfX2, y: rfY, w: rfBtnW, h: rfBtnH };
+    }
+
     // ── 開始按鈕 ──
     const btnW = Math.min(220, W * 0.45);
     const btnX = W / 2 - btnW / 2;
-    G._startR = { x: btnX, y: btnY, w: btnW, h: btnH };
+    G._startR = stEmpty ? null : { x: btnX, y: btnY, w: btnW, h: btnH };
     const t = performance.now() * 0.001;
 
     // 漸層按鈕底色
-    const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
-    btnGrad.addColorStop(0, '#43a047');
-    btnGrad.addColorStop(0.5, '#66bb6a');
-    btnGrad.addColorStop(1, '#2e7d32');
-    ctx.fillStyle = btnGrad;
-    ctx.shadowColor = '#4caf50'; ctx.shadowBlur = 12;
+    if (stEmpty) {
+      ctx.fillStyle = 'rgba(100,100,100,0.5)';
+    } else {
+      const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
+      btnGrad.addColorStop(0, '#43a047');
+      btnGrad.addColorStop(0.5, '#66bb6a');
+      btnGrad.addColorStop(1, '#2e7d32');
+      ctx.fillStyle = btnGrad;
+    }
+    if (!stEmpty) { ctx.shadowColor = '#4caf50'; ctx.shadowBlur = 12; }
     rr(ctx, btnX, btnY, btnW, btnH, 14); ctx.fill();
     ctx.shadowBlur = 0;
 
     // ⚽ + 文字 + ▶
     const btnFz = Math.min(20, W * 0.04);
-    const ballSz = Math.min(16, W * 0.032);
     ctx.font = `bold ${btnFz}px "Noto Sans TC", sans-serif`;
-    const labelW = ctx.measureText('開始遊戲').width;
-    const totalW = ballSz + 6 + labelW + 8 + 12; // ball + gap + text + gap + arrow
-    const startX = W / 2 - totalW / 2;
+    ctx.textAlign = 'center';
 
-    // ⚽ 彈跳
-    const ballBounce = Math.abs(Math.sin(t * 3)) * 4;
-    ctx.font = `${ballSz}px sans-serif`;
-    ctx.fillText('⚽', startX, btnY + 33 - ballBounce);
+    if (stEmpty) {
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillText('體力不足', W / 2, btnY + 33);
+    } else {
+      const ballSz = Math.min(16, W * 0.032);
+      const labelW = ctx.measureText('開始遊戲').width;
+      const totalW = ballSz + 6 + labelW + 8 + 12;
+      const startX = W / 2 - totalW / 2;
 
-    // 文字
-    ctx.fillStyle = '#fff';
-    ctx.font = `bold ${btnFz}px "Noto Sans TC", sans-serif`;
-    ctx.fillText('開始遊戲', startX + ballSz + 6 + labelW / 2, btnY + 33);
+      // ⚽ 彈跳
+      const ballBounce = Math.abs(Math.sin(t * 3)) * 4;
+      ctx.font = `${ballSz}px sans-serif`;
+      ctx.fillText('⚽', startX, btnY + 33 - ballBounce);
 
-    // ▶ 箭頭搖擺
-    const arrowOff = Math.sin(t * 3) * 4;
-    ctx.font = `bold ${Math.min(14, W * 0.028)}px sans-serif`;
-    ctx.fillStyle = `rgba(255,255,255,${0.5 + Math.sin(t * 2) * 0.3})`;
-    ctx.fillText('▶', startX + ballSz + 6 + labelW + 18 + arrowOff, btnY + 33);
+      // 文字
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${btnFz}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('開始遊戲', startX + ballSz + 6 + labelW / 2, btnY + 33);
+
+      // ▶ 箭頭搖擺
+      const arrowOff = Math.sin(t * 3) * 4;
+      ctx.font = `bold ${Math.min(14, W * 0.028)}px sans-serif`;
+      ctx.fillStyle = `rgba(255,255,255,${0.5 + Math.sin(t * 2) * 0.3})`;
+      ctx.fillText('▶', startX + ballSz + 6 + labelW + 18 + arrowOff, btnY + 33);
+    }
+
+    // 體力 Toast
+    if (G._staminaToast && performance.now() - (G._staminaToastT || 0) < 2500) {
+      const sta = Math.min(1, (2500 - (performance.now() - G._staminaToastT)) / 500);
+      ctx.globalAlpha = sta;
+      const stw = Math.min(220, W * 0.55);
+      rr(ctx, W / 2 - stw / 2, H * 0.45, stw, 32, 8);
+      ctx.fillStyle = 'rgba(0,0,0,0.85)'; ctx.fill();
+      ctx.fillStyle = G._staminaToast.includes('不足') || G._staminaToast.includes('登入') ? '#ef5350' : '#ffd740';
+      ctx.font = `bold ${Math.min(13, W * 0.025)}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(G._staminaToast, W / 2, H * 0.45 + 22);
+      ctx.globalAlpha = 1;
+    }
 
     drawAudioBtns();
   }
@@ -5314,7 +5487,15 @@
           }
         }
       }
+      // 寶石補充體力
+      if (G._staminaRefill1R && hitTest(x, y, G._staminaRefill1R)) {
+        _refillStamina(1); return;
+      }
+      if (G._staminaRefillFullR && hitTest(x, y, G._staminaRefillFullR)) {
+        _refillStamina(STAMINA_MAX); return;
+      }
       if (hitTest(x, y, G._startR)) {
+        if (!useStamina()) return; // 體力不足
         G.phase = 'playing';
         startBGM(curScene.name);
         beginWave();
