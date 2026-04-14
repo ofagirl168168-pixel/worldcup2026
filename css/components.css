@@ -2272,21 +2272,28 @@ img.flag-img {
 }
 /* 像素風插圖 */
 .rogue-banner-art {
-  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-  width: 45%; max-width: 340px; height: auto;
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 40%; max-width: 300px; height: auto;
   opacity: 0.4; pointer-events: none; z-index: 0;
   transition: opacity 0.4s;
   image-rendering: pixelated;
 }
 .rogue-home-banner:hover .rogue-banner-art { opacity: 0.6; }
-/* 紅隊跑步彈跳 */
-.art-runner { animation: artRun 0.45s steps(2) infinite; }
+/* 紅隊帶球往右移動 */
+.art-runner { animation: artRun 0.45s steps(2) infinite, artDrift 4s linear infinite; }
 @keyframes artRun {
   0%,100% { transform: translateY(0); }
   50%     { transform: translateY(-3px); }
 }
-/* 球彈跳（比人稍慢） */
-.art-ball { animation: artBall 0.45s steps(2) infinite; }
+@keyframes artDrift {
+  0%   { transform: translateX(-60px); opacity: 0; }
+  10%  { opacity: 1; }
+  80%  { opacity: 1; }
+  95%  { transform: translateX(60px); opacity: 0; }
+  100% { transform: translateX(60px); opacity: 0; }
+}
+/* 球跟著移動 */
+.art-ball { animation: artBall 0.45s steps(2) infinite, artDrift 4s linear infinite; }
 @keyframes artBall {
   0%,100% { transform: translateY(0); }
   50%     { transform: translateY(-2px); }
