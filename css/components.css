@@ -2270,59 +2270,36 @@ img.flag-img {
     rgba(255,255,255,0.015) 20px, rgba(255,255,255,0.015) 21px
   );
 }
-/* 2D 橫向卷軸插圖 */
+/* 像素風插圖 */
 .rogue-banner-art {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
-  opacity: 0.38; pointer-events: none; z-index: 0;
+  opacity: 0.4; pointer-events: none; z-index: 0;
   transition: opacity 0.4s;
+  image-rendering: pixelated;
 }
-.rogue-home-banner:hover .rogue-banner-art { opacity: 0.55; }
-/* 帶球者 — 跑步彈跳 */
-.art-runner { animation: artRun 0.6s ease-in-out infinite; }
+.rogue-home-banner:hover .rogue-banner-art { opacity: 0.6; }
+/* 紅隊跑步彈跳 */
+.art-runner { animation: artRun 0.45s steps(2) infinite; }
 @keyframes artRun {
   0%,100% { transform: translateY(0); }
-  50%     { transform: translateY(-4px); }
+  50%     { transform: translateY(-3px); }
 }
-/* 球跟著跑者彈 */
-.art-ball { animation: artBall 0.6s ease-in-out infinite; }
+/* 球彈跳（比人稍慢） */
+.art-ball { animation: artBall 0.45s steps(2) infinite; }
 @keyframes artBall {
-  0%,100% { transform: translateY(0); }
-  50%     { transform: translateY(-3px); }
-}
-/* 防守者 — 左右晃 */
-.art-def { animation: artDef 0.8s ease-in-out infinite; transform-origin: 250px 110px; }
-@keyframes artDef {
-  0%,100% { transform: translateX(0); }
-  50%     { transform: translateX(-3px); }
-}
-/* 中場跑位 */
-.art-mid { animation: artMid 1s ease-in-out infinite; }
-@keyframes artMid {
-  0%,100% { transform: translate(0, 0); }
-  50%     { transform: translate(4px, -3px); }
-}
-/* 前鋒回追 */
-.art-chase { animation: artChase 0.7s ease-in-out infinite; }
-@keyframes artChase {
-  0%,100% { transform: translateY(0); }
-  50%     { transform: translateY(-3px); }
-}
-/* 守門員準備撲 */
-.art-gk { animation: artGK 1.2s ease-in-out infinite; transform-origin: 472px 110px; }
-@keyframes artGK {
-  0%,100% { transform: translateX(0) translateY(0); }
-  40%     { transform: translateX(-3px) translateY(-2px); }
-  70%     { transform: translateX(2px) translateY(-1px); }
-}
-.art-gk2 { animation: artGK2 1.5s ease-in-out infinite; transform-origin: 46px 110px; }
-@keyframes artGK2 {
   0%,100% { transform: translateY(0); }
   50%     { transform: translateY(-2px); }
 }
+/* 守門員左右準備 */
+.art-gk { animation: artGK 0.8s steps(2) infinite; }
+@keyframes artGK {
+  0%,100% { transform: translateX(0); }
+  50%     { transform: translateX(-3px); }
+}
 @media (max-width: 600px) {
-  .rogue-banner-art { opacity: 0.25; }
-  .rogue-home-banner:hover .rogue-banner-art { opacity: 0.4; }
+  .rogue-banner-art { opacity: 0.28; }
+  .rogue-home-banner:hover .rogue-banner-art { opacity: 0.45; }
 }
 .rogue-home-banner-content {
   position: relative; z-index: 1;
