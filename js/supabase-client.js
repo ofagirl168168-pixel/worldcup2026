@@ -109,8 +109,8 @@ function updateAuthUI() {
 // ── 暱稱驗證 ─────────────────────────────────────────────
 function validateNickname(raw) {
   const name = raw.trim();
-  if (name.length < 2 || name.length > 20)
-    return '暱稱需在 2–20 字之間';
+  if (name.length < 2 || name.length > 8)
+    return '暱稱需在 2–8 字之間';
   if (/https?:\/\/|www\.|\.com|\.net|\.org|\.tw|\.io|\.me/i.test(name))
     return '暱稱不能包含網址';
   if (/09\d{8}|\+886|\d{10,}/.test(name))
@@ -155,7 +155,7 @@ function openNicknameModal(isEdit = false) {
       <div style="font-size:20px;font-weight:800">${isEdit ? '修改暱稱' : '設定你的暱稱'}</div>
       <div style="font-size:13px;color:var(--text-muted);margin-top:6px">將顯示在公開排行榜，請勿填入個人聯絡資訊</div>
     </div>
-    <input id="nickname-input" type="text" maxlength="20"
+    <input id="nickname-input" type="text" maxlength="8"
       placeholder="2–20 字，不含電話/網址/LINE"
       style="width:100%;padding:14px 16px;border-radius:12px;
              border:1px solid rgba(255,255,255,0.15);
