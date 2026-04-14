@@ -115,20 +115,22 @@
   //  音效系統（音檔 + Web Audio API 備援）
   // ═══════════════════════════════════════════════════════════
   let audioCtx = null;
-  let sfxOn = false, bgmOn = false;
+  let sfxOn = localStorage.getItem('rogue_sfx') === '1';
+  let bgmOn = localStorage.getItem('rogue_bgm') === '1';
   let bgmGain = null, sfxGain = null;
   let _bgmTimer = null, _bgmPlaying = false;
 
   // ── 預載音效檔 ──
   const SFX_FILES = {
     shoot:    'audio/sfx/shoot.mp3',
-    hit:      'audio/sfx/hit.ogg',
+    hit:      'audio/sfx/hit.mp3',
     goal:     'audio/sfx/goal.mp3',
-    block:    'audio/sfx/block.ogg',
+    block:    'audio/sfx/block.mp3',
     warning:  'audio/sfx/warning.mp3',
-    card:     'audio/sfx/card.wav',
+    card:     'audio/sfx/card.mp3',
     loselife: 'audio/sfx/loselife.mp3',
     gameover: 'audio/sfx/gameover.mp3',
+    post:     'audio/sfx/post.mp3',
   };
   const sfxPool = {};   // { name: [Audio, Audio, ...] }
   const SFX_POOL_SIZE = 3;
@@ -195,6 +197,7 @@
   function sfxCard()     { playSFX('card'); }
   function sfxLoseLife() { playSFX('loselife'); }
   function sfxGameOver() { playSFX('gameover'); }
+  function sfxPost()     { playSFX('post'); }
 
   // ── BGM：先嘗試載入音檔，無檔案則用程式生成旋律 ──
   let _bgmAudio = null;  // 音檔 BGM 用
@@ -207,6 +210,8 @@
     '英格蘭': 'audio/bgm-england.mp3',
     '法國': 'audio/bgm-france.mp3',
     '日本': 'audio/bgm-japan.mp3',
+    '_title': 'audio/bgm-title.mp3',
+    '_gameover': 'audio/bgm-gameover.mp3',
   };
 
   const COUNTRY_MUSIC = {
@@ -255,7 +260,7 @@
     const filePath = COUNTRY_BGM_FILES[sceneName];
     if (filePath) {
       const audio = new Audio(filePath);
-      audio.loop = true;
+      audio.loop = sceneName !== '_gameover';
       audio.volume = 0.25;
       audio.play().then(() => {
         _bgmAudio = audio;
@@ -731,6 +736,7 @@
         if (!b._postHit && Math.abs(b.x) >= effectiveGoalHW - b.r - 15 && Math.abs(b.x) < effectiveGoalHW + 20) {
           const postX = Math.sign(b.x) * effectiveGoalHW;
           addPart(postX, GOAL_Z, '門柱！', 0.8, 'post_hit');
+          sfxPost();
           shakeAmt = 6;
           b.vx = -b.vx * 0.6 + (Math.random() - 0.5) * 2;
           b.vz = -Math.abs(b.vz) * 0.4;
@@ -814,7 +820,7 @@
         if (G.lives <= 0) {
           // 先繪製死亡瞬間的遊戲畫面（不含 gameover overlay）作為分享截圖
           try { G._deathFrame = cvs.toDataURL('image/png'); } catch(e) { G._deathFrame = null; }
-          G.phase = 'gameover'; G._gameoverStart = performance.now(); sfxGameOver(); stopBGM(); G._resultSaved = false; return;
+          G.phase = 'gameover'; G._gameoverStart = performance.now(); sfxGameOver(); startBGM('_gameover'); G._resultSaved = false; return;
         }
       }
     }
@@ -3572,28 +3578,63 @@
       ctx.fillText('點擊畫面射門', W / 2, H - 16);
     }
 
-    // 音效/音樂開關按鈕（暫時隱藏，等音檔備齊後再開放）
-    // const btnSz = 20, btnY = 8, btnGap = 6;
-    // const bgmBtnX = W - btnSz * 3 - btnGap * 2 - 50;
-    // const sfxBtnX = bgmBtnX + btnSz + btnGap + 10;
-    // ctx.fillStyle = sfxOn ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)';
-    // ctx.font = `${btnSz - 4}px sans-serif`;
-    // ctx.textAlign = 'center';
-    // ctx.fillText(sfxOn ? 'SFX' : 'SFX', sfxBtnX + btnSz / 2, btnY + btnSz - 4);
-    // if (!sfxOn) {
-    //   ctx.strokeStyle = 'rgba(255,80,80,0.7)'; ctx.lineWidth = 2;
-    //   ctx.beginPath(); ctx.moveTo(sfxBtnX, btnY); ctx.lineTo(sfxBtnX + btnSz, btnY + btnSz); ctx.stroke();
-    //   ctx.lineWidth = 1;
-    // }
-    // ctx.fillStyle = bgmOn ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)';
-    // ctx.fillText(bgmOn ? 'BGM' : 'BGM', bgmBtnX + btnSz / 2, btnY + btnSz - 4);
-    // if (!bgmOn) {
-    //   ctx.strokeStyle = 'rgba(255,80,80,0.7)'; ctx.lineWidth = 2;
-    //   ctx.beginPath(); ctx.moveTo(bgmBtnX, btnY); ctx.lineTo(bgmBtnX + btnSz, btnY + btnSz); ctx.stroke();
-    //   ctx.lineWidth = 1;
-    // }
-    G._sfxBtn = null;
-    G._bgmBtn = null;
+    drawAudioBtns();
+  }
+
+  // ─── 音效/音樂開關按鈕（共用） ─────────────────────────────
+  function drawAudioBtns() {
+    const sz = Math.min(34, W * 0.07);
+    const gap = 8;
+    const bY = 6;
+    const bgmX = W - sz * 2 - gap - 10;
+    const sfxX = W - sz - 10;
+
+    // BGM 按鈕
+    ctx.save();
+    rr(ctx, bgmX, bY, sz, sz, 8);
+    ctx.fillStyle = bgmOn ? 'rgba(76,175,80,0.5)' : 'rgba(255,255,255,0.1)';
+    ctx.fill();
+    ctx.strokeStyle = bgmOn ? 'rgba(76,175,80,0.8)' : 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1.5; ctx.stroke();
+    // 音符圖示 ♪
+    ctx.fillStyle = bgmOn ? '#fff' : 'rgba(255,255,255,0.35)';
+    ctx.font = `${sz * 0.5}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('♪', bgmX + sz / 2, bY + sz * 0.65);
+    // 關閉時畫斜線
+    if (!bgmOn) {
+      ctx.strokeStyle = 'rgba(255,80,80,0.7)'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(bgmX + sz * 0.2, bY + sz * 0.8);
+      ctx.lineTo(bgmX + sz * 0.8, bY + sz * 0.2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // SFX 按鈕
+    ctx.save();
+    rr(ctx, sfxX, bY, sz, sz, 8);
+    ctx.fillStyle = sfxOn ? 'rgba(33,150,243,0.5)' : 'rgba(255,255,255,0.1)';
+    ctx.fill();
+    ctx.strokeStyle = sfxOn ? 'rgba(33,150,243,0.8)' : 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1.5; ctx.stroke();
+    // 喇叭圖示
+    ctx.fillStyle = sfxOn ? '#fff' : 'rgba(255,255,255,0.35)';
+    ctx.font = `${sz * 0.45}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('🔊', sfxX + sz / 2, bY + sz * 0.65);
+    // 關閉時畫斜線
+    if (!sfxOn) {
+      ctx.strokeStyle = 'rgba(255,80,80,0.7)'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(sfxX + sz * 0.2, bY + sz * 0.8);
+      ctx.lineTo(sfxX + sz * 0.8, bY + sz * 0.2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    G._bgmBtn = { x: bgmX, y: bY, w: sz, h: sz };
+    G._sfxBtn = { x: sfxX, y: bY, w: sz, h: sz };
   }
 
   // ─── 標題畫面 ────────────────────────────────────────────
@@ -3773,6 +3814,8 @@
     ctx.font = `bold ${Math.min(14, W * 0.028)}px sans-serif`;
     ctx.fillStyle = `rgba(255,255,255,${0.5 + Math.sin(t * 2) * 0.3})`;
     ctx.fillText('▶', startX + ballSz + 6 + labelW + 18 + arrowOff, btnY + 33);
+
+    drawAudioBtns();
   }
 
   // ── 排行榜 Tab ──
@@ -5189,6 +5232,7 @@
     }
 
     ctx.globalAlpha = 1;
+    drawAudioBtns();
   }
 
   // ─── 繪圖工具 ────────────────────────────────────────────
@@ -5239,12 +5283,13 @@
     // 音效/音樂開關判定
     if (G._sfxBtn && x >= G._sfxBtn.x && x <= G._sfxBtn.x + G._sfxBtn.w &&
         y >= G._sfxBtn.y && y <= G._sfxBtn.y + G._sfxBtn.h) {
-      sfxOn = !sfxOn; return;
+      sfxOn = !sfxOn; localStorage.setItem('rogue_sfx', sfxOn ? '1' : '0'); return;
     }
     if (G._bgmBtn && x >= G._bgmBtn.x && x <= G._bgmBtn.x + G._bgmBtn.w &&
         y >= G._bgmBtn.y && y <= G._bgmBtn.y + G._bgmBtn.h) {
       bgmOn = !bgmOn;
-      if (bgmOn) startBGM(curScene.name); else stopBGM();
+      localStorage.setItem('rogue_bgm', bgmOn ? '1' : '0');
+      if (bgmOn) startBGM(G.phase === 'title' ? '_title' : G.phase === 'gameover' ? '_gameover' : curScene.name); else stopBGM();
       return;
     }
 
@@ -5273,6 +5318,7 @@
       }
       if (hitTest(x, y, G._startR)) {
         G.phase = 'playing';
+        startBGM(curScene.name);
         beginWave();
       }
       return;
@@ -5384,7 +5430,7 @@
     G = freshState();
     curScene = SCENES[Math.floor(Math.random() * SCENES.length)];
     ensureAudio();
-    startBGM(curScene.name);
+    startBGM('_title');
     prevTs = performance.now();
     if (rafId) cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(loop);
