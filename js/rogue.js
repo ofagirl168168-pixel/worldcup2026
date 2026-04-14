@@ -983,9 +983,27 @@
   async function tryWeeklySettle() {
     try {
       if (typeof FUNC_URL === 'undefined') return;
-      await fetch(`${FUNC_URL}/rogue-weekly-settle`, { method: 'POST',
+      const res = await fetch(`${FUNC_URL}/rogue-weekly-settle`, { method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: '{}' });
+      const data = await res.json();
+      // 結算成功且有得獎者 → 發放週徽章
+      if (data.settled && data.winners?.length && typeof currentUser !== 'undefined' && currentUser) {
+        const uid = currentUser.id;
+        const myWin = data.winners.find(w => w.user_id === uid);
+        if (myWin) {
+          const wb = WEEKLY_BADGES[myWin.rank - 1];
+          if (wb) {
+            const existing = _loadWeeklyBadges();
+            const weekKey = data.week || _weekKey();
+            if (!existing.find(e => e.id === wb.id && e.week === weekKey)) {
+              existing.push({ ...wb, date: new Date().toISOString(), week: weekKey });
+              _saveWeeklyBadges(existing);
+              if (typeof showToast === 'function') showToast(`${wb.icon} 恭喜獲得「${wb.name}」徽章！`);
+            }
+          }
+        }
+      }
     } catch (_) {}
   }
 
@@ -1015,9 +1033,6 @@
       G._badgeToastT = performance.now();
     }
 
-    // 檢查週排名徽章
-    checkWeeklyBadges();
-
     // 上傳 Supabase（已登入時）
     if (typeof currentUser !== 'undefined' && currentUser && typeof callEdge === 'function') {
       const _score = G.score, _wave = G.wave;
@@ -1028,8 +1043,6 @@
         _rogueBoardLoaded = false;
         loadRogueBoards().then(() => {
           if (typeof renderRogueLeaderboard === 'function') renderRogueLeaderboard();
-          // 排行榜載入後再檢查週徽章
-          checkWeeklyBadges();
         });
       });
     } else {
@@ -4505,24 +4518,11 @@
     return newBadges;
   }
 
-  // 檢查週排名徽章（從排行榜資料）
-  function checkWeeklyBadges() {
-    if (!currentUser || !_rogueWeeklyBoard?.length) return;
-    const uid = currentUser.id;
+  // 清理過期週徽章（保留 7 天內的）
+  function cleanWeeklyBadges() {
     const existing = _loadWeeklyBadges().filter(b => {
-      // 只保留 7 天內的
-      const diff = (Date.now() - new Date(b.date).getTime()) / 86400000;
-      return diff < 7;
+      return (Date.now() - new Date(b.date).getTime()) / 86400000 < 7;
     });
-    for (let i = 0; i < Math.min(3, _rogueWeeklyBoard.length); i++) {
-      const entry = _rogueWeeklyBoard[i];
-      if (entry.user_id === uid) {
-        const wb = WEEKLY_BADGES[i];
-        if (!existing.find(e => e.id === wb.id && e.week === _weekKey())) {
-          existing.push({ ...wb, date: new Date().toISOString(), week: _weekKey() });
-        }
-      }
-    }
     _saveWeeklyBadges(existing);
     return existing;
   }
