@@ -89,6 +89,80 @@ function _dailyQ() {
 // 是否為俱樂部賽事（非國家隊）
 function _isClub() { return _isUCL() || _isEPL(); }
 
+// ── 賽事數據 HTML 渲染 ──
+function _renderStatsHTML(stats, ht, at) {
+  const rows = [
+    ['控球率', stats.poss?.[0], stats.poss?.[1], '%'],
+    ['射門', stats.shots?.[0], stats.shots?.[1], ''],
+    ['射正', stats.sot?.[0], stats.sot?.[1], ''],
+    ['角球', stats.corners?.[0], stats.corners?.[1], ''],
+    ['犯規', stats.fouls?.[0], stats.fouls?.[1], ''],
+    ['越位', stats.offsides?.[0], stats.offsides?.[1], ''],
+    ['黃牌', stats.yellow?.[0], stats.yellow?.[1], ''],
+    ['撲救', stats.saves?.[0], stats.saves?.[1], ''],
+  ].filter(([, h, a]) => h !== null && h !== undefined && a !== null && a !== undefined);
+
+  if (!rows.length) return '<div style="text-align:center;padding:12px;color:var(--text-muted);font-size:13px">暫無賽事數據</div>';
+
+  return `<div style="margin:20px 0">
+    <div class="modal-section-title">📊 賽事數據</div>
+    <div style="background:rgba(255,255,255,0.03);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)">
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;background:rgba(255,255,255,0.05);padding:10px 16px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:14px">${flagImg(ht.flag)}</span>
+          <span style="font-size:12px;font-weight:700">${ht.nameCN}</span>
+        </div>
+        <div></div>
+        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+          <span style="font-size:12px;font-weight:700">${at.nameCN}</span>
+          <span style="font-size:14px">${flagImg(at.flag)}</span>
+        </div>
+      </div>
+      ${rows.map(([label, hVal, aVal, unit]) => {
+        const hN = parseFloat(hVal) || 0, aN = parseFloat(aVal) || 0;
+        return `<div style="display:grid;grid-template-columns:1fr auto 1fr;padding:10px 16px;border-top:1px solid rgba(255,255,255,0.04)">
+          <div style="font-size:15px;font-weight:800;${hN>aN?'color:var(--green)':'color:var(--text-secondary)'}">${hVal}${unit}</div>
+          <div style="font-size:12px;color:var(--text-muted);text-align:center;min-width:60px">${label}</div>
+          <div style="font-size:15px;font-weight:800;text-align:right;${aN>hN?'color:var(--green)':'color:var(--text-secondary)'}">${aVal}${unit}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+// ── 非同步載入賽事數據 ──
+function _fetchMatchStats(home, away, date) {
+  const league = _isEPL() ? 'epl' : _isUCL() ? 'ucl' : 'wc';
+  const el = document.getElementById('modal-match-stats');
+  if (!el) return;
+
+  // 如果已有 stats，不需要再 fetch
+  if (el.querySelector('.modal-section-title')) return;
+
+  fetch(`/api/match-stats?home=${home}&away=${away}&date=${date}&league=${league}`)
+    .then(r => r.json())
+    .then(data => {
+      const el2 = document.getElementById('modal-match-stats');
+      if (!el2) return; // modal 已關閉
+      if (!data.ok || !data.stats) {
+        el2.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-muted);font-size:13px">賽事數據暫無提供</div>';
+        return;
+      }
+      // 從 data attributes 取得隊伍資訊
+      const homeCN = el2.dataset.homeCn;
+      const awayCN = el2.dataset.awayCn;
+      const homeFlag = el2.dataset.homeFlag;
+      const awayFlag = el2.dataset.awayFlag;
+      const ht = { nameCN: homeCN, flag: homeFlag };
+      const at = { nameCN: awayCN, flag: awayFlag };
+      el2.innerHTML = _renderStatsHTML(data.stats, ht, at);
+    })
+    .catch(() => {
+      const el2 = document.getElementById('modal-match-stats');
+      if (el2) el2.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-muted);font-size:13px">賽事數據載入失敗</div>';
+    });
+}
+
 // 比賽元資料（modal 共用）
 function _matchMeta(m) {
   const t = _tid();
@@ -837,6 +911,7 @@ async function openPredModal(id) {
           <span class="match-tag group">${matchTag}</span>
           <span class="match-tag">${matchTime}</span>
           ${matchVenue ? `<span class="match-tag">${matchVenue}</span>` : ''}
+          ${m.referee ? `<span class="match-tag">🧑‍⚖️ ${m.referee}</span>` : ''}
         </div>
       </div>
 
@@ -905,37 +980,56 @@ async function openPredModal(id) {
         </div>
       </div>` : ''}
 
-      <!-- 賽事數據統計（真實數據）-->
-      ${m.stats ? `
-      <div style="margin:20px 0">
-        <div class="modal-section-title">📊 賽事數據</div>
-        <div style="background:rgba(255,255,255,0.03);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)">
-          <div style="display:grid;grid-template-columns:1fr auto 1fr;background:rgba(255,255,255,0.05);padding:10px 16px">
-            <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:14px">${flagImg(ht.flag)}</span>
-              <span style="font-size:12px;font-weight:700">${ht.nameCN}</span>
-            </div>
-            <div></div>
-            <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
-              <span style="font-size:12px;font-weight:700">${at.nameCN}</span>
-              <span style="font-size:14px">${flagImg(at.flag)}</span>
-            </div>
-          </div>
-          ${[
-            ['控球率', m.stats.poss[0], m.stats.poss[1], '%'],
-            ['射門', m.stats.shots[0], m.stats.shots[1], ''],
-            ['射正', m.stats.sot[0], m.stats.sot[1], ''],
-            ['角球', m.stats.corners[0], m.stats.corners[1], ''],
-            ['黃牌', m.stats.yellow[0], m.stats.yellow[1], ''],
-            ['撲救', m.stats.saves[0], m.stats.saves[1], '']
-          ].map(([label, hVal, aVal, unit]) => `
-            <div style="display:grid;grid-template-columns:1fr auto 1fr;padding:10px 16px;border-top:1px solid rgba(255,255,255,0.04)">
-              <div style="font-size:15px;font-weight:800;${hVal>aVal?'color:var(--green)':'color:var(--text-secondary)'}">${hVal}${unit}</div>
-              <div style="font-size:12px;color:var(--text-muted);text-align:center;min-width:60px">${label}</div>
-              <div style="font-size:15px;font-weight:800;text-align:right;${aVal>hVal?'color:var(--green)':'color:var(--text-secondary)'}">${aVal}${unit}</div>
-            </div>`).join('')}
+      <!-- 半場比分 -->
+      ${m.halfTime ? `
+      <div style="text-align:center;margin:8px 0;font-size:12px;color:var(--text-muted)">
+        半場比分 ${m.halfTime.h} – ${m.halfTime.a}
+      </div>` : ''}
+
+      <!-- 黃紅牌紀錄 -->
+      ${m.bookings && m.bookings.length > 0 ? `
+      <div style="margin:16px 0">
+        <div class="modal-section-title">🟨 犯規紀錄</div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+          ${m.bookings.map(b => {
+            const isHome = b.side === 'h';
+            const cardIcon = b.card === 'red' ? '🟥' : b.card === 'yellow_red' ? '🟨🟥' : '🟨';
+            return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isHome ? '' : 'flex-direction:row-reverse;text-align:right'}">
+              <div style="min-width:42px;font-size:13px;font-weight:800;color:var(--text-muted);${isHome ? 'text-align:right' : 'text-align:left'}">${b.min}'</div>
+              <div style="font-size:14px">${cardIcon}</div>
+              <div style="flex:1;font-size:13px;color:var(--text-secondary)">${b.player}</div>
+            </div>`;
+          }).join('')}
         </div>
       </div>` : ''}
+
+      <!-- 換人紀錄 -->
+      ${m.substitutions && m.substitutions.length > 0 ? `
+      <div style="margin:16px 0">
+        <div class="modal-section-title">🔄 換人紀錄</div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+          ${m.substitutions.map(s => {
+            const isHome = s.side === 'h';
+            return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isHome ? '' : 'flex-direction:row-reverse;text-align:right'}">
+              <div style="min-width:42px;font-size:13px;font-weight:800;color:var(--text-muted);${isHome ? 'text-align:right' : 'text-align:left'}">${s.min}'</div>
+              <div style="flex:1;${isHome ? '' : 'text-align:right'}">
+                <span style="font-size:12px;color:#4caf50">▲ ${s.playerIn}</span>
+                <span style="font-size:11px;color:var(--text-muted);margin:0 4px">←</span>
+                <span style="font-size:12px;color:#ef5350">▼ ${s.playerOut}</span>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>` : ''}
+
+      <!-- 賽事數據統計（真實數據 — 非同步載入）-->
+      <div id="modal-match-stats" data-home="${m.home}" data-away="${m.away}" data-date="${m.date}" data-home-cn="${ht.nameCN}" data-away-cn="${at.nameCN}" data-home-flag="${ht.flag||''}" data-away-flag="${at.flag||''}">
+        ${m.stats ? _renderStatsHTML(m.stats, ht, at) : `
+        <div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">
+          <div class="modal-spinner" style="width:24px;height:24px;margin:0 auto 8px"></div>
+          載入賽事數據...
+        </div>`}
+      </div>
 
       <!-- 關鍵球員 -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
@@ -1027,6 +1121,7 @@ async function openPredModal(id) {
           <span class="live-badge" style="font-size:13px;padding:4px 12px"><span class="live-dot"></span>LIVE ${minuteText}</span>
           <span class="match-tag group">${matchTag}</span>
           ${matchVenue ? `<span class="match-tag">${matchVenue}</span>` : ''}
+          ${m.referee ? `<span class="match-tag">🧑‍⚖️ ${m.referee}</span>` : ''}
         </div>
       </div>
 
@@ -1070,6 +1165,56 @@ async function openPredModal(id) {
         </div>
       </div>` : `
       <div style="text-align:center;padding:16px;color:var(--text-muted);font-size:14px">⚽ 暫無進球</div>`}
+
+      <!-- 半場比分 -->
+      ${m.halfTime ? `
+      <div style="text-align:center;margin:8px 0;font-size:12px;color:var(--text-muted)">
+        半場比分 ${m.halfTime.h} – ${m.halfTime.a}
+      </div>` : ''}
+
+      <!-- 黃紅牌紀錄 -->
+      ${m.bookings && m.bookings.length > 0 ? `
+      <div style="margin:16px 0">
+        <div class="modal-section-title">🟨 犯規紀錄</div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+          ${m.bookings.map(b => {
+            const isHome = b.side === 'h';
+            const cardIcon = b.card === 'red' ? '🟥' : b.card === 'yellow_red' ? '🟨🟥' : '🟨';
+            return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isHome ? '' : 'flex-direction:row-reverse;text-align:right'}">
+              <div style="min-width:42px;font-size:13px;font-weight:800;color:var(--text-muted);${isHome ? 'text-align:right' : 'text-align:left'}">${b.min}'</div>
+              <div style="font-size:14px">${cardIcon}</div>
+              <div style="flex:1;font-size:13px;color:var(--text-secondary)">${b.player}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>` : ''}
+
+      <!-- 換人紀錄 -->
+      ${m.substitutions && m.substitutions.length > 0 ? `
+      <div style="margin:16px 0">
+        <div class="modal-section-title">🔄 換人紀錄</div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+          ${m.substitutions.map(s => {
+            const isHome = s.side === 'h';
+            return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isHome ? '' : 'flex-direction:row-reverse;text-align:right'}">
+              <div style="min-width:42px;font-size:13px;font-weight:800;color:var(--text-muted);${isHome ? 'text-align:right' : 'text-align:left'}">${s.min}'</div>
+              <div style="flex:1;${isHome ? '' : 'text-align:right'}">
+                <span style="font-size:12px;color:#4caf50">▲ ${s.playerIn}</span>
+                <span style="font-size:11px;color:var(--text-muted);margin:0 4px">←</span>
+                <span style="font-size:12px;color:#ef5350">▼ ${s.playerOut}</span>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>` : ''}
+
+      <!-- 賽事數據統計（非同步載入）-->
+      <div id="modal-match-stats" data-home="${m.home}" data-away="${m.away}" data-date="${m.date}" data-home-cn="${ht.nameCN}" data-away-cn="${at.nameCN}" data-home-flag="${ht.flag||''}" data-away-flag="${at.flag||''}">
+        <div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">
+          <div class="modal-spinner" style="width:24px;height:24px;margin:0 auto 8px"></div>
+          載入賽事數據...
+        </div>
+      </div>
 
       <!-- AI 賽前預測 -->
       <div style="background:var(--accent-bg);border-radius:12px;padding:16px;margin:16px 0;border:1px solid var(--accent-border)">
@@ -1119,6 +1264,8 @@ async function openPredModal(id) {
       </div>
     `;
     modal.scrollTop = 0;
+    // 非同步載入賽事數據
+    if (m.date) _fetchMatchStats(m.home, m.away, m.date);
     return;
   }
   // ── END 進行中比賽 ──────────────────────────────────────
@@ -1406,6 +1553,11 @@ async function openPredModal(id) {
   // 若深度分析已解鎖，自動展開（不再消耗寶石）
   if (window.unlockedDeepSet?.has(m.id)) {
     setTimeout(() => openDeepAnalysis(m.id, m.home, m.away), 0)
+  }
+
+  // 非同步載入賽事數據（已完賽或進行中才 fetch）
+  if ((m.status === 'finished' || m.status === 'live') && !m.stats && m.date) {
+    _fetchMatchStats(m.home, m.away, m.date);
   }
   } catch(e) {
     console.error('openPredModal error:', e);

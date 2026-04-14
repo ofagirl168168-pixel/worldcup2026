@@ -43,9 +43,9 @@ const NAME_TO_CODE = {
   'Kaizer Chiefs': 'KAI',
 };
 
-// football-data.org 常見 TLA → 本站代碼（TLA 可能與本站不同）
+// football-data.org 常見 TLA → 本站代碼
 const TLA_TO_CODE = {
-  'PSG': 'PSG', 'RMA': 'RMA', 'MCI': 'MCI', 'FCB': 'BAR', // FCB 可能是 BAR 或 BAY，靠 name 補正
+  'PSG': 'PSG', 'RMA': 'RMA', 'MCI': 'MCI', 'FCB': 'BAR',
   'LIV': 'LIV', 'LFC': 'LIV', 'INT': 'INT', 'CHE': 'CHE',
   'BVB': 'DOR', 'DOR': 'DOR', 'BAR': 'BAR', 'ARS': 'ARS',
   'B04': 'LEV', 'LEV': 'LEV', 'ATM': 'ATM', 'BEN': 'BEN',
@@ -72,14 +72,51 @@ const STAGE_MAP = {
 // ── 解析隊伍代碼 ──
 function resolveTeamCode(team) {
   if (!team) return 'TBD';
-  // 優先用 name 對照（最準確）
   if (team.name && NAME_TO_CODE[team.name]) return NAME_TO_CODE[team.name];
   if (team.shortName && NAME_TO_CODE[team.shortName]) return NAME_TO_CODE[team.shortName];
-  // 再用 TLA
   if (team.tla && TLA_TO_CODE[team.tla]) return TLA_TO_CODE[team.tla];
-  // 最後用 TLA 原文（3碼大寫）
   if (team.tla && /^[A-Z]{3}$/.test(team.tla)) return team.tla;
   return 'TBD';
+}
+
+// ── 判斷比賽是否最近完賽 ──
+function isRecentlyFinished(utcDate, hours = 24) {
+  if (!utcDate) return false;
+  const matchTime = new Date(utcDate).getTime();
+  return (Date.now() - matchTime) < hours * 60 * 60 * 1000;
+}
+
+// ── 轉換進球資料 ──
+function transformGoals(goals, homeTeamId) {
+  if (!goals || !goals.length) return [];
+  return goals.map(g => ({
+    min: String(g.minute) + (g.injuryTime ? `+${g.injuryTime}` : ''),
+    player: g.scorer?.name || '?',
+    side: g.team?.id === homeTeamId ? 'h' : 'a',
+    ...(g.type === 'OWN' ? { type: 'og' } : g.type === 'PENALTY' ? { type: 'pen' } : {})
+  }));
+}
+
+// ── 轉換黃紅牌資料 ──
+function transformBookings(bookings, homeTeamId) {
+  if (!bookings || !bookings.length) return [];
+  return bookings.map(b => ({
+    min: String(b.minute) + (b.injuryTime ? `+${b.injuryTime}` : ''),
+    player: b.player?.name || '?',
+    side: b.team?.id === homeTeamId ? 'h' : 'a',
+    card: b.card === 'YELLOW' ? 'yellow' : b.card === 'YELLOW_RED' ? 'yellow_red' : 'red'
+  }));
+}
+
+// ── 轉換換人資料 ──
+function transformSubs(substitutions, homeTeamId) {
+  if (!substitutions || !substitutions.length) return [];
+  return substitutions.map(s => ({
+    min: String(s.minute) + (s.injuryTime ? `+${s.injuryTime}` : ''),
+    playerOut: s.playerOut?.name || '?',
+    playerIn: s.playerIn?.name || '?',
+    side: s.team?.id === homeTeamId ? 'h' : 'a'
+  }));
 }
 
 // ── 轉換單場比賽 ──
@@ -98,17 +135,19 @@ function transformMatch(m) {
   if (m.score && m.score.fullTime && m.score.fullTime.home !== null) {
     score = { h: m.score.fullTime.home, a: m.score.fullTime.away };
   } else if (m.score && m.score.home !== null && m.score.home !== undefined) {
-    // 比賽進行中：fullTime 尚無值，用 score 根層級
     score = { h: m.score.home, a: m.score.away };
   }
 
-  // 進球（如果 API 有提供）
-  const goals = (m.goals || []).map(g => ({
-    min: String(g.minute) + (g.injuryTime ? `+${g.injuryTime}` : ''),
-    player: g.scorer?.name || '?',
-    side: g.team?.id === m.homeTeam?.id ? 'h' : 'a',
-    ...(g.type === 'OWN' ? { type: 'og' } : g.type === 'PENALTY' ? { type: 'pen' } : {})
-  }));
+  // 半場比分
+  let halfTime = null;
+  if (m.score?.halfTime?.home !== null && m.score?.halfTime?.home !== undefined) {
+    halfTime = { h: m.score.halfTime.home, a: m.score.halfTime.away };
+  }
+
+  // 進球（從批次端點可能為空，後續由 detail fetch 補充）
+  const goals = transformGoals(m.goals, m.homeTeam?.id);
+  const bookings = transformBookings(m.bookings, m.homeTeam?.id);
+  const substitutions = transformSubs(m.substitutions, m.homeTeam?.id);
 
   // 日期轉台灣時間（UTC+8）
   let date = '', time = '';
@@ -125,7 +164,6 @@ function transformMatch(m) {
     if (m.minute !== undefined && m.minute !== null) {
       minute = m.minute;
     }
-    // 如果 fullTime 沒有比分但 halfTime 或 regularTime 有
     if (!score && m.score) {
       if (m.score.halfTime && m.score.halfTime.home !== null) {
         score = { h: m.score.halfTime.home, a: m.score.halfTime.away };
@@ -133,7 +171,55 @@ function transformMatch(m) {
     }
   }
 
-  return { home, away, stage, status, score, goals, date, time, venue: m.venue || null, minute };
+  return {
+    home, away, stage, status, score, halfTime, goals, bookings, substitutions,
+    date, time, venue: m.venue || null, minute,
+    apiId: m.id,
+    homeTeamId: m.homeTeam?.id,
+    awayTeamId: m.awayTeam?.id,
+    referee: m.referees?.[0]?.name || null,
+  };
+}
+
+// ── 取得單場比賽詳情 ──
+async function fetchMatchDetail(apiId, apiKey) {
+  try {
+    const res = await fetch(`https://api.football-data.org/v4/matches/${apiId}`, {
+      headers: { 'X-Auth-Token': apiKey }
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+// ── 將詳情合併到比賽物件 ──
+function mergeDetail(match, detail) {
+  if (!detail) return;
+  const homeId = detail.homeTeam?.id;
+
+  if (detail.goals?.length) {
+    match.goals = transformGoals(detail.goals, homeId);
+  }
+  if (detail.bookings?.length) {
+    match.bookings = transformBookings(detail.bookings, homeId);
+  }
+  if (detail.substitutions?.length) {
+    match.substitutions = transformSubs(detail.substitutions, homeId);
+  }
+  if (detail.referees?.[0]?.name) {
+    match.referee = detail.referees[0].name;
+  }
+  if (detail.venue) {
+    match.venue = detail.venue;
+  }
+  if (!match.score && detail.score?.fullTime?.home !== null && detail.score?.fullTime?.home !== undefined) {
+    match.score = { h: detail.score.fullTime.home, a: detail.score.fullTime.away };
+  }
+  if (!match.halfTime && detail.score?.halfTime?.home !== null && detail.score?.halfTime?.home !== undefined) {
+    match.halfTime = { h: detail.score.halfTime.home, a: detail.score.halfTime.away };
+  }
 }
 
 // ── Handler ──
@@ -167,15 +253,37 @@ export async function onRequestGet(context) {
     }
 
     const data = await res.json();
-    const matches = (data.matches || [])
-      .map(transformMatch)
-      .filter(Boolean);
+    const rawMatches = data.matches || [];
+    const matches = rawMatches.map(transformMatch).filter(Boolean);
+
+    // ── 取得需要詳情的比賽（live 或最近 24h 完賽）──
+    const needDetail = rawMatches.filter(m =>
+      (STAGE_MAP[m.stage]) && (
+        m.status === 'IN_PLAY' || m.status === 'PAUSED' || m.status === 'LIVE' ||
+        (m.status === 'FINISHED' && isRecentlyFinished(m.utcDate, 24))
+      )
+    ).slice(0, 6);
+
+    if (needDetail.length > 0) {
+      const details = await Promise.allSettled(
+        needDetail.map(m => fetchMatchDetail(m.id, apiKey))
+      );
+
+      for (let i = 0; i < needDetail.length; i++) {
+        if (details[i].status === 'fulfilled' && details[i].value) {
+          const apiId = needDetail[i].id;
+          const match = matches.find(m => m.apiId === apiId);
+          if (match) mergeDetail(match, details[i].value);
+        }
+      }
+    }
 
     return new Response(JSON.stringify({
       ok: true,
       matches,
       updated: new Date().toISOString(),
-      count: matches.length
+      count: matches.length,
+      detailsFetched: needDetail.length,
     }), { headers });
 
   } catch (e) {

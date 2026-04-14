@@ -49,32 +49,39 @@
       const apiHasScore = live.score && live.score.h !== null;
       const localHasScore = existing.score && existing.score.h !== null;
 
+      // 通用欄位更新（進球、黃牌、換人、半場比分等）
+      const mergeExtra = () => {
+        if (live.goals?.length) existing.goals = live.goals;
+        if (live.bookings?.length) existing.bookings = live.bookings;
+        if (live.substitutions?.length) existing.substitutions = live.substitutions;
+        if (live.halfTime) existing.halfTime = live.halfTime;
+        if (live.referee) existing.referee = live.referee;
+        if (live.venue) existing.venue = live.venue;
+      };
+
       if (apiHasScore && live.status === 'finished' && existing.status !== 'finished') {
-        // 比賽結束：更新比分、狀態、進球
         existing.status = 'finished';
         existing.score = live.score;
-        if (live.goals?.length) existing.goals = live.goals;
         existing.minute = null;
+        mergeExtra();
         updated++;
       } else if (apiHasScore && live.status === 'live') {
-        // 進行中：更新即時比分 + 分鐘數
         existing.status = 'live';
         existing.score = live.score;
-        if (live.goals?.length) existing.goals = live.goals;
         if (live.minute !== undefined) existing.minute = live.minute;
+        mergeExtra();
         updated++;
       } else if (live.status === 'live' && existing.status !== 'live') {
-        // 比賽剛開始，可能還沒有比分
         existing.status = 'live';
         existing.score = live.score || { h: 0, a: 0 };
         if (live.minute !== undefined) existing.minute = live.minute;
+        mergeExtra();
         updated++;
       } else if (apiHasScore && !localHasScore) {
-        // 靜態資料沒有比分但 API 有（補資料）
         existing.status = live.status;
         existing.score = live.score;
-        if (live.goals?.length) existing.goals = live.goals;
         if (live.minute !== undefined) existing.minute = live.minute;
+        mergeExtra();
         updated++;
       }
 

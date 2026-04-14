@@ -51,7 +51,12 @@
           existing.status = live.status;
           existing.score = live.score;
           if (live.goals?.length) existing.goals = live.goals;
+          if (live.bookings?.length) existing.bookings = live.bookings;
+          if (live.substitutions?.length) existing.substitutions = live.substitutions;
+          if (live.halfTime) existing.halfTime = live.halfTime;
           if (live.minute !== undefined) existing.minute = live.minute;
+          if (live.referee) existing.referee = live.referee;
+          if (live.venue) existing.venue = live.venue;
           updated++;
         }
       } else {
