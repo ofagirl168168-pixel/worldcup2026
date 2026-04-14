@@ -5254,7 +5254,7 @@
       ctx.fillText('登入即可上排行榜！', W / 2, nextY + 24);
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
       ctx.font = `${Math.min(11, W * 0.021)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText('與其他玩家競爭，週排行前三名可獲得寶石', W / 2, nextY + 42);
+      ctx.fillText('與其他玩家競爭，週排行前六名可獲得寶石', W / 2, nextY + 42);
 
       // 登入按鈕
       if (fade >= 1) {
