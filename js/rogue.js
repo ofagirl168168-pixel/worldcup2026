@@ -3715,17 +3715,88 @@
 
     ctx.restore();
 
-    // ── 開始按鈕 ──
+    // ── 開始按鈕（動態效果）──
     const btnW = Math.min(220, W * 0.45);
     const btnX = W / 2 - btnW / 2;
     G._startR = { x: btnX, y: btnY, w: btnW, h: btnH };
+    const t = performance.now() * 0.001;
 
-    ctx.fillStyle = '#4caf50';
+    // 呼吸脈衝
+    const pulse = Math.sin(t * 2.5) * 0.08 + 1;
+    ctx.save();
+    ctx.translate(W / 2, btnY + btnH / 2);
+    ctx.scale(pulse, pulse);
+    ctx.translate(-W / 2, -(btnY + btnH / 2));
+
+    // 外發光
+    ctx.shadowColor = '#4caf50';
+    ctx.shadowBlur = 16 + Math.sin(t * 3) * 8;
+
+    // 漸層按鈕底色
+    const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
+    btnGrad.addColorStop(0, '#43a047');
+    btnGrad.addColorStop(0.5, '#66bb6a');
+    btnGrad.addColorStop(1, '#2e7d32');
+    ctx.fillStyle = btnGrad;
     rr(ctx, btnX, btnY, btnW, btnH, 14); ctx.fill();
+
+    // 閃光掃過
+    ctx.save();
+    rr(ctx, btnX, btnY, btnW, btnH, 14); ctx.clip();
+    const shineX = btnX - btnW + ((t * 0.4) % 1) * (btnW * 3);
+    const shineGrad = ctx.createLinearGradient(shineX, 0, shineX + btnW * 0.4, 0);
+    shineGrad.addColorStop(0, 'rgba(255,255,255,0)');
+    shineGrad.addColorStop(0.5, 'rgba(255,255,255,0.18)');
+    shineGrad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = shineGrad;
+    ctx.fillRect(btnX, btnY, btnW, btnH);
+    ctx.restore();
+
+    ctx.shadowBlur = 0;
+
+    // ⚽ 小球圖示（左側彈跳）
+    const ballSz = Math.min(16, W * 0.032);
+    const ballBounce = Math.abs(Math.sin(t * 3)) * 6;
+    const ballX = W / 2 - ctx.measureText('開始遊戲').width / 2 - ballSz - 8;
+    ctx.font = `${ballSz}px sans-serif`;
+    ctx.fillText('⚽', ballX, btnY + 33 + 1 - ballBounce);
+
+    // 文字
     ctx.fillStyle = '#fff';
     ctx.font = `bold ${Math.min(20, W * 0.04)}px "Noto Sans TC", sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('開始遊戲', W / 2, btnY + 33);
+    ctx.fillText('開始遊戲', W / 2 + ballSz / 2, btnY + 33);
+
+    // ▶ 箭頭（左右搖擺）
+    const arrowOff = Math.sin(t * 4) * 3;
+    const textW = ctx.measureText('開始遊戲').width;
+    ctx.font = `bold ${Math.min(14, W * 0.028)}px sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillText('▶', W / 2 + textW / 2 + ballSz / 2 + 10 + arrowOff, btnY + 33);
+
+    ctx.restore();
+
+    // 按鈕周圍粒子
+    if (!G._btnParticles) {
+      G._btnParticles = Array.from({length: 6}, () => ({
+        angle: Math.random() * Math.PI * 2,
+        speed: 0.3 + Math.random() * 0.5,
+        dist: 0.5 + Math.random() * 0.3,
+        size: 1.5 + Math.random() * 2,
+        phase: Math.random() * Math.PI * 2,
+      }));
+    }
+    G._btnParticles.forEach(p => {
+      const a = p.angle + t * p.speed;
+      const d = (btnW / 2 + 10) * p.dist + Math.sin(t * 2 + p.phase) * 8;
+      const px2 = W / 2 + Math.cos(a) * d;
+      const py2 = btnY + btnH / 2 + Math.sin(a) * (btnH / 2 + 6 + Math.sin(t * 2 + p.phase) * 4);
+      const alpha = 0.3 + Math.sin(t * 3 + p.phase) * 0.2;
+      ctx.beginPath();
+      ctx.arc(px2, py2, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(76,175,80,${alpha})`;
+      ctx.fill();
+    });
   }
 
   // ── 排行榜 Tab ──
