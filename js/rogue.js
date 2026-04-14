@@ -3891,7 +3891,7 @@
       const pad = regenSec < 10 ? '0' : '';
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
       ctx.font = `${Math.min(11, W * 0.022)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText(`下一點 ${regenMin}:${pad}${regenSec}`, W / 2, barY + barH + 14);
+      ctx.fillText(`${regenMin}:${pad}${regenSec} 後回復 1 體力`, W / 2, barY + barH + 14);
     }
 
     // 體力不足時：寶石補充按鈕
@@ -3929,19 +3929,34 @@
     G._startR = stEmpty ? null : { x: btnX, y: btnY, w: btnW, h: btnH };
     const t = performance.now() * 0.001;
 
-    // 漸層按鈕底色
+    // 漸層按鈕底色 + 呼吸光暈
     if (stEmpty) {
       ctx.fillStyle = 'rgba(100,100,100,0.5)';
+      rr(ctx, btnX, btnY, btnW, btnH, 14); ctx.fill();
     } else {
+      const pulse = 0.6 + 0.4 * Math.sin(t * 2.5);
+      // 外層光暈
+      ctx.shadowColor = `rgba(76,175,80,${0.4 * pulse})`;
+      ctx.shadowBlur = 16 + 8 * pulse;
       const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
       btnGrad.addColorStop(0, '#43a047');
       btnGrad.addColorStop(0.5, '#66bb6a');
       btnGrad.addColorStop(1, '#2e7d32');
       ctx.fillStyle = btnGrad;
+      rr(ctx, btnX, btnY, btnW, btnH, 14); ctx.fill();
+      ctx.shadowBlur = 0;
+      // 高光掃過效果
+      ctx.save();
+      rr(ctx, btnX, btnY, btnW, btnH, 14); ctx.clip();
+      const shineX = btnX - btnW + ((t * 0.3) % 1) * btnW * 3;
+      const shine = ctx.createLinearGradient(shineX, btnY, shineX + btnW * 0.4, btnY);
+      shine.addColorStop(0, 'rgba(255,255,255,0)');
+      shine.addColorStop(0.5, 'rgba(255,255,255,0.12)');
+      shine.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = shine;
+      ctx.fillRect(btnX, btnY, btnW, btnH);
+      ctx.restore();
     }
-    if (!stEmpty) { ctx.shadowColor = '#4caf50'; ctx.shadowBlur = 12; }
-    rr(ctx, btnX, btnY, btnW, btnH, 14); ctx.fill();
-    ctx.shadowBlur = 0;
 
     // 按鈕文字
     const btnFz = Math.min(20, W * 0.04);
