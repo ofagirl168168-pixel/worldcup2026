@@ -1027,14 +1027,8 @@ async function openPredModal(id) {
         </div>
       </div>` : ''}
 
-      <!-- 賽事數據統計（真實數據 — 非同步載入）-->
-      <div id="modal-match-stats" data-home="${m.home}" data-away="${m.away}" data-date="${m.date}" data-home-cn="${ht.nameCN}" data-away-cn="${at.nameCN}" data-home-flag="${ht.flag||''}" data-away-flag="${at.flag||''}">
-        ${m.stats ? _renderStatsHTML(m.stats, ht, at) : `
-        <div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">
-          <div class="modal-spinner" style="width:24px;height:24px;margin:0 auto 8px"></div>
-          載入賽事數據...
-        </div>`}
-      </div>
+      <!-- 賽事數據統計（需付費 API，暫時隱藏）-->
+      ${m.stats ? _renderStatsHTML(m.stats, {nameCN: typeof ht?.nameCN==='string'?ht.nameCN:'', flag: ht?.flag||''}, {nameCN: typeof at?.nameCN==='string'?at.nameCN:'', flag: at?.flag||''}) : ''}
 
       <!-- 關鍵球員 -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
@@ -1213,13 +1207,7 @@ async function openPredModal(id) {
         </div>
       </div>` : ''}
 
-      <!-- 賽事數據統計（非同步載入）-->
-      <div id="modal-match-stats" data-home="${m.home}" data-away="${m.away}" data-date="${m.date}" data-home-cn="${ht.nameCN}" data-away-cn="${at.nameCN}" data-home-flag="${ht.flag||''}" data-away-flag="${at.flag||''}">
-        <div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">
-          <div class="modal-spinner" style="width:24px;height:24px;margin:0 auto 8px"></div>
-          載入賽事數據...
-        </div>
-      </div>
+      <!-- 賽事數據統計（需付費 API，暫時隱藏）-->
 
       <!-- AI 賽前預測 -->
       <div style="background:var(--accent-bg);border-radius:12px;padding:16px;margin:16px 0;border:1px solid var(--accent-border)">
@@ -1269,8 +1257,6 @@ async function openPredModal(id) {
       </div>
     `;
     modal.scrollTop = 0;
-    // 非同步載入賽事數據
-    if (m.date) _fetchMatchStats(m.home, m.away, m.date);
     return;
   }
   // ── END 進行中比賽 ──────────────────────────────────────
@@ -1560,10 +1546,10 @@ async function openPredModal(id) {
     setTimeout(() => openDeepAnalysis(m.id, m.home, m.away), 0)
   }
 
-  // 非同步載入賽事數據（已完賽或進行中才 fetch）
-  if ((m.status === 'finished' || m.status === 'live') && !m.stats && m.date) {
-    _fetchMatchStats(m.home, m.away, m.date);
-  }
+  // 賽事數據統計：需付費 API（API-Football），暫時停用
+  // if ((m.status === 'finished' || m.status === 'live') && !m.stats && m.date) {
+  //   _fetchMatchStats(m.home, m.away, m.date);
+  // }
   } catch(e) {
     console.error('openPredModal error:', e);
     mc.innerHTML = `<div style="padding:30px;text-align:center;color:#ef9a9a">⚠️ 載入預測時發生錯誤：${e.message}</div>`;
