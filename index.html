@@ -304,6 +304,81 @@
       <div class="home-section">
         <div class="rogue-home-banner" onclick="startRogueGame()">
           <div class="rogue-home-banner-bg"></div>
+          <!-- 動漫風插圖：球門 + 飛球 + 撲球守門員 -->
+          <svg class="rogue-banner-art" viewBox="0 0 420 180" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- 球門（白色門柱 + 網格） -->
+            <g class="rogue-art-goal">
+              <rect x="180" y="20" width="220" height="140" rx="4" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="5"/>
+              <rect x="180" y="20" width="220" height="140" rx="4" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="12"/>
+              <!-- 球網 -->
+              <line x1="200" y1="20" x2="200" y2="160" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <line x1="220" y1="20" x2="220" y2="160" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <line x1="240" y1="20" x2="240" y2="160" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <line x1="260" y1="20" x2="260" y2="160" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <line x1="280" y1="20" x2="280" y2="160" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <line x1="300" y1="20" x2="300" y2="160" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <line x1="320" y1="20" x2="320" y2="160" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <line x1="340" y1="20" x2="340" y2="160" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <line x1="360" y1="20" x2="360" y2="160" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <line x1="380" y1="20" x2="380" y2="160" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+              <line x1="180" y1="45" x2="400" y2="45" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+              <line x1="180" y1="70" x2="400" y2="70" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+              <line x1="180" y1="95" x2="400" y2="95" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+              <line x1="180" y1="120" x2="400" y2="120" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+              <line x1="180" y1="145" x2="400" y2="145" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+            </g>
+            <!-- 守門員（動漫風，撲球姿勢） -->
+            <g class="rogue-art-keeper">
+              <!-- 身體 -->
+              <ellipse cx="300" cy="95" rx="18" ry="24" fill="#e8b84b" opacity="0.9" transform="rotate(-25 300 95)"/>
+              <!-- 頭 -->
+              <circle cx="280" cy="68" r="14" fill="#ffcc80"/>
+              <!-- 頭髮 -->
+              <path d="M268 62 Q280 50 294 60" fill="#5d4037" opacity="0.9"/>
+              <!-- 眼睛（動漫大眼） -->
+              <ellipse cx="275" cy="66" rx="3.5" ry="4" fill="#1a1a2e"/>
+              <ellipse cx="285" cy="66" rx="3.5" ry="4" fill="#1a1a2e"/>
+              <circle cx="274" cy="65" r="1.2" fill="#fff"/>
+              <circle cx="284" cy="65" r="1.2" fill="#fff"/>
+              <!-- 嘴（緊張的表情） -->
+              <path d="M276 73 Q280 76 284 73" fill="none" stroke="#c97" stroke-width="1.2" stroke-linecap="round"/>
+              <!-- 手套（左手伸出撲球） -->
+              <circle cx="258" cy="52" r="10" fill="#4caf50" opacity="0.9"/>
+              <circle cx="258" cy="52" r="7" fill="#66bb6a" opacity="0.8"/>
+              <!-- 左臂 -->
+              <line x1="272" y1="64" x2="260" y2="54" stroke="#e8b84b" stroke-width="5" stroke-linecap="round"/>
+              <!-- 手套（右手） -->
+              <circle cx="328" cy="80" r="9" fill="#4caf50" opacity="0.9"/>
+              <circle cx="328" cy="80" r="6" fill="#66bb6a" opacity="0.8"/>
+              <!-- 右臂 -->
+              <line x1="310" y1="85" x2="322" y2="82" stroke="#e8b84b" stroke-width="5" stroke-linecap="round"/>
+              <!-- 褲子 -->
+              <ellipse cx="298" cy="118" rx="12" ry="8" fill="#1a237e" opacity="0.8" transform="rotate(-15 298 118)"/>
+              <!-- 左腿 -->
+              <line x1="290" y1="122" x2="274" y2="145" stroke="#ffcc80" stroke-width="4.5" stroke-linecap="round"/>
+              <!-- 右腿 -->
+              <line x1="305" y1="120" x2="320" y2="148" stroke="#ffcc80" stroke-width="4.5" stroke-linecap="round"/>
+              <!-- 球鞋 -->
+              <ellipse cx="271" cy="148" rx="7" ry="4" fill="#1a1a2e"/>
+              <ellipse cx="323" cy="150" rx="7" ry="4" fill="#1a1a2e"/>
+              <!-- 球衣號碼 -->
+              <text x="300" y="100" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="11" font-weight="bold">1</text>
+            </g>
+            <!-- 足球（飛向右上角） -->
+            <g class="rogue-art-ball">
+              <circle cx="215" cy="42" r="12" fill="#fff"/>
+              <path d="M210 36 L215 32 L221 36 L219 42 L211 42 Z" fill="#222" opacity="0.7"/>
+              <circle cx="215" cy="42" r="12" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>
+              <!-- 速度線 -->
+              <line x1="188" y1="56" x2="205" y2="46" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
+              <line x1="182" y1="50" x2="200" y2="42" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="186" y1="62" x2="200" y2="52" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-linecap="round"/>
+            </g>
+            <!-- 衝擊波紋（球即將到達的感覺） -->
+            <circle class="rogue-art-impact" cx="215" cy="42" r="18" fill="none" stroke="rgba(255,215,0,0.3)" stroke-width="1.5"/>
+            <!-- 草地 -->
+            <rect x="170" y="158" width="250" height="22" fill="rgba(46,125,50,0.15)" rx="2"/>
+          </svg>
           <div class="rogue-home-banner-content">
             <div class="rogue-home-banner-left">
               <div class="rogue-home-banner-badge">NEW</div>
