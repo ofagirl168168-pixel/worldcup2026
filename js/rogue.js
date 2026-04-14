@@ -115,8 +115,8 @@
   //  音效系統（音檔 + Web Audio API 備援）
   // ═══════════════════════════════════════════════════════════
   let audioCtx = null;
-  let sfxOn = localStorage.getItem('rogue_sfx') === '1';
-  let bgmOn = localStorage.getItem('rogue_bgm') === '1';
+  let sfxOn = localStorage.getItem('rogue_sfx') !== '0';
+  let bgmOn = localStorage.getItem('rogue_bgm') !== '0';
   let bgmGain = null, sfxGain = null;
   let _bgmTimer = null, _bgmPlaying = false;
 
@@ -3583,11 +3583,12 @@
 
   // ─── 音效/音樂開關按鈕（共用） ─────────────────────────────
   function drawAudioBtns() {
-    const sz = Math.min(34, W * 0.07);
-    const gap = 8;
-    const bY = 6;
-    const bgmX = W - sz * 2 - gap - 10;
-    const sfxX = W - sz - 10;
+    const sz = Math.min(30, W * 0.06);
+    const gap = 6;
+    const bY = 14;
+    // 關閉按鈕佔 right 12px + 36px = 48px，按鈕放在其左側
+    const sfxX = W - 52 - sz;
+    const bgmX = sfxX - sz - gap;
 
     // BGM 按鈕
     ctx.save();
