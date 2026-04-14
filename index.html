@@ -304,96 +304,6 @@
       <div class="home-section">
         <div class="rogue-home-banner" onclick="startRogueGame()">
           <div class="rogue-home-banner-bg"></div>
-          <!-- 像素風橫向卷軸：紅隊運球 vs 藍隊守門員 -->
-          <svg class="rogue-banner-art" viewBox="0 0 480 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" shape-rendering="crispEdges">
-            <!-- 地平線 -->
-            <rect x="0" y="76" width="480" height="24" fill="#1b5e20" opacity="0.45"/>
-            <rect x="0" y="76" width="480" height="1" fill="#4caf50" opacity="0.5"/>
-
-            <!-- 左球門 -->
-            <g opacity="0.5">
-              <rect x="20" y="44" width="4" height="34" fill="#fff"/>
-              <rect x="20" y="42" width="32" height="4" fill="#fff"/>
-              <rect x="48" y="44" width="4" height="34" fill="#fff"/>
-              <g opacity="0.3" fill="#fff">
-                <rect x="28" y="46" width="1" height="28"/><rect x="36" y="46" width="1" height="28"/><rect x="44" y="46" width="1" height="28"/>
-                <rect x="24" y="54" width="24" height="1"/><rect x="24" y="64" width="24" height="1"/>
-              </g>
-            </g>
-
-            <!-- 右球門 -->
-            <g opacity="0.5">
-              <rect x="428" y="44" width="4" height="34" fill="#fff"/>
-              <rect x="428" y="42" width="32" height="4" fill="#fff"/>
-              <rect x="456" y="44" width="4" height="34" fill="#fff"/>
-              <g opacity="0.3" fill="#fff">
-                <rect x="436" y="46" width="1" height="28"/><rect x="444" y="46" width="1" height="28"/><rect x="452" y="46" width="1" height="28"/>
-                <rect x="432" y="54" width="24" height="1"/><rect x="432" y="64" width="24" height="1"/>
-              </g>
-            </g>
-
-            <!-- ★ 紅隊球員（運球往右 → 藍隊球門） -->
-            <g class="art-runner">
-              <!-- 影子 -->
-              <rect x="282" y="76" width="12" height="2" rx="1" fill="rgba(0,0,0,0.2)"/>
-              <!-- 右腳（前踏） -->
-              <rect x="292" y="72" width="4" height="4" fill="#222"/>
-              <rect x="290" y="68" width="4" height="6" fill="#dba86a"/>
-              <!-- 左腳（後蹬） -->
-              <rect x="280" y="72" width="4" height="4" fill="#222"/>
-              <rect x="282" y="68" width="4" height="6" fill="#dba86a"/>
-              <!-- 身體（紅色球衣） -->
-              <rect x="282" y="52" width="12" height="16" fill="#c62828"/>
-              <!-- 白色衣領 -->
-              <rect x="284" y="52" width="8" height="2" fill="#fff" opacity="0.6"/>
-              <!-- 背號 -->
-              <rect x="286" y="58" width="4" height="5" fill="#fff" opacity="0.4"/>
-              <!-- 左臂 -->
-              <rect x="278" y="54" width="4" height="10" fill="#c62828"/>
-              <rect x="278" y="64" width="4" height="2" fill="#dba86a"/>
-              <!-- 右臂 -->
-              <rect x="294" y="52" width="4" height="8" fill="#c62828"/>
-              <rect x="294" y="60" width="4" height="2" fill="#dba86a"/>
-              <!-- 頭 -->
-              <rect x="283" y="42" width="10" height="10" fill="#dba86a"/>
-              <!-- 頭髮 -->
-              <rect x="282" y="40" width="12" height="4" fill="#2c1e0f"/>
-            </g>
-
-            <!-- ★ 足球 -->
-            <g class="art-ball">
-              <rect x="300" y="70" width="6" height="6" fill="#fff"/>
-              <rect x="302" y="72" width="2" height="2" fill="#333"/>
-            </g>
-
-            <!-- ★ 藍隊守門員（在右球門前） -->
-            <g class="art-gk">
-              <!-- 影子 -->
-              <rect x="418" y="76" width="14" height="2" rx="1" fill="rgba(0,0,0,0.2)"/>
-              <!-- 腿 -->
-              <rect x="418" y="70" width="4" height="8" fill="#dba86a"/>
-              <rect x="416" y="74" width="4" height="4" fill="#222"/>
-              <rect x="428" y="70" width="4" height="8" fill="#dba86a"/>
-              <rect x="430" y="74" width="4" height="4" fill="#222"/>
-              <!-- 身體（螢光黃） -->
-              <rect x="418" y="52" width="14" height="18" fill="#fdd835"/>
-              <!-- 衣領 -->
-              <rect x="420" y="52" width="10" height="2" fill="#f9a825" opacity="0.7"/>
-              <!-- #1 -->
-              <rect x="423" y="58" width="4" height="5" fill="#333" opacity="0.3"/>
-              <!-- 左手套（張開撲球） -->
-              <rect x="410" y="48" width="6" height="6" fill="#4caf50"/>
-              <rect x="414" y="52" width="4" height="8" fill="#fdd835"/>
-              <!-- 右手套 -->
-              <rect x="434" y="48" width="6" height="6" fill="#4caf50"/>
-              <rect x="432" y="52" width="4" height="8" fill="#fdd835"/>
-              <!-- 頭 -->
-              <rect x="419" y="40" width="12" height="12" fill="#dba86a"/>
-              <!-- 帽子 -->
-              <rect x="418" y="38" width="14" height="4" fill="#fdd835"/>
-              <rect x="416" y="40" width="18" height="2" fill="#f9a825" opacity="0.6"/>
-            </g>
-          </svg>
           <div class="rogue-home-banner-content">
             <div class="rogue-home-banner-left">
               <div class="rogue-home-banner-badge">NEW</div>
@@ -409,6 +319,48 @@
             </div>
             <div class="rogue-home-banner-action">開始遊戲 →</div>
           </div>
+          <!-- 像素風橫向卷軸：紅隊運球 vs 藍隊守門員 -->
+          <svg class="rogue-banner-art" viewBox="0 0 480 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" shape-rendering="crispEdges">
+            <rect x="0" y="76" width="480" height="24" fill="#1b5e20" opacity="0.45"/>
+            <rect x="0" y="76" width="480" height="1" fill="#4caf50" opacity="0.5"/>
+            <!-- 左球門 -->
+            <g opacity="0.5">
+              <rect x="20" y="44" width="4" height="34" fill="#fff"/><rect x="20" y="42" width="32" height="4" fill="#fff"/><rect x="48" y="44" width="4" height="34" fill="#fff"/>
+              <g opacity="0.3" fill="#fff"><rect x="28" y="46" width="1" height="28"/><rect x="36" y="46" width="1" height="28"/><rect x="44" y="46" width="1" height="28"/><rect x="24" y="54" width="24" height="1"/><rect x="24" y="64" width="24" height="1"/></g>
+            </g>
+            <!-- 右球門 -->
+            <g opacity="0.5">
+              <rect x="428" y="44" width="4" height="34" fill="#fff"/><rect x="428" y="42" width="32" height="4" fill="#fff"/><rect x="456" y="44" width="4" height="34" fill="#fff"/>
+              <g opacity="0.3" fill="#fff"><rect x="436" y="46" width="1" height="28"/><rect x="444" y="46" width="1" height="28"/><rect x="452" y="46" width="1" height="28"/><rect x="432" y="54" width="24" height="1"/><rect x="432" y="64" width="24" height="1"/></g>
+            </g>
+            <!-- 紅隊球員 -->
+            <g class="art-runner">
+              <rect x="282" y="76" width="12" height="2" rx="1" fill="rgba(0,0,0,0.2)"/>
+              <rect x="292" y="72" width="4" height="4" fill="#222"/><rect x="290" y="68" width="4" height="6" fill="#dba86a"/>
+              <rect x="280" y="72" width="4" height="4" fill="#222"/><rect x="282" y="68" width="4" height="6" fill="#dba86a"/>
+              <rect x="282" y="52" width="12" height="16" fill="#c62828"/><rect x="284" y="52" width="8" height="2" fill="#fff" opacity="0.6"/>
+              <rect x="286" y="58" width="4" height="5" fill="#fff" opacity="0.4"/>
+              <rect x="278" y="54" width="4" height="10" fill="#c62828"/><rect x="278" y="64" width="4" height="2" fill="#dba86a"/>
+              <rect x="294" y="52" width="4" height="8" fill="#c62828"/><rect x="294" y="60" width="4" height="2" fill="#dba86a"/>
+              <rect x="283" y="42" width="10" height="10" fill="#dba86a"/><rect x="282" y="40" width="12" height="4" fill="#2c1e0f"/>
+            </g>
+            <!-- 足球 -->
+            <g class="art-ball">
+              <rect x="300" y="70" width="6" height="6" fill="#fff"/><rect x="302" y="72" width="2" height="2" fill="#333"/>
+            </g>
+            <!-- 藍隊守門員 -->
+            <g class="art-gk">
+              <rect x="418" y="76" width="14" height="2" rx="1" fill="rgba(0,0,0,0.2)"/>
+              <rect x="418" y="70" width="4" height="8" fill="#dba86a"/><rect x="416" y="74" width="4" height="4" fill="#222"/>
+              <rect x="428" y="70" width="4" height="8" fill="#dba86a"/><rect x="430" y="74" width="4" height="4" fill="#222"/>
+              <rect x="418" y="52" width="14" height="18" fill="#fdd835"/><rect x="420" y="52" width="10" height="2" fill="#f9a825" opacity="0.7"/>
+              <rect x="423" y="58" width="4" height="5" fill="#333" opacity="0.3"/>
+              <rect x="410" y="48" width="6" height="6" fill="#4caf50"/><rect x="414" y="52" width="4" height="8" fill="#fdd835"/>
+              <rect x="434" y="48" width="6" height="6" fill="#4caf50"/><rect x="432" y="52" width="4" height="8" fill="#fdd835"/>
+              <rect x="419" y="40" width="12" height="12" fill="#dba86a"/>
+              <rect x="418" y="38" width="14" height="4" fill="#fdd835"/><rect x="416" y="40" width="18" height="2" fill="#f9a825" opacity="0.6"/>
+            </g>
+          </svg>
         </div>
         <!-- 排行榜（JS 動態填入） -->
         <div id="rogue-home-leaderboard" class="rogue-home-lb"></div>

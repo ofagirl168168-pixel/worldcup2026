@@ -2305,8 +2305,12 @@ img.flag-img {
   50%     { transform: translateX(-3px); }
 }
 @media (max-width: 600px) {
-  .rogue-banner-art { width: 50%; opacity: 0.2; }
-  .rogue-home-banner:hover .rogue-banner-art { opacity: 0.35; }
+  .rogue-banner-art {
+    position: relative; left: auto; top: auto; transform: none;
+    width: 90%; max-width: none; margin: 4px auto -8px; display: block;
+    opacity: 0.5;
+  }
+  .rogue-home-banner:hover .rogue-banner-art { opacity: 0.6; }
 }
 .rogue-home-banner-content {
   position: relative; z-index: 1;
