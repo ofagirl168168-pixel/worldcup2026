@@ -3968,11 +3968,17 @@
       ctx.font = `bold ${btnFz}px "Noto Sans TC", sans-serif`;
       ctx.fillText('開始遊戲', startX + ballSz + 6 + labelW / 2, btnY + 33);
 
+      // ⚡-1 標示
+      const costFz = Math.min(11, W * 0.022);
+      ctx.font = `bold ${costFz}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = 'rgba(255,215,0,0.7)';
+      ctx.fillText('⚡-1', startX + ballSz + 6 + labelW + 14, btnY + 33);
+
       // ▶ 箭頭搖擺
       const arrowOff = Math.sin(t * 3) * 4;
       ctx.font = `bold ${Math.min(14, W * 0.028)}px sans-serif`;
       ctx.fillStyle = `rgba(255,255,255,${0.5 + Math.sin(t * 2) * 0.3})`;
-      ctx.fillText('▶', startX + ballSz + 6 + labelW + 18 + arrowOff, btnY + 33);
+      ctx.fillText('▶', startX + ballSz + 6 + labelW + 32 + arrowOff, btnY + 33);
     }
 
     // 體力 Toast
