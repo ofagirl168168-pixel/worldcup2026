@@ -3943,41 +3943,35 @@
     rr(ctx, btnX, btnY, btnW, btnH, 14); ctx.fill();
     ctx.shadowBlur = 0;
 
-    // ⚽ + 文字 + ▶
+    // 按鈕文字
     const btnFz = Math.min(20, W * 0.04);
-    ctx.font = `bold ${btnFz}px "Noto Sans TC", sans-serif`;
     ctx.textAlign = 'center';
 
     if (stEmpty) {
       ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.font = `bold ${btnFz}px "Noto Sans TC", sans-serif`;
       ctx.fillText('體力不足', W / 2, btnY + 33);
     } else {
-      const ballSz = Math.min(16, W * 0.032);
-      const labelW = ctx.measureText('開始遊戲').width;
-      const totalW = ballSz + 6 + labelW + 8 + 12;
-      const startX = W / 2 - totalW / 2;
-
-      // ⚽ 彈跳
-      const ballBounce = Math.abs(Math.sin(t * 3)) * 4;
-      ctx.font = `${ballSz}px sans-serif`;
-      ctx.fillText('⚽', startX, btnY + 33 - ballBounce);
-
-      // 文字
+      // 主文字：開始遊戲
       ctx.fillStyle = '#fff';
       ctx.font = `bold ${btnFz}px "Noto Sans TC", sans-serif`;
-      ctx.fillText('開始遊戲', startX + ballSz + 6 + labelW / 2, btnY + 33);
-
-      // ⚡-1 標示
-      const costFz = Math.min(11, W * 0.022);
+      const mainW = ctx.measureText('開始遊戲').width;
+      const costFz = Math.min(12, W * 0.024);
       ctx.font = `bold ${costFz}px "Noto Sans TC", sans-serif`;
-      ctx.fillStyle = 'rgba(255,215,0,0.7)';
-      ctx.fillText('⚡-1', startX + ballSz + 6 + labelW + 14, btnY + 33);
+      const costW = ctx.measureText('⚡-1').width;
+      const totalW = mainW + 10 + costW;
+      const baseX = W / 2 - totalW / 2;
 
-      // ▶ 箭頭搖擺
-      const arrowOff = Math.sin(t * 3) * 4;
-      ctx.font = `bold ${Math.min(14, W * 0.028)}px sans-serif`;
-      ctx.fillStyle = `rgba(255,255,255,${0.5 + Math.sin(t * 2) * 0.3})`;
-      ctx.fillText('▶', startX + ballSz + 6 + labelW + 32 + arrowOff, btnY + 33);
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${btnFz}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.fillText('開始遊戲', baseX, btnY + 33);
+
+      // ⚡-1 標示（金色小字）
+      ctx.font = `bold ${costFz}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = 'rgba(255,215,0,0.8)';
+      ctx.fillText('⚡-1', baseX + mainW + 10, btnY + 33);
+      ctx.textAlign = 'center';
     }
 
     // 體力 Toast
