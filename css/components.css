@@ -2270,48 +2270,59 @@ img.flag-img {
     rgba(255,255,255,0.015) 20px, rgba(255,255,255,0.015) 21px
   );
 }
-/* 動漫風插圖 */
+/* 2D 橫向卷軸插圖 */
 .rogue-banner-art {
-  position: absolute; right: 0; top: 0; bottom: 0;
-  width: 55%; max-width: 420px; height: 100%;
-  opacity: 0.45; pointer-events: none; z-index: 0;
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  opacity: 0.38; pointer-events: none; z-index: 0;
+  transition: opacity 0.4s;
 }
-.rogue-home-banner:hover .rogue-banner-art {
-  opacity: 0.65; transition: opacity 0.4s;
+.rogue-home-banner:hover .rogue-banner-art { opacity: 0.55; }
+/* 帶球者 — 跑步彈跳 */
+.art-runner { animation: artRun 0.6s ease-in-out infinite; }
+@keyframes artRun {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-4px); }
 }
-/* 守門員撲球晃動 */
-.rogue-art-keeper {
-  animation: keeperDive 2.5s ease-in-out infinite;
-  transform-origin: 300px 95px;
+/* 球跟著跑者彈 */
+.art-ball { animation: artBall 0.6s ease-in-out infinite; }
+@keyframes artBall {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-3px); }
 }
-@keyframes keeperDive {
-  0%,100% { transform: translate(0, 0) rotate(0deg); }
-  30%     { transform: translate(-8px, -4px) rotate(-6deg); }
-  60%     { transform: translate(4px, 2px) rotate(3deg); }
+/* 防守者 — 左右晃 */
+.art-def { animation: artDef 0.8s ease-in-out infinite; transform-origin: 250px 110px; }
+@keyframes artDef {
+  0%,100% { transform: translateX(0); }
+  50%     { transform: translateX(-3px); }
 }
-/* 球飛入震動 */
-.rogue-art-ball {
-  animation: ballFly 2.5s ease-in-out infinite;
+/* 中場跑位 */
+.art-mid { animation: artMid 1s ease-in-out infinite; }
+@keyframes artMid {
+  0%,100% { transform: translate(0, 0); }
+  50%     { transform: translate(4px, -3px); }
 }
-@keyframes ballFly {
-  0%,100% { transform: translate(0, 0) scale(1); }
-  20%     { transform: translate(10px, -6px) scale(1.08); }
-  50%     { transform: translate(-3px, 2px) scale(0.95); }
-  70%     { transform: translate(5px, -3px) scale(1.03); }
+/* 前鋒回追 */
+.art-chase { animation: artChase 0.7s ease-in-out infinite; }
+@keyframes artChase {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-3px); }
 }
-/* 衝擊波紋擴散 */
-.rogue-art-impact {
-  animation: impactRing 2.5s ease-out infinite;
-  transform-origin: 215px 42px;
+/* 守門員準備撲 */
+.art-gk { animation: artGK 1.2s ease-in-out infinite; transform-origin: 472px 110px; }
+@keyframes artGK {
+  0%,100% { transform: translateX(0) translateY(0); }
+  40%     { transform: translateX(-3px) translateY(-2px); }
+  70%     { transform: translateX(2px) translateY(-1px); }
 }
-@keyframes impactRing {
-  0%   { transform: scale(0.8); opacity: 0; }
-  20%  { transform: scale(1); opacity: 0.6; }
-  50%  { transform: scale(1.8); opacity: 0; }
-  100% { opacity: 0; }
+.art-gk2 { animation: artGK2 1.5s ease-in-out infinite; transform-origin: 46px 110px; }
+@keyframes artGK2 {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-2px); }
 }
 @media (max-width: 600px) {
-  .rogue-banner-art { width: 45%; opacity: 0.3; }
+  .rogue-banner-art { opacity: 0.25; }
+  .rogue-home-banner:hover .rogue-banner-art { opacity: 0.4; }
 }
 .rogue-home-banner-content {
   position: relative; z-index: 1;
