@@ -2273,7 +2273,7 @@ img.flag-img {
 /* 像素風插圖 */
 .rogue-banner-art {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: 40%; max-width: 300px; height: auto;
+  width: 60%; max-width: 460px; height: auto;
   opacity: 0.4; pointer-events: none; z-index: 0;
   transition: opacity 0.4s;
   image-rendering: pixelated;
@@ -2305,8 +2305,8 @@ img.flag-img {
   50%     { transform: translateX(-3px); }
 }
 @media (max-width: 600px) {
-  .rogue-banner-art { opacity: 0.28; }
-  .rogue-home-banner:hover .rogue-banner-art { opacity: 0.45; }
+  .rogue-banner-art { width: 50%; opacity: 0.2; }
+  .rogue-home-banner:hover .rogue-banner-art { opacity: 0.35; }
 }
 .rogue-home-banner-content {
   position: relative; z-index: 1;
