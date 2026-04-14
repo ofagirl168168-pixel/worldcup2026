@@ -1,12 +1,12 @@
 // rogue-weekly-settle — 射門挑戰週排行結算，發放寶石獎勵
 // 每週日結算上一週（週一 00:00 ~ 週日 23:59 UTC+8）
-// 第 1 名 +3 寶石，第 2 名 +2 寶石，第 3 名 +1 寶石
+// 第 1 名 +5，第 2 名 +3，第 3 名 +2，第 4~6 名 +1
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
-const REWARDS = [3, 2, 1]  // 前三名寶石數
+const REWARDS = [5, 3, 2, 1, 1, 1]  // 前六名寶石數
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
     // 排名
     const ranked = [...bestByUser.entries()]
       .sort((a, b) => b[1].score - a[1].score)
-      .slice(0, 3)
+      .slice(0, 6)
 
     const today = new Date().toISOString().slice(0, 10)
     const winners = []

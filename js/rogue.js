@@ -1075,21 +1075,25 @@
         headers: { 'Content-Type': 'application/json' },
         body: '{}' });
       const data = await res.json();
-      // 結算成功且有得獎者 → 發放週徽章
+      // 結算成功且有得獎者 → 發放週徽章 + 寶石通知
       if (data.settled && data.winners?.length && typeof currentUser !== 'undefined' && currentUser) {
         const uid = currentUser.id;
         const myWin = data.winners.find(w => w.user_id === uid);
         if (myWin) {
-          const wb = WEEKLY_BADGES[myWin.rank - 1];
+          const wb = WEEKLY_BADGES[myWin.rank - 1]; // 前3名有徽章
           if (wb) {
             const existing = _loadWeeklyBadges();
             const weekKey = data.week || _weekKey();
             if (!existing.find(e => e.id === wb.id && e.week === weekKey)) {
               existing.push({ ...wb, date: new Date().toISOString(), week: weekKey });
               _saveWeeklyBadges(existing);
-              if (typeof showToast === 'function') showToast(`${wb.icon} 恭喜獲得「${wb.name}」徽章！`);
+              if (typeof showToast === 'function') showToast(`${wb.icon} 恭喜獲得「${wb.name}」徽章！+${myWin.reward} 💎`);
             }
+          } else if (myWin.reward) {
+            // 第4~6名：只有寶石沒有徽章
+            if (typeof showToast === 'function') showToast(`🎉 週排行第${myWin.rank}名！+${myWin.reward} 💎`);
           }
+          if (typeof fetchGemBalance === 'function') fetchGemBalance().then(b => { if (typeof updateGemUI === 'function') updateGemUI(b); });
         }
       }
     } catch (_) {}
