@@ -136,6 +136,9 @@ export async function onRequestGet(context) {
     'x-apisports-key': apiKey,
   };
 
+  // EPL/UCL 2025/26 season = 2025
+  const seasonYear = (league === 'epl' || league === 'ucl') ? '2025' : date.slice(0, 4);
+
   // 搜尋比賽的輔助函式
   async function findFixture(searchDate) {
     const fixturesUrl = `https://v3.football.api-sports.io/fixtures?league=${leagueId}&season=${seasonYear}&date=${searchDate}`;
@@ -146,9 +149,6 @@ export async function onRequestGet(context) {
   }
 
   try {
-    // Step 1: 找到比賽 fixture ID
-    // EPL/UCL 2025/26 season = 2025
-    const seasonYear = (league === 'epl' || league === 'ucl') ? '2025' : date.slice(0, 4);
 
     // 我們的日期是台灣時間（UTC+8），API-Football 用 UTC 日期
     // 所以也嘗試前一天的日期
