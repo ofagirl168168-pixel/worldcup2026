@@ -2270,41 +2270,18 @@ img.flag-img {
     rgba(255,255,255,0.015) 20px, rgba(255,255,255,0.015) 21px
   );
 }
-/* 閃光掃過 */
-.rogue-home-banner-bg::after {
-  content: ''; position: absolute;
-  top: 0; left: -100%; width: 50%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-  animation: rogueBannerShine 4s ease-in-out infinite;
-}
-@keyframes rogueBannerShine {
-  0%   { left: -100%; }
-  50%  { left: 200%; }
-  100% { left: 200%; }
-}
-/* 浮動光球 */
-.rogue-home-banner .rogue-home-banner-orb {
-  position: absolute; border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle, rgba(76,175,80,0.2), transparent 70%);
-}
-.rogue-home-banner .rogue-home-banner-orb:nth-child(1) {
-  width: 100px; height: 100px; right: -20px; top: -20px;
-  animation: orbFloat 5s ease-in-out infinite;
-}
-.rogue-home-banner .rogue-home-banner-orb:nth-child(2) {
-  width: 60px; height: 60px; left: 30%; bottom: -10px;
-  animation: orbFloat 4s ease-in-out infinite 1s;
-}
-@keyframes orbFloat {
-  0%,100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-  50%     { transform: translate(8px, -12px) scale(1.2); opacity: 0.7; }
-}
 .rogue-home-banner-content {
   position: relative; z-index: 1;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
+.rogue-home-banner-title-row {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 6px;
+}
+.rogue-home-banner-title-row .rogue-arena-banner-icon {
+  width: 44px; height: 44px; font-size: 26px;
+}
 .rogue-home-banner-left h3 {
-  font-size: 18px; font-weight: 800; color: #fff; margin: 0 0 6px;
+  font-size: 18px; font-weight: 800; color: #fff; margin: 0;
 }
 .rogue-home-banner-left p {
   font-size: 12px; color: rgba(255,255,255,0.6); margin: 0 0 10px; line-height: 1.6;
@@ -2369,12 +2346,11 @@ img.flag-img {
     rgba(255,255,255,0.02) 18px, rgba(255,255,255,0.02) 19px
   );
 }
-/* 閃光掃過效果 */
+/* 光球裝飾 */
 .rogue-arena-banner-bg::after {
-  content: ''; position: absolute;
-  top: 0; left: -100%; width: 50%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-  animation: rogueBannerShine 4s ease-in-out infinite;
+  content: ''; position: absolute; right: -20px; top: -20px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(76,175,80,0.12) 0%, transparent 70%);
 }
 .rogue-arena-banner-content {
   position: relative; z-index: 1;
