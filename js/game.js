@@ -381,7 +381,7 @@ function showSettlementPopups(settled) {
     const hName = ht?.nameCN || match?.home || '?', aName = at?.nameCN || match?.away || '?';
 
     const icon = s.exact ? '🎯' : s.goalDiffMatch ? '🔥' : s.direction ? '✅' : '❌';
-    const title = s.exact ? '完美命中！' : s.goalDiffMatch ? '比分差命中！' : s.direction ? '方向正確！' : '預測失誤';
+    const title = s.exact ? '完美命中！' : s.goalDiffMatch ? '比分差命中！' : s.direction ? '輸贏正確！' : '預測失誤';
     const color = s.exact ? '#4caf50' : s.goalDiffMatch ? '#ff9800' : s.direction ? 'var(--accent)' : '#ef9a9a';
     const rewardText = s.xp > 0 ? `+${s.xp} XP${s.gem ? ` +${s.gem} 💎` : ''}` : '';
 

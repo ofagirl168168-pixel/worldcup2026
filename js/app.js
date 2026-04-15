@@ -1360,11 +1360,12 @@ async function openPredModal(id) {
             </div>` : `
             <div class="my-pred-prompt pred-cta">
               <div style="font-size:15px;font-weight:800;margin-bottom:6px">🎯 預測這場比分</div>
-              <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;line-height:1.6">
-                參與即得 <span style="color:var(--text-muted);font-weight:700">+1 XP</span>
-                ｜方向 <span style="color:var(--green);font-weight:700">+10 XP</span>
-                ｜比分差 <span style="color:#ff9800;font-weight:700">+15 XP +1💎</span>
-                ｜精準 <span style="color:var(--accent);font-weight:700">+30 XP +3💎</span>
+              <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;font-size:11px;color:var(--text-muted);margin-bottom:4px;line-height:1.8">
+                <span>參與 <b style="color:var(--text-muted)">+1</b></span>
+                <span>失敗 <b style="color:#ef9a9a">+2</b></span>
+                <span>輸贏 <b style="color:var(--green)">+10</b></span>
+                <span>比分差 <b style="color:#ff9800">+15 +1💎</b></span>
+                <span>精準 <b style="color:var(--accent)">+30 +3💎</b></span>
               </div>
               <div class="pred-countdown" id="pred-cd-${m.id}" data-kickoff="${kickoffMs}" style="margin-bottom:10px">⏰ 計算中...</div>
               <button class="btn-primary" style="width:100%;font-size:14px;padding:12px" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">
