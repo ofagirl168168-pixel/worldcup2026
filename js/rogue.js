@@ -4162,16 +4162,17 @@
       ctx.globalAlpha = 1;
     }
 
-    // ── 分享遊戲（開始按鈕上方小文字）──
-    const shareFz = Math.min(12, W * 0.024);
-    const shareY = btnY - shareFz - 10;
-    ctx.font = `${shareFz}px "Noto Sans TC", sans-serif`;
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    // ── 分享遊戲（左上角圖示）──
+    const shareSz = Math.min(30, W * 0.06);
+    const shareX = 12, shareY = 14;
+    rr(ctx, shareX, shareY, shareSz, shareSz, 8);
+    ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = `${shareSz * 0.45}px sans-serif`;
     ctx.textAlign = 'center';
-    const shareLabel = '🔗 分享遊戲給朋友';
-    ctx.fillText(shareLabel, W / 2, shareY + shareFz);
-    const shareLabelW = ctx.measureText(shareLabel).width + 16;
-    G._shareGameR = { x: W / 2 - shareLabelW / 2, y: shareY, w: shareLabelW, h: shareFz + 8 };
+    ctx.fillText('🔗', shareX + shareSz / 2, shareY + shareSz * 0.65);
+    G._shareGameR = { x: shareX, y: shareY, w: shareSz, h: shareSz };
 
     drawAudioBtns();
   }
