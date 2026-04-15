@@ -5594,9 +5594,9 @@
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
     ctx.fill();
 
-    // 閃爍發散短線（8條）
-    const blink = (Math.sin(performance.now() * 0.006) + 1) / 2; // 0~1 閃爍
-    const lineAlpha = 0.3 + blink * 0.6;
+    // 閃爍發散短線（8條）— 全亮全滅交替，模擬點擊
+    const on = Math.floor(performance.now() / 500) % 2 === 0; // 每 500ms 切換
+    const lineAlpha = on ? 0.85 : 0.1;
     ctx.strokeStyle = `rgba(255,255,255,${lineAlpha})`;
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
