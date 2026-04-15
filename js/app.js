@@ -27,7 +27,7 @@ function flagImg(src) {
 if (window.Tournament) {
   Tournament.init();
   Tournament.bind();
-  buildDynamicForm(); // 初始化動態近況
+  try { buildDynamicForm(); } catch(e) { console.error('[buildDynamicForm init]', e); }
   updateHero();
   // 賽事切換時重新渲染當前頁面
   window.addEventListener('tournamentChanged', () => {
@@ -1964,21 +1964,22 @@ function buildTournamentForm() {
 }
 
 function calcPred(ht, at) {
+  if (!ht?.radar || !at?.radar) return { hw:33, d:34, aw:33, score:'0-0', hXG:'0.0', aXG:'0.0', conf:'low', confLabel:'低信心', seed:0, wcFormAdj:false, hWC:null, aWC:null, hForm:[], aForm:[], hInj:{attack:0,defense:0,midfield:0,speed:0}, aInj:{attack:0,defense:0,midfield:0,speed:0}, dynamicAdj:false };
   // ── 傷兵影響：動態降低 radar 值 ────────────────────────────
   const hInj = injuryImpact(ht), aInj = injuryImpact(at);
   const ha = {
-    attack:  Math.max(40, ht.radar.attack  - hInj.attack),
-    defense: Math.max(40, ht.radar.defense - hInj.defense),
-    midfield:Math.max(40, ht.radar.midfield- hInj.midfield),
-    speed:   Math.max(40, ht.radar.speed   - hInj.speed),
-    experience: ht.radar.experience
+    attack:  Math.max(40, (ht.radar.attack||70)  - hInj.attack),
+    defense: Math.max(40, (ht.radar.defense||70) - hInj.defense),
+    midfield:Math.max(40, (ht.radar.midfield||70)- hInj.midfield),
+    speed:   Math.max(40, (ht.radar.speed||70)   - hInj.speed),
+    experience: ht.radar.experience || 50
   };
   const aa = {
-    attack:  Math.max(40, at.radar.attack  - aInj.attack),
-    defense: Math.max(40, at.radar.defense - aInj.defense),
-    midfield:Math.max(40, at.radar.midfield- aInj.midfield),
-    speed:   Math.max(40, at.radar.speed   - aInj.speed),
-    experience: at.radar.experience
+    attack:  Math.max(40, (at.radar.attack||70)  - aInj.attack),
+    defense: Math.max(40, (at.radar.defense||70) - aInj.defense),
+    midfield:Math.max(40, (at.radar.midfield||70)- aInj.midfield),
+    speed:   Math.max(40, (at.radar.speed||70)   - aInj.speed),
+    experience: at.radar.experience || 50
   };
 
   // 用球隊名稱產生確定性種子，確保同場比賽永遠顯示相同預測
