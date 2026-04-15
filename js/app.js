@@ -857,7 +857,7 @@ async function openPredModal(id) {
   const _isMatchLive = match && match.status === 'live';
   mc.innerHTML = `<div class="modal-loading">
     <div class="modal-spinner"></div>
-    <div class="modal-loading-text">${_isMatchLive ? '⚽ 載入即時數據...' : _isMatchFinished ? '⚽ 載入賽事結果...' : '🤖 AI 正在分析賽事...'}</div>
+    <div class="modal-loading-text">${_isMatchLive ? '⚽ 載入即時數據...' : _isMatchFinished ? '⚽ 載入賽事結果...' : '⚡ AI 正在分析賽事...'}</div>
     <div class="modal-loading-sub">${_isMatchLive ? '即時比分 · 進球紀錄 · 比賽數據' : _isMatchFinished ? '統計數據 · 比分回顧 · 預測比較' : '比對歷史數據 · 計算勝率 · 生成預測'}</div>
   </div>`;
   modal.classList.add('open');
@@ -891,7 +891,7 @@ async function openPredModal(id) {
           });
           // 更新 loading 訊息
           const loadingText = mc.querySelector('.modal-loading-text');
-          if (loadingText) loadingText.textContent = '🤖 即時數據已取得，生成分析中...';
+          if (loadingText) loadingText.textContent = '⚡ 即時數據已取得，生成分析中...';
           window._lastLiveFormData = json.data; // 保存供 modal 顯示
           window._lastLiveFormTime = json.updated;
         }
@@ -1444,7 +1444,7 @@ async function openPredModal(id) {
         </div>
 
         <!-- AI 戰術分析 -->
-        <div class="modal-section-title">🤖 AI 戰術分析</div>
+        <div class="modal-section-title">⚡ AI 戰術分析</div>
         <ul class="pred-key-points" style="margin-bottom:16px">
           ${pts.map(pt=>`<li>${pt}</li>`).join('')}
         </ul>
