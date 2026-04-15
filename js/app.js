@@ -863,7 +863,7 @@ async function openPredModal(id) {
   modal.classList.add('open');
 
   // 下一幀再渲染完整內容（讓 loading 畫面先顯示）
-  requestAnimationFrame(() => setTimeout(() => {
+  requestAnimationFrame(() => setTimeout(async () => {
   try {
   const _T = _teams();
   let m = schedule.find(x => x.id === id);
@@ -874,6 +874,32 @@ async function openPredModal(id) {
   if (!m || !m.home || !m.away) { console.warn('openPredModal: match not found', id); return; }
   const ht = _T[m.home], at = _T[m.away];
   if (!ht || !at) { console.warn('openPredModal: team not found', m.home, m.away); return; }
+
+  // ── 未開賽比賽：即時拉取兩隊最新近況 ──────────────────────
+  if (m.status === 'scheduled' && m.home !== 'TBD') {
+    try {
+      const league = _isEPL() ? 'epl' : _isUCL() ? 'ucl' : 'wc';
+      const resp = await fetch(`/api/team-form?teams=${m.home},${m.away}&league=${league}`);
+      if (resp.ok) {
+        const json = await resp.json();
+        if (json.ok && json.data) {
+          // 將 API 回傳的即時近況寫入動態 map
+          Object.entries(json.data).forEach(([code, info]) => {
+            if (info.form && info.form.length >= 2) {
+              _dynamicFormMap[code] = info.form;
+            }
+          });
+          // 更新 loading 訊息
+          const loadingText = mc.querySelector('.modal-loading-text');
+          if (loadingText) loadingText.textContent = '🤖 即時數據已取得，生成分析中...';
+          window._lastLiveFormData = json.data; // 保存供 modal 顯示
+          window._lastLiveFormTime = json.updated;
+        }
+      }
+    } catch (e) {
+      console.warn('[team-form API]', e.message); // 失敗不阻斷，用靜態資料
+    }
+  }
 
   // 判斷是否已解鎖
   const isUnlocked = !!(window.unlockedMatchSet?.has(id));
@@ -1443,6 +1469,7 @@ async function openPredModal(id) {
         <div class="modal-section-title">📈 ${p.wcFormAdj ? '滾動式動態分析（已更新預測）' : '近期狀態（最近5場）'}</div>
         ${p.wcFormAdj ? `<div style="margin-bottom:10px;padding:8px 12px;background:rgba(76,175,80,0.1);border-radius:8px;border-left:3px solid #4caf50;font-size:12px;color:#4caf50">
           ⚡ 預測已根據實際賽果與傷兵狀況動態調整
+          ${window._lastLiveFormTime ? `<br><span style="opacity:0.7">📡 即時數據取得時間：${new Date(window._lastLiveFormTime).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>` : ''}
         </div>` : ''}
         ${(ht.injuries?.length || at.injuries?.length) ? `<div style="margin-bottom:10px;padding:8px 12px;background:rgba(255,152,0,0.1);border-radius:8px;border-left:3px solid #ff9800;font-size:12px;color:#ff9800">
           🏥 傷兵影響已納入預測模型：${ht.injuries?.length ? ht.nameCN+' '+ht.injuries.length+'人傷缺' : ''}${ht.injuries?.length && at.injuries?.length ? '、' : ''}${at.injuries?.length ? at.nameCN+' '+at.injuries.length+'人傷缺' : ''}
@@ -1457,6 +1484,7 @@ async function openPredModal(id) {
               ${p.hWC.played}場：${p.hWC.win}勝${p.hWC.draw}平${p.hWC.lose}負
               · 進${p.hWC.gf}失${p.hWC.ga}（場均進球 ${p.hWC.gfPerGame}）
             </div>` : ''}
+            ${(() => { const ld = window._lastLiveFormData?.[m.home]; return ld?.matches ? `<div style="margin-top:6px;font-size:11px;color:var(--text-muted)">${ld.matches.slice(0,3).map(x=>`<div style="padding:2px 0">${x.venue==='H'?'主':'客'} vs ${x.opponent} <b>${x.score}</b></div>`).join('')}</div>` : ''; })()}
           </div>
           <div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
@@ -1467,6 +1495,7 @@ async function openPredModal(id) {
               ${p.aWC.played}場：${p.aWC.win}勝${p.aWC.draw}平${p.aWC.lose}負
               · 進${p.aWC.gf}失${p.aWC.ga}（場均進球 ${p.aWC.gfPerGame}）
             </div>` : ''}
+            ${(() => { const ld = window._lastLiveFormData?.[m.away]; return ld?.matches ? `<div style="margin-top:6px;font-size:11px;color:var(--text-muted)">${ld.matches.slice(0,3).map(x=>`<div style="padding:2px 0">${x.venue==='H'?'主':'客'} vs ${x.opponent} <b>${x.score}</b></div>`).join('')}</div>` : ''; })()}
           </div>
         </div>
 
@@ -2149,6 +2178,8 @@ function generateAnalysis(ht, at, pred) {
 
 function closeModal() {
   document.getElementById('team-modal').classList.remove('open');
+  window._lastLiveFormData = null;
+  window._lastLiveFormTime = null;
 }
 
 // ── 首頁 Hero 區塊切換 ──────────────────────────────────
