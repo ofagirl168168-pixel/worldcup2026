@@ -562,8 +562,9 @@
     for (let t = 1; t <= gkTier; t++) {
       if (t <= 3)       gkBonus += 0.7;  // wave 5-15：每階 +0.7
       else if (t <= 6)  gkBonus += 1.0;  // wave 20-30：每階 +1.0
-      else if (t <= 10) gkBonus += 1.8;  // wave 35-50：每階 +1.8
-      else              gkBonus += 2.8;  // wave 55+：每階 +2.8
+      else if (t <= 8)  gkBonus += 2.0;  // wave 35-40：每階 +2.0
+      else if (t <= 10) gkBonus += 3.0;  // wave 45-50：每階 +3.0
+      else              gkBonus += 4.0;  // wave 55+：每階 +4.0
     }
     G.gk.spd = (GK_BASE_SPD + gkBonus) * (G.gkSlowMul || 1);
     G.gk.tracking = G.wave >= 5; // wave5 起才追蹤球
