@@ -22,7 +22,14 @@ const EPL_TEAMS = {
     strengths:['Arteta戰術體系成熟','Saka+Ødegaard創造力頂級','英超最穩固後防之一'],
     weaknesses:['關鍵戰偶有緊張','板凳深度不如曼城','Gyökeres體系磨合中'],
     recentForm:['W','W','D','W','W'],
-    history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇'
+    history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
+    injuries:[
+      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題',returnDate:'評估中'},
+      {name:'Declan Rice',pos:'中場',status:'落地受傷',returnDate:'存疑'},
+      {name:'Martin Ødegaard',pos:'攻擊中場',status:'撞傷',returnDate:'存疑'},
+      {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢',returnDate:'存疑'},
+      {name:'Mikel Merino',pos:'中場',status:'長期傷缺',returnDate:'未定'}
+    ]
   },
   'LIV': {
     name:'Liverpool', nameCN:'利物浦', flag:'https://crests.football-data.org/64.png',
@@ -39,7 +46,13 @@ const EPL_TEAMS = {
     strengths:['Salah持續高效輸出','Slot體系穩定成熟','中場跑動覆蓋全場'],
     weaknesses:['Salah年齡漸長','傷兵時輪換選擇有限','對陣低位防守隊時偶有困難'],
     recentForm:['W','W','W','D','W'],
-    history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍'
+    history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍',
+    injuries:[
+      {name:'Alisson',pos:'門將',status:'傷勢恢復中',returnDate:'未定'},
+      {name:'Wataru Endo',pos:'中場',status:'足部傷勢',returnDate:'賽季報銷'},
+      {name:'Conor Bradley',pos:'右後衛',status:'長期傷缺',returnDate:'賽季報銷'},
+      {name:'Giovanni Leoni',pos:'後衛',status:'前十字韌帶',returnDate:'賽季報銷'}
+    ]
   },
   'MCI': {
     name:'Manchester City', nameCN:'曼城', flag:'https://crests.football-data.org/65.png',
@@ -56,7 +69,13 @@ const EPL_TEAMS = {
     strengths:['Haaland進球效率恐怖','Guardiola戰術無人能及','板凳深度聯賽最強'],
     weaknesses:['Rodri長期傷缺影響巨大','De Bruyne傷病風險','陣容老化需要更新'],
     recentForm:['W','D','W','L','W'],
-    history:'9次英格蘭頂級聯賽冠軍，2022/23三冠王'
+    history:'9次英格蘭頂級聯賽冠軍，2022/23三冠王',
+    injuries:[
+      {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末'},
+      {name:'Rúben Dias',pos:'中後衛',status:'腿後肌傷',returnDate:'四月中'},
+      {name:'John Stones',pos:'中後衛',status:'小腿傷',returnDate:'恢復中'},
+      {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷',returnDate:'評估中'}
+    ]
   },
   'CHE': {
     name:'Chelsea', nameCN:'乙爾西', flag:'https://crests.football-data.org/61.png',
@@ -73,7 +92,12 @@ const EPL_TEAMS = {
     strengths:['Cole Palmer創造力爆表','年輕陣容潛力無限','中場組合強悍'],
     weaknesses:['陣容磨合仍在進行','經驗不足影響穩定性','防守偶有失誤'],
     recentForm:['W','D','W','W','L'],
-    history:'6次英格蘭頂級聯賽冠軍，2次歐冠冠軍'
+    history:'6次英格蘭頂級聯賽冠軍，2次歐冠冠軍',
+    injuries:[
+      {name:'Reece James',pos:'右後衛',status:'腿後肌傷',returnDate:'評估中'},
+      {name:'Levi Colwill',pos:'中後衛',status:'長期傷缺',returnDate:'未定'},
+      {name:'Trevoh Chalobah',pos:'後衛',status:'傷缺約6週',returnDate:'五月'}
+    ]
   },
   'MUN': {
     name:'Manchester United', nameCN:'曼聯', flag:'https://crests.football-data.org/66.png',
@@ -90,7 +114,12 @@ const EPL_TEAMS = {
     strengths:['Bruno Fernandes核心創造力','年輕球員快速成長','Amorim戰術改造進行中'],
     weaknesses:['體系轉換需要時間','防守穩定性不足','傷兵問題嚴重'],
     recentForm:['L','W','D','W','L'],
-    history:'20次英格蘭頂級聯賽冠軍，3次歐冠冠軍，英格蘭最成功俱樂部'
+    history:'20次英格蘭頂級聯賽冠軍，3次歐冠冠軍，英格蘭最成功俱樂部',
+    injuries:[
+      {name:'Patrick Dorgu',pos:'翼衛',status:'傷勢復健中（一月受傷）',returnDate:'賽季末'},
+      {name:'Lisandro Martínez',pos:'中後衛',status:'小腿傷（恢復訓練中）',returnDate:'即將回歸'},
+      {name:'Harry Maguire',pos:'中後衛',status:'停賽',returnDate:'下一場'}
+    ]
   },
   'TOT': {
     name:'Tottenham Hotspur', nameCN:'熱刺', flag:'https://crests.football-data.org/73.png',
@@ -107,7 +136,11 @@ const EPL_TEAMS = {
     strengths:['Son進攻效率依然頂級','後防線速度極快','Postecoglou進攻哲學吸引人'],
     weaknesses:['傷兵名單長期居高不下','關鍵戰心態不穩','陣容深度不足'],
     recentForm:['W','L','W','D','W'],
-    history:'2次英格蘭頂級聯賽冠軍，2019歐冠亞軍'
+    history:'2次英格蘭頂級聯賽冠軍，2019歐冠亞軍',
+    injuries:[
+      {name:'James Maddison',pos:'攻擊中場',status:'前十字韌帶傷（恢復中）',returnDate:'賽季末'},
+      {name:'Mathys Tel',pos:'翼鋒',status:'大腿傷',returnDate:'評估中'}
+    ]
   },
   'NEW': {
     name:'Newcastle United', nameCN:'紐卡索', flag:'https://crests.football-data.org/67.png',

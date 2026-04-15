@@ -27,11 +27,13 @@ function flagImg(src) {
 if (window.Tournament) {
   Tournament.init();
   Tournament.bind();
+  buildDynamicForm(); // 初始化動態近況
   updateHero();
   // 賽事切換時重新渲染當前頁面
   window.addEventListener('tournamentChanged', () => {
     // 切換賽事時重新渲染所有頁面（try/catch 防止單一模組失敗阻擋其他）
     const _s = (fn) => { try { fn(); } catch(e) { console.error('[tournamentChanged]', e); } };
+    _s(() => buildDynamicForm()); // 切換賽事時重建動態近況
     _s(() => updateHero());
     _s(() => renderChampions());
     _s(() => renderUpcoming());
@@ -1261,8 +1263,8 @@ async function openPredModal(id) {
   // ── END 進行中比賽 ──────────────────────────────────────
 
   const pts = generateAnalysis(ht, at, p);
-  const hForm = p.hWC ? p.hWC.recentForm : (ht.recentForm||['W','D','W','W','D']);
-  const aForm = p.aWC ? p.aWC.recentForm : (at.recentForm||['W','D','W','W','D']);
+  const hForm = p.hForm || (p.hWC ? p.hWC.recentForm : (ht.recentForm||['W','D','W','W','D']));
+  const aForm = p.aForm || (p.aWC ? p.aWC.recentForm : (at.recentForm||['W','D','W','W','D']));
   const formDots = f => f.map(r=>`<span class="form-dot ${r}" style="width:24px;height:24px;font-size:11px">${r}</span>`).join('');
   const playerList = (t) => (t.keyPlayers||[]).slice(0,3).map(pl=>
     `<div class="modal-player-row">
@@ -1438,9 +1440,12 @@ async function openPredModal(id) {
         </div>
 
         <!-- 近期狀態 -->
-        <div class="modal-section-title">📈 ${p.wcFormAdj ? '本屆賽中表現（已更新預測）' : '近期狀態（最近5場）'}</div>
+        <div class="modal-section-title">📈 ${p.wcFormAdj ? '滾動式動態分析（已更新預測）' : '近期狀態（最近5場）'}</div>
         ${p.wcFormAdj ? `<div style="margin-bottom:10px;padding:8px 12px;background:rgba(76,175,80,0.1);border-radius:8px;border-left:3px solid #4caf50;font-size:12px;color:#4caf50">
-          ⚡ 預測已根據本屆世界盃實際賽果動態調整
+          ⚡ 預測已根據實際賽果與傷兵狀況動態調整
+        </div>` : ''}
+        ${(ht.injuries?.length || at.injuries?.length) ? `<div style="margin-bottom:10px;padding:8px 12px;background:rgba(255,152,0,0.1);border-radius:8px;border-left:3px solid #ff9800;font-size:12px;color:#ff9800">
+          🏥 傷兵影響已納入預測模型：${ht.injuries?.length ? ht.nameCN+' '+ht.injuries.length+'人傷缺' : ''}${ht.injuries?.length && at.injuries?.length ? '、' : ''}${at.injuries?.length ? at.nameCN+' '+at.injuries.length+'人傷缺' : ''}
         </div>` : ''}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
           <div>
@@ -1806,6 +1811,72 @@ function formScore(form) {
   return (form||['W','D','W','D','W']).reduce((s,r)=>s+(r==='W'?3:r==='D'?1:0),0);
 }
 
+// ── 動態近況計算（從實際比賽結果推算 recentForm）──────────────
+let _dynamicFormMap = {};
+
+function buildDynamicForm() {
+  _dynamicFormMap = {};
+  const matches = _matches();
+  if (!matches || !matches.length) return;
+
+  // 收集每支球隊已完成比賽的勝負平
+  const teamResults = {};
+  const finished = matches
+    .filter(m => m.status === 'finished' && m.score && m.home && m.away)
+    .sort((a,b) => ((a.date||'')+(a.time||'')) < ((b.date||'')+(b.time||'')) ? -1 : 1);
+
+  finished.forEach(m => {
+    const hGoals = m.score.h, aGoals = m.score.a;
+    if (!teamResults[m.home]) teamResults[m.home] = [];
+    if (!teamResults[m.away]) teamResults[m.away] = [];
+    teamResults[m.home].push(hGoals > aGoals ? 'W' : hGoals < aGoals ? 'L' : 'D');
+    teamResults[m.away].push(aGoals > hGoals ? 'W' : aGoals < hGoals ? 'L' : 'D');
+  });
+
+  // 取最近5場作為動態 recentForm
+  Object.entries(teamResults).forEach(([code, results]) => {
+    if (results.length >= 2) {
+      _dynamicFormMap[code] = results.slice(-5);
+    }
+  });
+}
+
+// ── 傷兵影響計算（根據傷兵名單降低 radar 值）─────────────────
+function injuryImpact(team) {
+  const injuries = team.injuries || [];
+  if (!injuries.length) return { attack:0, defense:0, midfield:0, speed:0 };
+
+  let atkPen = 0, defPen = 0, midPen = 0, spdPen = 0;
+  const keyNames = (team.keyPlayers||[]).map(p => p.name);
+
+  injuries.forEach(inj => {
+    const isKey = keyNames.some(n => inj.name.includes(n) || n.includes(inj.name));
+    const weight = isKey ? 1.5 : 0.6; // 主力球員影響更大
+    const pos = (inj.pos||'').toLowerCase();
+
+    if (pos.includes('前鋒') || pos.includes('翼') || pos.includes('攻擊')) {
+      atkPen += 4 * weight;
+      spdPen += 2 * weight;
+    } else if (pos.includes('中場')) {
+      midPen += 4 * weight;
+      atkPen += 1.5 * weight;
+    } else if (pos.includes('後衛') || pos.includes('後')) {
+      defPen += 4 * weight;
+      spdPen += 1 * weight;
+    } else if (pos.includes('門將')) {
+      defPen += 3 * weight;
+    }
+  });
+
+  // 上限：每項最多扣 15 分
+  return {
+    attack:  Math.min(15, Math.round(atkPen)),
+    defense: Math.min(15, Math.round(defPen)),
+    midfield:Math.min(15, Math.round(midPen)),
+    speed:   Math.min(10, Math.round(spdPen))
+  };
+}
+
 // ── 賽中狀態表（由 _liveStandings 建立，世界盃期間自動更新）─────
 // 結構：{ 'teamName': { played, win, draw, lose, gf, ga, gd, pts, formFactor } }
 // formFactor > 1 = 超越預期；< 1 = 低於預期；= 1 = 符合預期（賽前）
@@ -1864,7 +1935,22 @@ function buildTournamentForm() {
 }
 
 function calcPred(ht, at) {
-  const ha = ht.radar, aa = at.radar;
+  // ── 傷兵影響：動態降低 radar 值 ────────────────────────────
+  const hInj = injuryImpact(ht), aInj = injuryImpact(at);
+  const ha = {
+    attack:  Math.max(40, ht.radar.attack  - hInj.attack),
+    defense: Math.max(40, ht.radar.defense - hInj.defense),
+    midfield:Math.max(40, ht.radar.midfield- hInj.midfield),
+    speed:   Math.max(40, ht.radar.speed   - hInj.speed),
+    experience: ht.radar.experience
+  };
+  const aa = {
+    attack:  Math.max(40, at.radar.attack  - aInj.attack),
+    defense: Math.max(40, at.radar.defense - aInj.defense),
+    midfield:Math.max(40, at.radar.midfield- aInj.midfield),
+    speed:   Math.max(40, at.radar.speed   - aInj.speed),
+    experience: at.radar.experience
+  };
 
   // 用球隊名稱產生確定性種子，確保同場比賽永遠顯示相同預測
   const seed = Array.from(ht.nameCN+at.nameCN).reduce((s,c)=>s+c.charCodeAt(0),0) % 97;
@@ -1874,8 +1960,12 @@ function calcPred(ht, at) {
   const aWC = _wcFormMap[at.code] || null;
   const wcFormAdj = !!(hWC || aWC); // 是否有賽中資料
 
-  const hForm = hWC ? hWC.recentForm : (ht.recentForm || ['W','D','W','D','W']);
-  const aForm = aWC ? aWC.recentForm : (at.recentForm || ['W','D','W','D','W']);
+  // ── 動態近況：優先用比賽結果推算，其次賽中資料，最後靜態 ──
+  const hDynForm = _dynamicFormMap[ht.code || ht.name];
+  const aDynForm = _dynamicFormMap[at.code || at.name];
+  const hForm = hDynForm || (hWC ? hWC.recentForm : (ht.recentForm || ['W','D','W','D','W']));
+  const aForm = aDynForm || (aWC ? aWC.recentForm : (at.recentForm || ['W','D','W','D','W']));
+  const dynamicAdj = !!(hDynForm || aDynForm || hWC || aWC);
 
   // 進攻效率 vs 對方防守
   const homeXG = ((ha.attack/100)*2.4) * (1 - aa.defense/220) * (1 + (ha.speed-70)*0.003) * (1 + (formScore(hForm)-9)*0.04);
@@ -1975,8 +2065,11 @@ function calcPred(ht, at) {
     score:`${hGoals}-${aGoals}`,
     hXG: hXG.toFixed(1), aXG: aXG.toFixed(1),
     conf, confLabel, seed,
-    wcFormAdj,          // 是否套用賽中狀態
-    hWC, aWC            // 各隊賽中資料（供 modal 顯示）
+    wcFormAdj: wcFormAdj || dynamicAdj, // 是否套用動態狀態
+    hWC, aWC,           // 各隊賽中資料（供 modal 顯示）
+    hForm, aForm,       // 實際使用的近況（供分析文字用）
+    hInj, aInj,         // 傷兵影響值（供分析文字用）
+    dynamicAdj          // 是否有動態調整
   };
 }
 
@@ -2019,9 +2112,9 @@ function generateAnalysis(ht, at, pred) {
   else if (aa.experience - ha.experience > 15)
     lines.push(`${at.nameCN} 大賽經驗更豐富（${aa.experience} vs ${ha.experience}），關鍵時刻更能把握機會`);
 
-  // 近期狀態
-  const hForm = ht.recentForm||['W','D','W','W','D'];
-  const aForm = at.recentForm||['W','D','W','W','D'];
+  // 近期狀態（優先使用 calcPred 計算的動態近況）
+  const hForm = pred.hForm || ht.recentForm || ['W','D','W','W','D'];
+  const aForm = pred.aForm || at.recentForm || ['W','D','W','W','D'];
   const hFS = formScore(hForm), aFS = formScore(aForm);
   if (hFS > aFS + 3)
     lines.push(`近期狀態 ${ht.nameCN}（${hForm.join('')}，${hFS}分）明顯優於 ${at.nameCN}（${aForm.join('')}，${aFS}分），士氣與信心是關鍵加分`);
@@ -2029,6 +2122,17 @@ function generateAnalysis(ht, at, pred) {
     lines.push(`${at.nameCN} 近期狀態更佳（${aForm.join('')}，${aFS}分 vs ${hFS}分），來勢洶洶不可小覷`);
   else
     lines.push(`雙方近期狀態相當（${ht.nameCN} ${hFS}分 / ${at.nameCN} ${aFS}分），心理素質將是決勝關鍵`);
+
+  // 傷兵影響分析
+  const hInjuries = ht.injuries || [], aInjuries = at.injuries || [];
+  if (hInjuries.length >= 3)
+    lines.push(`⚠️ ${ht.nameCN} 傷兵嚴重（${hInjuries.length}人缺陣），包括${hInjuries.slice(0,2).map(i=>i.name).join('、')}等主力，整體戰力大打折扣`);
+  else if (hInjuries.length >= 1)
+    lines.push(`${ht.nameCN} 有${hInjuries.length}名球員傷缺（${hInjuries.map(i=>i.name).join('、')}），陣容完整度受影響`);
+  if (aInjuries.length >= 3)
+    lines.push(`⚠️ ${at.nameCN} 傷兵嚴重（${aInjuries.length}人缺陣），包括${aInjuries.slice(0,2).map(i=>i.name).join('、')}等主力，整體戰力大打折扣`);
+  else if (aInjuries.length >= 1)
+    lines.push(`${at.nameCN} 有${aInjuries.length}名球員傷缺（${aInjuries.map(i=>i.name).join('、')}），陣容完整度受影響`);
 
   // 比賽走向
   if (pred.hw >= 58)

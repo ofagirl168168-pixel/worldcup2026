@@ -21,7 +21,12 @@ const UCL_TEAMS = {
     style:'高控球率，邊路突破，團隊足球',
     strengths:['Dembélé+Kvaratskhelia雙翼突破犀利','Luis Enrique戰術體系清晰','年輕陣容潛力大'],
     weaknesses:['Kvaratskhelia體系融合仍在進行','歐冠決賽經驗不足','關鍵戰抗壓能力存疑'],
-    history:'2019/20首進歐冠決賽，歷史最佳成績亞軍'
+    history:'2019/20首進歐冠決賽，歷史最佳成績亞軍',
+    injuries:[
+      {name:'Fabián Ruiz',pos:'中場',status:'膝傷',returnDate:'未定'},
+      {name:'Nuno Mendes',pos:'左後衛',status:'肌肉傷（QF次回合退場）',returnDate:'評估中'},
+      {name:'Désiré Doué',pos:'翼鋒',status:'碰撞傷（QF次回合退場）',returnDate:'評估中'}
+    ]
   },
   'RMA': {
     name:'Real Madrid', nameCN:'皇家馬德里', flag:'https://crests.football-data.org/86.png', pot:1, league:'La Liga',
@@ -37,7 +42,12 @@ const UCL_TEAMS = {
     style:'控球為主，快速反擊，個人能力突破',
     strengths:['Mbappé+Vinícius雙翼極速','歐冠DNA，大賽經驗無人能及','Bellingham關鍵時刻爆發力'],
     weaknesses:['後防老化隱憂','中場節奏控制偶有失衡','板凳深度相對薄弱'],
-    history:'歐冠史上最成功球隊，15次奪冠，2023/24衛冕冠軍'
+    history:'歐冠史上最成功球隊，15次奪冠，2023/24衛冕冠軍',
+    injuries:[
+      {name:'Rodrygo',pos:'右翼',status:'右膝前十字韌帶斷裂+半月板',returnDate:'賽季報銷'},
+      {name:'Thibaut Courtois',pos:'門將',status:'右腿傷勢',returnDate:'四月底至五月初'},
+      {name:'Dani Ceballos',pos:'中場',status:'小腿傷',returnDate:'四月下旬'}
+    ]
   },
   'MCI': {
     name:'Manchester City', nameCN:'曼城', flag:'https://crests.football-data.org/65.png', pot:1, league:'Premier League',
@@ -53,7 +63,12 @@ const UCL_TEAMS = {
     style:'極致控球，位置輪轉，高位壓迫',
     strengths:['Haaland禁區終結能力頂級','Guardiola戰術體系成熟','中場控制力聯賽最強'],
     weaknesses:['De Bruyne傷病風險','歐冠淘汰賽心態波動','對陣強隊反擊時後防空間大'],
-    history:'2022/23首奪歐冠，近年穩定進入八強以上'
+    history:'2022/23首奪歐冠，近年穩定進入八強以上',
+    injuries:[
+      {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末'},
+      {name:'Rúben Dias',pos:'中後衛',status:'腿後肌傷',returnDate:'四月中'},
+      {name:'John Stones',pos:'中後衛',status:'小腿傷',returnDate:'恢復中'}
+    ]
   },
   'BAY': {
     name:'Bayern Munich', nameCN:'拜仁慕尼黑', flag:'https://crests.football-data.org/5.png', pot:1, league:'Bundesliga',
@@ -69,7 +84,11 @@ const UCL_TEAMS = {
     style:'高位壓迫，邊路進攻，中路滲透',
     strengths:['Kane進球效率驚人','Musiala創造力頂級','德甲統治力保證信心'],
     weaknesses:['後防重建期不穩定','Kompany歐冠執教經驗不足','高線防守易被反擊'],
-    history:'6次歐冠冠軍，2019/20最近一次奪冠'
+    history:'6次歐冠冠軍，2019/20最近一次奪冠',
+    injuries:[
+      {name:'Lennart Karl',pos:'前鋒',status:'右大腿肌肉撕裂',returnDate:'未定'},
+      {name:'Serge Gnabry',pos:'翼鋒',status:'膝傷（帶護具訓練）',returnDate:'評估中'}
+    ]
   },
   'LIV': {
     name:'Liverpool', nameCN:'利物浦', flag:'https://crests.football-data.org/64.png', pot:1, league:'Premier League',
@@ -85,7 +104,12 @@ const UCL_TEAMS = {
     style:'高強度壓迫，快速轉換，邊路交叉',
     strengths:['Salah依然是頂級得分手','Van Dijk後防領袖','Slot帶來新戰術活力'],
     weaknesses:['陣容老化需要更新換代','Slot歐冠執教經驗有限','板凳深度不如曼城'],
-    history:'6次歐冠冠軍，2018/19最近一次奪冠'
+    history:'6次歐冠冠軍，2018/19最近一次奪冠',
+    injuries:[
+      {name:'Alisson',pos:'門將',status:'傷勢恢復中',returnDate:'未定'},
+      {name:'Wataru Endo',pos:'中場',status:'足部傷勢',returnDate:'賽季報銷'},
+      {name:'Conor Bradley',pos:'右後衛',status:'長期傷缺',returnDate:'賽季報銷'}
+    ]
   },
   'INT': {
     name:'Inter Milan', nameCN:'國際米蘭', flag:'https://crests.football-data.org/108.png', pot:1, league:'Serie A',
@@ -167,7 +191,14 @@ const UCL_TEAMS = {
     style:'高位壓迫，定位球戰術強，控球推進',
     strengths:['Saka+Ødegaard右路連線致命','Gyökeres鋒線終結力頂級','Saliba後防磐石'],
     weaknesses:['歐冠經驗相對不足','Gyökeres體系融合仍在進行','面對低位防守時創造力不足'],
-    history:'2005/06歐冠亞軍，近年重返歐冠行列'
+    history:'2005/06歐冠亞軍，近年重返歐冠行列',
+    injuries:[
+      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題',returnDate:'評估中'},
+      {name:'Declan Rice',pos:'中場',status:'落地受傷（存疑）',returnDate:'評估中'},
+      {name:'Martin Ødegaard',pos:'攻擊中場',status:'撞傷（首回合）',returnDate:'存疑'},
+      {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢',returnDate:'存疑'},
+      {name:'Mikel Merino',pos:'中場',status:'長期傷缺',returnDate:'未定'}
+    ]
   },
   'LEV': {
     name:'Bayer Leverkusen', nameCN:'勒沃庫森', flag:'https://crests.football-data.org/3.png', pot:2, league:'Bundesliga',
@@ -199,7 +230,13 @@ const UCL_TEAMS = {
     style:'鐵血防守，強悍對抗，高效反擊',
     strengths:['Simeone防守體系歐洲最佳','Álvarez帶來新鋒線活力','大賽經驗極其豐富'],
     weaknesses:['進攻創造力偶有不足','陣容老化趨勢','控球率低時易被壓制'],
-    history:'2013/14、2015/16兩次歐冠亞軍'
+    history:'2013/14、2015/16兩次歐冠亞軍',
+    injuries:[
+      {name:'David Hancko',pos:'後衛',status:'腳踝傷（QF首回合退場）',returnDate:'存疑'},
+      {name:'Jan Oblak',pos:'門將',status:'腹部不適',returnDate:'評估中'},
+      {name:'Pablo Barrios',pos:'中場',status:'大腿傷',returnDate:'存疑'},
+      {name:'Johnny Cardoso',pos:'中場',status:'內收肌問題',returnDate:'評估中'}
+    ]
   },
   'BEN': {
     name:'Benfica', nameCN:'本菲卡', flag:'https://crests.football-data.org/1903.png', pot:2, league:'Liga Portugal',
@@ -359,7 +396,13 @@ const UCL_TEAMS = {
     style:'三後衛高壓體系，團隊進攻為核心',
     strengths:['Borges延續Amorim戰術框架','Pedro Gonçalves創造力出色','葡超統治力帶來信心'],
     weaknesses:['Gyökeres離隊後進攻火力銳減','歐冠淘汰賽經驗不足','板凳深度有限'],
-    history:'歐冠最佳成績2008/09十六強'
+    history:'歐冠最佳成績2008/09十六強',
+    injuries:[
+      {name:'Fotis Ioannidis',pos:'前鋒',status:'膝傷',returnDate:'未定'},
+      {name:'Nuno Santos',pos:'翼鋒',status:'腿後肌傷（長期）',returnDate:'賽季報銷'},
+      {name:'Geovany Quenda',pos:'翼鋒',status:'足部骨折',returnDate:'未定'},
+      {name:'Zeno Debast',pos:'後衛',status:'腿傷',returnDate:'評估中'}
+    ]
   },
   'OLY': {
     name:'Olympiacos', nameCN:'奧林匹亞科斯', flag:'https://crests.football-data.org/567.png', pot:3, league:'Super League Greece',
