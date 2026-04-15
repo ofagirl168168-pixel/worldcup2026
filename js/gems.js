@@ -183,8 +183,19 @@ async function checkStreakGem(streak) {
 // 每日答對（每個賽事各自獨立領取）
 async function onDailyCorrect() {
   const tid = window.Tournament?.current?.() || 'wc'
-  const r = await awardGem(`daily_correct_${tid}`)
-  if (r) showToast(`💎 答對！+${r.awarded} 寶石（餘額 ${r.balance}）`)
+  const type = `daily_correct_${tid}`
+  if (!currentUser) return
+  const result = await callEdge('award-gem', { type })
+  if (result.error) {
+    // 今日已領取 = 正常（重複呼叫）
+    if (!result.error.includes('已領取')) {
+      console.error('daily gem error:', result.error)
+      showToast('⚠ 寶石發放失敗：' + result.error)
+    }
+    return
+  }
+  updateGemUI(result.balance)
+  showToast(`💎 答對！+${result.awarded} 寶石（餘額 ${result.balance}）`)
 }
 
 // ── 邀請連結 ──────────────────────────────────────────────

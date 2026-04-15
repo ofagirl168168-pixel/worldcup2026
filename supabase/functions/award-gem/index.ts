@@ -123,12 +123,12 @@ Deno.serve(async (req) => {
     })
     if (insertErr) throw insertErr
 
-    // 回傳新餘額
+    // 回傳新餘額（用 maybeSingle 避免無資料時 .single() 報錯）
     const { data: bal } = await db
       .from('gem_balance')
       .select('balance')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
     return okRes({ awarded: rule.amount, balance: bal?.balance ?? rule.amount })
 

@@ -79,6 +79,11 @@ async function handleUserLoggedIn(isNew) {
 
   updateNavXP?.();
   renderArena?.();
+
+  // 登入後重新渲染首頁（移除「登入即可查看」提示 + 解鎖模糊區塊）
+  document.getElementById('champion-login-cta')?.remove();
+  renderChampions?.();
+  renderHomeDailyChallenge?.();
 }
 
 // ── 取得或建立 profile ────────────────────────────────────
