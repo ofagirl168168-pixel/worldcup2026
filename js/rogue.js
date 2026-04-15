@@ -428,7 +428,7 @@
       _holdFiring: false,        // 長按連續射擊中
       _holdXY: null,             // 長按座標 {x,y}
       _holdTimer: null,          // 長按判定計時器
-      _shootHintTimer: 5000,     // 射擊提示顯示時間（前5秒）
+      _shootHintTimer: 8000,     // 射擊提示顯示時間（前8秒）
 
       // cards UI
       cardPick: [],
@@ -3668,17 +3668,43 @@
       });
     }
 
-    // 射門提示（前5秒顯示詳細，之後淡出）
-    if (G.phase === 'playing') {
-      const hintAlpha = G._shootHintTimer > 1000 ? 0.5
-                       : G._shootHintTimer > 0 ? G._shootHintTimer / 1000 * 0.5 : 0;
-      if (hintAlpha > 0) {
-        const fs = Math.min(13, W * 0.028);
-        ctx.fillStyle = `rgba(255,255,255,${hintAlpha.toFixed(2)})`;
-        ctx.font = `${fs}px "Noto Sans TC", sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.fillText('點擊精準射擊 ｜ 長按連續射擊', W / 2, H - 16);
-      }
+    // 射門提示（前8秒，點擊後消失）
+    if (G.phase === 'playing' && G._shootHintTimer > 0) {
+      const fadeStart = 1500; // 最後 1.5 秒淡出
+      const alpha = G._shootHintTimer > fadeStart ? 0.85
+                   : G._shootHintTimer / fadeStart * 0.85;
+      const fs = Math.min(16, W * 0.038);
+      const yPos = H * 0.72;
+
+      // 背景膠囊
+      ctx.save();
+      const text1 = '👆 點擊精準射擊';
+      const text2 = '👆 長按連續射擊';
+      ctx.font = `700 ${fs}px "Noto Sans TC", sans-serif`;
+      const tw = Math.max(ctx.measureText(text1).width, ctx.measureText(text2).width);
+      const pw = tw + 36, ph = fs * 2.8 + 20;
+      const px = (W - pw) / 2, py = yPos - ph / 2;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.beginPath();
+      const cr = 14;
+      ctx.moveTo(px + cr, py); ctx.lineTo(px + pw - cr, py);
+      ctx.quadraticCurveTo(px + pw, py, px + pw, py + cr);
+      ctx.lineTo(px + pw, py + ph - cr);
+      ctx.quadraticCurveTo(px + pw, py + ph, px + pw - cr, py + ph);
+      ctx.lineTo(px + cr, py + ph);
+      ctx.quadraticCurveTo(px, py + ph, px, py + ph - cr);
+      ctx.lineTo(px, py + cr);
+      ctx.quadraticCurveTo(px, py, px + cr, py);
+      ctx.closePath();
+      ctx.fill();
+
+      // 文字
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.fillText(text1, W / 2, yPos - fs * 0.3);
+      ctx.fillText(text2, W / 2, yPos + fs * 1.1);
+      ctx.restore();
     }
 
     drawAudioBtns();
@@ -5642,6 +5668,7 @@
     }
 
     // playing 階段：短按先射一發 + 開始長按偵測
+    G._shootHintTimer = 0; // 一點擊就隱藏提示
     G._holdXY = p;
     G._holdFiring = false;
     clearTimeout(G._holdTimer);
