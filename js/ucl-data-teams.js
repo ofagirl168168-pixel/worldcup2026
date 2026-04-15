@@ -395,7 +395,7 @@ const UCL_TEAMS = {
     radar:{attack:76,defense:78,midfield:80,speed:80,experience:68},
     style:'三後衛高壓體系，團隊進攻為核心',
     strengths:['Borges延續Amorim戰術框架','Pedro Gonçalves創造力出色','葡超統治力帶來信心'],
-    weaknesses:['Gyökeres離隊後進攻火力銳減','歐冠淘汰賽經驗不足','板凳深度有限'],
+    weaknesses:['鋒線進球效率不足','歐冠淘汰賽經驗不足','板凳深度有限'],
     history:'歐冠最佳成績2008/09十六強',
     injuries:[
       {name:'Fotis Ioannidis',pos:'前鋒',status:'膝傷',returnDate:'未定'},

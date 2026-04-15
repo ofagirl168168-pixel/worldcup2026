@@ -1058,7 +1058,7 @@ async function openPredModal(id) {
       ${m.stats ? _renderStatsHTML(m.stats, {nameCN: typeof ht?.nameCN==='string'?ht.nameCN:'', flag: ht?.flag||''}, {nameCN: typeof at?.nameCN==='string'?at.nameCN:'', flag: at?.flag||''}) : ''}
 
       <!-- 關鍵球員 -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      <div class="modal-players-grid">
         <div class="modal-players-box">
           <div class="modal-players-title">${flagImg(ht.flag)} 關鍵球員</div>
           ${(ht.keyPlayers||[]).slice(0,3).map(pl=>
@@ -1404,7 +1404,7 @@ async function openPredModal(id) {
     })()}
 
     <!-- 免費顯示：關鍵球員 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+    <div class="modal-players-grid">
       <div class="modal-players-box">
         <div class="modal-players-title">${flagImg(ht.flag)} 關鍵球員</div>
         ${playerList(ht)}

@@ -524,11 +524,20 @@ img.flag-img {
 .modal-team-sub  { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
 .modal-badges    { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 /* Modal 關鍵球員區塊 */
+.modal-players-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
 .modal-players-box {
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px 12px;
+  min-width: 0; /* 防止 grid item 溢出 */
+  overflow: hidden;
 }
 .modal-players-title {
   font-size: 11px; font-weight: 700; color: var(--accent);
@@ -551,6 +560,34 @@ img.flag-img {
   background: rgba(255,255,255,0.07);
   padding: 2px 6px; border-radius: 4px;
   white-space: nowrap; flex-shrink: 0;
+}
+
+/* 手機寬度：關鍵球員區自適應 */
+@media (max-width: 420px) {
+  .modal-players-grid {
+    gap: 6px;
+  }
+  .modal-players-box {
+    padding: 8px 8px;
+  }
+  .modal-player-name {
+    font-size: 11px;
+  }
+  .modal-player-pos {
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+  .modal-players-title {
+    font-size: 10px;
+  }
+  .modal-players-title img.flag-img {
+    height: 14px;
+  }
+}
+@media (max-width: 340px) {
+  .modal-players-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .modal-section-title {
