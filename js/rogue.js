@@ -4162,9 +4162,9 @@
       ctx.globalAlpha = 1;
     }
 
-    // ── 分享遊戲（開始按鈕下方小文字）──
+    // ── 分享遊戲（開始按鈕上方小文字）──
     const shareFz = Math.min(12, W * 0.024);
-    const shareY = btnY + btnH + 6;
+    const shareY = btnY - shareFz - 10;
     ctx.font = `${shareFz}px "Noto Sans TC", sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.35)';
     ctx.textAlign = 'center';
