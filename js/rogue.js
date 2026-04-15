@@ -560,10 +560,10 @@
     const gkTier = Math.floor(G.wave / 5); // wave5=1, wave10=2, wave15=3...
     let gkBonus = 0;
     for (let t = 1; t <= gkTier; t++) {
-      if (t <= 3)       gkBonus += 1.0;  // wave 5-15：每階 +1.0
-      else if (t <= 6)  gkBonus += 1.5;  // wave 20-30：每階 +1.5
-      else if (t <= 10) gkBonus += 2.5;  // wave 35-50：每階 +2.5
-      else              gkBonus += 4.0;  // wave 55+：每階 +4.0（接近瞬移）
+      if (t <= 3)       gkBonus += 0.7;  // wave 5-15：每階 +0.7
+      else if (t <= 6)  gkBonus += 1.0;  // wave 20-30：每階 +1.0
+      else if (t <= 10) gkBonus += 1.8;  // wave 35-50：每階 +1.8
+      else              gkBonus += 2.8;  // wave 55+：每階 +2.8
     }
     G.gk.spd = (GK_BASE_SPD + gkBonus) * (G.gkSlowMul || 1);
     G.gk.tracking = G.wave >= 5; // wave5 起才追蹤球
@@ -785,12 +785,19 @@
               });
             }
           }
-          // 反彈：球反向繼續飛（可多次反彈）
+          // 反彈：根據來球方向決定彈射方向
           const maxBounce = G.bounce || 0;
           const curBounce = b._bounceCount || 0;
           if (maxBounce > 0 && curBounce < maxBounce) {
-            b.vz = -b.vz * 0.7;
-            b.vx += (Math.random() - 0.5) * 2;
+            if (b.vz > 0) {
+              // 從前方打到敵人 → 往前偏轉（不回彈），加大側向偏移
+              b.vz = Math.abs(b.vz) * 0.5;
+              b.vx += (Math.random() - 0.5) * 4 + (b.x > d.x ? 1.5 : -1.5);
+            } else {
+              // 從後方打到 → 正常反彈
+              b.vz = -b.vz * 0.7;
+              b.vx += (Math.random() - 0.5) * 2;
+            }
             b._bounceCount = curBounce + 1;
             b._bounced = true;
             hitDef = false; // 不消滅球
