@@ -51,9 +51,8 @@ if (window.Tournament) {
     const subEl = document.querySelector('.logo-sub');
     if (cfg && titleEl) {
       const titles = { wc:'世界盃預測', ucl:'歐冠預測', epl:'英超預測' };
-      const subs = { wc:'AI 分析平台 2026', ucl:'AI 分析平台 2025/26', epl:'AI 分析平台 2025/26' };
       titleEl.textContent = titles[cfg.id] || '足球預測';
-      subEl.textContent = subs[cfg.id] || 'AI 分析平台';
+      if (subEl) subEl.textContent = 'Soccer麥迪';
     }
   });
 }
