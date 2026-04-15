@@ -441,6 +441,7 @@
       _rerolling: false,        // reroll 請求中
       _restartR: null,
       _closeR: null,
+      _shareGameR: null,
       _reviveR: null,           // 復活按鈕區域
       _revived: false,          // 本局是否已復活
       _reviving: false,         // 復活請求中
@@ -4081,10 +4082,15 @@
       G._staminaRefillFullR = { x: rfX2, y: rfY, w: rfBtnW, h: rfBtnH };
     }
 
-    // ── 開始按鈕 ──
+    // ── 開始按鈕 + 分享按鈕 ──
+    const shareW = Math.min(50, W * 0.11);
+    const gap = 8;
     const btnW = Math.min(220, W * 0.45);
-    const btnX = W / 2 - btnW / 2;
+    const totalW = btnW + gap + shareW;
+    const btnX = W / 2 - totalW / 2;
+    const shareX = btnX + btnW + gap;
     G._startR = stEmpty ? null : { x: btnX, y: btnY, w: btnW, h: btnH };
+    G._shareGameR = { x: shareX, y: btnY, w: shareW, h: btnH };
     const t = performance.now() * 0.001;
 
     // 漸層按鈕底色 + 呼吸光暈
@@ -4161,7 +4167,30 @@
       ctx.globalAlpha = 1;
     }
 
+    // ── 分享遊戲按鈕 ──
+    rr(ctx, shareX, btnY, shareW, btnH, 14);
+    ctx.fillStyle = 'rgba(33,150,243,0.35)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(33,150,243,0.6)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#90caf9';
+    ctx.font = `bold ${Math.min(20, W * 0.04)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('🔗', shareX + shareW / 2, btnY + 33);
+
     drawAudioBtns();
+  }
+
+  // ── 分享遊戲連結 ──
+  function shareGameLink() {
+    const url = window.location.origin + '?play=rogue';
+    const text = '⚽ 射門挑戰：前進世界盃\n第一人稱射門 × 卡牌強化 × 無盡生存\n你能撐到第幾波？來挑戰！👇\n' + url;
+    if (navigator.share) {
+      navigator.share({ title: '射門挑戰：前進世界盃', text, url }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).then(() => {
+        G._staminaToast = '✅ 分享連結已複製！';
+        G._staminaToastT = performance.now();
+      }).catch(() => {});
+    }
   }
 
   // ── 排行榜 Tab ──
@@ -5721,6 +5750,7 @@
       if (G._staminaRefillFullR && hitTest(x, y, G._staminaRefillFullR)) {
         _refillStamina(STAMINA_MAX); return;
       }
+      if (hitTest(x, y, G._shareGameR)) { shareGameLink(); return; }
       if (hitTest(x, y, G._startR)) {
         if (!useStamina()) return; // 體力不足
         G.phase = 'playing';
