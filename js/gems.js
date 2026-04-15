@@ -176,8 +176,8 @@ async function onDailyCorrect() {
 // ── 邀請連結 ──────────────────────────────────────────────
 function _shareBaseUrl() {
   const base = window.location.origin;
-  const isUcl = window.Tournament?.isUCL?.() ?? false;
-  return isUcl ? `${base}?t=ucl` : base;
+  const tid = window.Tournament?.current?.() || 'wc';
+  return tid !== 'wc' ? `${base}?t=${tid}` : base;
 }
 
 async function getMyRefLink() {
@@ -185,10 +185,11 @@ async function getMyRefLink() {
   const { data } = await DB.from('profiles')
     .select('ref_code').eq('id', currentUser.id).single()
   if (!data?.ref_code) return null
-  const isUcl = window.Tournament?.isUCL?.() ?? false;
-  return isUcl
-    ? `${window.location.origin}?t=ucl&ref=${data.ref_code}`
-    : `${window.location.origin}?ref=${data.ref_code}`
+  const tid = window.Tournament?.current?.() || 'wc';
+  const base = window.location.origin;
+  return tid !== 'wc'
+    ? `${base}?t=${tid}&ref=${data.ref_code}`
+    : `${base}?ref=${data.ref_code}`
 }
 
 async function copyRefLink() {

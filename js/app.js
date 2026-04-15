@@ -3342,9 +3342,13 @@ async function shareMyPrediction(matchId) {
     img.src = proxied;
   });
 
-  // 載入 QR code（使用 QR API）
+  // 組合分享連結（帶賽事 + 個人邀請碼）
   const tid = _tid();
-  const siteUrl = window.location.origin + (tid !== 'wc' ? `?t=${tid}` : '');
+  let siteUrl = window.location.origin + (tid !== 'wc' ? `?t=${tid}` : '');
+  if (typeof getMyRefLink === 'function') {
+    const refLink = await getMyRefLink();
+    if (refLink) siteUrl = refLink;
+  }
   const loadQR = () => new Promise(async resolve => {
     try {
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(siteUrl)}&bgcolor=0a0e1a&color=ffffff&margin=0`;
@@ -3559,10 +3563,10 @@ async function shareMyPrediction(matchId) {
   ctx.fillStyle = 'rgba(255,255,255,0.5)';
   ctx.fillText('一起來預測比分，精準猜中贏寶石！', 42, bottomY + 42);
 
-  // 網站連結
-  ctx.font = '400 12px sans-serif';
+  // 網站連結（顯示完整邀請連結）
+  ctx.font = '400 11px sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.fillText(window.location.host, 42, bottomY + 64);
+  ctx.fillText(siteUrl.replace('https://', ''), 42, bottomY + 64);
 
   // 底部裝飾線
   const btmLine = ctx.createLinearGradient(0, 0, w, 0);
