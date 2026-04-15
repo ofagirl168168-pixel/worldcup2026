@@ -5,7 +5,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
 // 每種類型的規則
-const AWARD_RULES: Record<string, { amount: number; unique: boolean; dailyLimit?: boolean }> = {
+const AWARD_RULES: Record<string, { amount: number; unique: boolean; dailyLimit?: boolean; refUnique?: boolean }> = {
   daily_correct:    { amount: 1,  unique: false, dailyLimit: true },  // 每日答對（舊版相容）
   daily_correct_wc: { amount: 1,  unique: false, dailyLimit: true },  // 每日答對 — 世界盃
   daily_correct_ucl:{ amount: 1,  unique: false, dailyLimit: true },  // 每日答對 — 歐冠
@@ -40,6 +40,8 @@ const AWARD_RULES: Record<string, { amount: number; unique: boolean; dailyLimit?
   rogue_milestone_8000:  { amount: 3,  unique: true },                  // 射門遊戲里程碑 8000 分
   rogue_milestone_10000: { amount: 4,  unique: true },                  // 射門遊戲里程碑 10000 分
   rogue_milestone_12000: { amount: 5,  unique: true },                  // 射門遊戲里程碑 12000 分
+  pred_exact:       { amount: 3,  unique: false, refUnique: true },    // 精準比分預測獎勵（per match）
+  pred_goaldiff:    { amount: 1,  unique: false, refUnique: true },    // 猜中比分差獎勵（per match）
   referral_invite:  { amount: 3,  unique: false },                    // 邀請好友成功
   referral_joined:  { amount: 3,  unique: true },                     // 被邀請者首次登入
   level_2:          { amount: 2,  unique: true },                     // 升到 Lv.2
@@ -69,11 +71,24 @@ Deno.serve(async (req) => {
     )
     if (authErr || !user) return errorRes('驗證失敗', 401)
 
-    const { type } = await req.json()
+    const { type, ref_id } = await req.json()
     const rule = AWARD_RULES[type]
     if (!rule) return errorRes('不合法的類型', 400)
 
     const today = new Date().toISOString().slice(0, 10)
+
+    // refUnique: 同一 type + ref_id 只發一次（用於預測獎勵 per match）
+    if (rule.refUnique) {
+      if (!ref_id) return errorRes('缺少 ref_id', 400)
+      const { data: existing } = await db
+        .from('gem_transactions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('type', type)
+        .eq('ref_id', ref_id)
+        .maybeSingle()
+      if (existing) return errorRes('已領取過', 409)
+    }
 
     // 檢查唯一性（一次性獎勵）
     if (rule.unique) {
@@ -103,6 +118,7 @@ Deno.serve(async (req) => {
       user_id: user.id,
       type,
       amount: rule.amount,
+      ref_id: rule.refUnique ? ref_id : null,
       date: today,
     })
     if (insertErr) throw insertErr

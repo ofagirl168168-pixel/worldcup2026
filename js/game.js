@@ -324,23 +324,28 @@ function settlePredictions() {
       const actDir = actH > actA ? 'h' : actA > actH ? 'a' : 'd';
       const direction = predDir === actDir;
 
-      let xpReward = 0;
-      if (exact) xpReward = 20;
-      else if (direction) xpReward = 5;
+      const goalDiffMatch = direction && !exact && (predH - predA) === (actH - actA);
+
+      let xpReward = 2; // 參與獎
+      let gemReward = 0;
+      if (exact)              { xpReward = 30; gemReward = 3; }
+      else if (goalDiffMatch) { xpReward = 15; gemReward = 1; }
+      else if (direction)     { xpReward = 10; }
 
       bonusXP += xpReward;
 
       const result = {
-        predH, predA, actH, actA, exact, direction,
-        xp: xpReward, gem: exact ? 1 : 0,
+        predH, predA, actH, actA, exact, direction, goalDiffMatch,
+        xp: xpReward, gem: gemReward,
         settledAt: new Date().toISOString(),
         prefix: p
       };
       settled[matchId] = result;
       newlySettled.push({ matchId, ...result });
 
-      // 精確命中獎勵寶石
-      if (exact) awardGem?.(`exact_pred_${matchId}`);
+      // 寶石獎勵（透過 ref_id 確保每場只發一次）
+      if (exact) awardGem?.('pred_exact', matchId);
+      if (goalDiffMatch) awardGem?.('pred_goaldiff', matchId);
     }
 
     localStorage.setItem(settledKey, JSON.stringify(settled));
@@ -374,10 +379,10 @@ function showSettlementPopups(settled) {
     const hFlag = ht ? flagImg(ht.flag) : '', aFlag = at ? flagImg(at.flag) : '';
     const hName = ht?.nameCN || match?.home || '?', aName = at?.nameCN || match?.away || '?';
 
-    const icon = s.exact ? '🎯' : s.direction ? '✅' : '❌';
-    const title = s.exact ? '完美命中！' : s.direction ? '方向正確！' : '預測失誤';
-    const color = s.exact ? '#4caf50' : s.direction ? 'var(--accent)' : '#ef9a9a';
-    const rewardText = s.xp > 0 ? `+${s.xp} XP${s.gem ? ' +1 💎' : ''}` : '';
+    const icon = s.exact ? '🎯' : s.goalDiffMatch ? '🔥' : s.direction ? '✅' : '❌';
+    const title = s.exact ? '完美命中！' : s.goalDiffMatch ? '比分差命中！' : s.direction ? '方向正確！' : '預測失誤';
+    const color = s.exact ? '#4caf50' : s.goalDiffMatch ? '#ff9800' : s.direction ? 'var(--accent)' : '#ef9a9a';
+    const rewardText = s.xp > 0 ? `+${s.xp} XP${s.gem ? ` +${s.gem} 💎` : ''}` : '';
 
     const overlay = document.createElement('div');
     overlay.className = 'settlement-overlay';

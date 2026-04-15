@@ -34,9 +34,11 @@ async function callEdge(fnName, body) {
 }
 
 // ── 領取寶石（伺服器驗證）────────────────────────────────
-async function awardGem(type) {
+async function awardGem(type, ref_id) {
   if (!currentUser) return null
-  const result = await callEdge('award-gem', { type })
+  const body = { type }
+  if (ref_id) body.ref_id = ref_id
+  const result = await callEdge('award-gem', body)
   if (result.error) {
     // 409 = 已領過，正常情況不需要提示
     if (!result.error.includes('已領取') && !result.error.includes('已領取過')) {
