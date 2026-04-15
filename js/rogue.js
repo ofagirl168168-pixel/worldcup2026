@@ -4082,15 +4082,10 @@
       G._staminaRefillFullR = { x: rfX2, y: rfY, w: rfBtnW, h: rfBtnH };
     }
 
-    // ── 開始按鈕 + 分享按鈕 ──
-    const shareW = Math.min(50, W * 0.11);
-    const gap = 8;
+    // ── 開始按鈕（置中）──
     const btnW = Math.min(220, W * 0.45);
-    const totalW = btnW + gap + shareW;
-    const btnX = W / 2 - totalW / 2;
-    const shareX = btnX + btnW + gap;
+    const btnX = W / 2 - btnW / 2;
     G._startR = stEmpty ? null : { x: btnX, y: btnY, w: btnW, h: btnH };
-    G._shareGameR = { x: shareX, y: btnY, w: shareW, h: btnH };
     const t = performance.now() * 0.001;
 
     // 漸層按鈕底色 + 呼吸光暈
@@ -4167,14 +4162,16 @@
       ctx.globalAlpha = 1;
     }
 
-    // ── 分享遊戲按鈕 ──
-    rr(ctx, shareX, btnY, shareW, btnH, 14);
-    ctx.fillStyle = 'rgba(33,150,243,0.35)'; ctx.fill();
-    ctx.strokeStyle = 'rgba(33,150,243,0.6)'; ctx.lineWidth = 1; ctx.stroke();
-    ctx.fillStyle = '#90caf9';
-    ctx.font = `bold ${Math.min(20, W * 0.04)}px sans-serif`;
+    // ── 分享遊戲（開始按鈕下方小文字）──
+    const shareFz = Math.min(12, W * 0.024);
+    const shareY = btnY + btnH + 6;
+    ctx.font = `${shareFz}px "Noto Sans TC", sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
     ctx.textAlign = 'center';
-    ctx.fillText('🔗', shareX + shareW / 2, btnY + 33);
+    const shareLabel = '🔗 分享遊戲給朋友';
+    ctx.fillText(shareLabel, W / 2, shareY + shareFz);
+    const shareLabelW = ctx.measureText(shareLabel).width + 16;
+    G._shareGameR = { x: W / 2 - shareLabelW / 2, y: shareY, w: shareLabelW, h: shareFz + 8 };
 
     drawAudioBtns();
   }
