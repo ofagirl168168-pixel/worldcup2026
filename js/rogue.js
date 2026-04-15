@@ -1324,12 +1324,12 @@
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.font = `600 ${hintFS}px "Noto Sans TC", sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('精準射擊', tapX, hintY + hintSz / 2 + hintFS + 2);
+    ctx.fillText('點擊 - 精準射擊', tapX, hintY + hintSz / 2 + hintFS + 2);
     // 長按
     const holdX = cx + hintGap * 0.7;
     _drawHoldIcon(holdX, hintY, hintSz);
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.fillText('連續射擊', holdX, hintY + hintSz / 2 + hintFS + 2);
+    ctx.fillText('長按 - 自動射擊', holdX, hintY + hintSz / 2 + hintFS + 2);
   }
 
   // ─── 球場 ────────────────────────────────────────────────
@@ -3782,7 +3782,7 @@
       ctx.fillStyle = '#fff';
       ctx.font = `700 ${fs}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText('精準射擊', midX, y1icon + iconSz / 2 + fs + 4);
+      ctx.fillText('點擊 - 精準射擊', midX, y1icon + iconSz / 2 + fs + 4);
 
       // ── 第二行：長按 + 擴散波紋 ──
       const y2icon = y1icon + rowH + 4;
@@ -3790,7 +3790,7 @@
       ctx.fillStyle = '#fff';
       ctx.font = `700 ${fs}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText('連續射擊', midX, y2icon + iconSz / 2 + fs + 4);
+      ctx.fillText('長按 - 自動射擊', midX, y2icon + iconSz / 2 + fs + 4);
 
       ctx.restore();
     }
