@@ -662,9 +662,26 @@ function renderHighlights() {
 }
 
 function showSection(id) {
+  // 麥迪轉場動畫
+  const cur = document.querySelector('.page-section.active');
+  const target = document.getElementById('section-' + id);
+  if (cur && target && cur !== target) {
+    let splash = document.getElementById('maddy-splash');
+    if (!splash) {
+      splash = document.createElement('div');
+      splash.id = 'maddy-splash';
+      splash.innerHTML = '<img src="img/logo-soccermaddy.png" alt="" />';
+      document.body.appendChild(splash);
+    }
+    splash.classList.remove('active');
+    void splash.offsetWidth; // force reflow
+    splash.classList.add('active');
+    setTimeout(() => splash.classList.remove('active'), 600);
+  }
+
   document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('section-' + id).classList.add('active');
+  target.classList.add('active');
   document.querySelectorAll('[data-section="' + id + '"]').forEach(b => b.classList.add('active'));
   document.getElementById('mobile-nav').classList.remove('open');
   window.scrollTo(0, 0);
