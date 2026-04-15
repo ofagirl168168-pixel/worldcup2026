@@ -3299,15 +3299,16 @@ async function shareMyPrediction(matchId) {
   const mine = myPreds[matchId];
   if (!mine) return;
 
+  showToast?.('📤 正在生成分享圖...');
+
   const meta = _matchMeta(m);
   const p = calcPred(ht, at);
   const DPR = 2;
-  const W = 640 * DPR, H = 520 * DPR;
+  const w = 640, h = 780;
   const cvs = document.createElement('canvas');
-  cvs.width = W; cvs.height = H;
+  cvs.width = w * DPR; cvs.height = h * DPR;
   const ctx = cvs.getContext('2d');
   ctx.scale(DPR, DPR);
-  const w = 640, h = 520;
 
   // helpers
   const roundRect = (x, y, rw, rh, r) => {
@@ -3319,25 +3320,53 @@ async function shareMyPrediction(matchId) {
     ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
     ctx.closePath();
   };
+  const pill = (cx, cy, text, bgColor, borderColor, textColor, font) => {
+    ctx.font = font;
+    const tw = ctx.measureText(text).width + 20;
+    roundRect(cx - tw/2, cy - 13, tw, 26, 13);
+    ctx.fillStyle = bgColor; ctx.fill();
+    ctx.strokeStyle = borderColor; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = textColor; ctx.textAlign = 'center'; ctx.fillText(text, cx, cy + 5);
+  };
 
-  // 載入隊徽/國旗
-  const loadImg = (src) => new Promise(resolve => {
+  // 載入隊徽/國旗（用 fetch blob 繞過 CORS）
+  const loadImg = (src) => new Promise(async resolve => {
     if (!src) return resolve(null);
     const url = (src.startsWith('http') || src.startsWith('img/')) ? src : getFlagImgUrl(src);
     if (!url) return resolve(null);
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = url;
+    try {
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      const objUrl = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(objUrl); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(objUrl); resolve(null); };
+      img.src = objUrl;
+    } catch { resolve(null); }
   });
 
-  const [hImg, aImg] = await Promise.all([loadImg(ht.flag), loadImg(at.flag)]);
+  // 載入 QR code（使用 QR API）
+  const siteUrl = window.location.origin;
+  const loadQR = () => new Promise(async resolve => {
+    try {
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(siteUrl)}&bgcolor=0a0e1a&color=ffffff&margin=0`;
+      const resp = await fetch(qrUrl);
+      const blob = await resp.blob();
+      const objUrl = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(objUrl); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(objUrl); resolve(null); };
+      img.src = objUrl;
+    } catch { resolve(null); }
+  });
+
+  const [hImg, aImg, qrImg] = await Promise.all([loadImg(ht.flag), loadImg(at.flag), loadQR()]);
 
   // ── 背景 ──
   const bg = ctx.createLinearGradient(0, 0, w, h);
   bg.addColorStop(0, '#0a0e1a');
-  bg.addColorStop(1, '#111827');
+  bg.addColorStop(0.5, '#111827');
+  bg.addColorStop(1, '#0a0e1a');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
@@ -3354,33 +3383,14 @@ async function shareMyPrediction(matchId) {
   const dateStr = _isClub() ? `${(m.date||'').slice(5).replace('-','/')} ${m.time||''}` : `${(m.twDate||'').slice(5).replace('-','/')} ${m.twTime||''}`;
   ctx.textAlign = 'center';
 
-  // 標籤膠囊
+  // 標籤膠囊 + 時間膠囊
   const tagText = meta.matchTag;
-  ctx.font = '600 13px "Noto Sans TC", sans-serif';
-  const tagW = ctx.measureText(tagText).width + 24;
-  roundRect(w/2 - tagW/2 - 30, 18, tagW, 28, 14);
-  ctx.fillStyle = 'rgba(245,166,35,0.15)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(245,166,35,0.4)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  ctx.fillStyle = '#f5a623';
-  ctx.fillText(tagText, w/2 - 30, 37);
-
-  // 時間膠囊
   const timeText = `🕒 ${dateStr}`;
-  ctx.font = '500 12px "Noto Sans TC", sans-serif';
-  const timeW = ctx.measureText(timeText).width + 20;
-  roundRect(w/2 + tagW/2 - 20, 18, timeW, 28, 14);
-  ctx.fillStyle = 'rgba(255,255,255,0.06)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-  ctx.stroke();
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ctx.fillText(timeText, w/2 + tagW/2 - 20 + timeW/2, 37);
+  pill(w/2 - 70, 32, tagText, 'rgba(245,166,35,0.15)', 'rgba(245,166,35,0.4)', '#f5a623', '600 13px "Noto Sans TC", sans-serif');
+  pill(w/2 + 70, 32, timeText, 'rgba(255,255,255,0.06)', 'rgba(255,255,255,0.12)', 'rgba(255,255,255,0.6)', '500 12px "Noto Sans TC", sans-serif');
 
-  // ── 隊徽 + 隊名區 ──
-  const crestY = 68;
+  // ── 隊徽 + 隊名 + 排名 ──
+  const crestY = 65;
   const crestSize = 72;
   const teamX_h = w * 0.22;
   const teamX_a = w * 0.78;
@@ -3388,151 +3398,192 @@ async function shareMyPrediction(matchId) {
   if (hImg) ctx.drawImage(hImg, teamX_h - crestSize/2, crestY, crestSize, crestSize);
   if (aImg) ctx.drawImage(aImg, teamX_a - crestSize/2, crestY, crestSize, crestSize);
 
-  // 隊名
+  ctx.textAlign = 'center';
   ctx.font = '800 20px "Noto Sans TC", sans-serif';
   ctx.fillStyle = '#fff';
   ctx.fillText(ht.nameCN, teamX_h, crestY + crestSize + 24);
   ctx.fillText(at.nameCN, teamX_a, crestY + crestSize + 24);
 
-  // 副資訊
   ctx.font = '400 11px "Noto Sans TC", sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.35)';
   ctx.fillText(meta.hRankLabel, teamX_h, crestY + crestSize + 42);
   ctx.fillText(meta.aRankLabel, teamX_a, crestY + crestSize + 42);
 
-  // ── 中間 AI 預測區 ──
+  // ── 中間 AI 預測比分（打碼）──
   ctx.font = '400 12px "Noto Sans TC", sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.35)';
   ctx.fillText('AI 預測比分', w/2, crestY + 16);
 
-  // AI 比分（模糊效果）
-  ctx.font = '900 36px "Noto Sans TC", sans-serif';
+  // 打碼方塊取代數字
+  const maskY = crestY + 28;
   ctx.fillStyle = 'rgba(255,255,255,0.08)';
-  ctx.fillText(`${p.score.split('-')[0]}  -  ${p.score.split('-')[1]}`, w/2, crestY + 52);
+  roundRect(w/2 - 48, maskY, 32, 40, 6); ctx.fill();
+  roundRect(w/2 + 16, maskY, 32, 40, 6); ctx.fill();
+  ctx.font = '700 28px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.fillText('?', w/2 - 32, maskY + 29);
+  ctx.fillText('?', w/2 + 32, maskY + 29);
+  ctx.font = '700 20px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.fillText('–', w/2, maskY + 27);
 
   // xG
   ctx.font = '400 11px "Noto Sans TC", sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.fillText(`xG ${p.hXG} — ${p.aXG}`, w/2, crestY + 70);
+  ctx.fillText(`xG ${p.hXG} — ${p.aXG}`, w/2, crestY + 80);
 
   // 信心膠囊
-  const confText = p.confLabel;
-  ctx.font = '700 11px "Noto Sans TC", sans-serif';
-  const confW = ctx.measureText(confText).width + 16;
   const confColor = p.conf === 'high' ? '#22c55e' : p.conf === 'medium' ? '#f5a623' : '#ef4444';
-  roundRect(w/2 - confW/2, crestY + 78, confW, 22, 11);
-  ctx.fillStyle = confColor + '20';
-  ctx.fill();
-  ctx.strokeStyle = confColor + '60';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  ctx.fillStyle = confColor;
-  ctx.fillText(confText, w/2, crestY + 93);
+  pill(w/2, crestY + 100, p.confLabel, confColor + '20', confColor + '60', confColor, '700 11px "Noto Sans TC", sans-serif');
 
   // ── 我的預測卡片 ──
   const cardY = 210;
-  const cardH = 155;
+  const cardH = 140;
   roundRect(32, cardY, w - 64, cardH, 16);
   ctx.fillStyle = 'rgba(255,255,255,0.04)';
   ctx.fill();
-  ctx.strokeStyle = 'rgba(245,166,35,0.25)';
+  ctx.strokeStyle = 'rgba(245,166,35,0.3)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  // 卡片內：隊徽 + 比分
-  const predCY = cardY + cardH/2 - 8;
-  if (hImg) ctx.drawImage(hImg, w/2 - 145, predCY - 22, 44, 44);
-  if (aImg) ctx.drawImage(aImg, w/2 + 101, predCY - 22, 44, 44);
+  // 標題
+  ctx.font = '600 13px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.textAlign = 'center';
+  ctx.fillText('🎯 我的預測', w/2, cardY + 26);
 
-  // 大比分
+  // 隊徽小圖 + 大比分
+  const predCY = cardY + cardH/2 + 6;
+  const miniCrest = 40;
+  if (hImg) ctx.drawImage(hImg, w/2 - 140, predCY - miniCrest/2, miniCrest, miniCrest);
+  if (aImg) ctx.drawImage(aImg, w/2 + 100, predCY - miniCrest/2, miniCrest, miniCrest);
+
   ctx.font = '900 56px "Noto Sans TC", sans-serif';
   ctx.fillStyle = '#f5a623';
   ctx.fillText(`${mine.h}`, w/2 - 38, predCY + 20);
+  ctx.fillText(`${mine.a}`, w/2 + 38, predCY + 20);
   ctx.font = '700 32px sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.25)';
   ctx.fillText('–', w/2, predCY + 16);
-  ctx.font = '900 56px "Noto Sans TC", sans-serif';
-  ctx.fillStyle = '#f5a623';
-  ctx.fillText(`${mine.a}`, w/2 + 38, predCY + 20);
-
-  // 我的預測 標題
-  ctx.font = '600 13px "Noto Sans TC", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.fillText('🎯 我的預測', w/2, cardY + 24);
 
   // 預測時間
   const savedDate = new Date(mine.savedAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
   ctx.font = '400 11px "Noto Sans TC", sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.25)';
-  ctx.fillText(`已預測 · ${savedDate}`, w/2, predCY + 50);
+  ctx.fillText(`已預測 · ${savedDate}`, w/2, predCY + 44);
 
   // ── 勝率條 ──
-  const barY = 390;
+  const barY = 378;
   ctx.font = '800 18px "Noto Sans TC", sans-serif';
-  ctx.fillStyle = '#22c55e';
-  ctx.textAlign = 'left';
-  ctx.fillText(`${p.hw}%`, 42, barY);
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.textAlign = 'center';
-  ctx.fillText(`${p.d}%`, w/2, barY);
-  ctx.fillStyle = '#ef4444';
-  ctx.textAlign = 'right';
-  ctx.fillText(`${p.aw}%`, w - 42, barY);
+  ctx.fillStyle = '#22c55e'; ctx.textAlign = 'left'; ctx.fillText(`${p.hw}%`, 42, barY);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.textAlign = 'center'; ctx.fillText(`${p.d}%`, w/2, barY);
+  ctx.fillStyle = '#ef4444'; ctx.textAlign = 'right'; ctx.fillText(`${p.aw}%`, w - 42, barY);
 
   ctx.font = '400 10px "Noto Sans TC", sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.textAlign = 'left';
-  ctx.fillText(`${ht.nameCN} 勝`, 42, barY + 16);
-  ctx.textAlign = 'center';
-  ctx.fillText('平局', w/2, barY + 16);
-  ctx.textAlign = 'right';
-  ctx.fillText(`${at.nameCN} 勝`, w - 42, barY + 16);
+  ctx.textAlign = 'left'; ctx.fillText(`${ht.nameCN} 勝`, 42, barY + 16);
+  ctx.textAlign = 'center'; ctx.fillText('平局', w/2, barY + 16);
+  ctx.textAlign = 'right'; ctx.fillText(`${at.nameCN} 勝`, w - 42, barY + 16);
 
   // 勝率長條
-  const barX = 42, barW = w - 84, barH2 = 8, barTop = barY + 24;
-  roundRect(barX, barTop, barW, barH2, 4);
-  ctx.fillStyle = 'rgba(255,255,255,0.06)';
-  ctx.fill();
-  // home win
-  const hBarW = barW * (p.hw / 100);
-  roundRect(barX, barTop, hBarW, barH2, 4);
-  ctx.fillStyle = '#22c55e';
-  ctx.fill();
-  // away win
-  const aBarW = barW * (p.aw / 100);
-  roundRect(barX + barW - aBarW, barTop, aBarW, barH2, 4);
-  ctx.fillStyle = '#ef4444';
-  ctx.fill();
+  const barX = 42, barW2 = w - 84, barH2 = 8, barTop = barY + 24;
+  roundRect(barX, barTop, barW2, barH2, 4); ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fill();
+  const hBarW = barW2 * (p.hw / 100);
+  roundRect(barX, barTop, hBarW, barH2, 4); ctx.fillStyle = '#22c55e'; ctx.fill();
+  const aBarW = barW2 * (p.aw / 100);
+  roundRect(barX + barW2 - aBarW, barTop, aBarW, barH2, 4); ctx.fillStyle = '#ef4444'; ctx.fill();
 
-  // ── 底部 CTA ──
+  // ── 完整 AI 分析解鎖區 ──
+  const lockY = 438;
+  const lockH = 195;
+  roundRect(32, lockY, w - 64, lockH, 16);
+  ctx.fillStyle = 'rgba(255,255,255,0.03)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
   ctx.textAlign = 'center';
-  // CTA 按鈕外觀
-  const ctaBtnW = 260, ctaBtnH = 40, ctaBtnY = 460;
-  roundRect(w/2 - ctaBtnW/2, ctaBtnY, ctaBtnW, ctaBtnH, 20);
-  const ctaGrad = ctx.createLinearGradient(w/2 - ctaBtnW/2, 0, w/2 + ctaBtnW/2, 0);
-  ctaGrad.addColorStop(0, '#f5a623');
-  ctaGrad.addColorStop(1, '#ff8c00');
-  ctx.fillStyle = ctaGrad;
-  ctx.fill();
-  ctx.font = '700 15px "Noto Sans TC", sans-serif';
-  ctx.fillStyle = '#000';
-  ctx.fillText('你覺得呢？一起來預測！', w/2, ctaBtnY + 26);
+  // 鎖頭 icon
+  ctx.font = '400 28px sans-serif';
+  ctx.fillStyle = 'rgba(245,166,35,0.7)';
+  ctx.fillText('🔒', w/2, lockY + 32);
 
-  // 網站
-  ctx.font = '400 11px sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.25)';
-  ctx.fillText(window.location.host, w/2, h - 8);
+  ctx.font = '700 16px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('完整 AI 分析', w/2, lockY + 56);
+
+  ctx.font = '400 12px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.fillText('解鎖本場 AI 勝負預測、比分預估', w/2, lockY + 76);
+  ctx.fillText('與完整數據雷達圖', w/2, lockY + 93);
+
+  // 四個功能標籤
+  const tagRow1Y = lockY + 118;
+  const tagRow2Y = lockY + 146;
+  const tagFont = '600 12px "Noto Sans TC", sans-serif';
+  const tagBg = 'rgba(255,255,255,0.06)';
+  const tagBorder = 'rgba(255,255,255,0.1)';
+  const tags = [
+    { icon: '⚽', text: '預測比分', x: w/2 - 80, y: tagRow1Y },
+    { icon: '📊', text: '勝平負%', x: w/2 + 80, y: tagRow1Y },
+    { icon: '📈', text: '數據雷達圖', x: w/2 - 80, y: tagRow2Y },
+    { icon: '🧠', text: 'AI 分析文字', x: w/2 + 80, y: tagRow2Y },
+  ];
+  tags.forEach(t => {
+    pill(t.x, t.y, `${t.icon} ${t.text}`, tagBg, tagBorder, 'rgba(255,255,255,0.7)', tagFont);
+  });
+
+  // ── 底部：QR code + CTA ──
+  const bottomY = 655;
+
+  // QR code
+  const qrSize = 72;
+  const qrX = w - 42 - qrSize;
+  if (qrImg) {
+    // QR 背景
+    roundRect(qrX - 4, bottomY - 4, qrSize + 8, qrSize + 8, 8);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.drawImage(qrImg, qrX, bottomY, qrSize, qrSize);
+    ctx.font = '400 9px sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.textAlign = 'center';
+    ctx.fillText('掃碼預測', qrX + qrSize/2, bottomY + qrSize + 14);
+  }
+
+  // 左側 CTA 文字
+  ctx.textAlign = 'left';
+  ctx.font = '700 18px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#f5a623';
+  ctx.fillText('你覺得誰會贏？', 42, bottomY + 20);
+  ctx.font = '400 13px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText('一起來預測比分，精準猜中贏寶石！', 42, bottomY + 42);
+
+  // 網站連結
+  ctx.font = '400 12px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillText(window.location.host, 42, bottomY + 64);
+
+  // 底部裝飾線
+  const btmLine = ctx.createLinearGradient(0, 0, w, 0);
+  btmLine.addColorStop(0, 'rgba(245,166,35,0)');
+  btmLine.addColorStop(0.3, 'rgba(245,166,35,0.3)');
+  btmLine.addColorStop(0.7, 'rgba(245,166,35,0.3)');
+  btmLine.addColorStop(1, 'rgba(245,166,35,0)');
+  ctx.fillStyle = btmLine;
+  ctx.fillRect(0, h - 3, w, 3);
 
   // ── 轉成 blob 分享 ──
   cvs.toBlob(async (blob) => {
     if (!blob) return;
     const file = new File([blob], 'prediction.png', { type: 'image/png' });
-    const shareUrl = window.location.origin;
     const shareText = `我預測 ${ht.nameCN} ${mine.h}-${mine.a} ${at.nameCN}，你覺得呢？一起來預測！`;
 
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       try {
-        await navigator.share({ text: shareText, url: shareUrl, files: [file] });
+        await navigator.share({ text: shareText, url: siteUrl, files: [file] });
         return;
       } catch (e) { if (e.name === 'AbortError') return; }
     }
@@ -3542,7 +3593,7 @@ async function shareMyPrediction(matchId) {
     a.download = `prediction-${matchId}.png`;
     a.click();
     URL.revokeObjectURL(a.href);
-    try { await navigator.clipboard.writeText(shareText + '\n' + shareUrl); } catch {}
+    try { await navigator.clipboard.writeText(shareText + '\n' + siteUrl); } catch {}
     showToast?.('📤 圖片已下載，分享文字已複製');
   }, 'image/png');
 }
