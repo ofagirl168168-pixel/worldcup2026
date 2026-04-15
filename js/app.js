@@ -433,8 +433,8 @@ function renderHomeBracket() {
 
   // 標題列（row 1）
   html += `<div class="hb-lbl" style="grid-column:1;grid-row:1">十六強</div>`;
-  html += `<div class="hb-lbl hb-lbl-active" style="grid-column:3;grid-row:1">🔴 八強</div>`;
-  html += `<div class="hb-lbl" style="grid-column:5;grid-row:1">四強</div>`;
+  html += `<div class="hb-lbl" style="grid-column:3;grid-row:1">八強</div>`;
+  html += `<div class="hb-lbl hb-lbl-active" style="grid-column:5;grid-row:1">🔴 四強</div>`;
   html += `<div class="hb-lbl" style="grid-column:7;grid-row:1">🏆 決賽</div>`;
 
   // R16（col 1, rows 2-9）
