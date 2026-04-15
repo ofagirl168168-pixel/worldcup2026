@@ -3329,20 +3329,17 @@ async function shareMyPrediction(matchId) {
     ctx.fillStyle = textColor; ctx.textAlign = 'center'; ctx.fillText(text, cx, cy + 5);
   };
 
-  // 載入隊徽/國旗（用 fetch blob 繞過 CORS）
-  const loadImg = (src) => new Promise(async resolve => {
+  // 載入隊徽/國旗（透過 wsrv.nl 代理加上 CORS 標頭）
+  const loadImg = (src) => new Promise(resolve => {
     if (!src) return resolve(null);
     const url = (src.startsWith('http') || src.startsWith('img/')) ? src : getFlagImgUrl(src);
     if (!url) return resolve(null);
-    try {
-      const resp = await fetch(url);
-      const blob = await resp.blob();
-      const objUrl = URL.createObjectURL(blob);
-      const img = new Image();
-      img.onload = () => { URL.revokeObjectURL(objUrl); resolve(img); };
-      img.onerror = () => { URL.revokeObjectURL(objUrl); resolve(null); };
-      img.src = objUrl;
-    } catch { resolve(null); }
+    const proxied = url.startsWith('http') ? `https://wsrv.nl/?url=${encodeURIComponent(url)}` : url;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = proxied;
   });
 
   // 載入 QR code（使用 QR API）
