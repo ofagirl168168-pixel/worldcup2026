@@ -123,8 +123,7 @@
     overlay.innerHTML += '<div class="tt-border-flash"></div>';
     // 中央 Emblem（麥迪角色 + 賽事名稱）
     overlay.innerHTML += `<div class="tt-emblem">
-      <img src="img/logo-soccermaddy.png" class="tt-maddy" alt="" />
-      <div class="tt-emblem-icon">${cfg.emoji}</div>
+      <div class="tt-emblem-icon"><img src="img/logo-soccermaddy.png" class="tt-maddy" alt="" /></div>
       <div class="tt-emblem-text">${cfg.shortName}</div>
     </div>`;
 
