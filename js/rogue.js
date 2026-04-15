@@ -568,7 +568,7 @@
       else              gkBonus += 4.0;  // wave 55+：每階 +4.0
     }
     G.gk.spd = (GK_BASE_SPD + gkBonus) * (G.gkSlowMul || 1);
-    G.gk.tracking = G.wave >= 5; // wave5 起才追蹤球
+    G.gk.tracking = G.wave >= 10; // wave10 起才追蹤球
 
     // 守門員加寬：wave 35、50 大幅加寬，55+ 每階微幅加寬（上限 110）
     if (G.wave === 35) G.gk.w = 65;
@@ -1228,8 +1228,8 @@
       // 中二台詞
       const tier = G._warning.tier;
       const msgs = [
-        '守門員覺醒！開始自動追蹤球路',
-        '守門員強化！移動速度大幅提升',
+        '守門員覺醒！移動速度提升',
+        '守門員強化！開始自動追蹤球路',
         '守門員狂暴！反應速度接近極限',
         '守門員究極體！幾乎無法突破',
         '守門員超越極限！已進入神域',
