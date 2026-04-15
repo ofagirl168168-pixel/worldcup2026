@@ -425,6 +425,10 @@
       // shooting
       canShoot: true,
       shootCD: 0,
+      _holdFiring: false,        // 長按連續射擊中
+      _holdXY: null,             // 長按座標 {x,y}
+      _holdTimer: null,          // 長按判定計時器
+      _shootHintTimer: 5000,     // 射擊提示顯示時間（前5秒）
 
       // cards UI
       cardPick: [],
@@ -646,6 +650,14 @@
 
     // ── 射門冷卻 ──
     if (!G.canShoot) { G.shootCD -= dt; if (G.shootCD <= 0) G.canShoot = true; }
+
+    // ── 長按連續射擊 ──
+    if (G._holdFiring && G._holdXY && G.canShoot) {
+      shoot(G._holdXY.x, G._holdXY.y);
+    }
+
+    // ── 射擊提示倒數 ──
+    if (G._shootHintTimer > 0) G._shootHintTimer -= dt;
 
     // ── 排隊生成防守員 ──
     if (G.spawnQueue.length) {
@@ -902,7 +914,8 @@
         if (G.lives <= 0) {
           // 先繪製死亡瞬間的遊戲畫面（不含 gameover overlay）作為分享截圖
           try { G._deathFrame = cvs.toDataURL('image/png'); } catch(e) { G._deathFrame = null; }
-          G.phase = 'gameover'; G._gameoverStart = performance.now(); sfxGameOver(); startBGM('_gameover'); G._resultSaved = false; return;
+          G.phase = 'gameover'; G._holdFiring = false; G._holdXY = null; clearTimeout(G._holdTimer);
+          G._gameoverStart = performance.now(); sfxGameOver(); startBGM('_gameover'); G._resultSaved = false; return;
         }
       }
     }
@@ -985,7 +998,7 @@
     shakeAmt = 10;
     sfxGoal();
     addPart(0, GOAL_Z - 50, 'GOAL!', 1.5, 'goal');
-    G.phase = 'cards';
+    G.phase = 'cards'; G._holdFiring = false; G._holdXY = null; clearTimeout(G._holdTimer);
     G.cardPick = pickCards(3);
     G._rerollsLeft = 2;  // 每波重置 reroll 次數
     G._cardRevealStart = performance.now(); // 卡片逐張進場計時
@@ -3655,12 +3668,17 @@
       });
     }
 
-    // 射門提示
-    if (G.phase === 'playing' && G.canShoot) {
-      ctx.fillStyle = 'rgba(255,255,255,0.4)';
-      ctx.font = `${Math.min(14, W * 0.03)}px "Noto Sans TC", sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillText('點擊畫面射門', W / 2, H - 16);
+    // 射門提示（前5秒顯示詳細，之後淡出）
+    if (G.phase === 'playing') {
+      const hintAlpha = G._shootHintTimer > 1000 ? 0.5
+                       : G._shootHintTimer > 0 ? G._shootHintTimer / 1000 * 0.5 : 0;
+      if (hintAlpha > 0) {
+        const fs = Math.min(13, W * 0.028);
+        ctx.fillStyle = `rgba(255,255,255,${hintAlpha.toFixed(2)})`;
+        ctx.font = `${fs}px "Noto Sans TC", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('點擊精準射擊 ｜ 長按連續射擊', W / 2, H - 16);
+      }
     }
 
     drawAudioBtns();
@@ -5527,7 +5545,7 @@
       }
       return;
     }
-    if (G.phase === 'playing') { shoot(x, y); return; }
+    if (G.phase === 'playing') return; // 由 onPointerDown 處理射擊
     if (G.phase === 'cards') {
       // 卡片全部翻完才能點（每張 500ms，3 張 = 1500ms）
       const CARD_REVEAL_EACH = 500;
@@ -5583,7 +5601,68 @@
   function onTouch(e) {
     e.preventDefault();
     const t = e.touches[0];
-    onClick({ clientX: t.clientX, clientY: t.clientY });
+    onPointerDown({ clientX: t.clientX, clientY: t.clientY });
+  }
+  function onTouchEnd(e) {
+    e.preventDefault();
+    onPointerUp();
+  }
+  function onTouchMove(e) {
+    if (!G || !G._holdFiring) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    G._holdXY = _toLogical({ clientX: t.clientX, clientY: t.clientY });
+  }
+
+  // ── 長按連射 / 短按精準射擊 ──
+  const HOLD_THRESHOLD = 200; // ms，超過此時間判定為長按
+
+  function _toLogical(e) {
+    const rect = cvs.getBoundingClientRect();
+    return { x: (e.clientX - rect.left) * (W / rect.width), y: (e.clientY - rect.top) * (H / rect.height) };
+  }
+
+  function onPointerDown(e) {
+    if (!G) return;
+    const p = _toLogical(e);
+
+    // 非 playing 階段走原本的 click 邏輯
+    if (G.phase !== 'playing') {
+      onClick(e);
+      return;
+    }
+
+    // 音效按鈕區域也走 click
+    if ((G._sfxBtn && p.x >= G._sfxBtn.x && p.x <= G._sfxBtn.x + G._sfxBtn.w &&
+         p.y >= G._sfxBtn.y && p.y <= G._sfxBtn.y + G._sfxBtn.h) ||
+        (G._bgmBtn && p.x >= G._bgmBtn.x && p.x <= G._bgmBtn.x + G._bgmBtn.w &&
+         p.y >= G._bgmBtn.y && p.y <= G._bgmBtn.y + G._bgmBtn.h)) {
+      onClick(e);
+      return;
+    }
+
+    // playing 階段：短按先射一發 + 開始長按偵測
+    G._holdXY = p;
+    G._holdFiring = false;
+    clearTimeout(G._holdTimer);
+    shoot(p.x, p.y);
+
+    G._holdTimer = setTimeout(() => {
+      if (!G || G.phase !== 'playing') return;
+      G._holdFiring = true;
+    }, HOLD_THRESHOLD);
+  }
+
+  function onPointerUp() {
+    if (!G) return;
+    clearTimeout(G._holdTimer);
+    G._holdFiring = false;
+    G._holdXY = null;
+  }
+
+  function onMouseMove(e) {
+    if (!G || !G._holdFiring) return;
+    G._holdXY = _toLogical(e);
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -5598,8 +5677,14 @@
     cvs = document.getElementById('rogue-cvs');
     ctx = cvs.getContext('2d');
     document.getElementById('rogue-x').addEventListener('click', closeGame);
-    cvs.addEventListener('click', onClick);
+    cvs.addEventListener('mousedown', onPointerDown);
+    cvs.addEventListener('mouseup', onPointerUp);
+    cvs.addEventListener('mouseleave', onPointerUp);
+    cvs.addEventListener('mousemove', onMouseMove);
     cvs.addEventListener('touchstart', onTouch, { passive: false });
+    cvs.addEventListener('touchend', onTouchEnd, { passive: false });
+    cvs.addEventListener('touchcancel', onTouchEnd, { passive: false });
+    cvs.addEventListener('touchmove', onTouchMove, { passive: false });
 
     resize();
     window.addEventListener('resize', resize);
