@@ -3343,7 +3343,8 @@ async function shareMyPrediction(matchId) {
   });
 
   // 載入 QR code（使用 QR API）
-  const siteUrl = window.location.origin;
+  const tid = _tid();
+  const siteUrl = window.location.origin + (tid !== 'wc' ? `?t=${tid}` : '');
   const loadQR = () => new Promise(async resolve => {
     try {
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(siteUrl)}&bgcolor=0a0e1a&color=ffffff&margin=0`;
