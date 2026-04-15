@@ -3728,24 +3728,24 @@
 
     // 射門提示（前8秒，點擊後消失）
     if (G.phase === 'playing' && G._shootHintTimer > 0) {
-      const fadeStart = 1500; // 最後 1.5 秒淡出
+      const fadeStart = 1500;
       const alpha = G._shootHintTimer > fadeStart ? 0.85
                    : G._shootHintTimer / fadeStart * 0.85;
-      const fs = Math.min(16, W * 0.038);
+      const fs = Math.min(14, W * 0.033);
+      const iconSz = Math.min(32, W * 0.075);
+      const rowH = iconSz + fs + 12;
+      const totalH = rowH * 2 + 16;
       const yPos = H * 0.72;
 
-      // 背景膠囊
       ctx.save();
-      const text1 = '👆 點擊精準射擊';
-      const text2 = '👆 長按連續射擊';
-      ctx.font = `700 ${fs}px "Noto Sans TC", sans-serif`;
-      const tw = Math.max(ctx.measureText(text1).width, ctx.measureText(text2).width);
-      const pw = tw + 36, ph = fs * 2.8 + 20;
-      const px = (W - pw) / 2, py = yPos - ph / 2;
       ctx.globalAlpha = alpha;
+
+      // 背景膠囊
+      const pw = Math.min(220, W * 0.55), ph = totalH + 24;
+      const px = (W - pw) / 2, py = yPos - ph / 2;
+      const cr = 14;
       ctx.fillStyle = 'rgba(0,0,0,0.6)';
       ctx.beginPath();
-      const cr = 14;
       ctx.moveTo(px + cr, py); ctx.lineTo(px + pw - cr, py);
       ctx.quadraticCurveTo(px + pw, py, px + pw, py + cr);
       ctx.lineTo(px + pw, py + ph - cr);
@@ -3757,11 +3757,55 @@
       ctx.closePath();
       ctx.fill();
 
+      const cx = W / 2;
+
+      // ── 第一行：點擊 + 發散線條 ──
+      const y1 = py + 18;
+      const ic1 = y1 + iconSz / 2;
+      // 手指
+      _drawFinger(cx, ic1, iconSz);
+      // 發散短線（6條，從指尖往外）
+      const tipY = ic1 - iconSz * 0.42;
+      for (let i = 0; i < 6; i++) {
+        const ang = -Math.PI / 2 + (i - 2.5) * 0.5;
+        const r1 = iconSz * 0.38, r2 = iconSz * 0.55;
+        ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(ang) * r1, tipY + Math.sin(ang) * r1);
+        ctx.lineTo(cx + Math.cos(ang) * r2, tipY + Math.sin(ang) * r2);
+        ctx.stroke();
+      }
       // 文字
       ctx.fillStyle = '#fff';
+      ctx.font = `700 ${fs}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText(text1, W / 2, yPos - fs * 0.3);
-      ctx.fillText(text2, W / 2, yPos + fs * 1.1);
+      ctx.fillText('精準射擊', cx, y1 + iconSz + fs + 2);
+
+      // ── 第二行：長按 + 波紋圓圈 ──
+      const y2 = y1 + rowH + 8;
+      const ic2 = y2 + iconSz / 2;
+      // 手指
+      _drawFinger(cx, ic2, iconSz);
+      // 擴散波紋（3圈）
+      const tipY2 = ic2 - iconSz * 0.42;
+      const pulse = (performance.now() % 1500) / 1500; // 0~1 循環動畫
+      for (let i = 0; i < 3; i++) {
+        const p = (pulse + i * 0.33) % 1;
+        const r = iconSz * (0.3 + p * 0.4);
+        const a = 1 - p;
+        ctx.strokeStyle = `rgba(255,255,255,${a * 0.6})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, tipY2, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      // 文字
+      ctx.fillStyle = '#fff';
+      ctx.font = `700 ${fs}px "Noto Sans TC", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('連續射擊', cx, y2 + iconSz + fs + 2);
+
       ctx.restore();
     }
 
@@ -5555,6 +5599,45 @@
   }
 
   // ─── 繪圖工具 ────────────────────────────────────────────
+  // 手指圖示（食指朝上，簡潔線條風格）
+  function _drawFinger(cx, cy, sz) {
+    const s = sz / 32; // 基於 32px 設計
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 2 * s;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    // 指尖（頂部圓弧）
+    ctx.moveTo(-4 * s, -4 * s);
+    ctx.quadraticCurveTo(-4 * s, -14 * s, 0, -14 * s);
+    ctx.quadraticCurveTo(4 * s, -14 * s, 4 * s, -4 * s);
+    // 手指身體
+    ctx.lineTo(4 * s, 4 * s);
+    // 手掌（下方寬一些）
+    ctx.lineTo(7 * s, 6 * s);
+    ctx.quadraticCurveTo(9 * s, 8 * s, 8 * s, 11 * s);
+    ctx.lineTo(7 * s, 14 * s);
+    ctx.lineTo(-7 * s, 14 * s);
+    ctx.lineTo(-8 * s, 11 * s);
+    ctx.quadraticCurveTo(-9 * s, 8 * s, -7 * s, 6 * s);
+    ctx.lineTo(-4 * s, 4 * s);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // 指節線
+    ctx.beginPath();
+    ctx.moveTo(-3 * s, 0);
+    ctx.lineTo(3 * s, 0);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
   function rr(c, x, y, w, h, r) {
     c.beginPath();
     c.moveTo(x + r, y);
