@@ -785,19 +785,12 @@
               });
             }
           }
-          // 反彈：根據來球方向決定彈射方向
+          // 反彈：球反向繼續飛
           const maxBounce = G.bounce || 0;
           const curBounce = b._bounceCount || 0;
           if (maxBounce > 0 && curBounce < maxBounce) {
-            if (b.vz > 0) {
-              // 從前方打到敵人 → 往前偏轉（不回彈），加大側向偏移
-              b.vz = Math.abs(b.vz) * 0.5;
-              b.vx += (Math.random() - 0.5) * 4 + (b.x > d.x ? 1.5 : -1.5);
-            } else {
-              // 從後方打到 → 正常反彈
-              b.vz = -b.vz * 0.7;
-              b.vx += (Math.random() - 0.5) * 2;
-            }
+            b.vz = -b.vz * 0.7;
+            b.vx += (Math.random() - 0.5) * 2;
             b._bounceCount = curBounce + 1;
             b._bounced = true;
             hitDef = false; // 不消滅球
