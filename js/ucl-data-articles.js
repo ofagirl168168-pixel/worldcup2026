@@ -324,7 +324,7 @@ Arteta 可能以 Trossard 或 Martinelli 頂替 Saka 的位置。缺少多名主
 **陣容狀況：**
 - Harry Kane 從傷病中復出後狀態火燙，首回合就交出1球1助攻
 - **新傷兵：** Lennart Karl（右大腿肌肉撕裂）— 18歲前鋒缺陣，但非主力
-- 主力陣容大致完整，Musiala、Sané、Kimmich 全部可用
+- 主力陣容大致完整，Musiala、Olise、Kimmich 全部可用
 
 **主場優勢：**
 拜仁在安聯球場的歐冠戰績向來出色。7萬5千名球迷營造的氣氛將是拜仁最大的武器。他們只需不輸2球即可晉級。

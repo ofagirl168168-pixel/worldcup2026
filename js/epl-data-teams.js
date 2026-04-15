@@ -15,12 +15,12 @@ const EPL_TEAMS = {
       {name:'Declan Rice',pos:'中場',club:'兵工廠'},
       {name:'Martin Ødegaard',pos:'攻擊中場',club:'兵工廠'},
       {name:'William Saliba',pos:'中後衛',club:'兵工廠'},
-      {name:'Kai Havertz',pos:'前鋒/中場',club:'兵工廠'}
+      {name:'Viktor Gyökeres',pos:'前鋒',club:'兵工廠'}
     ],
     radar:{attack:90,defense:91,midfield:92,speed:87,experience:83},
     style:'高位壓迫，控球為主，邊路突破與定位球',
     strengths:['Arteta戰術體系成熟','Saka+Ødegaard創造力頂級','英超最穩固後防之一'],
-    weaknesses:['關鍵戰偶有緊張','板凳深度不如曼城','缺乏頂級中鋒終結力'],
+    weaknesses:['關鍵戰偶有緊張','板凳深度不如曼城','Gyökeres體系磨合中'],
     recentForm:['W','W','D','W','W'],
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇'
   },
@@ -49,7 +49,7 @@ const EPL_TEAMS = {
       {name:'Kevin De Bruyne',pos:'攻擊中場',club:'曼城'},
       {name:'Phil Foden',pos:'翼鋒/中場',club:'曼城'},
       {name:'Rodri',pos:'防守中場',club:'曼城'},
-      {name:'Ederson',pos:'門將',club:'曼城'}
+      {name:'Stefan Ortega',pos:'門將',club:'曼城'}
     ],
     radar:{attack:93,defense:88,midfield:93,speed:86,experience:92},
     style:'極致控球，位置輪轉，高位壓迫',
@@ -166,7 +166,7 @@ const EPL_TEAMS = {
     name:'AFC Bournemouth', nameCN:'伯恩茅斯', flag:'https://crests.football-data.org/1044.png',
     league:'Premier League', eplRank:10, coach:'Andoni Iraola', formation:'4-3-3',
     keyPlayers:[
-      {name:'Dominic Solanke',pos:'前鋒',club:'伯恩茅斯'},
+      {name:'Evanilson',pos:'前鋒',club:'伯恩茅斯'},
       {name:'Justin Kluivert',pos:'翼鋒',club:'伯恩茅斯'},
       {name:'Antoine Semenyo',pos:'右翼',club:'伯恩茅斯'},
       {name:'Lewis Cook',pos:'中場',club:'伯恩茅斯'},
@@ -186,7 +186,7 @@ const EPL_TEAMS = {
       {name:'Rodrigo Muniz',pos:'前鋒',club:'富勒姆'},
       {name:'Andreas Pereira',pos:'攻擊中場',club:'富勒姆'},
       {name:'Antonee Robinson',pos:'左後衛',club:'富勒姆'},
-      {name:'João Palhinha',pos:'防守中場',club:'富勒姆'},
+      {name:'Sander Berge',pos:'防守中場',club:'富勒姆'},
       {name:'Bernd Leno',pos:'門將',club:'富勒姆'}
     ],
     radar:{attack:76,defense:76,midfield:78,speed:77,experience:70},
@@ -235,7 +235,7 @@ const EPL_TEAMS = {
     league:'Premier League', eplRank:14, coach:'Oliver Glasner', formation:'3-4-3',
     keyPlayers:[
       {name:'Eberechi Eze',pos:'攻擊中場',club:'水晶宮'},
-      {name:'Michael Olise',pos:'右翼',club:'水晶宮'},
+      {name:'Ismaïla Sarr',pos:'右翼',club:'水晶宮'},
       {name:'Jean-Philippe Mateta',pos:'前鋒',club:'水晶宮'},
       {name:'Marc Guéhi',pos:'中後衛',club:'水晶宮'},
       {name:'Adam Wharton',pos:'中場',club:'水晶宮'}
@@ -249,7 +249,7 @@ const EPL_TEAMS = {
   },
   'WHU': {
     name:'West Ham United', nameCN:'西漢姆', flag:'https://crests.football-data.org/563.png',
-    league:'Premier League', eplRank:15, coach:'Julen Lopetegui', formation:'4-2-3-1',
+    league:'Premier League', eplRank:15, coach:'Graham Potter', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Mohammed Kudus',pos:'攻擊中場/翼鋒',club:'西漢姆'},
       {name:'Jarrod Bowen',pos:'右翼',club:'西漢姆'},
@@ -266,7 +266,7 @@ const EPL_TEAMS = {
   },
   'WOL': {
     name:'Wolverhampton Wanderers', nameCN:'狼隊', flag:'https://crests.football-data.org/76.png',
-    league:'Premier League', eplRank:16, coach:'Gary O\'Neil', formation:'4-4-2',
+    league:'Premier League', eplRank:16, coach:'Vítor Pereira', formation:'4-4-2',
     keyPlayers:[
       {name:'Matheus Cunha',pos:'前鋒/攻擊中場',club:'狼隊'},
       {name:'Hwang Hee-Chan',pos:'前鋒',club:'狼隊'},
@@ -283,7 +283,7 @@ const EPL_TEAMS = {
   },
   'EVE': {
     name:'Everton', nameCN:'艾佛頓', flag:'https://crests.football-data.org/62.png',
-    league:'Premier League', eplRank:17, coach:'Sean Dyche', formation:'4-4-2',
+    league:'Premier League', eplRank:17, coach:'David Moyes', formation:'4-4-2',
     keyPlayers:[
       {name:'Abdoulaye Doucouré',pos:'中場',club:'艾佛頓'},
       {name:'Dwight McNeil',pos:'翼鋒',club:'艾佛頓'},
@@ -304,8 +304,8 @@ const EPL_TEAMS = {
     name:'Leeds United', nameCN:'里茲聯', flag:'https://crests.football-data.org/341.png',
     league:'Premier League', eplRank:18, coach:'Daniel Farke', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Crysencio Summerville',pos:'翼鋒',club:'里茲聯'},
-      {name:'Georginio Rutter',pos:'攻擊中場',club:'里茲聯'},
+      {name:'Noah Okafor',pos:'前鋒',club:'里茲聯'},
+      {name:'Largie Ramazani',pos:'翼鋒',club:'里茲聯'},
       {name:'Willy Gnonto',pos:'翼鋒',club:'里茲聯'},
       {name:'Ethan Ampadu',pos:'中場/中衛',club:'里茲聯'},
       {name:'Illan Meslier',pos:'門將',club:'里茲聯'}
@@ -322,7 +322,7 @@ const EPL_TEAMS = {
     league:'Premier League', eplRank:19, coach:'Scott Parker', formation:'4-4-2',
     keyPlayers:[
       {name:'Lyle Foster',pos:'前鋒',club:'伯恩利'},
-      {name:'Sander Berge',pos:'中場',club:'伯恩利'},
+      {name:'Jay Rodriguez',pos:'前鋒',club:'伯恩利'},
       {name:'Josh Brownhill',pos:'中場',club:'伯恩利'},
       {name:'Dara O\'Shea',pos:'中後衛',club:'伯恩利'},
       {name:'James Trafford',pos:'門將',club:'伯恩利'}
@@ -334,22 +334,22 @@ const EPL_TEAMS = {
     recentForm:['L','L','D','L','L'],
     history:'2次英格蘭頂級聯賽冠軍，近年在英超與英冠間來回'
   },
-  'SHU': {
-    name:'Sheffield United', nameCN:'錫菲聯', flag:'https://crests.football-data.org/356.png',
-    league:'Premier League', eplRank:20, coach:'Chris Wilder', formation:'3-5-2',
+  'SUN': {
+    name:'Sunderland', nameCN:'桑德蘭', flag:'https://crests.football-data.org/71.png',
+    league:'Premier League', eplRank:20, coach:'Régis Le Bris', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Gus Hamer',pos:'中場',club:'錫菲聯'},
-      {name:'Cameron Archer',pos:'前鋒',club:'錫菲聯'},
-      {name:'Vini Souza',pos:'防守中場',club:'錫菲聯'},
-      {name:'Anel Ahmedhodžić',pos:'中後衛',club:'錫菲聯'},
-      {name:'Michael Cooper',pos:'門將',club:'錫菲聯'}
+      {name:'Jobe Bellingham',pos:'中場',club:'桑德蘭'},
+      {name:'Romaine Mundle',pos:'翼鋒',club:'桑德蘭'},
+      {name:'Chris Rigg',pos:'中場',club:'桑德蘭'},
+      {name:'Dennis Cirkin',pos:'左後衛',club:'桑德蘭'},
+      {name:'Anthony Patterson',pos:'門將',club:'桑德蘭'}
     ],
-    radar:{attack:66,defense:68,midfield:67,speed:72,experience:56},
-    style:'三後衛體系，翼衛推進，團隊防守',
-    strengths:['Wilder戰術體系有經驗','團隊精神強','主場拼搶積極'],
-    weaknesses:['個人能力差距大','進攻火力嚴重不足','降級區常客'],
-    recentForm:['L','L','L','D','L'],
-    history:'1次英格蘭頂級聯賽冠軍（1898），2019/20賽季表現驚艷全英超'
+    radar:{attack:72,defense:70,midfield:73,speed:76,experience:55},
+    style:'年輕快速，高壓逼搶，團隊足球',
+    strengths:['年輕陣容潛力爆發','主場光明球場氛圍狂熱','英冠冠軍信心加持'],
+    weaknesses:['英超經驗嚴重不足','陣容深度有限','對陣強隊差距大'],
+    recentForm:['L','D','L','W','L'],
+    history:'6次英格蘭頂級聯賽冠軍，英格蘭東北老牌豪門，睽違多年重返英超'
   }
 };
 

@@ -14,7 +14,7 @@ const TEAMS = {
     keyPlayers:[
       {name:'Santiago Giménez',pos:'中鋒',club:'費耶諾德'},
       {name:'Edson Álvarez',pos:'後腰',club:'西漢姆聯'},
-      {name:'Hirving Lozano',pos:'右翼',club:'PSV'},
+      {name:'Hirving Lozano',pos:'右翼',club:'聖地亞哥FC'},
       {name:'Raúl Jiménez',pos:'前鋒',club:'富勒姆'},
       {name:'Guillermo Ochoa',pos:'門將',club:'待定'}
     ],
@@ -51,7 +51,7 @@ const TEAMS = {
     coach:'Jesse Marsch', formation:'4-3-3',
     keyPlayers:[
       {name:'Alphonso Davies',pos:'左後衛',club:'拜仁慕尼黑'},
-      {name:'Jonathan David',pos:'中鋒',club:'里爾'},
+      {name:'Jonathan David',pos:'中鋒',club:'尤文圖斯'},
       {name:'Tajon Buchanan',pos:'翼鋒',club:'國際米蘭'},
       {name:'Cyle Larin',pos:'前鋒',club:'待定'},
       {name:'Milan Borjan',pos:'門將',club:'紅星'}
@@ -165,7 +165,7 @@ const TEAMS = {
       {name:'Christian Pulisic',pos:'翼鋒/攻擊中場',club:'AC米蘭'},
       {name:'Weston McKennie',pos:'中場',club:'尤文圖斯'},
       {name:'Tyler Adams',pos:'後腰',club:'伯恩茅斯'},
-      {name:'Giovanni Reyna',pos:'攻擊中場',club:'多特蒙德'},
+      {name:'Giovanni Reyna',pos:'攻擊中場',club:'門興格拉德巴赫'},
       {name:'Matt Turner',pos:'門將',club:'諾丁漢森林'}
     ],
     radar:{attack:74,defense:72,midfield:72,speed:78,experience:68},
@@ -203,7 +203,7 @@ const TEAMS = {
       {name:'Florian Wirtz',pos:'攻擊中場',club:'拜耳勒沃庫森'},
       {name:'Jamal Musiala',pos:'中場',club:'拜仁慕尼黑'},
       {name:'Joshua Kimmich',pos:'右後衛/後腰',club:'拜仁慕尼黑'},
-      {name:'Kai Havertz',pos:'前鋒',club:'阿仙奴'},
+      {name:'Kai Havertz',pos:'前鋒',club:'兵工廠'},
       {name:'Antonio Rüdiger',pos:'後衛',club:'皇家馬德里'}
     ],
     radar:{attack:84,defense:80,midfield:84,speed:80,experience:96},
@@ -236,7 +236,7 @@ const TEAMS = {
     name:'Ivory Coast', nameCN:'象牙海岸', flag:'🇨🇮', group:'E', conf:'CAF', fifaRank:48,
     coach:'Emerse Faé', formation:'4-3-3',
     keyPlayers:[
-      {name:'Sébastien Haller',pos:'中鋒',club:'多特蒙德'},
+      {name:'Sébastien Haller',pos:'中鋒',club:'烏特勒支'},
       {name:'Simon Adingra',pos:'翼鋒',club:'布萊頓'},
       {name:'Franck Kessié',pos:'中場',club:'Al-Ahli'},
       {name:'Yahia Fofana',pos:'門將',club:'切爾西'},
@@ -346,7 +346,7 @@ const TEAMS = {
   },
   'EGY': {
     name:'Egypt', nameCN:'埃及', flag:'🇪🇬', group:'G', conf:'CAF', fifaRank:42,
-    coach:'Hossam El-Badry', formation:'4-2-3-1',
+    coach:'Hossam Hassan', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Mohamed Salah',pos:'右翼/前鋒',club:'利物浦'},
       {name:'Omar Marmoush',pos:'前鋒',club:'曼城'},
@@ -404,7 +404,7 @@ const TEAMS = {
     name:'Uruguay', nameCN:'烏拉圭', flag:'🇺🇾', group:'H', conf:'CONMEBOL', fifaRank:10,
     coach:'Marcelo Bielsa', formation:'4-3-3',
     keyPlayers:[
-      {name:'Darwin Núñez',pos:'中鋒',club:'利物浦'},
+      {name:'Darwin Núñez',pos:'中鋒',club:'Al-Hilal'},
       {name:'Federico Valverde',pos:'中場',club:'皇家馬德里'},
       {name:'Ronald Araújo',pos:'後衛',club:'巴塞隆納'},
       {name:'Rodrigo Bentancur',pos:'中場',club:'熱刺'},
@@ -443,9 +443,9 @@ const TEAMS = {
     coach:'Didier Deschamps', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Kylian Mbappé',pos:'中鋒/翼鋒',club:'皇家馬德里'},
-      {name:'Antoine Griezmann',pos:'二前鋒',club:'馬積'},
+      {name:'Ousmane Dembélé',pos:'右翼',club:'巴黎聖日耳曼'},
       {name:'Aurélien Tchouaméni',pos:'防守中場',club:'皇家馬德里'},
-      {name:'William Saliba',pos:'中後衛',club:'阿仙奴'},
+      {name:'William Saliba',pos:'中後衛',club:'兵工廠'},
       {name:'Mike Maignan',pos:'門將',club:'AC米蘭'}
     ],
     radar:{attack:94,defense:85,midfield:88,speed:92,experience:96},
@@ -458,7 +458,7 @@ const TEAMS = {
   },
   'SEN': {
     name:'Senegal', nameCN:'塞內加爾', flag:'🇸🇳', group:'I', conf:'CAF', fifaRank:20,
-    coach:'Aliou Cissé', formation:'4-3-3',
+    coach:'Pape Thiaw', formation:'4-3-3',
     keyPlayers:[
       {name:'Sadio Mané',pos:'前鋒',club:'Al-Nassr'},
       {name:'Ismaila Sarr',pos:'翼鋒',club:'水晶宮'},
@@ -481,9 +481,9 @@ const TEAMS = {
     coach:'Lionel Scaloni', formation:'4-3-3',
     keyPlayers:[
       {name:'Lionel Messi',pos:'自由人/前鋒',club:'邁阿密國際'},
-      {name:'Julián Álvarez',pos:'中鋒',club:'馬積'},
+      {name:'Julián Álvarez',pos:'中鋒',club:'馬德里競技'},
       {name:'Enzo Fernández',pos:'中場',club:'切爾西'},
-      {name:'Rodrigo De Paul',pos:'中場',club:'馬積'},
+      {name:'Rodrigo De Paul',pos:'中場',club:'馬德里競技'},
       {name:'Emiliano Martínez',pos:'門將',club:'阿斯頓維拉'}
     ],
     radar:{attack:92,defense:80,midfield:85,speed:80,experience:99},
@@ -501,7 +501,7 @@ const TEAMS = {
       {name:'Marcel Sabitzer',pos:'中場',club:'多特蒙德'},
       {name:'Konrad Laimer',pos:'中場',club:'拜仁慕尼黑'},
       {name:'Christoph Baumgartner',pos:'攻擊中場',club:'萊比錫'},
-      {name:'Marko Arnautović',pos:'前鋒',club:'國際米蘭'},
+      {name:'Marko Arnautović',pos:'前鋒',club:'貝爾格勒紅星'},
       {name:'Patrick Pentz',pos:'門將',club:'雷恩'}
     ],
     radar:{attack:74,defense:74,midfield:74,speed:74,experience:70},
@@ -572,7 +572,7 @@ const TEAMS = {
     name:'Uzbekistan', nameCN:'烏茲別克', flag:'🇺🇿', group:'K', conf:'AFC', fifaRank:74,
     coach:'Srecko Katanec', formation:'4-4-2',
     keyPlayers:[
-      {name:'Eldor Shomurodov',pos:'中鋒',club:'AS羅馬'},
+      {name:'Eldor Shomurodov',pos:'中鋒',club:'巴薩克赫爾'},
       {name:'Jaloliddin Masharipov',pos:'翼鋒',club:'待定'},
       {name:'Otabek Shukurov',pos:'門將',club:'待定'},
       {name:'Bobur Abdixoliqov',pos:'翼鋒',club:'待定'},
@@ -594,7 +594,7 @@ const TEAMS = {
     keyPlayers:[
       {name:'Jude Bellingham',pos:'中場',club:'皇家馬德里'},
       {name:'Harry Kane',pos:'中鋒',club:'拜仁慕尼黑'},
-      {name:'Bukayo Saka',pos:'右翼',club:'阿仙奴'},
+      {name:'Bukayo Saka',pos:'右翼',club:'兵工廠'},
       {name:'Phil Foden',pos:'中場',club:'曼城'},
       {name:'Jordan Pickford',pos:'門將',club:'艾佛頓'}
     ],
@@ -647,7 +647,7 @@ const TEAMS = {
     coach:'Otto Addo', formation:'4-3-3',
     keyPlayers:[
       {name:'Mohammed Kudus',pos:'攻擊中場/翼鋒',club:'西漢姆聯'},
-      {name:'Thomas Partey',pos:'後腰',club:'阿仙奴'},
+      {name:'Thomas Partey',pos:'後腰',club:'兵工廠'},
       {name:'Antoine Semenyo',pos:'翼鋒',club:'伯恩茅斯'},
       {name:'Jordan Ayew',pos:'前鋒',club:'待定'},
       {name:'Lawrence Ati-Zigi',pos:'門將',club:'聖加侖'}

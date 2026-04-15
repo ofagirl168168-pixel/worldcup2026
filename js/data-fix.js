@@ -64,7 +64,7 @@ Object.assign(TEAMS, {
     coach:'Ståle Solbakken', formation:'4-3-3',
     keyPlayers:[
       {name:'Erling Haaland',pos:'中鋒',club:'曼城'},
-      {name:'Martin Ødegaard',pos:'中場',club:'阿仙奴'},
+      {name:'Martin Ødegaard',pos:'中場',club:'兵工廠'},
       {name:'Alexander Sørloth',pos:'前鋒',club:'馬德里競技'}
     ],
     radar:{attack:88,defense:72,midfield:80,speed:83,experience:62},
