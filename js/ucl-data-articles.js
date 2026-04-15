@@ -376,11 +376,12 @@ Arteta 可能以 Trossard 或 Martinelli 頂替 Saka 的位置。缺少多名主
 **總比分 3-2，馬競晉級四強** ｜ 觀眾：69,268 ｜ 裁判：Clément Turpin
 
 ### 比賽進球
-| 時間 | 進球者 | 比分 | 總比分 |
-|------|--------|------|--------|
-| 4' | ⚽ Lamine Yamal（巴薩）| 0-1 | 2-1 |
-| 24' | ⚽ Ferran Torres（巴薩）| 0-2 | 2-2 |
-| 31' | ⚽ Ademola Lookman（馬競）| 1-2 | 3-2 |
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">時間</th><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">進球者</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">比分</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">總比分</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">4'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Lamine Yamal（巴薩）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0-1</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2-1</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">24'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Ferran Torres（巴薩）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0-2</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2-2</td></tr>
+<tr><td style="padding:8px">31'</td><td style="padding:8px">⚽ Ademola Lookman（馬競）</td><td style="padding:8px;text-align:center">1-2</td><td style="padding:8px;text-align:center">3-2</td></tr>
+</table>
 
 ### 比賽回顧
 
@@ -397,14 +398,15 @@ Dani Olmo 一記精準長傳找到禁區內的 Torres，後者以精妙的第一
 比賽的轉折點。Alexander Sørloth 反擊中突破，Eric García 從身後犯規將其撲倒，主裁判直接出示紅牌。巴薩 10 人應戰，翻盤希望徹底破滅。
 
 ### 關鍵數據
-| 數據 | 馬競 | 巴薩 |
-|------|------|------|
-| 控球率 | 28.9% | 71.1% |
-| 射門 | 15 | 15 |
-| 射正 | 5 | 8 |
-| 角球 | 2 | 4 |
-| 黃牌 | 0 | 1 |
-| 撲救 | 7 | 4 |
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">數據</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">馬競</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">巴薩</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">控球率</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">28.9%</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">71.1%</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射門</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">15</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">15</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射正</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">5</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">8</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">角球</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">4</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">黃牌</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">1</td></tr>
+<tr><td style="padding:8px">撲救</td><td style="padding:8px;text-align:center">7</td><td style="padding:8px;text-align:center">4</td></tr>
+</table>
 
 ### 賽後分析
 
@@ -428,10 +430,11 @@ Simeone 的球隊自 2017 年以來首次重返歐冠四強，將對陣兵工廠
 **總比分 0-4，巴黎晉級四強** ｜ 觀眾：59,627 ｜ 裁判：Maurizio Mariani
 
 ### 比賽進球
-| 時間 | 進球者 | 比分 | 總比分 |
-|------|--------|------|--------|
-| 72' | ⚽ Ousmane Dembélé（巴黎）| 0-1 | 0-3 |
-| 90+1' | ⚽ Ousmane Dembélé（巴黎）| 0-2 | 0-4 |
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">時間</th><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">進球者</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">比分</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">總比分</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">72'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Ousmane Dembélé（巴黎）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0-1</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0-3</td></tr>
+<tr><td style="padding:8px">90+1'</td><td style="padding:8px">⚽ Ousmane Dembélé（巴黎）</td><td style="padding:8px;text-align:center">0-2</td><td style="padding:8px;text-align:center">0-4</td></tr>
+</table>
 
 ### 比賽回顧
 
@@ -447,14 +450,15 @@ Simeone 的球隊自 2017 年以來首次重返歐冠四強，將對陣兵工廠
 90+1 分鐘，巴黎發動一次行雲流水的團隊配合，Dembélé 在禁區內冷靜推射底角完成梅開二度。比分定格在 0-2，總比分 0-4——這是一場毫無懸念的碾壓。
 
 ### 關鍵數據
-| 數據 | 利物浦 | 巴黎 |
-|------|--------|------|
-| 控球率 | 52.6% | 47.4% |
-| 射門 | 21 | 12 |
-| 射正 | 5 | 6 |
-| 角球 | 8 | 2 |
-| 黃牌 | 2 | 0 |
-| 撲救 | 3 | 6 |
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">數據</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">利物浦</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">巴黎</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">控球率</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">52.6%</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">47.4%</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射門</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">21</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">12</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射正</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">5</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">6</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">角球</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">8</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">黃牌</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0</td></tr>
+<tr><td style="padding:8px">撲救</td><td style="padding:8px;text-align:center">3</td><td style="padding:8px;text-align:center">6</td></tr>
+</table>
 
 ### 賽後分析
 
