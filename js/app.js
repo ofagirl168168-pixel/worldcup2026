@@ -3300,25 +3300,25 @@ async function shareMyPrediction(matchId) {
   if (!mine) return;
 
   const meta = _matchMeta(m);
-  const W = 720, H = 480;
+  const p = calcPred(ht, at);
+  const DPR = 2;
+  const W = 640 * DPR, H = 520 * DPR;
   const cvs = document.createElement('canvas');
   cvs.width = W; cvs.height = H;
   const ctx = cvs.getContext('2d');
+  ctx.scale(DPR, DPR);
+  const w = 640, h = 520;
 
-  // 背景漸層
-  const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#0d1117');
-  bg.addColorStop(0.5, '#161b22');
-  bg.addColorStop(1, '#0d1117');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-
-  // 裝飾線
-  const accent = ctx.createLinearGradient(0, 0, W, 0);
-  accent.addColorStop(0, '#f5a623');
-  accent.addColorStop(1, '#ff6b35');
-  ctx.fillStyle = accent;
-  ctx.fillRect(0, 0, W, 4);
+  // helpers
+  const roundRect = (x, y, rw, rh, r) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + rw - r, y); ctx.arcTo(x + rw, y, x + rw, y + r, r);
+    ctx.lineTo(x + rw, y + rh - r); ctx.arcTo(x + rw, y + rh, x + rw - r, y + rh, r);
+    ctx.lineTo(x + r, y + rh); ctx.arcTo(x, y + rh, x, y + rh - r, r);
+    ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  };
 
   // 載入隊徽/國旗
   const loadImg = (src) => new Promise(resolve => {
@@ -3334,62 +3334,196 @@ async function shareMyPrediction(matchId) {
 
   const [hImg, aImg] = await Promise.all([loadImg(ht.flag), loadImg(at.flag)]);
 
-  // 頂部標籤
-  ctx.font = '600 16px "Noto Sans TC", sans-serif';
-  ctx.fillStyle = '#f5a623';
-  ctx.textAlign = 'center';
-  ctx.fillText(meta.matchTag, W/2, 40);
+  // ── 背景 ──
+  const bg = ctx.createLinearGradient(0, 0, w, h);
+  bg.addColorStop(0, '#0a0e1a');
+  bg.addColorStop(1, '#111827');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
 
-  // 比賽時間
-  ctx.font = '400 14px "Noto Sans TC", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  // 頂部金色裝飾線
+  const topLine = ctx.createLinearGradient(0, 0, w, 0);
+  topLine.addColorStop(0, 'rgba(245,166,35,0)');
+  topLine.addColorStop(0.3, '#f5a623');
+  topLine.addColorStop(0.7, '#f5a623');
+  topLine.addColorStop(1, 'rgba(245,166,35,0)');
+  ctx.fillStyle = topLine;
+  ctx.fillRect(0, 0, w, 3);
+
+  // ── 頂部標籤 ──
   const dateStr = _isClub() ? `${(m.date||'').slice(5).replace('-','/')} ${m.time||''}` : `${(m.twDate||'').slice(5).replace('-','/')} ${m.twTime||''}`;
-  ctx.fillText(dateStr + ' 台灣時間', W/2, 62);
+  ctx.textAlign = 'center';
 
-  // 隊徽
-  const logoSize = 80;
-  const logoY = 100;
-  if (hImg) ctx.drawImage(hImg, W/2 - 200 - logoSize/2, logoY, logoSize, logoSize);
-  if (aImg) ctx.drawImage(aImg, W/2 + 200 - logoSize/2, logoY, logoSize, logoSize);
+  // 標籤膠囊
+  const tagText = meta.matchTag;
+  ctx.font = '600 13px "Noto Sans TC", sans-serif';
+  const tagW = ctx.measureText(tagText).width + 24;
+  roundRect(w/2 - tagW/2 - 30, 18, tagW, 28, 14);
+  ctx.fillStyle = 'rgba(245,166,35,0.15)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(245,166,35,0.4)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = '#f5a623';
+  ctx.fillText(tagText, w/2 - 30, 37);
+
+  // 時間膠囊
+  const timeText = `🕒 ${dateStr}`;
+  ctx.font = '500 12px "Noto Sans TC", sans-serif';
+  const timeW = ctx.measureText(timeText).width + 20;
+  roundRect(w/2 + tagW/2 - 20, 18, timeW, 28, 14);
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText(timeText, w/2 + tagW/2 - 20 + timeW/2, 37);
+
+  // ── 隊徽 + 隊名區 ──
+  const crestY = 68;
+  const crestSize = 72;
+  const teamX_h = w * 0.22;
+  const teamX_a = w * 0.78;
+
+  if (hImg) ctx.drawImage(hImg, teamX_h - crestSize/2, crestY, crestSize, crestSize);
+  if (aImg) ctx.drawImage(aImg, teamX_a - crestSize/2, crestY, crestSize, crestSize);
 
   // 隊名
-  ctx.font = '800 22px "Noto Sans TC", sans-serif';
+  ctx.font = '800 20px "Noto Sans TC", sans-serif';
   ctx.fillStyle = '#fff';
-  ctx.fillText(ht.nameCN, W/2 - 200, logoY + logoSize + 30);
-  ctx.fillText(at.nameCN, W/2 + 200, logoY + logoSize + 30);
+  ctx.fillText(ht.nameCN, teamX_h, crestY + crestSize + 24);
+  ctx.fillText(at.nameCN, teamX_a, crestY + crestSize + 24);
 
-  // VS
-  ctx.font = '900 20px sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.2)';
-  ctx.fillText('VS', W/2, logoY + logoSize/2 + 6);
+  // 副資訊
+  ctx.font = '400 11px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.fillText(meta.hRankLabel, teamX_h, crestY + crestSize + 42);
+  ctx.fillText(meta.aRankLabel, teamX_a, crestY + crestSize + 42);
 
-  // 我的預測標題
-  ctx.font = '700 18px "Noto Sans TC", sans-serif';
+  // ── 中間 AI 預測區 ──
+  ctx.font = '400 12px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.fillText('AI 預測比分', w/2, crestY + 16);
+
+  // AI 比分（模糊效果）
+  ctx.font = '900 36px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.fillText(`${p.score.split('-')[0]}  -  ${p.score.split('-')[1]}`, w/2, crestY + 52);
+
+  // xG
+  ctx.font = '400 11px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillText(`xG ${p.hXG} — ${p.aXG}`, w/2, crestY + 70);
+
+  // 信心膠囊
+  const confText = p.confLabel;
+  ctx.font = '700 11px "Noto Sans TC", sans-serif';
+  const confW = ctx.measureText(confText).width + 16;
+  const confColor = p.conf === 'high' ? '#22c55e' : p.conf === 'medium' ? '#f5a623' : '#ef4444';
+  roundRect(w/2 - confW/2, crestY + 78, confW, 22, 11);
+  ctx.fillStyle = confColor + '20';
+  ctx.fill();
+  ctx.strokeStyle = confColor + '60';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = confColor;
+  ctx.fillText(confText, w/2, crestY + 93);
+
+  // ── 我的預測卡片 ──
+  const cardY = 210;
+  const cardH = 155;
+  roundRect(32, cardY, w - 64, cardH, 16);
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(245,166,35,0.25)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // 卡片內：隊徽 + 比分
+  const predCY = cardY + cardH/2 - 8;
+  if (hImg) ctx.drawImage(hImg, w/2 - 145, predCY - 22, 44, 44);
+  if (aImg) ctx.drawImage(aImg, w/2 + 101, predCY - 22, 44, 44);
+
+  // 大比分
+  ctx.font = '900 56px "Noto Sans TC", sans-serif';
   ctx.fillStyle = '#f5a623';
-  ctx.fillText('🎯 我的預測比分', W/2, 270);
+  ctx.fillText(`${mine.h}`, w/2 - 38, predCY + 20);
+  ctx.font = '700 32px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.fillText('–', w/2, predCY + 16);
+  ctx.font = '900 56px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#f5a623';
+  ctx.fillText(`${mine.a}`, w/2 + 38, predCY + 20);
 
-  // 比分（大字）
-  ctx.font = '900 72px "Noto Sans TC", sans-serif';
-  ctx.fillStyle = '#fff';
-  ctx.fillText(`${mine.h}`, W/2 - 80, 350);
-  ctx.font = '900 48px sans-serif';
+  // 我的預測 標題
+  ctx.font = '600 13px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText('🎯 我的預測', w/2, cardY + 24);
+
+  // 預測時間
+  const savedDate = new Date(mine.savedAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  ctx.font = '400 11px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.fillText(`已預測 · ${savedDate}`, w/2, predCY + 50);
+
+  // ── 勝率條 ──
+  const barY = 390;
+  ctx.font = '800 18px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#22c55e';
+  ctx.textAlign = 'left';
+  ctx.fillText(`${p.hw}%`, 42, barY);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${p.d}%`, w/2, barY);
+  ctx.fillStyle = '#ef4444';
+  ctx.textAlign = 'right';
+  ctx.fillText(`${p.aw}%`, w - 42, barY);
+
+  ctx.font = '400 10px "Noto Sans TC", sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.fillText('–', W/2, 345);
-  ctx.font = '900 72px "Noto Sans TC", sans-serif';
-  ctx.fillStyle = '#fff';
-  ctx.fillText(`${mine.a}`, W/2 + 80, 350);
+  ctx.textAlign = 'left';
+  ctx.fillText(`${ht.nameCN} 勝`, 42, barY + 16);
+  ctx.textAlign = 'center';
+  ctx.fillText('平局', w/2, barY + 16);
+  ctx.textAlign = 'right';
+  ctx.fillText(`${at.nameCN} 勝`, w - 42, barY + 16);
 
-  // 底部 CTA
-  ctx.font = '600 16px "Noto Sans TC", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ctx.fillText('你覺得誰會贏？一起來預測！', W/2, 410);
+  // 勝率長條
+  const barX = 42, barW = w - 84, barH2 = 8, barTop = barY + 24;
+  roundRect(barX, barTop, barW, barH2, 4);
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  ctx.fill();
+  // home win
+  const hBarW = barW * (p.hw / 100);
+  roundRect(barX, barTop, hBarW, barH2, 4);
+  ctx.fillStyle = '#22c55e';
+  ctx.fill();
+  // away win
+  const aBarW = barW * (p.aw / 100);
+  roundRect(barX + barW - aBarW, barTop, aBarW, barH2, 4);
+  ctx.fillStyle = '#ef4444';
+  ctx.fill();
 
-  // 網站連結
-  ctx.font = '400 13px sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.fillText(window.location.host, W/2, 455);
+  // ── 底部 CTA ──
+  ctx.textAlign = 'center';
+  // CTA 按鈕外觀
+  const ctaBtnW = 260, ctaBtnH = 40, ctaBtnY = 460;
+  roundRect(w/2 - ctaBtnW/2, ctaBtnY, ctaBtnW, ctaBtnH, 20);
+  const ctaGrad = ctx.createLinearGradient(w/2 - ctaBtnW/2, 0, w/2 + ctaBtnW/2, 0);
+  ctaGrad.addColorStop(0, '#f5a623');
+  ctaGrad.addColorStop(1, '#ff8c00');
+  ctx.fillStyle = ctaGrad;
+  ctx.fill();
+  ctx.font = '700 15px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#000';
+  ctx.fillText('你覺得呢？一起來預測！', w/2, ctaBtnY + 26);
 
-  // 轉成 blob 分享
+  // 網站
+  ctx.font = '400 11px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.fillText(window.location.host, w/2, h - 8);
+
+  // ── 轉成 blob 分享 ──
   cvs.toBlob(async (blob) => {
     if (!blob) return;
     const file = new File([blob], 'prediction.png', { type: 'image/png' });
@@ -3408,7 +3542,6 @@ async function shareMyPrediction(matchId) {
     a.download = `prediction-${matchId}.png`;
     a.click();
     URL.revokeObjectURL(a.href);
-    // 嘗試複製文字到剪貼簿
     try { await navigator.clipboard.writeText(shareText + '\n' + shareUrl); } catch {}
     showToast?.('📤 圖片已下載，分享文字已複製');
   }, 'image/png');
