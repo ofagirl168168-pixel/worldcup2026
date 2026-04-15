@@ -1341,6 +1341,7 @@ async function openPredModal(id) {
             <div class="my-pred-result">
               <div class="my-pred-score">${flagImg(ht.flag)} ${mine.h} – ${mine.a} ${flagImg(at.flag)}</div>
               <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">🔒 預測已鎖定</div>
+              <button class="my-pred-share-btn" style="margin-top:8px" onclick="shareMyPrediction('${m.id}')">📤 分享預測</button>
             </div>` : `
             <div class="my-pred-prompt">
               <div style="font-size:13px;color:rgba(255,69,58,0.7);text-align:center;padding:12px">🔒 比賽已開始，無法填寫預測</div>
@@ -1352,7 +1353,10 @@ async function openPredModal(id) {
               <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">
                 已預測 · ${new Date(mine.savedAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}
               </div>
-              <button class="my-pred-edit-btn" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">修改</button>
+              <div style="display:flex;gap:8px;justify-content:center;margin-top:6px">
+                <button class="my-pred-edit-btn" onclick="openMyPredInput('${m.id}','${ht.nameCN}','${at.nameCN}')">修改</button>
+                <button class="my-pred-share-btn" onclick="shareMyPrediction('${m.id}')">📤 分享</button>
+              </div>
             </div>` : `
             <div class="my-pred-prompt pred-cta">
               <div style="font-size:15px;font-weight:800;margin-bottom:6px">🎯 預測這場比分</div>
@@ -3279,6 +3283,135 @@ function saveMyPred(matchId) {
   localStorage.setItem(predKey, JSON.stringify(myPreds));
   document.getElementById('my-pred-overlay')?.remove();
   openPredModal(matchId);
+}
+
+// ── 分享預測圖片 ──
+async function shareMyPrediction(matchId) {
+  const _T = _teams();
+  const schedule = _matches();
+  const m = schedule.find(x => x.id === matchId);
+  if (!m) return;
+  const ht = _T[m.home], at = _T[m.away];
+  if (!ht || !at) return;
+
+  const predKey = {ucl:'ucl26_my_preds',epl:'epl26_my_preds',wc:'wc26_my_preds'}[_tid()] || 'wc26_my_preds';
+  const myPreds = (() => { try { return JSON.parse(localStorage.getItem(predKey))||{}; } catch { return {}; } })();
+  const mine = myPreds[matchId];
+  if (!mine) return;
+
+  const meta = _matchMeta(m);
+  const W = 720, H = 480;
+  const cvs = document.createElement('canvas');
+  cvs.width = W; cvs.height = H;
+  const ctx = cvs.getContext('2d');
+
+  // 背景漸層
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#0d1117');
+  bg.addColorStop(0.5, '#161b22');
+  bg.addColorStop(1, '#0d1117');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // 裝飾線
+  const accent = ctx.createLinearGradient(0, 0, W, 0);
+  accent.addColorStop(0, '#f5a623');
+  accent.addColorStop(1, '#ff6b35');
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, 0, W, 4);
+
+  // 載入隊徽/國旗
+  const loadImg = (src) => new Promise(resolve => {
+    if (!src) return resolve(null);
+    const url = (src.startsWith('http') || src.startsWith('img/')) ? src : getFlagImgUrl(src);
+    if (!url) return resolve(null);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+
+  const [hImg, aImg] = await Promise.all([loadImg(ht.flag), loadImg(at.flag)]);
+
+  // 頂部標籤
+  ctx.font = '600 16px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#f5a623';
+  ctx.textAlign = 'center';
+  ctx.fillText(meta.matchTag, W/2, 40);
+
+  // 比賽時間
+  ctx.font = '400 14px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  const dateStr = _isClub() ? `${(m.date||'').slice(5).replace('-','/')} ${m.time||''}` : `${(m.twDate||'').slice(5).replace('-','/')} ${m.twTime||''}`;
+  ctx.fillText(dateStr + ' 台灣時間', W/2, 62);
+
+  // 隊徽
+  const logoSize = 80;
+  const logoY = 100;
+  if (hImg) ctx.drawImage(hImg, W/2 - 200 - logoSize/2, logoY, logoSize, logoSize);
+  if (aImg) ctx.drawImage(aImg, W/2 + 200 - logoSize/2, logoY, logoSize, logoSize);
+
+  // 隊名
+  ctx.font = '800 22px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.fillText(ht.nameCN, W/2 - 200, logoY + logoSize + 30);
+  ctx.fillText(at.nameCN, W/2 + 200, logoY + logoSize + 30);
+
+  // VS
+  ctx.font = '900 20px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.fillText('VS', W/2, logoY + logoSize/2 + 6);
+
+  // 我的預測標題
+  ctx.font = '700 18px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#f5a623';
+  ctx.fillText('🎯 我的預測比分', W/2, 270);
+
+  // 比分（大字）
+  ctx.font = '900 72px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.fillText(`${mine.h}`, W/2 - 80, 350);
+  ctx.font = '900 48px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillText('–', W/2, 345);
+  ctx.font = '900 72px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.fillText(`${mine.a}`, W/2 + 80, 350);
+
+  // 底部 CTA
+  ctx.font = '600 16px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText('你覺得誰會贏？一起來預測！', W/2, 410);
+
+  // 網站連結
+  ctx.font = '400 13px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillText(window.location.host, W/2, 455);
+
+  // 轉成 blob 分享
+  cvs.toBlob(async (blob) => {
+    if (!blob) return;
+    const file = new File([blob], 'prediction.png', { type: 'image/png' });
+    const shareUrl = window.location.origin;
+    const shareText = `我預測 ${ht.nameCN} ${mine.h}-${mine.a} ${at.nameCN}，你覺得呢？一起來預測！`;
+
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ text: shareText, url: shareUrl, files: [file] });
+        return;
+      } catch (e) { if (e.name === 'AbortError') return; }
+    }
+    // fallback: 下載圖片 + 複製文字
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `prediction-${matchId}.png`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    // 嘗試複製文字到剪貼簿
+    try { await navigator.clipboard.writeText(shareText + '\n' + shareUrl); } catch {}
+    showToast?.('📤 圖片已下載，分享文字已複製');
+  }, 'image/png');
 }
 
 // ── 預測倒數計時器（Modal 內）──

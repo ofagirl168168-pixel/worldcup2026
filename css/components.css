@@ -1393,12 +1393,19 @@ img.flag-img {
   letter-spacing: 4px; margin-bottom: 6px;
 }
 .my-pred-edit-btn {
-  margin-top: 10px; padding: 6px 16px; border-radius: 20px;
+  padding: 6px 16px; border-radius: 20px;
   background: var(--accent-bg); border: 1px solid var(--accent-border);
   color: var(--accent); font-size: 12px; font-weight: 700; cursor: pointer;
   transition: all 0.2s;
 }
 .my-pred-edit-btn:hover { background: var(--accent-glow); }
+.my-pred-share-btn {
+  padding: 6px 16px; border-radius: 20px;
+  background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3);
+  color: #60a5fa; font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: all 0.2s;
+}
+.my-pred-share-btn:hover { background: rgba(59,130,246,0.25); }
 .my-pred-prompt { text-align: center; }
 
 @media (max-width: 768px) {
