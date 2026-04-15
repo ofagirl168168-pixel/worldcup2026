@@ -47,6 +47,7 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/components.css" />
   <link rel="stylesheet" href="css/animations.css" />
@@ -61,38 +62,10 @@
     <div class="header-inner">
       <!-- Logo -->
       <div class="logo" onclick="showSection('home')">
-        <svg class="logo-svg" viewBox="0 0 48 54" width="38" height="43" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="lg-shield" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#f5d26b"/>
-              <stop offset="100%" stop-color="#e07800"/>
-            </linearGradient>
-            <linearGradient id="lg-inner" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#0d1525"/>
-              <stop offset="100%" stop-color="#0a0f1e"/>
-            </linearGradient>
-            <filter id="glow-logo">
-              <feGaussianBlur stdDeviation="1.5" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-          <!-- 盾牌外框 -->
-          <path d="M24 2 L44 10 L44 28 C44 40 34 50 24 53 C14 50 4 40 4 28 L4 10 Z" fill="url(#lg-shield)" filter="url(#glow-logo)"/>
-          <!-- 盾牌內部 -->
-          <path d="M24 5.5 L41 12.5 L41 28 C41 38.5 32.5 47.5 24 50 C15.5 47.5 7 38.5 7 28 L7 12.5 Z" fill="url(#lg-inner)"/>
-          <!-- 中央橫線分隔 -->
-          <line x1="9" y1="23" x2="39" y2="23" stroke="rgba(240,192,64,0.3)" stroke-width="0.7"/>
-          <!-- 2026 數字（上半盾，清晰可讀）-->
-          <text x="24" y="18" text-anchor="middle" font-size="9.5" fill="#f0c040" font-weight="bold" letter-spacing="1.2" opacity="0.95">2026</text>
-          <!-- 六邊形（下半盾，中心下移避免遮擋 2026）-->
-          <circle cx="24" cy="34" r="9" fill="none" stroke="rgba(240,192,64,0.25)" stroke-width="0.8"/>
-          <polygon points="24,26 30,29.5 30,38.5 24,42 18,38.5 18,29.5" fill="none" stroke="#f0c040" stroke-width="1.2" opacity="0.85"/>
-          <!-- 星形裝飾（六邊形中央）-->
-          <text x="24" y="38" text-anchor="middle" font-size="11" fill="#f0c040" font-weight="bold" opacity="0.9">★</text>
-        </svg>
+        <img src="img/logo-soccermaddy.png" alt="Soccer麥迪" class="logo-img" style="width:40px;height:40px;border-radius:50%;object-fit:cover" />
         <div class="logo-text">
           <span class="logo-title">世界盃預測</span>
-          <span class="logo-sub">AI 分析平台 2026</span>
+          <span class="logo-sub">Soccer麥迪</span>
         </div>
       </div>
 
@@ -562,9 +535,9 @@
   <footer class="main-footer">
     <div class="footer-inner">
       <div class="footer-logo">
-        <span>⚽</span>
+        <img src="img/logo-soccermaddy.png" alt="Soccer麥迪" style="width:32px;height:32px;border-radius:50%;object-fit:cover" />
         <div>
-          <div class="footer-title">FIFA 世界盃 2026 預測分析平台</div>
+          <div class="footer-title">Soccer麥迪 — 足球預測分析平台</div>
           <div class="footer-sub">預測僅供參考，本平台不涉及任何博彩活動</div>
         </div>
       </div>
