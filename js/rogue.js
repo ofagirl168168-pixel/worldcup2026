@@ -401,7 +401,10 @@
   // ═══════════════════════════════════════════════════════════
   function freshState() {
     return {
-      phase: 'title',           // title | playing | cards | gameover
+      phase: 'title',           // title | playing | paused | cards | gameover
+      _pauseBtn: null,          // 暫停按鈕區域
+      _pauseResumeR: null,      // 暫停選單：繼續按鈕
+      _pauseQuitR: null,        // 暫停選單：離開按鈕
       lives: MAX_LIVES,
       score: 0,
       wave: 1,
@@ -1252,8 +1255,63 @@
 
     if (G.phase === 'cards')    drawCards();
     if (G.phase === 'gameover') drawGameOver();
+    if (G.phase === 'paused')   drawPaused();
 
     ctx.restore();
+  }
+
+  // ─── 暫停畫面 ─────────────────────────────────────────────
+  function drawPaused() {
+    // 半透明遮罩
+    ctx.fillStyle = 'rgba(0,0,0,0.65)';
+    ctx.fillRect(0, 0, W, H);
+
+    const cx = W / 2, cy = H * 0.42;
+    const fs = Math.min(28, W * 0.065);
+
+    // 標題
+    ctx.fillStyle = '#fff';
+    ctx.font = `900 ${fs}px "Noto Sans TC", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('⏸ 暫停', cx, cy);
+
+    // 按鈕共用
+    const btnW = Math.min(200, W * 0.5);
+    const btnH = 48;
+    const btnR = 12;
+    const btnFS = Math.min(17, W * 0.04);
+    const gap = 20;
+
+    // 繼續遊戲 按鈕
+    const rY = cy + 30;
+    ctx.save();
+    rr(ctx, cx - btnW / 2, rY, btnW, btnH, btnR);
+    ctx.fillStyle = 'rgba(76,175,80,0.8)';
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = `700 ${btnFS}px "Noto Sans TC", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('▶ 繼續遊戲', cx, rY + btnH * 0.62);
+    ctx.restore();
+    G._pauseResumeR = { x: cx - btnW / 2, y: rY, w: btnW, h: btnH };
+
+    // 離開遊戲 按鈕
+    const qY = rY + btnH + gap;
+    ctx.save();
+    rr(ctx, cx - btnW / 2, qY, btnW, btnH, btnR);
+    ctx.fillStyle = 'rgba(239,68,68,0.7)';
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = `700 ${btnFS}px "Noto Sans TC", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('✕ 離開遊戲', cx, qY + btnH * 0.62);
+    ctx.restore();
+    G._pauseQuitR = { x: cx - btnW / 2, y: qY, w: btnW, h: btnH };
+
+    // 小提示
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.font = `${Math.min(12, W * 0.028)}px "Noto Sans TC", sans-serif`;
+    ctx.fillText('離開將結束本局遊戲', cx, qY + btnH + 30);
   }
 
   // ─── 球場 ────────────────────────────────────────────────
@@ -3765,6 +3823,27 @@
 
     G._bgmBtn = { x: bgmX, y: bY, w: sz, h: sz };
     G._sfxBtn = { x: sfxX, y: bY, w: sz, h: sz };
+
+    // 暫停按鈕（僅 playing 階段，放左上角）
+    if (G.phase === 'playing') {
+      const pX = 14, pY = bY;
+      ctx.save();
+      rr(ctx, pX, pY, sz, sz, 8);
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctx.lineWidth = 1.5; ctx.stroke();
+      // ⏸ 兩條豎線
+      const bw = sz * 0.18, bh = sz * 0.45;
+      const cx = pX + sz / 2, cy = pY + sz / 2;
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.fillRect(cx - bw - 2, cy - bh / 2, bw, bh);
+      ctx.fillRect(cx + 2, cy - bh / 2, bw, bh);
+      ctx.restore();
+      G._pauseBtn = { x: pX, y: pY, w: sz, h: sz };
+    } else {
+      G._pauseBtn = null;
+    }
   }
 
   // ─── 標題畫面 ────────────────────────────────────────────
@@ -5572,6 +5651,11 @@
       return;
     }
     if (G.phase === 'playing') return; // 由 onPointerDown 處理射擊
+    if (G.phase === 'paused') {
+      if (hitTest(x, y, G._pauseResumeR)) { G.phase = 'playing'; return; }
+      if (hitTest(x, y, G._pauseQuitR))   { saveResult(); closeGame(); return; }
+      return;
+    }
     if (G.phase === 'cards') {
       // 卡片全部翻完才能點（每張 500ms，3 張 = 1500ms）
       const CARD_REVEAL_EACH = 500;
@@ -5658,6 +5742,13 @@
       return;
     }
 
+    // 暫停按鈕
+    if (G._pauseBtn && hitTest(p.x, p.y, G._pauseBtn)) {
+      G.phase = 'paused';
+      G._holdFiring = false; G._holdXY = null; clearTimeout(G._holdTimer);
+      return;
+    }
+
     // 音效按鈕區域也走 click
     if ((G._sfxBtn && p.x >= G._sfxBtn.x && p.x <= G._sfxBtn.x + G._sfxBtn.w &&
          p.y >= G._sfxBtn.y && p.y <= G._sfxBtn.y + G._sfxBtn.h) ||
@@ -5703,7 +5794,15 @@
 
     cvs = document.getElementById('rogue-cvs');
     ctx = cvs.getContext('2d');
-    document.getElementById('rogue-x').addEventListener('click', closeGame);
+    document.getElementById('rogue-x').addEventListener('click', () => {
+      if (G && (G.phase === 'playing' || G.phase === 'paused')) {
+        // 遊戲進行中 → 暫停並顯示確認
+        G.phase = 'paused';
+        G._holdFiring = false; G._holdXY = null; clearTimeout(G._holdTimer);
+      } else {
+        closeGame();
+      }
+    });
     cvs.addEventListener('mousedown', onPointerDown);
     cvs.addEventListener('mouseup', onPointerUp);
     cvs.addEventListener('mouseleave', onPointerUp);
