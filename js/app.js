@@ -3666,7 +3666,7 @@ function startSchedulePredCountdowns() {
       if (d > 0) cdText = `${d}天${h}時${m}分`;
       else if (h > 0) cdText = `${h}時${m}分${s}秒`;
       else cdText = `${m}分${s}秒`;
-      el.innerHTML = `🎯 預測比分 · <span class="pred-cd-text">⏰ ${cdText}</span>`;
+      el.innerHTML = `🎯 預測比分<br><span class="pred-cd-text">🔒 ${cdText}</span>`;
       el.className = 'match-pred-tag' + (ms < 2*3600000 ? ' urgent' : ms < 24*3600000 ? ' soon' : '');
     });
   }
