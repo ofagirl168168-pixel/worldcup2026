@@ -1312,6 +1312,24 @@
     ctx.fillStyle = 'rgba(255,255,255,0.4)';
     ctx.font = `${Math.min(12, W * 0.028)}px "Noto Sans TC", sans-serif`;
     ctx.fillText('離開將結束本局遊戲', cx, qY + btnH + 30);
+
+    // 操作提示（點擊/長按）
+    const hintY = qY + btnH + 60;
+    const hintSz = Math.min(28, W * 0.065);
+    const hintFS = Math.min(11, W * 0.026);
+    const hintGap = hintSz + hintFS + 16;
+    // 點擊
+    const tapX = cx - hintGap * 0.7;
+    _drawTapIcon(tapX, hintY, hintSz);
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = `600 ${hintFS}px "Noto Sans TC", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('精準射擊', tapX, hintY + hintSz / 2 + hintFS + 2);
+    // 長按
+    const holdX = cx + hintGap * 0.7;
+    _drawHoldIcon(holdX, hintY, hintSz);
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillText('連續射擊', holdX, hintY + hintSz / 2 + hintFS + 2);
   }
 
   // ─── 球場 ────────────────────────────────────────────────
