@@ -4183,7 +4183,7 @@
     const url = window.location.origin + '?play=rogue';
     const text = '⚽ 射門挑戰：前進世界盃\n第一人稱射門 × 卡牌強化 × 無盡生存\n你能撐到第幾波？來挑戰！👇\n' + url;
     if (navigator.share) {
-      navigator.share({ title: '射門挑戰：前進世界盃', text, url }).catch(() => {});
+      navigator.share({ title: '射門挑戰：前進世界盃', text }).catch(() => {});
     } else {
       navigator.clipboard.writeText(text).then(() => {
         G._staminaToast = '✅ 分享連結已複製！';
