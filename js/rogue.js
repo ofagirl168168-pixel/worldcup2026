@@ -4162,9 +4162,10 @@
       ctx.globalAlpha = 1;
     }
 
-    // ── 分享遊戲（左上角圖示）──
+    // ── 分享遊戲（右下角圖示）──
     const shareSz = Math.min(30, W * 0.06);
-    const shareX = 12, shareY = 14;
+    const shareX = W - shareSz - 12;
+    const shareY = H - shareSz - 10;
     rr(ctx, shareX, shareY, shareSz, shareSz, 8);
     ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 1.5; ctx.stroke();
