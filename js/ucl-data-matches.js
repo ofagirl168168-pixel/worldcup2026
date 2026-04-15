@@ -58,8 +58,8 @@ const UCL_MATCHES = [
   {id:'UCL-QF-04', date:'2026-04-09', time:'03:00', home:'PSG', away:'LIV', stage:'qf', leg:1, status:'finished', score:{h:2,a:0}, stats:{poss:[74,26],shots:[18,3],sot:[6,0],corners:[3,1],yellow:[0,2],saves:[0,4]}, goals:[{min:'11',player:'Désiré Doué',side:'h'},{min:'65',player:'Khvicha Kvaratskhelia',side:'h'}]},
 
   // ===== 八強 第二回合 (2026-04-15 / 04-16 台灣時間) =====
-  {id:'UCL-QF-05', date:'2026-04-15', time:'03:00', home:'ATM', away:'BAR', stage:'qf', leg:2, status:'scheduled', score:null},
-  {id:'UCL-QF-06', date:'2026-04-15', time:'03:00', home:'LIV', away:'PSG', stage:'qf', leg:2, status:'scheduled', score:null},
+  {id:'UCL-QF-05', date:'2026-04-15', time:'03:00', home:'ATM', away:'BAR', stage:'qf', leg:2, status:'finished', score:{h:1,a:2}, agg:{h:3,a:2}, stats:{poss:[28.9,71.1],shots:[15,15],sot:[5,8],corners:[2,4],yellow:[0,1],saves:[7,4]}, goals:[{min:'4',player:'Lamine Yamal',side:'a'},{min:'24',player:'Ferran Torres',side:'a'},{min:'31',player:'Ademola Lookman',side:'h'}]},
+  {id:'UCL-QF-06', date:'2026-04-15', time:'03:00', home:'LIV', away:'PSG', stage:'qf', leg:2, status:'finished', score:{h:0,a:2}, agg:{h:0,a:4}, stats:{poss:[52.6,47.4],shots:[21,12],sot:[5,6],corners:[8,2],yellow:[2,0],saves:[3,6]}, goals:[{min:'72',player:'Ousmane Dembélé',side:'a'},{min:'90+1',player:'Ousmane Dembélé',side:'a'}]},
   {id:'UCL-QF-07', date:'2026-04-16', time:'03:00', home:'ARS', away:'SCP', stage:'qf', leg:2, status:'scheduled', score:null},
   {id:'UCL-QF-08', date:'2026-04-16', time:'03:00', home:'BAY', away:'RMA', stage:'qf', leg:2, status:'scheduled', score:null},
 
