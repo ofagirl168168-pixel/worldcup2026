@@ -1361,7 +1361,7 @@ async function openPredModal(id) {
             <div class="my-pred-prompt pred-cta">
               <div style="font-size:15px;font-weight:800;margin-bottom:6px">🎯 預測這場比分</div>
               <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;line-height:1.6">
-                參與 <span style="color:var(--text-muted);font-weight:700">+2 XP</span>
+                參與即得 <span style="color:var(--text-muted);font-weight:700">+1 XP</span>
                 ｜方向 <span style="color:var(--green);font-weight:700">+10 XP</span>
                 ｜比分差 <span style="color:#ff9800;font-weight:700">+15 XP +1💎</span>
                 ｜精準 <span style="color:var(--accent);font-weight:700">+30 XP +3💎</span>
@@ -3281,8 +3281,19 @@ function saveMyPred(matchId) {
   const a = parseInt(document.getElementById('my-pred-a')?.textContent || 0);
   const predKey = {ucl:'ucl26_my_preds',epl:'epl26_my_preds',wc:'wc26_my_preds'}[_tid()] || 'wc26_my_preds';
   const myPreds = (() => { try { return JSON.parse(localStorage.getItem(predKey))||{}; } catch { return {}; } })();
+  const isNew = !myPreds[matchId];
   myPreds[matchId] = { h, a, savedAt: new Date().toISOString() };
   localStorage.setItem(predKey, JSON.stringify(myPreds));
+
+  // 首次預測立即給 +1 XP 參與獎
+  if (isNew) {
+    const bonusKey = {ucl:'ucl26_',epl:'epl26_',wc:'wc26_'}[_tid()] + 'bonus_xp';
+    const cur = parseInt(localStorage.getItem(bonusKey)||'0') || 0;
+    localStorage.setItem(bonusKey, String(cur + 1));
+    updateNavXP?.();
+    showToast?.('🎉 參與獎 +1 XP');
+  }
+
   document.getElementById('my-pred-overlay')?.remove();
   openPredModal(matchId);
 }

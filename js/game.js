@@ -326,11 +326,12 @@ function settlePredictions() {
 
       const goalDiffMatch = direction && !exact && (predH - predA) === (actH - actA);
 
-      let xpReward = 2; // 參與獎
+      let xpReward = 2; // 猜錯基底
       let gemReward = 0;
       if (exact)              { xpReward = 30; gemReward = 3; }
       else if (goalDiffMatch) { xpReward = 15; gemReward = 1; }
       else if (direction)     { xpReward = 10; }
+      // 猜錯 = +2 XP（參與獎 +1 XP 在送出時已即時發放）
 
       bonusXP += xpReward;
 
