@@ -1,5 +1,11 @@
 /* gems.js — 寶石系統前端 */
 
+// 頁面載入時立即暫存邀請碼（訪客可能先逛再註冊）
+;(function() {
+  const ref = new URLSearchParams(window.location.search).get('ref');
+  if (ref) localStorage.setItem('pending_ref_code', ref);
+})();
+
 const FUNC_URL = 'https://dwlngkspwtcsnacbsgct.supabase.co/functions/v1'
 
 // ── 取得 JWT token ─────────────────────────────────────────
@@ -133,8 +139,9 @@ async function initGems() {
     .select('id').eq('user_id', currentUser.id).eq('type', 'first_free').maybeSingle()
   window.firstFreeUsed = !!ffRow
 
-  // 處理邀請碼（從 URL ?ref=CODE）
+  // 處理邀請碼（優先 URL ?ref=CODE，其次 localStorage 暫存）
   const urlRef = new URLSearchParams(window.location.search).get('ref')
+    || localStorage.getItem('pending_ref_code')
   if (urlRef) {
     const token = await getToken()
     const res = await fetch(`${FUNC_URL}/referral-join`, {
@@ -145,9 +152,14 @@ async function initGems() {
     const data = await res.json()
     if (data.success) {
       showToast('🎁 邀請獎勵已發放！+3 寶石')
+      localStorage.removeItem('pending_ref_code')
       // 移除 URL 中的 ref 參數
-      window.history.replaceState({}, '', window.location.pathname)
+      const cleanUrl = new URL(window.location);
+      cleanUrl.searchParams.delete('ref');
+      window.history.replaceState({}, '', cleanUrl.toString())
       await initGems()
+    } else if (data.error === '已使用過邀請碼' || data.error === '邀請碼無效') {
+      localStorage.removeItem('pending_ref_code')
     }
   }
 }

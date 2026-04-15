@@ -26,9 +26,15 @@ async function initAuth() {
 
 // ── Google 登入 ───────────────────────────────────────────
 function loginWithGoogle() {
+  // 保留當前賽事 + 邀請碼參數
+  const url = new URL(window.location.origin);
+  const tid = window.Tournament?.current?.() || 'wc';
+  if (tid !== 'wc') url.searchParams.set('t', tid);
+  const ref = localStorage.getItem('pending_ref_code');
+  if (ref) url.searchParams.set('ref', ref);
   DB.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin }
+    options: { redirectTo: url.toString() }
   });
 }
 
