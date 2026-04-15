@@ -72,11 +72,11 @@ img.flag-img {
 .match-card:hover::before { opacity: 1; }
 
 .match-team {
-  display: flex; align-items: center; gap: 12px; min-width: 0;
+  display: flex; align-items: center; gap: 12px;
 }
 .match-team.away { flex-direction: row-reverse; text-align: right; }
 .match-team-flag { font-size: 28px; line-height: 1; flex-shrink: 0; }
-.match-team-name { font-size: 16px; font-weight: 700; word-break: keep-all; }
+.match-team-name { font-size: 16px; font-weight: 700; }
 .match-team-sub  { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
 .match-center { text-align: center; flex-shrink: 0; }
