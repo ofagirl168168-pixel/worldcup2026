@@ -379,14 +379,18 @@ function renderHomeBracket() {
 
   // ── Bracket 資料（依對陣樹排列）──
   const r16 = [
+    // 上半區 → QF(SCP/ARS) → SF(ATM vs ARS)
     tieR('UCL-R16-06','UCL-R16-09'), tieR('UCL-R16-05','UCL-R16-10'),
-    tieR('UCL-R16-08','UCL-R16-12'), tieR('UCL-R16-01','UCL-R16-15'),
+    // 上半區 → QF(BAR/ATM)
     tieR('UCL-R16-03','UCL-R16-13'), tieR('UCL-R16-02','UCL-R16-16'),
+    // 下半區 → QF(RMA/BAY) → SF(PSG vs BAY)
+    tieR('UCL-R16-08','UCL-R16-12'), tieR('UCL-R16-01','UCL-R16-15'),
+    // 下半區 → QF(PSG/LIV)
     tieR('UCL-R16-07','UCL-R16-11'), tieR('UCL-R16-04','UCL-R16-14'),
   ];
   const qf = [
-    tieR('UCL-QF-01','UCL-QF-07'), tieR('UCL-QF-02','UCL-QF-08'),
-    tieR('UCL-QF-03','UCL-QF-05'), tieR('UCL-QF-04','UCL-QF-06'),
+    tieR('UCL-QF-01','UCL-QF-07'), tieR('UCL-QF-03','UCL-QF-05'),
+    tieR('UCL-QF-02','UCL-QF-08'), tieR('UCL-QF-04','UCL-QF-06'),
   ];
   const sf = [tieR('UCL-SF-01','UCL-SF-03'), tieR('UCL-SF-02','UCL-SF-04')];
   const fin = singleR('UCL-F-01');
@@ -2998,9 +3002,10 @@ function renderUCLBracket() {
     </div>`;
   }
 
-  // 八強
+  // 八強（按 bracket 路徑排列：上半區 QF1+QF3，下半區 QF2+QF4）
+  const qfOrder = [1, 3, 2, 4];
   const qfMatches = [];
-  for (let i = 1; i <= 4; i++) {
+  for (const i of qfOrder) {
     const leg1 = matches.find(m => m.stage === 'qf' && m.id === `UCL-QF-0${i}`);
     const leg2 = matches.find(m => m.stage === 'qf' && m.id === `UCL-QF-0${i+4}`);
     const home = leg1?.home || 'TBD';
