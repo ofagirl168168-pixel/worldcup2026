@@ -1214,23 +1214,27 @@ async function shareDailyImage() {
   glow.addColorStop(1, 'transparent')
   ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H)
 
-  // ── Header：Shield Logo + 標題 ──────────────────────
-  const s = 44
-  const shieldFill = (() => { const g = ctx.createLinearGradient(PAD - 24, 24, PAD + 24, 68); g.addColorStop(0,'#f5d26b'); g.addColorStop(1,'#e07800'); return g })()
-  drawShield(ctx, PAD + s/2, 24 + s/2, s, shieldFill)
-  ctx.fillStyle = '#f0c040'
-  ctx.font = `800 22px "Noto Sans TC", sans-serif`
-  ctx.textBaseline = 'middle'
+  // ── Header：Logo + 標題 ──────────────────────
   const _ctx = _gameCtx()
-  ctx.fillText(_ctx.platformName, PAD + s + 12, 24 + s * 0.5)
-  ctx.fillStyle = 'rgba(255,255,255,0.35)'
-  ctx.font = `500 13px "Noto Sans TC", sans-serif`
-  ctx.fillText(window.location.host, PAD + s + 12, 24 + s * 0.5 + 22)
-
-  // Logo（右上角）
+  const logoH = 44
   if (logoImg) {
-    const lh = 40, lw = logoImg.width * (lh / logoImg.height)
-    ctx.drawImage(logoImg, W - PAD - lw, 26, lw, lh)
+    const lw = logoImg.width * (logoH / logoImg.height)
+    ctx.drawImage(logoImg, PAD, 24, lw, logoH)
+    ctx.fillStyle = '#f0c040'
+    ctx.font = `800 22px "Noto Sans TC", sans-serif`
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
+    ctx.fillText(_ctx.platformName, PAD + lw + 12, 24 + logoH * 0.4)
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'
+    ctx.font = `500 13px "Noto Sans TC", sans-serif`
+    ctx.fillText(window.location.host, PAD + lw + 12, 24 + logoH * 0.4 + 22)
+  } else {
+    ctx.fillStyle = '#f0c040'
+    ctx.font = `800 22px "Noto Sans TC", sans-serif`
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
+    ctx.fillText(_ctx.platformName, PAD, 24 + logoH * 0.4)
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'
+    ctx.font = `500 13px "Noto Sans TC", sans-serif`
+    ctx.fillText(window.location.host, PAD, 24 + logoH * 0.4 + 22)
   }
 
   // 分隔線
@@ -1498,19 +1502,22 @@ async function shareChampionText() {
   glow.addColorStop(0, 'rgba(240,192,64,0.1)'); glow.addColorStop(1, 'transparent')
   ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H)
 
-  // Header
-  const s = 44
-  const shieldFill = (() => { const g = ctx.createLinearGradient(PAD, 24, PAD+48, 68); g.addColorStop(0,'#f5d26b'); g.addColorStop(1,'#e07800'); return g })()
-  drawShield(ctx, PAD + s/2, 24 + s/2, s, shieldFill)
-  ctx.fillStyle = '#f0c040'; ctx.font = `800 22px "Noto Sans TC", sans-serif`
-  ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
-  ctx.fillText(_ctx.platformName, PAD + s + 12, 24 + s * 0.5)
-  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 13px "Noto Sans TC", sans-serif`
-  ctx.fillText(window.location.host, PAD + s + 12, 24 + s * 0.5 + 22)
-  // Logo（右上角）
+  // Header：Logo + 標題
+  const logoH = 44
   if (logoImg) {
-    const lh = 40, lw = logoImg.width * (lh / logoImg.height)
-    ctx.drawImage(logoImg, W - PAD - lw, 26, lw, lh)
+    const lw = logoImg.width * (logoH / logoImg.height)
+    ctx.drawImage(logoImg, PAD, 24, lw, logoH)
+    ctx.fillStyle = '#f0c040'; ctx.font = `800 22px "Noto Sans TC", sans-serif`
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
+    ctx.fillText(_ctx.platformName, PAD + lw + 12, 24 + logoH * 0.4)
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 13px "Noto Sans TC", sans-serif`
+    ctx.fillText(window.location.host, PAD + lw + 12, 24 + logoH * 0.4 + 22)
+  } else {
+    ctx.fillStyle = '#f0c040'; ctx.font = `800 22px "Noto Sans TC", sans-serif`
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
+    ctx.fillText(_ctx.platformName, PAD, 24 + logoH * 0.4)
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 13px "Noto Sans TC", sans-serif`
+    ctx.fillText(window.location.host, PAD, 24 + logoH * 0.4 + 22)
   }
   ctx.strokeStyle = 'rgba(240,192,64,0.25)'; ctx.lineWidth = 1
   ctx.beginPath(); ctx.moveTo(PAD, 100); ctx.lineTo(W-PAD, 100); ctx.stroke()
@@ -1611,19 +1618,22 @@ async function shareTeamText() {
   glow.addColorStop(0, 'rgba(30,136,229,0.1)'); glow.addColorStop(1, 'transparent')
   ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H)
 
-  // Header
-  const s = 40
-  const shieldFill = (() => { const g = ctx.createLinearGradient(PAD, 20, PAD+44, 60); g.addColorStop(0,'#f5d26b'); g.addColorStop(1,'#e07800'); return g })()
-  drawShield(ctx, PAD + s/2, 20 + s/2, s, shieldFill)
-  ctx.fillStyle = '#f0c040'; ctx.font = `800 20px "Noto Sans TC", sans-serif`
-  ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
-  ctx.fillText(_ctx.platformName, PAD + s + 10, 20 + s * 0.5)
-  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 12px "Noto Sans TC", sans-serif`
-  ctx.fillText(window.location.host, PAD + s + 10, 20 + s * 0.5 + 20)
-  // Logo（右上角）
+  // Header：Logo + 標題
+  const logoH = 40
   if (logoImg) {
-    const lh = 36, lw = logoImg.width * (lh / logoImg.height)
-    ctx.drawImage(logoImg, W - PAD - lw, 22, lw, lh)
+    const lw = logoImg.width * (logoH / logoImg.height)
+    ctx.drawImage(logoImg, PAD, 20, lw, logoH)
+    ctx.fillStyle = '#f0c040'; ctx.font = `800 20px "Noto Sans TC", sans-serif`
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
+    ctx.fillText(_ctx.platformName, PAD + lw + 10, 20 + logoH * 0.4)
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 12px "Noto Sans TC", sans-serif`
+    ctx.fillText(window.location.host, PAD + lw + 10, 20 + logoH * 0.4 + 20)
+  } else {
+    ctx.fillStyle = '#f0c040'; ctx.font = `800 20px "Noto Sans TC", sans-serif`
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left'
+    ctx.fillText(_ctx.platformName, PAD, 20 + logoH * 0.4)
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 12px "Noto Sans TC", sans-serif`
+    ctx.fillText(window.location.host, PAD, 20 + logoH * 0.4 + 20)
   }
   ctx.strokeStyle = 'rgba(240,192,64,0.25)'; ctx.lineWidth = 1
   ctx.beginPath(); ctx.moveTo(PAD, 88); ctx.lineTo(W-PAD, 88); ctx.stroke()
@@ -1836,26 +1846,26 @@ async function shareGroupImage() {
   ctx.fillStyle = topBar
   ctx.fillRect(0, 0, W, 3)
 
-  // ── Header（盾牌 logo + 標題）────────────────────────
-  const sx = W / 2, logoSize = 60
+  // ── Header（Logo + 標題）────────────────────────
+  const sx = W / 2
+  const _grpCtx = _gameCtx()
 
-  // 光暈背景
-  const glowR = ctx.createRadialGradient(sx, 52, 0, sx, 52, 70)
-  glowR.addColorStop(0, 'rgba(240,192,64,0.18)')
-  glowR.addColorStop(1, 'rgba(240,192,64,0)')
-  ctx.fillStyle = glowR
-  ctx.fillRect(sx - 70, 0, 140, 120)
-
-  const shieldGrad = ctx.createLinearGradient(sx - 24, 20, sx + 24, 80)
-  shieldGrad.addColorStop(0, '#f5d26b')
-  shieldGrad.addColorStop(1, '#e07800')
-  drawShield(ctx, sx, 52, logoSize, shieldGrad)
+  // Logo 居中
+  if (logoImg) {
+    const lh = 60, lw = logoImg.width * (lh / logoImg.height)
+    // 光暈背景
+    const glowR = ctx.createRadialGradient(sx, 52, 0, sx, 52, 70)
+    glowR.addColorStop(0, 'rgba(240,192,64,0.18)')
+    glowR.addColorStop(1, 'rgba(240,192,64,0)')
+    ctx.fillStyle = glowR
+    ctx.fillRect(sx - 70, 0, 140, 120)
+    ctx.drawImage(logoImg, sx - lw / 2, 22, lw, lh)
+  }
 
   // 標題
   ctx.fillStyle = '#f0c040'
   ctx.font = 'bold 30px sans-serif'
   ctx.textAlign = 'center'
-  const _grpCtx = _gameCtx()
   const _grpTitle = _grpCtx.isEpl ? '我的英超賽季預測' : _grpCtx.isUcl ? '我的歐冠聯賽階段預測' : '我的世界盃分組晉級預測'
   ctx.fillText(_grpTitle, W / 2, 136)
 
@@ -1864,12 +1874,6 @@ async function shareGroupImage() {
   ctx.font = '15px sans-serif'
   const _grpSub = _grpCtx.isEpl ? 'English Premier League 2025/26' : _grpCtx.isUcl ? 'UEFA Champions League 2025/26 · League Phase' : 'FIFA World Cup 2026 · Group Stage Predictions'
   ctx.fillText(_grpSub, W / 2, 164)
-
-  // Logo（右上角）
-  if (logoImg) {
-    const lh = 40, lw = logoImg.width * (lh / logoImg.height)
-    ctx.drawImage(logoImg, W - PAD - lw, 20, lw, lh)
-  }
 
   // 分隔線
   const divGrad = ctx.createLinearGradient(PAD, 0, W - PAD, 0)

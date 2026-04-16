@@ -5130,19 +5130,17 @@
     const PAD = 36;
     c.textAlign = 'center'; c.textBaseline = 'middle';
 
-    // ── 頂部標題 ──
+    // ── 頂部標題 + Logo ──
+    if (logoImg) {
+      const lh = 40, lw = logoImg.width * (lh / logoImg.height);
+      c.drawImage(logoImg, PAD, 28, lw, lh);
+    }
     c.fillStyle = '#ffd700';
     c.font = `900 28px "Noto Sans TC", sans-serif`;
     c.fillText('⚽ 射門挑戰：前進世界盃', IW/2, 48);
     c.fillStyle = 'rgba(255,255,255,0.3)';
     c.font = `500 14px "Noto Sans TC", sans-serif`;
     c.fillText(window.location.host, IW/2, 78);
-
-    // Logo（右上角）
-    if (logoImg) {
-      const lh = 40, lw = logoImg.width * (lh / logoImg.height);
-      c.drawImage(logoImg, IW - PAD - lw, 28, lw, lh);
-    }
 
     // 分隔線
     const divGrad = c.createLinearGradient(PAD, 0, IW-PAD, 0);

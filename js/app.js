@@ -3535,10 +3535,10 @@ async function shareMyPrediction(matchId) {
   ctx.fillStyle = topLine;
   ctx.fillRect(0, 0, w, 3);
 
-  // Logo（右上角）
+  // Logo（左上角）
   if (logoImg) {
-    const lh = 32, lw = logoImg.width * (lh / logoImg.height);
-    ctx.drawImage(logoImg, w - 42 - lw, 14, lw, lh);
+    const lh = 28, lw = logoImg.width * (lh / logoImg.height);
+    ctx.drawImage(logoImg, 20, 10, lw, lh);
   }
 
   // ── 頂部標籤 ──
