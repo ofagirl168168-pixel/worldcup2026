@@ -161,6 +161,10 @@
           <button onclick="showSection('arena');setTimeout(()=>document.getElementById('leaderboard-section')?.scrollIntoView({behavior:'smooth'}),300);event.stopPropagation()">
             <i class="fas fa-trophy"></i> 查看排行榜
           </button>
+          <button onclick="openMyPredModal();event.stopPropagation()">
+            <i class="fas fa-clipboard-list"></i> 我的預測記錄
+            <span id="pred-badge" class="pred-badge" style="display:none"></span>
+          </button>
           <hr style="border-color:rgba(255,255,255,0.08);margin:4px 0">
           <button onclick="logout();event.stopPropagation()" style="color:#f44336">
             <i class="fas fa-sign-out-alt"></i> 登出
@@ -458,18 +462,6 @@
         <div id="predictions-list" class="predictions-list"></div>
       </div>
 
-      <!-- 我的預測記錄 -->
-      <div class="home-section">
-        <div class="section-header">
-          <h2><i class="fas fa-clipboard-list"></i> 我的預測記錄</h2>
-          <div class="filter-tabs" id="my-pred-filter">
-            <button class="filter-tab active" data-mypred="all">全部</button>
-            <button class="filter-tab" data-mypred="settled">已結算</button>
-            <button class="filter-tab" data-mypred="pending">等待中</button>
-          </div>
-        </div>
-        <div id="my-pred-history"></div>
-      </div>
     </section>
 
     <!-- ===== 球隊介紹 ===== -->
@@ -561,6 +553,22 @@
       </div>
     </div>
   </footer>
+
+  <!-- 我的預測記錄 Modal -->
+  <div id="pred-history-modal" class="pred-modal-overlay" style="display:none" onclick="if(event.target===this)closePredModal()">
+    <div class="pred-modal-box">
+      <div class="pred-modal-header">
+        <h2><i class="fas fa-clipboard-list"></i> 我的預測記錄</h2>
+        <button class="pred-modal-close" onclick="closePredModal()">&times;</button>
+      </div>
+      <div class="filter-tabs pred-modal-filter" id="modal-pred-filter">
+        <button class="filter-tab active" data-mypred="all">全部</button>
+        <button class="filter-tab" data-mypred="settled">已結算</button>
+        <button class="filter-tab" data-mypred="pending">等待中</button>
+      </div>
+      <div id="modal-pred-history" class="pred-modal-body"></div>
+    </div>
+  </div>
 
   <!-- JS 載入順序：data → tournament → app → supabase -->
   <script src="js/data-teams.js"></script>

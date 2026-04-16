@@ -816,7 +816,7 @@ function showSection(id) {
   if (id === 'teams')       _r(() => renderTeams('all',''));
   if (id === 'stats')       _r(() => renderStats('standings'));
   if (id === 'focus')       _r(() => renderFocus());
-  if (id === 'predictions') { _r(() => renderPredictions()); _r(() => renderMyPredHistory()); }
+  if (id === 'predictions') { _r(() => renderPredictions()); }
   if (id === 'arena')       _r(() => renderArena());
 }
 
@@ -863,10 +863,10 @@ document.querySelectorAll('.stats-tab').forEach(btn => {
   });
 });
 
-// 我的預測記錄篩選
-document.getElementById('my-pred-filter')?.addEventListener('click', e => {
+// 我的預測記錄 Modal 篩選
+document.getElementById('modal-pred-filter')?.addEventListener('click', e => {
   if (!e.target.dataset.mypred) return;
-  document.querySelectorAll('#my-pred-filter .filter-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#modal-pred-filter .filter-tab').forEach(b => b.classList.remove('active'));
   e.target.classList.add('active');
   renderMyPredHistory(e.target.dataset.mypred);
 });
@@ -982,7 +982,7 @@ function renderPredictions() {
 
 // ── 我的預測記錄 ──────────────────────────────────────────
 function renderMyPredHistory(filter = 'all') {
-  const el = document.getElementById('my-pred-history');
+  const el = document.getElementById('modal-pred-history');
   if (!el) return;
 
   // 收集所有賽事的預測
@@ -1085,6 +1085,68 @@ function renderMyPredHistory(filter = 'all') {
 
   el.innerHTML = html;
 }
+
+// 開啟預測記錄 Modal
+function openMyPredModal() {
+  const modal = document.getElementById('pred-history-modal');
+  if (!modal) return;
+  // 重置 filter
+  document.querySelectorAll('#modal-pred-filter .filter-tab').forEach(b => b.classList.remove('active'));
+  document.querySelector('#modal-pred-filter .filter-tab[data-mypred="all"]')?.classList.add('active');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  renderMyPredHistory('all');
+  // 標記已讀：記錄當前已結算數
+  _markPredSeen();
+  // 關閉 dropdown
+  document.getElementById('user-dropdown')?.classList.remove('open');
+}
+function closePredModal() {
+  const modal = document.getElementById('pred-history-modal');
+  if (!modal) return;
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// Badge 通知：計算未讀已結算數
+function _getSettledCount() {
+  let count = 0;
+  ['wc26_', 'ucl26_', 'epl26_'].forEach(p => {
+    try { const s = JSON.parse(localStorage.getItem(p + 'settled'))||{}; count += Object.keys(s).length; } catch {}
+  });
+  return count;
+}
+function _markPredSeen() {
+  localStorage.setItem('pred_seen_settled', _getSettledCount());
+  _updatePredBadge();
+}
+function _updatePredBadge() {
+  const seen = parseInt(localStorage.getItem('pred_seen_settled'))||0;
+  const total = _getSettledCount();
+  const unseen = Math.max(0, total - seen);
+  // dropdown 內的 badge
+  const badge = document.getElementById('pred-badge');
+  if (badge) {
+    badge.textContent = unseen;
+    badge.style.display = unseen > 0 ? 'inline-flex' : 'none';
+  }
+  // nav widget 上的小紅點
+  const navBadge = document.getElementById('nav-pred-badge');
+  if (unseen > 0) {
+    if (!navBadge) {
+      const w = document.getElementById('nav-user-widget');
+      if (w) {
+        const b = document.createElement('span');
+        b.id = 'nav-pred-badge'; b.className = 'nav-pred-badge';
+        b.textContent = unseen;
+        w.appendChild(b);
+      }
+    } else { navBadge.textContent = unseen; navBadge.style.display = 'flex'; }
+  } else if (navBadge) { navBadge.style.display = 'none'; }
+}
+
+// 頁面載入時更新 badge
+document.addEventListener('DOMContentLoaded', () => setTimeout(_updatePredBadge, 1500));
 
 // 統一的比賽預測 Modal（所有入口都走這裡）
 async function openPredModal(id) {

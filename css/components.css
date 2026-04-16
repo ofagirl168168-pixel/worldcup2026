@@ -2631,3 +2631,48 @@ img.flag-img {
   .pred-stat-card { padding: 8px 10px; }
   .pred-stat-num { font-size: 18px; }
 }
+
+/* 預測記錄 Modal */
+.pred-modal-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.pred-modal-box {
+  background: var(--bg-dark, #1a1a2e); border: 1px solid var(--border);
+  border-radius: 16px; width: 94%; max-width: 560px; max-height: 85vh;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.pred-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px 12px; border-bottom: 1px solid var(--border);
+}
+.pred-modal-header h2 { font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px; }
+.pred-modal-close {
+  background: none; border: none; color: var(--text-muted); font-size: 28px;
+  cursor: pointer; line-height: 1; padding: 0 4px;
+}
+.pred-modal-close:hover { color: #fff; }
+.pred-modal-filter { padding: 12px 20px 0; }
+.pred-modal-body { padding: 16px 20px 20px; overflow-y: auto; flex: 1; }
+
+/* 紅點通知 Badge */
+.pred-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #f44336; color: #fff; font-size: 11px; font-weight: 800;
+  min-width: 18px; height: 18px; border-radius: 99px; padding: 0 5px;
+  margin-left: 6px; line-height: 1;
+}
+.nav-user-widget { position: relative; }
+.nav-pred-badge {
+  position: absolute; top: -4px; right: -4px;
+  background: #f44336; color: #fff; font-size: 10px; font-weight: 800;
+  min-width: 16px; height: 16px; border-radius: 99px; padding: 0 4px;
+  display: flex; align-items: center; justify-content: center; line-height: 1;
+}
+
+@media (max-width: 600px) {
+  .pred-modal-box { width: 100%; max-width: 100%; max-height: 92vh; border-radius: 14px 14px 0 0; }
+  .pred-modal-overlay { align-items: flex-end; }
+}
