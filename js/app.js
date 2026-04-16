@@ -816,7 +816,7 @@ function showSection(id) {
   if (id === 'teams')       _r(() => renderTeams('all',''));
   if (id === 'stats')       _r(() => renderStats('standings'));
   if (id === 'focus')       _r(() => renderFocus());
-  if (id === 'predictions') _r(() => renderPredictions());
+  if (id === 'predictions') { _r(() => renderPredictions()); _r(() => renderMyPredHistory()); }
   if (id === 'arena')       _r(() => renderArena());
 }
 
@@ -861,6 +861,14 @@ document.querySelectorAll('.stats-tab').forEach(btn => {
     btn.classList.add('active');
     renderStats(btn.dataset.stats);
   });
+});
+
+// 我的預測記錄篩選
+document.getElementById('my-pred-filter')?.addEventListener('click', e => {
+  if (!e.target.dataset.mypred) return;
+  document.querySelectorAll('#my-pred-filter .filter-tab').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  renderMyPredHistory(e.target.dataset.mypred);
 });
 
 // AI預測頁
@@ -970,6 +978,112 @@ function renderPredictions() {
       <span class="confidence-badge confidence-${p.conf}">${p.hw}% - ${p.d}% - ${p.aw}%</span>
     </div>`;
   }).join('');
+}
+
+// ── 我的預測記錄 ──────────────────────────────────────────
+function renderMyPredHistory(filter = 'all') {
+  const el = document.getElementById('my-pred-history');
+  if (!el) return;
+
+  // 收集所有賽事的預測
+  const entries = [];
+  ['wc26_', 'ucl26_', 'epl26_'].forEach(p => {
+    const myPreds = (() => { try { return JSON.parse(localStorage.getItem(p + 'my_preds'))||{}; } catch { return {}; } })();
+    const settled = (() => { try { return JSON.parse(localStorage.getItem(p + 'settled'))||{}; } catch { return {}; } })();
+    const matches = p === 'epl26_' ? (window.EPL_MATCHES||[]) : p === 'ucl26_' ? (window.UCL_MATCHES||[]) : (typeof SCHEDULE!=='undefined' ? SCHEDULE : []);
+    const teams = p === 'epl26_' ? (window.EPL_TEAMS||{}) : p === 'ucl26_' ? (window.UCL_TEAMS||{}) : (typeof TEAMS!=='undefined' ? TEAMS : {});
+    const label = p === 'epl26_' ? '英超' : p === 'ucl26_' ? '歐冠' : '世界盃';
+
+    for (const [matchId, pred] of Object.entries(myPreds)) {
+      const m = matches.find(x => x.id === matchId);
+      if (!m) continue;
+      const ht = teams[m.home], at = teams[m.away];
+      if (!ht || !at) continue;
+      const s = settled[matchId] || null;
+      entries.push({ matchId, pred, match: m, ht, at, settled: s, label, prefix: p });
+    }
+  });
+
+  if (!entries.length) {
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
+      <div style="font-size:40px;margin-bottom:12px">🎯</div>
+      <div>你還沒有任何預測紀錄</div>
+      <div style="font-size:13px;margin-top:6px">在賽事預測頁面選擇比賽，開始你的第一場預測！</div>
+    </div>`;
+    return;
+  }
+
+  // 排序：未結算在前（按比賽日期升序），已結算在後（按結算時間降序）
+  entries.sort((a, b) => {
+    const aSettled = !!a.settled, bSettled = !!b.settled;
+    if (aSettled !== bSettled) return aSettled ? 1 : -1;
+    if (!aSettled) return (a.match.date||'') < (b.match.date||'') ? -1 : 1;
+    return (b.settled.settledAt||'') < (a.settled.settledAt||'') ? -1 : 1;
+  });
+
+  // 篩選
+  const filtered = filter === 'settled' ? entries.filter(e => e.settled)
+    : filter === 'pending' ? entries.filter(e => !e.settled)
+    : entries;
+
+  // 統計
+  const totalPreds = entries.length;
+  const settledCount = entries.filter(e => e.settled).length;
+  const correctDir = entries.filter(e => e.settled?.direction).length;
+  const exactCount = entries.filter(e => e.settled?.exact).length;
+  const accuracy = settledCount > 0 ? Math.round(correctDir / settledCount * 100) : 0;
+
+  let html = `<div class="my-pred-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+    <div class="pred-stat-card"><span class="pred-stat-num">${totalPreds}</span><span class="pred-stat-label">總預測</span></div>
+    <div class="pred-stat-card"><span class="pred-stat-num">${settledCount}</span><span class="pred-stat-label">已結算</span></div>
+    <div class="pred-stat-card"><span class="pred-stat-num" style="color:#4caf50">${correctDir}</span><span class="pred-stat-label">猜對方向</span></div>
+    <div class="pred-stat-card"><span class="pred-stat-num" style="color:#f5a623">${exactCount}</span><span class="pred-stat-label">精準比分</span></div>
+    <div class="pred-stat-card"><span class="pred-stat-num">${accuracy}%</span><span class="pred-stat-label">準確率</span></div>
+  </div>`;
+
+  html += filtered.map(e => {
+    const { pred, match: m, ht, at, settled: s, label } = e;
+    const isClub = e.prefix !== 'wc26_';
+    const dateStr = isClub ? (m.date||'').slice(5).replace('-','/') : (m.twDate||m.date||'').slice(5).replace('-','/');
+    const time = isClub ? (m.time||'') : (m.twTime||m.time||'');
+
+    let resultHtml, statusCls;
+    if (s) {
+      if (s.exact) {
+        resultHtml = `<span class="pred-result pred-exact">🎯 精準命中</span>`;
+        statusCls = 'pred-row-exact';
+      } else if (s.goalDiffMatch) {
+        resultHtml = `<span class="pred-result pred-goaldiff">✅ 猜中比分差</span>`;
+        statusCls = 'pred-row-correct';
+      } else if (s.direction) {
+        resultHtml = `<span class="pred-result pred-correct">✅ 方向正確</span>`;
+        statusCls = 'pred-row-correct';
+      } else {
+        resultHtml = `<span class="pred-result pred-wrong">❌ 未命中</span>`;
+        statusCls = 'pred-row-wrong';
+      }
+      resultHtml += ` <span class="pred-xp-reward">+${s.xp} XP${s.gem ? ` +${s.gem}💎` : ''}</span>`;
+    } else {
+      resultHtml = `<span class="pred-result pred-pending">⏳ 等待開賽</span>`;
+      statusCls = 'pred-row-pending';
+    }
+
+    return `<div class="pred-history-row ${statusCls}" onclick="openPredModal('${e.matchId}')">
+      <div class="pred-h-meta">
+        <span class="pred-h-label">${label}</span>
+        <span class="pred-h-date">${dateStr} ${time}</span>
+      </div>
+      <div class="pred-h-match">
+        <span class="pred-h-team">${flagImg(ht.flag)} ${ht.nameCN}</span>
+        <span class="pred-h-score">${pred.h} - ${pred.a}</span>
+        <span class="pred-h-team">${at.nameCN} ${flagImg(at.flag)}</span>
+      </div>
+      ${s ? `<div class="pred-h-actual">實際比分：${s.actH} - ${s.actA}</div>` : ''}
+      <div class="pred-h-result">${resultHtml}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = html;
 }
 
 // 統一的比賽預測 Modal（所有入口都走這裡）

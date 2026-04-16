@@ -2592,3 +2592,42 @@ img.flag-img {
   --tournament-color: #1a56db;
   --tournament-accent: #0e3fa8;
 }
+
+/* ========== 我的預測記錄 ========== */
+.pred-stat-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 18px; display: flex; flex-direction: column; align-items: center; flex:1; min-width:70px;
+}
+.pred-stat-num { font-size: 22px; font-weight: 900; }
+.pred-stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.pred-history-row {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 18px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.2s;
+}
+.pred-history-row:hover { border-color: var(--accent); }
+.pred-row-exact { border-left: 3px solid #f5a623; }
+.pred-row-correct { border-left: 3px solid #4caf50; }
+.pred-row-wrong { border-left: 3px solid #ef5350; }
+.pred-row-pending { border-left: 3px solid var(--border); }
+.pred-h-meta { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.pred-h-label { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: rgba(255,255,255,0.06); color: var(--text-muted); }
+.pred-h-date { font-size: 12px; color: var(--text-muted); }
+.pred-h-match { display: flex; align-items: center; justify-content: center; gap: 14px; font-weight: 700; font-size: 15px; }
+.pred-h-score { font-size: 20px; font-weight: 900; color: var(--accent); min-width: 60px; text-align: center; }
+.pred-h-team { display: flex; align-items: center; gap: 6px; min-width: 80px; }
+.pred-h-team:last-child { justify-content: flex-end; }
+.pred-h-actual { text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+.pred-h-result { text-align: center; margin-top: 6px; }
+.pred-result { font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
+.pred-exact { background: rgba(245,166,35,0.15); color: #f5a623; }
+.pred-goaldiff { background: rgba(76,175,80,0.15); color: #4caf50; }
+.pred-correct { background: rgba(76,175,80,0.12); color: #4caf50; }
+.pred-wrong { background: rgba(239,83,80,0.12); color: #ef5350; }
+.pred-pending { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+.pred-xp-reward { font-size: 12px; color: var(--text-muted); margin-left: 6px; }
+@media (max-width: 600px) {
+  .pred-h-match { gap: 8px; font-size: 13px; }
+  .pred-h-score { font-size: 17px; min-width: 50px; }
+  .pred-stat-card { padding: 8px 10px; }
+  .pred-stat-num { font-size: 18px; }
+}
