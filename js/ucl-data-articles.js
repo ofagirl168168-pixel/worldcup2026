@@ -31,81 +31,6 @@ const UCL_ARTICLES = [
     tags: ['賽制', '新制', '聯賽階段']
   },
   {
-    id: 'ucl-002',
-    title: '歐冠八強前瞻：巴塞隆納 vs 拜仁慕尼黑',
-    date: '2026-04-05',
-    category: '前瞻分析',
-    summary: '歐冠經典對決再度上演！Yamal領軍的巴薩對決Kane坐鎮的拜仁，誰能晉級四強？',
-    content: `## 巴塞隆納 vs 拜仁慕尼黑
-
-### 歷史交鋒
-這是歐冠史上最經典的對決之一。2020年拜仁8:2屠殺巴薩仍讓人記憶猶新。
-
-### 巴塞隆納優勢
-- Lamine Yamal本賽季狀態火燙
-- 聯賽階段表現出色，多場大勝
-- Flick熟悉拜仁體系
-
-### 拜仁慕尼黑優勢
-- Harry Kane進球機器全開
-- Musiala歐冠賽場靈感十足
-- Kompany高壓戰術成型
-
-### AI預測
-巴塞隆納 55% vs 拜仁 45%`,
-    tags: ['八強', '巴塞隆納', '拜仁', '前瞻']
-  },
-  {
-    id: 'ucl-003',
-    title: '歐冠八強前瞻：利物浦 vs 國際米蘭',
-    date: '2026-04-05',
-    category: '前瞻分析',
-    summary: 'Slot帶領利物浦在歐冠勢如破竹，但Inzaghi的國際米蘭防守堅如磐石。',
-    content: `## 利物浦 vs 國際米蘭
-
-### 對決焦點
-Salah vs Bastoni的翼對後衛對決將是關鍵。
-
-### 利物浦優勢
-- 聯賽階段攻擊力最強之一
-- Salah歐冠經驗豐富
-- 安菲爾德之夜的魔力
-
-### 國際米蘭優勢
-- 三後衛防守體系成熟
-- Lautaro+Thuram鋒線配合默契
-- Inzaghi善於應對英超球隊
-
-### AI預測
-利物浦 58% vs 國際米蘭 42%`,
-    tags: ['八強', '利物浦', '國際米蘭', '前瞻']
-  },
-  {
-    id: 'ucl-004',
-    title: '歐冠八強前瞻：皇家馬德里 vs 馬德里競技',
-    date: '2026-04-06',
-    category: '前瞻分析',
-    summary: '馬德里德比在歐冠八強上演！Mbappé首次在歐冠面對Simeone的鐵血防線。',
-    content: `## 皇家馬德里 vs 馬德里競技
-
-### 德比之戰
-歐冠史上最火爆的同城德比之一。兩隊曾在2014和2016年歐冠決賽相遇。
-
-### 皇馬優勢
-- Mbappé+Vinícius+Bellingham三叉戟
-- 歐冠DNA——15次奪冠的底蘊
-- 伯納烏主場改建後氣勢更強
-
-### 馬競優勢
-- Simeone防守反擊戰術專門克制皇馬
-- Álvarez帶來新的反擊威脅
-- 從不在大賽中放棄
-
-### AI預測
-皇家馬德里 52% vs 馬德里競技 48%`,
-    tags: ['八強', '皇馬', '馬競', '德比', '前瞻']
-  },
-  {
     id: 'ucl-005',
     title: '聯賽階段總結：誰是最大贏家與輸家？',
     date: '2026-02-01',
@@ -417,7 +342,7 @@ Dani Olmo 一記精準長傳找到禁區內的 Torres，後者以精妙的第一
 71.1% 控球率、更多射正，但依然被淘汰。巴薩在前 24 分鐘展現了頂級實力，但一個失誤（讓 Lookman 反擊得手）和一張紅牌（García）就足以毀掉一切。這就是歐冠——效率比控球更重要。
 
 **馬競四強展望**
-Simeone 的球隊自 2017 年以來首次重返歐冠四強，將對陣兵工廠或體育CP的勝者。`,
+Simeone 的球隊自 2017 年以來首次重返歐冠四強，將在四強對陣兵工廠。`,
     tags: ['八強', '馬競', '巴薩', '戰報', 'Yamal', 'Lookman', 'Simeone']
   },
   {
@@ -472,8 +397,215 @@ Simeone 的球隊自 2017 年以來首次重返歐冠四強，將對陣兵工廠
 首回合 Doué 和 Kvaratskhelia 建功，次回合輪到 Dembélé 接管比賽。金球獎得主在關鍵時刻展現了頂級球星的冷酷——兩球封喉，無情但優雅。
 
 **巴黎四強展望**
-衛冕冠軍以不失一球的完美表現闖入四強，將對陣拜仁或皇馬的勝者。巴黎正在向連續衛冕發起衝擊，目前的表現讓所有對手都心生畏懼。`,
+衛冕冠軍以不失一球的完美表現闖入四強，將在四強對陣拜仁慕尼黑。巴黎正在向連續衛冕發起衝擊，目前的表現讓所有對手都心生畏懼。`,
     tags: ['八強', '利物浦', '巴黎', '戰報', 'Dembélé', 'VAR', '衛冕冠軍']
+  },
+  {
+    id: 'ucl-013',
+    title: '【八強戰報】兵工廠 0-0 體育CP：悶戰守住晉級，槍手隊史首度連續兩年殺入四強',
+    date: '2026-04-16',
+    category: '賽後回顧',
+    summary: '酋長球場的歐冠之夜缺乏火花。雙方各擊中一次門柱，0.93 xG 創下本賽季歐冠最低，但兵工廠憑總比數 1-0 完成任務，隊史首度連續兩季進入四強。',
+    content: `## 兵工廠 0-0 體育CP｜歐冠八強次回合・4/16（三）03:00 台灣時間
+**總比分 1-0，兵工廠晉級四強** ｜ 裁判：François Letexier
+
+### 比賽回顧
+
+**沉悶的上半場**
+兵工廠帶著首回合 1-0 的領先回到主場，Arteta 選擇穩守策略。上半場幾乎沒有值得一提的機會，直到半場前 Geny Catamo 一記凌空抽射擊中門柱，讓酋長球場倒吸一口涼氣。
+
+**下半場的掙扎**
+Arteta 在 60 分鐘左右換上 16 歲的 Max Dowman，這位小將立刻帶來活力。Noni Madueke 一腳射門擦柱而過，可惜隨後膝傷退場，成為週末對曼城的重大隱憂。
+
+比賽尾聲 Leandro Trossard 頭球擊中門柱，是兵工廠全場最接近進球的一次。體育CP 方面 Maxi Araujo 的遠射逼迫 David Raya 做出撲救，但整場比賽缺乏真正的威脅。
+
+**爭議判罰**
+體育CP 主張 Araujo 在禁區內被 Mosquera 碰倒應判點球，但主裁判 Letexier 不予理會。Arteta 也因場邊過度激動而被黃牌警告。
+
+### 關鍵數據
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">數據</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">兵工廠</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">體育CP</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">控球率</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">50.4%</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">49.6%</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射門</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">15</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">8</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射正</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">1</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">1</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">角球</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">8</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">3</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">xG</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0.64</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0.29</td></tr>
+<tr><td style="padding:8px">撲救</td><td style="padding:8px;text-align:center">1</td><td style="padding:8px;text-align:center">1</td></tr>
+</table>
+
+### 賽後分析
+
+**務實的勝利**
+0.93 的合計 xG 是本季歐冠最低，也是自 2019 年巴薩 vs 曼聯以來八強最低。但 Arteta 不在乎美感——任務完成就好。缺少 Saka 的兵工廠選擇保守是合理的策略選擇。
+
+**Madueke 傷退的隱憂**
+Madueke 膝傷退場可能讓兵工廠週日對曼城的英超爭冠戰少了一員大將。加上 Saka 仍在養傷，兵工廠右路火力嚴重短缺。
+
+**四強展望**
+兵工廠將在四強對陣馬德里競技。首回合 4/29 客場挑戰大都會球場，次回合 5/6 回到酋長球場。上一次兩隊在歐冠交手是聯賽階段，兵工廠以 4-0 大勝，但淘汰賽的 Simeone 完全是另一個檔次。`,
+    tags: ['八強', '兵工廠', '體育CP', '戰報', '晉級', '四強']
+  },
+  {
+    id: 'ucl-014',
+    title: '【八強戰報】拜仁 4-3 皇馬：7球史詩大戰！Díaz、Olise 傷停補時雙殺，終結皇馬歐冠霸權',
+    date: '2026-04-16',
+    category: '賽後回顧',
+    summary: '安聯球場上演本世紀最瘋狂的歐冠之夜。上半場 5 球轟炸，Güler 梅開二度一度讓皇馬看見希望，但 Camavinga 紅牌後拜仁連入兩球逆轉，總比數 6-4 晉級。',
+    content: `## 拜仁 4-3 皇馬｜歐冠八強次回合・4/16（三）03:00 台灣時間
+**總比分 6-4，拜仁晉級四強** ｜ 觀眾：75,000 ｜ 安聯球場
+
+### 比賽進球
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">時間</th><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">進球者</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">比分</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">總比分</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">1'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Arda Güler（皇馬）— Neuer 失誤</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0-1</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2-2</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">6'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Aleksandar Pavlovic（拜仁）— 頭球</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">1-1</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">3-2</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">29'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Arda Güler（皇馬）— 任意球直接破門</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">1-2</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">3-3</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">38'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Harry Kane（拜仁）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2-2</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">4-3</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">42'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Kylian Mbappé（皇馬）— Vinícius Jr. 助攻</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2-3</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">4-4</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">89'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Luis Díaz（拜仁）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">3-3</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">5-4</td></tr>
+<tr><td style="padding:8px">90+4'</td><td style="padding:8px">⚽ Michael Olise（拜仁）</td><td style="padding:8px;text-align:center">4-3</td><td style="padding:8px;text-align:center">6-4</td></tr>
+</table>
+
+### 比賽回顧
+
+**瘋狂的上半場：42 分鐘 5 球**
+比賽在第 40 秒就爆炸——Manuel Neuer 出擊判斷失誤，Güler 輕鬆將球送入空門，總比分瞬間扳成 2-2。安聯球場陷入沉默。
+
+但拜仁僅用 5 分鐘就回敬。第 6 分鐘 Pavlovic 角球頭球破門，拜仁重新取得總比分領先。然而 Güler 在 29 分鐘又以一記完美的任意球直接破門，皮球飛入球門右上死角，連 Neuer 都只能目送。
+
+Kane 在 38 分鐘為拜仁扳平，隨後 Mbappé 在 42 分鐘接 Vinícius Jr. 的助攻再度讓皇馬領先——半場結束，安聯球場已經見證了 5 粒進球，總比分 4-4 懸念未解。
+
+**沉寂的下半場與 Camavinga 的災難**
+下半場節奏驟降。兩隊在中場絞殺了近 40 分鐘，直到第 86 分鐘替補上場的 Eduardo Camavinga 因第二張黃牌被罰下——皇馬 10 人應戰。
+
+**致命的最後 5 分鐘**
+Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推射，打破僵局。傷停補時第 4 分鐘，Michael Olise 接應隊友傳球一腳射入，安聯球場瞬間沸騰——拜仁在最後時刻連入 2 球，以 4-3（總比分 6-4）終結了皇馬的歐冠之旅。
+
+終場前 Güler 因情緒失控也被紅牌罰下（90+5'），為這個戲劇性的夜晚畫下句點。
+
+### 關鍵數據
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">數據</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">拜仁</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">皇馬</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">控球率</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">68.6%</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">31.4%</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射門</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">21</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">12</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射正</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">9</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">5</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">角球</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">9</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">黃牌</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">1</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2 + 2紅</td></tr>
+<tr><td style="padding:8px">撲救</td><td style="padding:8px;text-align:center">2</td><td style="padding:8px;text-align:center">4</td></tr>
+</table>
+
+### 賽後分析
+
+**Güler：一個人扛起皇馬**
+21 歲的土耳其天才獨進 2 球、單場 xG 全隊最高，幾乎以一己之力讓皇馬看見翻盤曙光。但最終的紅牌也讓人唏噓——天才與情緒控制之間的平衡，是 Güler 未來必須修煉的課題。
+
+**Kompany 的臨危不亂**
+半場 2-3 落後、總比分打平，Kompany 沒有慌張。他在下半場收縮陣型、等待機會，最終在 Camavinga 被罰下後精準抓住數量優勢，以 Díaz 和 Olise 的替補進球完成逆轉。
+
+**皇馬的歐冠霸權終結？**
+缺少 Courtois 和 Rodrygo 的皇馬展現了驚人的戰鬥力，但最終仍然被淘汰。15 次奪冠的歐冠之王本賽季止步八強，Ancelotti 面臨嚴峻的夏季重建壓力。
+
+**拜仁四強展望**
+拜仁將在四強對陣衛冕冠軍巴黎聖日耳曼。首回合 4/30 客戰王子公園球場，次回合 5/7 回到安聯球場。兩隊在本季聯賽階段已交手，拜仁憑 Díaz 的梅開二度取勝——巧合的是，正是 Díaz 在今晚的 89 分鐘打破僵局。`,
+    tags: ['八強', '拜仁', '皇馬', '戰報', 'Güler', 'Kane', 'Díaz', 'Olise', '七球大戰']
+  },
+  {
+    id: 'ucl-015',
+    title: '歐冠四強前瞻：馬德里競技 vs 兵工廠 — Simeone 鐵血 vs Arteta 革命',
+    date: '2026-04-16',
+    category: '四強前瞻',
+    summary: '聯賽階段 0-4 慘敗後 Simeone 已重新找到解法。馬競的反擊效率 vs 兵工廠的控球壓迫，誰能率先搶佔決賽門票？',
+    content: `## 馬德里競技 vs 兵工廠｜歐冠四強
+**首回合：4/29（二）03:00 台灣時間・大都會球場**
+**次回合：5/6（二）03:00 台灣時間・酋長球場**
+
+### 晉級之路
+
+**馬競：** 淘汰巴塞隆納（總比分 3-2）
+八強首回合客場 2-0 大勝諾坎普，次回合雖被 Yamal 和 Torres 連扳兩球，但 Lookman 反擊進球穩住局面。Simeone 經典的防守反擊哲學再次奏效。
+
+**兵工廠：** 淘汰體育CP（總比分 1-0）
+首回合客場 Havertz 傷停補時絕殺，次回合主場 0-0 安全晉級。過程不華麗，但 Arteta 展現了歐冠淘汰賽必備的務實精神。
+
+### 歷史交鋒
+兩隊在本季歐冠聯賽階段交手，兵工廠在酋長球場以 4-0 大勝。但 Simeone 從來不會被同一招擊敗兩次——淘汰賽的馬競和聯賽階段完全是兩支不同的球隊。
+
+### 馬競的武器
+- **Simeone 的防守體系：** 八強兩回合僅 28.9% 控球率卻成功淘汰巴薩，效率是馬競的代名詞
+- **Lookman + Álvarez 反擊組合：** 速度與終結力兼備，兵工廠高線防守將面臨考驗
+- **大都會球場的魔力：** 馬競主場向來是歐冠最難攻克的堡壘之一
+- **大賽經驗：** Griezmann、Koke、Oblak 都是身經百戰的老將
+
+### 兵工廠的武器
+- **Saliba + Gabriel 中衛組合：** 全歐洲最穩固的後防之一
+- **控球壓迫體系：** Arteta 的戰術能有效壓縮馬競的反擊空間
+- **深度陣容：** 即使缺少 Saka，Trossard、Martinelli、Madueke 都能頂上
+- **歐冠成長曲線：** 連續兩年四強，槍手的歐冠經驗正在快速累積
+
+### 關鍵對決
+1. **Lookman vs Saliba**：馬競最鋒利的反擊刀刃 vs 英超最佳中衛
+2. **Griezmann vs Rice**：法國老將的創造力 vs 英格蘭中場屏障
+3. **Álvarez vs Gabriel**：阿根廷射手在禁區內的嗅覺 vs 巴西後衛的制空權
+
+### 隱憂
+- **兵工廠：** Saka 傷勢、Madueke 膝傷退場、週日還有曼城英超大戰體力消耗
+- **馬競：** Oblak 腹部不適、Hancko 腳踝傷、Barrios 和 Cardoso 出戰存疑
+
+### 預測
+這將是風格完全對立的四強大戰。馬競會把比賽節奏拉到極低，伺機反擊；兵工廠則需要耐心推進、避免被反擊得手。Simeone 在大賽中的戰術調整能力是最大變數。
+
+**預測：兵工廠總比分 2-1 晉級，但過程極其艱難**`,
+    tags: ['四強', '馬競', '兵工廠', '前瞻', 'Simeone', 'Arteta']
+  },
+  {
+    id: 'ucl-016',
+    title: '歐冠四強前瞻：巴黎聖日耳曼 vs 拜仁慕尼黑 — 衛冕冠軍 vs 七球殺手',
+    date: '2026-04-16',
+    category: '四強前瞻',
+    summary: '巴黎帶著四場不失球的完美紀錄迎戰剛以 7 球轟殺皇馬的拜仁。後 Mbappé 時代的巴黎 vs Kane 領軍的拜仁，這是一場進攻藝術的對決。',
+    content: `## 巴黎聖日耳曼 vs 拜仁慕尼黑｜歐冠四強
+**首回合：4/30（三）03:00 台灣時間・王子公園球場**
+**次回合：5/7（三）03:00 台灣時間・安聯球場**
+
+### 晉級之路
+
+**巴黎：** 淘汰利物浦（總比分 4-0）
+兩回合碾壓式淘汰利物浦，四場不失球。Doué、Kvaratskhelia 首回合建功，Dembélé 次回合梅開二度。衛冕冠軍展現了令人畏懼的整體實力。
+
+**拜仁：** 淘汰皇馬（總比分 6-4）
+兩回合轟進 6 球淘汰歐冠之王。八強次回合 4-3 的七球大戰更是本季歐冠最戲劇性的一夜，Díaz 和 Olise 傷停補時雙殺完成逆轉。
+
+### 本季已有交手
+聯賽階段兩隊在慕尼黑交手，拜仁憑 Luis Díaz 的梅開二度 2-0 擊敗巴黎。但那是數個月前的事了——巴黎在淘汰賽階段的蛻變有目共睹。
+
+### 巴黎的武器
+- **Dembélé + Kvaratskhelia + Doué 三叉戟：** 後 Mbappé 時代的巴黎找到了新的進攻密碼
+- **Luis Enrique 的控球體系：** 淘汰賽階段場均超過 60% 控球率
+- **不失球紀錄：** 八強四場比賽零封對手，防守端的進步令人驚嘆
+- **衛冕冠軍心態：** 去年決賽奪冠的經驗是無價的心理優勢
+
+### 拜仁的武器
+- **Harry Kane 49 球賽季：** 本季各賽事 49 球，歐冠 11 球位居射手榜第二
+- **Musiala 的創造力：** 德國新星是拜仁進攻的大腦
+- **替補席火力：** Díaz、Olise 都能在替補登場後改變比賽走向
+- **安聯球場主場：** 本季歐冠主場全勝，次回合回到慕尼黑是巨大優勢
+- **Kompany 的戰術彈性：** 八強次回合展現了臨危不亂的能力
+
+### 關鍵對決
+1. **Dembélé vs Davies**：金球獎得主的爆發力 vs 加拿大飛翼的速度
+2. **Kane vs Marquinhos**：英格蘭隊長 vs 巴西後防磐石
+3. **Musiala vs Vitinha**：兩位中場天才的正面交鋒
+4. **Kvaratskhelia vs Kimmich**：格魯吉亞魔翼 vs 德國全能戰士
+
+### 隱憂
+- **巴黎：** Fabián Ruiz 膝傷缺陣、Nuno Mendes 和 Doué 八強退場傷勢評估中
+- **拜仁：** Gnabry 膝傷帶護具、八強次回合體力消耗巨大（90 分鐘高強度 7 球大戰）
+
+### 預測
+這是本季歐冠最令人期待的四強對決。巴黎擁有更穩定的防守和衛冕冠軍的氣質，但拜仁的進攻火力和主場優勢不可忽視。如果 Doué 和 Mendes 能傷癒，巴黎的整體實力略佔上風。
+
+**預測：巴黎總比分 3-2 晉級，但拜仁在安聯球場將讓巴黎付出巨大代價**`,
+    tags: ['四強', '巴黎', '拜仁', '前瞻', 'Dembélé', 'Kane', '衛冕冠軍']
   }
 ];
 

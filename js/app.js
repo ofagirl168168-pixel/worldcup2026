@@ -629,14 +629,14 @@ function renderHighlights() {
   ];
 
   const uclItems = [
-    {title:'瑞士制第二年更精彩',desc:'新賽制經過首年磨合，36隊混戰格局讓排名懸念延續到最後一輪'},
-    {title:'巴薩 Yamal 世代全面爆發',desc:'Lamine Yamal 率領巴薩青年軍，Flick 體系第二年劍指歐冠冠軍'},
-    {title:'皇馬 Mbappé 磨合完成',desc:'Mbappé 融入皇馬第二季，與 Bellingham、Vinícius 三叉戟全面開火'},
-    {title:'Arsenal 的歐冠野心',desc:'連續征戰歐冠的槍手越來越成熟，Saka+Rice 帶隊衝擊四強'},
-    {title:'拜仁重返巔峰之路',desc:'Kane+Musiala 組合火力全開，拜仁能否重現歐冠榮光？'},
-    {title:'國際米蘭再戰歐洲',desc:'Lautaro 領銜的藍黑軍團，意甲霸主力爭歐冠突破'},
-    {title:'利物浦 Slot 體系成熟',desc:'Slot 執教第二季戰術更穩定，紅軍瞄準第七座歐冠獎盃'},
-    {title:'巴黎聖日耳曼重建進行式',desc:'後 Mbappé 時代的巴黎，新陣容能否在歐冠證明自己？'},
+    {title:'四強對決即將登場',desc:'馬競 vs 兵工廠、巴黎 vs 拜仁，四支勁旅爭奪布達佩斯決賽門票'},
+    {title:'拜仁 4-3 皇馬史詩之戰',desc:'八強次回合7球大戰，Güler 梅開二度仍無力回天，拜仁總比數 6-4 晉級'},
+    {title:'巴黎後 Mbappé 時代蛻變',desc:'Dembélé 雙響淘汰利物浦、總比數 4-0 強勢晉級，巴黎重建成功'},
+    {title:'馬競逆轉巴薩晉級',desc:'Lookman 關鍵進球助馬競總比數 3-2 淘汰巴薩，Simeone 再展鐵血本色'},
+    {title:'Arsenal 歐冠四強新里程',desc:'兵工廠連續兩年晉級八強後首次殺入四強，Arteta 體系日趨成熟'},
+    {title:'Kane 本季49球追逐金靴',desc:'Harry Kane 八強再度建功，本季各項賽事已攻入49球，劍指歐冠金靴'},
+    {title:'Güler 紅牌爭議收場',desc:'皇馬新星 Arda Güler 八強梅開二度卻染紅離場，賽季遺憾告終'},
+    {title:'Simeone 的防守哲學',desc:'馬競總比數 3-2 淘汰巴薩，Simeone 以少勝多的戰術再次奏效'},
     {title:'決賽在布達佩斯',desc:'2025/26 歐冠決賽移師匈牙利普斯卡什球場，中歐足球盛宴'},
     {title:'VAR 與半自動越位技術',desc:'科技持續改變歐冠判罰，爭議是否因此減少？'}
   ];
@@ -756,7 +756,7 @@ function renderPredictions() {
     }
   } else if (_isUCL()) {
     // 歐冠：挑選即將進行的 or 最近的精選比賽
-    const uclFeatPairs = [['BAR','BAY'],['LIV','INT'],['RMA','ATM'],['LEV','ARS'],['PSG','BAY'],['BAR','RMA']];
+    const uclFeatPairs = [['ATM','ARS'],['PSG','BAY'],['ARS','ATM'],['BAY','PSG'],['BAY','RMA'],['LIV','PSG']];
     featuredMatches = uclFeatPairs.map(([h,a]) =>
       schedule.find(m => m.home===h && m.away===a) ||
       schedule.find(m => m.home===a && m.away===h)
@@ -2207,7 +2207,7 @@ function updateHero() {
     ? `<div class="hero-stat"><span class="hero-stat-num">36</span><span class="hero-stat-label">參賽球會</span></div>
        <div class="hero-stat"><span class="hero-stat-num">189</span><span class="hero-stat-label">場比賽</span></div>
        <div class="hero-stat"><span class="hero-stat-num">8</span><span class="hero-stat-label">聯賽輪次</span></div>
-       <div class="hero-stat"><span class="hero-stat-num">QF</span><span class="hero-stat-label">目前階段</span></div>`
+       <div class="hero-stat"><span class="hero-stat-num">SF</span><span class="hero-stat-label">目前階段</span></div>`
     : `<div class="hero-stat"><span class="hero-stat-num">48</span><span class="hero-stat-label">參賽球隊</span></div>
        <div class="hero-stat"><span class="hero-stat-num">104</span><span class="hero-stat-label">場比賽</span></div>
        <div class="hero-stat"><span class="hero-stat-num">16</span><span class="hero-stat-label">比賽場館</span></div>
