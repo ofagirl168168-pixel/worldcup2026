@@ -745,18 +745,23 @@ function renderArena() {
     </div>
 
     <!-- 射門挑戰入口 -->
-    <div class="rogue-arena-banner" onclick="startRogueGame()">
-      <div class="rogue-arena-banner-bg"></div>
-      <div class="goal-post-right"></div>
-      <div class="rogue-arena-banner-content">
-        <div class="rogue-arena-banner-left">
-          <div class="rogue-arena-banner-icon"><span class="rogue-kick-ball">⚽</span></div>
-          <div>
-            <div class="rogue-arena-banner-title">射門挑戰：前進世界盃</div>
-            <div class="rogue-arena-banner-desc">射門 × 卡牌 Build × 無盡生存｜週排行前六名贏寶石</div>
+    <div class="rogue-arena-banner-wrap">
+      <div class="rogue-arena-banner" onclick="startRogueGame()">
+        <div class="rogue-arena-banner-bg"></div>
+        <div class="goal-post-left"></div>
+        <div class="goal-post-right"></div>
+        <div class="goal-depth-shadow"></div>
+        <div class="goal-spotlight"></div>
+        <div class="rogue-arena-banner-content">
+          <div class="rogue-arena-banner-left">
+            <div class="rogue-arena-banner-icon"><span class="rogue-kick-ball">⚽</span></div>
+            <div>
+              <div class="rogue-arena-banner-title">射門挑戰：前進世界盃</div>
+              <div class="rogue-arena-banner-desc">射門 × 卡牌 Build × 無盡生存｜週排行前六名贏寶石</div>
+            </div>
           </div>
+          <div class="rogue-arena-banner-btn"><i class="fas fa-futbol"></i> 射門！</div>
         </div>
-        <div class="rogue-arena-banner-btn"><i class="fas fa-futbol"></i> 射門！</div>
       </div>
     </div>
 
