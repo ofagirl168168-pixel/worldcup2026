@@ -282,11 +282,14 @@ function calcChampionOdds() {
     });
   }
 
-  // ── 4. 正規化為機率 ──
+  // ── 4. 正規化為機率（指數放大強弱差距）──
   scores.sort((a, b) => b.power - a.power);
-  const totalPower = scores.reduce((s, x) => s + x.power, 0);
-  scores.forEach(s => {
-    s.pct = Math.max(1, Math.round(s.power / totalPower * 100));
+  // 用指數函數放大差距，讓強隊機率更集中（球隊數越多指數越大）
+  const exponent = t === 'ucl' ? 3 : t === 'epl' ? 5 : 6;
+  const expScores = scores.map(s => Math.pow(s.power, exponent));
+  const totalExp = expScores.reduce((s, x) => s + x, 0);
+  scores.forEach((s, i) => {
+    s.pct = Math.max(1, Math.round(expScores[i] / totalExp * 100));
   });
   // 修正總和為 100%
   const pctSum = scores.reduce((s, x) => s + x.pct, 0);
