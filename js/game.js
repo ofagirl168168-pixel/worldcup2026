@@ -658,6 +658,28 @@ function showArenaWelcomeIfNeeded() {
   }, 30000); // 頁面載入 30 秒後出現
 }
 
+// ── 球門球網滑鼠撥弄效果 ─────────────────────────────────
+function initGoalNetRipple() {
+  const banner = document.querySelector('.rogue-arena-banner');
+  if (!banner || banner._goalNetBound) return;
+  banner._goalNetBound = true;
+
+  let lastT = 0;
+  banner.addEventListener('mousemove', (e) => {
+    const now = Date.now();
+    if (now - lastT < 50) return;   // 節流 50ms
+    lastT = now;
+
+    const rect = banner.getBoundingClientRect();
+    const ripple = document.createElement('div');
+    ripple.className = 'goal-net-ripple';
+    ripple.style.left = (e.clientX - rect.left) + 'px';
+    ripple.style.top  = (e.clientY - rect.top) + 'px';
+    banner.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
+  });
+}
+
 // ── 競技場主頁面 ──────────────────────────────────────────
 function renderArena() {
   const el = document.getElementById('section-arena');
@@ -749,6 +771,8 @@ function renderArena() {
       <div class="rogue-arena-banner" onclick="startRogueGame()">
         <div class="rogue-arena-banner-bg"></div>
         <div class="goal-net"></div>
+        <div class="goal-net-side goal-net-side--left"></div>
+        <div class="goal-net-side goal-net-side--right"></div>
         <div class="goal-post-left"></div>
         <div class="goal-post-right"></div>
         <div class="goal-depth-shadow"></div>
@@ -921,6 +945,9 @@ function renderArena() {
 
   // 每日任務卡片
   renderDailyTaskCard();
+
+  // 球門球網滑鼠撥弄效果
+  initGoalNetRipple();
 
   // 如果已登入，載入排行榜
   if (currentUser) {
