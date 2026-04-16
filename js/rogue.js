@@ -4936,6 +4936,13 @@
       }
     }
     _saveBadges(badges);
+
+    // 每日任務
+    if (typeof completeDailyTask === 'function') {
+      completeDailyTask('play_rogue');
+      if (score >= 3000) completeDailyTask('rogue_3000');
+    }
+
     return newBadges;
   }
 
@@ -5092,6 +5099,7 @@
 
   // 分享遊戲成績（生成圖片）
   async function shareScore(score, wave) {
+    if (typeof completeDailyTask === 'function') completeDailyTask('share_any');
     const praise = scorePraise(score, wave);
     const url = window.location.origin + '?play=rogue';
     const shareText = `⚽ 射門挑戰：前進世界盃\n🏅 分數 ${score}｜Wave ${wave}\n${praise.text}\n你能打敗我嗎？來挑戰！👇\n${url}`;

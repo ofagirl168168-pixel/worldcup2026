@@ -1922,6 +1922,7 @@ async function unlockPredModal(id, spendType) {
   if (ok) {
     if (!window.unlockedMatchSet) window.unlockedMatchSet = new Set()
     window.unlockedMatchSet.add(id)
+    completeDailyTask?.('unlock_match');
     openPredModal(id)
   }
 }
@@ -3433,6 +3434,7 @@ function renderFocus() {
 function openArticle(id) {
   const a = ARTICLES.find(x => x.id === id);
   if (!a) return;
+  completeDailyTask?.('read_article');
   let overlay = document.getElementById('article-modal-overlay');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -3741,6 +3743,7 @@ function saveMyPred(matchId) {
   myPreds[matchId] = { h, a, savedAt: new Date().toISOString() };
   localStorage.setItem(predKey, JSON.stringify(myPreds));
   _updatePredBadge();
+  completeDailyTask?.('pred_match');
 
   // 首次預測立即給 +1 XP 參與獎
   if (isNew) {
@@ -3768,6 +3771,7 @@ async function shareMyPrediction(matchId) {
   const myPreds = (() => { try { return JSON.parse(localStorage.getItem(predKey))||{}; } catch { return {}; } })();
   const mine = myPreds[matchId];
   if (!mine) return;
+  completeDailyTask?.('share_any');
 
   showToast?.('📤 正在生成分享圖...');
 

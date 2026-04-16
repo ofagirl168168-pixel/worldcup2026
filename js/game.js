@@ -307,6 +307,9 @@ function recordDailyAnswer(optIdx) {
     checkStreakGem?.(newStreak);
   }
 
+  // 每日任務
+  completeDailyTask?.('daily_quiz');
+
   return state;
 }
 
@@ -708,6 +711,9 @@ function renderArena() {
       </div>
     </div>
 
+    <!-- 每日任務 -->
+    <div id="daily-task-card" class="dtask-card dtask-expanded"></div>
+
     <!-- 個人戰況儀表板 -->
     <div class="arena-dashboard">
       <div class="arena-stat-card">
@@ -900,6 +906,9 @@ function renderArena() {
         <div style="text-align:center;padding:30px;color:var(--text-muted)">載入中...</div>
       </div>
     </div>`}`;
+
+  // 每日任務卡片
+  renderDailyTaskCard();
 
   // 如果已登入，載入排行榜
   if (currentUser) {
@@ -1194,6 +1203,7 @@ function saveGroupPicks() {
 
 // ── 每日一題分享圖 ────────────────────────────────────────
 async function shareDailyImage() {
+  completeDailyTask?.('share_any');
   const { q, opts } = getTodayQuestion()
   const dailyState  = getDailyState()
   const streak      = dailyState.streak || 0
@@ -1484,6 +1494,7 @@ function showDesktopShareModal({ blob, text, link, title, filename }) {
 
 // ── 冠軍預測分享 ──────────────────────────────────────────
 async function shareChampionText() {
+  completeDailyTask?.('share_any');
   const champion = load(GK.champion)
   if (!champion) return
   const _ctx = _gameCtx()
@@ -1602,6 +1613,7 @@ async function shareChampionText() {
 
 // ── 支持球隊分享 ──────────────────────────────────────────
 async function shareTeamText() {
+  completeDailyTask?.('share_any');
   const teamCode = load(GK.team)
   if (!teamCode) return
   const _ctx = _gameCtx()
@@ -1778,6 +1790,7 @@ function loadImg(src) {
 }
 
 async function shareGroupImage() {
+  completeDailyTask?.('share_any');
   const groups = load(GK.groups)
   if (!groups) return
 
@@ -2546,4 +2559,263 @@ function setShowcaseBadge(icon) {
   }
   syncXPToProfile?.();
   closeModal();
+}
+
+// ══════════════════════════════════════════════════════════════
+// ── 每日任務系統 ─────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+
+const DAILY_TASK_POOL = {
+  // 固定任務
+  daily_quiz:   { id:'daily_quiz',   icon:'❓', label:'完成每日一題',           fixed:true },
+  pred_match:   { id:'pred_match',   icon:'🎯', label:'預測至少 1 場比賽',     fixed:true },
+  play_rogue:   { id:'play_rogue',   icon:'⚽', label:'玩一場射門挑戰',        fixed:true },
+  // 輪替任務
+  rogue_3000:   { id:'rogue_3000',   icon:'🏅', label:'射門挑戰達 3000 分',    fixed:false },
+  share_any:    { id:'share_any',    icon:'📤', label:'分享任一預測或成績',     fixed:false },
+  unlock_match: { id:'unlock_match', icon:'🔓', label:'解鎖一場 AI 分析',      fixed:false },
+  read_article: { id:'read_article', icon:'📰', label:'閱讀一篇文章',          fixed:false },
+};
+
+const DAILY_TASK_XP = 5;
+const DAILY_TASK_BONUS_XP = 15;
+const DAILY_TASK_BONUS_GEM = 1;
+
+function _getDailyTaskKey() { return 'daily_tasks_' + localDateStr(); }
+
+// 取得今天的任務清單（若無則初始化）
+function getDailyTasks() {
+  const key = _getDailyTaskKey();
+  const saved = load(key);
+  if (saved && saved.date === localDateStr()) return saved;
+
+  // 決定固定任務
+  const fixed = ['daily_quiz', 'play_rogue'];
+
+  // 檢查是否有可預測比賽
+  const _tid = window.Tournament?.current?.() || 'wc';
+  const _isUcl = _tid === 'ucl', _isEpl = _tid === 'epl';
+  const matches = _isEpl ? (window.EPL_MATCHES||[]) : _isUcl ? (window.UCL_MATCHES||[]) : (typeof SCHEDULE!=='undefined' ? SCHEDULE : []);
+  const predKey = {ucl:'ucl26_my_preds',epl:'epl26_my_preds',wc:'wc26_my_preds'}[_tid] || 'wc26_my_preds';
+  const myPreds = (() => { try { return JSON.parse(localStorage.getItem(predKey))||{}; } catch { return {}; } })();
+  const hasPredictable = matches.some(m => m.status !== 'finished' && m.status !== 'live' && !myPreds[m.id]);
+
+  if (hasPredictable) fixed.push('pred_match');
+
+  // 輪替任務池
+  const rotating = ['rogue_3000', 'share_any', 'unlock_match', 'read_article'];
+  // 用日期做 seed 確保每天固定
+  const seed = localDateStr().replace(/-/g,'');
+  const seedNum = parseInt(seed) || 0;
+  // 需要幾個輪替任務（若無 pred_match 則多選一個）
+  const rotateCount = hasPredictable ? 1 : 2;
+  // 打亂排序
+  const shuffled = rotating.slice().sort((a,b) => {
+    const ha = (seedNum * 31 + a.charCodeAt(0) * 17) % 997;
+    const hb = (seedNum * 31 + b.charCodeAt(0) * 17) % 997;
+    return ha - hb;
+  });
+  const picked = shuffled.slice(0, rotateCount);
+
+  const taskIds = [...fixed, ...picked];
+  const tasks = {};
+  taskIds.forEach(id => { tasks[id] = false; });
+
+  const state = { date: localDateStr(), tasks, claimed: false };
+  save(key, state);
+  return state;
+}
+
+// 標記任務完成
+function completeDailyTask(taskId) {
+  const state = getDailyTasks();
+  if (!(taskId in state.tasks)) return;
+  if (state.tasks[taskId]) return; // 已完成
+  state.tasks[taskId] = true;
+  save(_getDailyTaskKey(), state);
+
+  // 單項獎勵 +5 XP
+  const prefix = _gameCtx().prefix;
+  const bonusKey = prefix + 'bonus_xp';
+  const cur = parseInt(localStorage.getItem(bonusKey)||'0') || 0;
+  localStorage.setItem(bonusKey, String(cur + DAILY_TASK_XP));
+  updateNavXP?.();
+  syncXPToProfile?.();
+  showToast?.(`✅ 任務完成：${DAILY_TASK_POOL[taskId]?.label || taskId}（+${DAILY_TASK_XP} XP）`);
+
+  // 更新 UI
+  _refreshDailyTaskUI?.();
+}
+
+// 領取每日寶箱
+function claimDailyTaskBonus() {
+  const state = getDailyTasks();
+  if (state.claimed) return;
+  const allDone = Object.values(state.tasks).every(v => v);
+  if (!allDone) return;
+
+  state.claimed = true;
+  save(_getDailyTaskKey(), state);
+
+  // 獎勵
+  const prefix = _gameCtx().prefix;
+  const bonusKey = prefix + 'bonus_xp';
+  const cur = parseInt(localStorage.getItem(bonusKey)||'0') || 0;
+  localStorage.setItem(bonusKey, String(cur + DAILY_TASK_BONUS_XP));
+
+  // 寶石（透過 Supabase edge function）
+  if (typeof awardGem === 'function') {
+    awardGem('daily_tasks_' + localDateStr());
+  }
+
+  updateNavXP?.();
+  syncXPToProfile?.();
+  showToast?.(`🎁 每日寶箱：+${DAILY_TASK_BONUS_XP} XP、+${DAILY_TASK_BONUS_GEM} 💎`);
+  _refreshDailyTaskUI?.();
+}
+
+// 取得任務完成進度
+function getDailyTaskProgress() {
+  const state = getDailyTasks();
+  const ids = Object.keys(state.tasks);
+  const done = ids.filter(id => state.tasks[id]).length;
+  return { total: ids.length, done, allDone: done === ids.length, claimed: state.claimed, tasks: state.tasks };
+}
+
+// 清理舊任務 (保留 3 天)
+function _cleanOldDailyTasks() {
+  const today = localDateStr();
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('daily_tasks_') && !k.endsWith(today)) {
+      const dateStr = k.replace('daily_tasks_', '');
+      if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const diff = (new Date(today) - new Date(dateStr)) / 86400000;
+        if (diff > 3) localStorage.removeItem(k);
+      }
+    }
+  }
+}
+_cleanOldDailyTasks();
+
+// ── 每日任務 UI 渲染 ────────────────────────────────────────
+
+function renderDailyTaskCard() {
+  const el = document.getElementById('daily-task-card');
+  if (!el) return;
+  const { total, done, allDone, claimed, tasks } = getDailyTaskProgress();
+
+  const taskHtml = Object.keys(tasks).map(id => {
+    const t = DAILY_TASK_POOL[id];
+    if (!t) return '';
+    const isDone = tasks[id];
+    return `<div class="dtask-row ${isDone ? 'dtask-done' : ''}">
+      <span class="dtask-check">${isDone ? '✅' : '⬜'}</span>
+      <span class="dtask-icon">${t.icon}</span>
+      <span class="dtask-label">${t.label}</span>
+      <span class="dtask-xp">${isDone ? `<span style="color:var(--green)">+${DAILY_TASK_XP}</span>` : `+${DAILY_TASK_XP} XP`}</span>
+    </div>`;
+  }).join('');
+
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+
+  el.innerHTML = `
+    <div class="dtask-header" onclick="this.parentElement.classList.toggle('dtask-expanded')">
+      <div class="dtask-header-left">
+        <span class="dtask-title">📋 每日任務</span>
+        <span class="dtask-progress-text">${done}/${total}</span>
+      </div>
+      <div class="dtask-header-right">
+        ${allDone && !claimed ? '<span class="dtask-claim-hint">可領取！</span>' : ''}
+        <span class="dtask-chevron"><i class="fas fa-chevron-down"></i></span>
+      </div>
+    </div>
+    <div class="dtask-progress-bar">
+      <div class="dtask-progress-fill ${allDone ? 'dtask-full' : ''}" style="width:${pct}%"></div>
+    </div>
+    <div class="dtask-body">
+      ${taskHtml}
+      <div class="dtask-bonus ${allDone ? (claimed ? 'dtask-bonus-claimed' : 'dtask-bonus-ready') : ''}">
+        ${allDone && !claimed
+          ? `<button class="dtask-claim-btn" onclick="event.stopPropagation();claimDailyTaskBonus()">🎁 領取每日寶箱（+${DAILY_TASK_BONUS_XP} XP、+${DAILY_TASK_BONUS_GEM} 💎）</button>`
+          : claimed
+            ? '<div class="dtask-claimed-text">🎁 今日寶箱已領取 ✓</div>'
+            : `<div class="dtask-bonus-preview">🎁 全部完成可領取：+${DAILY_TASK_BONUS_XP} XP、+${DAILY_TASK_BONUS_GEM} 💎</div>`
+        }
+      </div>
+    </div>`;
+}
+
+// 全域 refresh 函式
+function _refreshDailyTaskUI() {
+  renderDailyTaskCard();
+  // 也更新彈窗內的（如果存在）
+  const popup = document.getElementById('daily-task-popup-body');
+  if (popup) _renderDailyTaskPopupBody(popup);
+}
+
+// ── 每日任務彈窗（每日首次進站）─────────────────────────────
+
+function showDailyTaskPopup() {
+  const popupKey = 'daily_task_popup_' + localDateStr();
+  if (localStorage.getItem(popupKey)) return; // 今天已彈過
+  localStorage.setItem(popupKey, '1');
+
+  // 清理舊 popup keys
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('daily_task_popup_') && k !== popupKey) localStorage.removeItem(k);
+  }
+
+  const { total, done, allDone, claimed, tasks } = getDailyTaskProgress();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'daily-task-popup';
+  overlay.className = 'dtask-popup-overlay';
+  overlay.innerHTML = `
+    <div class="dtask-popup-box">
+      <div class="dtask-popup-header">
+        <span>📋 今日任務</span>
+        <button class="dtask-popup-close" onclick="document.getElementById('daily-task-popup').remove()">&times;</button>
+      </div>
+      <div class="dtask-popup-sub">完成所有任務可領取每日寶箱 🎁</div>
+      <div id="daily-task-popup-body"></div>
+      <button class="dtask-popup-go" onclick="document.getElementById('daily-task-popup').remove();showSection('arena')">
+        前往競技場 ⚡
+      </button>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+
+  _renderDailyTaskPopupBody(document.getElementById('daily-task-popup-body'));
+}
+
+function _renderDailyTaskPopupBody(el) {
+  if (!el) return;
+  const { total, done, allDone, claimed, tasks } = getDailyTaskProgress();
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+
+  el.innerHTML = `
+    <div class="dtask-popup-progress">
+      <div class="dtask-progress-bar" style="margin:0">
+        <div class="dtask-progress-fill ${allDone ? 'dtask-full' : ''}" style="width:${pct}%"></div>
+      </div>
+      <div style="text-align:center;font-size:13px;color:var(--text-muted);margin-top:6px">${done}/${total} 已完成</div>
+    </div>
+    ${Object.keys(tasks).map(id => {
+      const t = DAILY_TASK_POOL[id];
+      if (!t) return '';
+      const isDone = tasks[id];
+      return `<div class="dtask-row ${isDone ? 'dtask-done' : ''}">
+        <span class="dtask-check">${isDone ? '✅' : '⬜'}</span>
+        <span class="dtask-icon">${t.icon}</span>
+        <span class="dtask-label">${t.label}</span>
+        <span class="dtask-xp">${isDone ? `<span style="color:var(--green)">+${DAILY_TASK_XP}</span>` : `+${DAILY_TASK_XP} XP`}</span>
+      </div>`;
+    }).join('')}
+    <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text-muted)">
+      ${allDone && !claimed ? '🎁 <strong style="color:var(--accent)">全部完成！前往競技場領取寶箱</strong>' :
+        claimed ? '🎁 今日寶箱已領取 ✓' :
+        `🎁 全部完成可領取：+${DAILY_TASK_BONUS_XP} XP、+${DAILY_TASK_BONUS_GEM} 💎`}
+    </div>`;
 }
