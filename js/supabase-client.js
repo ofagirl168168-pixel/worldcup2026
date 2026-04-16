@@ -416,7 +416,6 @@ async function fetchLeaderboard() {
   const { data, error } = await DB.from('leaderboard')
     .select('*')
     .not('nickname', 'is', null)
-    .gt('xp', 0)
     .order('xp', { ascending: false }).limit(50);
   if (error) { console.error('排行榜錯誤:', error); return []; }
   return data ?? [];
