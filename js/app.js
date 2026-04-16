@@ -282,22 +282,17 @@ function calcChampionOdds() {
     });
   }
 
-  // ── 4. 取 top5 並正規化為機率 ──
+  // ── 4. 正規化為機率（指數放大強弱差距）──
   scores.sort((a, b) => b.power - a.power);
-  const top = scores.slice(0, 5);
-
-  // 用指數函數放大差距，只在 top5 之間分配（避免弱隊稀釋）
-  const exponent = t === 'ucl' ? 3 : t === 'epl' ? 4 : 5;
-  const expScores = top.map(s => Math.pow(s.power, exponent));
+  const exponent = t === 'ucl' ? 3 : t === 'epl' ? 5 : 6;
+  const expScores = scores.map(s => Math.pow(s.power, exponent));
   const totalExp = expScores.reduce((s, x) => s + x, 0);
-  top.forEach((s, i) => {
-    s.pct = Math.max(3, Math.round(expScores[i] / totalExp * 100));
+  scores.forEach((s, i) => {
+    s.pct = Math.max(1, Math.round(expScores[i] / totalExp * 100));
   });
-  // 修正總和為 100%
-  const pctSum = top.reduce((s, x) => s + x.pct, 0);
-  if (top.length && pctSum !== 100) top[0].pct += (100 - pctSum);
 
-  // ── 5. 產生描述 ──
+  // ── 5. 取 top5 + 產生描述 ──
+  const top = scores.slice(0, 5);
   top.forEach(s => {
     s.desc = _genChampionDesc(s, t);
   });
