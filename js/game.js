@@ -771,7 +771,7 @@ function renderArena() {
         </div>
         <div onclick="event.stopPropagation()" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:10px">
           <div style="font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5">考考朋友，<br>看誰足球 IQ 最高！</div>
-          <button onclick="shareDailyImage()" style="flex-shrink:0;padding:7px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(255,109,0,0.25),rgba(255,109,0,0.1));border:1px solid rgba(255,109,0,0.45);color:#ff8c42;font-size:12px;font-weight:800;cursor:pointer">🧠 出題挑戰</button>
+          <button id="btn-share-daily" onclick="shareDailyImage()" style="flex-shrink:0;padding:7px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(255,109,0,0.25),rgba(255,109,0,0.1));border:1px solid rgba(255,109,0,0.45);color:#ff8c42;font-size:12px;font-weight:800;cursor:pointer">🧠 出題挑戰</button>
         </div>
       </div>
 
@@ -2568,11 +2568,11 @@ function setShowcaseBadge(icon) {
 const DAILY_TASK_POOL = {
   // 固定任務
   daily_quiz:   { id:'daily_quiz',   icon:'❓', label:'完成每日一題',           fixed:true,  go:'openDailyPick()' },
-  pred_match:   { id:'pred_match',   icon:'🎯', label:'預測至少 1 場比賽',     fixed:true,  go:"showSection('predictions')" },
+  pred_match:   { id:'pred_match',   icon:'🎯', label:'預測至少 1 場比賽',     fixed:true,  go:"showSection('schedule')" },
   play_rogue:   { id:'play_rogue',   icon:'⚽', label:'玩一場射門挑戰',        fixed:true,  go:'startRogueGame()' },
   // 輪替任務
   rogue_3000:   { id:'rogue_3000',   icon:'🏅', label:'射門挑戰達 3000 分',    fixed:false, go:'startRogueGame()' },
-  share_any:    { id:'share_any',    icon:'📤', label:'分享任一預測或成績',     fixed:false, go:"showSection('arena')" },
+  share_any:    { id:'share_any',    icon:'📤', label:'分享任一預測或成績',     fixed:false, go:"goShareTask()" },
   unlock_match: { id:'unlock_match', icon:'🔓', label:'解鎖一場 AI 分析',      fixed:false, go:"showSection('predictions')" },
   read_article: { id:'read_article', icon:'📰', label:'閱讀一篇文章',          fixed:false, go:"showSection('focus')" },
 };
@@ -2697,6 +2697,20 @@ function _cleanOldDailyTasks() {
   }
 }
 _cleanOldDailyTasks();
+
+// 分享任務：導向競技場並高亮出題挑戰按鈕
+function goShareTask() {
+  showSection('arena');
+  setTimeout(() => {
+    const btn = document.getElementById('btn-share-daily');
+    if (!btn) return;
+    btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => {
+      btn.classList.add('dtask-flash');
+      btn.addEventListener('animationend', () => btn.classList.remove('dtask-flash'), { once: true });
+    }, 400);
+  }, 350);
+}
 
 // ── 每日任務 UI 渲染 ────────────────────────────────────────
 

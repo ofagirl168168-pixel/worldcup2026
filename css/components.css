@@ -2740,6 +2740,13 @@ img.flag-img {
 }
 .dtask-go-btn:hover { transform: scale(1.05); }
 .dtask-done .dtask-go-btn { display: none; }
+.dtask-flash {
+  animation: dtaskFlash 0.5s ease-in-out 2;
+}
+@keyframes dtaskFlash {
+  0%,100% { box-shadow: none; }
+  50% { box-shadow: 0 0 16px 4px rgba(255,140,66,0.7); transform: scale(1.08); }
+}
 .dtask-bonus { margin-top: 12px; text-align: center; }
 .dtask-bonus-preview { font-size: 13px; color: var(--text-muted); padding: 10px; border-radius: 12px; background: rgba(255,255,255,0.03); }
 .dtask-claim-btn {
