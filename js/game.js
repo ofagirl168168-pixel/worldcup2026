@@ -831,9 +831,79 @@ function initGoalNetRipple() {
   });
   obs.observe(banner);
 
+  // 公開 API：外部觸發撞網衝擊
+  window._goalNetImpact = function(ix, iy, strength) {
+    for (let i = 0, len = allP.length; i < len; i++) {
+      const p = allP[i];
+      const dx = p.x - ix;
+      const dy = p.y - iy;
+      const d2 = dx * dx + dy * dy;
+      const r = strength * 3; // 衝擊半徑
+      if (d2 < r * r && d2 > 1) {
+        const dist = Math.sqrt(d2);
+        const f = (1 - dist / r) * strength;
+        p.vx += (dx / dist) * f;
+        p.vy += (dy / dist) * f;
+      }
+    }
+  };
+
   window.addEventListener('resize', resize);
   resize();
   loop();
+}
+
+// ── 球門 Banner 射門過場 ─────────────────────────────────
+let _goalShootLock = false;
+function goalBannerShoot(e) {
+  if (_goalShootLock) return;
+  _goalShootLock = true;
+
+  const banner = e.currentTarget;
+  const rect = banner.getBoundingClientRect();
+
+  // 撞擊目標：banner 中央
+  const targetX = rect.left + rect.width / 2;
+  const targetY = rect.top + rect.height / 2;
+
+  // 建立飛行足球
+  const ball = document.createElement('div');
+  ball.textContent = '⚽';
+  ball.style.cssText = `
+    position:fixed; z-index:9999; font-size:32px;
+    pointer-events:none; will-change:transform;
+    left:${e.clientX}px; top:${e.clientY}px;
+    transition: left 0.4s cubic-bezier(0.2,0,0.3,1),
+                top 0.4s cubic-bezier(0.2,0,0.3,1),
+                transform 0.4s ease-out;
+    filter: drop-shadow(0 0 8px rgba(255,200,0,0.6));
+  `;
+  document.body.appendChild(ball);
+
+  // 下一幀啟動飛行
+  requestAnimationFrame(() => {
+    ball.style.left = targetX + 'px';
+    ball.style.top = targetY + 'px';
+    ball.style.transform = 'scale(1.3) rotate(360deg)';
+  });
+
+  // 撞擊時刻
+  setTimeout(() => {
+    ball.remove();
+
+    // 觸發球網強烈衝擊
+    const ix = targetX - rect.left;
+    const iy = targetY - rect.top;
+    if (window._goalNetImpact) {
+      window._goalNetImpact(ix, iy, 18);
+    }
+
+    // 延遲後進入遊戲
+    setTimeout(() => {
+      _goalShootLock = false;
+      startRogueGame();
+    }, 500);
+  }, 400);
 }
 
 // ── 競技場主頁面 ──────────────────────────────────────────
@@ -924,7 +994,7 @@ function renderArena() {
 
     <!-- 射門挑戰入口 -->
     <div class="rogue-arena-banner-wrap">
-      <div class="rogue-arena-banner" onclick="startRogueGame()">
+      <div class="rogue-arena-banner" onclick="goalBannerShoot(event)">
         <div class="rogue-arena-banner-bg"></div>
         <div class="goal-post-left"></div>
         <div class="goal-post-right"></div>
