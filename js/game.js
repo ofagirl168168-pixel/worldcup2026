@@ -658,26 +658,218 @@ function showArenaWelcomeIfNeeded() {
   }, 30000); // 頁面載入 30 秒後出現
 }
 
-// ── 球門球網滑鼠撥弄效果 ─────────────────────────────────
+// ── 球門粒子球網系統（Canvas） ────────────────────────────
 function initGoalNetRipple() {
   const banner = document.querySelector('.rogue-arena-banner');
-  if (!banner || banner._goalNetBound) return;
-  banner._goalNetBound = true;
+  if (!banner || banner._netInit) return;
+  banner._netInit = true;
 
-  let lastT = 0;
-  banner.addEventListener('mousemove', (e) => {
-    const now = Date.now();
-    if (now - lastT < 50) return;   // 節流 50ms
-    lastT = now;
+  const canvas = document.createElement('canvas');
+  canvas.className = 'goal-net-canvas';
+  // 插入到 content 之前，門柱之後
+  const content = banner.querySelector('.rogue-arena-banner-content');
+  banner.insertBefore(canvas, content);
 
+  const ctx = canvas.getContext('2d');
+
+  // ── 參數 ──
+  const COLS       = 30;    // 橫向格數
+  const ROWS       = 4;     // 縱向格數
+  const SIDE_DEPTH = 50;    // 側面球網深度 (px)
+  const TOP_INSET  = 40;    // 頂部內縮 (模擬遠處較窄)
+  const REPEL_R    = 90;    // 斥力半徑
+  const REPEL_STR  = 20;    // 斥力強度
+  const SPRING     = 0.06;  // 回彈彈性
+  const DAMPING    = 0.82;  // 阻尼
+
+  // 用陣列索引快速查找粒子（避免 .find）
+  let back  = [];  // back[r][c]
+  let left  = [];  // left[r][s]
+  let right = [];  // right[r][s]
+  let top   = [];  // top[c]
+  let allP  = [];  // 所有粒子（物理更新用）
+  let mouseX = -9999, mouseY = -9999;
+  let animId = null;
+  let W = 0, H = 0;
+
+  function resize() {
     const rect = banner.getBoundingClientRect();
-    const ripple = document.createElement('div');
-    ripple.className = 'goal-net-ripple';
-    ripple.style.left = (e.clientX - rect.left) + 'px';
-    ripple.style.top  = (e.clientY - rect.top) + 'px';
-    banner.appendChild(ripple);
-    ripple.addEventListener('animationend', () => ripple.remove());
+    W = canvas.width  = rect.width;
+    H = canvas.height = rect.height;
+    buildNet();
+  }
+
+  function mkP(x, y) {
+    return { x, y, ox: x, oy: y, vx: 0, vy: 0 };
+  }
+
+  function buildNet() {
+    back = []; left = []; right = []; top = []; allP = [];
+    const pad = 8;
+
+    // ── 後方網面（梯形） ──
+    for (let r = 0; r <= ROWS; r++) {
+      back[r] = [];
+      const t = r / ROWS;
+      const inset = TOP_INSET * (1 - t);
+      const y = pad + t * (H - pad * 2);
+      for (let c = 0; c <= COLS; c++) {
+        const x = (SIDE_DEPTH + inset) + (c / COLS) * (W - (SIDE_DEPTH + inset) * 2);
+        const p = mkP(x, y);
+        back[r][c] = p;
+        allP.push(p);
+      }
+    }
+
+    // ── 左側面網 ──
+    const SIDE_SEG = 2;
+    for (let r = 0; r <= ROWS; r++) {
+      left[r] = [];
+      const y = pad + (r / ROWS) * (H - pad * 2);
+      const postX = pad;
+      const backX = back[r][0].ox;
+      for (let s = 0; s <= SIDE_SEG; s++) {
+        const x = postX + (s / SIDE_SEG) * (backX - postX);
+        const p = mkP(x, y);
+        left[r][s] = p;
+        allP.push(p);
+      }
+    }
+
+    // ── 右側面網 ──
+    for (let r = 0; r <= ROWS; r++) {
+      right[r] = [];
+      const y = pad + (r / ROWS) * (H - pad * 2);
+      const postX = W - pad;
+      const backX = back[r][COLS].ox;
+      for (let s = 0; s <= SIDE_SEG; s++) {
+        const x = postX - (s / SIDE_SEG) * (postX - backX);
+        const p = mkP(x, y);
+        right[r][s] = p;
+        allP.push(p);
+      }
+    }
+
+    // ── 頂面網（橫樑→後方頂邊） ──
+    for (let c = 0; c <= COLS; c++) {
+      const p = mkP(back[0][c].ox, 2);
+      top[c] = p;
+      allP.push(p);
+    }
+  }
+
+  function update() {
+    for (let i = 0, len = allP.length; i < len; i++) {
+      const p = allP[i];
+      p.vx += (p.ox - p.x) * SPRING;
+      p.vy += (p.oy - p.y) * SPRING;
+      const dx = p.x - mouseX;
+      const dy = p.y - mouseY;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < REPEL_R * REPEL_R && d2 > 1) {
+        const dist = Math.sqrt(d2);
+        const f = (1 - dist / REPEL_R) * REPEL_STR;
+        p.vx += (dx / dist) * f;
+        p.vy += (dy / dist) * f;
+      }
+      p.vx *= DAMPING;
+      p.vy *= DAMPING;
+      p.x += p.vx;
+      p.y += p.vy;
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // ── 後方網面 ──
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 1.2;
+    for (let r = 0; r <= ROWS; r++) {
+      for (let c = 0; c <= COLS; c++) {
+        const p = back[r][c];
+        if (c < COLS) { ctx.moveTo(p.x, p.y); ctx.lineTo(back[r][c+1].x, back[r][c+1].y); }
+        if (r < ROWS) { ctx.moveTo(p.x, p.y); ctx.lineTo(back[r+1][c].x, back[r+1][c].y); }
+      }
+    }
+    ctx.stroke();
+
+    // ── 左側面網 ──
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 1;
+    for (let r = 0; r <= ROWS; r++) {
+      for (let s = 0; s <= 2; s++) {
+        const p = left[r][s];
+        if (s < 2) { ctx.moveTo(p.x, p.y); ctx.lineTo(left[r][s+1].x, left[r][s+1].y); }
+        if (r < ROWS) { ctx.moveTo(p.x, p.y); ctx.lineTo(left[r+1][s].x, left[r+1][s].y); }
+      }
+      // 連接到後方網
+      const last = left[r][2]; const bk = back[r][0];
+      ctx.moveTo(last.x, last.y); ctx.lineTo(bk.x, bk.y);
+    }
+    ctx.stroke();
+
+    // ── 右側面網 ──
+    ctx.beginPath();
+    for (let r = 0; r <= ROWS; r++) {
+      for (let s = 0; s <= 2; s++) {
+        const p = right[r][s];
+        if (s < 2) { ctx.moveTo(p.x, p.y); ctx.lineTo(right[r][s+1].x, right[r][s+1].y); }
+        if (r < ROWS) { ctx.moveTo(p.x, p.y); ctx.lineTo(right[r+1][s].x, right[r+1][s].y); }
+      }
+      const last = right[r][2]; const bk = back[r][COLS];
+      ctx.moveTo(last.x, last.y); ctx.lineTo(bk.x, bk.y);
+    }
+    ctx.stroke();
+
+    // ── 頂面網（橫樑→後方頂邊） ──
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    for (let c = 0; c <= COLS; c++) {
+      const tp = top[c]; const bp = back[0][c];
+      ctx.moveTo(tp.x, tp.y); ctx.lineTo(bp.x, bp.y);
+      if (c < COLS) { ctx.moveTo(tp.x, tp.y); ctx.lineTo(top[c+1].x, top[c+1].y); }
+    }
+    ctx.stroke();
+
+    // ── 交點粒子 ──
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    for (let i = 0, len = allP.length; i < len; i++) {
+      const p = allP[i];
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 1.3, 0, 6.283);
+      ctx.fill();
+    }
+  }
+
+  function loop() {
+    update();
+    draw();
+    animId = requestAnimationFrame(loop);
+  }
+
+  // 滑鼠事件（穿透 pointer-events:none 的 canvas，綁在 banner 上）
+  banner.addEventListener('mousemove', (e) => {
+    const rect = banner.getBoundingClientRect();
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
   });
+  banner.addEventListener('mouseleave', () => {
+    mouseX = -9999; mouseY = -9999;
+  });
+
+  // 可見時才跑動畫
+  const obs = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) { if (!animId) loop(); }
+    else { cancelAnimationFrame(animId); animId = null; }
+  });
+  obs.observe(banner);
+
+  window.addEventListener('resize', resize);
+  resize();
+  loop();
 }
 
 // ── 競技場主頁面 ──────────────────────────────────────────
@@ -770,9 +962,6 @@ function renderArena() {
     <div class="rogue-arena-banner-wrap">
       <div class="rogue-arena-banner" onclick="startRogueGame()">
         <div class="rogue-arena-banner-bg"></div>
-        <div class="goal-net"></div>
-        <div class="goal-net-side goal-net-side--left"></div>
-        <div class="goal-net-side goal-net-side--right"></div>
         <div class="goal-post-left"></div>
         <div class="goal-post-right"></div>
         <div class="goal-depth-shadow"></div>

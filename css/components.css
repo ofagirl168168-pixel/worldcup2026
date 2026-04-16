@@ -2559,65 +2559,11 @@ img.flag-img {
   background: transparent;
 }
 
-/* ── 球網（後方正面）：白色方格 ── */
-.goal-net {
+/* ── 球網 Canvas ── */
+.goal-net-canvas {
   position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%;
   pointer-events: none;
-  background:
-    repeating-linear-gradient(0deg,   transparent, transparent 26px, rgba(255,255,255,0.45) 26px, rgba(255,255,255,0.45) 28px),
-    repeating-linear-gradient(90deg,  transparent, transparent 30px, rgba(255,255,255,0.45) 30px, rgba(255,255,255,0.45) 32px);
-  mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 10%, rgba(0,0,0,0.6) 45%, rgba(0,0,0,1) 100%);
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 10%, rgba(0,0,0,0.6) 45%, rgba(0,0,0,1) 100%);
-}
-/* 遠處小網格疊加 */
-.goal-net::after {
-  content: ''; position: absolute; inset: 0;
-  background:
-    repeating-linear-gradient(0deg,   transparent, transparent 11px, rgba(255,255,255,0.22) 11px, rgba(255,255,255,0.22) 12px),
-    repeating-linear-gradient(90deg,  transparent, transparent 13px, rgba(255,255,255,0.22) 13px, rgba(255,255,255,0.22) 14px);
-  mask-image: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 30%, transparent 55%);
-  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 30%, transparent 55%);
-}
-
-/* ── 側面球網（3D 深度關鍵！） ── */
-.goal-net-side {
-  position: absolute; top: 0; bottom: 0; z-index: 1;
-  width: 70px;
-  background:
-    repeating-linear-gradient(0deg,   transparent, transparent 18px, rgba(255,255,255,0.4) 18px, rgba(255,255,255,0.4) 20px),
-    repeating-linear-gradient(90deg,  transparent, transparent 14px, rgba(255,255,255,0.4) 14px, rgba(255,255,255,0.4) 16px);
-  pointer-events: none;
-}
-.goal-net-side--left {
-  left: 0;
-  transform-origin: left center;
-  transform: perspective(300px) rotateY(-50deg);
-  mask-image: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.3) 100%);
-  -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.3) 100%);
-}
-.goal-net-side--right {
-  right: 0;
-  transform-origin: right center;
-  transform: perspective(300px) rotateY(50deg);
-  mask-image: linear-gradient(270deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.3) 100%);
-  -webkit-mask-image: linear-gradient(270deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.3) 100%);
-}
-
-/* ── 滑鼠局部撥網漣漪 ── */
-.goal-net-ripple {
-  position: absolute;
-  width: 80px; height: 80px;
-  margin-left: -40px; margin-top: -40px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 4;
-  background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 35%, transparent 70%);
-  animation: goalNetRippleAnim 0.6s ease-out forwards;
-}
-@keyframes goalNetRippleAnim {
-  0%   { transform: scale(0.3); opacity: 1; }
-  50%  { transform: scale(1.2); opacity: 0.5; }
-  100% { transform: scale(1.8); opacity: 0; }
 }
 
 /* ── 橫樑下方投影 ── */
