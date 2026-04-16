@@ -204,40 +204,168 @@ function _matchMeta(m) {
 
 /* app.js — 導覽 + 倒計時 + 首頁 */
 
+// ── 動態奪冠熱門預測（依剩餘球隊、近況、傷兵、對戰組合每日更新）──
+function calcChampionOdds() {
+  const t = _tid();
+  const _T = _teams();
+  const matches = _matches();
+  if (!_T || !Object.keys(_T).length) return [];
+
+  // 確保動態近況已建立
+  if (typeof buildDynamicForm === 'function') buildDynamicForm();
+
+  // ── 1. 找出仍存活的球隊 ──
+  let aliveCodes;
+  if (t === 'ucl') {
+    // 歐冠淘汰賽：從比賽結果推算晉級隊伍
+    aliveCodes = _getUCLAliveTeams(matches);
+  } else if (t === 'epl') {
+    // 英超：所有球隊都還在爭冠（但用排名加權）
+    aliveCodes = Object.keys(_T);
+  } else {
+    // 世界盃：尚未開賽，所有球隊
+    aliveCodes = Object.keys(_T);
+  }
+
+  // ── 2. 計算每隊奪冠力量分數 ──
+  const scores = [];
+  aliveCodes.forEach(code => {
+    const team = _T[code];
+    if (!team?.radar) return;
+    const r = team.radar;
+
+    // 基礎實力（加權平均 radar）
+    const base = r.attack * 0.25 + r.defense * 0.2 + r.midfield * 0.25 + r.speed * 0.15 + r.experience * 0.15;
+
+    // 傷兵扣分
+    const inj = injuryImpact(team);
+    const injPen = (inj.attack + inj.defense + inj.midfield + inj.speed) * 0.3;
+
+    // 近況加成（動態 form 優先）
+    const dynForm = _dynamicFormMap[code];
+    const form = dynForm || team.recentForm || ['W','D','W','D','W'];
+    const fScore = formScore(form);
+    const formAdj = (fScore - 9) * 1.5; // 9=中位數(3W2D)，每分±1.5
+
+    // 排名加成
+    let rankAdj = 0;
+    if (t === 'epl') {
+      rankAdj = Math.max(0, 22 - (team.eplRank || 20)) * 1.2; // 排名越前加越多
+    } else if (t === 'ucl') {
+      rankAdj = (team.uefaCoeff || 50) * 0.12; // UEFA 係數加成
+    } else {
+      rankAdj = Math.max(0, 60 - (team.fifaRank || 50)) * 0.5; // FIFA 排名
+    }
+
+    const power = Math.max(1, base - injPen + formAdj + rankAdj);
+    scores.push({ code, power, team, form, inj });
+  });
+
+  // ── 3. 歐冠：對戰組合難度調整（剩餘對手強度）──
+  if (t === 'ucl' && scores.length <= 8) {
+    const powerMap = {};
+    scores.forEach(s => powerMap[s.code] = s.power);
+    // 找出下一輪對手
+    const sfMatches = matches.filter(m => m.stage === 'sf' && m.status === 'scheduled');
+    const opponents = {};
+    sfMatches.forEach(m => {
+      if (powerMap[m.home] !== undefined) opponents[m.home] = m.away;
+      if (powerMap[m.away] !== undefined) opponents[m.away] = m.home;
+    });
+    // 對手越弱，自己奪冠機率越高（反向加成）
+    scores.forEach(s => {
+      const opp = opponents[s.code];
+      if (opp && powerMap[opp]) {
+        const oppPower = powerMap[opp];
+        s.power *= (1 + (s.power - oppPower) * 0.003); // 微調
+      }
+    });
+  }
+
+  // ── 4. 正規化為機率 ──
+  scores.sort((a, b) => b.power - a.power);
+  const totalPower = scores.reduce((s, x) => s + x.power, 0);
+  scores.forEach(s => {
+    s.pct = Math.max(1, Math.round(s.power / totalPower * 100));
+  });
+  // 修正總和為 100%
+  const pctSum = scores.reduce((s, x) => s + x.pct, 0);
+  if (scores.length && pctSum !== 100) scores[0].pct += (100 - pctSum);
+
+  // ── 5. 產生描述 ──
+  scores.forEach(s => {
+    s.desc = _genChampionDesc(s, t);
+  });
+
+  return scores.slice(0, 5);
+}
+
+// 取得歐冠仍存活球隊
+function _getUCLAliveTeams(matches) {
+  // 從淘汰賽結果推算：有 agg 的 leg:2 比賽 → 輸家被淘汰
+  const eliminated = new Set();
+  const koMatches = matches.filter(m =>
+    ['playoff','r16','qf','sf'].includes(m.stage) && m.leg === 2 && m.status === 'finished' && m.agg
+  );
+  koMatches.forEach(m => {
+    const hAgg = m.agg.h, aAgg = m.agg.a;
+    if (hAgg > aAgg) eliminated.add(m.away);
+    else if (aAgg > hAgg) eliminated.add(m.home);
+    // 客場進球或 PK 的 edge case 略（目前資料夠明確）
+  });
+
+  // 從所有淘汰賽參賽隊中找仍存活的
+  const allKO = new Set();
+  matches.filter(m => ['playoff','r16','qf','sf','final'].includes(m.stage))
+    .forEach(m => { if (m.home !== 'TBD') allKO.add(m.home); if (m.away !== 'TBD') allKO.add(m.away); });
+
+  return [...allKO].filter(c => !eliminated.has(c));
+}
+
+// 動態產生奪冠描述
+function _genChampionDesc(s, t) {
+  const team = s.team;
+  const kp = (team.keyPlayers || []).slice(0, 2).map(p => p.name.split(' ').pop()).join('+');
+  const formW = (s.form || []).filter(f => f === 'W').length;
+  const formL = (s.form || []).filter(f => f === 'L').length;
+  const injCount = (team.injuries || []).length;
+
+  let parts = [];
+  // 核心球員
+  if (kp) parts.push(`${kp}領銜`);
+  // 近況
+  if (formW >= 4) parts.push('近況火燙');
+  else if (formW >= 3 && formL === 0) parts.push('近況穩定');
+  else if (formL >= 2) parts.push('近況起伏');
+  // 傷兵
+  if (injCount >= 3) parts.push(`${injCount}人傷缺影響大`);
+  else if (injCount >= 1) parts.push('小有傷兵隱患');
+  // 風格
+  if (team.style) {
+    const styleShort = team.style.split('，')[0];
+    if (styleShort.length <= 10) parts.push(styleShort);
+  }
+
+  return parts.slice(0, 3).join('，') || team.predDesc || '實力不容小覷';
+}
+
 // 首頁：冠軍預測
 function renderChampions() {
   const t = _tid();
-  const top5 = t === 'epl' ? [
-    {code:'ARS', prob:'35%', desc:'Arteta體系成熟，Saka+Ødegaard黃金搭檔，防守英超最穩'},
-    {code:'LIV', prob:'30%', desc:'Slot第二季穩定輸出，Salah持續高效，中場全面升級'},
-    {code:'MCI', prob:'20%', desc:'Haaland進球機器，Guardiola戰術無人能敵，但Rodri傷缺影響大'},
-    {code:'CHE', prob:'8%',  desc:'Cole Palmer率領年輕軍團，Maresca體系漸入佳境'},
-    {code:'NEW', prob:'7%',  desc:'Isak+Gordon攻擊組合犀利，Howe帶隊穩步上升'}
-  ] : t === 'ucl' ? [
-    {code:'BAR', prob:'23%', desc:'Yamal+Pedri黃金世代，Flick體系第二年更成熟'},
-    {code:'RMA', prob:'20%', desc:'歐冠之王DNA，Mbappé+Bellingham雙核驅動'},
-    {code:'LIV', prob:'18%', desc:'Slot體系穩定輸出，英超+歐冠雙線爭冠'},
-    {code:'ARS', prob:'14%', desc:'Saka+Rice領軍，槍手劍指隊史第二座歐冠'},
-    {code:'BAY', prob:'10%', desc:'Kane+Musiala組合，拜仁渴望重返歐洲之巔'}
-  ] : [
-    {code:'FRA', prob:'29%', desc:'陣容最均衡，Mbappé狀態巔峰'},
-    {code:'BRA', prob:'24%', desc:'雙翼最強，渴望第六星'},
-    {code:'ESP', prob:'20%', desc:'中場統治，Yamal橫空出世'},
-    {code:'ENG', prob:'12%', desc:'Bellingham+Kane，等待54年'},
-    {code:'ARG', prob:'8%',  desc:'衛冕冠軍，Messi告別之旅'}
-  ];
+  const top5 = calcChampionOdds();
   const el = document.getElementById('champion-cards');
   if (!el) return;
 
   const _T = _teams();
   const cards = top5.map((t, i) => {
     const tm = _T[t.code];
+    if (!tm) return '';
     const locked = !currentUser && i >= 2;
     return `<div class="champion-card${locked ? ' champion-card-locked' : ''}" onclick="${locked ? 'loginWithGoogle()' : "showSection('teams')"}">
       <div class="champion-rank">#${i+1}</div>
       <div class="champion-flag">${flagImg(tm.flag)}</div>
       <div class="champion-name">${tm.nameCN}</div>
-      <div class="champion-prob" style="${locked ? 'filter:blur(6px);user-select:none' : ''}" id="champ-prob-${t.code}">${t.prob}</div>
+      <div class="champion-prob" style="${locked ? 'filter:blur(6px);user-select:none' : ''}" id="champ-prob-${t.code}">${t.pct}%</div>
       <div class="champion-desc" style="${locked ? 'filter:blur(5px);user-select:none' : ''}">${t.desc}</div>
       <div id="champ-votes-${t.code}" class="champion-votes"></div>
       ${locked ? `<div class="champion-lock-hint">🔒 登入查看</div>` : ''}

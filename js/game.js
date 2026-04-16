@@ -215,17 +215,31 @@ const DAILY_QUESTIONS = [
 function getSimVotes() {
   const daysSince = Math.max(1, Math.floor((Date.now() - new Date('2026-03-01').getTime()) / 86400000));
   const total = 1500 + daysSince * 38;
+  const _T = typeof _teams === 'function' ? _teams() : (typeof TEAMS !== 'undefined' ? TEAMS : {});
 
-  // 基礎份額（前段強隊）
-  const base = { FRA:0.21, BRA:0.17, ESP:0.14, ENG:0.10, ARG:0.09,
-                 GER:0.06, POR:0.04, NED:0.03, BEL:0.025, URU:0.015 };
-  const used = Object.values(base).reduce((a,b)=>a+b,0);
-  const perRemainder = (1 - used) / (48 - Object.keys(base).length);
+  // 動態權重：若有 calcChampionOdds 則用動態機率，否則用 radar 基礎實力
+  const dynOdds = typeof calcChampionOdds === 'function' ? calcChampionOdds() : [];
+  const oddsMap = {};
+  dynOdds.forEach(o => { oddsMap[o.code] = o.pct / 100; });
 
   const votes = {};
-  Object.keys(TEAMS).forEach(code => {
-    const t = TEAMS[code];
-    const share = base[code] ?? Math.max(0.002, perRemainder * (1 - (t.fifaRank||100)/200));
+  const codes = Object.keys(_T);
+  const fallbackShare = 1 / Math.max(1, codes.length);
+
+  codes.forEach(code => {
+    const t = _T[code];
+    // 動態份額 > radar 推算 > 均分
+    let share = oddsMap[code];
+    if (share === undefined) {
+      // 非 top5 球隊：用 radar 加權推算基礎份額
+      const r = t?.radar;
+      if (r) {
+        const power = r.attack * 0.25 + r.defense * 0.2 + r.midfield * 0.25 + r.speed * 0.15 + r.experience * 0.15;
+        share = Math.max(0.003, (power - 60) / 500);
+      } else {
+        share = fallbackShare * 0.3;
+      }
+    }
     // 加入微小隨機性（以 code 為種子，保持穩定）
     const jitter = 1 + (Array.from(code).reduce((s,c)=>s+c.charCodeAt(0),0) % 17 - 8) * 0.01;
     votes[code] = Math.max(1, Math.round(total * share * jitter));
