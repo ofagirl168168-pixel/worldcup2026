@@ -2573,15 +2573,23 @@ function setShowcaseBadge(icon) {
 
 const DAILY_TASK_POOL = {
   // 固定任務
-  daily_quiz:   { id:'daily_quiz',   icon:'❓', label:'完成每日一題',           fixed:true,  go:'openDailyPick()' },
-  pred_match:   { id:'pred_match',   icon:'🎯', label:'預測至少 1 場比賽',     fixed:true,  go:"showSection('schedule')" },
-  play_rogue:   { id:'play_rogue',   icon:'⚽', label:'玩一場射門挑戰',        fixed:true,  go:'startRogueGame()' },
+  daily_quiz:   { id:'daily_quiz',   icon:'<i class="fas fa-question-circle"></i>', label:'完成每日一題',           fixed:true,  go:'openDailyPick()' },
+  pred_match:   { id:'pred_match',   icon:'<i class="fas fa-bullseye"></i>',        label:'預測至少 1 場比賽',     fixed:true,  go:"showSection('schedule')" },
+  play_rogue:   { id:'play_rogue',   icon:'<i class="fas fa-futbol"></i>',          label:'玩一場射門挑戰',        fixed:true,  go:'startRogueGame()' },
   // 輪替任務
-  rogue_3000:   { id:'rogue_3000',   icon:'🏅', label:'射門挑戰達 3000 分',    fixed:false, go:'startRogueGame()' },
-  share_any:    { id:'share_any',    icon:'📤', label:'分享任一預測或成績',     fixed:false, go:"goShareTask()" },
-  unlock_match: { id:'unlock_match', icon:'🔓', label:'解鎖一場 AI 分析',      fixed:false, go:"showSection('predictions')" },
-  read_article: { id:'read_article', icon:'📰', label:'閱讀一篇文章',          fixed:false, go:"showSection('focus')" },
+  rogue_3000:   { id:'rogue_3000',   icon:'<i class="fas fa-medal"></i>',           label:'射門挑戰達 3000 分',    fixed:false, go:'startRogueGame()' },
+  share_any:    { id:'share_any',    icon:'<i class="fas fa-share-alt"></i>',       label:'分享任一預測或成績',     fixed:false, go:"goShareTask()" },
+  unlock_match: { id:'unlock_match', icon:'<i class="fas fa-lock-open"></i>',       label:'解鎖一場 AI 分析',      fixed:false, go:"showSection('predictions')" },
+  read_article: { id:'read_article', icon:'<i class="fas fa-newspaper"></i>',       label:'閱讀一篇文章',          fixed:false, go:"showSection('focus')" },
 };
+
+const DAILY_CHEST_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20" style="vertical-align:middle">
+  <defs><linearGradient id="dcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd700"/><stop offset="100%" stop-color="#b8860b"/></linearGradient></defs>
+  <rect x="8" y="28" width="48" height="28" rx="4" fill="url(#dcg)" stroke="#8b6914" stroke-width="2"/>
+  <rect x="8" y="28" width="48" height="12" rx="4" fill="#ffe066"/>
+  <path d="M8 22 Q32 10 56 22 L56 32 Q32 20 8 32Z" fill="#ffd700" stroke="#b8860b" stroke-width="1.5"/>
+  <rect x="27" y="34" width="10" height="10" rx="2" fill="#8b6914"/><circle cx="32" cy="39" r="3" fill="#fff"/>
+</svg>`;
 
 const DAILY_TASK_XP = 5;
 const DAILY_TASK_BONUS_XP = 15;
@@ -2647,7 +2655,7 @@ function completeDailyTask(taskId) {
   localStorage.setItem(bonusKey, String(cur + DAILY_TASK_XP));
   updateNavXP?.();
   syncXPToProfile?.();
-  showToast?.(`✅ 任務完成：${DAILY_TASK_POOL[taskId]?.label || taskId}（+${DAILY_TASK_XP} XP）`);
+  showToast?.(`任務完成：${DAILY_TASK_POOL[taskId]?.label || taskId}（+${DAILY_TASK_XP} XP）`, 'success');
 
   // 更新 UI
   _refreshDailyTaskUI?.();
@@ -2731,7 +2739,7 @@ function renderDailyTaskCard() {
     const isDone = tasks[id];
     const goBtn = !isDone && t.go ? `<button class="dtask-go-btn" onclick="event.stopPropagation();${t.go}">去完成</button>` : '';
     return `<div class="dtask-row ${isDone ? 'dtask-done' : ''}">
-      <span class="dtask-check">${isDone ? '✅' : '⬜'}</span>
+      <span class="dtask-check">${isDone ? '<i class="fas fa-check-circle" style="color:var(--success)"></i>' : '<i class="far fa-square"></i>'}</span>
       <span class="dtask-icon">${t.icon}</span>
       <span class="dtask-label">${t.label}</span>
       ${isDone ? `<span class="dtask-xp"><span style="color:var(--green)">+${DAILY_TASK_XP}</span></span>` : goBtn}
@@ -2743,7 +2751,7 @@ function renderDailyTaskCard() {
   el.innerHTML = `
     <div class="dtask-header" onclick="this.parentElement.classList.toggle('dtask-expanded')">
       <div class="dtask-header-left">
-        <span class="dtask-title">📋 每日任務</span>
+        <span class="dtask-title"><i class="fas fa-clipboard-check"></i> 每日任務</span>
         <span class="dtask-progress-text">${done}/${total}</span>
       </div>
       <div class="dtask-header-right">
@@ -2758,10 +2766,10 @@ function renderDailyTaskCard() {
       ${taskHtml}
       <div class="dtask-bonus ${allDone ? (claimed ? 'dtask-bonus-claimed' : 'dtask-bonus-ready') : ''}">
         ${allDone && !claimed
-          ? `<button class="dtask-claim-btn" onclick="event.stopPropagation();claimDailyTaskBonus()">🎁 領取每日寶箱（+${DAILY_TASK_BONUS_XP} XP、+${DAILY_TASK_BONUS_GEM} 💎）</button>`
+          ? `<button class="dtask-claim-btn" onclick="event.stopPropagation();claimDailyTaskBonus()">${DAILY_CHEST_SVG} 領取每日寶箱（+${DAILY_TASK_BONUS_XP} XP、+${DAILY_TASK_BONUS_GEM} 💎）</button>`
           : claimed
-            ? '<div class="dtask-claimed-text">🎁 今日寶箱已領取 ✓</div>'
-            : `<div class="dtask-bonus-preview">🎁 全部完成可領取：+${DAILY_TASK_BONUS_XP} XP、+${DAILY_TASK_BONUS_GEM} 💎</div>`
+            ? `<div class="dtask-claimed-text">${DAILY_CHEST_SVG} 今日寶箱已領取 ✓</div>`
+            : `<div class="dtask-bonus-preview">${DAILY_CHEST_SVG} 全部完成可領取：+${DAILY_TASK_BONUS_XP} XP、+${DAILY_TASK_BONUS_GEM} 💎</div>`
         }
       </div>
     </div>`;
@@ -2796,10 +2804,10 @@ function showDailyTaskPopup() {
   overlay.innerHTML = `
     <div class="dtask-popup-box">
       <div class="dtask-popup-header">
-        <span>📋 今日任務</span>
+        <span><i class="fas fa-clipboard-check"></i> 今日任務</span>
         <button class="dtask-popup-close" onclick="document.getElementById('daily-task-popup').remove()">&times;</button>
       </div>
-      <div class="dtask-popup-sub">完成所有任務可領取每日寶箱 🎁</div>
+      <div class="dtask-popup-sub">完成所有任務可領取每日寶箱 ${DAILY_CHEST_SVG}</div>
       <div id="daily-task-popup-body"></div>
       <button class="dtask-popup-go" onclick="document.getElementById('daily-task-popup').remove();showSection('arena')">
         前往競技場 ⚡
@@ -2829,15 +2837,15 @@ function _renderDailyTaskPopupBody(el) {
       const isDone = tasks[id];
       const goBtn = !isDone && t.go ? `<button class="dtask-go-btn" onclick="document.getElementById('daily-task-popup')?.remove();${t.go}">去完成</button>` : '';
       return `<div class="dtask-row ${isDone ? 'dtask-done' : ''}">
-        <span class="dtask-check">${isDone ? '✅' : '⬜'}</span>
+        <span class="dtask-check">${isDone ? '<i class="fas fa-check-circle" style="color:var(--success)"></i>' : '<i class="far fa-square"></i>'}</span>
         <span class="dtask-icon">${t.icon}</span>
         <span class="dtask-label">${t.label}</span>
         ${isDone ? `<span class="dtask-xp"><span style="color:var(--green)">+${DAILY_TASK_XP}</span></span>` : goBtn}
       </div>`;
     }).join('')}
     <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text-muted)">
-      ${allDone && !claimed ? '🎁 <strong style="color:var(--accent)">全部完成！前往競技場領取寶箱</strong>' :
-        claimed ? '🎁 今日寶箱已領取 ✓' :
-        `🎁 全部完成可領取：+${DAILY_TASK_BONUS_XP} XP、+${DAILY_TASK_BONUS_GEM} 💎`}
+      ${allDone && !claimed ? `${DAILY_CHEST_SVG} <strong style="color:var(--accent)">全部完成！前往競技場領取寶箱</strong>` :
+        claimed ? `${DAILY_CHEST_SVG} 今日寶箱已領取 ✓` :
+        `${DAILY_CHEST_SVG} 全部完成可領取：+${DAILY_TASK_BONUS_XP} XP、+${DAILY_TASK_BONUS_GEM} 💎`}
     </div>`;
 }
