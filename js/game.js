@@ -748,10 +748,10 @@ function renderArena() {
     <div class="rogue-arena-banner-wrap">
       <div class="rogue-arena-banner" onclick="startRogueGame()">
         <div class="rogue-arena-banner-bg"></div>
+        <div class="goal-net"></div>
         <div class="goal-post-left"></div>
         <div class="goal-post-right"></div>
         <div class="goal-depth-shadow"></div>
-        <div class="goal-spotlight"></div>
         <div class="rogue-arena-banner-content">
           <div class="rogue-arena-banner-left">
             <div class="rogue-arena-banner-icon"><span class="rogue-kick-ball">⚽</span></div>

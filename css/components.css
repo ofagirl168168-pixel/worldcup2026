@@ -2558,56 +2558,68 @@ img.flag-img {
 .goal-post-left::after  { left: 3px; }
 .goal-post-right::after { right: 3px; }
 
-/* ── 球門內部（深度背景） ── */
+/* ── 球門內部（深色背景 = 球門後方暗處） ── */
 .rogue-arena-banner-bg {
   position: absolute; inset: 0; overflow: hidden;
   border-radius: 4px 4px 0 0;
-  /* 3D 深度：從暗到更暗，模擬球門內部 */
-  background: linear-gradient(180deg, #061a09 0%, #0d2e14 30%, #0f3518 60%, #1a5c28 100%);
+  background: linear-gradient(180deg, #08090a 0%, #0e1112 40%, #131719 100%);
 }
-/* 球網：菱形交叉，帶透視縮小感 */
-.rogue-arena-banner-bg::before {
+/* 球網：白色菱形交叉，清晰可見 */
+.goal-net {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(52deg,  rgba(255,255,255,0.18) 1px, transparent 1px),
+    linear-gradient(-52deg, rgba(255,255,255,0.18) 1px, transparent 1px);
+  background-size: 32px 26px;
+  /* 透視深度：頂部（遠處）網格密+淡，底部（近處）清晰 */
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,1) 100%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,1) 100%);
+  z-index: 1;
+}
+/* 第二層小網格（遠處更密的網） = 深度錯覺 */
+.goal-net::after {
   content: ''; position: absolute; inset: 0;
   background:
-    linear-gradient(52deg, rgba(255,255,255,0.07) 1px, transparent 1px),
-    linear-gradient(-52deg, rgba(255,255,255,0.07) 1px, transparent 1px);
-  background-size: 28px 22px;
-  /* 透視讓網格向後方收窄 */
-  mask-image: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%);
-  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%);
+    linear-gradient(48deg,  rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(-48deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 14px 11px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
 }
-/* 球門底部橫線 + 草地 */
+/* 草地底邊（球門線） */
 .rogue-arena-banner-bg::after {
-  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 18px;
-  background: linear-gradient(180deg,
-    transparent 0%,
-    rgba(30,100,40,0.3) 30%,
-    rgba(46,125,50,0.6) 70%,
-    rgba(56,142,60,0.8) 100%);
-  border-top: 2px solid rgba(255,255,255,0.1);
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 6px;
+  background: linear-gradient(180deg, transparent, rgba(46,125,50,0.5));
+  border-top: 2px solid rgba(255,255,255,0.06);
+  z-index: 2;
 }
 
-/* ── 球門深度陰影（頂部內陰影 = 橫樑下方遮光） ── */
+/* ── 橫樑下方投影 ── */
 .goal-depth-shadow {
-  position: absolute; top: 0; left: 0; right: 0; height: 40px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+  position: absolute; top: 0; left: 0; right: 0; height: 30px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
   z-index: 3;
   pointer-events: none;
 }
 
-/* ── 球門內透視聚光 ── */
-.goal-spotlight {
-  position: absolute; top: 30%; left: 50%; width: 200px; height: 120px;
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse, rgba(76,175,80,0.08) 0%, transparent 70%);
-  z-index: 2; pointer-events: none;
+/* ── 左右門柱內側陰影（深度感） ── */
+.goal-depth-shadow::before {
+  content: ''; position: absolute; top: 0; bottom: -80px; left: 0; width: 20px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.35) 0%, transparent 100%);
+}
+.goal-depth-shadow::after {
+  content: ''; position: absolute; top: 0; bottom: -80px; right: 0; width: 20px;
+  background: linear-gradient(270deg, rgba(0,0,0,0.35) 0%, transparent 100%);
 }
 
-/* ── 內容層 ── */
+/* ── 內容層（半透明底板 = 文字可讀） ── */
 .rogue-arena-banner-content {
   position: relative; z-index: 6;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 28px 32px 22px; gap: 16px;
+  padding: 24px 28px 20px; gap: 16px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 100%);
+  border-radius: 4px;
+  margin: 4px;
 }
 .rogue-arena-banner-left {
   display: flex; align-items: center; gap: 16px;
@@ -2653,12 +2665,12 @@ img.flag-img {
 /* ── 球撞網震動 ── */
 @keyframes netRipple {
   0%,26%,100% { transform: scaleX(1); }
-  68%  { transform: scaleX(1.008); }
-  72%  { transform: scaleX(0.996); }
-  76%  { transform: scaleX(1.003); }
+  68%  { transform: scaleX(1.01); }
+  72%  { transform: scaleX(0.994); }
+  76%  { transform: scaleX(1.004); }
   80%  { transform: scaleX(1); }
 }
-.rogue-arena-banner-bg::before {
+.goal-net {
   animation: netRipple 2.8s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
 }
 
