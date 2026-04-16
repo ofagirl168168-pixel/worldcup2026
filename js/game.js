@@ -660,7 +660,9 @@ function showArenaWelcomeIfNeeded() {
 
 // ── 球門粒子球網系統（Canvas） ────────────────────────────
 function initGoalNetRipple() {
-  const banner = document.querySelector('.rogue-arena-banner');
+  document.querySelectorAll('.rogue-arena-banner').forEach(b => _initOneGoalNet(b));
+}
+function _initOneGoalNet(banner) {
   if (!banner || banner._netInit) return;
   banner._netInit = true;
 
@@ -836,7 +838,7 @@ function initGoalNetRipple() {
   let dampOverride = 0;
   const BASE_DAMP = DAMPING;
 
-  window._goalNetImpact = function(ix, iy, strength) {
+  banner._goalNetImpact = function(ix, iy, strength) {
     const r = strength * 4; // 衝擊半徑（更大範圍）
     for (let i = 0, len = allP.length; i < len; i++) {
       const p = allP[i];
@@ -860,6 +862,9 @@ function initGoalNetRipple() {
   loop();
 }
 
+// 首頁 banner 也初始化球網
+document.addEventListener('DOMContentLoaded', () => initGoalNetRipple());
+
 // ── 球門 Banner 射門過場 ─────────────────────────────────
 let _goalShootLock = false;
 function goalBannerShoot(e) {
@@ -874,8 +879,8 @@ function goalBannerShoot(e) {
 
   // 等 fx.js 的球飛到後觸發撞網
   setTimeout(() => {
-    if (window._goalNetImpact) {
-      window._goalNetImpact(ix, iy, 50);
+    if (banner._goalNetImpact) {
+      banner._goalNetImpact(ix, iy, 50);
     }
 
     // 球網震盪後進入遊戲
