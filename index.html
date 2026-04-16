@@ -158,7 +158,7 @@
           <button onclick="openNicknameModal(true);event.stopPropagation()">
             <i class="fas fa-pen"></i> 修改暱稱
           </button>
-          <button onclick="showSection('arena');setTimeout(()=>document.getElementById('leaderboard-section')?.scrollIntoView({behavior:'smooth'}),300);event.stopPropagation()">
+          <button onclick="showSection('arena');setTimeout(()=>{(function _s(n){var el=document.getElementById('leaderboard-section');if(el){el.scrollIntoView({behavior:'smooth'})}else if(n<20){setTimeout(()=>_s(n+1),150)}})(0)},350);event.stopPropagation()">
             <i class="fas fa-trophy"></i> 查看排行榜
           </button>
           <button onclick="openMyPredModal();event.stopPropagation()">
