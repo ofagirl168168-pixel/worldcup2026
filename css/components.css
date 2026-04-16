@@ -2558,58 +2558,50 @@ img.flag-img {
 .goal-post-left::after  { left: 3px; }
 .goal-post-right::after { right: 3px; }
 
-/* ── 球門內部（深色背景 = 球門後方暗處） ── */
+/* ── 球門內部（全透明，讓網站底色穿透） ── */
 .rogue-arena-banner-bg {
   position: absolute; inset: 0; overflow: hidden;
   border-radius: 4px 4px 0 0;
-  background: linear-gradient(180deg, #08090a 0%, #0e1112 40%, #131719 100%);
+  background: transparent;
 }
-/* 球網：白色菱形交叉，清晰可見 */
+/* 球網：粗白線菱形，明顯可見 */
 .goal-net {
   position: absolute; inset: 0;
   background:
-    linear-gradient(52deg,  rgba(255,255,255,0.18) 1px, transparent 1px),
-    linear-gradient(-52deg, rgba(255,255,255,0.18) 1px, transparent 1px);
-  background-size: 32px 26px;
-  /* 透視深度：頂部（遠處）網格密+淡，底部（近處）清晰 */
-  mask-image: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,1) 100%);
-  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,1) 100%);
+    linear-gradient(52deg,  rgba(255,255,255,0.35) 2px, transparent 2px),
+    linear-gradient(-52deg, rgba(255,255,255,0.35) 2px, transparent 2px);
+  background-size: 36px 28px;
+  /* 透視深度：頂部（遠）淡+密，底部（近）清晰 */
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,1) 100%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,1) 100%);
   z-index: 1;
 }
-/* 第二層小網格（遠處更密的網） = 深度錯覺 */
+/* 第二層小網格（遠處更密的網）= 深度錯覺 */
 .goal-net::after {
   content: ''; position: absolute; inset: 0;
   background:
-    linear-gradient(48deg,  rgba(255,255,255,0.06) 1px, transparent 1px),
-    linear-gradient(-48deg, rgba(255,255,255,0.06) 1px, transparent 1px);
-  background-size: 14px 11px;
-  mask-image: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
-  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
-}
-/* 草地底邊（球門線） */
-.rogue-arena-banner-bg::after {
-  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 6px;
-  background: linear-gradient(180deg, transparent, rgba(46,125,50,0.5));
-  border-top: 2px solid rgba(255,255,255,0.06);
-  z-index: 2;
+    linear-gradient(48deg,  rgba(255,255,255,0.12) 1px, transparent 1px),
+    linear-gradient(-48deg, rgba(255,255,255,0.12) 1px, transparent 1px);
+  background-size: 16px 12px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 45%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 45%, transparent 100%);
 }
 
 /* ── 橫樑下方投影 ── */
 .goal-depth-shadow {
-  position: absolute; top: 0; left: 0; right: 0; height: 30px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+  position: absolute; top: 0; left: 0; right: 0; height: 25px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%);
   z-index: 3;
   pointer-events: none;
 }
-
-/* ── 左右門柱內側陰影（深度感） ── */
+/* ── 左右門柱內側陰影 ── */
 .goal-depth-shadow::before {
-  content: ''; position: absolute; top: 0; bottom: -80px; left: 0; width: 20px;
-  background: linear-gradient(90deg, rgba(0,0,0,0.35) 0%, transparent 100%);
+  content: ''; position: absolute; top: 0; bottom: -80px; left: 0; width: 16px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.25) 0%, transparent 100%);
 }
 .goal-depth-shadow::after {
-  content: ''; position: absolute; top: 0; bottom: -80px; right: 0; width: 20px;
-  background: linear-gradient(270deg, rgba(0,0,0,0.35) 0%, transparent 100%);
+  content: ''; position: absolute; top: 0; bottom: -80px; right: 0; width: 16px;
+  background: linear-gradient(270deg, rgba(0,0,0,0.25) 0%, transparent 100%);
 }
 
 /* ── 內容層（半透明底板 = 文字可讀） ── */
@@ -2617,9 +2609,11 @@ img.flag-img {
   position: relative; z-index: 6;
   display: flex; align-items: center; justify-content: space-between;
   padding: 24px 28px 20px; gap: 16px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 100%);
-  border-radius: 4px;
-  margin: 4px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border-radius: 6px;
+  margin: 6px 8px;
 }
 .rogue-arena-banner-left {
   display: flex; align-items: center; gap: 16px;
