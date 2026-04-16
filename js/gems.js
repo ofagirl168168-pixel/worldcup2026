@@ -121,6 +121,8 @@ async function fetchUnlockedDeep() {
 function updateGemUI(balance) {
   const el = document.getElementById('nav-gem-count')
   if (el) el.textContent = balance ?? '?'
+  const mGem = document.getElementById('mobile-nav-gem')
+  if (mGem) mGem.textContent = balance ?? '?'
 }
 
 // ── 初始化寶石（登入後呼叫）──────────────────────────────

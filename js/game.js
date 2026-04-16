@@ -490,6 +490,12 @@ function updateNavXP() {
   lvEl.textContent   = `⚡ Lv.${level}`;
   fillEl.style.width = `${xpInLv}%`;
   ptsEl.textContent  = `${xp} XP`;
+
+  // 同步手機版選單狀態
+  const mXp = document.getElementById('mobile-nav-xp');
+  const mLv = document.getElementById('mobile-nav-lv');
+  if (mXp) mXp.textContent = `${xp} XP`;
+  if (mLv) mLv.textContent = level;
 }
 
 // ── 導覽列紅點徽章 ────────────────────────────────────────
@@ -1102,8 +1108,8 @@ function saveChampionPick() {
   _syncGK();
   const picks = document.getElementById('champ-picks');
   const c1 = picks.dataset.c1, c2 = picks.dataset.c2, c3 = picks.dataset.c3;
-  if (!c1 || !c2 || !c3) { alert('請選擇冠、亞、季軍各一支球隊'); return; }
-  if (c1===c2 || c1===c3 || c2===c3) { alert('冠亞季軍不能選同一支球隊'); return; }
+  if (!c1 || !c2 || !c3) { showToast('⚠️ 請選擇冠、亞、季軍各一支球隊'); return; }
+  if (c1===c2 || c1===c3 || c2===c3) { showToast('⚠️ 冠亞季軍不能選同一支球隊'); return; }
   save(GK.champion, { c1, c2, c3, lockedAt: new Date().toISOString() });
   syncToSupabase?.();
   syncXPToProfile?.();
@@ -1187,7 +1193,7 @@ function saveGroupPicks() {
     if (sel.length < 2) incomplete++;
   });
   if (incomplete > 0) {
-    alert(`還有 ${incomplete} 組未選滿 2 隊，請完成後再儲存`);
+    showToast(`⚠️ 還有 ${incomplete} 組未選滿 2 隊，請完成後再儲存`);
     return;
   }
   save(GK.groups, groups);
@@ -2130,7 +2136,7 @@ function selectSupportTeam(code) {
 function saveSupportTeam() {
   _syncGK();
   const code = _pendingSupportTeam || load(GK.team);
-  if (!code) { alert('請選擇一支球隊'); return; }
+  if (!code) { showToast('⚠️ 請選擇一支球隊'); return; }
   save(GK.team, code);
   syncToSupabase?.();
   syncXPToProfile?.();

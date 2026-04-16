@@ -413,7 +413,7 @@ function renderUpcoming() {
   if (!el) return;
   const _T = _teams();
   const schedule = _matches();
-  if (!schedule.length) { el.innerHTML = ''; return; }
+  if (!schedule.length) { el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-title">尚無賽程資料</div><div class="empty-state-desc">切換賽事或稍後再來看看</div></div>'; return; }
 
   // 俱樂部賽事: 進行中優先，再取尚未結束的比賽；WC: 直接取前6場
   let upcoming;
@@ -631,10 +631,10 @@ function renderDeathGroups() {
     const zoneLabel = (pos) => pos <= 4 ? 'UCL' : pos <= 6 ? 'UEL' : pos <= 7 ? 'UECL' : '';
     el.innerHTML = `
       <div style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px">
-        <span style="color:#4caf50">● 1-4 歐冠</span>
-        <span style="color:#ff9800">● 5-6 歐霸</span>
+        <span style="color:var(--success)">● 1-4 歐冠</span>
+        <span style="color:var(--warning)">● 5-6 歐霸</span>
         <span style="color:#2196f3">● 7 歐協聯</span>
-        <span style="color:#ef5350">● 18-20 降級</span>
+        <span style="color:var(--danger)">● 18-20 降級</span>
       </div>
       <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
         <div style="display:grid;${cols};gap:0;padding:10px 16px;font-size:11px;color:var(--text-muted);font-weight:600;border-bottom:1px solid var(--border)">
@@ -712,7 +712,7 @@ function renderDeathGroups() {
               <span style="font-size:13px;font-weight:800;color:var(--text-muted);width:24px;text-align:center">${i+9}</span>
               <span style="font-size:20px">${flagImg(t.flag)}</span>
               <div style="flex:1"><div style="font-size:13px;font-weight:700">${t.nameCN}</div><div style="font-size:10px;color:var(--text-muted)">${row.w}勝${row.d}平${row.l}負</div></div>
-              <div style="text-align:right"><span style="font-size:15px;font-weight:800;color:var(--text-secondary)">${row.pts}</span><span style="font-size:11px;color:var(--text-muted)"> 分</span></div>
+              <div style="text-align:right"><span style="font-size:15px;font-weight:800;color:var(--text-secondary)">${row.pts}</span><span class="text-muted-sm"> 分</span></div>
             </div>`;
           }).join('')}
         </div>
@@ -946,7 +946,7 @@ function renderPredictions() {
       <div class="featured-pred-teams">
         <div class="pred-team"><div class="pred-team-flag">${flagImg(ht.flag)}</div><div class="pred-team-name">${ht.nameCN}</div></div>
         ${m.status==='finished' && m.score
-          ? `<div class="pred-score-big" style="color:#4caf50">${m.score.h} – ${m.score.a}</div>`
+          ? `<div class="pred-score-big" style="color:var(--success)">${m.score.h} – ${m.score.a}</div>`
           : `<div class="pred-score-big" style="${window.unlockedMatchSet?.has(m.id) ? '' : 'filter:blur(8px);user-select:none'}">${p.score}</div>`}
         <div class="pred-team"><div class="pred-team-flag">${flagImg(at.flag)}</div><div class="pred-team-name">${at.nameCN}</div></div>
       </div>
@@ -979,7 +979,7 @@ function renderPredictions() {
           ? `<div style="font-size:16px;font-weight:800;color:#4caf50">${m.score.h} – ${m.score.a}</div>
              <div style="font-size:10px;color:#4caf50;margin-top:1px">已結束</div>`
           : `<div style="font-size:16px;font-weight:800;color:var(--accent);${window.unlockedMatchSet?.has(m.id) ? '' : 'filter:blur(7px);user-select:none'}">${p.score}</div>`}
-        <div style="font-size:11px;color:var(--text-muted)">${_isClub() ? (m.date||'').slice(5).replace('-','/') + ' ' + (m.time||'') : (m.twDate?.slice(5).replace('-','/')||'') + ' ' + (m.twTime||'')}</div>
+        <div class="text-muted-sm">${_isClub() ? (m.date||'').slice(5).replace('-','/') + ' ' + (m.time||'') : (m.twDate?.slice(5).replace('-','/')||'') + ' ' + (m.twTime||'')}</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
         <span style="font-weight:700">${at.nameCN}</span>
@@ -1015,7 +1015,7 @@ function renderMyPredHistory(filter = 'all') {
   });
 
   if (!entries.length) {
-    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
+    el.innerHTML = `<div class="empty-hint">
       <div style="font-size:40px;margin-bottom:12px">🎯</div>
       <div>你還沒有任何預測紀錄</div>
       <div style="font-size:13px;margin-top:6px">在賽事預測頁面選擇比賽，開始你的第一場預測！</div>
@@ -1046,7 +1046,7 @@ function renderMyPredHistory(filter = 'all') {
   let html = `<div class="my-pred-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
     <div class="pred-stat-card"><span class="pred-stat-num">${totalPreds}</span><span class="pred-stat-label">總預測</span></div>
     <div class="pred-stat-card"><span class="pred-stat-num">${settledCount}</span><span class="pred-stat-label">已結算</span></div>
-    <div class="pred-stat-card"><span class="pred-stat-num" style="color:#4caf50">${correctDir}</span><span class="pred-stat-label">猜對方向</span></div>
+    <div class="pred-stat-card"><span class="pred-stat-num" style="color:var(--success)">${correctDir}</span><span class="pred-stat-label">猜對方向</span></div>
     <div class="pred-stat-card"><span class="pred-stat-num" style="color:#f5a623">${exactCount}</span><span class="pred-stat-label">精準比分</span></div>
     <div class="pred-stat-card"><span class="pred-stat-num">${accuracy}%</span><span class="pred-stat-label">準確率</span></div>
   </div>`;
@@ -1269,8 +1269,8 @@ async function openPredModal(id) {
       <!-- 比分結果（大字醒目）-->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px">
         <div style="text-align:center;flex:1;min-width:0">
-          <div style="font-size:52px;margin-bottom:6px">${flagImg(ht.flag)}</div>
-          <div style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ht.nameCN}</div>
+          <div class="icon-xl">${flagImg(ht.flag)}</div>
+          <div class="team-name-truncate">${ht.nameCN}</div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${hRankLabel}</div>
         </div>
         <div style="text-align:center;padding:0 8px;flex-shrink:0">
@@ -1279,8 +1279,8 @@ async function openPredModal(id) {
           ${aggHTML}
         </div>
         <div style="text-align:center;flex:1;min-width:0">
-          <div style="font-size:52px;margin-bottom:6px">${flagImg(at.flag)}</div>
-          <div style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${at.nameCN}</div>
+          <div class="icon-xl">${flagImg(at.flag)}</div>
+          <div class="team-name-truncate">${at.nameCN}</div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${aRankLabel}</div>
         </div>
       </div>
@@ -1290,13 +1290,13 @@ async function openPredModal(id) {
         <div style="font-size:14px;font-weight:800;color:var(--accent);margin-bottom:12px;text-align:center">🤖 AI 預測 vs 實際結果</div>
         <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center">
           <div>
-            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">AI 賽前預測</div>
+            <div class="text-muted-sm-mb">AI 賽前預測</div>
             <div style="font-size:28px;font-weight:900;color:var(--accent)">${predH} – ${predA}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${ht.nameCN}勝率 ${p.hw}%</div>
           </div>
           <div style="font-size:20px;color:var(--text-muted)">vs</div>
           <div>
-            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">實際結果</div>
+            <div class="text-muted-sm-mb">實際結果</div>
             <div style="font-size:28px;font-weight:900;color:#4caf50">${hGoal} – ${aGoal}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${resultText}</div>
           </div>
@@ -1315,7 +1315,7 @@ async function openPredModal(id) {
       ${m.goals && m.goals.length > 0 ? `
       <div style="margin:20px 0">
         <div class="modal-section-title">⚽ 進球紀錄</div>
-        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+        <div class="panel-subtle">
           ${m.goals.map(g => {
             const isHome = g.side === 'h';
             const teamFlag = isHome ? flagImg(ht.flag) : flagImg(at.flag);
@@ -1341,7 +1341,7 @@ async function openPredModal(id) {
       ${m.bookings && m.bookings.length > 0 ? `
       <div style="margin:16px 0">
         <div class="modal-section-title">🟨 犯規紀錄</div>
-        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+        <div class="panel-subtle">
           ${m.bookings.map(b => {
             const isHome = b.side === 'h';
             const cardIcon = b.card === 'red' ? '🟥' : b.card === 'yellow_red' ? '🟨🟥' : '🟨';
@@ -1358,7 +1358,7 @@ async function openPredModal(id) {
       ${m.substitutions && m.substitutions.length > 0 ? `
       <div style="margin:16px 0">
         <div class="modal-section-title">🔄 換人紀錄</div>
-        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+        <div class="panel-subtle">
           ${m.substitutions.map(s => {
             const isHome = s.side === 'h';
             return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isHome ? '' : 'flex-direction:row-reverse;text-align:right'}">
@@ -1427,12 +1427,12 @@ async function openPredModal(id) {
         <div class="modal-section-title" style="margin-bottom:12px">🎯 你的預測回顧</div>
         <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center">
           <div>
-            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">你的預測</div>
+            <div class="text-muted-sm-mb">你的預測</div>
             <div style="font-size:24px;font-weight:900;color:var(--blue)">${mine.h} – ${mine.a}</div>
           </div>
           <div style="font-size:20px;color:var(--text-muted)">vs</div>
           <div>
-            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">實際結果</div>
+            <div class="text-muted-sm-mb">實際結果</div>
             <div style="font-size:24px;font-weight:900;color:#4caf50">${hGoal} – ${aGoal}</div>
           </div>
         </div>
@@ -1474,8 +1474,8 @@ async function openPredModal(id) {
       <div style="background:linear-gradient(135deg, rgba(255,69,58,0.12), rgba(255,69,58,0.04));border:1px solid rgba(255,69,58,0.3);border-radius:16px;padding:24px 16px;margin-bottom:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
           <div style="text-align:center;flex:1;min-width:0">
-            <div style="font-size:52px;margin-bottom:6px">${flagImg(ht.flag)}</div>
-            <div style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ht.nameCN}</div>
+            <div class="icon-xl">${flagImg(ht.flag)}</div>
+            <div class="team-name-truncate">${ht.nameCN}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${hRankLabel}</div>
           </div>
           <div style="text-align:center;padding:0 8px;flex-shrink:0">
@@ -1483,8 +1483,8 @@ async function openPredModal(id) {
             <div style="margin-top:6px"><span class="live-badge"><span class="live-dot"></span>${minuteText}</span></div>
           </div>
           <div style="text-align:center;flex:1;min-width:0">
-            <div style="font-size:52px;margin-bottom:6px">${flagImg(at.flag)}</div>
-            <div style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${at.nameCN}</div>
+            <div class="icon-xl">${flagImg(at.flag)}</div>
+            <div class="team-name-truncate">${at.nameCN}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${aRankLabel}</div>
           </div>
         </div>
@@ -1494,7 +1494,7 @@ async function openPredModal(id) {
       ${m.goals && m.goals.length > 0 ? `
       <div style="margin:16px 0">
         <div class="modal-section-title">⚽ 進球紀錄</div>
-        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+        <div class="panel-subtle">
           ${m.goals.map(g => {
             const isHome = g.side === 'h';
             const teamFlag = isHome ? flagImg(ht.flag) : flagImg(at.flag);
@@ -1521,7 +1521,7 @@ async function openPredModal(id) {
       ${m.bookings && m.bookings.length > 0 ? `
       <div style="margin:16px 0">
         <div class="modal-section-title">🟨 犯規紀錄</div>
-        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+        <div class="panel-subtle">
           ${m.bookings.map(b => {
             const isHome = b.side === 'h';
             const cardIcon = b.card === 'red' ? '🟥' : b.card === 'yellow_red' ? '🟨🟥' : '🟨';
@@ -1538,7 +1538,7 @@ async function openPredModal(id) {
       ${m.substitutions && m.substitutions.length > 0 ? `
       <div style="margin:16px 0">
         <div class="modal-section-title">🔄 換人紀錄</div>
-        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+        <div class="panel-subtle">
           ${m.substitutions.map(s => {
             const isHome = s.side === 'h';
             return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isHome ? '' : 'flex-direction:row-reverse;text-align:right'}">
@@ -1560,15 +1560,15 @@ async function openPredModal(id) {
         <div style="font-size:14px;font-weight:800;color:var(--accent);margin-bottom:12px;text-align:center">🤖 AI 賽前預測</div>
         <div style="display:flex;justify-content:center;gap:24px;text-align:center">
           <div>
-            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">${ht.nameCN} 勝率</div>
+            <div class="text-muted-sm-mb">${ht.nameCN} 勝率</div>
             <div style="font-size:22px;font-weight:900;color:var(--accent)">${p.hw}%</div>
           </div>
           <div>
-            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">平局</div>
+            <div class="text-muted-sm-mb">平局</div>
             <div style="font-size:22px;font-weight:900;color:var(--text-secondary)">${p.d}%</div>
           </div>
           <div>
-            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">${at.nameCN} 勝率</div>
+            <div class="text-muted-sm-mb">${at.nameCN} 勝率</div>
             <div style="font-size:22px;font-weight:900;color:var(--accent)">${p.aw}%</div>
           </div>
         </div>
@@ -1646,10 +1646,10 @@ async function openPredModal(id) {
     <!-- 對陣（免費顯示：旗幟 + 球隊名 + 資訊）-->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:8px">
       <div style="text-align:center;flex:1;min-width:0">
-        <div style="font-size:52px;margin-bottom:6px">${flagImg(ht.flag)}</div>
-        <div style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ht.nameCN}</div>
+        <div class="icon-xl">${flagImg(ht.flag)}</div>
+        <div class="team-name-truncate">${ht.nameCN}</div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${hRankLabel}</div>
-        <div style="font-size:11px;color:var(--text-muted)">${ht.formation}</div>
+        <div class="text-muted-sm">${ht.formation}</div>
       </div>
       <div style="text-align:center;padding:0 8px;flex-shrink:0">
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">AI 預測比分</div>
@@ -1658,10 +1658,10 @@ async function openPredModal(id) {
         <div class="confidence-badge confidence-${p.conf}">${p.confLabel}</div>
       </div>
       <div style="text-align:center;flex:1;min-width:0">
-        <div style="font-size:52px;margin-bottom:6px">${flagImg(at.flag)}</div>
-        <div style="font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${at.nameCN}</div>
+        <div class="icon-xl">${flagImg(at.flag)}</div>
+        <div class="team-name-truncate">${at.nameCN}</div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${aRankLabel}</div>
-        <div style="font-size:11px;color:var(--text-muted)">${at.formation}</div>
+        <div class="text-muted-sm">${at.formation}</div>
       </div>
     </div>
 
@@ -1710,7 +1710,7 @@ async function openPredModal(id) {
                 <span>參與 <b style="color:var(--text-muted)">+1 XP</b></span>
                 <span>失敗 <b style="color:#ef9a9a">+2 XP</b></span>
                 <span>輸贏 <b style="color:var(--green)">+10 XP</b></span>
-                <span>比分差 <b style="color:#ff9800">+15 XP +1💎</b></span>
+                <span>比分差 <b style="color:var(--warning)">+15 XP +1💎</b></span>
                 <span>精準 <b style="color:var(--accent)">+30 XP +3💎</b></span>
               </div>
               <div class="pred-countdown" id="pred-cd-${m.id}" data-kickoff="${kickoffMs}" style="margin-bottom:10px">⏰ 計算中...</div>
@@ -1741,9 +1741,9 @@ async function openPredModal(id) {
         <!-- 勝率條 -->
         <div style="margin-bottom:20px">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-bottom:6px">
-            <div><div style="font-size:22px;font-weight:900;color:var(--green)">${p.hw}%</div><div style="font-size:11px;color:var(--text-muted)">${ht.nameCN} 勝</div></div>
-            <div><div style="font-size:22px;font-weight:900;color:var(--text-secondary)">${p.d}%</div><div style="font-size:11px;color:var(--text-muted)">平局</div></div>
-            <div><div style="font-size:22px;font-weight:900;color:var(--red)">${p.aw}%</div><div style="font-size:11px;color:var(--text-muted)">${at.nameCN} 勝</div></div>
+            <div><div style="font-size:22px;font-weight:900;color:var(--green)">${p.hw}%</div><div class="text-muted-sm">${ht.nameCN} 勝</div></div>
+            <div><div style="font-size:22px;font-weight:900;color:var(--text-secondary)">${p.d}%</div><div class="text-muted-sm">平局</div></div>
+            <div><div style="font-size:22px;font-weight:900;color:var(--red)">${p.aw}%</div><div class="text-muted-sm">${at.nameCN} 勝</div></div>
           </div>
           <div style="display:flex;height:10px;border-radius:5px;overflow:hidden">
             <div style="width:${p.hw}%;background:var(--green)"></div>
@@ -1771,13 +1771,13 @@ async function openPredModal(id) {
         <!-- 球隊風格 -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
           <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px">
-            <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">${flagImg(ht.flag)} ${ht.nameCN} 踢法</div>
+            <div class="text-accent-sm" style="margin-bottom:6px">${flagImg(ht.flag)} ${ht.nameCN} 踢法</div>
             <div style="font-size:12px;color:var(--text-secondary)">${ht.style||''}</div>
             <div style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${(ht.strengths||['整體實力強'])[0]}</div>
             <div style="font-size:12px;color:#ef9a9a">✗ ${(ht.weaknesses||['有待觀察'])[0]}</div>
           </div>
           <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px">
-            <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">${flagImg(at.flag)} ${at.nameCN} 踢法</div>
+            <div class="text-accent-sm" style="margin-bottom:6px">${flagImg(at.flag)} ${at.nameCN} 踢法</div>
             <div style="font-size:12px;color:var(--text-secondary)">${at.style||''}</div>
             <div style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${(at.strengths||['整體實力強'])[0]}</div>
             <div style="font-size:12px;color:#ef9a9a">✗ ${(at.weaknesses||['有待觀察'])[0]}</div>
@@ -1799,7 +1799,7 @@ async function openPredModal(id) {
               <span style="font-size:20px">${flagImg(ht.flag)}</span>${formDots(hForm)}
               <span style="font-size:12px;color:var(--text-muted)">${formScore(hForm)}分</span>
             </div>
-            ${p.hWC ? `<div style="font-size:11px;color:var(--text-muted)">
+            ${p.hWC ? `<div class="text-muted-sm">
               ${p.hWC.played}場：${p.hWC.win}勝${p.hWC.draw}平${p.hWC.lose}負
               · 進${p.hWC.gf}失${p.hWC.ga}（場均進球 ${p.hWC.gfPerGame}）
             </div>` : ''}
@@ -1810,7 +1810,7 @@ async function openPredModal(id) {
               <span style="font-size:20px">${flagImg(at.flag)}</span>${formDots(aForm)}
               <span style="font-size:12px;color:var(--text-muted)">${formScore(aForm)}分</span>
             </div>
-            ${p.aWC ? `<div style="font-size:11px;color:var(--text-muted)">
+            ${p.aWC ? `<div class="text-muted-sm">
               ${p.aWC.played}場：${p.aWC.win}勝${p.aWC.draw}平${p.aWC.lose}負
               · 進${p.aWC.gf}失${p.aWC.ga}（場均進球 ${p.aWC.gfPerGame}）
             </div>` : ''}
@@ -1820,7 +1820,7 @@ async function openPredModal(id) {
 
         <!-- 焦點球員對決 -->
         <div style="background:var(--accent-bg);border-radius:10px;padding:14px;border-left:3px solid var(--accent)">
-          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">⚽ 焦點球員對決</div>
+          <div class="text-accent-sm" style="margin-bottom:6px">⚽ 焦點球員對決</div>
           <div style="font-size:13px;color:var(--text-secondary)">
             <strong style="color:var(--text-primary)">${ht.keyPlayers?.[0]?.name||ht.nameCN}</strong>（${ht.keyPlayers?.[0]?.pos||'前鋒'}）
             vs
@@ -1836,14 +1836,14 @@ async function openPredModal(id) {
             <div style="font-weight:800;font-size:15px;margin-bottom:6px">深度分析</div>
             <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:2">
               <div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center">
-                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">🎯 大小球</span>
-                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">🔁 讓球盤</span>
-                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">🅱 雙方進球</span>
-                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">⛳ 角球數</span>
-                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">🟨 黃牌數</span>
-                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">⏱ 半場比分</span>
-                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">🏥 傷兵狀況</span>
-                <span style="background:rgba(255,255,255,0.07);border-radius:6px;padding:2px 7px">📋 陣型詳解</span>
+                <span class="tag-subtle">🎯 大小球</span>
+                <span class="tag-subtle">🔁 讓球盤</span>
+                <span class="tag-subtle">🅱 雙方進球</span>
+                <span class="tag-subtle">⛳ 角球數</span>
+                <span class="tag-subtle">🟨 黃牌數</span>
+                <span class="tag-subtle">⏱ 半場比分</span>
+                <span class="tag-subtle">🏥 傷兵狀況</span>
+                <span class="tag-subtle">📋 陣型詳解</span>
               </div>
             </div>
             <button class="pred-unlock-btn" onclick="openDeepAnalysis('${m.id}','${m.home}','${m.away}')">
@@ -2018,12 +2018,12 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
 
     <!-- 大小球 -->
     <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">⚽ 大小球（Poisson 模型）</div>
+      <div class="text-accent-sm" style="margin-bottom:6px">⚽ 大小球（Poisson 模型）</div>
       <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">預測比分 ${p.score}（總進球 <strong style="color:var(--text-primary)">${lambda}</strong>）· xG ${hXG}–${aXG}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
         ${[['大 1.5', pOver15], ['大 2.5', pOver25], ['大 3.5', pOver35]].map(([label, prob]) => `
           <div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:10px 8px">
-            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">${label}</div>
+            <div class="text-muted-sm-mb">${label}</div>
             <div style="font-size:22px;font-weight:900;color:${pColor(prob)}">${prob}%</div>
             ${probBar(prob, pColor(prob))}
           </div>`).join('')}
@@ -2033,7 +2033,7 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
     <!-- BTTS + 亞盤 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">🥅 兩隊都進球</div>
+        <div class="text-accent-sm" style="margin-bottom:10px">🥅 兩隊都進球</div>
         <div style="text-align:center">
           <div style="font-size:28px;font-weight:900;color:${pColor(pBTTS)}">${pBTTS}%</div>
           <div style="font-size:11px;color:var(--text-muted);margin:4px 0">${pBTTS >= 55 ? '較可能發生' : '較不可能'}</div>
@@ -2042,7 +2042,7 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
         </div>
       </div>
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">⚖️ 亞盤讓球</div>
+        <div class="text-accent-sm" style="margin-bottom:10px">⚖️ 亞盤讓球</div>
         <div style="text-align:center">
           <div style="font-size:14px;font-weight:900;color:var(--text-primary);line-height:1.5">${handicap}</div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:6px">${handicapNote}</div>
@@ -2054,36 +2054,36 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
     <!-- 角球 + 黃牌 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">🚩 角球預測</div>
+        <div class="text-accent-sm" style="margin-bottom:10px">🚩 角球預測</div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <div style="text-align:center">
-            <div style="font-size:11px;color:var(--text-muted)">${flagImg(ht.flag)}</div>
+            <div class="text-muted-sm">${flagImg(ht.flag)}</div>
             <div style="font-size:22px;font-weight:800">${hCorners}</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:11px;color:var(--text-muted)">合計</div>
+            <div class="text-muted-sm">合計</div>
             <div style="font-size:22px;font-weight:800;color:var(--accent)">${totalCorners}</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:11px;color:var(--text-muted)">${flagImg(at.flag)}</div>
+            <div class="text-muted-sm">${flagImg(at.flag)}</div>
             <div style="font-size:22px;font-weight:800">${aCorners}</div>
           </div>
         </div>
         <div style="font-size:11px;color:var(--text-muted);text-align:center">盤口 ${cornerLine} 建議<strong style="color:${pColor(cornerOverProb)}">${cornerOverProb >= 55 ? '大' : '小'}</strong>（${cornerOverProb}%）</div>
       </div>
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">🟨 黃牌預測</div>
+        <div class="text-accent-sm" style="margin-bottom:10px">🟨 黃牌預測</div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <div style="text-align:center">
-            <div style="font-size:11px;color:var(--text-muted)">${flagImg(ht.flag)}</div>
+            <div class="text-muted-sm">${flagImg(ht.flag)}</div>
             <div style="font-size:22px;font-weight:800">${hCards}</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:11px;color:var(--text-muted)">合計</div>
+            <div class="text-muted-sm">合計</div>
             <div style="font-size:22px;font-weight:800;color:#ffd54f">${totalCards}</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:11px;color:var(--text-muted)">${flagImg(at.flag)}</div>
+            <div class="text-muted-sm">${flagImg(at.flag)}</div>
             <div style="font-size:22px;font-weight:800">${aCards}</div>
           </div>
         </div>
@@ -2093,11 +2093,11 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
 
     <!-- 上半場分析 -->
     <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">⏱️ 上半場走向</div>
+      <div class="text-accent-sm" style="margin-bottom:10px">⏱️ 上半場走向</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-bottom:10px">
-        <div><div style="font-size:18px;font-weight:900;color:var(--green)">${htHW}%</div><div style="font-size:11px;color:var(--text-muted)">${ht.nameCN} 領先</div></div>
-        <div><div style="font-size:18px;font-weight:900;color:var(--text-secondary)">${htD}%</div><div style="font-size:11px;color:var(--text-muted)">平手</div></div>
-        <div><div style="font-size:18px;font-weight:900;color:var(--red)">${htAW}%</div><div style="font-size:11px;color:var(--text-muted)">${at.nameCN} 領先</div></div>
+        <div><div style="font-size:18px;font-weight:900;color:var(--green)">${htHW}%</div><div class="text-muted-sm">${ht.nameCN} 領先</div></div>
+        <div><div style="font-size:18px;font-weight:900;color:var(--text-secondary)">${htD}%</div><div class="text-muted-sm">平手</div></div>
+        <div><div style="font-size:18px;font-weight:900;color:var(--red)">${htAW}%</div><div class="text-muted-sm">${at.nameCN} 領先</div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:8px;text-align:center">
@@ -2116,11 +2116,11 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
 
     <!-- 歷史交手 -->
     <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:10px">
-      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">⚔️ 歷史交手紀錄</div>
+      <div class="text-accent-sm" style="margin-bottom:10px">⚔️ 歷史交手紀錄</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:8px">
-        <div><div style="font-size:20px;font-weight:800;color:var(--green)">${h2h.wins ?? '—'}</div><div style="font-size:11px;color:var(--text-muted)">${ht.nameCN} 勝</div></div>
-        <div><div style="font-size:20px;font-weight:800;color:var(--text-secondary)">${h2h.draws ?? '—'}</div><div style="font-size:11px;color:var(--text-muted)">平局</div></div>
-        <div><div style="font-size:20px;font-weight:800;color:var(--red)">${h2h.losses ?? '—'}</div><div style="font-size:11px;color:var(--text-muted)">${at.nameCN} 勝</div></div>
+        <div><div style="font-size:20px;font-weight:800;color:var(--green)">${h2h.wins ?? '—'}</div><div class="text-muted-sm">${ht.nameCN} 勝</div></div>
+        <div><div style="font-size:20px;font-weight:800;color:var(--text-secondary)">${h2h.draws ?? '—'}</div><div class="text-muted-sm">平局</div></div>
+        <div><div style="font-size:20px;font-weight:800;color:var(--red)">${h2h.losses ?? '—'}</div><div class="text-muted-sm">${at.nameCN} 勝</div></div>
       </div>
       ${h2h.played !== '—' ? `<div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">共 ${h2h.played} 場 · ${ht.nameCN} ${h2h.gf} : ${h2h.ga} ${at.nameCN}</div>` : '<div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">歷史交手資料待更新</div>'}
     </div>
@@ -2140,13 +2140,13 @@ async function openDeepAnalysis(matchId, homeCode, awayCode) {
     <!-- 陣型詳解 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">${flagImg(ht.flag)} ${ht.formation}</div>
+        <div class="text-accent-sm" style="margin-bottom:6px">${flagImg(ht.flag)} ${ht.formation}</div>
         <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">${ht.formationDesc || ht.style || '陣型詳解待更新'}</div>
         ${ht.strengths?.length ? `<div style="margin-top:8px;font-size:11px;color:var(--green)">✓ ${ht.strengths[0]}</div>` : ''}
         ${ht.strengths?.[1] ? `<div style="font-size:11px;color:var(--green)">✓ ${ht.strengths[1]}</div>` : ''}
       </div>
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">${flagImg(at.flag)} ${at.formation}</div>
+        <div class="text-accent-sm" style="margin-bottom:6px">${flagImg(at.flag)} ${at.formation}</div>
         <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">${at.formationDesc || at.style || '陣型詳解待更新'}</div>
         ${at.strengths?.length ? `<div style="margin-top:8px;font-size:11px;color:var(--green)">✓ ${at.strengths[0]}</div>` : ''}
         ${at.strengths?.[1] ? `<div style="font-size:11px;color:var(--green)">✓ ${at.strengths[1]}</div>` : ''}
@@ -2608,7 +2608,7 @@ function renderSchedule(phaseFilter, groupFilter) {
     }).sort((a, b) => (a.date+a.time) < (b.date+b.time) ? -1 : 1);
 
     if (!list.length) {
-      el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px">⏳</div>載入英超賽程中...<br><small>資料從 football-data.org 即時取得</small></div>';
+      el.innerHTML = '<div class="empty-hint"><div class="icon-lg">⏳</div>載入英超賽程中...<br><small>資料從 football-data.org 即時取得</small></div>';
       return;
     }
 
@@ -2671,7 +2671,7 @@ function renderSchedule(phaseFilter, groupFilter) {
       return true;
     }).sort((a, b) => (a.date+a.time) < (b.date+b.time) ? -1 : 1);
 
-    if (!list.length) { el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">暫無賽事資料</div>'; return; }
+    if (!list.length) { el.innerHTML = '<div class="empty-hint">暫無賽事資料</div>'; return; }
 
     // 更新篩選器 UI（歐冠專用）
     _renderUCLFilters();
@@ -2702,7 +2702,7 @@ function renderSchedule(phaseFilter, groupFilter) {
         : m.status === 'finished' && m.score
           ? `<div class="match-vs" style="font-size:20px;font-weight:800">${m.score.h} - ${m.score.a}</div>`
           : `<div class="match-vs">VS</div>`;
-      const aggText = m.agg ? `<div style="font-size:11px;color:var(--text-muted)">總比分 ${m.agg.h}-${m.agg.a}</div>` : '';
+      const aggText = m.agg ? `<div class="text-muted-sm">總比分 ${m.agg.h}-${m.agg.a}</div>` : '';
       const uclPreds = (() => { try { return JSON.parse(localStorage.getItem('ucl26_my_preds'))||{}; } catch { return {}; } })();
       const uclMine = uclPreds[m.id];
       const uclKo = (m.date && m.time) ? new Date(m.date+'T'+m.time+':00+08:00').getTime() : 0;
@@ -2746,7 +2746,7 @@ function renderSchedule(phaseFilter, groupFilter) {
     const kb = (b.twDate || '') + (b.twTime || '');
     return ka < kb ? -1 : ka > kb ? 1 : 0;
   });
-  if (!list.length) { el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">暫無賽事資料</div>'; return; }
+  if (!list.length) { el.innerHTML = '<div class="empty-hint">暫無賽事資料</div>'; return; }
   let lastDate = '';
   el.innerHTML = list.map(m => {
     let header = '';
@@ -2951,12 +2951,12 @@ function renderStats(tab) {
 
   // ── 英超數據頁 ──
   if (_isEPL() && tab === 'standings') {
-    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
-      <div style="font-size:24px;margin-bottom:8px">⏳</div>載入積分榜中...</div>`;
+    el.innerHTML = `<div class="empty-hint">
+      <div class="icon-lg">⏳</div>載入積分榜中...</div>`;
     fetch('/api/epl-standings').then(r => r.json()).then(data => {
       if (!data.ok || !data.standings?.length) {
-        el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
-          <div style="font-size:24px;margin-bottom:8px">📊</div>暫無數據</div>`;
+        el.innerHTML = `<div class="empty-hint">
+          <div class="icon-lg">📊</div>暫無數據</div>`;
         return;
       }
       window._eplStandings = data.standings;
@@ -2974,14 +2974,14 @@ function renderStats(tab) {
           <td>${row.playedGames}</td><td>${row.won}</td><td>${row.draw}</td><td>${row.lost}</td>
           <td>${row.goalsFor}</td><td>${row.goalsAgainst}</td><td>${row.goalDifference>0?'+':''}${row.goalDifference}</td>
           <td><strong>${row.points}</strong></td>
-          <td style="font-size:11px;letter-spacing:1px">${(row.form||'').split(',').map(f => f === 'W' ? '<span style="color:#4caf50">W</span>' : f === 'L' ? '<span style="color:#ef5350">L</span>' : '<span style="color:#ff9800">D</span>').join('')}</td>
+          <td style="font-size:11px;letter-spacing:1px">${(row.form||'').split(',').map(f => f === 'W' ? '<span style="color:var(--success)">W</span>' : f === 'L' ? '<span style="color:var(--danger)">L</span>' : '<span style="color:var(--warning)">D</span>').join('')}</td>
         </tr>`;
       }).join('');
       el.innerHTML = `
         <div style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px">
-          <span style="color:#4caf50">● 1-4 歐冠資格</span>
-          <span style="color:#ff9800">● 5-6 歐霸</span>
-          <span style="color:#ef5350">● 18-20 降級區</span>
+          <span style="color:var(--success)">● 1-4 歐冠資格</span>
+          <span style="color:var(--warning)">● 5-6 歐霸</span>
+          <span style="color:var(--danger)">● 18-20 降級區</span>
           <span style="color:var(--text-muted)">🟢 即時數據（football-data.org）· 第 ${data.matchday||'?'} 輪</span>
         </div>
         <div class="standings-group">
@@ -2992,20 +2992,20 @@ function renderStats(tab) {
           </table>
         </div>`;
     }).catch(() => {
-      el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
-        <div style="font-size:24px;margin-bottom:8px">⚠️</div>載入失敗，請稍後再試</div>`;
+      el.innerHTML = `<div class="empty-hint">
+        <div class="icon-lg">⚠️</div>載入失敗，請稍後再試</div>`;
     });
     return;
   }
 
   if (_isEPL() && (tab === 'epl-scorers' || tab === 'epl-assists')) {
     const isScorers = tab === 'epl-scorers';
-    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
-      <div style="font-size:24px;margin-bottom:8px">⏳</div>載入中...</div>`;
+    el.innerHTML = `<div class="empty-hint">
+      <div class="icon-lg">⏳</div>載入中...</div>`;
     fetch('/api/epl-scorers').then(r => r.json()).then(data => {
       if (!data.ok || (!data.topScorers?.length && !data.topAssists?.length)) {
-        el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
-          <div style="font-size:24px;margin-bottom:8px">📊</div>暫無數據</div>`;
+        el.innerHTML = `<div class="empty-hint">
+          <div class="icon-lg">📊</div>暫無數據</div>`;
         return;
       }
       const list = isScorers ? data.topScorers : data.topAssists;
@@ -3026,8 +3026,8 @@ function renderStats(tab) {
             <div class="scorer-stat">${p[valKey]} ${unit}</div>
           </div>`).join('')}</div>`;
     }).catch(() => {
-      el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
-        <div style="font-size:24px;margin-bottom:8px">⚠️</div>載入失敗，請稍後再試</div>`;
+      el.innerHTML = `<div class="empty-hint">
+        <div class="icon-lg">⚠️</div>載入失敗，請稍後再試</div>`;
     });
     return;
   }
@@ -3073,9 +3073,9 @@ function renderStats(tab) {
     }).join('');
     el.innerHTML = `
       <div style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px">
-        <span style="color:#4caf50">● 1-8 直接晉級十六強</span>
+        <span style="color:var(--success)">● 1-8 直接晉級十六強</span>
         <span style="color:var(--text-muted)">● 9-24 進入附加賽</span>
-        <span style="color:#ef5350">● 25-36 淘汰</span>
+        <span style="color:var(--danger)">● 25-36 淘汰</span>
       </div>
       <div class="standings-group">
         <h3>🏆 2025/26 歐冠聯賽階段積分表</h3>
@@ -3090,12 +3090,12 @@ function renderStats(tab) {
   if (_isUCL() && (tab === 'ucl-scorers' || tab === 'ucl-assists')) {
     // 歐冠：射手榜 / 助攻榜（從 API 即時取得）
     const isScorers = tab === 'ucl-scorers';
-    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
-      <div style="font-size:24px;margin-bottom:8px">⏳</div>載入中...</div>`;
+    el.innerHTML = `<div class="empty-hint">
+      <div class="icon-lg">⏳</div>載入中...</div>`;
     fetch('/api/ucl-scorers').then(r => r.json()).then(data => {
       if (!data.ok || (!data.topScorers?.length && !data.topAssists?.length)) {
-        el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
-          <div style="font-size:24px;margin-bottom:8px">📊</div>暫無數據（賽季尚未開始或 API 無資料）</div>`;
+        el.innerHTML = `<div class="empty-hint">
+          <div class="icon-lg">📊</div>暫無數據（賽季尚未開始或 API 無資料）</div>`;
         return;
       }
       const list = isScorers ? data.topScorers : data.topAssists;
@@ -3116,8 +3116,8 @@ function renderStats(tab) {
             <div class="scorer-stat">${p[valKey]} ${unit}</div>
           </div>`).join('')}</div>`;
     }).catch(() => {
-      el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">
-        <div style="font-size:24px;margin-bottom:8px">⚠️</div>載入失敗，請稍後再試</div>`;
+      el.innerHTML = `<div class="empty-hint">
+        <div class="icon-lg">⚠️</div>載入失敗，請稍後再試</div>`;
     });
     return;
   }
@@ -3259,10 +3259,10 @@ function renderStats(tab) {
             <div class="scorer-goals">${p.saves ?? 0} <span>撲救</span></div>
           </div>`).join('')}</div>`;
     } else {
-      el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">賽事開始後更新</div>';
+      el.innerHTML = '<div class="empty-hint">賽事開始後更新</div>';
     }
   } else {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">賽事開始後更新</div>';
+    el.innerHTML = '<div class="empty-hint">賽事開始後更新</div>';
   }
 }
 
@@ -3388,7 +3388,7 @@ function renderFocus() {
 
   if (_isClub()) {
     const arts = [..._articles()].sort((a, b) => b.date.localeCompare(a.date));
-    if (!arts.length) { main.innerHTML = ''; grid.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">暫無文章</div>'; return; }
+    if (!arts.length) { main.innerHTML = ''; grid.innerHTML = '<div class="empty-hint">暫無文章</div>'; return; }
     const [first, ...rest] = arts;
     main.innerHTML = `<div class="focus-main-card" onclick="openUCLArticle('${first.id}')">
       <div class="focus-cat">📌 ${first.category}</div>
@@ -4142,3 +4142,55 @@ function startSchedulePredCountdowns() {
 
 // 頁面載入後啟動
 document.addEventListener('DOMContentLoaded', () => setTimeout(startSchedulePredCountdowns, 1500));
+
+/* ========== 回到頂部按鈕 ========== */
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('btn-back-top');
+  if (!btn) return;
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 400);
+  }, { passive: true });
+});
+
+/* ========== 帳號選單捷徑 ========== */
+function scrollToDailyTask() {
+  setTimeout(() => {
+    const el = document.getElementById('daily-task-card');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 400);
+}
+function scrollToAchievements() {
+  setTimeout(() => {
+    const el = document.querySelector('.badges-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 400);
+}
+
+/* ========== 射門排行榜展開/收合 ========== */
+function toggleRogueLb() {
+  const lb = document.getElementById('rogue-home-leaderboard');
+  const btn = document.getElementById('rogue-lb-toggle');
+  if (!lb || !btn) return;
+  const collapsed = lb.classList.toggle('rogue-lb-collapsed');
+  if (!collapsed) lb.style.maxHeight = lb.scrollHeight + 'px';
+  else lb.style.maxHeight = '0';
+  btn.textContent = collapsed ? '展開排行榜 ↓' : '收合排行榜 ↑';
+}
+
+/* ========== 分組死亡指數展開/收合 ========== */
+function toggleDeathGroups() {
+  const grid = document.getElementById('death-groups');
+  const btn = document.getElementById('death-toggle');
+  if (!grid || !btn) return;
+  const collapsed = grid.classList.toggle('highlights-collapsed');
+  btn.textContent = collapsed ? '展開全部 ↓' : '收合 ↑';
+}
+
+/* ========== 看點展開/收合 ========== */
+function toggleHighlights() {
+  const grid = document.getElementById('highlights-grid');
+  const btn = document.getElementById('highlights-toggle');
+  if (!grid || !btn) return;
+  const collapsed = grid.classList.toggle('highlights-collapsed');
+  btn.textContent = collapsed ? '展開全部 ↓' : '收合 ↑';
+}

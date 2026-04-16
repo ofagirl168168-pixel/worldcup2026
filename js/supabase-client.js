@@ -525,9 +525,10 @@ async function renderLeaderboard(containerId) {
 }
 
 // ── 簡易 Toast 通知 ───────────────────────────────────────
-function showToast(msg) {
+function showToast(msg, severity) {
   const el = document.createElement('div');
   el.className = 'supa-toast';
+  if (severity) el.classList.add('toast-' + severity);
   el.textContent = msg;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
