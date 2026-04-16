@@ -747,6 +747,7 @@ function renderArena() {
     <!-- 射門挑戰入口 -->
     <div class="rogue-arena-banner" onclick="startRogueGame()">
       <div class="rogue-arena-banner-bg"></div>
+      <div class="goal-post-right"></div>
       <div class="rogue-arena-banner-content">
         <div class="rogue-arena-banner-left">
           <div class="rogue-arena-banner-icon"><span class="rogue-kick-ball">⚽</span></div>
@@ -755,7 +756,7 @@ function renderArena() {
             <div class="rogue-arena-banner-desc">射門 × 卡牌 Build × 無盡生存｜週排行前六名贏寶石</div>
           </div>
         </div>
-        <div class="rogue-arena-banner-btn">開始遊戲<span>▶</span></div>
+        <div class="rogue-arena-banner-btn"><i class="fas fa-futbol"></i> 射門！</div>
       </div>
     </div>
 

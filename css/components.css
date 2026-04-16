@@ -2489,92 +2489,125 @@ img.flag-img {
 .rogue-home-banner--compact .rogue-home-banner-left p { font-size: 13px; margin: 0; }
 .rogue-home-banner--compact .rogue-banner-art { height: 60px; opacity: 0.5; }
 
-/* ========== 競技場射門挑戰橫幅 ========== */
+/* ========== 競技場射門挑戰橫幅（球門造型） ========== */
 .rogue-arena-banner {
   position: relative; overflow: hidden; cursor: pointer;
   margin: 0 auto 24px; max-width: 960px;
-  border-radius: 16px;
-  border: 1px solid rgba(76,175,80,0.35);
-  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
-  animation: rogueBannerGlow 3s ease-in-out infinite;
+  border-radius: 4px 4px 16px 16px;
+  /* 球門框：粗頂框 + 側框 */
+  border-top: 6px solid #e0e0e0;
+  border-left: 5px solid #e0e0e0;
+  border-right: 5px solid #e0e0e0;
+  border-bottom: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 .rogue-arena-banner:hover {
   transform: translateY(-3px) scale(1.01);
   box-shadow: 0 12px 40px rgba(76,175,80,0.35), 0 0 30px rgba(76,175,80,0.15);
-  border-color: rgba(76,175,80,0.6);
 }
+/* 門柱金屬光澤 */
+.rogue-arena-banner::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+  background: linear-gradient(180deg, #fff 0%, #d0d0d0 40%, #b0b0b0 100%);
+  z-index: 5;
+}
+.rogue-arena-banner::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 5px;
+  background: linear-gradient(90deg, #fff 0%, #c8c8c8 100%);
+  z-index: 5;
+}
+/* 右側門柱光澤（用 bg 的 after） */
 .rogue-arena-banner-bg {
   position: absolute; inset: 0;
-  background: linear-gradient(135deg, #0d3b15 0%, #1a5c28 40%, #0a2e10 100%);
+  /* 深綠球場 + 球網菱形紋路 */
+  background:
+    repeating-conic-gradient(
+      rgba(255,255,255,0.04) 0% 25%, transparent 0% 50%
+    ) 0 0 / 24px 24px,
+    linear-gradient(180deg, #0a2e10 0%, #145224 50%, #1a6830 85%, #2d8a44 100%);
 }
+/* 球網紋路 */
 .rogue-arena-banner-bg::before {
   content: ''; position: absolute; inset: 0;
-  background: repeating-linear-gradient(
-    0deg, transparent, transparent 18px,
-    rgba(255,255,255,0.02) 18px, rgba(255,255,255,0.02) 19px
-  );
+  background:
+    linear-gradient(45deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
-/* 光球裝飾 */
+/* 草地底邊 */
 .rogue-arena-banner-bg::after {
-  content: ''; position: absolute; right: -20px; top: -20px;
-  width: 120px; height: 120px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(76,175,80,0.12) 0%, transparent 70%);
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 8px;
+  background: linear-gradient(180deg, transparent, rgba(34,120,50,0.6));
+  border-top: 2px solid rgba(255,255,255,0.08);
+}
+/* 右門柱光澤 */
+.rogue-arena-banner .goal-post-right {
+  position: absolute; top: 0; bottom: 0; right: 0; width: 5px;
+  background: linear-gradient(270deg, #fff 0%, #c8c8c8 100%);
+  z-index: 5;
 }
 .rogue-arena-banner-content {
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 20px; gap: 14px;
+  padding: 22px 28px; gap: 16px;
 }
 .rogue-arena-banner-left {
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; gap: 16px;
 }
+/* 球飛入球門動畫 */
 .rogue-arena-banner-icon {
-  font-size: 32px;
-  width: 52px; height: 52px;
+  font-size: 36px;
+  width: 56px; height: 56px;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.08);
-  border-radius: 14px; flex-shrink: 0;
-  border: 1px solid rgba(76,175,80,0.25);
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.15);
   overflow: hidden; position: relative;
-  box-shadow: 0 0 12px rgba(76,175,80,0.2);
+  box-shadow: 0 0 20px rgba(76,175,80,0.25), inset 0 0 12px rgba(0,0,0,0.2);
 }
 .rogue-arena-banner-icon .rogue-kick-ball {
   position: absolute;
-  animation: rogueKick 2s ease-in-out infinite;
+  animation: goalShot 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.4));
 }
-@keyframes rogueKick {
-  0%   { transform: scale(2.8) translateY(45px) rotate(0deg); opacity: 0; }
+@keyframes goalShot {
+  0%   { transform: scale(3) translateY(60px) rotate(0deg); opacity: 0; }
   5%   { opacity: 1; }
-  20%  { transform: scale(1) translateY(0) rotate(360deg); opacity: 1; }
-  22%  { transform: scale(1.1) translateX(3px) rotate(365deg); opacity: 1; }
-  24%  { transform: scale(0.95) translateX(-3px) rotate(370deg); opacity: 1; }
-  26%  { transform: scale(1.05) translateX(2px) rotate(373deg); opacity: 1; }
-  28%  { transform: scale(0.98) translateX(-1px) rotate(375deg); opacity: 1; }
-  30%  { transform: scale(1) translateX(0) rotate(376deg); opacity: 1; }
-  60%  { transform: scale(1) translateY(0) rotate(376deg); opacity: 1; }
-  80%  { transform: scale(0.7) translateY(45px) rotate(420deg); opacity: 0.4; }
-  100% { transform: scale(0.4) translateY(65px) rotate(480deg); opacity: 0; }
+  18%  { transform: scale(1) translateY(0) rotate(360deg); opacity: 1; }
+  20%  { transform: scale(1.15) rotate(370deg); opacity: 1; }
+  22%  { transform: scale(0.9) rotate(375deg); opacity: 1; }
+  24%  { transform: scale(1.05) rotate(378deg); opacity: 1; }
+  26%  { transform: scale(1) rotate(380deg); opacity: 1; }
+  55%  { transform: scale(1) translateY(0) rotate(380deg); opacity: 1; }
+  70%  { transform: scale(1.3) rotate(380deg); opacity: 0.7; filter: drop-shadow(0 0 12px rgba(255,255,255,0.6)); }
+  85%  { transform: scale(0.5) translateY(-30px) rotate(420deg); opacity: 0.3; }
+  100% { transform: scale(0.2) translateY(-50px) rotate(450deg); opacity: 0; }
 }
 .rogue-arena-banner-title {
-  font-size: 16px; font-weight: 900; color: #fff;
+  font-size: 17px; font-weight: 900; color: #fff;
   margin-bottom: 4px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
 .rogue-arena-banner-desc {
-  font-size: 11px; color: rgba(255,255,255,0.5);
+  font-size: 11px; color: rgba(255,255,255,0.55);
   line-height: 1.5;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
+/* 射門按鈕 */
 .rogue-arena-banner-btn {
   flex-shrink: 0;
-  font-size: 13px; font-weight: 800; color: #fff;
-  padding: 10px 20px; border-radius: 12px;
-  background: linear-gradient(135deg, var(--success), var(--success-dk));
-  box-shadow: 0 3px 12px rgba(76,175,80,0.35);
+  font-size: 14px; font-weight: 900; color: #fff;
+  padding: 12px 24px; border-radius: 14px;
+  background: linear-gradient(135deg, #43a047, #2e7d32);
+  box-shadow: 0 4px 16px rgba(76,175,80,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
   transition: all 0.3s;
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: 8px;
   animation: rogueBtnPulse 2s ease-in-out infinite;
+  letter-spacing: 0.5px;
 }
 .rogue-arena-banner-btn span {
-  font-size: 10px; opacity: 0.8;
+  font-size: 11px; opacity: 0.9;
   display: inline-block;
   animation: arrowBounce 1.2s ease-in-out infinite;
 }
@@ -2587,7 +2620,7 @@ img.flag-img {
   transform: scale(1.06);
 }
 @media (max-width: 480px) {
-  .rogue-arena-banner-content { flex-direction: column; text-align: center; }
+  .rogue-arena-banner-content { flex-direction: column; text-align: center; padding: 18px 16px; }
   .rogue-arena-banner-left { flex-direction: column; }
   .rogue-arena-banner-btn { width: 100%; justify-content: center; }
 }
