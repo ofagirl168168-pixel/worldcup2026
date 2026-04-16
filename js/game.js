@@ -861,49 +861,22 @@ function goalBannerShoot(e) {
 
   const banner = e.currentTarget;
   const rect = banner.getBoundingClientRect();
+  // 撞擊點 = 點擊位置（fx.js 的球會飛到這裡）
+  const ix = e.clientX - rect.left;
+  const iy = e.clientY - rect.top;
 
-  // 撞擊目標：banner 中央
-  const targetX = rect.left + rect.width / 2;
-  const targetY = rect.top + rect.height / 2;
-
-  // 建立飛行足球
-  const ball = document.createElement('div');
-  ball.textContent = '⚽';
-  ball.style.cssText = `
-    position:fixed; z-index:9999; font-size:32px;
-    pointer-events:none; will-change:transform;
-    left:${e.clientX}px; top:${e.clientY}px;
-    transition: left 0.4s cubic-bezier(0.2,0,0.3,1),
-                top 0.4s cubic-bezier(0.2,0,0.3,1),
-                transform 0.4s ease-out;
-    filter: drop-shadow(0 0 8px rgba(255,200,0,0.6));
-  `;
-  document.body.appendChild(ball);
-
-  // 下一幀啟動飛行
-  requestAnimationFrame(() => {
-    ball.style.left = targetX + 'px';
-    ball.style.top = targetY + 'px';
-    ball.style.transform = 'scale(1.3) rotate(360deg)';
-  });
-
-  // 撞擊時刻
+  // 等 fx.js 的球飛到後觸發撞網
   setTimeout(() => {
-    ball.remove();
-
-    // 觸發球網強烈衝擊
-    const ix = targetX - rect.left;
-    const iy = targetY - rect.top;
     if (window._goalNetImpact) {
       window._goalNetImpact(ix, iy, 18);
     }
 
-    // 延遲後進入遊戲
+    // 球網震盪後進入遊戲
     setTimeout(() => {
       _goalShootLock = false;
       startRogueGame();
     }, 500);
-  }, 400);
+  }, 350);
 }
 
 // ── 競技場主頁面 ──────────────────────────────────────────
