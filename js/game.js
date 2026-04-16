@@ -764,8 +764,9 @@ function initGoalNetRipple() {
         p.vx += (dx / dist) * f;
         p.vy += (dy / dist) * f;
       }
-      p.vx *= DAMPING;
-      p.vy *= DAMPING;
+      const d = dampOverride || DAMPING;
+      p.vx *= d;
+      p.vy *= d;
       p.x += p.vx;
       p.y += p.vy;
     }
@@ -832,13 +833,16 @@ function initGoalNetRipple() {
   obs.observe(banner);
 
   // 公開 API：外部觸發撞網衝擊
+  let dampOverride = 0;
+  const BASE_DAMP = DAMPING;
+
   window._goalNetImpact = function(ix, iy, strength) {
+    const r = strength * 4; // 衝擊半徑（更大範圍）
     for (let i = 0, len = allP.length; i < len; i++) {
       const p = allP[i];
       const dx = p.x - ix;
       const dy = p.y - iy;
       const d2 = dx * dx + dy * dy;
-      const r = strength * 3; // 衝擊半徑
       if (d2 < r * r && d2 > 1) {
         const dist = Math.sqrt(d2);
         const f = (1 - dist / r) * strength;
@@ -846,6 +850,9 @@ function initGoalNetRipple() {
         p.vy += (dy / dist) * f;
       }
     }
+    // 暫時降低阻尼讓震盪更久
+    dampOverride = 0.88;
+    setTimeout(() => { dampOverride = 0; }, 800);
   };
 
   window.addEventListener('resize', resize);
@@ -868,7 +875,7 @@ function goalBannerShoot(e) {
   // 等 fx.js 的球飛到後觸發撞網
   setTimeout(() => {
     if (window._goalNetImpact) {
-      window._goalNetImpact(ix, iy, 18);
+      window._goalNetImpact(ix, iy, 50);
     }
 
     // 球網震盪後進入遊戲
