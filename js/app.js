@@ -801,10 +801,13 @@ function showSection(id, scrollToId) {
   document.querySelectorAll('[data-section="' + id + '"]').forEach(b => b.classList.add('active'));
   document.getElementById('mobile-nav').classList.remove('open');
   if (scrollToId) {
-    requestAnimationFrame(() => {
+    let _tries = 0;
+    const _scroll = () => {
       const t = document.getElementById(scrollToId);
-      if (t) t.scrollIntoView({ behavior: 'smooth' });
-    });
+      if (t) { t.scrollIntoView({ behavior: 'smooth' }); }
+      else if (++_tries < 30) { setTimeout(_scroll, 100); }
+    };
+    setTimeout(_scroll, 200);
   } else {
     window.scrollTo(0, 0);
   }
