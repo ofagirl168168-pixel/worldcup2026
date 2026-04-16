@@ -1068,7 +1068,7 @@ function renderMyPredHistory(filter = 'all') {
       statusCls = 'pred-row-pending';
     }
 
-    return `<div class="pred-history-row ${statusCls}" onclick="openPredModal('${e.matchId}')">
+    return `<div class="pred-history-row ${statusCls}" onclick="closePredModal();openPredModal('${e.matchId}')">
       <div class="pred-h-meta">
         <span class="pred-h-label">${label}</span>
         <span class="pred-h-date">${dateStr} ${time}</span>
