@@ -794,13 +794,20 @@ function renderHighlights() {
     </div>`).join('');
 }
 
-function showSection(id) {
+function showSection(id, scrollToId) {
   document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('section-' + id).classList.add('active');
   document.querySelectorAll('[data-section="' + id + '"]').forEach(b => b.classList.add('active'));
   document.getElementById('mobile-nav').classList.remove('open');
-  window.scrollTo(0, 0);
+  if (scrollToId) {
+    requestAnimationFrame(() => {
+      const t = document.getElementById(scrollToId);
+      if (t) t.scrollIntoView({ behavior: 'smooth' });
+    });
+  } else {
+    window.scrollTo(0, 0);
+  }
   // 觸發對應頁面渲染（確保切換賽事後資料正確）
   const _r = (fn) => { try { fn(); } catch(e) { console.error('[showSection]', e); } };
   if (id === 'home') {
