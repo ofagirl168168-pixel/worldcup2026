@@ -1108,21 +1108,22 @@ function closePredModal() {
   document.body.style.overflow = '';
 }
 
-// Badge 通知：計算未讀已結算數
-function _getSettledCount() {
-  let count = 0;
+// Badge 通知：計算未讀預測數（新預測 + 新結算都算）
+function _getPredTotal() {
+  let preds = 0, settled = 0;
   ['wc26_', 'ucl26_', 'epl26_'].forEach(p => {
-    try { const s = JSON.parse(localStorage.getItem(p + 'settled'))||{}; count += Object.keys(s).length; } catch {}
+    try { preds += Object.keys(JSON.parse(localStorage.getItem(p + 'my_preds'))||{}).length; } catch {}
+    try { settled += Object.keys(JSON.parse(localStorage.getItem(p + 'settled'))||{}).length; } catch {}
   });
-  return count;
+  return preds + settled;
 }
 function _markPredSeen() {
-  localStorage.setItem('pred_seen_settled', _getSettledCount());
+  localStorage.setItem('pred_seen_total', _getPredTotal());
   _updatePredBadge();
 }
 function _updatePredBadge() {
-  const seen = parseInt(localStorage.getItem('pred_seen_settled'))||0;
-  const total = _getSettledCount();
+  const seen = parseInt(localStorage.getItem('pred_seen_total'))||0;
+  const total = _getPredTotal();
   const unseen = Math.max(0, total - seen);
   // dropdown 內的 badge
   const badge = document.getElementById('pred-badge');
@@ -3729,6 +3730,7 @@ function saveMyPred(matchId) {
   const isNew = !myPreds[matchId];
   myPreds[matchId] = { h, a, savedAt: new Date().toISOString() };
   localStorage.setItem(predKey, JSON.stringify(myPreds));
+  _updatePredBadge();
 
   // 首次預測立即給 +1 XP 參與獎
   if (isNew) {
