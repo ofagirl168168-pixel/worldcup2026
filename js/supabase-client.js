@@ -414,7 +414,10 @@ async function fetchChampionVotes() {
 // ── 取得排行榜資料 ────────────────────────────────────────
 async function fetchLeaderboard() {
   const { data, error } = await DB.from('leaderboard')
-    .select('*').order('xp', { ascending: false }).limit(50);
+    .select('*')
+    .not('nickname', 'is', null)
+    .gt('xp', 0)
+    .order('xp', { ascending: false }).limit(50);
   if (error) { console.error('排行榜錯誤:', error); return []; }
   return data ?? [];
 }
@@ -512,7 +515,7 @@ async function renderLeaderboard(containerId) {
         <div class="lb-rank">${medals[i] ?? `#${i + 1}`}</div>
         <div class="lb-flag">${flagImg(flag)}</div>
         <div class="lb-name">
-          ${row.nickname}${badgesHtml}${isMe ? ' <span class="lb-you">你</span>' : ''}
+          ${row.nickname || '匿名玩家'}${badgesHtml}${isMe ? ' <span class="lb-you">你</span>' : ''}
           ${title ? `<span class="lb-title ${title.cls}">${title.icon} ${title.name}</span>` : ''}
         </div>
         <div class="lb-stats">
