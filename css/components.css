@@ -2761,6 +2761,7 @@ img.flag-img {
 .dtask-card {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
   overflow: hidden; margin-bottom: 16px;
+  max-width: 560px;
 }
 .dtask-header {
   display: flex; align-items: center; justify-content: space-between;
