@@ -2567,14 +2567,14 @@ function setShowcaseBadge(icon) {
 
 const DAILY_TASK_POOL = {
   // 固定任務
-  daily_quiz:   { id:'daily_quiz',   icon:'❓', label:'完成每日一題',           fixed:true },
-  pred_match:   { id:'pred_match',   icon:'🎯', label:'預測至少 1 場比賽',     fixed:true },
-  play_rogue:   { id:'play_rogue',   icon:'⚽', label:'玩一場射門挑戰',        fixed:true },
+  daily_quiz:   { id:'daily_quiz',   icon:'❓', label:'完成每日一題',           fixed:true,  go:'openDailyPick()' },
+  pred_match:   { id:'pred_match',   icon:'🎯', label:'預測至少 1 場比賽',     fixed:true,  go:"showSection('predictions')" },
+  play_rogue:   { id:'play_rogue',   icon:'⚽', label:'玩一場射門挑戰',        fixed:true,  go:'startRogueGame()' },
   // 輪替任務
-  rogue_3000:   { id:'rogue_3000',   icon:'🏅', label:'射門挑戰達 3000 分',    fixed:false },
-  share_any:    { id:'share_any',    icon:'📤', label:'分享任一預測或成績',     fixed:false },
-  unlock_match: { id:'unlock_match', icon:'🔓', label:'解鎖一場 AI 分析',      fixed:false },
-  read_article: { id:'read_article', icon:'📰', label:'閱讀一篇文章',          fixed:false },
+  rogue_3000:   { id:'rogue_3000',   icon:'🏅', label:'射門挑戰達 3000 分',    fixed:false, go:'startRogueGame()' },
+  share_any:    { id:'share_any',    icon:'📤', label:'分享任一預測或成績',     fixed:false, go:"showSection('arena')" },
+  unlock_match: { id:'unlock_match', icon:'🔓', label:'解鎖一場 AI 分析',      fixed:false, go:"showSection('predictions')" },
+  read_article: { id:'read_article', icon:'📰', label:'閱讀一篇文章',          fixed:false, go:"showSection('focus')" },
 };
 
 const DAILY_TASK_XP = 5;
@@ -2709,11 +2709,12 @@ function renderDailyTaskCard() {
     const t = DAILY_TASK_POOL[id];
     if (!t) return '';
     const isDone = tasks[id];
+    const goBtn = !isDone && t.go ? `<button class="dtask-go-btn" onclick="event.stopPropagation();${t.go}">去完成</button>` : '';
     return `<div class="dtask-row ${isDone ? 'dtask-done' : ''}">
       <span class="dtask-check">${isDone ? '✅' : '⬜'}</span>
       <span class="dtask-icon">${t.icon}</span>
       <span class="dtask-label">${t.label}</span>
-      <span class="dtask-xp">${isDone ? `<span style="color:var(--green)">+${DAILY_TASK_XP}</span>` : `+${DAILY_TASK_XP} XP`}</span>
+      ${isDone ? `<span class="dtask-xp"><span style="color:var(--green)">+${DAILY_TASK_XP}</span></span>` : goBtn}
     </div>`;
   }).join('');
 
@@ -2806,11 +2807,12 @@ function _renderDailyTaskPopupBody(el) {
       const t = DAILY_TASK_POOL[id];
       if (!t) return '';
       const isDone = tasks[id];
+      const goBtn = !isDone && t.go ? `<button class="dtask-go-btn" onclick="document.getElementById('daily-task-popup')?.remove();${t.go}">去完成</button>` : '';
       return `<div class="dtask-row ${isDone ? 'dtask-done' : ''}">
         <span class="dtask-check">${isDone ? '✅' : '⬜'}</span>
         <span class="dtask-icon">${t.icon}</span>
         <span class="dtask-label">${t.label}</span>
-        <span class="dtask-xp">${isDone ? `<span style="color:var(--green)">+${DAILY_TASK_XP}</span>` : `+${DAILY_TASK_XP} XP`}</span>
+        ${isDone ? `<span class="dtask-xp"><span style="color:var(--green)">+${DAILY_TASK_XP}</span></span>` : goBtn}
       </div>`;
     }).join('')}
     <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text-muted)">
