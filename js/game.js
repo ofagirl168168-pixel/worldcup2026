@@ -674,7 +674,7 @@ function initGoalNetRipple() {
 
   // ── 參數 ──
   const COLS       = 30;
-  const ROWS       = 4;
+  const ROWS       = 7;
   const REPEL_R    = 40;    // 斥力半徑
   const REPEL_STR  = 3;     // 斥力強度
   const SPRING     = 0.1;   // 回彈彈性
@@ -711,29 +711,29 @@ function initGoalNetRipple() {
 
       for (let c = 0; c <= COLS; c++) {
         const ct = c / COLS; // 0~1
-        // 中間 80% 直線；左右各 10% 向內斜收
         let x;
+        // 中間 90% 直線，左右各 5% 斜向景深
+        const midL = pad + sideDepth;          // 中段左起點
+        const midR = W - pad - sideDepth;      // 中段右終點
+        // 頂部(遠)向內收，底部(近)不收 → 景深
+        const offset = sideDepth * (1 - t) * 0.7;
+
         if (ct <= SIDE_PCT) {
-          // 左側 10%：從門柱(pad)斜向收到 sideW 處
-          const st = ct / SIDE_PCT; // 0=門柱 1=進入中段
+          // 左側 5%：門柱→中段左邊緣，頂部往左偏（向外）
+          const st = ct / SIDE_PCT; // 0=門柱 1=接中段
           const postX = pad;
-          const innerX = pad + sideDepth;
-          // 頂部(遠)收更多，底部(近)幾乎不收
-          const depth = sideDepth * (1 - t) * 0.8;
-          x = postX + st * (innerX + depth - postX);
+          const junctionX = midL - offset; // 頂部時往左偏
+          x = postX + st * (junctionX - postX);
         } else if (ct >= (1 - SIDE_PCT)) {
-          // 右側 10%
-          const st = (1 - ct) / SIDE_PCT;
+          // 右側 5%：中段右邊緣→門柱，頂部往右偏（向外，對稱）
+          const st = (1 - ct) / SIDE_PCT; // 0=門柱 1=接中段
           const postX = W - pad;
-          const innerX = W - pad - sideDepth;
-          const depth = sideDepth * (1 - t) * 0.8;
-          x = postX - st * (postX - innerX - depth);
+          const junctionX = midR + offset; // 頂部時往右偏
+          x = postX - st * (postX - junctionX);
         } else {
-          // 中間 80%：直線均分
-          const midStart = pad + sideDepth;
-          const midEnd   = W - pad - sideDepth;
+          // 中間 90%：直線均分
           const midT = (ct - SIDE_PCT) / (1 - 2 * SIDE_PCT);
-          x = midStart + midT * (midEnd - midStart);
+          x = midL + midT * (midR - midL);
         }
 
         const p = mkP(x, y);
