@@ -675,19 +675,15 @@ function initGoalNetRipple() {
   // ── 參數 ──
   const COLS       = 30;    // 橫向格數
   const ROWS       = 4;     // 縱向格數
-  const SIDE_DEPTH = 50;    // 側面球網深度 (px)
-  const TOP_INSET  = 40;    // 頂部內縮 (模擬遠處較窄)
-  const REPEL_R    = 90;    // 斥力半徑
-  const REPEL_STR  = 20;    // 斥力強度
-  const SPRING     = 0.06;  // 回彈彈性
-  const DAMPING    = 0.82;  // 阻尼
+  const REPEL_R    = 60;    // 斥力半徑（縮小）
+  const REPEL_STR  = 8;     // 斥力強度（減弱）
+  const SPRING     = 0.08;  // 回彈彈性（稍快回彈）
+  const DAMPING    = 0.78;  // 阻尼（更快靜止）
+  const SIDE_PCT   = 0.10;  // 左右各 10% 做斜向景深
 
-  // 用陣列索引快速查找粒子（避免 .find）
-  let back  = [];  // back[r][c]
-  let left  = [];  // left[r][s]
-  let right = [];  // right[r][s]
-  let top   = [];  // top[c]
-  let allP  = [];  // 所有粒子（物理更新用）
+  let back  = [];  // back[r][c]  中央+側面全在一個網格
+  let top   = [];  // top[c]      橫樑→後方頂邊
+  let allP  = [];
   let mouseX = -9999, mouseY = -9999;
   let animId = null;
   let W = 0, H = 0;
@@ -704,48 +700,44 @@ function initGoalNetRipple() {
   }
 
   function buildNet() {
-    back = []; left = []; right = []; top = []; allP = [];
-    const pad = 8;
+    back = []; top = []; allP = [];
+    const pad = 6;
+    const sideDepth = W * 0.06; // 側面向內收多少
 
-    // ── 後方網面（梯形） ──
     for (let r = 0; r <= ROWS; r++) {
       back[r] = [];
-      const t = r / ROWS;
-      const inset = TOP_INSET * (1 - t);
+      const t = r / ROWS; // 0=頂(遠) 1=底(近)
       const y = pad + t * (H - pad * 2);
+
       for (let c = 0; c <= COLS; c++) {
-        const x = (SIDE_DEPTH + inset) + (c / COLS) * (W - (SIDE_DEPTH + inset) * 2);
+        const ct = c / COLS; // 0~1
+        // 中間 80% 直線；左右各 10% 向內斜收
+        let x;
+        if (ct <= SIDE_PCT) {
+          // 左側 10%：從門柱(pad)斜向收到 sideW 處
+          const st = ct / SIDE_PCT; // 0=門柱 1=進入中段
+          const postX = pad;
+          const innerX = pad + sideDepth;
+          // 頂部(遠)收更多，底部(近)幾乎不收
+          const depth = sideDepth * (1 - t) * 0.8;
+          x = postX + st * (innerX + depth - postX);
+        } else if (ct >= (1 - SIDE_PCT)) {
+          // 右側 10%
+          const st = (1 - ct) / SIDE_PCT;
+          const postX = W - pad;
+          const innerX = W - pad - sideDepth;
+          const depth = sideDepth * (1 - t) * 0.8;
+          x = postX - st * (postX - innerX - depth);
+        } else {
+          // 中間 80%：直線均分
+          const midStart = pad + sideDepth;
+          const midEnd   = W - pad - sideDepth;
+          const midT = (ct - SIDE_PCT) / (1 - 2 * SIDE_PCT);
+          x = midStart + midT * (midEnd - midStart);
+        }
+
         const p = mkP(x, y);
         back[r][c] = p;
-        allP.push(p);
-      }
-    }
-
-    // ── 左側面網 ──
-    const SIDE_SEG = 2;
-    for (let r = 0; r <= ROWS; r++) {
-      left[r] = [];
-      const y = pad + (r / ROWS) * (H - pad * 2);
-      const postX = pad;
-      const backX = back[r][0].ox;
-      for (let s = 0; s <= SIDE_SEG; s++) {
-        const x = postX + (s / SIDE_SEG) * (backX - postX);
-        const p = mkP(x, y);
-        left[r][s] = p;
-        allP.push(p);
-      }
-    }
-
-    // ── 右側面網 ──
-    for (let r = 0; r <= ROWS; r++) {
-      right[r] = [];
-      const y = pad + (r / ROWS) * (H - pad * 2);
-      const postX = W - pad;
-      const backX = back[r][COLS].ox;
-      for (let s = 0; s <= SIDE_SEG; s++) {
-        const x = postX - (s / SIDE_SEG) * (postX - backX);
-        const p = mkP(x, y);
-        right[r][s] = p;
         allP.push(p);
       }
     }
@@ -782,10 +774,10 @@ function initGoalNetRipple() {
   function draw() {
     ctx.clearRect(0, 0, W, H);
 
-    // ── 後方網面 ──
+    // ── 網面（側面+中央一體） ──
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = 1;
     for (let r = 0; r <= ROWS; r++) {
       for (let c = 0; c <= COLS; c++) {
         const p = back[r][c];
@@ -795,38 +787,10 @@ function initGoalNetRipple() {
     }
     ctx.stroke();
 
-    // ── 左側面網 ──
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-    ctx.lineWidth = 1;
-    for (let r = 0; r <= ROWS; r++) {
-      for (let s = 0; s <= 2; s++) {
-        const p = left[r][s];
-        if (s < 2) { ctx.moveTo(p.x, p.y); ctx.lineTo(left[r][s+1].x, left[r][s+1].y); }
-        if (r < ROWS) { ctx.moveTo(p.x, p.y); ctx.lineTo(left[r+1][s].x, left[r+1][s].y); }
-      }
-      // 連接到後方網
-      const last = left[r][2]; const bk = back[r][0];
-      ctx.moveTo(last.x, last.y); ctx.lineTo(bk.x, bk.y);
-    }
-    ctx.stroke();
-
-    // ── 右側面網 ──
-    ctx.beginPath();
-    for (let r = 0; r <= ROWS; r++) {
-      for (let s = 0; s <= 2; s++) {
-        const p = right[r][s];
-        if (s < 2) { ctx.moveTo(p.x, p.y); ctx.lineTo(right[r][s+1].x, right[r][s+1].y); }
-        if (r < ROWS) { ctx.moveTo(p.x, p.y); ctx.lineTo(right[r+1][s].x, right[r+1][s].y); }
-      }
-      const last = right[r][2]; const bk = back[r][COLS];
-      ctx.moveTo(last.x, last.y); ctx.lineTo(bk.x, bk.y);
-    }
-    ctx.stroke();
-
     // ── 頂面網（橫樑→後方頂邊） ──
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.lineWidth = 0.8;
     for (let c = 0; c <= COLS; c++) {
       const tp = top[c]; const bp = back[0][c];
       ctx.moveTo(tp.x, tp.y); ctx.lineTo(bp.x, bp.y);
@@ -834,12 +798,12 @@ function initGoalNetRipple() {
     }
     ctx.stroke();
 
-    // ── 交點粒子 ──
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    // ── 交點粒子（小圓點） ──
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
     for (let i = 0, len = allP.length; i < len; i++) {
       const p = allP[i];
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 1.3, 0, 6.283);
+      ctx.arc(p.x, p.y, 1, 0, 6.283);
       ctx.fill();
     }
   }

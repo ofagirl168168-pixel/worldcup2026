@@ -2506,8 +2506,8 @@ img.flag-img {
   min-height: 110px;
 }
 .rogue-arena-banner:hover {
-  transform: rotateX(0deg) translateY(-4px);
-  box-shadow: 0 20px 50px rgba(76,175,80,0.25), 0 8px 20px rgba(0,0,0,0.3);
+  transform: rotateX(0deg) translateY(-3px);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.4);
 }
 
 /* ── 橫樑（頂部金屬圓管） ── */
