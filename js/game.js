@@ -673,13 +673,13 @@ function initGoalNetRipple() {
   const ctx = canvas.getContext('2d');
 
   // ── 參數 ──
-  const COLS       = 30;    // 橫向格數
-  const ROWS       = 4;     // 縱向格數
-  const REPEL_R    = 60;    // 斥力半徑（縮小）
-  const REPEL_STR  = 8;     // 斥力強度（減弱）
-  const SPRING     = 0.08;  // 回彈彈性（稍快回彈）
-  const DAMPING    = 0.78;  // 阻尼（更快靜止）
-  const SIDE_PCT   = 0.10;  // 左右各 10% 做斜向景深
+  const COLS       = 30;
+  const ROWS       = 4;
+  const REPEL_R    = 40;    // 斥力半徑
+  const REPEL_STR  = 3;     // 斥力強度
+  const SPRING     = 0.1;   // 回彈彈性
+  const DAMPING    = 0.7;   // 阻尼
+  const SIDE_PCT   = 0.05;  // 左右各 5% 斜向景深
 
   let back  = [];  // back[r][c]  中央+側面全在一個網格
   let top   = [];  // top[c]      橫樑→後方頂邊
