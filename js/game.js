@@ -1187,9 +1187,12 @@ async function shareDailyImage() {
     try { return await getMyRefLink?.() || _shareBaseUrl() } catch { return _shareBaseUrl() }
   })()
 
-  // QR Code
+  // QR Code + Logo
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(shareLink)}&color=0a0f1e&bgcolor=ffffff&margin=8`
-  const qrImg = await loadImg(qrUrl).catch(() => null)
+  const [qrImg, logoImg] = await Promise.all([
+    loadImg(qrUrl).catch(() => null),
+    loadImg('img/logo-soccermaddy.png').catch(() => null)
+  ])
 
   // Canvas 尺寸
   const W = 800, PAD = 36
@@ -1223,6 +1226,12 @@ async function shareDailyImage() {
   ctx.fillStyle = 'rgba(255,255,255,0.35)'
   ctx.font = `500 13px "Noto Sans TC", sans-serif`
   ctx.fillText(window.location.host, PAD + s + 12, 24 + s * 0.5 + 22)
+
+  // Logo（右上角）
+  if (logoImg) {
+    const lh = 40, lw = logoImg.width * (lh / logoImg.height)
+    ctx.drawImage(logoImg, W - PAD - lw, 26, lw, lh)
+  }
 
   // 分隔線
   ctx.strokeStyle = 'rgba(240,192,64,0.25)'
@@ -1468,11 +1477,12 @@ async function shareChampionText() {
 
   // QR Code
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(link)}&color=0a0f1e&bgcolor=ffffff&margin=8`
-  const [qrImg, flag1, flag2, flag3] = await Promise.all([
+  const [qrImg, flag1, flag2, flag3, logoImg] = await Promise.all([
     loadImg(qrUrl).catch(() => null),
     loadImg(getFlagImgUrl(t1?.flag)).catch(() => null),
     loadImg(getFlagImgUrl(t2?.flag)).catch(() => null),
-    loadImg(getFlagImgUrl(t3?.flag)).catch(() => null)
+    loadImg(getFlagImgUrl(t3?.flag)).catch(() => null),
+    loadImg('img/logo-soccermaddy.png').catch(() => null)
   ])
 
   const W = 800, H = 720, PAD = 36
@@ -1497,6 +1507,11 @@ async function shareChampionText() {
   ctx.fillText(_ctx.platformName, PAD + s + 12, 24 + s * 0.5)
   ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 13px "Noto Sans TC", sans-serif`
   ctx.fillText(window.location.host, PAD + s + 12, 24 + s * 0.5 + 22)
+  // Logo（右上角）
+  if (logoImg) {
+    const lh = 40, lw = logoImg.width * (lh / logoImg.height)
+    ctx.drawImage(logoImg, W - PAD - lw, 26, lw, lh)
+  }
   ctx.strokeStyle = 'rgba(240,192,64,0.25)'; ctx.lineWidth = 1
   ctx.beginPath(); ctx.moveTo(PAD, 100); ctx.lineTo(W-PAD, 100); ctx.stroke()
 
@@ -1576,9 +1591,10 @@ async function shareTeamText() {
   const eventName = _ctx.fullName
   const shareText = `⚽ ${eventName}，我宣示支持 ${t.nameCN}！\n整個賽事我都陪著他們！\n一起來預測吧👇\n${link}`
 
-  const [qrImg, flagImg2] = await Promise.all([
+  const [qrImg, flagImg2, logoImg] = await Promise.all([
     loadImg(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(link)}&color=0a0f1e&bgcolor=ffffff&margin=8`).catch(() => null),
-    loadImg(getFlagImgUrl(t.flag)).catch(() => null)
+    loadImg(getFlagImgUrl(t.flag)).catch(() => null),
+    loadImg('img/logo-soccermaddy.png').catch(() => null)
   ])
 
   const W = 800, H = 600, PAD = 36
@@ -1604,6 +1620,11 @@ async function shareTeamText() {
   ctx.fillText(_ctx.platformName, PAD + s + 10, 20 + s * 0.5)
   ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = `500 12px "Noto Sans TC", sans-serif`
   ctx.fillText(window.location.host, PAD + s + 10, 20 + s * 0.5 + 20)
+  // Logo（右上角）
+  if (logoImg) {
+    const lh = 36, lw = logoImg.width * (lh / logoImg.height)
+    ctx.drawImage(logoImg, W - PAD - lw, 22, lw, lh)
+  }
   ctx.strokeStyle = 'rgba(240,192,64,0.25)'; ctx.lineWidth = 1
   ctx.beginPath(); ctx.moveTo(PAD, 88); ctx.lineTo(W-PAD, 88); ctx.stroke()
 
@@ -1720,14 +1741,15 @@ function drawShield(ctx, cx, cy, size, fill, stroke) {
   ctx.restore()
 }
 
-// 預載圖片 helper（crossOrigin anonymous，適用有 CORS header 的 CDN）
+// 預載圖片 helper（crossOrigin anonymous，外部 URL 透過 wsrv.nl 代理）
 function loadImg(src) {
   return new Promise(resolve => {
+    if (!src) return resolve(null)
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.onload = () => resolve(img)
     img.onerror = () => resolve(null)
-    img.src = src
+    img.src = src.startsWith('http') ? `https://wsrv.nl/?url=${encodeURIComponent(src)}` : src
   })
 }
 
@@ -1762,9 +1784,12 @@ async function shareGroupImage() {
     if (url) flagImgs[code] = await loadImg(url)
   }))
 
-  // ── 預載 QR Code（指向分享者邀請連結）───────────────
+  // ── 預載 QR Code + Logo ───────────────
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(shareLink)}&color=0a0f1e&bgcolor=ffffff&margin=8`
-  const qrImg = await loadImg(qrUrl)
+  const [qrImg, logoImg] = await Promise.all([
+    loadImg(qrUrl),
+    loadImg('img/logo-soccermaddy.png').catch(() => null)
+  ])
 
   // ── 直式 Canvas（手機分享友善）────────────────────────
   const W = 800, PAD = 28
@@ -1839,6 +1864,12 @@ async function shareGroupImage() {
   ctx.font = '15px sans-serif'
   const _grpSub = _grpCtx.isEpl ? 'English Premier League 2025/26' : _grpCtx.isUcl ? 'UEFA Champions League 2025/26 · League Phase' : 'FIFA World Cup 2026 · Group Stage Predictions'
   ctx.fillText(_grpSub, W / 2, 164)
+
+  // Logo（右上角）
+  if (logoImg) {
+    const lh = 40, lw = logoImg.width * (lh / logoImg.height)
+    ctx.drawImage(logoImg, W - PAD - lw, 20, lw, lh)
+  }
 
   // 分隔線
   const divGrad = ctx.createLinearGradient(PAD, 0, W - PAD, 0)

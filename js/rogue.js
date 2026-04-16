@@ -5096,9 +5096,12 @@
     const url = window.location.origin + '?play=rogue';
     const shareText = `⚽ 射門挑戰：前進世界盃\n🏅 分數 ${score}｜Wave ${wave}\n${praise.text}\n你能打敗我嗎？來挑戰！👇\n${url}`;
 
-    // 載入 QR Code
+    // 載入 QR Code + Logo
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}&color=0a0f1e&bgcolor=ffffff&margin=8`;
-    const qrImg = await loadImg?.(qrUrl).catch(() => null);
+    const [qrImg, logoImg] = await Promise.all([
+      loadImg?.(qrUrl).catch(() => null),
+      loadImg?.('img/logo-soccermaddy.png').catch(() => null)
+    ]);
 
     // 載入死亡截圖
     let deathImg = null;
@@ -5134,6 +5137,12 @@
     c.fillStyle = 'rgba(255,255,255,0.3)';
     c.font = `500 14px "Noto Sans TC", sans-serif`;
     c.fillText(window.location.host, IW/2, 78);
+
+    // Logo（右上角）
+    if (logoImg) {
+      const lh = 40, lw = logoImg.width * (lh / logoImg.height);
+      c.drawImage(logoImg, IW - PAD - lw, 28, lw, lh);
+    }
 
     // 分隔線
     const divGrad = c.createLinearGradient(PAD, 0, IW-PAD, 0);

@@ -3516,7 +3516,7 @@ async function shareMyPrediction(matchId) {
     } catch { resolve(null); }
   });
 
-  const [hImg, aImg, qrImg] = await Promise.all([loadImg(ht.flag), loadImg(at.flag), loadQR()]);
+  const [hImg, aImg, qrImg, logoImg] = await Promise.all([loadImg(ht.flag), loadImg(at.flag), loadQR(), loadImg('img/logo-soccermaddy.png')]);
 
   // ── 背景 ──
   const bg = ctx.createLinearGradient(0, 0, w, h);
@@ -3534,6 +3534,12 @@ async function shareMyPrediction(matchId) {
   topLine.addColorStop(1, 'rgba(245,166,35,0)');
   ctx.fillStyle = topLine;
   ctx.fillRect(0, 0, w, 3);
+
+  // Logo（右上角）
+  if (logoImg) {
+    const lh = 32, lw = logoImg.width * (lh / logoImg.height);
+    ctx.drawImage(logoImg, w - 42 - lw, 14, lw, lh);
+  }
 
   // ── 頂部標籤 ──
   const dateStr = _isClub() ? `${(m.date||'').slice(5).replace('-','/')} ${m.time||''}` : `${(m.twDate||'').slice(5).replace('-','/')} ${m.twTime||''}`;
