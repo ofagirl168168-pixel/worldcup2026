@@ -1,0 +1,651 @@
+/* =============================================
+   OPINION-POLL.JS — 觀點投票彈窗系統
+   全螢幕投票 → 動畫結果 → 分享卡片
+   ============================================= */
+
+(function () {
+  'use strict';
+
+  const STORAGE_PREFIX = 'opinion_vote_';
+  const STORAGE_SHOWN = 'opinion_shown_';
+  const TAG_LABELS = { trending: '🔥 時事', classic: '⚽ 經典', fun: '🎉 趣味', predict: '🔮 預測' };
+
+  /* ---------- 顯示觀點投票彈窗 ---------- */
+  function showOpinionPoll(onClose) {
+    const today = localDateStr();
+    const shownKey = STORAGE_SHOWN + today;
+    if (localStorage.getItem(shownKey)) {
+      if (onClose) onClose();
+      return;
+    }
+
+    const opinion = getTodayOpinion();
+    if (!opinion) { if (onClose) onClose(); return; }
+
+    localStorage.setItem(shownKey, '1');
+    _cleanOldKeys(STORAGE_SHOWN);
+
+    const voteKey = STORAGE_PREFIX + opinion.id;
+    const existingVote = localStorage.getItem(voteKey);
+
+    // 建立 overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'opinion-overlay';
+    overlay.id = 'opinion-overlay';
+
+    const isMulti = opinion.opts.length > 2;
+    const cardsClass = isMulti ? 'opinion-cards opinion-cards--multi' : 'opinion-cards';
+    const tagClass = 'opinion-tag opinion-tag--' + (opinion.type || 'classic');
+
+    overlay.innerHTML = `
+      <div class="opinion-glow"></div>
+      <div class="opinion-stars"></div>
+      <div class="opinion-container">
+        <div class="opinion-brand">
+          <div class="opinion-brand-line"></div>
+          <div class="opinion-brand-title">
+            <span class="opinion-brand-vs left">VS</span>
+            <span class="opinion-brand-name">麥迪擂台</span>
+            <span class="opinion-brand-vs right">VS</span>
+          </div>
+          <div class="opinion-brand-line"></div>
+        </div>
+        <div class="opinion-brand-tagline">MADDY ARENA · 每天一題，選邊站</div>
+        <span class="${tagClass}">${TAG_LABELS[opinion.type] || '⚽ 觀點'}</span>
+        <div class="opinion-question">${opinion.q}</div>
+        <div class="opinion-context">${opinion.context || ''}</div>
+        <div class="${cardsClass}" id="opinion-cards">
+          ${opinion.opts.map((opt, i) => {
+            const parts = _splitEmoji(opt);
+            const romans = ['I','II','III','IV'];
+            return `<div class="opinion-card opinion-card--c${i}" data-idx="${i}">
+              <div class="opinion-card-frame">
+                <span class="opinion-card-corner tl"></span>
+                <span class="opinion-card-corner tr"></span>
+                <span class="opinion-card-corner bl"></span>
+                <span class="opinion-card-corner br"></span>
+                <span class="opinion-card-diamond top"></span>
+                <span class="opinion-card-diamond bottom"></span>
+              </div>
+              ${parts.emoji ? `<div class="opinion-card-icon">${parts.emoji}</div>` : ''}
+              <div class="opinion-card-divider"></div>
+              <div class="opinion-card-text">${parts.text}</div>
+              <div class="opinion-card-label">${romans[i] || ''}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="opinion-result" id="opinion-result"></div>
+        <button class="opinion-skip" id="opinion-skip">先跳過</button>
+      </div>`;
+
+    document.body.appendChild(overlay);
+
+    // 觸發入場動畫 (需要一幀延遲)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        overlay.classList.add('open');
+      });
+    });
+
+    // 如果已投過票，直接顯示結果
+    if (existingVote !== null) {
+      setTimeout(() => {
+        _showResult(opinion, parseInt(existingVote), overlay, onClose);
+      }, 600);
+      return;
+    }
+
+    // 綁定卡片點擊 + hover 光暈（以卡片為中心）
+    const cards = overlay.querySelectorAll('.opinion-card');
+    const setGlowFromCard = (card, idx) => {
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      overlay.style.setProperty('--glow-x', cx + 'px');
+      overlay.style.setProperty('--glow-y', cy + 'px');
+      // 切換配色
+      overlay.classList.remove('glow-0', 'glow-1', 'glow-2', 'glow-3');
+      overlay.classList.add('glow-' + idx);
+      // 依卡片位置選同側遮罩（水平優先；若垂直偏移明顯則改用上下遮罩）
+      overlay.classList.remove('glow-side-left', 'glow-side-right', 'glow-side-top', 'glow-side-bottom');
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const dx = cx - vw / 2, dy = cy - vh / 2;
+      if (Math.abs(dx) >= Math.abs(dy)) {
+        overlay.classList.add(dx < 0 ? 'glow-side-left' : 'glow-side-right');
+      } else {
+        overlay.classList.add(dy < 0 ? 'glow-side-top' : 'glow-side-bottom');
+      }
+    };
+    cards.forEach(card => {
+      const idx = parseInt(card.dataset.idx);
+      card.addEventListener('mouseenter', () => {
+        if (overlay.dataset.voted) return;
+        setGlowFromCard(card, idx);
+        overlay.classList.add('hover-active');
+      });
+      card.addEventListener('mouseleave', () => {
+        if (overlay.dataset.voted) return;
+        overlay.classList.remove('hover-active');
+      });
+      card.addEventListener('click', function () {
+        if (overlay.dataset.voted) return;
+        overlay.dataset.voted = '1';
+        setGlowFromCard(card, idx);
+        overlay.classList.remove('hover-active');
+        _handleVote(opinion, idx, cards, overlay, onClose);
+      });
+    });
+
+    // 跳過按鈕
+    overlay.querySelector('#opinion-skip').addEventListener('click', () => {
+      _closeOverlay(overlay, onClose);
+    });
+
+    // 點背景關閉
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) _closeOverlay(overlay, onClose);
+    });
+  }
+
+  /* ---------- 處理投票 ---------- */
+  function _handleVote(opinion, chosenIdx, cards, overlay, onClose) {
+    // 儲存投票
+    localStorage.setItem(STORAGE_PREFIX + opinion.id, chosenIdx);
+
+    // 觸發滿版光暈爆發（位置已在 click 時設好，切換為 burst 模式）
+    overlay.classList.add('burst-active');
+
+    // 動畫：選中放大、其他飛走
+    cards.forEach((card, i) => {
+      if (i === chosenIdx) {
+        card.classList.add('voted-yes');
+      } else {
+        card.classList.add('voted-no');
+      }
+    });
+
+    // 隱藏跳過按鈕
+    const skipBtn = overlay.querySelector('#opinion-skip');
+    if (skipBtn) skipBtn.style.display = 'none';
+
+    // 延遲後顯示結果
+    setTimeout(() => {
+      _showResult(opinion, chosenIdx, overlay, onClose);
+    }, 600);
+  }
+
+  /* ---------- 顯示結果 ---------- */
+  function _showResult(opinion, chosenIdx, overlay, onClose) {
+    const votes = _getVotes(opinion.id, opinion.opts.length);
+    // 加上自己這票（如果是新投的）
+    const totalVotes = votes.reduce((a, b) => a + b, 0);
+
+    const resultEl = overlay.querySelector('#opinion-result');
+    if (!resultEl) return;
+
+    // 找少數派
+    const maxVotes = Math.max(...votes);
+    const isMinority = votes[chosenIdx] < maxVotes;
+
+    resultEl.innerHTML = `
+      ${opinion.opts.map((opt, i) => {
+        const pct = totalVotes > 0 ? Math.round(votes[i] / totalVotes * 100) : 0;
+        const isMine = i === chosenIdx;
+        return `<div class="opinion-result-bar">
+          <span class="opinion-result-label">${_shortLabel(opt)}</span>
+          <div class="opinion-result-track">
+            <div class="opinion-result-fill opinion-result-fill--${i} ${isMine ? 'mine' : ''}" data-pct="${pct}">
+              ${pct}%
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+      <div class="opinion-total">${totalVotes} 人已投票</div>
+      ${isMinority ? '<div class="opinion-minority">🤔 你是少數派！</div>' : ''}
+      <div class="opinion-actions">
+        <button class="opinion-btn opinion-btn--share" id="opinion-share-btn">
+          <i class="fas fa-share-alt"></i> 分享立場
+        </button>
+        <button class="opinion-btn opinion-btn--close" id="opinion-close-btn">
+          繼續 →
+        </button>
+      </div>`;
+
+    resultEl.classList.add('show');
+
+    // 動畫填充百分比條
+    requestAnimationFrame(() => {
+      resultEl.querySelectorAll('.opinion-result-fill').forEach(bar => {
+        bar.style.width = bar.dataset.pct + '%';
+      });
+    });
+
+    // 繼續按鈕
+    resultEl.querySelector('#opinion-close-btn').addEventListener('click', () => {
+      _closeOverlay(overlay, onClose);
+    });
+
+    // 分享按鈕
+    const shareBtn = resultEl.querySelector('#opinion-share-btn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        _shareOpinion(opinion, chosenIdx, votes, totalVotes);
+      });
+    }
+    // 保留 window 版（外部呼叫備援）
+    window._shareOpinion = () => _shareOpinion(opinion, chosenIdx, votes, totalVotes);
+  }
+
+  /* ---------- 模擬投票數據（localStorage only） ---------- */
+  function _getVotes(opinionId, optCount) {
+    // 用 opinion id 產生穩定的模擬數據
+    const seed = _hashCode(opinionId);
+    const votes = [];
+    for (let i = 0; i < optCount; i++) {
+      // 每個選項基礎 30~70 票，用 seed 產生變化
+      const base = 30 + ((seed * (i + 7)) % 41);
+      votes.push(base);
+    }
+    // 加上自己的投票
+    const myVote = localStorage.getItem(STORAGE_PREFIX + opinionId);
+    if (myVote !== null) {
+      votes[parseInt(myVote)]++;
+    }
+    return votes;
+  }
+
+  function _hashCode(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const c = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + c;
+      hash |= 0;
+    }
+    return Math.abs(hash);
+  }
+
+  /* ---------- 分享功能（Canvas 產分享卡） ---------- */
+  // 對應 .glow-0/1/2/3 的配色（見 css/components.css）
+  const SHARE_PALETTE = [
+    { c1: '#ff6b6b', c2: '#ee5a24' },
+    { c1: '#7f73ff', c2: '#4834d4' },
+    { c1: '#2ed573', c2: '#009432' },
+    { c1: '#ffa502', c2: '#e67e22' },
+  ];
+
+  async function _shareOpinion(opinion, chosenIdx, votes, totalVotes) {
+    console.log('[opinion] 分享流程啟動', { id: opinion.id, chosenIdx });
+    const btn = document.querySelector('.opinion-btn--share');
+    if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 產生分享卡...';
+
+    try {
+      const blob = await _makeShareCard(opinion, chosenIdx, votes, totalVotes);
+      console.log('[opinion] 分享卡產生完成，大小', blob && blob.size);
+      const file = new File([blob], `maddy-arena-${opinion.id}.png`, { type: 'image/png' });
+      const pct = totalVotes > 0 ? Math.round(votes[chosenIdx] / totalVotes * 100) : 0;
+      const text = `⚽ 麥迪擂台 今日觀點：${opinion.q}\n我選了「${opinion.opts[chosenIdx]}」(${pct}% 的人跟我一樣)\n來 Soccer麥迪 投下你的一票 👉`;
+
+      // 1) 行動端：Web Share Level 2（含檔案）
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ title: '麥迪擂台', text, url: location.href, files: [file] }).catch(() => {});
+        _resetShareBtn(btn);
+        return;
+      }
+      // 2) 桌機：嘗試把圖片複製到剪貼簿
+      if (navigator.clipboard && window.ClipboardItem) {
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          if (btn) btn.innerHTML = '<i class="fas fa-check"></i> 圖片已複製！';
+          setTimeout(() => _resetShareBtn(btn), 2500);
+          return;
+        } catch (e) { /* fall through to download */ }
+      }
+      // 3) 退而求其次：直接下載 PNG
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      if (btn) btn.innerHTML = '<i class="fas fa-download"></i> 已下載圖片';
+      setTimeout(() => _resetShareBtn(btn), 2500);
+    } catch (err) {
+      console.error('[opinion] 分享卡產生失敗', err);
+      if (btn) {
+        btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 失敗：' + (err && err.message || err);
+        setTimeout(() => _resetShareBtn(btn), 4000);
+      }
+    }
+  }
+
+  function _resetShareBtn(btn) {
+    if (!btn) return;
+    btn.innerHTML = '<i class="fas fa-share-alt"></i> 分享立場';
+  }
+
+  // 生成 1080x1350 分享卡：用 html2canvas 截網站的塔羅牌畫面 + 頁尾 logo/QR
+  async function _makeShareCard(opinion, chosenIdx, votes, totalVotes) {
+    if (typeof window.html2canvas !== 'function') {
+      throw new Error('html2canvas 未載入');
+    }
+    const W = 1080, H = 1350;
+    const isMulti = opinion.opts.length > 2;
+    const romans = ['I', 'II', 'III', 'IV'];
+    const tagText = TAG_LABELS[opinion.type] || '⚽ 觀點';
+    const palette = SHARE_PALETTE[chosenIdx % SHARE_PALETTE.length];
+    const url = (location.origin && location.origin !== 'null' && !location.origin.startsWith('file:'))
+      ? location.origin + '/' : 'https://soccermaddy.com/';
+    const host = location.host || 'soccermaddy.com';
+    const totalStr = (typeof totalVotes === 'number' && totalVotes > 0)
+      ? totalVotes.toLocaleString() + ' 人已投票'
+      : '';
+
+    const cardsHtml = opinion.opts.map((opt, i) => {
+      const parts = _splitEmoji(opt);
+      return `<div class="opinion-card opinion-card--c${i}" style="
+        min-width:${isMulti ? '180px' : '260px'};
+        max-width:${isMulti ? '230px' : '320px'};
+        padding:28px; border-radius:20px; font-size:${isMulti ? '22px' : '28px'};
+        transform:none !important; opacity:1 !important; gap:18px;
+        animation:none !important;
+      ">
+        <div class="opinion-card-frame">
+          <span class="opinion-card-corner tl" style="width:26px;height:26px;top:22px;left:22px;border-width:2px"></span>
+          <span class="opinion-card-corner tr" style="width:26px;height:26px;top:22px;right:22px;border-width:2px"></span>
+          <span class="opinion-card-corner bl" style="width:26px;height:26px;bottom:22px;left:22px;border-width:2px"></span>
+          <span class="opinion-card-corner br" style="width:26px;height:26px;bottom:22px;right:22px;border-width:2px"></span>
+          <span class="opinion-card-diamond top" style="width:12px;height:12px;top:28px"></span>
+          <span class="opinion-card-diamond bottom" style="width:12px;height:12px;bottom:28px"></span>
+        </div>
+        ${parts.emoji ? `<div class="opinion-card-icon" style="font-size:${isMulti ? '72px' : '90px'};animation:none !important">${parts.emoji}</div>` : ''}
+        <div class="opinion-card-divider" style="width:60%"></div>
+        <div class="opinion-card-text">${parts.text}</div>
+        <div class="opinion-card-label" style="bottom:40px;font-size:14px">${romans[i] || ''}</div>
+      </div>`;
+    }).join('');
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `
+      position: fixed; left: -20000px; top: 0;
+      width: ${W}px; height: ${H}px;
+      background: radial-gradient(ellipse at 50% 35%, ${_rgba(palette.c1, 0.18)} 0%, #0a0a18 70%), #0a0a18;
+      color: #fff; overflow: hidden; box-sizing: border-box;
+      font-family: 'Noto Sans TC','Microsoft JhengHei',sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 60px 60px 40px;
+      z-index: -1;
+    `;
+
+    wrapper.innerHTML = `
+      <div class="opinion-overlay open glow-${chosenIdx}" style="
+        position:static; background:transparent; width:100%;
+        display:flex; justify-content:center; padding:0;
+      ">
+        <div class="opinion-container" style="
+          max-width: 900px; width: 100%;
+          transform:none !important; opacity:1 !important;
+        ">
+          <div class="opinion-brand" style="gap:20px;margin-bottom:10px;align-items:center">
+            <div class="opinion-brand-line" style="max-width:180px;height:2px"></div>
+            <div id="share-title-slot" style="display:flex;align-items:center;gap:22px"></div>
+            <div class="opinion-brand-line" style="max-width:180px;height:2px"></div>
+          </div>
+          <div class="opinion-brand-tagline" style="font-size:18px;letter-spacing:5px;margin-bottom:36px">MADDY ARENA · 每天一題，選邊站</div>
+          <div style="text-align:center">
+            <span class="opinion-tag opinion-tag--${opinion.type || 'classic'}" style="font-size:18px;padding:8px 22px;border-radius:30px;margin-bottom:28px;letter-spacing:2px">${tagText}</span>
+          </div>
+          <div class="opinion-question" style="font-size:46px;margin-bottom:14px;line-height:1.35;margin-top:16px">${opinion.q}</div>
+          <div class="opinion-context" style="font-size:22px;margin-bottom:40px;line-height:1.55">${opinion.context || ''}</div>
+          <div class="opinion-cards ${isMulti ? 'opinion-cards--multi' : ''}" style="gap:28px;${isMulti ? 'flex-wrap:wrap' : ''};perspective:none">
+            ${cardsHtml}
+          </div>
+        </div>
+      </div>
+
+      <div style="
+        margin-top: 42px; font-size: 34px; font-weight: 900; letter-spacing: 2px;
+        color: ${palette.c1}; text-shadow: 0 0 18px ${_rgba(palette.c1, 0.7)};
+        text-align: center;
+      ">我選了：${opinion.opts[chosenIdx]}</div>
+      ${totalStr ? `<div style="
+        margin-top: 10px; font-size: 20px; font-weight: 600;
+        color: rgba(255,255,255,0.55); letter-spacing: 1.5px; text-align: center;
+      ">${totalStr}</div>` : ''}
+
+      <div style="
+        margin-top:auto; width:100%;
+        display:flex; align-items:center; justify-content:space-between;
+        padding-top:28px; border-top:1px solid rgba(255,255,255,0.12);
+      ">
+        <div style="display:flex;align-items:center;gap:22px">
+          <div id="share-logo-wrap" style="
+            width:92px;height:92px;border-radius:50%;overflow:hidden;
+            border:2px solid rgba(255,255,255,0.28);flex:none;
+            background:rgba(255,255,255,0.05);
+            display:flex;align-items:center;justify-content:center;
+          "></div>
+          <div>
+            <div style="font-size:32px;font-weight:900;color:#fff;letter-spacing:1px">Soccer麥迪</div>
+            <div style="font-size:20px;color:rgba(255,255,255,0.6);margin-top:6px">${host}</div>
+            <div style="font-size:17px;color:rgba(255,255,255,0.45);margin-top:6px">掃 QR 加入戰局 →</div>
+          </div>
+        </div>
+        <div id="share-qr-wrap" style="
+          background:#fff;padding:10px;border-radius:10px;
+          display:flex;align-items:center;justify-content:center;
+        "></div>
+      </div>
+    `;
+
+    document.body.appendChild(wrapper);
+
+    // 標題：用 canvas 畫漸層字（html2canvas 對 background-clip:text 支援不佳）
+    const titleSlot = wrapper.querySelector('#share-title-slot');
+    if (titleSlot) {
+      titleSlot.appendChild(_makeVsBadge('VS', '#ff4757', 'rgba(255,71,87,0.12)'));
+      titleSlot.appendChild(_makeGradientTitle('麥迪擂台'));
+      titleSlot.appendChild(_makeVsBadge('VS', '#686de0', 'rgba(104,109,224,0.12)'));
+    }
+
+    // Logo：用 async Image + drawImage 到 canvas，避免 html2canvas 拿 <img> 時的 CORS 問題
+    const logoWrap = wrapper.querySelector('#share-logo-wrap');
+    try {
+      const logo = await _loadImage('img/logo-soccermaddy.png');
+      const lc = document.createElement('canvas');
+      lc.width = 92; lc.height = 92;
+      const lctx = lc.getContext('2d');
+      lctx.save();
+      lctx.beginPath();
+      lctx.arc(46, 46, 46, 0, Math.PI * 2);
+      lctx.clip();
+      lctx.drawImage(logo, 0, 0, 92, 92);
+      lctx.restore();
+      lc.style.cssText = 'width:92px;height:92px;display:block';
+      logoWrap.appendChild(lc);
+    } catch (e) {
+      logoWrap.innerHTML = '<div style="font-size:34px;font-weight:900;color:#ffa502">M</div>';
+    }
+
+    // QR：用 canvas 直接畫（不依賴 html2canvas 去解析外部資源）
+    const qrWrap = wrapper.querySelector('#share-qr-wrap');
+    if (qrWrap && typeof window.qrcode === 'function') {
+      try {
+        const qr = window.qrcode(0, 'M');
+        qr.addData(url);
+        qr.make();
+        const modules = qr.getModuleCount();
+        const size = 140;
+        const cell = size / modules;
+        const qc = document.createElement('canvas');
+        qc.width = size; qc.height = size;
+        const qctx = qc.getContext('2d');
+        qctx.fillStyle = '#fff';
+        qctx.fillRect(0, 0, size, size);
+        qctx.fillStyle = '#000';
+        for (let r = 0; r < modules; r++) {
+          for (let c = 0; c < modules; c++) {
+            if (qr.isDark(r, c)) qctx.fillRect(c * cell, r * cell, cell, cell);
+          }
+        }
+        qc.style.cssText = 'width:140px;height:140px;display:block';
+        qrWrap.appendChild(qc);
+      } catch (e) { console.warn('[opinion] QR 產生失敗', e); }
+    }
+
+    try {
+      const canvas = await window.html2canvas(wrapper, {
+        width: W, height: H,
+        windowWidth: W, windowHeight: H,
+        backgroundColor: null,
+        scale: 1,
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
+      });
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+      if (!blob) throw new Error('toBlob 回傳 null（canvas 仍被污染）');
+      return blob;
+    } finally {
+      wrapper.remove();
+    }
+  }
+
+  // 用 canvas 畫漸層「麥迪擂台」
+  function _makeGradientTitle(text) {
+    const dpr = 2;
+    const fontSize = 72;
+    const font = `900 ${fontSize}px "Noto Sans TC","Microsoft JhengHei",sans-serif`;
+    // 先量測寬度
+    const meas = document.createElement('canvas').getContext('2d');
+    meas.font = font;
+    const letterSpacing = 8;
+    const w = Math.ceil(meas.measureText(text).width + letterSpacing * (text.length - 1) + 40);
+    const h = Math.ceil(fontSize * 1.35);
+
+    const c = document.createElement('canvas');
+    c.width = w * dpr;
+    c.height = h * dpr;
+    c.style.cssText = `width:${w}px;height:${h}px;display:block`;
+    const ctx = c.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.font = font;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#ff6b6b');
+    grad.addColorStop(0.5, '#ffa502');
+    grad.addColorStop(1, '#686de0');
+    ctx.fillStyle = grad;
+    ctx.shadowColor = 'rgba(255,165,2,0.35)';
+    ctx.shadowBlur = 16;
+
+    // 逐字繪製（支援 letter-spacing）
+    let x = 20;
+    for (const ch of text) {
+      ctx.fillText(ch, x, h / 2);
+      x += ctx.measureText(ch).width + letterSpacing;
+    }
+    return c;
+  }
+
+  // 用 canvas 畫 VS 徽章（不用 skew 動畫，乾淨呈現）
+  function _makeVsBadge(text, color, bg) {
+    const dpr = 2;
+    const fontSize = 30;
+    const padX = 14, padY = 6;
+    const font = `900 ${fontSize}px "Noto Sans TC",sans-serif`;
+    const meas = document.createElement('canvas').getContext('2d');
+    meas.font = font;
+    const textW = meas.measureText(text).width;
+    const w = Math.ceil(textW + padX * 2);
+    const h = Math.ceil(fontSize + padY * 2);
+
+    const c = document.createElement('canvas');
+    c.width = w * dpr;
+    c.height = h * dpr;
+    c.style.cssText = `width:${w}px;height:${h}px;display:block`;
+    const ctx = c.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    // 背景 + 邊框
+    const r = 6;
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.arcTo(w, 0, w, h, r);
+    ctx.arcTo(w, h, 0, h, r);
+    ctx.arcTo(0, h, 0, 0, r);
+    ctx.arcTo(0, 0, w, 0, r);
+    ctx.closePath();
+    ctx.fillStyle = bg;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = color;
+    ctx.stroke();
+
+    // 文字
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 8;
+    ctx.fillText(text, w / 2, h / 2 + 1);
+    return c;
+  }
+
+  function _loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      // 同源圖不加 crossOrigin；外部資源才需要
+      if (/^https?:\/\//i.test(src) && !src.startsWith(location.origin)) {
+        img.crossOrigin = 'anonymous';
+      }
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  function _rgba(hex, a) {
+    const m = hex.match(/^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i);
+    if (!m) return hex;
+    return `rgba(${parseInt(m[1], 16)},${parseInt(m[2], 16)},${parseInt(m[3], 16)},${a})`;
+  }
+
+  /* ---------- 工具 ---------- */
+  function _shortLabel(opt) {
+    // 去掉 emoji，取前 6 字
+    return opt.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').trim().slice(0, 8);
+  }
+
+  // 把選項文字拆成 emoji + 純文字（emoji 顯示在卡片上方作為 icon）
+  function _splitEmoji(opt) {
+    const emojiRegex = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F900}-\u{1F9FF}\u{2B00}-\u{2BFF}]/gu;
+    const emojis = opt.match(emojiRegex) || [];
+    const text = opt.replace(emojiRegex, '').trim();
+    return { emoji: emojis.join(''), text: text || opt };
+  }
+
+  function _closeOverlay(overlay, onClose) {
+    overlay.classList.remove('open');
+    setTimeout(() => {
+      overlay.remove();
+      if (onClose) onClose();
+    }, 400);
+  }
+
+  function _cleanOldKeys(prefix) {
+    const today = localDateStr();
+    const todayKey = prefix + today;
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(prefix) && k !== todayKey) localStorage.removeItem(k);
+    }
+  }
+
+  /* ---------- 匯出 ---------- */
+  window.showOpinionPoll = showOpinionPoll;
+})();

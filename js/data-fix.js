@@ -353,10 +353,12 @@ window.addEventListener('load', () => {
   _safe(() => updateArenaBadge(), 'updateArenaBadge');
   _safe(() => updateNavXP(), 'updateNavXP');
   _safe(() => showArenaWelcomeIfNeeded(), 'showArenaWelcomeIfNeeded');
-  // 每日任務彈窗（延遲 3 秒，避免與歡迎窗衝突）
+  // 觀點投票 → 每日任務彈窗（延遲 3 秒，合併流程）
   setTimeout(() => {
     if (!document.getElementById('arena-welcome-overlay')) {
-      _safe(() => showDailyTaskPopup(), 'showDailyTaskPopup');
+      _safe(() => showOpinionPoll(() => {
+        _safe(() => showDailyTaskPopup(), 'showDailyTaskPopup');
+      }), 'showOpinionPoll');
     }
   }, 3000);
   // 預測結算（延遲執行，避免阻塞初始渲染）
