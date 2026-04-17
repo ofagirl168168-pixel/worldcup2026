@@ -11,10 +11,17 @@
   const TAG_LABELS = { trending: '🔥 時事', classic: '⚽ 經典', fun: '🎉 趣味', predict: '🔮 預測' };
 
   /* ---------- 顯示觀點投票彈窗 ---------- */
-  function showOpinionPoll(onClose) {
+  function showOpinionPoll(onClose, opts) {
+    opts = opts || {};
+    // 同時間已有 overlay 就不重開
+    if (document.getElementById('opinion-overlay')) {
+      if (onClose) onClose();
+      return;
+    }
     const today = localDateStr();
     const shownKey = STORAGE_SHOWN + today;
-    if (localStorage.getItem(shownKey)) {
+    // 自動彈窗只彈一次；手動呼叫（force）不受限
+    if (!opts.force && localStorage.getItem(shownKey)) {
       if (onClose) onClose();
       return;
     }
