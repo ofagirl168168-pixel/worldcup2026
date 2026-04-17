@@ -606,6 +606,43 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 
 **預測：巴黎總比分 3-2 晉級，但拜仁在安聯球場將讓巴黎付出巨大代價**`,
     tags: ['四強', '巴黎', '拜仁', '前瞻', 'Dembélé', 'Kane', '衛冕冠軍']
+  },
+  {
+    id: 'ucl-017',
+    title: '歐冠八強回顧：七球大戰、衛冕冠軍碾壓、10人巴薩的悲壯 — 四場經典戰役',
+    date: '2026-04-17',
+    category: '賽事回顧',
+    summary: '拜仁與皇馬上演本季最瘋狂的七球大戰，巴黎4-0總比分碾壓利物浦，馬競靠Lookman絕殺淘汰10人巴薩，兵工廠0-0悶戰驚險過關。四場八強次回合，四種截然不同的故事。',
+    content: `<h2>歐冠八強次回合全戰報</h2>
+
+<h3>拜仁 4-3 皇馬（總比分 6-4）— 本季歐冠最佳比賽</h3>
+<p>這場比賽從開場 34 秒就失控了。Neuer 出球失誤，Arda Güler 從中場直接射入空門，安聯球場一片死寂。但 Pavlović 第6分鐘頭球扳平，此後兩隊陷入瘋狂的進球交替——Güler 再入一球、Kane 扳平、Mbappé 反超。</p>
+<p>轉折點在第 86 分鐘：Camavinga 因對 Kane 犯規被出示第二張黃牌紅牌離場，皇馬球員暴怒。僅 3 分鐘後，Luis Díaz 射入右門柱內側；補時第 4 分鐘，Olise 遠射入網，蓋棺定論。</p>
+<p><strong>Kane 本季第 50 球，</strong>但拜仁真正的英雄是替補改變比賽的 Díaz 和 Olise。Güler 獨進兩球也值得被銘記，可惜在補時領到第二面紅牌黯然離場。</p>
+
+<h3>馬競 1-2 巴薩（總比分 3-2 馬競晉級）— Simeone 的生存藝術</h3>
+<p>巴薩開場氣勢如虹：Yamal 第 4 分鐘破門，Ferran Torres 第 24 分鐘再下一城，總比分一度扳平 2-2。但 Lookman 的反擊進球重新把馬競送回領先位置。</p>
+<p>第 56 分鐘，Eric García 對突入禁區的 Sørloth 犯規被直紅離場，巴薩 10 人作戰。此後巴薩雖拼盡全力進攻，但馬競的防守銅牆鐵壁般堅固，Simeone 的球隊再次用「醜陋但有效」的方式挺進四強。</p>
+<p>這是馬競自 2017 年後首次重返歐冠四強。Julián Álvarez 兩回合 3 球是絕對核心。</p>
+
+<h3>利物浦 0-2 巴黎（總比分 0-4）— 衛冕��軍的碾壓宣言</h3>
+<p>利物浦在安菲爾德需要奇蹟，但巴黎連一絲希望都沒給。前 70 分鐘是一場折磨人的消耗戰，利物浦 21 腳射門卻只有 5 腳射正。</p>
+<p>第 72 分鐘，Dembélé 接反擊一劍封喉；補時再追加一球，完成梅開二度。<strong>巴黎四場淘汰賽不失一球，</strong>這是何等恐怖的數據。</p>
+<p>更令人心痛的是 Ekitike 上半場滑倒導致阿基里斯腱斷裂，不僅賽季報銷，世界盃也將缺席。利物浦在最不需要的時刻失去了最依賴的前鋒之一。</p>
+
+<h3>兵工廠 0-0 士砵亭（總比分 1-0）— 最沉悶的晉級</h3>
+<p>這場比賽的 xG 數據說明一切：兵工廠 0.67，士砵亭 0.23。合計 0.90 是本季歐冠所有比賽中最低的。兩隊各有一腳射正，各擊中一次門柱。</p>
+<p>Catamo 的凌空抽射打中門柱讓兵工廠冒了一身冷汗，Trossard 的頭球同樣中柱。但 Arteta 的球隊靠著首回合 Havertz 補時絕殺的 1-0 領先，在傷兵滿營的情況下成功晉級。</p>
+<p>兵工廠連續兩年殺入歐冠四強——在此之前，他們隊史只進過兩次半決賽（05/06 和 08/09）。</p>
+
+<h3>四強對陣確定</h3>
+<table style="width:100%;border-collapse:collapse;margin:16px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">對陣</th><th style="padding:8px">首回合</th><th style="padding:8px">次回合</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #333">馬競 vs 兵工廠</td><td style="padding:8px;border-bottom:1px solid #333">4/29（二）03:00</td><td style="padding:8px;border-bottom:1px solid #333">5/6（三）03:00</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #333">巴黎 vs 拜仁</td><td style="padding:8px;border-bottom:1px solid #333">4/30（三）03:00</td><td style="padding:8px;border-bottom:1px solid #333">5/7（四）03:00</td></tr>
+</table>
+<p>決賽：5/31（日）03:00 台灣時間・布達佩斯普斯卡什球場</p>`,
+    tags: ['八強', '回顧', '戰報', '拜仁', '皇馬', '巴黎', '利物浦', '馬競', '巴薩', '兵工廠', '士砵亭']
   }
 ];
 

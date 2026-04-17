@@ -302,6 +302,260 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 **本站賽前預測 2-0 曼聯勝 ❌ — AI 未能預見里茲的保級鬥志與曼聯後防的全面崩盤**`,
     tags: ['賽後回顧', '曼聯', '里茲聯', 'Okafor', 'Martinez紅牌', '德比', '第32輪']
+  },
+  {
+    id: 'epl-014',
+    title: '【賽前分析】布倫特福德 vs 富勒姆：西倫敦德比，Thiago 挑戰金靴',
+    date: '2026-04-17',
+    category: '賽前分析',
+    summary: 'Igor Thiago 本季 21 球僅落後 Haaland 1 球，布倫特福德卻陷入 5 連平怪圈。富勒姆能否在德比中爆冷？',
+    content: `<h2>布倫特福德 vs 富勒姆｜第33輪・4/18（六）19:30 台灣時間</h2>
+
+<h3>布倫特福德：5連平的奇怪紀錄</h3>
+<p>連續 5 場平局，英超本季最長連平紀錄。聯賽排名第 7（47分），歐戰資格仍有機會，但必須開始贏球。</p>
+<p>好消息是 <strong>Igor Thiago 狀態火熱</strong>——近 2 場主場進 3 球，本季已攻入 21 球，僅落後 Haaland 1 球，金靴競爭白熱化。</p>
+<p>傷兵方面：Carvalho、Rico Henry、Dasilva、Henderson、Janelt 均缺陣，但 Hickey 和 Damsgaard 有望回歸。</p>
+
+<h3>富勒姆（第9・44分）</h3>
+<p>上輪 0-2 負於利物浦，但整體賽季表現穩定。Harry Wilson 本季 16 個進球貢獻（進球+助攻），是富勒姆最大威脅。</p>
+<p>客場戰績中規中矩，Kenny Tete 因足部傷勢確定缺席。</p>
+
+<p><strong>預測比分：布倫特福德 2-1 富勒姆</strong><br>
+<strong>看點：Thiago 能否追平 Haaland 的金靴領先？布倫特福德的連平紀錄何時終結？</strong></p>`,
+    tags: ['賽前分析', '布倫特福德', '富勒姆', 'Thiago', '倫敦德比', '第33輪']
+  },
+  {
+    id: 'epl-015',
+    title: '【賽前分析】紐卡索 vs 伯恩茅斯：紐卡索連7場不勝的夢魘對手',
+    date: '2026-04-17',
+    category: '賽前分析',
+    summary: '紐卡索對伯恩茅斯已連續 7 場英超不勝，加上 3 連敗和多名主力缺陣，主場能否止血？伯恩茅斯剛擊敗聯賽領頭羊兵工廠。',
+    content: `<h2>紐卡索 vs 伯恩茅斯｜第33輪・4/18（六）22:00 台灣時間・聖詹姆斯公園</h2>
+
+<h3>紐卡索：3連敗 + 傷兵潮</h3>
+<p>紐卡索正經歷困難時期：歐冠被巴薩 7-2 淘汰（次回合），聯賽連輸兩場跌至第 12（42分）。</p>
+<ul>
+<li><strong>Joelinton</strong> — 停賽</li>
+<li><strong>Schär、Krafth</strong> — 傷缺</li>
+<li><strong>Bruno Guimarães</strong> — 身體不適，出戰存疑</li>
+</ul>
+<p>本季主場 16 場只有 3 場零封，防守漏洞明顯。</p>
+
+<h3>伯恩茅斯（第13・42分）：剛擊敗兵工廠的巨人殺手</h3>
+<p>上輪作客酋長球場 2-1 擊敗兵工廠（Kroupi + A. Scott 進球），士氣正旺。不過客場防守是軟肋——16 場客場丟 32 球。Kluivert 和 Cook 長期傷缺。</p>
+
+<h3>恐怖數據</h3>
+<p><strong>紐卡索對伯恩茅斯已連續 7 場英超不勝。</strong>伯恩茅斯在聖詹姆斯公園的每次造訪都至少進了一球。</p>
+
+<p><strong>預測比分：紐卡索 2-2 伯恩茅斯</strong><br>
+<strong>看點：紐卡索能否打破對伯恩茅斯的連不勝魔咒？沒有 Bruno G 的中場如何運作？</strong></p>`,
+    tags: ['賽前分析', '紐卡索', '伯恩茅斯', '第33輪']
+  },
+  {
+    id: 'epl-016',
+    title: '【賽前分析】里茲聯 vs 狼隊：保級隊的求生戰',
+    date: '2026-04-17',
+    category: '賽前分析',
+    summary: '里茲剛在老特拉福德創造歷史，狼隊則在降級深淵掙扎。兩隊目標截然不同——里茲要確保安全，狼隊要創造奇蹟。',
+    content: `<h2>里茲聯 vs 狼隊｜第33輪・4/18（六）22:00 台灣時間・艾蘭路</h2>
+
+<h3>里茲聯（第15・36分）：士氣爆棚</h3>
+<p>上輪 2-1 擊敗曼聯，45 年來首次在老特拉福德取勝！Okafor 梅開二度，Farke 的球隊充滿信心。目前領先降級區 6 分，再拿 3 分基本保級無虞。</p>
+
+<h3>狼隊（第20・17分）：幾乎已經宣判</h3>
+<p>墊底球隊只有 17 分，距安全區 13 分以上，降級幾乎已成定局。但近期表現比積分表反映的更有競爭力——多場比賽的內容其實不差，只是結果總是不站在他們這邊。</p>
+
+<p><strong>預測比分：里茲聯 2-0 狼隊</strong><br>
+<strong>看點：里茲能否趁勝追擊鎖定保級？Okafor 能否延續進球潮？</strong></p>`,
+    tags: ['賽前分析', '里茲聯', '狼隊', '保級', 'Okafor', '第33輪']
+  },
+  {
+    id: 'epl-017',
+    title: '【賽前分析】熱刺 vs 布萊頓：保級大戰！De Zerbi 回歸能否拯救熱刺？',
+    date: '2026-04-17',
+    category: '賽前分析',
+    summary: '熱刺跌入降級區，De Zerbi 上任第二場就要面對自己的前東家布萊頓。布萊頓近6場贏5場，是英超最火熱的球隊。這是自1977年以來熱刺最接近降級的時刻。',
+    content: `<h2>熱刺 vs 布萊頓｜第33輪・4/19（日）00:30 台灣時間</h2>
+
+<h3>熱刺：1977年以來首次面臨降級危機</h3>
+<p>這不是演習——<strong>熱刺目前排名第 18，身處降級區。</strong>30 分的成績是災難性的。上輪 0-1 負於桑德蘭，De Zerbi 上任後的首場比賽就以失敗告終。</p>
+<p>博彩公司已將熱刺列為最大降級熱門，這是一個讓所有北倫敦球迷難以置信的事實。自 1977 年以來，熱刺從未降級過——但現在，這個可能性是真實存在的。</p>
+
+<h3>布萊頓（第10・43分）：英超最火熱球隊</h3>
+<p>近 6 場贏 5 場，最近 3 場客場全部零封對手。De Zerbi 離開後的布萊頓不但沒有衰退，反而更加穩定。這場比賽對 De Zerbi 來說無比諷刺——他要對抗自己一手打造的球隊。</p>
+
+<h3>戲劇性背景</h3>
+<p>De Zerbi 在布萊頓執教兩年，打造了他們現在的踢球哲學和青訓體系。現在他坐在對面的教練席上，為熱刺的生存而戰。足球的劇本沒有比這更殘酷的了。</p>
+
+<p><strong>預測比分：熱刺 1-2 布萊頓</strong><br>
+<strong>看點：De Zerbi 對陣前東家的情感交鋒。熱刺能否從降級區爬出？布萊頓能否延續零封客場連勝？</strong></p>`,
+    tags: ['賽前分析', '熱刺', '布萊頓', '保級', 'De Zerbi', '第33輪']
+  },
+  {
+    id: 'epl-018',
+    title: '【賽前分析】第33輪其餘場次：維拉爭歐冠、森林求生、水晶宮迎保級戰',
+    date: '2026-04-17',
+    category: '賽前分析',
+    summary: '阿斯頓維拉 vs 桑德蘭、諾丁漢森林 vs 伯恩利、水晶宮 vs 西漢姆——三場各有故事的比賽。',
+    content: `<h2>第33輪其餘場次速覽</h2>
+
+<h3>阿斯頓維拉 vs 桑德蘭｜4/19（日）21:00 台灣時間</h3>
+<p><strong>維拉（第4・54分）</strong>穩居歐冠區，Emery 的球隊本季表現超越預期。<strong>桑德蘭（第11・43分）</strong>升班馬表現令人驚喜，上輪主場 1-0 擊敗熱刺。</p>
+<p>維拉主場優勢明顯，但桑德蘭的拚勁不容小覷。</p>
+<p><strong>預測：維拉 2-1 桑德蘭</strong></p>
+
+<h3>諾丁漢森林 vs 伯恩利｜4/19（日）21:00 台灣時間</h3>
+<p><strong>森林（第16・32分）</strong>距降級區僅 2 分，上輪 1-1 平維拉止血。<strong>伯恩利（第19・25分）</strong>深陷降級區，上輪 0-2 負布萊頓。</p>
+<p>這是一場雙方都輸不起的保級大戰。</p>
+<p><strong>預測：森林 1-0 伯恩利</strong></p>
+
+<h3>水晶宮 vs 西漢姆｜4/21（一）04:00 台灣時間</h3>
+<p><strong>水晶宮（第14・39分）</strong>上輪 2-1 逆轉紐卡索，Mateta 梅開二度（含補時絕殺點球）。<strong>西漢姆（第17・32分）</strong>上輪 4-0 大勝狼隊，Mavropanos 雙響。</p>
+<p>兩隊都在保級邊緣遊走，倫敦德比勝者有機會基本脫離危險。</p>
+<p><strong>預測：水晶宮 1-1 西漢姆</strong></p>`,
+    tags: ['賽前分析', '維拉', '桑德蘭', '森林', '伯恩利', '水晶宮', '西漢姆', '第33輪']
+  },
+  {
+    id: 'epl-011',
+    title: '【賽前分析】曼城 vs 兵工廠：爭冠生死戰，6分差距的最後機會',
+    date: '2026-04-17',
+    category: '賽前分析',
+    summary: '兵工廠帶著6分領先優勢作客伊蒂哈德，但傷兵滿營。曼城必須取勝才能維持爭冠希望。這是本季最關鍵的 90 分鐘。',
+    content: `<h2>曼城 vs 兵工廠｜第33輪・4/19（六）23:30 台灣時間・伊蒂哈德球場</h2>
+
+<h3>積分形勢</h3>
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">球隊</th><th>場次</th><th>積分</th><th>淨勝球</th></tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)"><td style="text-align:left;padding:8px">兵工廠</td><td>32</td><td>70</td><td>+39</td></tr>
+<tr><td style="text-align:left;padding:8px">曼城</td><td>32</td><td>64</td><td>+35</td></tr>
+</table>
+<p>兵工廠領先 6 分，還剩 6 輪。如果曼城輸球，差距拉大到 9 分，爭冠懸念基本結束。如果曼城勝出，差距縮至 3 分，爭冠白熱化。<strong>這是曼城本季最後的機會。</strong></p>
+
+<h3>兵工廠：傷兵名單長到令人窒息</h3>
+<p>Arteta 面臨隊史級別的傷兵危機：</p>
+<ul>
+<li><strong>Saka</strong> — 阿基里斯腱問題，自國際賽受傷後未出場，可能缺陣</li>
+<li><strong>Timber</strong> — 腳踝傷勢，已缺席五場，本場有望回歸但存疑</li>
+<li><strong>Rice</strong> — 歐冠前訓練中缺席，出戰成疑</li>
+<li><strong>Ødegaard</strong> — 小傷評估中</li>
+<li><strong>Calafiori</strong> — 不明傷勢</li>
+<li><strong>Merino</strong> — 賽季報銷</li>
+</ul>
+<p>加上上輪輸給伯恩茅斯 1-2（Kroupi 和 A. Scott 進球），兵工廠的狀態令人擔憂。不過，他們在歐冠成功晉級四強（儘管是 0-0 悶戰），證明 Arteta 在大賽中的防守組織依然可靠。</p>
+
+<h3>曼城：3-0 碾壓切爾西後信心回升</h3>
+<p>上輪 O'Reilly、Guéhi、Doku 各入一球大勝切爾西，是曼城近期最有說服力的表現。但代價是 O'Reilly 下半場腿後肌受傷（已輕度訓練）。</p>
+<ul>
+<li><strong>Gvardiol</strong> — 脛骨骨折，賽季末可望回歸</li>
+<li><strong>Dias</strong> — 腿後肌傷，目標本場回歸</li>
+<li><strong>Stones</strong> — 已部分訓練，可望復出</li>
+</ul>
+<p>好消息是 Haaland 狀態火熱（本季英超 22 球），Kovačić 傷癒回歸。如果 Dias 和 Stones 能上場，曼城的後防將恢復到接近最佳狀態。</p>
+
+<h3>關鍵對決</h3>
+<ol>
+<li><strong>Haaland vs Gabriel</strong>：挪威巨人 vs 巴西磐石，英超最頂級的矛盾對決</li>
+<li><strong>De Bruyne vs 兵工廠中場</strong>：如果 Rice 缺陣，誰來盯防 KDB？</li>
+<li><strong>Gyökeres vs Akanji</strong>：瑞典射手在大場面能否證明自己？</li>
+</ol>
+
+<h3>歷史戰績</h3>
+<p>上賽季兵工廠在伊蒂哈德 0-1 落敗，那粒丟球直接影響了冠軍走向。Arteta 的球隊需要打破曼城主場的魔咒。</p>
+
+<p><strong>預測比分：曼城 2-1 兵工廠</strong><br>
+<strong>信心指數：60%</strong><br>
+<strong>看點：兵工廠傷兵滿營能否堅守？Haaland 能否再次成為爭冠決定者？</strong></p>`,
+    tags: ['賽前分析', '曼城', '兵工廠', '爭冠', 'Haaland', 'Arteta', '第33輪']
+  },
+  {
+    id: 'epl-012',
+    title: '【賽前分析】愛華頓 vs 利物浦：新球場首場默西賽德德比，Salah 的最後一舞？',
+    date: '2026-04-17',
+    category: '賽前分析',
+    summary: 'Hill Dickinson 球場首次上演默西賽德德比。愛華頓近況火熱劍指歐戰，利物浦卻5場輸4場陷入低谷。這會是 Salah 的最後一場德比嗎？',
+    content: `<h2>愛華頓 vs 利物浦｜第33輪・4/19（六）21:00 台灣時間・Hill Dickinson 球場</h2>
+
+<h3>歷史性時刻</h3>
+<p>這是 <strong>Hill Dickinson 球場史上首場默西賽德德比</strong>。愛華頓告別了古迪遜公園，在新家迎接宿敵。上賽季最後一場古迪遜德比，Tarkowski 的進球幫助愛華頓 2-2 逼平利物浦——利物浦未能在「永別古迪遜」之夜取勝。</p>
+
+<h3>愛華頓：Moyes 的復興奇蹟</h3>
+<p>David Moyes 回歸後執教成績驚人：</p>
+<ul>
+<li>聯賽排名第 8（46分），距歐戰席位僅 2 分</li>
+<li>近 5 場英超拿下 12 分，僅次於布萊頓</li>
+<li>新球場的氣氛為球隊注入強大動力</li>
+</ul>
+<p>如果愛華頓能拿下德比三分，這將是他們自 1964 年以來首次在單季雙殺利物浦。</p>
+
+<h3>利物浦：最近 5 場輸了 4 場</h3>
+<p>Slot 的球隊正經歷本季最嚴重的低潮：</p>
+<ul>
+<li>歐冠被巴黎 4-0 淘汰（總比分），毫無還手之力</li>
+<li><strong>Ekitike 阿基里斯腱斷裂</strong>，賽季報銷＋世界盃缺席——這是毀滅性的打擊</li>
+<li>Alisson 仍未隨隊訓練，門將位置只能依賴替補</li>
+<li>Curtis Jones 腹股溝問題，出戰存疑</li>
+<li>英超排名跌至第 5（49分），爭冠已無望，歐冠資格也岌岌可危</li>
+</ul>
+
+<h3>關鍵對決</h3>
+<ol>
+<li><strong>Salah vs 愛華頓左路防線</strong>：這很可能是 Salah 的最後一場默西賽德德比，他會想留下一個精彩告別</li>
+<li><strong>Moyes 的戰術佈局 vs Slot 的高位壓迫</strong>：Moyes 擅長針對性部署，而利物浦的壓迫在近期頻頻失靈</li>
+<li><strong>新球場氣氛因素</strong>：Hill Dickinson 的首場德比，愛華頓球迷將創造震耳欲聾的噪音</li>
+</ol>
+
+<h3>數據對比</h3>
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)"><th style="text-align:left;padding:8px">數據</th><th>愛華頓</th><th>利物浦</th></tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)"><td style="text-align:left;padding:6px 8px">聯賽排名</td><td>第8</td><td>第5</td></tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)"><td style="text-align:left;padding:6px 8px">近5場聯賽</td><td>4勝1平</td><td>2勝1平2負</td></tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)"><td style="text-align:left;padding:6px 8px">客場/主場勝率</td><td>主場 63%</td><td>客場 37%</td></tr>
+<tr><td style="text-align:left;padding:6px 8px">利物浦客場對愛華頓</td><td colspan="2">自2021年12月以來未贏</td></tr>
+</table>
+
+<p><strong>預測比分：愛華頓 1-1 利物浦</strong><br>
+<strong>信心指數：55%</strong><br>
+<strong>看點：新球場首場德比的氣氛能否助愛華頓爆冷？Salah 能否在可能的最後德比留下紀念？</strong></p>`,
+    tags: ['賽前分析', '愛華頓', '利物浦', '德比', 'Salah', 'Moyes', '第33輪']
+  },
+  {
+    id: 'epl-013',
+    title: '【賽前分析】車路士 vs 曼聯：兩支迷途的豪門，誰能先找到出路？',
+    date: '2026-04-17',
+    category: '賽前分析',
+    summary: '車路士被曼城 3-0 羞辱後士氣低落，曼聯則剛在老特拉福德被里茲聯掀翻。Martinez 停賽讓後防雪上加霜。',
+    content: `<h2>車路士 vs 曼聯｜第33輪・4/19（六）04:00 台灣時間・史丹福橋</h2>
+
+<h3>兩隊近況：一個比一個慘</h3>
+
+<p><strong>車路士（第6・48分）</strong>：Rosenior 上任後的蜜月期已經結束。最近 7 場聯賽只贏 1 場，上輪被曼城 0-3 完敗更暴露了防守端的全面崩潰。</p>
+
+<p><strong>曼聯（第3・55分）</strong>：Carrick 一月接手時帶來了新氣象，但上輪在老特拉福德 1-2 負於里茲聯——45 年來首次在主場輸給死敵。更糟的是 Martinez 因拉扯頭髮紅牌停賽，後防捉襟見肘。</p>
+
+<h3>曼聯後防危機</h3>
+<ul>
+<li><strong>Martinez</strong> — 紅牌停賽</li>
+<li><strong>De Ligt</strong> — 背傷缺陣</li>
+<li><strong>Maguire</strong> — 上輪停賽，本場可望回歸</li>
+<li><strong>Mainoo</strong> — 訓練中受傷，出戰存疑</li>
+</ul>
+<p>三名一線中衛只有 Yoro 確定能上場。曼聯本季客場 16 場只保持了 1 場零封——英超六強中最差的客場防守紀錄。</p>
+
+<h3>車路士的反彈需求</h3>
+<p>0-3 的恥辱敗仗後，Rosenior 需要一場提振士氣的勝利。好消息是他們的主場紀錄尚可，Palmer 和 Nkunku 的進攻組合在史丹福橋依然具有威脅。</p>
+
+<h3>關鍵對決</h3>
+<ol>
+<li><strong>Palmer vs Yoro</strong>：車路士最具創造力的球員 vs 曼聯僅存的一線中衛</li>
+<li><strong>Bruno Fernandes vs Enzo Fernández</strong>：兩位 Fernández 的中場對決</li>
+<li><strong>客場進球大戰？</strong>：曼聯 16 場客場 BTTS（雙方進球）命中 14 場，這場很可能又是一場對攻</li>
+</ol>
+
+<p><strong>預測比分：車路士 2-2 曼聯</strong><br>
+<strong>信心指數：50%</strong><br>
+<strong>看點：兩支防守漏洞百出的球隊對決，進球大戰機率極高</strong></p>`,
+    tags: ['賽前分析', '車路士', '曼聯', 'Palmer', 'Bruno', 'Martinez停賽', '第33輪']
   }
 ];
 

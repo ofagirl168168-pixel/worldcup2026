@@ -21,14 +21,15 @@ const EPL_TEAMS = {
     style:'高位壓迫，控球為主，邊路突破與定位球',
     strengths:['Arteta戰術體系成熟','Saka+Ødegaard創造力頂級','英超最穩固後防之一'],
     weaknesses:['關鍵戰偶有緊張','板凳深度不如曼城','Gyökeres體系磨合中'],
-    recentForm:['W','W','D','W','W'],
+    recentForm:['W','D','W','W','L'],
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
     injuries:[
-      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題',returnDate:'評估中'},
-      {name:'Declan Rice',pos:'中場',status:'落地受傷',returnDate:'存疑'},
-      {name:'Martin Ødegaard',pos:'攻擊中場',status:'撞傷',returnDate:'存疑'},
+      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題',returnDate:'四月下旬可望回歸'},
+      {name:'Jurrien Timber',pos:'後衛',status:'腳踝傷勢',returnDate:'04/19 vs 曼城可望回歸'},
+      {name:'Declan Rice',pos:'中場',status:'訓練中缺席',returnDate:'存疑'},
+      {name:'Martin Ødegaard',pos:'攻擊中場',status:'小傷',returnDate:'評估中'},
       {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢',returnDate:'存疑'},
-      {name:'Mikel Merino',pos:'中場',status:'長期傷缺',returnDate:'未定'}
+      {name:'Mikel Merino',pos:'中場',status:'已脫護具但本季不預期回歸',returnDate:'賽季報銷'}
     ]
   },
   'LIV': {
@@ -45,12 +46,13 @@ const EPL_TEAMS = {
     style:'高強度壓迫，快速轉換，邊路推進',
     strengths:['Salah持續高效輸出','Slot體系穩定成熟','中場跑動覆蓋全場'],
     weaknesses:['Salah年齡漸長','傷兵時輪換選擇有限','對陣低位防守隊時偶有困難'],
-    recentForm:['W','W','W','D','W'],
+    recentForm:['W','W','D','W','W'],
     history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍',
     injuries:[
-      {name:'Alisson',pos:'門將',status:'傷勢恢復中',returnDate:'未定'},
-      {name:'Wataru Endo',pos:'中場',status:'足部傷勢',returnDate:'賽季報銷'},
-      {name:'Conor Bradley',pos:'右後衛',status:'長期傷缺',returnDate:'賽季報銷'},
+      {name:'Hugo Ekitike',pos:'前鋒',status:'阿基里斯腱斷裂（vs PSG受傷）',returnDate:'賽季報銷＋世界盃缺席'},
+      {name:'Alisson',pos:'門將',status:'傷勢恢復中，尚未隨隊訓練',returnDate:'短期內可望回歸'},
+      {name:'Wataru Endo',pos:'中場',status:'足部手術',returnDate:'賽季報銷（目標世界盃）'},
+      {name:'Conor Bradley',pos:'右後衛',status:'膝蓋重傷手術',returnDate:'賽季報銷'},
       {name:'Giovanni Leoni',pos:'後衛',status:'前十字韌帶',returnDate:'賽季報銷'}
     ]
   },
@@ -68,13 +70,13 @@ const EPL_TEAMS = {
     style:'極致控球，位置輪轉，高位壓迫',
     strengths:['Haaland進球效率恐怖','Guardiola戰術無人能及','板凳深度聯賽最強'],
     weaknesses:['Rodri長期傷缺影響巨大','De Bruyne傷病風險','陣容老化需要更新'],
-    recentForm:['W','D','W','L','W'],
+    recentForm:['D','W','L','W','W'],
     history:'9次英格蘭頂級聯賽冠軍，2022/23三冠王',
     injuries:[
-      {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末'},
-      {name:'Rúben Dias',pos:'中後衛',status:'腿後肌傷',returnDate:'四月中'},
-      {name:'John Stones',pos:'中後衛',status:'小腿傷',returnDate:'恢復中'},
-      {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷',returnDate:'評估中'}
+      {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末可望回歸'},
+      {name:'Rúben Dias',pos:'中後衛',status:'腿後肌傷',returnDate:'目標 04/19 vs 兵工廠'},
+      {name:'John Stones',pos:'中後衛',status:'小腿傷，已部分訓練',returnDate:'短期內'},
+      {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷（vs Chelsea下半場受傷）',returnDate:'評估中，已輕度訓練'}
     ]
   },
   'CHE': {
