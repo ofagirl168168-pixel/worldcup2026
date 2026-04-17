@@ -393,9 +393,7 @@
             <div class="opinion-brand-line" style="max-width:180px;height:2px"></div>
           </div>
           <div class="opinion-brand-tagline" style="font-size:18px;letter-spacing:5px;margin-bottom:36px">MADDY ARENA · 每天一題，選邊站</div>
-          <div style="text-align:center">
-            <span class="opinion-tag opinion-tag--${opinion.type || 'classic'}" style="font-size:18px;padding:8px 22px;border-radius:30px;margin-bottom:28px;letter-spacing:2px">${tagText}</span>
-          </div>
+          <div id="share-tag-slot" style="text-align:center;margin-bottom:28px;display:flex;justify-content:center"></div>
           <div class="opinion-question" style="font-size:46px;margin-bottom:14px;line-height:1.35;margin-top:16px">${opinion.q}</div>
           <div class="opinion-context" style="font-size:22px;margin-bottom:40px;line-height:1.55">${opinion.context || ''}</div>
           <div class="opinion-cards ${isMulti ? 'opinion-cards--multi' : ''}" style="gap:28px;${isMulti ? 'flex-wrap:wrap' : ''};perspective:none">
@@ -447,6 +445,19 @@
       titleSlot.appendChild(_makeVsBadge('VS', '#ff4757', 'rgba(255,71,87,0.12)'));
       titleSlot.appendChild(_makeGradientTitle('麥迪擂台'));
       titleSlot.appendChild(_makeVsBadge('VS', '#686de0', 'rgba(104,109,224,0.12)'));
+    }
+
+    // 類型標籤：同樣用 canvas 畫，避免 emoji/文字 baseline 跟底框跑掉
+    const tagSlot = wrapper.querySelector('#share-tag-slot');
+    if (tagSlot) {
+      const tagColors = {
+        trending: { bg: '#ff4757', fg: '#fff' },
+        classic:  { bg: '#ffa502', fg: '#1a1a2e' },
+        fun:      { bg: '#2ed573', fg: '#1a1a2e' },
+        predict:  { bg: '#3742fa', fg: '#fff' },
+      };
+      const t = tagColors[opinion.type] || tagColors.classic;
+      tagSlot.appendChild(_makeTagPill(tagText, t.bg, t.fg));
     }
 
     // Logo：用 async Image + drawImage 到 canvas，避免 html2canvas 拿 <img> 時的 CORS 問題
@@ -546,6 +557,51 @@
     let x = 20;
     for (const ch of text) {
       ctx.fillText(ch, x, h / 2);
+      x += ctx.measureText(ch).width + letterSpacing;
+    }
+    return c;
+  }
+
+  // 用 canvas 畫類型標籤（圓角藥丸，emoji + 文字精準垂直置中）
+  function _makeTagPill(text, bg, fg) {
+    const dpr = 2;
+    const fontSize = 22;
+    const padX = 28, padY = 12;
+    const font = `700 ${fontSize}px "Noto Sans TC","Segoe UI Emoji","Apple Color Emoji",sans-serif`;
+    const meas = document.createElement('canvas').getContext('2d');
+    meas.font = font;
+    const letterSpacing = 2;
+    const textW = meas.measureText(text).width + letterSpacing * Math.max(0, text.length - 1);
+    const w = Math.ceil(textW + padX * 2);
+    const h = Math.ceil(fontSize + padY * 2);
+
+    const c = document.createElement('canvas');
+    c.width = w * dpr;
+    c.height = h * dpr;
+    c.style.cssText = `width:${w}px;height:${h}px;display:block`;
+    const ctx = c.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    // 藥丸底
+    const r = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.arcTo(w, 0, w, h, r);
+    ctx.arcTo(w, h, 0, h, r);
+    ctx.arcTo(0, h, 0, 0, r);
+    ctx.arcTo(0, 0, w, 0, r);
+    ctx.closePath();
+    ctx.fillStyle = bg;
+    ctx.fill();
+
+    // 文字（逐字畫以支援 letter-spacing 並且手動做 baseline 校正）
+    ctx.font = font;
+    ctx.fillStyle = fg;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+    let x = padX;
+    for (const ch of text) {
+      ctx.fillText(ch, x, h / 2 + 1);
       x += ctx.measureText(ch).width + letterSpacing;
     }
     return c;
