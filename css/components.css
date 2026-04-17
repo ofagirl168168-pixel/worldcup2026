@@ -3512,3 +3512,167 @@ img.flag-img {
   .opinion-cards--multi .opinion-card { min-width: 80px; padding: 18px 10px; font-size: 13px; }
   .opinion-result-label { min-width: 60px; font-size: 12px; }
 }
+
+/* ── 麥迪擂台浮動入口按鈕 ──────────────────────── */
+.btn-arena-float {
+  position: fixed; bottom: 24px; left: 24px; z-index: 900;
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 18px 12px 14px;
+  background: linear-gradient(135deg, #ff4757 0%, #ffa502 50%, #686de0 100%);
+  color: #fff; font-weight: 900; font-size: 14px; letter-spacing: 1.5px;
+  border: 0; border-radius: 999px; cursor: pointer;
+  box-shadow: 0 6px 24px rgba(255,107,107,0.35), 0 0 0 1px rgba(255,255,255,0.12) inset;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-arena-float:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 32px rgba(255,107,107,0.5), 0 0 0 1px rgba(255,255,255,0.2) inset;
+}
+.btn-arena-float:active { transform: translateY(0) scale(0.98); }
+
+.btn-arena-float-icon {
+  font-size: 20px; display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+.btn-arena-float-label { white-space: nowrap; }
+
+.btn-arena-float-ring {
+  position: absolute; inset: -4px; border-radius: 999px;
+  border: 2px solid rgba(255,165,2,0.7); pointer-events: none;
+  animation: arenaFloatPulse 2.2s ease-out infinite;
+}
+@keyframes arenaFloatPulse {
+  0%   { transform: scale(1);   opacity: 0.9; }
+  70%  { transform: scale(1.18); opacity: 0; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+
+/* 彈窗打開時把浮動按鈕藏起來，避免疊在上層 */
+body.opinion-open .btn-arena-float { display: none; }
+
+@media (max-width: 600px) {
+  .btn-arena-float { padding: 10px 14px 10px 12px; font-size: 13px; bottom: 16px; left: 16px; gap: 8px; }
+  .btn-arena-float-icon { font-size: 18px; width: 22px; height: 22px; }
+}
+
+/* ── 擂台留言區 ──────────────────────────── */
+.opinion-comments {
+  margin-top: 26px; padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  text-align: left;
+}
+.opinion-comments-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.opinion-comments-title {
+  font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.88);
+  letter-spacing: 1px;
+}
+.opinion-comments-count {
+  font-size: 12px; color: rgba(255,255,255,0.45);
+}
+.opinion-comments-list {
+  max-height: 260px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 10px;
+  padding-right: 4px;
+}
+.opinion-comments-list::-webkit-scrollbar { width: 6px; }
+.opinion-comments-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+.opinion-comment {
+  position: relative;
+  padding: 10px 14px 8px; border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border-left: 3px solid rgba(255,255,255,0.2);
+  font-size: 14px; line-height: 1.5;
+  animation: opinionCommentIn 0.4s ease-out both;
+}
+@keyframes opinionCommentIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.opinion-comment--c0 { border-left-color: #ff6b6b; background: rgba(255,107,107,0.08); }
+.opinion-comment--c1 { border-left-color: #686de0; background: rgba(104,109,224,0.08); }
+.opinion-comment--c2 { border-left-color: #2ed573; background: rgba(46,213,115,0.08); }
+.opinion-comment--c3 { border-left-color: #ffa502; background: rgba(255,165,2,0.08); }
+.opinion-comment--mine { box-shadow: 0 0 0 1px rgba(255,255,255,0.12); }
+
+.opinion-comment-head {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: rgba(255,255,255,0.55);
+  margin-bottom: 4px;
+}
+.opinion-comment-nick { font-weight: 700; color: rgba(255,255,255,0.85); }
+.opinion-comment-side { font-size: 11px; color: rgba(255,255,255,0.45); }
+.opinion-comment-mine-tag {
+  margin-left: auto; font-size: 10px; font-weight: 700;
+  padding: 1px 6px; border-radius: 3px;
+  background: rgba(255,255,255,0.12); color: #fff;
+}
+.opinion-comment-body {
+  color: rgba(255,255,255,0.92);
+  word-break: break-word; white-space: pre-wrap;
+}
+.opinion-comment-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 6px;
+}
+.opinion-comment-like {
+  background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 2px 10px; border-radius: 12px;
+  font-size: 12px; cursor: pointer;
+  transition: transform 0.15s, background 0.2s;
+}
+.opinion-comment-like:hover { background: rgba(255,255,255,0.12); }
+.opinion-comment-like:active { transform: scale(0.94); }
+.opinion-comment-like.liked {
+  background: rgba(255,107,107,0.22); color: #ff6b6b;
+  border-color: rgba(255,107,107,0.4); cursor: default;
+}
+.opinion-comment-time { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+.opinion-comments-form {
+  display: flex; gap: 8px; margin-top: 14px;
+}
+.opinion-comments-form input {
+  flex: 1; padding: 10px 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; color: #fff; font-size: 14px;
+  outline: none; transition: border-color 0.2s, background 0.2s;
+}
+.opinion-comments-form input:focus {
+  border-color: rgba(255,165,2,0.5);
+  background: rgba(255,255,255,0.1);
+}
+.opinion-comments-form input:disabled {
+  opacity: 0.5; cursor: not-allowed;
+}
+.opinion-comment-submit {
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #ff6b6b, #ffa502);
+  color: #1a1a2e; font-weight: 800; font-size: 14px;
+  border: none; border-radius: 8px; cursor: pointer;
+  transition: transform 0.15s, opacity 0.2s;
+}
+.opinion-comment-submit:hover:not(:disabled) { transform: translateY(-1px); }
+.opinion-comment-submit:disabled {
+  opacity: 0.5; cursor: not-allowed;
+  background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.6);
+}
+.opinion-comment-hint {
+  font-size: 12px; margin-top: 8px; min-height: 16px;
+  color: rgba(255,255,255,0.5);
+}
+.opinion-comment-hint.warn { color: #ff6b6b; }
+.opinion-comment-hint.ok { color: #2ed573; }
+
+@media (max-width: 600px) {
+  .opinion-comments-list { max-height: 200px; }
+  .opinion-comment { font-size: 13px; }
+  .opinion-comments-form input { font-size: 13px; padding: 9px 12px; }
+  .opinion-comment-submit { padding: 9px 14px; font-size: 13px; }
+}

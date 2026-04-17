@@ -594,6 +594,14 @@
   <button id="btn-back-top" class="btn-back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到頂部">
     <i class="fa-solid fa-chevron-up"></i>
   </button>
+  <!-- 麥迪擂台浮動入口（所有訪客皆可見） -->
+  <button id="btn-arena-float" class="btn-arena-float"
+    onclick="showOpinionPoll(null,{force:true})"
+    aria-label="麥迪擂台 今日投票">
+    <span class="btn-arena-float-ring"></span>
+    <span class="btn-arena-float-icon">⚔️</span>
+    <span class="btn-arena-float-label">麥迪擂台</span>
+  </button>
 
   <script src="js/fx.js" defer></script>
   <script src="js/rogue.js" defer></script>

@@ -3,6 +3,7 @@
 const SUPA_URL = 'https://dwlngkspwtcsnacbsgct.supabase.co';
 const SUPA_KEY = 'sb_publishable_XOYghSiO49fG8nMsztm-cQ_l_Tt6V1u';
 const DB = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+window.DB = DB; // 供其他 IIFE（例如 opinion-poll.js）取用
 
 let currentUser = null;
 

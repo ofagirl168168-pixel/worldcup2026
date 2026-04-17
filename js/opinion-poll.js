@@ -8,7 +8,11 @@
 
   const STORAGE_PREFIX = 'opinion_vote_';
   const STORAGE_SHOWN = 'opinion_shown_';
+  const STORAGE_COMMENT = 'opinion_commented_';
+  const STORAGE_LIKE = 'opinion_liked_';
   const TAG_LABELS = { trending: '🔥 時事', classic: '⚽ 經典', fun: '🎉 趣味', predict: '🔮 預測' };
+  const MAX_COMMENT_LEN = 100;
+  let _commentChannel = null; // realtime subscription
 
   /* ---------- 顯示觀點投票彈窗 ---------- */
   function showOpinionPoll(onClose, opts) {
@@ -86,6 +90,7 @@
       </div>`;
 
     document.body.appendChild(overlay);
+    document.body.classList.add('opinion-open');
 
     // 觸發入場動畫 (需要一幀延遲)
     requestAnimationFrame(() => {
@@ -216,6 +221,20 @@
         <button class="opinion-btn opinion-btn--close" id="opinion-close-btn">
           繼續 →
         </button>
+      </div>
+      <div class="opinion-comments" id="opinion-comments">
+        <div class="opinion-comments-header">
+          <span class="opinion-comments-title">💬 擂台留言</span>
+          <span class="opinion-comments-count" id="opinion-comments-count">載入中…</span>
+        </div>
+        <div class="opinion-comments-list" id="opinion-comments-list"></div>
+        <div class="opinion-comments-form">
+          <input type="text" id="opinion-comment-input"
+            maxlength="${MAX_COMMENT_LEN}"
+            placeholder="說一句話撐你這邊…（${MAX_COMMENT_LEN}字內）" />
+          <button id="opinion-comment-submit" class="opinion-comment-submit">送出</button>
+        </div>
+        <div class="opinion-comment-hint" id="opinion-comment-hint"></div>
       </div>`;
 
     resultEl.classList.add('show');
@@ -243,6 +262,9 @@
     }
     // 保留 window 版（外部呼叫備援）
     window._shareOpinion = () => _shareOpinion(opinion, chosenIdx, votes, totalVotes);
+
+    // 擂台留言區
+    _initComments(opinion, chosenIdx, resultEl);
   }
 
   /* ---------- 模擬投票數據（localStorage only） ---------- */
@@ -694,10 +716,233 @@
 
   function _closeOverlay(overlay, onClose) {
     overlay.classList.remove('open');
+    document.body.classList.remove('opinion-open');
+    _unsubscribeComments();
     setTimeout(() => {
       overlay.remove();
       if (onClose) onClose();
     }, 400);
+  }
+
+  /* ---------- 擂台留言 ---------- */
+  async function _initComments(opinion, chosenIdx, resultEl) {
+    const listEl = resultEl.querySelector('#opinion-comments-list');
+    const countEl = resultEl.querySelector('#opinion-comments-count');
+    const input = resultEl.querySelector('#opinion-comment-input');
+    const submitBtn = resultEl.querySelector('#opinion-comment-submit');
+    const hintEl = resultEl.querySelector('#opinion-comment-hint');
+
+    if (!window.DB) {
+      countEl.textContent = '（未連線）';
+      input.disabled = true; submitBtn.disabled = true;
+      return;
+    }
+
+    // 已留言過 → 鎖定輸入框
+    const commentedKey = STORAGE_COMMENT + opinion.id;
+    const alreadyCommented = localStorage.getItem(commentedKey);
+    if (alreadyCommented) {
+      input.disabled = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = '已留言';
+      input.placeholder = '每題只能留一則喔 👀';
+    }
+
+    // 提交
+    submitBtn.addEventListener('click', async () => {
+      const text = (input.value || '').trim();
+      if (!text) { _setHint(hintEl, '留言不能空白', 'warn'); return; }
+      if (text.length > MAX_COMMENT_LEN) {
+        _setHint(hintEl, `最多 ${MAX_COMMENT_LEN} 字`, 'warn'); return;
+      }
+      submitBtn.disabled = true;
+      submitBtn.textContent = '送出中…';
+      try {
+        const nickname = _resolveNickname();
+        const { data, error } = await window.DB.from('opinion_comments').insert({
+          opinion_id: opinion.id,
+          side: chosenIdx,
+          nickname,
+          content: text,
+        }).select().single();
+        if (error) throw error;
+        // 本機立即渲染（realtime 也會送同一筆，用 id 去重）
+        _renderComment(listEl, data, opinion, chosenIdx, { prepend: true });
+        _bumpCount(countEl, +1);
+        localStorage.setItem(commentedKey, '1');
+        _cleanOldKeys(STORAGE_COMMENT);
+        input.value = '';
+        input.disabled = true;
+        submitBtn.textContent = '已留言';
+        _setHint(hintEl, '已發佈 ✅', 'ok');
+      } catch (err) {
+        console.warn('[opinion] 留言失敗', err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = '送出';
+        _setHint(hintEl, '送出失敗：' + (err.message || err), 'warn');
+      }
+    });
+
+    // Enter 送出
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.isComposing && !submitBtn.disabled) submitBtn.click();
+    });
+
+    // 載入現有留言
+    try {
+      const { data, error } = await window.DB
+        .from('opinion_comments')
+        .select('id,opinion_id,side,nickname,content,likes,created_at')
+        .eq('opinion_id', opinion.id)
+        .eq('deleted', false)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      listEl.innerHTML = '';
+      if (!data || !data.length) {
+        countEl.textContent = '搶頭香';
+      } else {
+        countEl.textContent = data.length + ' 則';
+        data.forEach(c => _renderComment(listEl, c, opinion, chosenIdx));
+      }
+    } catch (err) {
+      console.warn('[opinion] 載入留言失敗', err);
+      countEl.textContent = '（載入失敗）';
+    }
+
+    // 訂閱新留言（realtime）
+    _subscribeComments(opinion, chosenIdx, listEl, countEl);
+  }
+
+  function _subscribeComments(opinion, chosenIdx, listEl, countEl) {
+    _unsubscribeComments();
+    if (!window.DB || !window.DB.channel) return;
+    try {
+      _commentChannel = window.DB
+        .channel('opinion-comments-' + opinion.id)
+        .on('postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'opinion_comments', filter: `opinion_id=eq.${opinion.id}` },
+          (payload) => {
+            const row = payload.new;
+            if (!row || row.deleted) return;
+            _renderComment(listEl, row, opinion, chosenIdx, { prepend: true, dedupe: true });
+            _bumpCount(countEl, +1);
+          })
+        .on('postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'opinion_comments', filter: `opinion_id=eq.${opinion.id}` },
+          (payload) => {
+            const row = payload.new;
+            const node = listEl.querySelector(`[data-cid="${row.id}"]`);
+            if (!node) return;
+            if (row.deleted) {
+              node.remove();
+              _bumpCount(countEl, -1);
+              return;
+            }
+            const likeBtn = node.querySelector('.opinion-comment-like');
+            if (likeBtn) likeBtn.textContent = `👍 ${row.likes}`;
+          })
+        .subscribe();
+    } catch (e) { console.warn('[opinion] 訂閱失敗', e); }
+  }
+
+  function _unsubscribeComments() {
+    if (_commentChannel && window.DB && window.DB.removeChannel) {
+      try { window.DB.removeChannel(_commentChannel); } catch (e) {}
+    }
+    _commentChannel = null;
+  }
+
+  function _renderComment(listEl, c, opinion, chosenIdx, opt) {
+    opt = opt || {};
+    if (!listEl) return;
+    // 去重
+    if (opt.dedupe && listEl.querySelector(`[data-cid="${c.id}"]`)) return;
+    const mine = c.side === chosenIdx;
+    const sideLabel = _shortLabel(opinion.opts[c.side] || '');
+    const likedKey = STORAGE_LIKE + c.id;
+    const alreadyLiked = !!localStorage.getItem(likedKey);
+    const node = document.createElement('div');
+    node.className = `opinion-comment opinion-comment--c${c.side}` + (mine ? ' opinion-comment--mine' : '');
+    node.dataset.cid = c.id;
+    node.innerHTML = `
+      <div class="opinion-comment-head">
+        <span class="opinion-comment-nick">${_escape(c.nickname || '匿名觀眾')}</span>
+        <span class="opinion-comment-side">站「${_escape(sideLabel)}」</span>
+        ${mine ? '<span class="opinion-comment-mine-tag">我</span>' : ''}
+      </div>
+      <div class="opinion-comment-body">${_escape(c.content)}</div>
+      <div class="opinion-comment-foot">
+        <button class="opinion-comment-like${alreadyLiked ? ' liked' : ''}" type="button">👍 ${c.likes || 0}</button>
+        <span class="opinion-comment-time">${_relTime(c.created_at)}</span>
+      </div>`;
+
+    const likeBtn = node.querySelector('.opinion-comment-like');
+    likeBtn.addEventListener('click', async () => {
+      if (likeBtn.classList.contains('liked')) return;
+      likeBtn.classList.add('liked');
+      localStorage.setItem(likedKey, '1');
+      _cleanOldKeys(STORAGE_LIKE);
+      // 樂觀更新
+      const m = likeBtn.textContent.match(/\d+/);
+      const cur = m ? parseInt(m[0]) : 0;
+      likeBtn.textContent = `👍 ${cur + 1}`;
+      try {
+        await window.DB.rpc('opinion_comment_like', { cid: c.id });
+      } catch (e) { /* 忽略，realtime UPDATE 會同步計數 */ }
+    });
+
+    if (opt.prepend) listEl.insertBefore(node, listEl.firstChild);
+    else listEl.appendChild(node);
+  }
+
+  function _resolveNickname() {
+    // 優先使用登入 profile 暱稱
+    try {
+      if (typeof window.currentProfile === 'object' && window.currentProfile && window.currentProfile.nickname) {
+        return String(window.currentProfile.nickname).slice(0, 20);
+      }
+    } catch (e) {}
+    // 其次：本機匿名暱稱（穩定）
+    let anon = localStorage.getItem('opinion_anon_nick');
+    if (!anon) {
+      const pool = ['路人甲','看球狼','PK魂','擂台客','熱血派','場邊記者','足球宅','替補中','VAR魔人','越位線'];
+      anon = pool[Math.floor(Math.random() * pool.length)] + Math.floor(Math.random() * 90 + 10);
+      localStorage.setItem('opinion_anon_nick', anon);
+    }
+    return anon;
+  }
+
+  function _setHint(el, msg, kind) {
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'opinion-comment-hint' + (kind ? ' ' + kind : '');
+    if (kind !== 'warn') setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 3000);
+  }
+
+  function _bumpCount(countEl, delta) {
+    if (!countEl) return;
+    const m = (countEl.textContent || '').match(/\d+/);
+    const cur = m ? parseInt(m[0]) : 0;
+    const next = Math.max(0, cur + delta);
+    countEl.textContent = next ? next + ' 則' : '搶頭香';
+  }
+
+  function _escape(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function _relTime(iso) {
+    if (!iso) return '';
+    const t = new Date(iso).getTime();
+    if (!t) return '';
+    const diff = Date.now() - t;
+    if (diff < 60000) return '剛剛';
+    if (diff < 3600000) return Math.floor(diff / 60000) + ' 分鐘前';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小時前';
+    return Math.floor(diff / 86400000) + ' 天前';
   }
 
   function _cleanOldKeys(prefix) {

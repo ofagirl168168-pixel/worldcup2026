@@ -17,3 +17,6 @@ Thumbs.db
 
 # Node（之後加 GitHub Actions 會用到）
 node_modules/
+
+# 留言審核機器人游標
+scripts/.comments-cursor
