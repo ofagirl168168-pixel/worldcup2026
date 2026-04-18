@@ -1,0 +1,53 @@
+name: 每日 Claude 日更提醒
+
+on:
+  schedule:
+    # 00:00 UTC = 08:00 台灣時間
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 允許手動觸發測試
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram reminder with action buttons
+        env:
+          TOKEN: ${{ secrets.CLAUDE330_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.MY_TG_CHAT_ID }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$CHAT_ID" ]; then
+            echo "❌ 缺少 Secrets: CLAUDE330_BOT_TOKEN 或 MY_TG_CHAT_ID"
+            exit 1
+          fi
+
+          TODAY=$(TZ='Asia/Taipei' date +"%Y-%m-%d (%A)")
+
+          MESSAGE="🌅 早安！今天是 $TODAY
+
+          世足預測網站 · 日更提醒：
+          • 更新傷兵 / recentForm / 比賽資料
+          • 依排程判斷是否寫新文章
+          • 抽明日擂台題
+
+          選一個動作 👇"
+
+          jq -n \
+            --arg chat_id "$CHAT_ID" \
+            --arg text "$MESSAGE" \
+            '{
+              chat_id: $chat_id,
+              text: $text,
+              reply_markup: {
+                inline_keyboard: [
+                  [{"text":"🚀 立即執行日更","callback_data":"daily:run"}],
+                  [
+                    {"text":"📋 只看清單","callback_data":"daily:list"},
+                    {"text":"⏭️ 跳過今天","callback_data":"daily:skip"}
+                  ]
+                ]
+              }
+            }' > payload.json
+
+          curl -sf -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d @payload.json
