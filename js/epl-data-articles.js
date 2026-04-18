@@ -456,7 +456,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <h3>關鍵對決</h3>
 <ol>
 <li><strong>Haaland vs Gabriel</strong>：挪威巨人 vs 巴西磐石，英超最頂級的矛盾對決</li>
-<li><strong>De Bruyne vs 兵工廠中場</strong>：如果 Rice 缺陣，誰來盯防 KDB？</li>
+<li><strong>Reijnders vs 兵工廠中場</strong>：如果 Rice 缺陣，誰來盯防曼城新核 Reijnders 和 Cherki 的創造力？</li>
 <li><strong>Gyökeres vs Akanji</strong>：瑞典射手在大場面能否證明自己？</li>
 </ol>
 

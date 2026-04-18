@@ -61,15 +61,15 @@ const EPL_TEAMS = {
     league:'Premier League', eplRank:3, coach:'Pep Guardiola', formation:'4-3-3',
     keyPlayers:[
       {name:'Erling Haaland',pos:'中鋒',club:'曼城'},
-      {name:'Kevin De Bruyne',pos:'攻擊中場',club:'曼城'},
+      {name:'Tijjani Reijnders',pos:'中場',club:'曼城'},
+      {name:'Rayan Cherki',pos:'攻擊中場',club:'曼城'},
       {name:'Phil Foden',pos:'翼鋒/中場',club:'曼城'},
-      {name:'Rodri',pos:'防守中場',club:'曼城'},
-      {name:'Stefan Ortega',pos:'門將',club:'曼城'}
+      {name:'Rodri',pos:'防守中場',club:'曼城'}
     ],
-    radar:{attack:93,defense:88,midfield:93,speed:86,experience:92},
+    radar:{attack:93,defense:88,midfield:93,speed:86,experience:90},
     style:'極致控球，位置輪轉，高位壓迫',
     strengths:['Haaland進球效率恐怖','Guardiola戰術無人能及','板凳深度聯賽最強'],
-    weaknesses:['Rodri長期傷缺影響巨大','De Bruyne傷病風險','陣容老化需要更新'],
+    weaknesses:['Rodri傷癒後狀態仍在回升','夏季新援（Reijnders/Cherki）磨合中','後防傷兵影響輪替'],
     recentForm:['D','W','L','W','W'],
     history:'9次英格蘭頂級聯賽冠軍，2022/23三冠王',
     injuries:[

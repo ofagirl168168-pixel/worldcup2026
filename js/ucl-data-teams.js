@@ -54,15 +54,15 @@ const UCL_TEAMS = {
     uefaCoeff:148, coach:'Pep Guardiola', formation:'4-3-3',
     keyPlayers:[
       {name:'Erling Haaland',pos:'中鋒',club:'曼城'},
-      {name:'Kevin De Bruyne',pos:'攻擊中場',club:'曼城'},
+      {name:'Tijjani Reijnders',pos:'中場',club:'曼城'},
+      {name:'Rayan Cherki',pos:'攻擊中場',club:'曼城'},
       {name:'Phil Foden',pos:'翼鋒/中場',club:'曼城'},
-      {name:'Rodri',pos:'防守中場',club:'曼城'},
-      {name:'Stefan Ortega',pos:'門將',club:'曼城'}
+      {name:'Rodri',pos:'防守中場',club:'曼城'}
     ],
-    radar:{attack:95,defense:90,midfield:95,speed:88,experience:92},
+    radar:{attack:95,defense:90,midfield:95,speed:88,experience:90},
     style:'極致控球，位置輪轉，高位壓迫',
     strengths:['Haaland禁區終結能力頂級','Guardiola戰術體系成熟','中場控制力聯賽最強'],
-    weaknesses:['De Bruyne傷病風險','歐冠淘汰賽心態波動','對陣強隊反擊時後防空間大'],
+    weaknesses:['Rodri傷癒後狀態仍在回升','新援（Reijnders/Cherki）大賽經驗有限','後防傷兵影響輪替'],
     history:'2022/23首奪歐冠，近年穩定進入八強以上',
     injuries:[
       {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末'},

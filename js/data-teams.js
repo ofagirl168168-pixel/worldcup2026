@@ -312,7 +312,7 @@ const TEAMS = {
     name:'Belgium', nameCN:'比利時', flag:'🇧🇪', group:'G', conf:'UEFA', fifaRank:8,
     coach:'Domenico Tedesco', formation:'4-3-3',
     keyPlayers:[
-      {name:'Kevin De Bruyne',pos:'中場',club:'曼城'},
+      {name:'Kevin De Bruyne',pos:'中場',club:'拿坡里'},
       {name:'Romelu Lukaku',pos:'中鋒',club:'拿坡里'},
       {name:'Jeremy Doku',pos:'右翼',club:'曼城'},
       {name:'Thibaut Courtois',pos:'門將',club:'皇家馬德里'},
