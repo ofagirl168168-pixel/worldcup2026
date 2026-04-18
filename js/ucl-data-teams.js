@@ -66,7 +66,7 @@ const UCL_TEAMS = {
     history:'2022/23首奪歐冠，近年穩定進入八強以上',
     injuries:[
       {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末'},
-      {name:'Rúben Dias',pos:'中後衛',status:'腿後肌傷',returnDate:'四月中'},
+      {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢',returnDate:'四月底（本月報銷）'},
       {name:'John Stones',pos:'中後衛',status:'小腿傷',returnDate:'恢復中'}
     ]
   },

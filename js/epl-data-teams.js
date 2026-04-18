@@ -25,7 +25,7 @@ const EPL_TEAMS = {
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
     injuries:[
       {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題',returnDate:'四月下旬可望回歸'},
-      {name:'Jurrien Timber',pos:'後衛',status:'腳踝傷勢',returnDate:'04/19 vs 曼城可望回歸'},
+      {name:'Jurrien Timber',pos:'後衛',status:'腳踝傷勢（已恢復訓練）',returnDate:'04/19 可望回歸'},
       {name:'Declan Rice',pos:'中場',status:'訓練中缺席',returnDate:'存疑'},
       {name:'Martin Ødegaard',pos:'攻擊中場',status:'小傷',returnDate:'評估中'},
       {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢',returnDate:'存疑'},
@@ -74,7 +74,7 @@ const EPL_TEAMS = {
     history:'9次英格蘭頂級聯賽冠軍，2022/23三冠王',
     injuries:[
       {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末可望回歸'},
-      {name:'Rúben Dias',pos:'中後衛',status:'腿後肌傷',returnDate:'目標 04/19 vs 兵工廠'},
+      {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢',returnDate:'四月底（本月報銷）'},
       {name:'John Stones',pos:'中後衛',status:'小腿傷，已部分訓練',returnDate:'短期內'},
       {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷（vs Chelsea下半場受傷）',returnDate:'評估中，已輕度訓練'}
     ]
