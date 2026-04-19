@@ -3474,6 +3474,43 @@ img.flag-img {
   100% { transform: scale(1); }
 }
 
+/* 連續天數 streak（Duolingo 式） */
+.opinion-streak {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-top: 14px; padding: 10px 18px;
+  background: linear-gradient(135deg, rgba(255,165,2,0.18), rgba(255,71,87,0.22));
+  border: 1px solid rgba(255,165,2,0.55);
+  border-radius: 999px;
+  font-size: 13px; font-weight: 700; color: #ffb347;
+  box-shadow: 0 0 24px rgba(255,165,2,0.25), inset 0 0 12px rgba(255,165,2,0.12);
+  animation: opinionStreakIn 0.55s ease 0.9s both;
+}
+.opinion-streak-flame {
+  font-size: 20px;
+  animation: opinionStreakFlame 1.6s ease-in-out infinite;
+  transform-origin: 50% 80%;
+}
+.opinion-streak-main { color: #fff; letter-spacing: 0.5px; }
+.opinion-streak-main b { color: #ffb347; font-size: 18px; margin: 0 3px; text-shadow: 0 0 10px rgba(255,165,2,0.7); }
+.opinion-streak-best { color: rgba(255,255,255,0.55); font-weight: 600; font-size: 12px; }
+.opinion-streak-tip { width: 100%; text-align: center; color: rgba(255,255,255,0.6); font-weight: 500; font-size: 11px; letter-spacing: 1px; }
+.opinion-streak.just-bumped {
+  animation: opinionStreakIn 0.55s ease 0.9s both, opinionStreakPulse 1.2s ease 1.6s 2;
+}
+@keyframes opinionStreakIn {
+  0%   { transform: translateY(10px) scale(0.85); opacity: 0; }
+  60%  { transform: translateY(-2px) scale(1.06); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes opinionStreakFlame {
+  0%, 100% { transform: translateY(0) rotate(-4deg) scale(1); }
+  50%      { transform: translateY(-2px) rotate(4deg) scale(1.1); }
+}
+@keyframes opinionStreakPulse {
+  0%, 100% { box-shadow: 0 0 24px rgba(255,165,2,0.25), inset 0 0 12px rgba(255,165,2,0.12); }
+  50%      { box-shadow: 0 0 40px rgba(255,165,2,0.65), inset 0 0 20px rgba(255,165,2,0.25); }
+}
+
 /* 底部按鈕區 */
 .opinion-actions {
   margin-top: 20px; display: flex; gap: 10px; justify-content: center;

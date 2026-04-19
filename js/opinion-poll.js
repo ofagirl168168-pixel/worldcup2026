@@ -11,6 +11,7 @@
   const STORAGE_COMMENT = 'opinion_commented_';
   const STORAGE_LIKE = 'opinion_liked_';
   const STORAGE_VOTER_KEY = 'opinion_voter_key';
+  const STORAGE_STREAK = 'opinion_streak'; // {current, longest, lastDate}
   const TAG_LABELS = { trending: '🔥 時事', classic: '⚽ 經典', fun: '🎉 趣味', predict: '🔮 預測' };
   const MAX_COMMENT_LEN = 100;
   let _commentChannel = null; // realtime subscription
@@ -179,6 +180,9 @@
     localStorage.setItem(STORAGE_PREFIX + opinion.id, chosenIdx);
     _cleanOldKeys(STORAGE_PREFIX);
 
+    // 連續天數 +1（同日重複投不會重算）→ 供 _showResult 渲染
+    overlay.dataset.streakBump = JSON.stringify(_bumpStreakToday());
+
     // 送到 Supabase（失敗不擋 UI）
     _insertVote(opinion.id, chosenIdx);
 
@@ -202,6 +206,39 @@
     setTimeout(() => {
       _showResult(opinion, chosenIdx, overlay, onClose);
     }, 600);
+  }
+
+  /* ---------- 連續天數 streak（Duolingo 式 localStorage 單機紀錄） ---------- */
+  function _getStreak() {
+    try {
+      const raw = localStorage.getItem(STORAGE_STREAK);
+      if (!raw) return { current: 0, longest: 0, lastDate: null };
+      const o = JSON.parse(raw) || {};
+      return {
+        current: (o.current | 0) || 0,
+        longest: (o.longest | 0) || 0,
+        lastDate: o.lastDate || null,
+      };
+    } catch (e) { return { current: 0, longest: 0, lastDate: null }; }
+  }
+
+  function _bumpStreakToday() {
+    const today = localDateStr();
+    const s = _getStreak();
+    if (s.lastDate === today) return { ...s, bumped: false };
+    const d = new Date(today + 'T00:00:00');
+    d.setDate(d.getDate() - 1);
+    const y = d.getFullYear() + '-' +
+              String(d.getMonth() + 1).padStart(2, '0') + '-' +
+              String(d.getDate()).padStart(2, '0');
+    const next = {
+      current: s.lastDate === y ? s.current + 1 : 1,
+      longest: 0,
+      lastDate: today,
+    };
+    next.longest = Math.max(s.longest, next.current);
+    localStorage.setItem(STORAGE_STREAK, JSON.stringify(next));
+    return { ...next, bumped: true, prevCurrent: s.current };
   }
 
   /* ---------- 真實投票：裝置唯一碼、INSERT、聚合 RPC、realtime ---------- */
@@ -289,6 +326,19 @@
     const maxVotes = Math.max(...votes);
     const isMinority = totalVotes >= 2 && votes[chosenIdx] < maxVotes;
 
+    // 連續天數：若剛投完票（_handleVote 寫入 dataset），用 bumped 後狀態；否則直接讀
+    let streak;
+    try {
+      streak = overlay.dataset.streakBump ? JSON.parse(overlay.dataset.streakBump) : _getStreak();
+    } catch (e) { streak = _getStreak(); }
+    const streakHtml = (streak && streak.current > 0) ? `
+      <div class="opinion-streak ${streak.bumped ? 'just-bumped' : ''}">
+        <span class="opinion-streak-flame">🔥</span>
+        <span class="opinion-streak-main">連續 <b>${streak.current}</b> 天戰場集合</span>
+        ${streak.longest > streak.current ? `<span class="opinion-streak-best">個人最佳 ${streak.longest} 天</span>` : ''}
+        ${streak.bumped && streak.current >= 2 ? `<span class="opinion-streak-tip">斷了就歸零，明天再來 💪</span>` : ''}
+      </div>` : '';
+
     resultEl.innerHTML = `
       ${opinion.opts.map((opt, i) => {
         const pct = totalVotes > 0 ? Math.round(votes[i] / totalVotes * 100) : 0;
@@ -304,6 +354,7 @@
       }).join('')}
       <div class="opinion-total">${totalVotes} 人已投票</div>
       ${isMinority ? '<div class="opinion-minority">🤔 你是少數派！</div>' : ''}
+      ${streakHtml}
       <div class="opinion-actions">
         <button class="opinion-btn opinion-btn--share" id="opinion-share-btn">
           <i class="fas fa-share-alt"></i> 分享立場
