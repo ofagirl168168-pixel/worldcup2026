@@ -197,7 +197,8 @@ const UCL_TEAMS = {
       {name:'Declan Rice',pos:'中場',status:'落地受傷（存疑）',returnDate:'評估中'},
       {name:'Martin Ødegaard',pos:'攻擊中場',status:'撞傷（首回合）',returnDate:'存疑'},
       {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢',returnDate:'存疑'},
-      {name:'Mikel Merino',pos:'中場',status:'長期傷缺',returnDate:'未定'}
+      {name:'Mikel Merino',pos:'中場',status:'長期傷缺',returnDate:'未定'},
+      {name:'Noni Madueke',pos:'右翼',status:'膝傷（QF次回合退場）',returnDate:'評估中'}
     ]
   },
   'LEV': {

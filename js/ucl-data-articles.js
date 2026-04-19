@@ -442,7 +442,7 @@ Arteta 在 60 分鐘左右換上 16 歲的 Max Dowman，這位小將立刻帶來
 Madueke 膝傷退場可能讓兵工廠週日對曼城的英超爭冠戰少了一員大將。加上 Saka 仍在養傷，兵工廠右路火力嚴重短缺。
 
 **四強展望**
-兵工廠將在四強對陣馬德里競技。首回合 4/29 客場挑戰大都會球場，次回合 5/6 回到酋長球場。上一次兩隊在歐冠交手是聯賽階段，兵工廠以 4-0 大勝，但淘汰賽的 Simeone 完全是另一個檔次。`,
+兵工廠將在四強對陣馬德里競技。首回合 4/30 客場挑戰大都會球場，次回合 5/6 回到酋長球場。上一次兩隊在歐冠交手是聯賽階段，兵工廠以 4-0 大勝，但淘汰賽的 Simeone 完全是另一個檔次。`,
     tags: ['八強', '兵工廠', '體育CP', '戰報', '晉級', '四強']
   },
   {
@@ -506,7 +506,7 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 缺少 Courtois 和 Rodrygo 的皇馬展現了驚人的戰鬥力，但最終仍然被淘汰。15 次奪冠的歐冠之王本賽季止步八強，Ancelotti 面臨嚴峻的夏季重建壓力。
 
 **拜仁四強展望**
-拜仁將在四強對陣衛冕冠軍巴黎聖日耳曼。首回合 4/30 客戰王子公園球場，次回合 5/7 回到安聯球場。兩隊在本季聯賽階段已交手，拜仁憑 Díaz 的梅開二度取勝——巧合的是，正是 Díaz 在今晚的 89 分鐘打破僵局。`,
+拜仁將在四強對陣衛冕冠軍巴黎聖日耳曼。首回合 4/29 客戰王子公園球場，次回合 5/7 回到安聯球場。兩隊在本季聯賽階段已交手，拜仁憑 Díaz 的梅開二度取勝——巧合的是，正是 Díaz 在今晚的 89 分鐘打破僵局。`,
     tags: ['八強', '拜仁', '皇馬', '戰報', 'Güler', 'Kane', 'Díaz', 'Olise', '七球大戰']
   },
   {
@@ -516,8 +516,8 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
     category: '四強前瞻',
     summary: '聯賽階段 0-4 慘敗後 Simeone 已重新找到解法。馬競的反擊效率 vs 兵工廠的控球壓迫，誰能率先搶佔決賽門票？',
     content: `## 馬德里競技 vs 兵工廠｜歐冠四強
-**首回合：4/29（二）03:00 台灣時間・大都會球場**
-**次回合：5/6（二）03:00 台灣時間・酋長球場**
+**首回合：4/30（四）03:00 台灣時間・大都會球場**
+**次回合：5/6（三）03:00 台灣時間・酋長球場**
 
 ### 晉級之路
 
@@ -564,8 +564,8 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
     category: '四強前瞻',
     summary: '巴黎帶著四場不失球的完美紀錄迎戰剛以 7 球轟殺皇馬的拜仁。後 Mbappé 時代的巴黎 vs Kane 領軍的拜仁，這是一場進攻藝術的對決。',
     content: `## 巴黎聖日耳曼 vs 拜仁慕尼黑｜歐冠四強
-**首回合：4/30（三）03:00 台灣時間・王子公園球場**
-**次回合：5/7（三）03:00 台灣時間・安聯球場**
+**首回合：4/29（三）03:00 台灣時間・王子公園球場**
+**次回合：5/7（四）03:00 台灣時間・安聯球場**
 
 ### 晉級之路
 
@@ -638,8 +638,8 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 <h3>四強對陣確定</h3>
 <table style="width:100%;border-collapse:collapse;margin:16px 0">
 <tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">對陣</th><th style="padding:8px">首回合</th><th style="padding:8px">次回合</th></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #333">馬競 vs 兵工廠</td><td style="padding:8px;border-bottom:1px solid #333">4/29（二）03:00</td><td style="padding:8px;border-bottom:1px solid #333">5/6（三）03:00</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #333">巴黎 vs 拜仁</td><td style="padding:8px;border-bottom:1px solid #333">4/30（三）03:00</td><td style="padding:8px;border-bottom:1px solid #333">5/7（四）03:00</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #333">巴黎 vs 拜仁</td><td style="padding:8px;border-bottom:1px solid #333">4/29（三）03:00</td><td style="padding:8px;border-bottom:1px solid #333">5/7（四）03:00</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #333">馬競 vs 兵工廠</td><td style="padding:8px;border-bottom:1px solid #333">4/30（四）03:00</td><td style="padding:8px;border-bottom:1px solid #333">5/6（三）03:00</td></tr>
 </table>
 <p>決賽：5/31（日）03:00 台灣時間・布達佩斯普斯卡什球場</p>`,
     tags: ['八強', '回顧', '戰報', '拜仁', '皇馬', '巴黎', '利物浦', '馬競', '巴薩', '兵工廠', '士砵亭']

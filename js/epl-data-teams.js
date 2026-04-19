@@ -29,7 +29,8 @@ const EPL_TEAMS = {
       {name:'Declan Rice',pos:'中場',status:'訓練中缺席',returnDate:'存疑'},
       {name:'Martin Ødegaard',pos:'攻擊中場',status:'小傷',returnDate:'評估中'},
       {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢',returnDate:'存疑'},
-      {name:'Mikel Merino',pos:'中場',status:'已脫護具但本季不預期回歸',returnDate:'賽季報銷'}
+      {name:'Mikel Merino',pos:'中場',status:'已脫護具但本季不預期回歸',returnDate:'賽季報銷'},
+      {name:'Noni Madueke',pos:'右翼',status:'膝傷（歐冠八強次回合退場）',returnDate:'評估中'}
     ]
   },
   'LIV': {

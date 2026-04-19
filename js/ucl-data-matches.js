@@ -64,8 +64,8 @@ const UCL_MATCHES = [
   {id:'UCL-QF-08', date:'2026-04-16', time:'03:00', home:'BAY', away:'RMA', stage:'qf', leg:2, status:'finished', score:{h:4,a:3}, agg:{h:6,a:4}, stats:{poss:[68.6,31.4],shots:[21,12],sot:[9,5],corners:[9,2],yellow:[1,2],saves:[2,4]}, goals:[{min:'1',player:'Arda Güler',side:'a'},{min:'6',player:'Aleksandar Pavlovic',side:'h'},{min:'29',player:'Arda Güler',side:'a',type:'fk'},{min:'38',player:'Harry Kane',side:'h'},{min:'42',player:'Kylian Mbappé',side:'a'},{min:'89',player:'Luis Díaz',side:'h'},{min:'90+4',player:'Michael Olise',side:'h'}], events:[{min:'86',player:'Eduardo Camavinga',side:'a',type:'red'},{min:'90+5',player:'Arda Güler',side:'a',type:'red'}]},
 
   // ===== 四強 (2026-04-29 / 04-30 & 05-06 / 05-07 台灣時間) =====
-  {id:'UCL-SF-01', date:'2026-04-29', time:'03:00', home:'ATM', away:'ARS', stage:'sf', leg:1, status:'scheduled', score:null},
-  {id:'UCL-SF-02', date:'2026-04-30', time:'03:00', home:'PSG', away:'BAY', stage:'sf', leg:1, status:'scheduled', score:null},
+  {id:'UCL-SF-01', date:'2026-04-29', time:'03:00', home:'PSG', away:'BAY', stage:'sf', leg:1, status:'scheduled', score:null},
+  {id:'UCL-SF-02', date:'2026-04-30', time:'03:00', home:'ATM', away:'ARS', stage:'sf', leg:1, status:'scheduled', score:null},
   {id:'UCL-SF-03', date:'2026-05-06', time:'03:00', home:'ARS', away:'ATM', stage:'sf', leg:2, status:'scheduled', score:null},
   {id:'UCL-SF-04', date:'2026-05-07', time:'03:00', home:'BAY', away:'PSG', stage:'sf', leg:2, status:'scheduled', score:null},
 
