@@ -24,13 +24,19 @@
     }
     const today = localDateStr();
     const shownKey = STORAGE_SHOWN + today;
-    // 自動彈窗只彈一次；手動呼叫（force）不受限
-    if (!opts.force && localStorage.getItem(shownKey)) {
+    // 指定 pollId 時視同強制開啟（分享連結、歷史題永久連結）
+    const forced = opts.force || !!opts.pollId;
+    if (!forced && localStorage.getItem(shownKey)) {
       if (onClose) onClose();
       return;
     }
 
-    const opinion = getTodayOpinion();
+    // 指定 pollId → 依 id 找題；否則走今日題邏輯
+    let opinion = null;
+    if (opts.pollId && Array.isArray(window.DAILY_OPINIONS)) {
+      opinion = window.DAILY_OPINIONS.find(o => o.id === opts.pollId) || null;
+    }
+    if (!opinion) opinion = getTodayOpinion();
     if (!opinion) { if (onClose) onClose(); return; }
 
     const voteKey = STORAGE_PREFIX + opinion.id;
@@ -323,11 +329,12 @@
       console.log('[opinion] 分享卡產生完成，大小', blob && blob.size);
       const file = new File([blob], `maddy-arena-${opinion.id}.png`, { type: 'image/png' });
       const pct = totalVotes > 0 ? Math.round(votes[chosenIdx] / totalVotes * 100) : 0;
+      const shareUrl = _buildPollUrl(opinion.id);
       const text = `⚽ 麥迪擂台 今日觀點：${opinion.q}\n我選了「${opinion.opts[chosenIdx]}」(${pct}% 的人跟我一樣)\n來 Soccer麥迪 投下你的一票 👉`;
 
       // 1) 行動端：Web Share Level 2（含檔案）
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ title: '麥迪擂台', text, url: location.href, files: [file] }).catch(() => {});
+        await navigator.share({ title: '麥迪擂台', text, url: shareUrl, files: [file] }).catch(() => {});
         _resetShareBtn(btn);
         return;
       }
@@ -373,8 +380,7 @@
     const romans = ['I', 'II', 'III', 'IV'];
     const tagText = TAG_LABELS[opinion.type] || '⚽ 觀點';
     const palette = SHARE_PALETTE[chosenIdx % SHARE_PALETTE.length];
-    const url = (location.origin && location.origin !== 'null' && !location.origin.startsWith('file:'))
-      ? location.origin + '/' : 'https://soccermaddy.com/';
+    const url = _buildPollUrl(opinion.id);
     const host = location.host || 'soccermaddy.com';
     const totalStr = (typeof totalVotes === 'number' && totalVotes > 0)
       ? totalVotes.toLocaleString() + ' 人已投票'
@@ -701,6 +707,12 @@
       img.onerror = reject;
       img.src = src;
     });
+  }
+
+  function _buildPollUrl(pollId) {
+    const base = (location.origin && location.origin !== 'null' && !location.origin.startsWith('file:'))
+      ? location.origin + '/' : 'https://soccermaddy.com/';
+    return base + '?poll=' + encodeURIComponent(pollId);
   }
 
   function _rgba(hex, a) {
