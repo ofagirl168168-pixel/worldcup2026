@@ -51,7 +51,9 @@
     overlay.id = 'opinion-overlay';
 
     const isMulti = opinion.opts.length > 2;
-    const cardsClass = isMulti ? 'opinion-cards opinion-cards--multi' : 'opinion-cards';
+    const cardsClass = isMulti
+      ? `opinion-cards opinion-cards--multi opinion-cards--opts-${opinion.opts.length}`
+      : 'opinion-cards';
     const tagClass = 'opinion-tag opinion-tag--' + (opinion.type || 'classic');
 
     overlay.innerHTML = `

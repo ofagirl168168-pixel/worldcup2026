@@ -3579,20 +3579,38 @@ img.flag-img {
   .opinion-question { font-size: 19px; }
   .opinion-card { padding: 22px 12px; font-size: 14px; min-width: 100px; }
   .opinion-cards--multi .opinion-card {
-    min-width: 0; flex-basis: calc(50% - 10px);   /* 固定兩欄，避免四選項擠一排 */
+    min-width: 0;
     padding: 14px 8px 28px;                        /* 底部預留 label 空間，防文字壓到羅馬數字 */
-    font-size: 12px;
     gap: 8px; line-height: 1.25;
-    aspect-ratio: 4 / 5;                           /* 比 3/4 稍寬鬆，文字換行後不爆版 */
+  }
+  /* 四選項：固定 2x2，避免擠一排 */
+  .opinion-cards--opts-4 .opinion-card {
+    flex-basis: calc(50% - 10px);
+    font-size: 12px;
+    aspect-ratio: 4 / 5;
+  }
+  /* 三選項：一排三張，字再縮一點好塞，三張大小一致 */
+  .opinion-cards--opts-3 .opinion-card {
+    flex: 1 1 0;
+    font-size: 11px;
+    padding: 12px 6px 26px;
+    gap: 6px;
+    aspect-ratio: 3 / 4;
   }
   .opinion-cards--multi .opinion-card-icon {
     font-size: 32px;                               /* 原 54px 太大擠壓文字 */
+  }
+  .opinion-cards--opts-3 .opinion-card-icon {
+    font-size: 26px;
   }
   .opinion-cards--multi .opinion-card-text {
     padding: 0 2px; word-break: break-word;
   }
   .opinion-cards--multi .opinion-card-label {
     bottom: 10px; font-size: 9px; letter-spacing: 2px;
+  }
+  .opinion-cards--opts-3 .opinion-card-label {
+    bottom: 8px; font-size: 8px; letter-spacing: 1.5px;
   }
   .opinion-result-label { min-width: 60px; font-size: 12px; }
 }
