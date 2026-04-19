@@ -114,6 +114,15 @@
         </button>
       </nav>
 
+      <!-- 擂台連續天數 streak（沒 streak 時預設隱藏） -->
+      <div class="nav-streak-widget" id="nav-streak-widget"
+           style="display:none;cursor:pointer"
+           onclick="showOpinionPoll(null,{force:true});event.stopPropagation()"
+           title="點擊開啟麥迪擂台今日題目">
+        <span class="nav-streak-flame">🔥</span>
+        <span class="nav-streak-num" id="nav-streak-num">0</span>
+      </div>
+
       <!-- XP 等級小元件 -->
       <div class="nav-xp-widget" id="nav-xp-widget" onclick="showSection('arena')" title="點擊進入競技場">
         <span class="nav-xp-level" id="nav-xp-level">⚡ Lv.1</span>
@@ -198,6 +207,7 @@
       <button class="nav-btn" data-section="focus"><i class="fas fa-newspaper"></i> 賽事解讀</button>
       <button class="nav-btn" data-section="arena"><i class="fas fa-gamepad"></i> 競技場</button>
       <div class="mobile-nav-status" id="mobile-nav-status">
+        <div class="mobile-nav-stat" id="mobile-nav-streak-stat" style="display:none"><span class="mobile-nav-stat-icon">🔥</span> <span id="mobile-nav-streak">0</span> 天</div>
         <div class="mobile-nav-stat"><span class="mobile-nav-stat-icon">⭐</span> <span id="mobile-nav-xp">0 XP</span></div>
         <div class="mobile-nav-stat"><span class="mobile-nav-stat-icon">💎</span> <span id="mobile-nav-gem">0</span></div>
         <div class="mobile-nav-stat"><span class="mobile-nav-stat-icon">🏅</span> Lv.<span id="mobile-nav-lv">1</span></div>

@@ -182,6 +182,8 @@
 
     // 連續天數 +1（同日重複投不會重算）→ 供 _showResult 渲染
     overlay.dataset.streakBump = JSON.stringify(_bumpStreakToday());
+    // 同步 nav 徽章（票後立即顯示新數字、清 pending 狀態）
+    try { renderStreakWidget(); } catch (e) {}
 
     // 送到 Supabase（失敗不擋 UI）
     _insertVote(opinion.id, chosenIdx);
@@ -1146,6 +1148,35 @@
     }
   }
 
+  /* ---------- nav 連續天數徽章渲染 ---------- */
+  function renderStreakWidget() {
+    const s = _getStreak();
+    const today = localDateStr();
+    const votedToday = s.lastDate === today;
+    const desktop = document.getElementById('nav-streak-widget');
+    const desktopNum = document.getElementById('nav-streak-num');
+    const mobileStat = document.getElementById('mobile-nav-streak-stat');
+    const mobileNum = document.getElementById('mobile-nav-streak');
+
+    // 0 天 → 整個藏起來（不打擾還沒開始的用戶）
+    if (!s.current || s.current < 1) {
+      if (desktop) desktop.style.display = 'none';
+      if (mobileStat) mobileStat.style.display = 'none';
+      return;
+    }
+    if (desktop) {
+      desktop.style.display = '';
+      desktop.classList.toggle('nav-streak-pending', !votedToday);
+      desktop.title = votedToday
+        ? `連續 ${s.current} 天已達成（個人最佳 ${s.longest} 天）`
+        : `連續 ${s.current} 天 — 今天還沒投票！點這裡保留連勝`;
+    }
+    if (desktopNum) desktopNum.textContent = s.current;
+    if (mobileStat) mobileStat.style.display = '';
+    if (mobileNum) mobileNum.textContent = s.current;
+  }
+
   /* ---------- 匯出 ---------- */
   window.showOpinionPoll = showOpinionPoll;
+  window.renderOpinionStreakWidget = renderStreakWidget;
 })();

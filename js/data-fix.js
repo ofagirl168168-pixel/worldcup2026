@@ -352,6 +352,7 @@ window.addEventListener('load', () => {
   _safe(() => renderHomeDailyChallenge(), 'renderHomeDailyChallenge');
   _safe(() => updateArenaBadge(), 'updateArenaBadge');
   _safe(() => updateNavXP(), 'updateNavXP');
+  _safe(() => window.renderOpinionStreakWidget && window.renderOpinionStreakWidget(), 'renderOpinionStreakWidget');
   _safe(() => showArenaWelcomeIfNeeded(), 'showArenaWelcomeIfNeeded');
   // 觀點投票 → 每日任務彈窗（延遲 3 秒，合併流程）
   // 若 URL 帶 ?poll=<id>（分享連結落地）→ 強制開該題，忽略「今日已彈過」旗標
