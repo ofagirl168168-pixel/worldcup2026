@@ -449,7 +449,19 @@
       const file = new File([blob], `maddy-arena-${opinion.id}.png`, { type: 'image/png' });
       const pct = totalVotes > 0 ? Math.round(votes[chosenIdx] / totalVotes * 100) : 0;
       const shareUrl = _buildPollUrl(opinion.id);
-      const text = `⚽ 麥迪擂台 今日觀點：${opinion.q}\n我選了「${opinion.opts[chosenIdx]}」(${pct}% 的人跟我一樣)\n來 Soccer麥迪 投下你的一票 👉`;
+      const _maxVotes = Math.max(...votes);
+      const _isMinority = totalVotes >= 2 && votes[chosenIdx] < _maxVotes;
+      const _streak = _getStreak();
+      // 依身份動態組 hook：少數派 > streak > 一般
+      let hook;
+      if (_isMinority) {
+        hook = `我是那 ${pct}% 的少數派 ⚔️\n我選「${opinion.opts[chosenIdx]}」，你敢跟我站同邊嗎？`;
+      } else if (_streak && _streak.current >= 3) {
+        hook = `🔥 連續 ${_streak.current} 天戰場集合\n今天我選「${opinion.opts[chosenIdx]}」(${pct}% 的人跟我一樣)`;
+      } else {
+        hook = `我選了「${opinion.opts[chosenIdx]}」(${pct}% 的人跟我一樣)`;
+      }
+      const text = `⚽ 麥迪擂台 今日觀點：${opinion.q}\n${hook}\n來 Soccer麥迪 投下你的一票 👉`;
 
       // 1) 行動端：Web Share Level 2（含檔案）
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -504,6 +516,44 @@
     const totalStr = (typeof totalVotes === 'number' && totalVotes > 0)
       ? totalVotes.toLocaleString() + ' 人已投票'
       : '';
+
+    // 身份徽章資料：少數派 %、連續天數 streak
+    const myVotes = Array.isArray(votes) ? (votes[chosenIdx] || 0) : 0;
+    const myPct = totalVotes > 0 ? Math.round(myVotes / totalVotes * 100) : 0;
+    const maxVotes = Array.isArray(votes) ? Math.max(...votes) : 0;
+    const isMinority = totalVotes >= 2 && myVotes < maxVotes;
+    const streak = _getStreak();
+    const hasStreakBadge = streak && streak.current >= 2;
+    const hasMinorityBadge = isMinority && myPct > 0;
+    const badgesHtml = (hasStreakBadge || hasMinorityBadge) ? `
+      <div style="
+        margin-top:18px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+      ">
+        ${hasMinorityBadge ? `
+          <div style="
+            padding:10px 22px; border-radius:999px;
+            background:linear-gradient(135deg, rgba(255,71,87,0.25), rgba(255,165,2,0.18));
+            border:2px solid rgba(255,71,87,0.65);
+            font-size:22px; font-weight:900; color:#ff4757;
+            letter-spacing:1.5px; text-shadow:0 0 12px rgba(255,71,87,0.5);
+            display:flex; align-items:center; gap:10px;
+          ">
+            <span style="font-size:26px">⚔️</span>
+            <span>少數派 ${myPct}%</span>
+          </div>` : ''}
+        ${hasStreakBadge ? `
+          <div style="
+            padding:10px 22px; border-radius:999px;
+            background:linear-gradient(135deg, rgba(255,165,2,0.25), rgba(255,71,87,0.2));
+            border:2px solid rgba(255,165,2,0.65);
+            font-size:22px; font-weight:900; color:#ffb347;
+            letter-spacing:1.5px; text-shadow:0 0 12px rgba(255,165,2,0.5);
+            display:flex; align-items:center; gap:10px;
+          ">
+            <span style="font-size:26px">🔥</span>
+            <span>連續 ${streak.current} 天戰場集合</span>
+          </div>` : ''}
+      </div>` : '';
 
     const cardsHtml = opinion.opts.map((opt, i) => {
       const parts = _splitEmoji(opt);
@@ -574,6 +624,7 @@
         margin-top: 10px; font-size: 20px; font-weight: 600;
         color: rgba(255,255,255,0.55); letter-spacing: 1.5px; text-align: center;
       ">${totalStr}</div>` : ''}
+      ${badgesHtml}
 
       <div style="
         margin-top:auto; width:100%;
