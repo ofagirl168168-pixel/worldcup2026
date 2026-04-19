@@ -3573,16 +3573,10 @@ img.flag-img {
 /* 多選項小尺寸 */
 .opinion-cards--multi .opinion-card {
   min-width: 100px; padding: 22px 12px; font-size: 14px;
-  /* icon 置頂、text 佔剩餘空間自行置中 → 文字跨行時 emoji 高度仍一致 */
-  justify-content: flex-start;
 }
-.opinion-cards--multi .opinion-card-icon {
-  flex: 0 0 auto;
-  height: 1em;                    /* 與 font-size 同高，固定 icon 佔位 */
-  display: flex; align-items: center; justify-content: center;
-}
+/* 保留 2 行文字高度 → 即使只有 1 行，emoji 位置也跟跨行時一致 */
 .opinion-cards--multi .opinion-card-text {
-  flex: 1 1 auto;
+  min-height: calc(1.3em * 2);
   display: flex; align-items: center; justify-content: center;
 }
 
