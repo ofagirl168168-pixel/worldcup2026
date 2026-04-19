@@ -3578,7 +3578,22 @@ img.flag-img {
 @media (max-width: 600px) {
   .opinion-question { font-size: 19px; }
   .opinion-card { padding: 22px 12px; font-size: 14px; min-width: 100px; }
-  .opinion-cards--multi .opinion-card { min-width: 80px; padding: 18px 10px; font-size: 13px; }
+  .opinion-cards--multi .opinion-card {
+    min-width: 0; flex-basis: calc(50% - 10px);   /* 固定兩欄，避免四選項擠一排 */
+    padding: 14px 8px 28px;                        /* 底部預留 label 空間，防文字壓到羅馬數字 */
+    font-size: 12px;
+    gap: 8px; line-height: 1.25;
+    aspect-ratio: 4 / 5;                           /* 比 3/4 稍寬鬆，文字換行後不爆版 */
+  }
+  .opinion-cards--multi .opinion-card-icon {
+    font-size: 32px;                               /* 原 54px 太大擠壓文字 */
+  }
+  .opinion-cards--multi .opinion-card-text {
+    padding: 0 2px; word-break: break-word;
+  }
+  .opinion-cards--multi .opinion-card-label {
+    bottom: 10px; font-size: 9px; letter-spacing: 2px;
+  }
   .opinion-result-label { min-width: 60px; font-size: 12px; }
 }
 
