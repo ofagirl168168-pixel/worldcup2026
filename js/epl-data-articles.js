@@ -304,6 +304,343 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
     tags: ['賽後回顧', '曼聯', '里茲聯', 'Okafor', 'Martinez紅牌', '德比', '第32輪']
   },
   {
+    id: 'epl-019',
+    title: '【賽後回顧】布倫特福德 0-0 富勒姆：Leno 絕殺救援守住西倫敦德比',
+    date: '2026-04-18',
+    category: '賽後深度回顧',
+    summary: 'Gtech Community Stadium 17,171 觀眾見證一場 0-0 西倫敦德比。Leno 在 90 分鐘後對 Ouattara 的絕殺撲救保住富勒姆一分。',
+    content: `<h2>布倫特福德 0-0 富勒姆｜第33輪・Gtech Community Stadium・觀眾 17,171</h2>
+
+<h3>比分速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">90+' 🧤</td>
+<td style="padding:8px"><strong>Bernd Leno（富勒姆）</strong> — 比賽尾聲 Ouattara 近距離打門，Leno 側身單手將球撲出橫樑上方，保住一分</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-0 ∣ 終場 0-0</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<p>這是一場雙方都錯過了重要機會的西倫敦德比。布倫特福德若能拿下三分，就能升上第 6、距歐冠席次（本季前五名資格）只剩 4 分追趕空間。最終一分雖然讓 Keith Andrews 的球隊錯失直接躋身第 6 的良機，但至少保住了不敗。</p>
+
+<h4>上半場：試探性開局</h4>
+
+<p>午場 12:30（英國時間）的開球讓比賽節奏偏慢，雙方前 30 分鐘互相試探、沒有真正的破門機會。布倫特福德的 Damsgaard 在禁區邊緣射門高出橫樑，Fulham 則透過 Smith Rowe 與 Iwobi 的配合在左路製造威脅，但始終沒有轉化成射正。第 42 分鐘 Iwobi 抱著大腿後側倒下，43 分鐘由 Chukwueze 替補登場——這次傷勢後來證實讓 Iwobi 可能缺席本季最後 5 輪賽事。</p>
+
+<h4>下半場：布倫特福德強攻被 Leno 擋下</h4>
+
+<p>下半場布倫特福德明顯拉高戰線。Lewis-Potter 和 Damsgaard 兩度逼近破門，一次橫樑外、一次 Leno 側撲化解。富勒姆則改打反擊，但射門始終無法射正——全場 11 次射門 0 次射正，這是 Marco Silva 最頭痛的問題。</p>
+
+<p>真正的比賽關鍵出現在 89 分鐘後：Dango Ouattara 接應傳中後在禁區內第一時間打門，Leno 以一記反應神速的單手救球將皮球托過橫樑。這一撲被現場解說稱為「整個賽季最重要的撲救之一」，直接阻止了布倫特福德的絕殺。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">布倫特福德</th>
+<th style="padding:8px">富勒姆</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>48.1%</td><td>51.9%</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">射門/射正</td><td>13/4</td><td>11/0</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">角球</td><td>9</td><td>3</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">黃牌</td><td>0</td><td>1</td>
+</tr>
+</table>
+
+<h3>未來看點</h3>
+
+<ul>
+<li><strong>布倫特福德</strong>：賽後 48 分排第 7，距歐冠門檻（本季前五）4 分，剩 5 輪要繼續拼——Andrews 接手後的首個真正考驗。</li>
+<li><strong>富勒姆</strong>：Leno 的神救讓他們保住一分但表現平平（0 射正）；Marco Silva 需要解決進攻端停滯的問題。</li>
+<li><strong>積分意義</strong>：雙方各得 1 分，都沒有實質推進排名。</li>
+</ul>`,
+    tags: ['賽後回顧', '布倫特福德', '富勒姆', 'Leno', '西倫敦德比', '第33輪']
+  },
+  {
+    id: 'epl-020',
+    title: '【賽後回顧】紐卡索 1-2 伯恩茅斯：Truffert 絕殺讓 Howe 承受更大壓力',
+    date: '2026-04-18',
+    category: '賽後深度回顧',
+    summary: '紐卡索主場再吞敗，英超 3 連敗加上歐冠慘遭巴薩淘汰，Eddie Howe 壓力山大。Bournemouth 延續 13 場不敗升至第 8。',
+    content: `<h2>紐卡索 1-2 伯恩茅斯｜第33輪・St James' Park・觀眾 52,109</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">32' ⚽</td>
+<td style="padding:8px"><strong>Tavernier（伯恩茅斯）</strong> — 上半場先破門，客隊以 1-0 領先進入半場</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">68' ⚽</td>
+<td style="padding:8px"><strong>Osula（紐卡索）</strong> — Bruno Guimarães 復出即送出助攻，Osula 門前搶點扳平</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">85' ⚽</td>
+<td style="padding:8px"><strong>Truffert（伯恩茅斯）</strong> — Tavernier 傳中，Evanilson 頭槌擺渡，Truffert 近距離推射絕殺</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-1 ∣ 終場 1-2</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>Howe 的煎熬之夜</h4>
+
+<p>紐卡索已是第 3 場英超連敗（近 6 場英超輸 4 場），加上稍早歐冠半準決賽第 2 回合 2-7 慘遭巴薩淘汰（兩回合總比分 3-8），Eddie Howe 一月以來的戰績正在累積壓力。主場 St James' Park 觀眾出現賽後噓聲，不是對球員，而是對球隊近兩個月的方向。</p>
+
+<p>上半場 32 分鐘 Tavernier 破門，讓 Howe 賽前的積極排陣落空；紐卡索整個上半場的射門始終找不到 Bournemouth 門將的十指關。</p>
+
+<h4>Bruno 復出 + Osula 扳平</h4>
+
+<p>下半場 Howe 換上缺席 12 場的 Bruno Guimarães，瞬間改變中場節奏。第 68 分鐘，Bruno 在禁區外斜傳，Osula 反應迅速、門前搶點得手，聖詹姆斯公園瞬間沸騰。</p>
+
+<p>但 Truffert 的絕殺粉碎一切。第 85 分鐘 Tavernier 從右路精準傳中，Evanilson 中路頭槌向後撥給跟進的 Truffert，這位法國左後衛近距離凌空推射破網——就這樣 Bournemouth 帶走三分。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">紐卡索</th>
+<th style="padding:8px">伯恩茅斯</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>53.7%</td><td>46.3%</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">射門/射正</td><td>12/3</td><td>12/3</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">角球</td><td>2</td><td>3</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">黃牌</td><td>2</td><td>4</td>
+</tr>
+</table>
+
+<h3>影響與展望</h3>
+
+<ul>
+<li><strong>紐卡索</strong>：連敗延長，歐戰資格危矣；Howe 的位置壓力持續加大。</li>
+<li><strong>伯恩茅斯</strong>：Iraola 本季結束將離開（已由俱樂部確認，Marco Rose 已達成接手協議），本場延續擊敗兵工廠後的火熱狀態，賽後升至第 8、積 48 分，與 Brentford、Chelsea 同分，英超 13 場不敗紀錄延續。</li>
+<li><strong>關鍵數據</strong>：Tavernier 在本場對青訓母會紐卡索貢獻 1 球 1 助攻，命運交織。</li>
+</ul>`,
+    tags: ['賽後回顧', '紐卡索', '伯恩茅斯', 'Truffert', 'Howe壓力', '第33輪']
+  },
+  {
+    id: 'epl-021',
+    title: '【賽後回顧】里茲聯 3-0 狼隊：Justin 倒勾 + Okafor 神勇，保級戰大勝',
+    date: '2026-04-18',
+    category: '賽後深度回顧',
+    summary: 'Elland Road 開場 20 分鐘風暴，Justin 倒勾 + Okafor 推射，Calvert-Lewin 補時點球封盤。Farke 球隊本季首次兩連勝。',
+    content: `<h2>里茲聯 3-0 狼隊｜第33輪・Elland Road・觀眾 36,840</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">18' ⚽</td>
+<td style="padding:8px"><strong>James Justin（里茲）</strong> — 角球後 Ampadu 頭槌被撲，Justin 門前禁區小禁區內凌空倒勾破網</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">20' ⚽</td>
+<td style="padding:8px"><strong>Okafor（里茲）</strong> — Aaronson 低平傳中直送遠柱，Okafor 推射空門，本季第 7 球、兩場第 3 球</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">90+5' ⚽ PK</td>
+<td style="padding:8px"><strong>Calvert-Lewin（里茲）</strong> — Gnonto 直塞，Bueno 禁區內絆倒 Calvert-Lewin（VAR 確認），主角親自操刀主罰命中，本季第 11 個聯賽進球</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 2-0 ∣ 終場 3-0</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>Elland Road 開場 20 分鐘的風暴</h4>
+
+<p>Daniel Farke 的球隊從一開始就展現想贏球的決心。第 18 分鐘，角球開出後 Ampadu 頭槌被 Dan Bentley 擋出，James Justin 機警跟進，在門前用一記乾淨的凌空倒勾破門——全場起立歡呼的同時，狼隊已經被打矇。</p>
+
+<p>僅僅 2 分鐘後，Brenden Aaronson 左路低平傳中直送遠柱，Noah Okafor 推射空門得手。這是瑞士前鋒本賽季的第 7 球，也是近兩場比賽的第 3 球（上輪在 Old Trafford 梅開二度），他毫無疑問是里茲聯夏窗引援的最大成功。</p>
+
+<p>狼隊在 Rob Edwards 接手後一直沒有起色，前 20 分鐘就丟兩球讓他們的保級希望實質上已經結束——賽後聯賽積分榜顯示狼隊的降級幾乎已成定局。</p>
+
+<h4>下半場控場 + 補時點球封盤</h4>
+
+<p>半場 2-0 領先後，里茲聯把節奏完全握在手中。狼隊幾次快攻都未能射正，Dominic Calvert-Lewin 和 Okafor 的壓力讓對方後防無法喘息。</p>
+
+<p>補時階段 Hugo Bueno 在禁區內絆倒 Calvert-Lewin（VAR 確認為犯規），裁判毫不猶豫指向點球點。Calvert-Lewin 親自主罰大力命中，將比分鎖定 3-0。這是他本季的第 11 個聯賽進球。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">里茲</th>
+<th style="padding:8px">狼隊</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>56%</td><td>44%</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">結果</td><td colspan="2">里茲取得本季首度聯賽兩連勝</td>
+</tr>
+</table>
+
+<h3>影響與展望</h3>
+
+<ul>
+<li><strong>里茲</strong>：Farke 的球隊本季首次聯賽兩連勝，與第 18 名的熱刺拉開 9 分差距，保級形勢大幅樂觀。</li>
+<li><strong>狼隊</strong>：Rob Edwards 的接手始終沒能扭轉局面，降級幾乎已成定局。</li>
+<li><strong>Okafor + Calvert-Lewin 雙核</strong>：夏窗加盟的 Okafor 搭配 Calvert-Lewin，已成為 Elland Road 的保級救命稻草。</li>
+</ul>`,
+    tags: ['賽後回顧', '里茲聯', '狼隊', 'Okafor', 'Calvert-Lewin', '保級戰', '第33輪']
+  },
+  {
+    id: 'epl-022',
+    title: '【賽後回顧】熱刺 2-2 布萊頓：Rutter 補時絕平，De Zerbi 主場首秀遺憾',
+    date: '2026-04-18',
+    category: '賽後深度回顧',
+    summary: 'De Zerbi 熱刺主場首秀面對舊東家布萊頓，Simons 1 球 1 助攻，但 Danso 禁區內丟球讓 Rutter 90+5 絕平——熱刺仍在降級區。',
+    content: `<h2>熱刺 2-2 布萊頓｜第33輪・Tottenham Hotspur Stadium・觀眾 61,167</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">39' ⚽</td>
+<td style="padding:8px"><strong>Porro（熱刺）</strong> — Xavi Simons 精妙吊傳越過 Verbruggen 前緣，Porro 後點頭槌頂入空門</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">45+3' ⚽</td>
+<td style="padding:8px"><strong>Mitoma（布萊頓）</strong> — 半場補時左路切入射門，將比分扳平進入半場</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">77' ⚽</td>
+<td style="padding:8px"><strong>Simons（熱刺）</strong> — 一記遠射劃出弧線飛入死角，精彩遠射讓熱刺 2-1 領先</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">90+5' ⚽</td>
+<td style="padding:8px"><strong>Rutter（布萊頓）</strong> — Kevin Danso 禁區內持球太久遭 Van Hecke 搶斷並橫傳，替補登場的 Rutter 冷靜弧線射入遠角絕平</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 1-1 ∣ 終場 2-2</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>De Zerbi 主場首秀</h4>
+
+<p>Roberto De Zerbi 三月底才接任熱刺、是本賽季第 3 位主帥，今晚是他的主場首秀——面對的還是他自己的前東家布萊頓。Tottenham Hotspur Stadium 湧入 61,167 位觀眾，氣氛格外緊張。</p>
+
+<p>上半場熱刺掌握了機會把握，第 39 分鐘 Simons 精妙吊傳越過 Brighton 門將 Verbruggen 前緣，Porro 後點頭槌頂入空門。但補時階段 Mitoma 一記凌空抽射扳平，讓 De Zerbi 半場休息的情緒一落千丈。</p>
+
+<h4>下半場從希望到心碎</h4>
+
+<p>下半場 Simons 成為比賽最好球員。第 77 分鐘，這位荷蘭攻擊中場在禁區外一記遠射，皮球劃出完美弧線飛入死角——熱刺 2-1 領先，主場球迷以為看到了 De Zerbi 的首勝。</p>
+
+<p>然而補時第 5 分鐘，Danso 在熱刺<strong>禁區內</strong>持球處理時間過久，Brighton 的 Van Hecke 勇敢上搶斷球並橫傳，替補登場的 Rutter 在禁區外冷靜一記弧線射入遠角——球場瞬間如遭冷水當頭淋下。熱刺仍在降級區，De Zerbi 依然未嚐勝績。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">熱刺</th>
+<th style="padding:8px">布萊頓</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>42.4%</td><td>57.6%</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">射門/射正</td><td>13/6</td><td>10/3</td>
+</tr>
+</table>
+
+<h3>影響與展望</h3>
+
+<ul>
+<li><strong>熱刺</strong>：De Zerbi 主場首秀未嚐勝績，球隊依然困在降級區。5 輪剩餘賽程必須開始贏球。</li>
+<li><strong>布萊頓</strong>：Fabian Hürzeler 的球隊客場搶 1 分，排名穩固在中游。</li>
+<li><strong>關鍵數字</strong>：Simons 是熱刺本場最大亮點，1 進球 1 助攻；Danso 的關鍵丟球則成為 De Zerbi 下一步戰術修正的重點。</li>
+</ul>`,
+    tags: ['賽後回顧', '熱刺', '布萊頓', 'De Zerbi', 'Simons', 'Rutter絕平', '第33輪']
+  },
+  {
+    id: 'epl-023',
+    title: '【賽後回顧】切爾西 0-1 曼聯：Cunha 半場絕殺，Rosenior 的歐冠夢破碎',
+    date: '2026-04-18',
+    category: '賽後深度回顧',
+    summary: 'Cunha 第 43 分鐘抽射絕殺 Stamford Bridge，Bruno 本季第 18 次助攻。切爾西 4 連敗 + 4 連無進球，Rosenior 歐冠夢破碎。',
+    content: `<h2>切爾西 0-1 曼聯｜第33輪・Stamford Bridge</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">43' ⚽</td>
+<td style="padding:8px"><strong>Cunha（曼聯）</strong> — Bruno Fernandes 右路回傳，Cunha 第一時間抽射死角入網</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-1 ∣ 終場 0-1</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>Carrick 的拼湊後防 + 一記致命反擊</h4>
+
+<p>Michael Carrick 今晚把後防線排成「三個邊後衛 + 19 歲 Ayden Heaven」的臨時組合——這是因為傷兵潮迫使他不得不創新。理論上這個拼湊後防應該被切爾西的進攻摧毀，但事實完全相反。</p>
+
+<p>整個上半場切爾西完全掌握控球（最終 59%）、不斷推進，但曼聯後防齊心防守、把所有射門擋在門前。第 43 分鐘半場即將結束時，Bruno Fernandes 在右路橫敲回傳，Matheus Cunha 第一時間抽射——皮球劃出弧線飛入遠角上死角，Filip Jörgensen 無能為力。Bruno 的這次助攻是他本季英超第 <strong>18 次助攻</strong>，穩居聯賽助攻榜前列。</p>
+
+<h4>下半場：曼聯的防守盛宴</h4>
+
+<p>Liam Rosenior 一月上任以來本就壓力重重，這已是切爾西的<strong>第 4 場英超連敗</strong>，也是<strong>連續第 4 場沒有進球</strong>。下半場切爾西持續壓上，全場射門 21 次（射正 3 次），但曼聯的 Ayden Heaven 和替補後衛們展現驚人的紀律，Cunha + Zirkzee 的反擊威脅也讓切爾西不敢全力壓上（Højlund 本季外借拿坡里）。</p>
+
+<p>終場哨響，Stamford Bridge 的噓聲蓋過客隊慶祝：Rosenior 的歐冠夢基本破碎。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">切爾西</th>
+<th style="padding:8px">曼聯</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>59%</td><td>41%</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">射門/射正</td><td>21/3</td><td>4/1</td>
+</tr>
+</table>
+
+<h3>影響與展望</h3>
+
+<ul>
+<li><strong>切爾西</strong>：本季 <strong>4 連敗 + 4 連無進球</strong>，Rosenior（1 月接手 Maresca）壓力持續累積；距離第 3 名曼聯已擴大到 10 分，歐冠夢基本破碎。</li>
+<li><strong>曼聯</strong>：Carrick 1 月接手後首 10 場即 7 勝 2 和 1 負，延續至今成為近兩個月英超狀態最佳的球隊之一。以第 3 名 + 10 分領先切爾西的優勢，歐冠資格已近鎖定。</li>
+<li><strong>Cunha + Bruno 雙核</strong>：Bruno 本場第 18 次助攻，Cunha 繼續在關鍵戰建功——曼聯的進攻軸心已經成形。</li>
+</ul>`,
+    tags: ['賽後回顧', '切爾西', '曼聯', 'Cunha', 'Bruno助攻', 'Rosenior', '第33輪']
+  },
+  {
     id: 'epl-014',
     title: '【賽前分析】布倫特福德 vs 富勒姆：西倫敦德比，Thiago 挑戰金靴',
     date: '2026-04-17',

@@ -490,5 +490,47 @@ window.EPL_MATCHES = [
      {min:'56',player:'Lisandro Martínez',side:'h',card:'red'}
    ]},
 
+  // ===== 第 33 輪 (2026-04-18 ~ 04-21 台灣時間) =====
+
+  // 布倫特福德 0-0 富勒姆 | 04/18 19:30 台灣時間
+  {id:'EPL-MW33-BRE-FUL', matchday:33, date:'2026-04-18', time:'19:30', home:'BRE', away:'FUL', stage:'league',
+   status:'finished', score:{h:0,a:0}, halfTime:{h:0,a:0},
+   goals:[]},
+
+  // 紐卡索 1-2 伯恩茅斯 | 04/18 22:00 台灣時間
+  {id:'EPL-MW33-NEW-BOU', matchday:33, date:'2026-04-18', time:'22:00', home:'NEW', away:'BOU', stage:'league',
+   status:'finished', score:{h:1,a:2}, halfTime:{h:0,a:1},
+   goals:[
+     {min:'32',player:'Marcus Tavernier',side:'a'},
+     {min:'68',player:'William Osula',side:'h'},
+     {min:'85',player:'Adrien Truffert',side:'a'}
+   ]},
+
+  // 里茲聯 3-0 狼隊 | 04/18 22:00 台灣時間
+  {id:'EPL-MW33-LEE-WOL', matchday:33, date:'2026-04-18', time:'22:00', home:'LEE', away:'WOL', stage:'league',
+   status:'finished', score:{h:3,a:0}, halfTime:{h:2,a:0},
+   goals:[
+     {min:'18',player:'James Justin',side:'h'},
+     {min:'20',player:'Noah Okafor',side:'h'},
+     {min:'90+5',player:'Dominic Calvert-Lewin',side:'h',type:'pen'}
+   ]},
+
+  // 熱刺 2-2 布萊頓 | 04/19 00:30 台灣時間
+  {id:'EPL-MW33-TOT-BHA', matchday:33, date:'2026-04-19', time:'00:30', home:'TOT', away:'BHA', stage:'league',
+   status:'finished', score:{h:2,a:2}, halfTime:{h:1,a:1},
+   goals:[
+     {min:'39',player:'Pedro Porro',side:'h'},
+     {min:'45+3',player:'Kaoru Mitoma',side:'a'},
+     {min:'77',player:'Xavi Simons',side:'h'},
+     {min:'90+5',player:'Georginio Rutter',side:'a'}
+   ]},
+
+  // 切爾西 0-1 曼聯 | 04/19 03:00 台灣時間
+  {id:'EPL-MW33-CHE-MUN', matchday:33, date:'2026-04-19', time:'03:00', home:'CHE', away:'MUN', stage:'league',
+   status:'finished', score:{h:0,a:1}, halfTime:{h:0,a:1},
+   goals:[
+     {min:'43',player:'Matheus Cunha',side:'a'}
+   ]},
+
 ];
 
