@@ -33,9 +33,6 @@
     const opinion = getTodayOpinion();
     if (!opinion) { if (onClose) onClose(); return; }
 
-    localStorage.setItem(shownKey, '1');
-    _cleanOldKeys(STORAGE_SHOWN);
-
     const voteKey = STORAGE_PREFIX + opinion.id;
     const existingVote = localStorage.getItem(voteKey);
 
@@ -98,6 +95,15 @@
         overlay.classList.add('open');
       });
     });
+
+    // 標記「今天已彈過」——延遲到真的看到 overlay 後再寫，
+    // 避免預載/瞬開瞬關把旗標預先設掉導致當天再也不彈
+    setTimeout(() => {
+      if (document.body.contains(overlay)) {
+        localStorage.setItem(shownKey, '1');
+        _cleanOldKeys(STORAGE_SHOWN);
+      }
+    }, 800);
 
     // 如果已投過票，直接顯示結果
     if (existingVote !== null) {
@@ -238,6 +244,9 @@
       </div>`;
 
     resultEl.classList.add('show');
+
+    // 結果顯示後把 overlay 捲回頂部（避免投完票後停在下方看不到題目/結果）
+    try { overlay.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { overlay.scrollTop = 0; }
 
     // 動畫填充百分比條
     requestAnimationFrame(() => {
