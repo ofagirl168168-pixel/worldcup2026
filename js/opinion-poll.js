@@ -10,9 +10,11 @@
   const STORAGE_SHOWN = 'opinion_shown_';
   const STORAGE_COMMENT = 'opinion_commented_';
   const STORAGE_LIKE = 'opinion_liked_';
+  const STORAGE_VOTER_KEY = 'opinion_voter_key';
   const TAG_LABELS = { trending: '🔥 時事', classic: '⚽ 經典', fun: '🎉 趣味', predict: '🔮 預測' };
   const MAX_COMMENT_LEN = 100;
   let _commentChannel = null; // realtime subscription
+  let _voteChannel = null;    // realtime vote tally 訂閱
 
   /* ---------- 顯示觀點投票彈窗 ---------- */
   function showOpinionPoll(onClose, opts) {
@@ -173,8 +175,12 @@
 
   /* ---------- 處理投票 ---------- */
   function _handleVote(opinion, chosenIdx, cards, overlay, onClose) {
-    // 儲存投票
+    // 本機先記（立即生效，網路失敗也保留用戶立場）
     localStorage.setItem(STORAGE_PREFIX + opinion.id, chosenIdx);
+    _cleanOldKeys(STORAGE_PREFIX);
+
+    // 送到 Supabase（失敗不擋 UI）
+    _insertVote(opinion.id, chosenIdx);
 
     // 觸發滿版光暈爆發（位置已在 click 時設好，切換為 burst 模式）
     overlay.classList.add('burst-active');
@@ -198,18 +204,90 @@
     }, 600);
   }
 
-  /* ---------- 顯示結果 ---------- */
-  function _showResult(opinion, chosenIdx, overlay, onClose) {
-    const votes = _getVotes(opinion.id, opinion.opts.length);
-    // 加上自己這票（如果是新投的）
-    const totalVotes = votes.reduce((a, b) => a + b, 0);
+  /* ---------- 真實投票：裝置唯一碼、INSERT、聚合 RPC、realtime ---------- */
+  function _ensureVoterKey() {
+    let k = localStorage.getItem(STORAGE_VOTER_KEY);
+    if (!k) {
+      k = 'v_' + Math.random().toString(36).slice(2, 10)
+            + Math.random().toString(36).slice(2, 10)
+            + Date.now().toString(36);
+      localStorage.setItem(STORAGE_VOTER_KEY, k);
+    }
+    return k;
+  }
 
+  async function _insertVote(opinionId, side) {
+    if (!window.DB) return { ok: false, reason: 'no-db' };
+    try {
+      const voter_key = _ensureVoterKey();
+      const { error } = await window.DB.from('opinion_votes').insert({
+        opinion_id: opinionId, side, voter_key,
+      });
+      if (error) {
+        // 同裝置已投過 → UNIQUE 違反，視為正常
+        if (/duplicate|unique/i.test(error.message || error.code || '')) return { ok: true, duplicate: true };
+        throw error;
+      }
+      return { ok: true };
+    } catch (e) {
+      console.warn('[opinion] 投票 INSERT 失敗', e);
+      return { ok: false, error: e };
+    }
+  }
+
+  async function _fetchTally(opinionId, optCount) {
+    const zeros = Array(optCount).fill(0);
+    if (!window.DB) return zeros;
+    try {
+      const { data, error } = await window.DB.rpc('opinion_vote_tally', { oid: opinionId });
+      if (error) throw error;
+      (data || []).forEach(row => {
+        const s = typeof row.side === 'number' ? row.side : parseInt(row.side);
+        if (s >= 0 && s < optCount) zeros[s] = Number(row.votes) || 0;
+      });
+      return zeros;
+    } catch (e) {
+      console.warn('[opinion] tally 讀取失敗', e);
+      return zeros;
+    }
+  }
+
+  function _subscribeVotes(opinion, onInsert) {
+    _unsubscribeVotes();
+    if (!window.DB || !window.DB.channel) return;
+    try {
+      _voteChannel = window.DB
+        .channel('opinion-votes-' + opinion.id)
+        .on('postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'opinion_votes', filter: `opinion_id=eq.${opinion.id}` },
+          (payload) => {
+            const row = payload.new;
+            if (!row) return;
+            onInsert(row.side);
+          })
+        .subscribe();
+    } catch (e) { console.warn('[opinion] 投票訂閱失敗', e); }
+  }
+
+  function _unsubscribeVotes() {
+    if (_voteChannel && window.DB && window.DB.removeChannel) {
+      try { window.DB.removeChannel(_voteChannel); } catch (e) {}
+    }
+    _voteChannel = null;
+  }
+
+  /* ---------- 顯示結果 ---------- */
+  async function _showResult(opinion, chosenIdx, overlay, onClose) {
     const resultEl = overlay.querySelector('#opinion-result');
     if (!resultEl) return;
 
-    // 找少數派
+    // 先拉真實票數（RPC 聚合）
+    const votes = await _fetchTally(opinion.id, opinion.opts.length);
+    const totalVotes = votes.reduce((a, b) => a + b, 0);
+
+    // 找少數派（至少有 2 人投票才判斷，避免首票就被叫少數派）
     const maxVotes = Math.max(...votes);
-    const isMinority = votes[chosenIdx] < maxVotes;
+    const isMinority = totalVotes >= 2 && votes[chosenIdx] < maxVotes;
 
     resultEl.innerHTML = `
       ${opinion.opts.map((opt, i) => {
@@ -280,34 +358,24 @@
 
     // 擂台留言區
     _initComments(opinion, chosenIdx, resultEl);
-  }
 
-  /* ---------- 模擬投票數據（localStorage only） ---------- */
-  function _getVotes(opinionId, optCount) {
-    // 用 opinion id 產生穩定的模擬數據
-    const seed = _hashCode(opinionId);
-    const votes = [];
-    for (let i = 0; i < optCount; i++) {
-      // 每個選項基礎 30~70 票，用 seed 產生變化
-      const base = 30 + ((seed * (i + 7)) % 41);
-      votes.push(base);
-    }
-    // 加上自己的投票
-    const myVote = localStorage.getItem(STORAGE_PREFIX + opinionId);
-    if (myVote !== null) {
-      votes[parseInt(myVote)]++;
-    }
-    return votes;
-  }
-
-  function _hashCode(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const c = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + c;
-      hash |= 0;
-    }
-    return Math.abs(hash);
+    // 訂閱新票 → 即時更新百分比條
+    _subscribeVotes(opinion, (side) => {
+      if (side < 0 || side >= votes.length) return;
+      votes[side]++;
+      const newTotal = votes.reduce((a, b) => a + b, 0);
+      // 更新每條百分比（寬度 + 文字）
+      resultEl.querySelectorAll('.opinion-result-fill').forEach((bar, i) => {
+        const pct = newTotal > 0 ? Math.round(votes[i] / newTotal * 100) : 0;
+        bar.dataset.pct = pct;
+        bar.style.width = pct + '%';
+        bar.textContent = pct + '%';
+        if (i === chosenIdx) bar.classList.add('mine');
+      });
+      // 更新總票數
+      const totalEl = resultEl.querySelector('.opinion-total');
+      if (totalEl) totalEl.textContent = newTotal + ' 人已投票';
+    });
   }
 
   /* ---------- 分享功能（Canvas 產分享卡） ---------- */
@@ -739,6 +807,7 @@
     overlay.classList.remove('open');
     document.body.classList.remove('opinion-open');
     _unsubscribeComments();
+    _unsubscribeVotes();
     setTimeout(() => {
       overlay.remove();
       if (onClose) onClose();
