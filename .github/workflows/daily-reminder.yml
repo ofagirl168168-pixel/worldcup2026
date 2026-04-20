@@ -1,10 +1,10 @@
 name: 每日 Claude 日更提醒
 
 on:
-  schedule:
-    # 00:00 UTC = 08:00 台灣時間
-    - cron: '0 0 * * *'
-  workflow_dispatch: # 允許手動觸發測試
+  # 原 schedule (cron '0 0 * * *' = 08:00 TW) 已停用：
+  # GitHub Actions 免費方案排程常延遲 6-8 小時，改由本機 Windows 工作排程器
+  # (SoccerMaddy-DailyReminder) 每天 08:00 跑 C:\Users\user\claude-telegram-bot\send-daily-reminder.ps1
+  workflow_dispatch: # 保留手動觸發（緊急備援用）
 
 jobs:
   remind:
