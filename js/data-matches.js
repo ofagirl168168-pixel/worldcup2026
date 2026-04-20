@@ -1,7 +1,11 @@
-/* data-matches.js — 自動生成所有賽程 */
+/* data-matches.js — 自動生成所有賽程
+   ⚠️ 小組賽 GS 僅為抽籤前預估模板。真實賽程（日期/場地/對戰）
+      由 data-fix.js 的 realMD1/2/3 於載入時透過 buildRealSchedule() 覆蓋 SCHEDULE。
+      欲修改小組賽真實賽程請改 data-fix.js，不要改此檔 GS。
+   KNOCKOUT（淘汰賽）則為真實資料，data-fix.js 不覆蓋此區。 */
 var PREDS = {}; // 預測由 calcPred() 動態計算，此為空佔位
 
-// 每組3輪的台灣時間 [日期, 時間, 場地, 城市, 國家]
+// 每組3輪的台灣時間 [日期, 時間, 場地, 城市, 國家]（舊模板，已被 data-fix.js 覆蓋）
 const GS = {
   A:{ md1:[['2026-06-12','10:00','MetLife Stadium','紐澤西','USA'],['2026-06-12','04:00','MetLife Stadium','紐澤西','USA']],
       md2:[['2026-06-20','07:00','Gillette Stadium','波士頓','USA'],['2026-06-20','10:00','MetLife Stadium','紐澤西','USA']],

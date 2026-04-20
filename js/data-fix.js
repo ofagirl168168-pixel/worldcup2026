@@ -34,7 +34,7 @@ Object.assign(TEAMS, {
   'PAR': { name:'Paraguay', nameCN:'巴拉圭', flag:'🇵🇾', group:'D', conf:'CONMEBOL', fifaRank:50,
     coach:'Gustavo Alfaro', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Miguel Almirón',pos:'中場',club:'紐卡素'},
+      {name:'Miguel Almirón',pos:'中場',club:'亞特蘭大聯'},
       {name:'Antonio Sanabria',pos:'前鋒',club:'托連奴'},
       {name:'Óscar Romero',pos:'中場',club:'River Plate'}
     ],
@@ -47,11 +47,11 @@ Object.assign(TEAMS, {
     predTitle:'南美黑馬候選', predOdds:'150-1', predDesc:'Almirón是巴拉圭突圍的關鍵，能否闖進16強是焦點' },
 
   'CUW': { name:'Curaçao', nameCN:'庫拉索', flag:'🇨🇼', group:'E', conf:'CONCACAF', fifaRank:83,
-    coach:'Remko Bicentini', formation:'4-3-3',
+    coach:'Dick Advocaat', formation:'4-3-3',
     keyPlayers:[
-      {name:'Leandro Bacuna',pos:'中場',club:'待定'},
-      {name:'Elson Hooi',pos:'翼鋒',club:'待定'},
-      {name:'Cuco Martina',pos:'後衛',club:'退役教練組'}
+      {name:'Leandro Bacuna',pos:'中場',club:'自由身'},
+      {name:'Juninho Bacuna',pos:'中場',club:'比勒陀利亞大學'},
+      {name:'Tahith Chong',pos:'翼鋒',club:'史特拉斯堡'}
     ],
     radar:{attack:55,defense:55,midfield:53,speed:64,experience:44},
     style:'整體配合，積極跑動壓迫', strengths:['小國大志，士氣高昂','整體紀律','速度優勢'],
@@ -110,7 +110,7 @@ Object.assign(TEAMS, {
     keyPlayers:[
       {name:'Tomáš Souček',pos:'中場',club:'西漢姆'},
       {name:'Patrik Schick',pos:'前鋒',club:'拜耳勒沃庫森'},
-      {name:'Vladimír Coufal',pos:'後衛',club:'西漢姆'}
+      {name:'Vladimír Coufal',pos:'後衛',club:'霍芬海姆'}
     ],
     radar:{attack:68,defense:68,midfield:66,speed:68,experience:70},
     style:'防守穩健，依靠Souček中場控制，Schick提供進攻火力',
@@ -150,9 +150,9 @@ Object.assign(TEAMS, {
   'EUPB': { name:'Sweden', nameCN:'瑞典', flag:'🇸🇪', group:'F', conf:'UEFA', fifaRank:25,
     coach:'Jon Dahl Tomasson', formation:'4-4-2',
     keyPlayers:[
-      {name:'Victor Nilsson Lindelöf',pos:'後衛',club:'曼聯'},
+      {name:'Victor Nilsson Lindelöf',pos:'後衛',club:'阿斯頓維拉'},
       {name:'Dejan Kulusevski',pos:'中場',club:'熱刺'},
-      {name:'Alexander Isak',pos:'前鋒',club:'紐卡素'}
+      {name:'Alexander Isak',pos:'前鋒',club:'利物浦'}
     ],
     radar:{attack:72,defense:74,midfield:70,speed:73,experience:72},
     style:'防守組織嚴密，依靠Isak前場突破與Kulusevski推進',
@@ -176,7 +176,7 @@ Object.assign(TEAMS, {
     recentForm:['W','W','D','W','L'], predTitle:'非洲黑馬', predOdds:'300-1', predDesc:'剛果民主共和國的晉級是非洲足球多元化的展現，力爭創造歷史' },
 
   'ICP2': { name:'Iraq', nameCN:'伊拉克', flag:'🇮🇶', group:'I', conf:'AFC', fifaRank:58,
-    coach:'Jesús Casas', formation:'4-4-2',
+    coach:'Graham Arnold', formation:'4-4-2',
     keyPlayers:[
       {name:'Aymen Hussein',pos:'前鋒',club:'Al-Zawraa'},
       {name:'Ibrahim Bayesh',pos:'後衛',club:'Al-Shorta'},
