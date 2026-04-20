@@ -21,7 +21,7 @@ const EPL_TEAMS = {
     style:'高位壓迫，控球為主，邊路突破與定位球',
     strengths:['Arteta戰術體系成熟','Saka+Ødegaard創造力頂級','英超最穩固後防之一'],
     weaknesses:['關鍵戰偶有緊張','板凳深度不如曼城','Gyökeres體系磨合中'],
-    recentForm:['W','D','W','W','L'],
+    recentForm:['D','W','W','L','L'],
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
     injuries:[
       {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題',returnDate:'四月下旬可望回歸'},
@@ -47,7 +47,7 @@ const EPL_TEAMS = {
     style:'高強度壓迫，快速轉換，邊路推進',
     strengths:['Salah持續高效輸出','Slot體系穩定成熟','中場跑動覆蓋全場'],
     weaknesses:['Salah年齡漸長','傷兵時輪換選擇有限','對陣低位防守隊時偶有困難'],
-    recentForm:['W','W','D','W','W'],
+    recentForm:['W','D','W','W','W'],
     history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍',
     injuries:[
       {name:'Hugo Ekitike',pos:'前鋒',status:'阿基里斯腱斷裂（vs PSG受傷）',returnDate:'賽季報銷＋世界盃缺席'},
@@ -71,7 +71,7 @@ const EPL_TEAMS = {
     style:'極致控球，位置輪轉，高位壓迫',
     strengths:['Haaland進球效率恐怖','Guardiola戰術無人能及','板凳深度聯賽最強'],
     weaknesses:['Rodri傷癒後狀態仍在回升','夏季新援（Reijnders/Cherki）磨合中','後防傷兵影響輪替'],
-    recentForm:['D','W','L','W','W'],
+    recentForm:['W','L','W','W','W'],
     history:'9次英格蘭頂級聯賽冠軍，2022/23三冠王',
     injuries:[
       {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末可望回歸'},
@@ -82,7 +82,7 @@ const EPL_TEAMS = {
   },
   'CHE': {
     name:'Chelsea', nameCN:'乙爾西', flag:'https://crests.football-data.org/61.png',
-    league:'Premier League', eplRank:4, coach:'Enzo Maresca', formation:'4-2-3-1',
+    league:'Premier League', eplRank:4, coach:'Liam Rosenior', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Cole Palmer',pos:'攻擊中場/右翼',club:'乙爾西'},
       {name:'Enzo Fernández',pos:'中場',club:'乙爾西'},
@@ -94,7 +94,7 @@ const EPL_TEAMS = {
     style:'控球導向，中場掌控，快速轉換進攻',
     strengths:['Cole Palmer創造力爆表','年輕陣容潛力無限','中場組合強悍'],
     weaknesses:['陣容磨合仍在進行','經驗不足影響穩定性','防守偶有失誤'],
-    recentForm:['W','D','W','W','L'],
+    recentForm:['D','W','W','L','L'],
     history:'6次英格蘭頂級聯賽冠軍，2次歐冠冠軍',
     injuries:[
       {name:'Reece James',pos:'右後衛',status:'腿後肌傷',returnDate:'評估中'},
@@ -104,7 +104,7 @@ const EPL_TEAMS = {
   },
   'MUN': {
     name:'Manchester United', nameCN:'曼聯', flag:'https://crests.football-data.org/66.png',
-    league:'Premier League', eplRank:7, coach:'Rúben Amorim', formation:'3-4-3',
+    league:'Premier League', eplRank:7, coach:'Michael Carrick', formation:'3-4-3',
     keyPlayers:[
       {name:'Bruno Fernandes',pos:'攻擊中場',club:'曼聯'},
       {name:'Rasmus Højlund',pos:'前鋒',club:'曼聯'},
@@ -116,7 +116,7 @@ const EPL_TEAMS = {
     style:'三後衛體系，翼衛推進，快速反擊',
     strengths:['Bruno Fernandes核心創造力','年輕球員快速成長','Amorim戰術改造進行中'],
     weaknesses:['體系轉換需要時間','防守穩定性不足','傷兵問題嚴重'],
-    recentForm:['L','W','D','W','L'],
+    recentForm:['W','D','W','L','W'],
     history:'20次英格蘭頂級聯賽冠軍，3次歐冠冠軍，英格蘭最成功俱樂部',
     injuries:[
       {name:'Patrick Dorgu',pos:'翼衛',status:'傷勢復健中（一月受傷）',returnDate:'賽季末'},
@@ -126,7 +126,7 @@ const EPL_TEAMS = {
   },
   'TOT': {
     name:'Tottenham Hotspur', nameCN:'熱刺', flag:'https://crests.football-data.org/73.png',
-    league:'Premier League', eplRank:8, coach:'Ange Postecoglou', formation:'4-3-3',
+    league:'Premier League', eplRank:8, coach:'Roberto De Zerbi', formation:'4-3-3',
     keyPlayers:[
       {name:'Heung-Min Son',pos:'前鋒/左翼',club:'熱刺'},
       {name:'James Maddison',pos:'攻擊中場',club:'熱刺'},
@@ -138,7 +138,7 @@ const EPL_TEAMS = {
     style:'進攻足球，高位壓迫，後場出球',
     strengths:['Son進攻效率依然頂級','後防線速度極快','Postecoglou進攻哲學吸引人'],
     weaknesses:['傷兵名單長期居高不下','關鍵戰心態不穩','陣容深度不足'],
-    recentForm:['W','L','W','D','W'],
+    recentForm:['L','W','D','W','D'],
     history:'2次英格蘭頂級聯賽冠軍，2019歐冠亞軍',
     injuries:[
       {name:'James Maddison',pos:'攻擊中場',status:'前十字韌帶傷（恢復中）',returnDate:'賽季末'},
@@ -159,7 +159,7 @@ const EPL_TEAMS = {
     style:'快速反擊，邊路衝擊，高強度防守',
     strengths:['Isak進球效率英超頂尖','中場Bruno+Tonali雙核強勢','整體戰術執行力高'],
     weaknesses:['板凳深度仍不夠頂級','歐冠+英超雙線作戰疲勞','傷病時缺乏替代方案'],
-    recentForm:['W','W','W','D','W'],
+    recentForm:['W','W','D','W','L'],
     history:'4次英格蘭頂級聯賽冠軍，近年在沙特資金注入後重返強隊行列'
   },
   'AVL': {
@@ -176,7 +176,7 @@ const EPL_TEAMS = {
     style:'Emery體系，緊湊防守反擊，定位球威脅大',
     strengths:['Watkins全面的前鋒能力','Emery歐戰經驗豐富','團隊凝聚力強'],
     weaknesses:['頂級球星不足','多線作戰體能考驗','客場表現波動'],
-    recentForm:['D','W','W','L','W'],
+    recentForm:['W','W','L','W','W'],
     history:'7次英格蘭頂級聯賽冠軍，1982年歐冠冠軍'
   },
 
@@ -195,7 +195,7 @@ const EPL_TEAMS = {
     style:'後場組織出球，控球進攻，數據驅動招募',
     strengths:['球探系統發掘天才','戰術執行力高','年輕球員發展好'],
     weaknesses:['關鍵球員被挖角風險','經驗不足','進攻終結效率偶有波動'],
-    recentForm:['D','W','L','W','D'],
+    recentForm:['W','L','W','D','D'],
     history:'近年從英甲升至英超穩定中游，數據化管理典範'
   },
   'BOU': {
@@ -212,7 +212,7 @@ const EPL_TEAMS = {
     style:'高壓逼搶，快速轉換，直接進攻',
     strengths:['Iraola壓迫體系有效','球員拼搶意志強','反擊速度快'],
     weaknesses:['陣容深度不足','對陣強隊經驗少','定位球防守不穩'],
-    recentForm:['W','L','D','W','L'],
+    recentForm:['L','D','W','L','W'],
     history:'2015年首次升上英超，近年穩定在英超中游'
   },
   'FUL': {
@@ -229,7 +229,7 @@ const EPL_TEAMS = {
     style:'控球穩健，邊路推進，防守組織嚴謹',
     strengths:['Marco Silva戰術紀律好','Robinson邊路推進犀利','整體平衡性佳'],
     weaknesses:['進攻火力不夠頂尖','板凳深度一般','客場表現較弱'],
-    recentForm:['D','D','W','L','W'],
+    recentForm:['D','W','L','W','D'],
     history:'倫敦老牌球會，曾在2010年打進歐霸決賽'
   },
   'BRE': {
@@ -246,7 +246,7 @@ const EPL_TEAMS = {
     style:'直接打法，定位球威脅大，邊路傳中',
     strengths:['Mbeumo進攻爆發力強','Thomas Frank戰術靈活','定位球得分率高'],
     weaknesses:['陣容深度有限','對陣強隊防守壓力大','長期傷兵影響'],
-    recentForm:['W','L','W','D','L'],
+    recentForm:['L','W','D','L','D'],
     history:'2021年首次升上英超，以數據化管理聞名'
   },
   'NFO': {
@@ -263,7 +263,7 @@ const EPL_TEAMS = {
     style:'紀律防守，快速反擊，硬朗對抗',
     strengths:['Nuno防守體系穩固','Wood進球穩定性高','團隊防守意志強'],
     weaknesses:['創造力不足','過度依賴反擊','關鍵球員深度不夠'],
-    recentForm:['D','W','L','W','D'],
+    recentForm:['W','L','W','D','W'],
     history:'2次歐冠冠軍（1979、1980），英格蘭足球傳奇俱樂部'
   },
   'CRY': {
@@ -314,7 +314,7 @@ const EPL_TEAMS = {
     style:'快速轉換，反擊為主，身體對抗',
     strengths:['Matheus Cunha攻擊核心','反擊速度快','葡萄牙系球員默契好'],
     weaknesses:['陣容厚度不足','整體質量差距','保級壓力下心態波動'],
-    recentForm:['L','D','L','W','D'],
+    recentForm:['D','L','W','D','L'],
     history:'3次英格蘭頂級聯賽冠軍，1970年代黃金時期'
   },
   'EVE': {
@@ -331,7 +331,7 @@ const EPL_TEAMS = {
     style:'硬朗防守，直接長球，定位球',
     strengths:['Dyche防守紀律嚴明','Pickford撲救穩定','團隊拼搏精神強'],
     weaknesses:['進攻火力嚴重不足','財政公平法限制引援','創造力匱乏'],
-    recentForm:['L','D','L','D','L'],
+    recentForm:['D','L','D','L','L'],
     history:'9次英格蘭頂級聯賽冠軍，利物浦同城宿敵'
   },
 
@@ -350,7 +350,7 @@ const EPL_TEAMS = {
     style:'控球進攻，高位壓迫，年輕有活力',
     strengths:['年輕球員速度快','主場氣氛狂熱','進攻人才儲備不錯'],
     weaknesses:['英超經驗不足','防守是最大弱點','對頂級球隊差距大'],
-    recentForm:['L','W','L','L','D'],
+    recentForm:['W','L','L','D','W'],
     history:'3次英格蘭頂級聯賽冠軍，Don Revie時代傳奇，睽違一年重返英超'
   },
   'BUR': {
@@ -367,7 +367,7 @@ const EPL_TEAMS = {
     style:'硬朗防守，直接打法，身體對抗',
     strengths:['防守意志頑強','主場難以攻克','定位球戰術有效'],
     weaknesses:['進攻創造力嚴重不足','英超水平球員不夠','升班馬經驗限制'],
-    recentForm:['L','L','D','L','L'],
+    recentForm:['L','D','L','L','L'],
     history:'2次英格蘭頂級聯賽冠軍，近年在英超與英冠間來回'
   },
   'SUN': {
@@ -384,7 +384,7 @@ const EPL_TEAMS = {
     style:'年輕快速，高壓逼搶，團隊足球',
     strengths:['年輕陣容潛力爆發','主場光明球場氛圍狂熱','英冠冠軍信心加持'],
     weaknesses:['英超經驗嚴重不足','陣容深度有限','對陣強隊差距大'],
-    recentForm:['L','D','L','W','L'],
+    recentForm:['D','L','W','L','L'],
     history:'6次英格蘭頂級聯賽冠軍，英格蘭東北老牌豪門，睽違多年重返英超'
   }
 };
@@ -531,6 +531,52 @@ window.EPL_MATCHES = [
    goals:[
      {min:'43',player:'Matheus Cunha',side:'a'}
    ]},
+
+  // 諾丁漢森林 4-1 伯恩利 | 04/19 21:00 台灣時間
+  {id:'EPL-MW33-NFO-BUR', matchday:33, date:'2026-04-19', time:'21:00', home:'NFO', away:'BUR', stage:'league',
+   status:'finished', score:{h:4,a:1}, halfTime:{h:0,a:1},
+   goals:[
+     {min:'45+2',player:'Zian Flemming',side:'a'},
+     {min:'62',player:'Morgan Gibbs-White',side:'h'},
+     {min:'69',player:'Morgan Gibbs-White',side:'h'},
+     {min:'77',player:'Morgan Gibbs-White',side:'h'},
+     {min:'90+8',player:'Igor Jesus',side:'h'}
+   ]},
+
+  // 阿斯頓維拉 4-3 桑德蘭 | 04/19 21:00 台灣時間
+  {id:'EPL-MW33-AVL-SUN', matchday:33, date:'2026-04-19', time:'21:00', home:'AVL', away:'SUN', stage:'league',
+   status:'finished', score:{h:4,a:3}, halfTime:{h:2,a:1},
+   goals:[
+     {min:'2',player:'Ollie Watkins',side:'h'},
+     {min:'9',player:'Chris Rigg',side:'a'},
+     {min:'36',player:'Ollie Watkins',side:'h'},
+     {min:'46',player:'Morgan Rogers',side:'h'},
+     {min:'86',player:'Trai Hume',side:'a'},
+     {min:'87',player:'Wilson Isidor',side:'a'},
+     {min:'90+3',player:'Tammy Abraham',side:'h'}
+   ]},
+
+  // 艾佛頓 1-2 利物浦 | 04/19 21:00 台灣時間
+  {id:'EPL-MW33-EVE-LIV', matchday:33, date:'2026-04-19', time:'21:00', home:'EVE', away:'LIV', stage:'league',
+   status:'finished', score:{h:1,a:2}, halfTime:{h:0,a:1},
+   goals:[
+     {min:'29',player:'Mohamed Salah',side:'a'},
+     {min:'54',player:'Beto',side:'h'},
+     {min:'100',player:'Virgil van Dijk',side:'a'}
+   ]},
+
+  // 曼城 2-1 兵工廠 | 04/19 23:30 台灣時間
+  {id:'EPL-MW33-MCI-ARS', matchday:33, date:'2026-04-19', time:'23:30', home:'MCI', away:'ARS', stage:'league',
+   status:'finished', score:{h:2,a:1}, halfTime:{h:1,a:1},
+   goals:[
+     {min:'16',player:'Rayan Cherki',side:'h'},
+     {min:'18',player:'Kai Havertz',side:'a'},
+     {min:'65',player:'Erling Haaland',side:'h'}
+   ]},
+
+  // 水晶宮 vs 西漢姆 | 04/21 04:00 台灣時間
+  {id:'EPL-MW33-CRY-WHU', matchday:33, date:'2026-04-21', time:'04:00', home:'CRY', away:'WHU', stage:'league',
+   status:'scheduled', score:{h:null,a:null}},
 
 ];
 
