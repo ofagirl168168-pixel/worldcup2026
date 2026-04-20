@@ -9,12 +9,12 @@ const TEAMS = {
 
   // ===== 實際賽程A組球隊 =====
   'MEX': {
-    name:'Mexico', nameCN:'墨西哥', flag:'🇲🇽', group:'A', conf:'CONCACAF', fifaRank:16,
+    name:'Mexico', nameCN:'墨西哥', flag:'🇲🇽', group:'A', conf:'CONCACAF', fifaRank:15,
     coach:'Javier Aguirre', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Santiago Giménez',pos:'中鋒',club:'費耶諾德'},
       {name:'Edson Álvarez',pos:'後腰',club:'西漢姆聯'},
-      {name:'Hirving Lozano',pos:'右翼',club:'聖地亞哥FC'},
+      {name:'Hirving Lozano',pos:'右翼',club:'自由身'},
       {name:'Raúl Jiménez',pos:'前鋒',club:'富勒姆'},
       {name:'Guillermo Ochoa',pos:'門將',club:'待定'}
     ],
@@ -23,14 +23,14 @@ const TEAMS = {
     strengths:['Giménez禁區效率高','主辦國之一，球迷支持強大','Aguirre大賽備戰豐富'],
     weaknesses:['連七屆十六強止步的心理魔咒','後衛線偶有失誤','缺乏穩定主力中場'],
     history:'連續七屆世界盃均止步十六強，2026主辦國之一',
-    recentForm:['W','D','W','W','D'],
+    recentForm:['W','W','W','D','D'],
     predTitle:'打破十六強魔咒', predOdds:'16-1', predDesc:'主辦國之一，Giménez成長為世界級中鋒，2026必須突破詛咒'
   },
   'KOR': {
-    name:'South Korea', nameCN:'韓國', flag:'🇰🇷', group:'A', conf:'AFC', fifaRank:22,
+    name:'South Korea', nameCN:'韓國', flag:'🇰🇷', group:'A', conf:'AFC', fifaRank:25,
     coach:'Hong Myung-bo', formation:'4-3-3',
     keyPlayers:[
-      {name:'Son Heung-min',pos:'左翼/前鋒',club:'熱刺'},
+      {name:'Son Heung-min',pos:'左翼/前鋒',club:'LAFC'},
       {name:'Lee Kang-in',pos:'攻擊中場',club:'巴黎聖日耳曼'},
       {name:'Kim Min-jae',pos:'中後衛',club:'拜仁慕尼黑'},
       {name:'Hwang Hee-chan',pos:'前鋒',club:'狼隊'},
@@ -47,12 +47,12 @@ const TEAMS = {
 
   // ===== 實際賽程B組球隊 =====
   'CAN': {
-    name:'Canada', nameCN:'加拿大', flag:'🇨🇦', group:'B', conf:'CONCACAF', fifaRank:43,
+    name:'Canada', nameCN:'加拿大', flag:'🇨🇦', group:'B', conf:'CONCACAF', fifaRank:30,
     coach:'Jesse Marsch', formation:'4-3-3',
     keyPlayers:[
       {name:'Alphonso Davies',pos:'左後衛',club:'拜仁慕尼黑'},
       {name:'Jonathan David',pos:'中鋒',club:'尤文圖斯'},
-      {name:'Tajon Buchanan',pos:'翼鋒',club:'國際米蘭'},
+      {name:'Tajon Buchanan',pos:'翼鋒',club:'比利亞雷阿爾'},
       {name:'Cyle Larin',pos:'前鋒',club:'待定'},
       {name:'Milan Borjan',pos:'門將',club:'紅星'}
     ],
@@ -65,10 +65,10 @@ const TEAMS = {
     predTitle:'北美主辦國驚喜', predOdds:'18-1', predDesc:'Davies+David是CONCACAF最危險組合，B組出線具備實力'
   },
   'SUI': {
-    name:'Switzerland', nameCN:'瑞士', flag:'🇨🇭', group:'B', conf:'UEFA', fifaRank:15,
+    name:'Switzerland', nameCN:'瑞士', flag:'🇨🇭', group:'B', conf:'UEFA', fifaRank:19,
     coach:'Murat Yakin', formation:'3-4-2-1',
     keyPlayers:[
-      {name:'Granit Xhaka',pos:'中場',club:'拜耳勒沃庫森'},
+      {name:'Granit Xhaka',pos:'中場',club:'桑德蘭'},
       {name:'Manuel Akanji',pos:'後衛',club:'曼城'},
       {name:'Yann Sommer',pos:'門將',club:'國際米蘭'},
       {name:'Remo Freuler',pos:'中場',club:'諾丁漢森林'},
@@ -103,8 +103,8 @@ const TEAMS = {
 
   // ===== 實際賽程C組球隊 =====
   'BRA': {
-    name:'Brazil', nameCN:'巴西', flag:'🇧🇷', group:'C', conf:'CONMEBOL', fifaRank:5,
-    coach:'Dorival Júnior', formation:'4-2-3-1',
+    name:'Brazil', nameCN:'巴西', flag:'🇧🇷', group:'C', conf:'CONMEBOL', fifaRank:6,
+    coach:'Carlo Ancelotti', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Vinícius Jr.',pos:'左翼',club:'皇家馬德里'},
       {name:'Rodrygo',pos:'右翼',club:'皇家馬德里'},
@@ -115,19 +115,19 @@ const TEAMS = {
     radar:{attack:90,defense:80,midfield:84,speed:92,experience:98},
     style:'快速邊路滲透，雙翼速度撕裂對方防線',
     strengths:['Vinícius Jr.是現役最具威脅的邊鋒','皇馬三劍客進攻威力驚人','五冠世界盃底蘊'],
-    weaknesses:['中場核心缺乏Casemiro傳承者','關鍵淘汰賽心理包袱沉重','Dorival體系尚在磨合'],
+    weaknesses:['中場核心缺乏Casemiro傳承者','關鍵淘汰賽心理包袱沉重','Ancelotti體系尚在磨合'],
     history:'五次世界盃冠軍（1958/1962/1970/1994/2002），史上最多',
     recentForm:['W','D','W','W','L'],
     predTitle:'奪冠熱門', predOdds:'4-1', predDesc:'Vinícius+Rodrygo+Endrick，三人均在皇馬效力，是本屆最強攻擊線之一'
   },
   'MAR': {
-    name:'Morocco', nameCN:'摩洛哥', flag:'🇲🇦', group:'C', conf:'CAF', fifaRank:14,
-    coach:'Walid Regragui', formation:'4-1-4-1',
+    name:'Morocco', nameCN:'摩洛哥', flag:'🇲🇦', group:'C', conf:'CAF', fifaRank:8,
+    coach:'Mohamed Ouahbi', formation:'4-1-4-1',
     keyPlayers:[
       {name:'Achraf Hakimi',pos:'右後衛',club:'巴黎聖日耳曼'},
-      {name:'Hakim Ziyech',pos:'翼鋒',club:'加拉塔薩雷'},
+      {name:'Hakim Ziyech',pos:'翼鋒',club:'Wydad AC'},
       {name:'Youssef En-Nesyri',pos:'中鋒',club:'費內巴切'},
-      {name:'Sofyan Amrabat',pos:'防守中場',club:'待定'},
+      {name:'Sofyan Amrabat',pos:'防守中場',club:'貝蒂斯（租借）'},
       {name:'Yassine Bounou',pos:'門將',club:'Al-Hilal'}
     ],
     radar:{attack:78,defense:84,midfield:76,speed:80,experience:82},
@@ -135,11 +135,11 @@ const TEAMS = {
     strengths:['2022四強精神傳承','Hakimi是世界頂級右後衛','防守組織是非洲最佳'],
     weaknesses:['中場創造力有限','複製2022奇蹟的心理壓力','Amrabat去向影響中場穩定性'],
     history:'2022首支進四強的非洲/阿拉伯世界球隊',
-    recentForm:['W','W','D','W','W'],
+    recentForm:['W','W','D','D','W'],
     predTitle:'非洲真正強隊', predOdds:'15-1', predDesc:'摩洛哥已非黑馬，而是世界級大賽強隊'
   },
   'SCO': {
-    name:'Scotland', nameCN:'蘇格蘭', flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', group:'C', conf:'UEFA', fifaRank:35,
+    name:'Scotland', nameCN:'蘇格蘭', flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', group:'C', conf:'UEFA', fifaRank:43,
     coach:'Steve Clarke', formation:'3-4-3',
     keyPlayers:[
       {name:'Andrew Robertson',pos:'左後衛',club:'利物浦'},
@@ -159,7 +159,7 @@ const TEAMS = {
 
   // ===== 實際賽程D組球隊 =====
   'USA': {
-    name:'USA', nameCN:'美國', flag:'🇺🇸', group:'D', conf:'CONCACAF', fifaRank:14,
+    name:'USA', nameCN:'美國', flag:'🇺🇸', group:'D', conf:'CONCACAF', fifaRank:16,
     coach:'Mauricio Pochettino', formation:'4-3-3',
     keyPlayers:[
       {name:'Christian Pulisic',pos:'翼鋒/攻擊中場',club:'AC米蘭'},
@@ -177,7 +177,7 @@ const TEAMS = {
     predTitle:'主場翻身的最大舞台', predOdds:'12-1', predDesc:'美國有史以來最強一代，Pulisic+Adams是中場核心'
   },
   'AUS': {
-    name:'Australia', nameCN:'澳洲', flag:'🇦🇺', group:'D', conf:'AFC', fifaRank:26,
+    name:'Australia', nameCN:'澳洲', flag:'🇦🇺', group:'D', conf:'AFC', fifaRank:27,
     coach:'Tony Popović', formation:'4-4-2',
     keyPlayers:[
       {name:'Mat Ryan',pos:'門將',club:'哥本哈根'},
@@ -197,7 +197,7 @@ const TEAMS = {
 
   // ===== 實際賽程E組球隊 =====
   'GER': {
-    name:'Germany', nameCN:'德國', flag:'🇩🇪', group:'E', conf:'UEFA', fifaRank:12,
+    name:'Germany', nameCN:'德國', flag:'🇩🇪', group:'E', conf:'UEFA', fifaRank:10,
     coach:'Julian Nagelsmann', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Florian Wirtz',pos:'攻擊中場',club:'拜耳勒沃庫森'},
@@ -211,11 +211,11 @@ const TEAMS = {
     strengths:['Wirtz+Musiala是世界最令人興奮的中場組合','體系完整有深度','2024歐洲盃主場激情帶動'],
     weaknesses:['2018/2022小組出局心理陰影','中鋒位置未完全解決','克羅斯退役後中場組織稍弱'],
     history:'四次世界盃冠軍（1954/1974/1990/2014）；2024歐洲盃主場八強',
-    recentForm:['W','W','D','W','W'],
+    recentForm:['W','W','W','W','W'],
     predTitle:'重返巔峰的戰車', predOdds:'6-1', predDesc:'Wirtz和Musiala的雙核心是本屆最令人期待的中場，德國渴望重現榮光'
   },
   'ECU': {
-    name:'Ecuador', nameCN:'厄瓜多', flag:'🇪🇨', group:'E', conf:'CONMEBOL', fifaRank:33,
+    name:'Ecuador', nameCN:'厄瓜多', flag:'🇪🇨', group:'E', conf:'CONMEBOL', fifaRank:23,
     coach:'Sebastián Beccacece', formation:'4-3-3',
     keyPlayers:[
       {name:'Moisés Caicedo',pos:'防守中場',club:'切爾西'},
@@ -233,13 +233,13 @@ const TEAMS = {
     predTitle:'南美黑馬', predOdds:'50-1', predDesc:'Caicedo在Chelsea的磨練讓厄瓜多中場質素大幅提升'
   },
   'CIV': {
-    name:'Ivory Coast', nameCN:'象牙海岸', flag:'🇨🇮', group:'E', conf:'CAF', fifaRank:48,
+    name:'Ivory Coast', nameCN:'象牙海岸', flag:'🇨🇮', group:'E', conf:'CAF', fifaRank:34,
     coach:'Emerse Faé', formation:'4-3-3',
     keyPlayers:[
       {name:'Sébastien Haller',pos:'中鋒',club:'烏特勒支'},
       {name:'Simon Adingra',pos:'翼鋒',club:'布萊頓'},
       {name:'Franck Kessié',pos:'中場',club:'Al-Ahli'},
-      {name:'Yahia Fofana',pos:'門將',club:'切爾西'},
+      {name:'Yahia Fofana',pos:'門將',club:'昂熱'},
       {name:'Serge Aurier',pos:'右後衛',club:'待定'}
     ],
     radar:{attack:70,defense:66,midfield:68,speed:74,experience:72},
@@ -258,20 +258,20 @@ const TEAMS = {
     keyPlayers:[
       {name:'Virgil van Dijk',pos:'中後衛',club:'利物浦'},
       {name:'Frenkie de Jong',pos:'中場',club:'巴塞隆納'},
-      {name:'Xavi Simons',pos:'攻擊中場',club:'巴黎聖日耳曼'},
+      {name:'Xavi Simons',pos:'攻擊中場',club:'熱刺'},
       {name:'Cody Gakpo',pos:'翼鋒',club:'利物浦'},
-      {name:'Tijjani Reijnders',pos:'中場',club:'AC米蘭'}
+      {name:'Tijjani Reijnders',pos:'中場',club:'曼城'}
     ],
     radar:{attack:84,defense:82,midfield:82,speed:80,experience:90},
     style:'全能足球現代詮釋，位置互換與逼搶並重',
     strengths:['Van Dijk是世界最佳中後衛之一','Simons是下一個天才','整體足球智商高'],
     weaknesses:['大賽關鍵時刻歷史性失常','中鋒位置選擇有限','更衣室歷史問題'],
     history:'三次世界盃亞軍（1974/1978/2010）；2024歐洲盃四強',
-    recentForm:['W','W','L','W','W'],
+    recentForm:['W','W','L','W','D'],
     predTitle:'等待首冠的橙衣軍團', predOdds:'8-1', predDesc:'VVD+Simons+Gakpo，荷蘭陣容是近20年最強一代'
   },
   'JPN': {
-    name:'Japan', nameCN:'日本', flag:'🇯🇵', group:'F', conf:'AFC', fifaRank:17,
+    name:'Japan', nameCN:'日本', flag:'🇯🇵', group:'F', conf:'AFC', fifaRank:18,
     coach:'Hajime Moriyasu', formation:'4-3-3',
     keyPlayers:[
       {name:'Takefusa Kubo',pos:'右翼',club:'皇家社會'},
@@ -289,7 +289,7 @@ const TEAMS = {
     predTitle:'亞洲最強挑戰者', predOdds:'22-1', predDesc:'2022的黑馬，2026的正規強隊，日本首進八強並非遙不可及'
   },
   'TUN': {
-    name:'Tunisia', nameCN:'突尼西亞', flag:'🇹🇳', group:'F', conf:'CAF', fifaRank:40,
+    name:'Tunisia', nameCN:'突尼西亞', flag:'🇹🇳', group:'F', conf:'CAF', fifaRank:44,
     coach:'Faouzi Benzarti', formation:'4-3-3',
     keyPlayers:[
       {name:'Hannibal Mejbri',pos:'中場',club:'塞維利亞'},
@@ -309,8 +309,8 @@ const TEAMS = {
 
   // ===== 實際賽程G組球隊 =====
   'BEL': {
-    name:'Belgium', nameCN:'比利時', flag:'🇧🇪', group:'G', conf:'UEFA', fifaRank:8,
-    coach:'Domenico Tedesco', formation:'4-3-3',
+    name:'Belgium', nameCN:'比利時', flag:'🇧🇪', group:'G', conf:'UEFA', fifaRank:9,
+    coach:'Rudi Garcia', formation:'4-3-3',
     keyPlayers:[
       {name:'Kevin De Bruyne',pos:'中場',club:'拿坡里'},
       {name:'Romelu Lukaku',pos:'中鋒',club:'拿坡里'},
@@ -323,14 +323,14 @@ const TEAMS = {
     strengths:['De Bruyne是世界最完整的中場之一','Courtois是世界頂級門將','Doku年輕爆發力強'],
     weaknesses:['黃金一代步入末期','後衛線老化','大賽關鍵時刻心理問題'],
     history:'黃金一代最佳成績2018三名，從未拿過主要冠軍',
-    recentForm:['D','W','L','W','W'],
+    recentForm:['W','W','W','W','D'],
     predTitle:'黃金一代最後機會', predOdds:'8-1', predDesc:'De Bruyne+Lukaku+Courtois的最後同台，不拿冠軍將是永遠遺憾'
   },
   'IRN': {
-    name:'Iran', nameCN:'伊朗', flag:'🇮🇷', group:'G', conf:'AFC', fifaRank:23,
+    name:'Iran', nameCN:'伊朗', flag:'🇮🇷', group:'G', conf:'AFC', fifaRank:21,
     coach:'Amir Ghalenoei', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Mehdi Taremi',pos:'中鋒',club:'國際米蘭'},
+      {name:'Mehdi Taremi',pos:'中鋒',club:'奧林匹亞科斯'},
       {name:'Alireza Jahanbakhsh',pos:'翼鋒',club:'費內巴切'},
       {name:'Sardar Azmoun',pos:'前鋒',club:'待定'},
       {name:'Ali Gholizadeh',pos:'翼鋒',club:'待定'},
@@ -341,11 +341,11 @@ const TEAMS = {
     strengths:['Taremi在國米磨練後水準大幅提升','整體組織穩定','亞洲最有韌性的球隊'],
     weaknesses:['除Taremi外進攻創造力有限','防守線趨向老化','缺乏快速邊翼'],
     history:'多次世界盃參賽；2022年在強組也能拿到積分',
-    recentForm:['W','D','W','W','D'],
+    recentForm:['W','D','W','L','W'],
     predTitle:'亞洲最頑強球隊', predOdds:'90-1', predDesc:'Taremi在歐洲的蛻變讓伊朗進攻完全不同'
   },
   'EGY': {
-    name:'Egypt', nameCN:'埃及', flag:'🇪🇬', group:'G', conf:'CAF', fifaRank:42,
+    name:'Egypt', nameCN:'埃及', flag:'🇪🇬', group:'G', conf:'CAF', fifaRank:29,
     coach:'Hossam Hassan', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Mohamed Salah',pos:'右翼/前鋒',club:'利物浦'},
@@ -383,7 +383,7 @@ const TEAMS = {
 
   // ===== 實際賽程H組球隊 =====
   'ESP': {
-    name:'Spain', nameCN:'西班牙', flag:'🇪🇸', group:'H', conf:'UEFA', fifaRank:3,
+    name:'Spain', nameCN:'西班牙', flag:'🇪🇸', group:'H', conf:'UEFA', fifaRank:2,
     coach:'Luis de la Fuente', formation:'4-3-3',
     keyPlayers:[
       {name:'Lamine Yamal',pos:'右翼',club:'巴塞隆納'},
@@ -397,11 +397,11 @@ const TEAMS = {
     strengths:['中場天賦豐富，Pedri+Rodri無可匹敵','Yamal是本屆最令人期待的天才','2024歐洲盃衛冕'],
     weaknesses:['Rodri/Carvajal傷病後恢復情況存疑','中鋒位置長期問題','對平衡攻守依賴Rodri過深'],
     history:'一次世界盃（2010）＋三次歐洲盃（2008/2012/2024），傳控足球代名詞',
-    recentForm:['W','W','W','W','W'],
+    recentForm:['W','D','W','W','D'],
     predTitle:'歐洲盃衛冕冠軍', predOdds:'4-1', predDesc:'連莊歐洲盃冠軍，Yamal橫空出世，西班牙是本屆最完整的球隊'
   },
   'URU': {
-    name:'Uruguay', nameCN:'烏拉圭', flag:'🇺🇾', group:'H', conf:'CONMEBOL', fifaRank:10,
+    name:'Uruguay', nameCN:'烏拉圭', flag:'🇺🇾', group:'H', conf:'CONMEBOL', fifaRank:17,
     coach:'Marcelo Bielsa', formation:'4-3-3',
     keyPlayers:[
       {name:'Darwin Núñez',pos:'中鋒',club:'Al-Hilal'},
@@ -415,7 +415,7 @@ const TEAMS = {
     strengths:['Valverde是世界最完整的中場球員之一','Núñez爆發力驚人','Bielsa戰術革命成效顯著'],
     weaknesses:['Bielsa體系適應期','高壓迫消耗體能影響後半段','防守偶爾因壓迫過深而空虛'],
     history:'兩次世界盃冠軍（1930/1950）；2024美洲盃四強',
-    recentForm:['W','W','W','D','L'],
+    recentForm:['W','D','W','D','D'],
     predTitle:'Bielsa的烏拉圭革命', predOdds:'18-1', predDesc:'Valverde是南美最被低估的球員，烏拉圭令人耳目一新'
   },
   'KSA': {
@@ -439,7 +439,7 @@ const TEAMS = {
 
   // ===== 實際賽程I組球隊 =====
   'FRA': {
-    name:'France', nameCN:'法國', flag:'🇫🇷', group:'I', conf:'UEFA', fifaRank:2,
+    name:'France', nameCN:'法國', flag:'🇫🇷', group:'I', conf:'UEFA', fifaRank:1,
     coach:'Didier Deschamps', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Kylian Mbappé',pos:'中鋒/翼鋒',club:'皇家馬德里'},
@@ -453,11 +453,11 @@ const TEAMS = {
     strengths:['Mbappé是現役最快速最全面的球員','陣容深度驚人','冠軍基因強烈（1998/2018）'],
     weaknesses:['更衣室內部團結歷史問題','Deschamps戰術偏保守','Mbappé未必百分百與體系融合'],
     history:'兩次世界盃冠軍（1998/2018），2022年亞軍',
-    recentForm:['W','W','W','D','W'],
+    recentForm:['W','W','W','W','W'],
     predTitle:'奪冠最大熱門', predOdds:'3-1', predDesc:'Mbappé在皇馬磨練後更成熟，法國是本屆奪冠最大熱門'
   },
   'SEN': {
-    name:'Senegal', nameCN:'塞內加爾', flag:'🇸🇳', group:'I', conf:'CAF', fifaRank:20,
+    name:'Senegal', nameCN:'塞內加爾', flag:'🇸🇳', group:'I', conf:'CAF', fifaRank:14,
     coach:'Pape Thiaw', formation:'4-3-3',
     keyPlayers:[
       {name:'Sadio Mané',pos:'前鋒',club:'Al-Nassr'},
@@ -477,7 +477,7 @@ const TEAMS = {
 
   // ===== 實際賽程J組球隊 =====
   'ARG': {
-    name:'Argentina', nameCN:'阿根廷', flag:'🇦🇷', group:'J', conf:'CONMEBOL', fifaRank:1,
+    name:'Argentina', nameCN:'阿根廷', flag:'🇦🇷', group:'J', conf:'CONMEBOL', fifaRank:3,
     coach:'Lionel Scaloni', formation:'4-3-3',
     keyPlayers:[
       {name:'Lionel Messi',pos:'自由人/前鋒',club:'邁阿密國際'},
@@ -513,7 +513,7 @@ const TEAMS = {
     predTitle:'歐洲最大黑馬之一', predOdds:'35-1', predDesc:'Rangnick的奧地利是本屆最令人期待的中游強隊'
   },
   'ALG': {
-    name:'Algeria', nameCN:'阿爾及利亞', flag:'🇩🇿', group:'J', conf:'CAF', fifaRank:38,
+    name:'Algeria', nameCN:'阿爾及利亞', flag:'🇩🇿', group:'J', conf:'CAF', fifaRank:28,
     coach:'Vladimir Petković', formation:'4-3-3',
     keyPlayers:[
       {name:'Riyad Mahrez',pos:'翼鋒',club:'Al-Ahli'},
@@ -533,7 +533,7 @@ const TEAMS = {
 
   // ===== 實際賽程K組球隊 =====
   'POR': {
-    name:'Portugal', nameCN:'葡萄牙', flag:'🇵🇹', group:'K', conf:'UEFA', fifaRank:6,
+    name:'Portugal', nameCN:'葡萄牙', flag:'🇵🇹', group:'K', conf:'UEFA', fifaRank:5,
     coach:'Roberto Martínez', formation:'4-3-3',
     keyPlayers:[
       {name:'Bruno Fernandes',pos:'攻擊中場',club:'曼聯'},
@@ -547,15 +547,15 @@ const TEAMS = {
     strengths:['Bruno+Bernardo世界頂級中場組合','Leão邊路爆發力驚人','Rúben Dias後防領袖'],
     weaknesses:['Ronaldo角色定位影響整體戰術','中鋒位置無明確接班人','更衣室壓力管理'],
     history:'2016歐洲盃冠軍；2019歐國聯冠軍；世界盃最佳四強（1966）',
-    recentForm:['W','W','W','W','W'],
+    recentForm:['L','W','W','D','W'],
     predTitle:'葡萄牙最強一代', predOdds:'7-1', predDesc:'後Ronaldo時代，Bruno+Leão+Bernardo組成的葡萄牙更完整'
   },
   'COL': {
-    name:'Colombia', nameCN:'哥倫比亞', flag:'🇨🇴', group:'K', conf:'CONMEBOL', fifaRank:11,
+    name:'Colombia', nameCN:'哥倫比亞', flag:'🇨🇴', group:'K', conf:'CONMEBOL', fifaRank:13,
     coach:'Néstor Lorenzo', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Luis Díaz',pos:'左翼',club:'利物浦'},
-      {name:'James Rodríguez',pos:'攻擊中場',club:'拉約瓦利卡諾'},
+      {name:'James Rodríguez',pos:'攻擊中場',club:'明尼蘇達聯'},
       {name:'Richard Ríos',pos:'中場',club:'帕梅拉斯'},
       {name:'Davinson Sánchez',pos:'後衛',club:'待定'},
       {name:'Camilo Vargas',pos:'門將',club:'待定'}
@@ -569,7 +569,7 @@ const TEAMS = {
     predTitle:'南美最強後起之秀', predOdds:'18-1', predDesc:'2024美洲盃亞軍，哥倫比亞達到近年最強狀態'
   },
   'UZB': {
-    name:'Uzbekistan', nameCN:'烏茲別克', flag:'🇺🇿', group:'K', conf:'AFC', fifaRank:74,
+    name:'Uzbekistan', nameCN:'烏茲別克', flag:'🇺🇿', group:'K', conf:'AFC', fifaRank:50,
     coach:'Srecko Katanec', formation:'4-4-2',
     keyPlayers:[
       {name:'Eldor Shomurodov',pos:'中鋒',club:'巴薩克赫爾'},
@@ -603,14 +603,14 @@ const TEAMS = {
     strengths:['Bellingham+Kane是世界最強中鋒中場搭檔之一','攻擊線陣容深度極強','2024歐洲盃決賽底氣'],
     weaknesses:['大賽關鍵時刻心理脆弱','後衛線偶有失誤','Tuchel體系磨合期'],
     history:'1966年唯一冠軍；近年2018四強、2021/2024歐洲盃亞軍',
-    recentForm:['W','W','D','W','L'],
+    recentForm:['W','W','W','D','L'],
     predTitle:'等待60年的夢想', predOdds:'5-1', predDesc:'Bellingham和Kane組合無解，這一代是英格蘭史上最強'
   },
   'CRO': {
-    name:'Croatia', nameCN:'克羅埃西亞', flag:'🇭🇷', group:'L', conf:'UEFA', fifaRank:10,
+    name:'Croatia', nameCN:'克羅埃西亞', flag:'🇭🇷', group:'L', conf:'UEFA', fifaRank:11,
     coach:'Zlatko Dalić', formation:'4-3-3',
     keyPlayers:[
-      {name:'Luka Modrić',pos:'中場',club:'皇家馬德里'},
+      {name:'Luka Modrić',pos:'中場',club:'AC米蘭'},
       {name:'Joško Gvardiol',pos:'後衛',club:'曼城'},
       {name:'Mateo Kovačić',pos:'中場',club:'曼城'},
       {name:'Andrej Kramarić',pos:'前鋒',club:'霍芬海姆'},
@@ -621,11 +621,11 @@ const TEAMS = {
     strengths:['Modrić的中場領導無可取代','Gvardiol是世界頂級後衛','2018亞軍2022季軍底氣'],
     weaknesses:['進攻火力有限','主力陣容老化','缺乏速度型邊鋒'],
     history:'2018亞軍、2022季軍，近兩屆連續四強',
-    recentForm:['W','D','L','D','W'],
+    recentForm:['W','W','W','W','L'],
     predTitle:'老將最後出征', predOdds:'20-1', predDesc:'Modrić最後一屆世界盃，克羅埃西亞的中場韌性仍是一流'
   },
   'PAN': {
-    name:'Panama', nameCN:'巴拿馬', flag:'🇵🇦', group:'L', conf:'CONCACAF', fifaRank:71,
+    name:'Panama', nameCN:'巴拿馬', flag:'🇵🇦', group:'L', conf:'CONCACAF', fifaRank:33,
     coach:'Thomas Christiansen', formation:'4-4-2',
     keyPlayers:[
       {name:'Ismael Díaz',pos:'前鋒',club:'波爾圖'},
@@ -646,7 +646,7 @@ const TEAMS = {
     name:'Ghana', nameCN:'迦納', flag:'🇬🇭', group:'L', conf:'CAF', fifaRank:60,
     coach:'Otto Addo', formation:'4-3-3',
     keyPlayers:[
-      {name:'Mohammed Kudus',pos:'攻擊中場/翼鋒',club:'西漢姆聯'},
+      {name:'Mohammed Kudus',pos:'攻擊中場/翼鋒',club:'熱刺'},
       {name:'Thomas Partey',pos:'後腰',club:'兵工廠'},
       {name:'Antoine Semenyo',pos:'翼鋒',club:'伯恩茅斯'},
       {name:'Jordan Ayew',pos:'前鋒',club:'待定'},
