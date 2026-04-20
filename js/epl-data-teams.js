@@ -77,7 +77,8 @@ const EPL_TEAMS = {
       {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末可望回歸'},
       {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢',returnDate:'四月底（本月報銷）'},
       {name:'John Stones',pos:'中後衛',status:'小腿傷，已部分訓練',returnDate:'短期內'},
-      {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷（vs Chelsea下半場受傷）',returnDate:'評估中，已輕度訓練'}
+      {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷（vs Chelsea下半場受傷）',returnDate:'評估中，已輕度訓練'},
+      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（vs 兵工廠比賽中再度受傷）',returnDate:'評估中，可能缺陣數週'}
     ]
   },
   'CHE': {
@@ -251,7 +252,7 @@ const EPL_TEAMS = {
   },
   'NFO': {
     name:'Nottingham Forest', nameCN:'諾丁漢森林', flag:'https://crests.football-data.org/351.png',
-    league:'Premier League', eplRank:13, coach:'Nuno Espírito Santo', formation:'4-2-3-1',
+    league:'Premier League', eplRank:13, coach:'Vítor Pereira', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Chris Wood',pos:'前鋒',club:'諾丁漢森林'},
       {name:'Morgan Gibbs-White',pos:'攻擊中場',club:'諾丁漢森林'},

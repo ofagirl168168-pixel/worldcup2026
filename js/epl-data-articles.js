@@ -981,6 +981,169 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p><strong>本站賽前預測：曼城 2-1 兵工廠 ✅ — 比分完全命中</strong></p>`,
     tags: ['賽後回顧', '曼城', '兵工廠', 'Cherki', 'Haaland', 'Donnarumma', '爭冠', '第33輪']
+  },
+  {
+    id: 'epl-025',
+    title: '【賽後回顧】艾佛頓 1-2 利物浦：Van Dijk 第 100 分鐘頭鎚絕殺新球場德比',
+    date: '2026-04-20',
+    category: '賽後深度回顧',
+    summary: 'Salah 29 分鐘破門追平 Gerrard 德比 9 球紀錄，Beto 54 分鐘扳平，Van Dijk 補時第 100 分鐘頭鎚絕殺。利物浦本季第 7 個補時致勝球。',
+    content: `<h2>艾佛頓 1-2 利物浦｜第33輪・Hill Dickinson Stadium・觀眾 52,585</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">29' ⚽</td>
+<td style="padding:8px"><strong>Mohamed Salah（利物浦）</strong> — 追平 Steven Gerrard 的默西塞德德比 9 球紀錄</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">54' ⚽</td>
+<td style="padding:8px"><strong>Beto（艾佛頓）</strong> — Kiernan Dewsbury-Hall 傳中，Beto 門前混戰中將球捅入</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">100' ⚽</td>
+<td style="padding:8px"><strong>Virgil van Dijk（利物浦）</strong> — Szoboszlai 角球開到六碼區，Van Dijk 高高躍起力頭鎚破門絕殺</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-1 ∣ 終場 1-2</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>歷史性的場地，歷史性的德比</h4>
+
+<p>這是艾佛頓搬遷至全新 Hill Dickinson Stadium 後的首場默西塞德德比。52,585 名球迷擠滿了新球場的每個角落，氣氛從開球前就已達到沸點。艾佛頓球迷渴望在新家創造歷史，利物浦則決心不讓同城宿敵如願。</p>
+
+<h4>上半場：Salah 的里程碑</h4>
+
+<p>利物浦從一開始就掌控節奏，56.4% 的控球率讓艾佛頓難以組織有效進攻。第 29 分鐘，Salah 以標誌性的左腳入球為利物浦率先破門——這是他在默西塞德德比中的第 <strong>9 顆進球</strong>，追平了 Steven Gerrard 的隊史紀錄。這可能是 Salah 職業生涯的最後一場德比，他選擇以最完美的方式刻下自己的名字。</p>
+
+<h4>下半場：Beto 扳平與漫長的傷停補時</h4>
+
+<p>David Moyes 在中場休息後調整了戰術，艾佛頓的壓迫強度明顯提升。第 54 分鐘，Dewsbury-Hall 右路傳中製造混亂，Beto 在門前搶到落點將球捅入網窩。Hill Dickinson Stadium 瞬間爆發，艾佛頓看到了在新家取得首場德比勝利的希望。</p>
+
+<p>此後比賽陷入膠著，雙方都有破門機會但都未能把握。比賽進入傷停補時，裁判給出了 <strong>10 分鐘</strong>的補時——而 Van Dijk 正是在第 100 分鐘完成了絕殺。</p>
+
+<p>Szoboszlai 的角球弧度精準，飛向六碼區。Van Dijk 擺脫盯防球員高高躍起，一記力拔山河的頭鎚砸入網角。Pickford 飛撲無果，利物浦球員瘋狂慶祝，艾佛頓球迷則陷入絕望的沉默。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">艾佛頓</th>
+<th style="padding:8px">利物浦</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>43.6%</td><td>56.4%</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">射門/射正</td><td>10/4</td><td>14/6</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">角球</td><td>1</td><td>6</td>
+</tr>
+</table>
+
+<h3>影響與展望</h3>
+
+<ul>
+<li><strong>利物浦</strong>：三分到手讓利物浦穩固第五的位置，在歐冠資格爭奪戰中拉開與車路士的差距。Van Dijk 在最關鍵時刻展現了隊長本色，而 Salah 的德比紀錄則為他可能的告別季增添了濃墨重彩的一筆。</li>
+<li><strong>艾佛頓</strong>：新球場首場德比的心碎結局。Moyes 的球隊表現出了保級所需的鬥志和拼勁，但第 100 分鐘的丟球讓所有努力付諸東流。保級形勢依然嚴峻。</li>
+<li><strong>關鍵數字</strong>：Salah 默西塞德德比 9 球追平 Gerrard，Van Dijk 的頭球是利物浦本季第 7 個補時絕殺進球。</li>
+</ul>`,
+    tags: ['賽後回顧', '艾佛頓', '利物浦', 'Salah', 'Van Dijk', '德比', '第33輪']
+  },
+  {
+    id: 'epl-026',
+    title: '【賽後回顧】MW33 週日場次：Gibbs-White 帽子戲法 + Villa Park 七球大戰',
+    date: '2026-04-20',
+    category: '賽後深度回顧',
+    summary: '森林靠 Gibbs-White 15 分鐘帽子戲法逆轉伯恩利 4-1；維拉 4-3 險勝桑德蘭，Abraham 補時絕殺。',
+    content: `<h2>第33輪週日場次回顧：Gibbs-White 帽子戲法 + Villa Park 七球大戰</h2>
+
+<h3>諾丁漢森林 4-1 伯恩利｜City Ground</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">45+2' ⚽</td>
+<td style="padding:8px"><strong>Zian Flemming（伯恩利）</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">62' ⚽</td>
+<td style="padding:8px"><strong>Morgan Gibbs-White（森林）</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">69' ⚽</td>
+<td style="padding:8px"><strong>Morgan Gibbs-White（森林）</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">77' ⚽</td>
+<td style="padding:8px"><strong>Morgan Gibbs-White（森林）</strong> — 15 分鐘帽子戲法完成！</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">90+8' ⚽</td>
+<td style="padding:8px"><strong>Igor Jesus（森林）</strong></td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-1 ∣ 終場 4-1</td>
+</tr>
+</table>
+
+<p>森林在半場落後一球的情況下，靠 <strong>Morgan Gibbs-White 的 15 分鐘帽子戲法</strong>（62'、69'、77'）完成驚天逆轉。伯恩利的 Flemming 在上半場補時先開紀錄，但 Vítor Pereira 的球隊在下半場完全不同——Gibbs-White 連入三球撕碎了伯恩利脆弱的防線，Igor Jesus 在補時再添一球鎖定 4-1 大勝。</p>
+
+<p>這場勝利對森林的保級大業至關重要。伯恩利則繼續在降級深淵中掙扎，Scott Parker 面臨越來越大的壓力。</p>
+
+<h3>阿斯頓維拉 4-3 桑德蘭｜Villa Park</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">2' ⚽</td>
+<td style="padding:8px"><strong>Ollie Watkins（維拉）</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">9' ⚽</td>
+<td style="padding:8px"><strong>Chris Rigg（桑德蘭）</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">36' ⚽</td>
+<td style="padding:8px"><strong>Ollie Watkins（維拉）</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">46' ⚽</td>
+<td style="padding:8px"><strong>Morgan Rogers（維拉）</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">86' ⚽</td>
+<td style="padding:8px"><strong>Trai Hume（桑德蘭）</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">87' ⚽</td>
+<td style="padding:8px"><strong>Wilson Isidor（桑德蘭）</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">90+3' ⚽</td>
+<td style="padding:8px"><strong>Tammy Abraham（維拉）</strong> — 補時絕殺！</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 2-1 ∣ 終場 4-3</td>
+</tr>
+</table>
+
+<p>Villa Park 上演了一場令人窒息的七球大戰。Watkins 梅開二度（2'、36'）加上 Rogers 開場即入球，維拉似乎穩操勝券。但桑德蘭在最後 5 分鐘連扳兩球（Hume 86'、Isidor 87'），將比分拉成 3-3，全場球迷不敢相信眼前的逆轉正在發生。</p>
+
+<p>就在所有人以為比賽要以平局收場時，<strong>Tammy Abraham 在補時第 3 分鐘挺身而出</strong>，搶點破門完成絕殺。維拉 4-3 驚險勝出，朝歐冠資格邁出堅實一步。桑德蘭雖敗猶榮，升班馬展現了不屈的戰鬥精神。</p>
+
+<h3>兩場比賽的共同主題</h3>
+
+<ul>
+<li><strong>保級戰線</strong>：森林 4-1 大勝讓他們的保級形勢大為改觀，而伯恩利的處境愈加絕望。</li>
+<li><strong>歐冠爭奪</strong>：維拉的三分讓他們繼續穩居歐冠區，Emery 的球隊在關鍵時刻展現了冠軍氣質。</li>
+<li><strong>絕殺劇情</strong>：Abraham 的補時絕殺與同日 Van Dijk 的第 100 分鐘頭球，讓這個英超週日成為了本季最戲劇化的一天。</li>
+</ul>`,
+    tags: ['賽後回顧', '森林', '伯恩利', '維拉', '桑德蘭', 'Gibbs-White', '帽子戲法', '第33輪']
   }
 ];
 
