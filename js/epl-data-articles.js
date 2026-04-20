@@ -893,6 +893,94 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <strong>信心指數：50%</strong><br>
 <strong>看點：兩支防守漏洞百出的球隊對決，進球大戰機率極高</strong></p>`,
     tags: ['賽前分析', '車路士', '曼聯', 'Palmer', 'Bruno', 'Martinez停賽', '第33輪']
+  },
+  {
+    id: 'epl-024',
+    title: '【賽後回顧】曼城 2-1 兵工廠：Haaland 絕殺，爭冠懸念全面引爆',
+    date: '2026-04-19',
+    category: '賽後深度回顧',
+    summary: 'Cherki 16 分鐘破門，Donnarumma 失誤讓 Havertz 兩分鐘後扳平，Haaland 65 分鐘絕殺。曼城將差距從 6 分縮至 3 分，手上還有補賽。',
+    content: `<h2>曼城 2-1 兵工廠｜第33輪・伊蒂哈德球場</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">16' ⚽</td>
+<td style="padding:8px"><strong>Rayan Cherki（曼城）</strong> — Rodri 橫傳被半解圍，Matheus Nunes 回敲，Cherki 禁區邊緣連過兩人後低射遠角入網</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">18' ⚽</td>
+<td style="padding:8px"><strong>Kai Havertz（兵工廠）</strong> — Donnarumma 接回傳後猶豫出球，Havertz 全力追趕將解圍球擋入球門，門將烏龍式失誤</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">65' ⚽</td>
+<td style="padding:8px"><strong>Erling Haaland（曼城）</strong> — Nico O'Reilly 右路底線回傳，Haaland 門前搶點推射破網</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 1-1 ∣ 終場 2-1</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>開場 18 分鐘的瘋狂</h4>
+
+<p>這場被視為本季英超爭冠決戰的比賽，開場就以瘋狂節奏展開。第 16 分鐘，Rodri 的橫傳被兵工廠後防半解圍，Matheus Nunes 在混亂中將球回敲給 Cherki。這位法國天才在禁區邊緣連續擺脫兩名防守者，冷靜地將球推入遠角底部——Raya 只能目送皮球入網。Cherki 在大場面中的表現再次證明曼城夏窗的精準引援。</p>
+
+<p>但兵工廠的回應只用了 120 秒。第 18 分鐘，一個看似無害的邊線球被回傳給 Donnarumma，意大利門將猶豫了一瞬——Havertz 像獵豹般全速衝刺追趕。Donnarumma 倉促大腳解圍，皮球直接彈在 Havertz 身上反彈入網。伊蒂哈德一片死寂，客隊球迷則陷入瘋狂。這是 Donnarumma 本季最尷尬的失誤。</p>
+
+<h4>下半場：Haaland 的致命一擊</h4>
+
+<p>半場 1-1 平手，雙方都知道下半場的第一顆進球將決定一切。Guardiola 在中場休息時的調整立竿見影：曼城收緊中場壓縮空間，迫使兵工廠的推進變得困難。</p>
+
+<p>第 65 分鐘，致命一刻來臨。O'Reilly 在右路底線附近擺脫防守後低平回傳禁區，Haaland 在門前搶到第一點，一腳推射輕鬆破網——這就是世界上最致命前鋒的價值。Raya 毫無機會，兵工廠的後防線在這一刻被完全拆穿。</p>
+
+<p>此後兵工廠傾巢而出試圖扳平。Ødegaard 和 Eze 輪番嘗試遠射，但曼城防線在 Rodri 的組織下固若金湯。Haaland 的進球不僅為 Donnarumma 的失誤贖罪，更讓英超爭冠形勢發生根本性改變。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">曼城</th>
+<th style="padding:8px">兵工廠</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>58.6%</td><td>41.4%</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">射門/射正</td><td>15/5</td><td>9/3</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">角球</td><td>8</td><td>5</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">黃牌</td><td>2</td><td>2</td>
+</tr>
+</table>
+
+<h3>爭冠形勢劇變</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">球隊</th><th>場次</th><th>積分</th><th>淨勝球</th></tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)"><td style="text-align:left;padding:8px">兵工廠</td><td>33</td><td>70</td><td>+37</td></tr>
+<tr><td style="text-align:left;padding:8px">曼城</td><td>33</td><td>67</td><td>+36</td></tr>
+</table>
+
+<p>賽前 6 分差距變成 3 分。更關鍵的是，曼城手上還有一場補賽（vs 伯恩利），如果拿下三分就能以 70 分追平兵工廠。剩餘 5 輪，爭冠懸念完全被打開。</p>
+
+<h3>影響與展望</h3>
+
+<ul>
+<li><strong>曼城</strong>：Cherki 和 Haaland 的配合越來越默契，Rodri 傷癒回歸後中場控制力大幅提升。但壞消息是 Rodri 在本場比賽中再度受傷（腹股溝），可能缺陣數週。如果補賽順利拿下伯恩利，曼城將重新掌握爭冠主動權，但 Rodri 的傷勢是一大隱憂。</li>
+<li><strong>兵工廠</strong>：英超 2 連敗（先輸伯恩茅斯再負曼城）是本季最嚴峻的危機。好消息是 Ødegaard 和 Rice 都首發出場，證明傷勢不嚴重。壞消息是 Saka 仍然缺陣，下週的歐冠四強首回合（vs 馬競）將進一步消耗體力。雙線作戰的壓力正在擠壓 Arteta 的陣容。</li>
+<li><strong>Donnarumma</strong>：去年夏窗從 PSG 轉會曼城後表現穩健，但今晚的失誤提醒所有人——頂級門將一個失誤就可能改變比賽走向。幸好 Haaland 替他贖罪。</li>
+</ul>
+
+<p><strong>本站賽前預測：曼城 2-1 兵工廠 ✅ — 比分完全命中</strong></p>`,
+    tags: ['賽後回顧', '曼城', '兵工廠', 'Cherki', 'Haaland', 'Donnarumma', '爭冠', '第33輪']
   }
 ];
 
