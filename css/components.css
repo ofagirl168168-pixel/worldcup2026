@@ -3580,36 +3580,36 @@ img.flag-img {
   display: flex; align-items: center; justify-content: center;
 }
 
-/* 桌機 3 選項：以 2 選項為範本按比例縮小（~0.76x），保留底部羅馬數字空間 */
+/* 桌機 3 選項：以 2 選項為範本按比例縮小，保留底部羅馬數字 + 菱形空間 */
 .opinion-cards--opts-3 .opinion-card {
   max-width: 175px;
-  padding: 14px 10px 40px;          /* 底部拉大給羅馬數字留位 */
+  padding: 14px 10px 50px;          /* 底部預留：羅馬數字 30 + label 本身 12 + 緩衝 */
   font-size: 14px;
   gap: 10px;
 }
 .opinion-cards--opts-3 .opinion-card-icon {
-  font-size: 42px;                  /* 54 × 0.76 */
+  font-size: 36px;                  /* 再縮一點 */
 }
 .opinion-cards--opts-3 .opinion-card-label {
-  bottom: 18px;
+  bottom: 30px;                     /* 維持原設計，避開 bottom diamond (22px) */
   font-size: 9px;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
 }
 
-/* 桌機 4 選項：比 3 選項再縮一階，維持排版彈性 */
+/* 桌機 4 選項 */
 .opinion-cards--opts-4 .opinion-card {
   max-width: 165px;
-  padding: 14px 10px 40px;
+  padding: 14px 10px 50px;
   font-size: 13px;
   gap: 10px;
 }
 .opinion-cards--opts-4 .opinion-card-icon {
-  font-size: 40px;
+  font-size: 34px;
 }
 .opinion-cards--opts-4 .opinion-card-label {
-  bottom: 18px;
+  bottom: 30px;
   font-size: 9px;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
 }
 
 @media (max-width: 600px) {
