@@ -1052,7 +1052,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <ul>
 <li><strong>利物浦</strong>：三分到手讓利物浦穩固第五的位置，在歐冠資格爭奪戰中拉開與車路士的差距。Van Dijk 在最關鍵時刻展現了隊長本色，而 Salah 的德比紀錄則為他可能的告別季增添了濃墨重彩的一筆。</li>
 <li><strong>艾佛頓</strong>：新球場首場德比的心碎結局。Moyes 的球隊表現出了保級所需的鬥志和拼勁，但第 100 分鐘的丟球讓所有努力付諸東流。保級形勢依然嚴峻。</li>
-<li><strong>關鍵數字</strong>：Salah 默西塞德德比 9 球追平 Gerrard，Van Dijk 的頭球是利物浦本季第 7 個補時絕殺進球。</li>
+<li><strong>關鍵數字</strong>：Salah 默西塞德德比 9 球追平 Gerrard，Van Dijk 的頭球是利物浦本季第 6 個補時絕殺進球。</li>
 </ul>`,
     tags: ['賽後回顧', '艾佛頓', '利物浦', 'Salah', 'Van Dijk', '德比', '第33輪']
   },
