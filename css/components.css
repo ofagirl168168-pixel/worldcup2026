@@ -3583,7 +3583,7 @@ img.flag-img {
 /* 桌機 3 選項：以 2 選項為範本按比例縮小，保留底部羅馬數字 + 菱形空間 */
 .opinion-cards--opts-3 .opinion-card {
   max-width: 175px;
-  padding: 14px 10px 50px;          /* 底部預留：羅馬數字 30 + label 本身 12 + 緩衝 */
+  padding: 36px 10px 50px;          /* 上下更對稱，讓 icon+text 整體往下一點更置中 */
   font-size: 14px;
   gap: 10px;
 }
@@ -3599,7 +3599,7 @@ img.flag-img {
 /* 桌機 4 選項 */
 .opinion-cards--opts-4 .opinion-card {
   max-width: 165px;
-  padding: 14px 10px 50px;
+  padding: 36px 10px 50px;
   font-size: 13px;
   gap: 10px;
 }
