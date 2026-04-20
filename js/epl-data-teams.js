@@ -205,7 +205,7 @@ const EPL_TEAMS = {
       {name:'Justin Kluivert',pos:'翼鋒',club:'伯恩茅斯'},
       {name:'Antoine Semenyo',pos:'右翼',club:'伯恩茅斯'},
       {name:'Lewis Cook',pos:'中場',club:'伯恩茅斯'},
-      {name:'Milos Kerkez',pos:'左後衛',club:'伯恩茅斯'}
+      {name:'Marcus Tavernier',pos:'攻擊中場',club:'伯恩茅斯'}
     ],
     radar:{attack:78,defense:74,midfield:76,speed:80,experience:62},
     style:'高壓逼搶，快速轉換，直接進攻',
@@ -269,16 +269,16 @@ const EPL_TEAMS = {
     name:'Crystal Palace', nameCN:'水晶宮', flag:'https://crests.football-data.org/354.png',
     league:'Premier League', eplRank:14, coach:'Oliver Glasner', formation:'3-4-3',
     keyPlayers:[
-      {name:'Eberechi Eze',pos:'攻擊中場',club:'水晶宮'},
       {name:'Ismaïla Sarr',pos:'右翼',club:'水晶宮'},
       {name:'Jean-Philippe Mateta',pos:'前鋒',club:'水晶宮'},
       {name:'Adam Wharton',pos:'中場',club:'水晶宮'},
+      {name:'Yeremy Pino',pos:'右翼/前腰',club:'水晶宮'},
       {name:'Dean Henderson',pos:'門將',club:'水晶宮'}
     ],
-    radar:{attack:78,defense:73,midfield:77,speed:82,experience:66},
+    radar:{attack:76,defense:73,midfield:74,speed:82,experience:66},
     style:'邊路速度衝擊，定位球戰術，反擊犀利',
-    strengths:['Eze創造力出色','邊路速度優勢明顯','Glasner戰術執行力佳'],
-    weaknesses:['Guéhi轉會曼城後中衛深度下降','進攻過度依賴個人能力','客場拿分困難'],
+    strengths:['Sarr+Pino邊路速度優勢','Mateta終結效率穩定','Glasner戰術執行力佳'],
+    weaknesses:['Eze夏窗轉兵工廠、Guéhi轉曼城後創造力與中衛深度雙降','進攻過度依賴個人能力','客場拿分困難'],
     recentForm:['L','D','W','W','L'],
     history:'倫敦南部老牌球會，從未贏得頂級聯賽冠軍'
   },
@@ -286,16 +286,16 @@ const EPL_TEAMS = {
     name:'West Ham United', nameCN:'西漢姆', flag:'https://crests.football-data.org/563.png',
     league:'Premier League', eplRank:17, coach:'Nuno Espírito Santo', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Mohammed Kudus',pos:'攻擊中場/翼鋒',club:'西漢姆'},
       {name:'Jarrod Bowen',pos:'右翼',club:'西漢姆'},
       {name:'Lucas Paquetá',pos:'攻擊中場',club:'西漢姆'},
-      {name:'Edson Álvarez',pos:'防守中場',club:'西漢姆'},
+      {name:'Mateus Fernandes',pos:'中場',club:'西漢姆'},
+      {name:'El Hadji Malick Diouf',pos:'左後衛',club:'西漢姆'},
       {name:'Alphonse Areola',pos:'門將',club:'西漢姆'}
     ],
-    radar:{attack:78,defense:73,midfield:77,speed:79,experience:72},
+    radar:{attack:74,defense:70,midfield:72,speed:78,experience:70},
     style:'直接進攻，邊路傳中，定位球',
-    strengths:['Kudus個人能力突出','Bowen進攻穩定','歐戰經驗有底蘊'],
-    weaknesses:['防守不夠穩固','陣容融合仍在進行','主場優勢不夠明顯'],
+    strengths:['Bowen進攻穩定','Paquetá創造力仍在','Diouf夏窗補強左路'],
+    weaknesses:['Kudus夏窗轉熱刺、Álvarez租借費內巴切，中前場創造力銳減','防守不夠穩固','陣容融合仍在進行'],
     recentForm:['L','L','W','D','W'],
     history:'1965年歐洲盃賽冠軍盃冠軍，2023年歐協聯冠軍'
   },
