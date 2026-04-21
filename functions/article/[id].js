@@ -43,14 +43,22 @@ export async function onRequest(context) {
   const ogImage = `${origin}/og/${encodeURIComponent(id)}.png`;
   const title = sanitize(article.title);
   const desc = sanitize(article.summary).slice(0, 200);
-  const fullTitle = `${title}｜Soccer麥迪`;
+  const fullTitle = `${title}｜Soccer麥迪-足球情報站`;
 
   // 取原 index.html，改 meta tag
   const base = await env.ASSETS.fetch(`${origin}/`);
 
   const rewriter = new HTMLRewriter()
+    // 文章頁 URL 是 /article/:id，原 HTML 裡的相對資源路徑（css/ js/ img/）
+    // 會被瀏覽器 resolve 成 /article/css/... 導致 404，所以插一個 <base href="/">
+    .on('head', {
+      element(e) { e.prepend('<base href="/">', { html: true }); },
+    })
     .on('title', {
       element(e) { e.setInnerContent(fullTitle); },
+    })
+    .on('meta[property="og:site_name"]', {
+      element(e) { e.setAttribute('content', 'Soccer麥迪-足球情報站'); },
     })
     .on('meta[name="description"]', {
       element(e) { e.setAttribute('content', desc); },
