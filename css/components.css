@@ -812,6 +812,14 @@ img.flag-img {
 .article-modal-body ul { margin: 0 0 14px 16px; list-style: disc; }
 .article-modal-body ul li { margin-bottom: 8px; }
 
+/* ========== 首頁積分榜列（可點擊跳轉至數據頁） ========== */
+.home-standings-row:hover {
+  background: rgba(255,165,2,0.08) !important;
+}
+.home-standings-row:active {
+  background: rgba(255,165,2,0.14) !important;
+}
+
 /* ========== 導覽列 XP 元件 ========== */
 .nav-streak-widget {
   display: flex; align-items: center; gap: 4px;
@@ -871,6 +879,19 @@ img.flag-img {
 }
 @media (max-width: 768px) {
   .nav-xp-widget { display: none; }
+  /* 手機：連勝小徽章更緊湊，避免擠壓賽事切換器 */
+  .nav-streak-widget { padding: 4px 8px; gap: 2px; }
+  .nav-streak-flame  { font-size: 13px; }
+  .nav-streak-num    { font-size: 12px; letter-spacing: 0; }
+  /* 手機：寶石已在漢堡選單內顯示，主列隱藏以騰空間 */
+  .nav-gem-widget { display: none; }
+}
+@media (max-width: 420px) {
+  /* 非常窄：賽事切換器僅顯示 logo、按鈕貼緊 */
+  .tournament-switcher { gap: 2px; padding: 2px; }
+  .tournament-btn { padding: 4px 6px; }
+  .tournament-btn .t-logo { height: 18px; width: 18px; }
+  .nav-streak-widget { padding: 3px 6px; }
 }
 
 /* ========== 寶石元件 ========== */

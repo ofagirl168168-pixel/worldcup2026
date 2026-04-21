@@ -646,7 +646,7 @@ function renderDeathGroups() {
           const crest = t?.flag || row.teamCrest || '';
           const name = t?.nameCN || row.team;
           const gd = row.goalDifference;
-          return `<div style="display:grid;${cols};gap:0;padding:12px 16px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.04);${i%2?'':'background:rgba(255,255,255,0.02)'}">
+          return `<div class="home-standings-row" onclick="showSection('stats')" style="display:grid;${cols};gap:0;padding:12px 16px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.15s;${i%2?'':'background:rgba(255,255,255,0.02)'}">
             <span style="font-size:16px;font-weight:800;color:${zoneColor(row.position)}">${row.position}</span>
             <span style="font-size:22px">${flagImg(crest)}</span>
             <div><div style="font-weight:700;font-size:14px">${name}</div></div>
@@ -689,7 +689,7 @@ function renderDeathGroups() {
           ${top8.map((row, i) => {
             const t = _T[row.code];
             if (!t) return '';
-            return `<div style="display:grid;${cols};gap:0;padding:12px 16px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.04);${i%2?'':'background:rgba(255,255,255,0.02)'}">
+            return `<div class="home-standings-row" onclick="showSection('stats')" style="display:grid;${cols};gap:0;padding:12px 16px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.15s;${i%2?'':'background:rgba(255,255,255,0.02)'}">
               <span style="font-size:16px;font-weight:800;color:var(--accent)">${i+1}</span>
               <span style="font-size:22px">${flagImg(t.flag)}</span>
               <div><div style="font-weight:700;font-size:14px">${t.nameCN}</div><div style="font-size:11px;color:var(--text-muted);margin-top:1px">${t.league||''}</div></div>
@@ -708,7 +708,7 @@ function renderDeathGroups() {
           ${next16.map((row, i) => {
             const t = _T[row.code];
             if (!t) return '';
-            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);border:1px solid var(--border)">
+            return `<div class="home-standings-row" onclick="showSection('stats')" style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;transition:background 0.15s">
               <span style="font-size:13px;font-weight:800;color:var(--text-muted);width:24px;text-align:center">${i+9}</span>
               <span style="font-size:20px">${flagImg(t.flag)}</span>
               <div style="flex:1"><div style="font-size:13px;font-weight:700">${t.nameCN}</div><div style="font-size:10px;color:var(--text-muted)">${row.w}勝${row.d}平${row.l}負</div></div>
