@@ -5,9 +5,9 @@ Object.assign(TEAMS, {
   'RSA': { name:'South Africa', nameCN:'南非', flag:'🇿🇦', group:'A', conf:'CAF', fifaRank:67,
     coach:'Hugo Broos', formation:'4-4-2',
     keyPlayers:[
-      {name:'Percy Tau',pos:'前鋒',club:'Al-Ahly'},
+      {name:'Percy Tau',pos:'前鋒',club:'Thep Xanh Nam Dinh'},
       {name:'Ronwen Williams',pos:'門將',club:'Mamelodi Sundowns'},
-      {name:'Bongani Zungu',pos:'中場',club:'Amiens'}
+      {name:'Bongani Zungu',pos:'中場',club:'AmaZulu FC'}
     ],
     radar:{attack:60,defense:64,midfield:59,speed:68,experience:60},
     style:'防守反擊，強調速度與集體紀律',
@@ -18,9 +18,9 @@ Object.assign(TEAMS, {
     predTitle:'非洲黑馬', predOdds:'200-1', predDesc:'2024非洲盃打入四強，有一定實力，但世界盃是全新挑戰' },
 
   'HAI': { name:'Haiti', nameCN:'海地', flag:'🇭🇹', group:'C', conf:'CONCACAF', fifaRank:83,
-    coach:'Marc Collat', formation:'4-4-2',
+    coach:'Sébastien Migné', formation:'4-4-2',
     keyPlayers:[
-      {name:'Duckens Nazon',pos:'前鋒',club:'待定'},
+      {name:'Duckens Nazon',pos:'前鋒',club:'Esteghlal F.C.'},
       {name:'James Léa Siliki',pos:'中場',club:'Stade Rennais'},
       {name:'Steeven Saba',pos:'前鋒',club:'待定'}
     ],
@@ -35,8 +35,8 @@ Object.assign(TEAMS, {
     coach:'Gustavo Alfaro', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Miguel Almirón',pos:'中場',club:'亞特蘭大聯'},
-      {name:'Antonio Sanabria',pos:'前鋒',club:'托連奴'},
-      {name:'Óscar Romero',pos:'中場',club:'River Plate'}
+      {name:'Antonio Sanabria',pos:'前鋒',club:'克雷莫納'},
+      {name:'Óscar Romero',pos:'中場',club:'Huracán'}
     ],
     radar:{attack:65,defense:68,midfield:63,speed:68,experience:63},
     style:'防守嚴密，依賴Almirón推進反擊',
@@ -50,8 +50,8 @@ Object.assign(TEAMS, {
     coach:'Dick Advocaat', formation:'4-3-3',
     keyPlayers:[
       {name:'Leandro Bacuna',pos:'中場',club:'自由身'},
-      {name:'Juninho Bacuna',pos:'中場',club:'比勒陀利亞大學'},
-      {name:'Tahith Chong',pos:'翼鋒',club:'史特拉斯堡'}
+      {name:'Juninho Bacuna',pos:'中場',club:'Volendam(租借)'},
+      {name:'Tahith Chong',pos:'翼鋒',club:'Sheffield United'}
     ],
     radar:{attack:55,defense:55,midfield:53,speed:64,experience:44},
     style:'整體配合，積極跑動壓迫', strengths:['小國大志，士氣高昂','整體紀律','速度優勢'],
@@ -78,7 +78,7 @@ Object.assign(TEAMS, {
   'CPV': { name:'Cape Verde', nameCN:'維德角', flag:'🇨🇻', group:'H', conf:'CAF', fifaRank:55,
     coach:'Pedro Brito "Bubista"', formation:'4-4-2',
     keyPlayers:[
-      {name:'Djaniny',pos:'前鋒',club:'Al-Qadsiah'},
+      {name:'Djaniny',pos:'前鋒',club:'Al-Fateh FC'},
       {name:'Ryan Mendes',pos:'翼鋒',club:'待定'},
       {name:'Kenny Rocha Santos',pos:'中場',club:'待定'}
     ],
@@ -91,9 +91,9 @@ Object.assign(TEAMS, {
     predTitle:'非洲島國驚喜', predOdds:'400-1', predDesc:'維德角實力在非洲名列前茅，但世界盃舞台是全新挑戰' },
 
   'JOR': { name:'Jordan', nameCN:'約旦', flag:'🇯🇴', group:'J', conf:'AFC', fifaRank:72,
-    coach:'Hussein Ammouta', formation:'4-2-3-1',
+    coach:'Jamal Sellami', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Musa Al-Taamari',pos:'翼鋒',club:'蒙彼利埃'},
+      {name:'Musa Al-Taamari',pos:'翼鋒',club:'雷恩(Stade Rennais)'},
       {name:'Yazan Al-Naimat',pos:'前鋒',club:'待定'},
       {name:'Baha Faisal',pos:'中場',club:'待定'}
     ],
@@ -106,7 +106,7 @@ Object.assign(TEAMS, {
     predTitle:'亞洲盃亞軍挑世界', predOdds:'500-1', predDesc:'2023亞洲盃決賽資歷讓人刮目相看，Al-Taamari是最危險武器' },
 
   'EUPD': { name:'Czechia', nameCN:'捷克', flag:'🇨🇿', group:'A', conf:'UEFA', fifaRank:35,
-    coach:'Ivan Hašek', formation:'4-2-3-1',
+    coach:'Miroslav Koubek', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Tomáš Souček',pos:'中場',club:'西漢姆'},
       {name:'Patrik Schick',pos:'前鋒',club:'拜耳勒沃庫森'},
@@ -122,8 +122,8 @@ Object.assign(TEAMS, {
   'EUPA': { name:'Bosnia and Herzegovina', nameCN:'波士尼亞', flag:'🇧🇦', group:'B', conf:'UEFA', fifaRank:65,
     coach:'Sergej Barbarez', formation:'4-3-3',
     keyPlayers:[
-      {name:'Edin Džeko',pos:'中鋒',club:'費倫茨瓦羅斯'},
-      {name:'Sead Kolašinac',pos:'後衛',club:'馬賽'},
+      {name:'Edin Džeko',pos:'中鋒',club:'Schalke 04'},
+      {name:'Sead Kolašinac',pos:'後衛',club:'亞特蘭大(Atalanta)'},
       {name:'Miralem Pjanić',pos:'中場',club:'退役'}
     ],
     radar:{attack:66,defense:64,midfield:64,speed:65,experience:68},
@@ -138,7 +138,7 @@ Object.assign(TEAMS, {
     keyPlayers:[
       {name:'Hakan Çalhanoğlu',pos:'中場',club:'國際米蘭'},
       {name:'Arda Güler',pos:'中場',club:'皇家馬德里'},
-      {name:'Cenk Tosun',pos:'前鋒',club:'待定'}
+      {name:'Cenk Tosun',pos:'前鋒',club:'Kasımpaşa'}
     ],
     radar:{attack:72,defense:70,midfield:74,speed:72,experience:72},
     style:'中場控制為主，依賴Çalhanoğlu組織，Güler創造力突出',
@@ -148,7 +148,7 @@ Object.assign(TEAMS, {
     recentForm:['W','W','D','W','W'], predTitle:'歐洲盃四強霸主', predOdds:'35-1', predDesc:'Çalhanoğlu與Güler是最令人期待的中場組合，土耳其有實力挺進八強' },
 
   'EUPB': { name:'Sweden', nameCN:'瑞典', flag:'🇸🇪', group:'F', conf:'UEFA', fifaRank:25,
-    coach:'Jon Dahl Tomasson', formation:'4-4-2',
+    coach:'Graham Potter', formation:'4-4-2',
     keyPlayers:[
       {name:'Victor Nilsson Lindelöf',pos:'後衛',club:'阿斯頓維拉'},
       {name:'Dejan Kulusevski',pos:'中場',club:'熱刺'},
@@ -164,9 +164,9 @@ Object.assign(TEAMS, {
   'ICP1': { name:'DR Congo', nameCN:'剛果民主共和國', flag:'🇨🇩', group:'K', conf:'CAF', fifaRank:53,
     coach:'Sébastien Desabre', formation:'4-3-3',
     keyPlayers:[
-      {name:'Chancel Mbemba',pos:'後衛',club:'馬賽'},
-      {name:'Cédric Bakambu',pos:'前鋒',club:'待定'},
-      {name:'Arthur Masuaku',pos:'後衛',club:'貝西克塔斯'}
+      {name:'Chancel Mbemba',pos:'後衛',club:'LOSC Lille'},
+      {name:'Cédric Bakambu',pos:'前鋒',club:'Real Betis'},
+      {name:'Arthur Masuaku',pos:'後衛',club:'RC Lens(租借)'}
     ],
     radar:{attack:65,defense:66,midfield:62,speed:72,experience:60},
     style:'快速反擊，依靠速度與身體對抗優勢',
@@ -178,8 +178,8 @@ Object.assign(TEAMS, {
   'ICP2': { name:'Iraq', nameCN:'伊拉克', flag:'🇮🇶', group:'I', conf:'AFC', fifaRank:58,
     coach:'Graham Arnold', formation:'4-4-2',
     keyPlayers:[
-      {name:'Aymen Hussein',pos:'前鋒',club:'Al-Zawraa'},
-      {name:'Ibrahim Bayesh',pos:'後衛',club:'Al-Shorta'},
+      {name:'Aymen Hussein',pos:'前鋒',club:'Al-Karma'},
+      {name:'Ibrahim Bayesh',pos:'後衛',club:'Al-Dhafra FC'},
       {name:'Amjed Attwan',pos:'中場',club:'待定'}
     ],
     radar:{attack:62,defense:63,midfield:60,speed:66,experience:56},
