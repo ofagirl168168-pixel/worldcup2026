@@ -116,11 +116,20 @@
       }
     }, 800);
 
-    // 如果已投過票，直接顯示結果
+    // 如果已投過票，直接顯示結果（不讓卡片看起來還能選）
     if (existingVote !== null) {
+      const prevIdx = parseInt(existingVote);
+      const preCards = overlay.querySelectorAll('.opinion-card');
+      preCards.forEach((card, i) => {
+        card.classList.add(i === prevIdx ? 'voted-yes' : 'voted-no');
+        card.style.pointerEvents = 'none';
+      });
+      const preSkip = overlay.querySelector('#opinion-skip');
+      if (preSkip) preSkip.style.display = 'none';
+      overlay.dataset.voted = '1';
       setTimeout(() => {
-        _showResult(opinion, parseInt(existingVote), overlay, onClose);
-      }, 600);
+        _showResult(opinion, prevIdx, overlay, onClose);
+      }, 350);
       return;
     }
 
