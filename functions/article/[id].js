@@ -40,7 +40,9 @@ export async function onRequest(context) {
   }
 
   const canonical = `${origin}/article/${encodeURIComponent(id)}`;
-  const ogImage = `${origin}/og/${encodeURIComponent(id)}.png`;
+  // ?v=2 強制 FB/Telegram/LINE 等社群平台重抓（它們會用 URL 當快取 key）
+  // 之前這些平台快取了 function 回傳的舊 og-cover 內容，只有改 URL 才能洗掉
+  const ogImage = `${origin}/og/${encodeURIComponent(id)}.png?v=2`;
   const title = sanitize(article.title);
   const desc = sanitize(article.summary).slice(0, 200);
   const fullTitle = `${title}｜Soccer麥迪-足球情報站`;
