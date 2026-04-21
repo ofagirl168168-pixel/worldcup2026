@@ -1144,6 +1144,90 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <li><strong>絕殺劇情</strong>：Abraham 的補時絕殺與同日 Van Dijk 的第 100 分鐘頭球，讓這個英超週日成為了本季最戲劇化的一天。</li>
 </ul>`,
     tags: ['賽後回顧', '森林', '伯恩利', '維拉', '桑德蘭', 'Gibbs-White', '帽子戲法', '第33輪']
+  },
+  {
+    id: 'epl-027',
+    title: '【賽後回顧】水晶宮 0-0 西漢姆：Henderson 神撲保白卷，狼隊確認降級',
+    date: '2026-04-21',
+    category: '賽後深度回顧',
+    summary: 'Selhurst Park 互交白卷，水晶宮 54.2% 控球但射正僅 1 次。Henderson 關鍵神撲擋下 Mavropanos 頭鎚，Sarr 進球被 VAR 取消。西漢姆拿到保級關鍵 1 分領先熱刺 2 分，狼隊數學上正式降級。',
+    content: `<h2>水晶宮 0-0 西漢姆｜第33輪・Selhurst Park</h2>
+
+<h3>關鍵時刻</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">20' ❌</td>
+<td style="padding:8px"><strong>Brennan Johnson（水晶宮）錯失空中機會</strong> — Jefferson Lerma 右路精準傳中，Johnson 在禁區內搶到無人盯防的空中頭球位置，但頭鎚偏離球門，全場最佳得分機會化為烏有</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">45' 🧤</td>
+<td style="padding:8px"><strong>Dean Henderson 神撲 Mavropanos 頭鎚</strong> — 西漢姆角球戰術，Konstantinos Mavropanos 近距離頭鎚強攻死角，Henderson 反應神速指尖將球撥出橫樑上沿</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">VAR ❌</td>
+<td style="padding:8px"><strong>Ismaila Sarr 進球取消</strong> — 禁區混戰中 Jean-Philippe Mateta 將球擺渡給 Sarr 近距離推射入網，但 VAR 介入確認 Mateta 用手臂觸球，進球無效</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-0 ∣ 終場 0-0</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>主場壓陣但缺乏臨門一腳</h4>
+
+<p>水晶宮在主場 Selhurst Park 掌握局面，全場控球率 54.2%，但攻勢始終無法轉化成有效射門。Oliver Glasner 的三後衛體系讓兩側翼衛 Daniel Muñoz 和 Tyrick Mitchell 頻繁插上製造寬度，Brennan Johnson 與替補上陣的 Ismaila Sarr 也不斷嘗試從邊路切入。</p>
+
+<p>最可惜的是 20 分鐘 Johnson 的空中機會——Lerma 的傳中質量極佳，Johnson 在禁區內完全沒有受到干擾，但頭球卻偏離球門。這是整場比賽最接近破門的時刻，錯失之後水晶宮的進攻就再難創造絕對機會。</p>
+
+<h4>西漢姆靠防守反擊咬住</h4>
+
+<p>Nuno Espírito Santo 的球隊採取穩守反擊策略，全場射正 4 次、射門機會反而多於主隊。上半場補時前 Mavropanos 從角球中爭得的頭鎚是最大威脅，若非 Henderson 指尖神撲將球撥過橫樑，西漢姆早已搶到領先。</p>
+
+<p>下半場 Sarr 看似打破僵局的進球被 VAR 判定 Mateta 手球，這次判罰基本符合現行規則——即便是無意識的手臂觸球，只要在進球環節中發生都會被吹掉。Nuno 賽後表示「這就是現代足球的現實，我們只能接受」。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">水晶宮</th>
+<th style="padding:8px">西漢姆</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>54.2%</td><td>45.8%</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">射正</td><td>1</td><td>4</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">撲救（門將）</td><td>3（Henderson）</td><td>1（Hermansen）</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">進球被取消</td><td>0</td><td>1（Sarr, VAR）</td>
+</tr>
+</table>
+
+<h3>保級與降級形勢</h3>
+
+<ul>
+<li><strong>水晶宮</strong>：英超 4 場不敗延續，排名保持中游。距離歐會盃附加賽區（由布倫特福德佔據）僅差 5 分且還有一場補賽，Glasner 的球隊在賽季末仍保有歐戰資格的挑戰空間。</li>
+<li><strong>西漢姆</strong>：這一分對保級戰意義重大，領先第 18 名熱刺 2 分回到安全區外。Nuno 上任以來西漢姆展現出更扎實的防守組織，Hermansen 與 Mavropanos 的後防軸心逐漸成形。</li>
+<li><strong>狼隊</strong>：CRY vs WHU 和局後，狼隊在數學上正式降級，成為本季第一支確定墜入英冠的球隊。這是 2012 年後狼隊首次降級，上次花了 6 年才升回英超。</li>
+</ul>
+
+<h3>影響與展望</h3>
+
+<p>對三支球隊的意義：</p>
+<ul>
+<li><strong>Glasner 的水晶宮</strong>：雖然錯失三分，但 4 場不敗延續了賽季末的穩定節奏。Henderson 的神撲再次證明他是球隊最可靠的門將，下週作客訪狼隊將是拿分良機。</li>
+<li><strong>Nuno 的西漢姆</strong>：成功帶走 1 分拉開與降級區的距離。Mavropanos 和 Walker-Peters 的後防表現值得肯定，但前鋒線還需要再找解答——Bowen 與 Füllkrug 的進攻組合尚未完全發揮。</li>
+<li><strong>狼隊的未來</strong>：降級確定後的重建方向成為焦點。2025 年夏窗主力球員（如 Matheus Cunha 已轉會曼聯）的流失已難以彌補，預期夏窗還會有更多離隊潮，新任球隊經理需要圍繞保留的核心球員重建陣容，爭取一季即升回英超。</li>
+</ul>
+
+<p><strong>本站賽前預測：水晶宮 1-1 西漢姆 ❌ — 互交白卷，預測比分未中但和局結果命中</strong></p>`,
+    tags: ['賽後回顧', '水晶宮', '西漢姆', 'Henderson', 'Mavropanos', 'VAR', '狼隊降級', '第33輪']
   }
 ];
 
