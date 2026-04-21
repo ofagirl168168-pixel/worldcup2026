@@ -136,7 +136,7 @@
       overlay.dataset.voted = '1';
       setTimeout(() => {
         _showResult(opinion, prevIdx, overlay, onClose);
-      }, 1100);
+      }, 500);
       return;
     }
 
