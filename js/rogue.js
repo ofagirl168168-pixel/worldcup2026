@@ -4226,8 +4226,8 @@
     });
 
     const curBoard = G._lbTab === 'weekly' ? weeklyBoard : allTimeBoard;
-    const rowH = Math.min(32, W * 0.060);
-    const headerH = Math.min(26, W * 0.048);
+    const rowH = Math.min(28, W * 0.052);
+    const headerH = Math.min(24, W * 0.044);
     const startY = py + 6 + subTabH + 12;
 
     // 表頭
@@ -4244,8 +4244,8 @@
     ctx.fillText('分數', colScore, startY);
     ctx.fillText('Wave', colWave, startY);
 
-    // 排行列表
-    const showCount = Math.min(curBoard.length, 5);
+    // 排行列表（前 10 名）
+    const showCount = Math.min(curBoard.length, 10);
     const bodyFz = Math.min(13, W * 0.026);
     const medals = ['🥇', '🥈', '🥉'];
     const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
