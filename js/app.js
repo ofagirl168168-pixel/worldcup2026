@@ -623,6 +623,23 @@ function renderDeathGroups() {
     const _T = _teams();
     if (!standings.length) {
       el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">⏳ 載入積分榜中...</div>';
+      // 首頁若尚未載入過積分榜，主動 fetch 一次（不等使用者切到數據頁）
+      if (!window._eplStandingsFetching) {
+        window._eplStandingsFetching = true;
+        fetch('/api/epl-standings').then(r => r.json()).then(data => {
+          window._eplStandingsFetching = false;
+          if (data?.ok && data.standings?.length) {
+            window._eplStandings = data.standings;
+            window._eplCurrentMatchday = data.matchday;
+            renderDeathGroups(); // 重新渲染
+          } else {
+            el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">📊 暫無積分榜資料</div>';
+          }
+        }).catch(() => {
+          window._eplStandingsFetching = false;
+          el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">⚠️ 積分榜載入失敗</div>';
+        });
+      }
       return;
     }
     const top8 = standings.slice(0, 8);
