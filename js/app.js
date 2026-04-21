@@ -3479,6 +3479,7 @@ function openUCLArticle(id) {
   const arts = _articles();
   const a = arts.find(x => x.id === id);
   if (!a) return;
+  completeDailyTask?.('read_article');
   let overlay = document.getElementById('article-modal-overlay');
   if (!overlay) {
     overlay = document.createElement('div');
