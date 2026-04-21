@@ -812,6 +812,53 @@ img.flag-img {
 .article-modal-body ul { margin: 0 0 14px 16px; list-style: disc; }
 .article-modal-body ul li { margin-bottom: 8px; }
 
+/* ========== 文章分享列 ========== */
+.article-share-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 18px 0 4px;
+  margin-top: 28px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.article-share-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-right: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.article-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.article-share-btn:hover { background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+.article-share-btn.copy.copied { background: #16a34a; border-color: #16a34a; color: #fff; }
+.article-share-btn.line { background: #06c755; border-color: #06c755; color: #fff; }
+.article-share-btn.line:hover { background: #04a647; }
+.article-share-btn.fb   { background: #1877f2; border-color: #1877f2; color: #fff; }
+.article-share-btn.fb:hover { background: #1466d6; }
+.article-share-btn.x    { background: #000; border-color: #333; color: #fff; }
+.article-share-btn.x:hover { background: #111; }
+@media (max-width: 520px) {
+  .article-share-bar { gap: 6px; }
+  .article-share-btn { padding: 6px 11px; font-size: 12px; }
+}
+
 /* ========== 首頁積分榜列（可點擊跳轉至數據頁） ========== */
 .home-standings-row:hover {
   background: rgba(255,165,2,0.08) !important;

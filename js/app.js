@@ -3452,18 +3452,8 @@ function openArticle(id) {
   const a = ARTICLES.find(x => x.id === id);
   if (!a) return;
   completeDailyTask?.('read_article');
-  let overlay = document.getElementById('article-modal-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'article-modal-overlay';
-    overlay.className = 'article-modal-overlay';
-    overlay.innerHTML = `<div class="article-modal-box">
-      <button class="modal-close" onclick="document.getElementById('article-modal-overlay').classList.remove('open')"><i class="fas fa-times"></i></button>
-      <div id="article-modal-inner"></div>
-    </div>`;
-    overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('open'); });
-    document.body.appendChild(overlay);
-  }
+  _pushArticleUrl(a.id);
+  _ensureArticleOverlay();
   document.getElementById('article-modal-inner').innerHTML = `
     <div class="focus-cat">${a.cat}</div>
     <div class="article-modal-title">${a.title}</div>
@@ -3471,8 +3461,9 @@ function openArticle(id) {
       <span><i class="fas fa-calendar"></i> ${a.date}</span>
       <span><i class="fas fa-clock"></i> ${a.readTime}</span>
     </div>
-    <div class="article-modal-body">${a.body}</div>`;
-  overlay.classList.add('open');
+    <div class="article-modal-body">${a.body}</div>
+    ${_renderShareBar(a.id, a.title)}`;
+  document.getElementById('article-modal-overlay').classList.add('open');
 }
 
 function openUCLArticle(id) {
@@ -3480,18 +3471,8 @@ function openUCLArticle(id) {
   const a = arts.find(x => x.id === id);
   if (!a) return;
   completeDailyTask?.('read_article');
-  let overlay = document.getElementById('article-modal-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'article-modal-overlay';
-    overlay.className = 'article-modal-overlay';
-    overlay.innerHTML = `<div class="article-modal-box">
-      <button class="modal-close" onclick="document.getElementById('article-modal-overlay').classList.remove('open')"><i class="fas fa-times"></i></button>
-      <div id="article-modal-inner"></div>
-    </div>`;
-    overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('open'); });
-    document.body.appendChild(overlay);
-  }
+  _pushArticleUrl(a.id);
+  _ensureArticleOverlay();
   // Convert markdown-ish content to HTML
   const bodyHtml = (a.content||'').replace(/^## (.+)$/gm, '<h3>$1</h3>')
     .replace(/^### (.+)$/gm, '<h4>$1</h4>')
@@ -3503,8 +3484,151 @@ function openUCLArticle(id) {
     <div class="focus-cat">${a.category}</div>
     <div class="article-modal-title">${a.title}</div>
     <div class="article-modal-meta"><span><i class="fas fa-calendar"></i> ${a.date}</span></div>
-    <div class="article-modal-body">${bodyHtml}</div>`;
-  overlay.classList.add('open');
+    <div class="article-modal-body">${bodyHtml}</div>
+    ${_renderShareBar(a.id, a.title)}`;
+  document.getElementById('article-modal-overlay').classList.add('open');
+}
+
+// ── 文章 modal overlay 建立與路由 ─────────────────────────
+function _ensureArticleOverlay() {
+  let overlay = document.getElementById('article-modal-overlay');
+  if (overlay) return overlay;
+  overlay = document.createElement('div');
+  overlay.id = 'article-modal-overlay';
+  overlay.className = 'article-modal-overlay';
+  overlay.innerHTML = `<div class="article-modal-box">
+    <button class="modal-close" onclick="closeArticleModal()"><i class="fas fa-times"></i></button>
+    <div id="article-modal-inner"></div>
+  </div>`;
+  overlay.addEventListener('click', e => { if(e.target===overlay) closeArticleModal(); });
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function closeArticleModal() {
+  const overlay = document.getElementById('article-modal-overlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  try {
+    // 若 URL 還在 /article/... 就 pop 回上一個或換成首頁
+    if (location.pathname.startsWith('/article/')) {
+      if (history.state && history.state.__article) history.back();
+      else history.replaceState({}, '', '/');
+    } else if (new URLSearchParams(location.search).get('article')) {
+      const url = new URL(location.href);
+      url.searchParams.delete('article');
+      history.replaceState({}, '', url.pathname + url.search);
+    }
+  } catch(e) {}
+}
+
+function _pushArticleUrl(id) {
+  try {
+    const path = '/article/' + encodeURIComponent(id);
+    if (location.pathname === path) return;
+    history.pushState({ __article: String(id) }, '', path);
+  } catch(e) {}
+}
+
+function _renderShareBar(id, title) {
+  const url = `${location.origin}/article/${encodeURIComponent(id)}`;
+  const t = String(title || '').replace(/"/g,'&quot;').replace(/'/g,"\\'");
+  const enc = encodeURIComponent;
+  return `
+    <div class="article-share-bar">
+      <div class="article-share-label"><i class="fas fa-share-nodes"></i> 分享這篇</div>
+      <button class="article-share-btn copy" type="button" onclick="copyArticleLink('${url}', event)"><i class="fas fa-link"></i> 複製連結</button>
+      <a class="article-share-btn line" target="_blank" rel="noopener" href="https://social-plugins.line.me/lineit/share?url=${enc(url)}&text=${enc(title)}"><i class="fab fa-line"></i> LINE</a>
+      <a class="article-share-btn fb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${enc(url)}"><i class="fab fa-facebook-f"></i> Facebook</a>
+      <a class="article-share-btn x" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=${enc(url)}&text=${enc(title)}"><i class="fab fa-x-twitter"></i> X</a>
+    </div>`;
+}
+
+function copyArticleLink(url, ev) {
+  if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+  const done = () => {
+    const btn = ev?.target?.closest?.('.article-share-btn');
+    if (btn) {
+      const prev = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-check"></i> 已複製';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.innerHTML = prev; btn.classList.remove('copied'); }, 1600);
+    }
+  };
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(url).then(done).catch(() => prompt('複製此連結：', url));
+  } else {
+    prompt('複製此連結：', url);
+  }
+}
+
+// 初次載入或直接進 /article/<id> 時自動開啟文章
+function _openArticleByIdFromUrl(id) {
+  if (!id) return false;
+  const inWC = (typeof ARTICLES !== 'undefined') ? ARTICLES.find(a => String(a.id) === String(id)) : null;
+  if (inWC) {
+    if (window.Tournament?.current() !== 'wc') window.Tournament?.switch('wc');
+    openArticle(inWC.id);
+    return true;
+  }
+  const inEPL = (window.EPL_ARTICLES || []).find(a => a.id === id);
+  if (inEPL) {
+    if (window.Tournament?.current() !== 'epl') window.Tournament?.switch('epl');
+    setTimeout(() => openUCLArticle(id), window.Tournament?.current() === 'epl' ? 0 : 700);
+    return true;
+  }
+  const inUCL = (window.UCL_ARTICLES || []).find(a => a.id === id);
+  if (inUCL) {
+    if (window.Tournament?.current() !== 'ucl') window.Tournament?.switch('ucl');
+    setTimeout(() => openUCLArticle(id), window.Tournament?.current() === 'ucl' ? 0 : 700);
+    return true;
+  }
+  return false;
+}
+
+function _initArticleRouter() {
+  // 已初始化過就略過
+  if (window.__articleRouterInited) return;
+  window.__articleRouterInited = true;
+
+  window.addEventListener('popstate', () => {
+    const m = location.pathname.match(/^\/article\/(.+)$/);
+    if (m) {
+      _openArticleByIdFromUrl(decodeURIComponent(m[1]));
+    } else {
+      const overlay = document.getElementById('article-modal-overlay');
+      overlay?.classList.remove('open');
+    }
+  });
+
+  const m = location.pathname.match(/^\/article\/(.+)$/);
+  const q = new URLSearchParams(location.search).get('article');
+  const id = m ? decodeURIComponent(m[1]) : q;
+  if (!id) return;
+
+  // 等資料與 Tournament 載好再開
+  let tries = 0;
+  const tryOpen = () => {
+    tries++;
+    const ready = window.Tournament && (
+      (typeof ARTICLES !== 'undefined') || window.EPL_ARTICLES || window.UCL_ARTICLES
+    );
+    if (ready) {
+      if (_openArticleByIdFromUrl(id) && q) {
+        // 從 ?article= 進來的，替換 URL 成漂亮版
+        try { history.replaceState({ __article: String(id) }, '', '/article/' + encodeURIComponent(id)); } catch(e){}
+      }
+    } else if (tries < 40) {
+      setTimeout(tryOpen, 100);
+    }
+  };
+  setTimeout(tryOpen, 300);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _initArticleRouter);
+} else {
+  _initArticleRouter();
 }
 
 function openTeamModal(code) {
