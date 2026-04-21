@@ -3534,22 +3534,6 @@ img.flag-img {
   100% { transform: scale(0.3) translateY(40px); opacity: 0; pointer-events: none; }
 }
 
-/* 已投票提示（再次打開時顯示） */
-.opinion-voted-notice {
-  margin: 18px auto 6px;
-  padding: 10px 16px;
-  max-width: 320px;
-  text-align: center;
-  font-size: 14px; color: rgba(255,255,255,0.85);
-  background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,215,0,0.04));
-  border: 1px solid rgba(255,215,0,0.3);
-  border-radius: 10px;
-  letter-spacing: 0.3px;
-}
-.opinion-voted-notice b {
-  color: #ffd700; font-weight: 800;
-}
-
 /* 結果區域 */
 .opinion-result {
   margin-top: 24px; opacity: 0; transform: translateY(20px);

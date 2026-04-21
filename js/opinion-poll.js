@@ -116,25 +116,20 @@
       }
     }, 800);
 
-    // 如果已投過票，直接顯示結果（隱藏卡片避免使用者以為可以重投）
+    // 如果已投過票：當初選的卡片放大、其他縮小飛走，再進結果頁
     if (existingVote !== null) {
       const prevIdx = parseInt(existingVote);
-      const preCardsWrap = overlay.querySelector('#opinion-cards');
-      if (preCardsWrap) preCardsWrap.style.display = 'none';
+      const preCards = overlay.querySelectorAll('.opinion-card');
+      preCards.forEach((card, i) => {
+        card.classList.add(i === prevIdx ? 'voted-yes' : 'voted-no');
+        card.style.pointerEvents = 'none';
+      });
       const preSkip = overlay.querySelector('#opinion-skip');
       if (preSkip) preSkip.style.display = 'none';
       overlay.dataset.voted = '1';
-      // 插入「你當初選的」小提示（用文字簡短交代，不再佔整個卡片版面）
-      const opt = opinion.opts[prevIdx] || '';
-      const optText = (_splitEmoji(opt).emoji || '') + ' ' + _splitEmoji(opt).text;
-      const notice = document.createElement('div');
-      notice.className = 'opinion-voted-notice';
-      notice.innerHTML = `你已投：<b>${optText.trim()}</b>`;
-      const ctx = overlay.querySelector('.opinion-context');
-      if (ctx) ctx.after(notice); else preCardsWrap?.parentNode?.insertBefore(notice, preCardsWrap);
       setTimeout(() => {
         _showResult(opinion, prevIdx, overlay, onClose);
-      }, 200);
+      }, 500);
       return;
     }
 
