@@ -1077,8 +1077,8 @@
     try {
       if (typeof DB === 'undefined') return;
       const [{ data: weekly }, { data: allTime }] = await Promise.all([
-        DB.from('rogue_weekly_leaderboard').select('*').order('score', { ascending: false }).limit(10),
-        DB.from('rogue_alltime_leaderboard').select('*').order('score', { ascending: false }).limit(10),
+        DB.from('rogue_weekly_leaderboard').select('*').order('score', { ascending: false }).limit(100),
+        DB.from('rogue_alltime_leaderboard').select('*').order('score', { ascending: false }).limit(100),
       ]);
       _rogueWeeklyBoard = weekly ?? [];
       _rogueAllTimeBoard = allTime ?? [];
@@ -4206,6 +4206,7 @@
 
     // 排行子 Tab（週排行 / 歷史排行）
     if (!G._lbTab) G._lbTab = 'weekly';
+    if (!G._lbScroll) G._lbScroll = { weekly: 0, alltime: 0 };
     const subTabH = Math.min(26, W * 0.048);
     const subTabs = [
       { key: 'weekly', label: '本週' },
@@ -4228,33 +4229,68 @@
     const curBoard = G._lbTab === 'weekly' ? weeklyBoard : allTimeBoard;
     const rowH = Math.min(28, W * 0.052);
     const headerH = Math.min(24, W * 0.044);
-    const startY = py + 6 + subTabH + 12;
 
-    // 表頭
+    // 週獎勵提示（固定頂端，不捲動）
+    let topOffset = py + 6 + subTabH + 8;
+    if (G._lbTab === 'weekly') {
+      const tipFz = Math.min(11, W * 0.022);
+      ctx.font = `${tipFz}px "Noto Sans TC", sans-serif`;
+      ctx.fillStyle = 'rgba(255,215,0,0.5)';
+      ctx.textAlign = 'center';
+      ctx.fillText('🏆1st +5💎  🥈2nd +3💎  🥉3rd +2💎  4~6th +1💎', px + pw / 2, topOffset + tipFz);
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.font = `${Math.min(10, W * 0.018)}px "Noto Sans TC", sans-serif`;
+      ctx.fillText('每週日結算', px + pw / 2, topOffset + tipFz + 14);
+      topOffset += tipFz + 22;
+    }
+
+    // 表頭（固定）
     const hdrFz = Math.min(12, W * 0.024);
-    const colRank = px + pw * 0.10;
-    const colName = px + pw * 0.38;
-    const colScore = px + pw * 0.66;
-    const colWave = px + pw * 0.88;
+    const scrollReserveRight = 10;
+    const contentPW = pw - scrollReserveRight;
+    const colRank = px + contentPW * 0.10;
+    const colName = px + contentPW * 0.38;
+    const colScore = px + contentPW * 0.66;
+    const colWave = px + contentPW * 0.88;
+    const hdrY = topOffset + headerH * 0.65;
     ctx.font = `bold ${hdrFz}px "Noto Sans TC", sans-serif`;
     ctx.fillStyle = 'rgba(255,215,0,0.5)';
     ctx.textAlign = 'center';
-    ctx.fillText('#', colRank, startY);
-    ctx.fillText('玩家', colName, startY);
-    ctx.fillText('分數', colScore, startY);
-    ctx.fillText('Wave', colWave, startY);
+    ctx.fillText('#', colRank, hdrY);
+    ctx.fillText('玩家', colName, hdrY);
+    ctx.fillText('分數', colScore, hdrY);
+    ctx.fillText('Wave', colWave, hdrY);
 
-    // 排行列表（前 10 名）
-    const showCount = Math.min(curBoard.length, 10);
+    // 可捲動的排行列表
+    const rowsStartY = topOffset + headerH + 2;
+    const rowsEndY = py + ph - 4;
+    const rowsH = Math.max(0, rowsEndY - rowsStartY);
+    const totalContentH = curBoard.length * rowH;
+    const maxScroll = Math.max(0, totalContentH - rowsH);
+    const curKey = G._lbTab;
+    if (G._lbScroll[curKey] > maxScroll) G._lbScroll[curKey] = maxScroll;
+    if (G._lbScroll[curKey] < 0) G._lbScroll[curKey] = 0;
+    const scroll = G._lbScroll[curKey];
+
+    G._lbScrollR = { x: px, y: rowsStartY, w: pw, h: rowsH, scrollKey: curKey, maxScroll };
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(px, rowsStartY, pw, rowsH);
+    ctx.clip();
+
     const bodyFz = Math.min(13, W * 0.026);
     const medals = ['🥇', '🥈', '🥉'];
     const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
-    for (let i = 0; i < showCount; i++) {
+    for (let i = 0; i < curBoard.length; i++) {
       const entry = curBoard[i];
-      const ey = startY + headerH + i * rowH;
+      const rowTop = rowsStartY + i * rowH - scroll;
+      if (rowTop + rowH < rowsStartY) continue;
+      if (rowTop > rowsEndY) break;
+      const ey = rowTop + rowH * 0.72;
       if (i < 3) {
         ctx.fillStyle = ['rgba(255,215,0,0.1)', 'rgba(192,192,192,0.07)', 'rgba(205,127,50,0.06)'][i];
-        rr(ctx, px + 6, ey - rowH * 0.6, pw - 12, rowH - 2, 4); ctx.fill();
+        rr(ctx, px + 6, rowTop + 2, contentPW - 12, rowH - 4, 4); ctx.fill();
       }
       ctx.font = `bold ${bodyFz}px "Noto Sans TC", sans-serif`;
       ctx.textAlign = 'center';
@@ -4270,18 +4306,17 @@
       ctx.fillStyle = 'rgba(255,255,255,0.45)';
       ctx.fillText(`${entry.wave}`, colWave, ey);
     }
+    ctx.restore();
 
-    // 週排行獎勵提示
-    if (G._lbTab === 'weekly') {
-      const tipY = startY + headerH + showCount * rowH + 12;
-      const tipFz = Math.min(11, W * 0.022);
-      ctx.font = `${tipFz}px "Noto Sans TC", sans-serif`;
-      ctx.fillStyle = 'rgba(255,215,0,0.5)';
-      ctx.textAlign = 'center';
-      ctx.fillText('🏆1st +5💎  🥈2nd +3💎  🥉3rd +2💎  4~6th +1💎', px + pw / 2, tipY);
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.font = `${Math.min(10, W * 0.018)}px "Noto Sans TC", sans-serif`;
-      ctx.fillText('每週日結算', px + pw / 2, tipY + tipFz + 4);
+    // Scrollbar
+    if (maxScroll > 0) {
+      const sbX = px + pw - 6;
+      const thumbH = Math.max(20, rowsH * (rowsH / totalContentH));
+      const thumbY = rowsStartY + (rowsH - thumbH) * (scroll / maxScroll);
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      rr(ctx, sbX, rowsStartY, 3, rowsH, 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,215,0,0.45)';
+      rr(ctx, sbX, thumbY, 3, thumbH, 2); ctx.fill();
     }
   }
 
@@ -5841,9 +5876,19 @@
     onPointerUp();
   }
   function onTouchMove(e) {
-    if (!G || !G._holdFiring) return;
-    e.preventDefault();
+    if (!G) return;
     const t = e.touches[0];
+    if (G._lbDrag) {
+      e.preventDefault();
+      const p = _toLogical({ clientX: t.clientX, clientY: t.clientY });
+      const dy = p.y - G._lbDrag.startY;
+      if (Math.abs(dy) > 3) G._lbDrag.moved = true;
+      const next = G._lbDrag.startScroll - dy;
+      G._lbScroll[G._lbDrag.key] = Math.max(0, Math.min(G._lbDrag.maxScroll, next));
+      return;
+    }
+    if (!G._holdFiring) return;
+    e.preventDefault();
     G._holdXY = _toLogical({ clientX: t.clientX, clientY: t.clientY });
   }
 
@@ -5861,6 +5906,18 @@
 
     // 非 playing 階段走原本的 click 邏輯
     if (G.phase !== 'playing') {
+      // 排行榜捲動：在捲動區域內開始 drag，攔截 click
+      if (G.phase === 'title' && G._titleTab === 'board' && G._lbScrollR &&
+          hitTest(p.x, p.y, G._lbScrollR) && G._lbScrollR.maxScroll > 0) {
+        G._lbDrag = {
+          startY: p.y,
+          startScroll: G._lbScroll?.[G._lbScrollR.scrollKey] || 0,
+          key: G._lbScrollR.scrollKey,
+          maxScroll: G._lbScrollR.maxScroll,
+          moved: false,
+        };
+        return;
+      }
       onClick(e);
       return;
     }
@@ -5899,10 +5956,32 @@
     clearTimeout(G._holdTimer);
     G._holdFiring = false;
     G._holdXY = null;
+    G._lbDrag = null;
+  }
+
+  function onWheel(e) {
+    if (!G || G.phase !== 'title' || G._titleTab !== 'board' || !G._lbScrollR) return;
+    if (G._lbScrollR.maxScroll <= 0) return;
+    const p = _toLogical(e);
+    if (!hitTest(p.x, p.y, G._lbScrollR)) return;
+    e.preventDefault();
+    if (!G._lbScroll) G._lbScroll = { weekly: 0, alltime: 0 };
+    const key = G._lbScrollR.scrollKey;
+    const next = (G._lbScroll[key] || 0) + e.deltaY;
+    G._lbScroll[key] = Math.max(0, Math.min(G._lbScrollR.maxScroll, next));
   }
 
   function onMouseMove(e) {
-    if (!G || !G._holdFiring) return;
+    if (!G) return;
+    if (G._lbDrag) {
+      const p = _toLogical(e);
+      const dy = p.y - G._lbDrag.startY;
+      if (Math.abs(dy) > 3) G._lbDrag.moved = true;
+      const next = G._lbDrag.startScroll - dy;
+      G._lbScroll[G._lbDrag.key] = Math.max(0, Math.min(G._lbDrag.maxScroll, next));
+      return;
+    }
+    if (!G._holdFiring) return;
     G._holdXY = _toLogical(e);
   }
 
@@ -5934,6 +6013,7 @@
     cvs.addEventListener('touchend', onTouchEnd, { passive: false });
     cvs.addEventListener('touchcancel', onTouchEnd, { passive: false });
     cvs.addEventListener('touchmove', onTouchMove, { passive: false });
+    cvs.addEventListener('wheel', onWheel, { passive: false });
 
     resize();
     window.addEventListener('resize', resize);
@@ -6022,7 +6102,7 @@
       html += `<div class="rogue-lb-panel" id="rogue-lb-alltime" style="display:none">${aRows.length ? buildTable(aRows) : '<div class="rogue-home-lb-empty">還沒有紀錄</div>'}</div>`;
       // 首頁只顯示前 5 名，進遊戲內排行榜可看前 10 名
       if (wRows.length >= 5 || aRows.length >= 5) {
-        html += `<button class="rogue-lb-more" onclick="startRogueGame()">看完整排行（前 10 名） →</button>`;
+        html += `<button class="rogue-lb-more" onclick="startRogueGame()">看完整排行榜 →</button>`;
       }
 
       el.innerHTML = html;
