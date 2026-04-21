@@ -294,9 +294,12 @@ function toggleGemPanel() {
 }
 function closeGemPanelOutside(e) {
   const widget = document.getElementById('nav-gem-widget')
-  if (widget && !widget.contains(e.target)) {
-    document.getElementById('gem-panel')?.classList.remove('open')
-  }
+  const panel = document.getElementById('gem-panel')
+  const mobileGem = document.getElementById('mobile-nav-gem')?.parentElement
+  if (widget?.contains(e.target)) return
+  if (panel?.contains(e.target)) return
+  if (mobileGem?.contains(e.target)) return
+  panel?.classList.remove('open')
 }
 
 // ── 未登入提示 ────────────────────────────────────────────
