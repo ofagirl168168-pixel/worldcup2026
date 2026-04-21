@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026年4月）
+   資料截止：2025/26 賽季（2026-04-21 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -24,11 +24,9 @@ const EPL_TEAMS = {
     recentForm:['D','W','W','L','L'],
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
     injuries:[
-      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題',returnDate:'四月下旬可望回歸'},
-      {name:'Jurrien Timber',pos:'後衛',status:'腳踝傷勢（已恢復訓練）',returnDate:'04/19 可望回歸'},
-      {name:'Declan Rice',pos:'中場',status:'訓練中缺席',returnDate:'存疑'},
-      {name:'Martin Ødegaard',pos:'攻擊中場',status:'小傷',returnDate:'評估中'},
-      {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢',returnDate:'存疑'},
+      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題',returnDate:'持續評估中'},
+      {name:'Jurrien Timber',pos:'後衛',status:'腳踝傷勢（缺陣超過一個月）',returnDate:'存疑'},
+      {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢（上次出場為歐冠 vs Sporting）',returnDate:'存疑'},
       {name:'Mikel Merino',pos:'中場',status:'已脫護具但本季不預期回歸',returnDate:'賽季報銷'},
       {name:'Noni Madueke',pos:'右翼',status:'膝傷（歐冠八強次回合退場）',returnDate:'評估中'}
     ]
@@ -78,7 +76,7 @@ const EPL_TEAMS = {
       {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢',returnDate:'四月底（本月報銷）'},
       {name:'John Stones',pos:'中後衛',status:'小腿傷，已部分訓練',returnDate:'短期內'},
       {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷（vs Chelsea下半場受傷）',returnDate:'評估中，已輕度訓練'},
-      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（vs 兵工廠比賽中再度受傷）',returnDate:'評估中，可能缺陣數週'}
+      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（vs 兵工廠 88 分鐘退場）',returnDate:'檢查中，可能缺陣 1-6 週'}
     ]
   },
   'CHE': {
@@ -236,15 +234,15 @@ const EPL_TEAMS = {
     league:'Premier League', eplRank:7, coach:'Keith Andrews', formation:'4-3-3',
     keyPlayers:[
       {name:'Igor Thiago',pos:'前鋒',club:'布倫特福德'},
-      {name:'Yoane Wissa',pos:'前鋒',club:'布倫特福德'},
+      {name:'Kevin Schade',pos:'翼鋒',club:'布倫特福德'},
       {name:'Mikkel Damsgaard',pos:'攻擊中場',club:'布倫特福德'},
-      {name:'Christian Nørgaard',pos:'中場',club:'布倫特福德'},
+      {name:'Mathias Jensen',pos:'中場',club:'布倫特福德'},
       {name:'Nathan Collins',pos:'中後衛',club:'布倫特福德'}
     ],
-    radar:{attack:81,defense:76,midfield:77,speed:78,experience:66},
+    radar:{attack:78,defense:76,midfield:75,speed:78,experience:66},
     style:'直接打法，定位球威脅大，邊路傳中',
-    strengths:['Igor Thiago+Wissa雙前鋒火力兇猛','Andrews延續Frank戰術遺產','定位球得分率高'],
-    weaknesses:['陣容深度有限','對陣強隊防守壓力大','長期傷兵影響'],
+    strengths:['Igor Thiago獨撐前線終結力穩','Andrews延續Frank戰術遺產','定位球得分率高'],
+    weaknesses:['失去Wissa(紐卡)與Nørgaard(兵工廠)攻守同減','對陣強隊防守壓力大','陣容深度有限'],
     recentForm:['L','W','D','L','D'],
     history:'2021年首次升上英超，以數據化管理聞名'
   },
@@ -279,7 +277,7 @@ const EPL_TEAMS = {
     style:'邊路速度衝擊，定位球戰術，反擊犀利',
     strengths:['Sarr+Pino邊路速度優勢','Mateta終結效率穩定','Glasner戰術執行力佳'],
     weaknesses:['Eze夏窗轉兵工廠、Guéhi轉曼城後創造力與中衛深度雙降','進攻過度依賴個人能力','客場拿分困難'],
-    recentForm:['L','D','W','W','L'],
+    recentForm:['D','L','D','W','W'],
     history:'倫敦南部老牌球會，從未贏得頂級聯賽冠軍'
   },
   'WHU': {
@@ -296,7 +294,7 @@ const EPL_TEAMS = {
     style:'直接進攻，邊路傳中，定位球',
     strengths:['Bowen進攻穩定','Paquetá創造力仍在','Diouf夏窗補強左路'],
     weaknesses:['Kudus夏窗轉熱刺、Álvarez租借費內巴切，中前場創造力銳減','防守不夠穩固','陣容融合仍在進行'],
-    recentForm:['L','L','W','D','W'],
+    recentForm:['D','L','L','W','D'],
     history:'1965年歐洲盃賽冠軍盃冠軍，2023年歐協聯冠軍'
   },
   'WOL': {
@@ -306,7 +304,7 @@ const EPL_TEAMS = {
       {name:'Hwang Hee-Chan',pos:'前鋒',club:'狼隊'},
       {name:'Mario Lemina',pos:'中場',club:'狼隊'},
       {name:'Jørgen Strand Larsen',pos:'前鋒',club:'狼隊'},
-      {name:'Rayan Aït-Nouri',pos:'左後衛',club:'狼隊'},
+      {name:'João Gomes',pos:'中場',club:'狼隊'},
       {name:'José Sá',pos:'門將',club:'狼隊'}
     ],
     radar:{attack:68,defense:68,midfield:70,speed:76,experience:64},
@@ -328,7 +326,7 @@ const EPL_TEAMS = {
     ],
     radar:{attack:70,defense:73,midfield:71,speed:74,experience:74},
     style:'硬朗防守，直接長球，定位球',
-    strengths:['Dyche防守紀律嚴明','Pickford撲救穩定','團隊拼搏精神強'],
+    strengths:['Moyes防守紀律嚴明','Pickford撲救穩定','團隊拼搏精神強'],
     weaknesses:['進攻火力嚴重不足','財政公平法限制引援','創造力匱乏'],
     recentForm:['D','L','D','L','L'],
     history:'9次英格蘭頂級聯賽冠軍，利物浦同城宿敵'
@@ -340,7 +338,7 @@ const EPL_TEAMS = {
     league:'Premier League', eplRank:15, coach:'Daniel Farke', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Noah Okafor',pos:'前鋒',club:'里茲聯'},
-      {name:'Largie Ramazani',pos:'翼鋒',club:'里茲聯'},
+      {name:'Joe Rodon',pos:'中後衛',club:'里茲聯'},
       {name:'Willy Gnonto',pos:'翼鋒',club:'里茲聯'},
       {name:'Ethan Ampadu',pos:'中場/中衛',club:'里茲聯'},
       {name:'Illan Meslier',pos:'門將',club:'里茲聯'}
@@ -357,10 +355,10 @@ const EPL_TEAMS = {
     league:'Premier League', eplRank:19, coach:'Scott Parker', formation:'4-4-2',
     keyPlayers:[
       {name:'Lyle Foster',pos:'前鋒',club:'伯恩利'},
-      {name:'Jay Rodriguez',pos:'前鋒',club:'伯恩利'},
-      {name:'Josh Brownhill',pos:'中場',club:'伯恩利'},
+      {name:'Jaidon Anthony',pos:'翼鋒/前鋒',club:'伯恩利'},
+      {name:'Hannibal Mejbri',pos:'中場',club:'伯恩利'},
       {name:'Dara O\'Shea',pos:'中後衛',club:'伯恩利'},
-      {name:'James Trafford',pos:'門將',club:'伯恩利'}
+      {name:'Max Weiß',pos:'門將',club:'伯恩利'}
     ],
     radar:{attack:68,defense:70,midfield:69,speed:73,experience:60},
     style:'硬朗防守，直接打法，身體對抗',
@@ -377,7 +375,7 @@ const EPL_TEAMS = {
       {name:'Romaine Mundle',pos:'翼鋒',club:'桑德蘭'},
       {name:'Chris Rigg',pos:'中場',club:'桑德蘭'},
       {name:'Granit Xhaka',pos:'中場',club:'桑德蘭'},
-      {name:'Anthony Patterson',pos:'門將',club:'桑德蘭'}
+      {name:'Robin Roefs',pos:'門將',club:'桑德蘭'}
     ],
     radar:{attack:76,defense:74,midfield:77,speed:76,experience:68},
     style:'年輕快速，高壓逼搶，團隊足球',
@@ -573,9 +571,10 @@ window.EPL_MATCHES = [
      {min:'65',player:'Erling Haaland',side:'h'}
    ]},
 
-  // 水晶宮 vs 西漢姆 | 04/21 04:00 台灣時間
+  // 水晶宮 0-0 西漢姆 | 04/21 04:00 台灣時間
   {id:'EPL-MW33-CRY-WHU', matchday:33, date:'2026-04-21', time:'04:00', home:'CRY', away:'WHU', stage:'league',
-   status:'scheduled', score:{h:null,a:null}},
+   status:'finished', score:{h:0,a:0}, halfTime:{h:0,a:0},
+   goals:[]},
 
 ];
 

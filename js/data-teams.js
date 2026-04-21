@@ -2,7 +2,7 @@
    DATA-TEAMS.JS — 2026 FIFA世界盃 35支球隊資料
    FIFA排名：2026 年 4 月官方版（ESPN/FIFA Top 50）
    近期狀態：截至 2026/03 國際賽窗結束（含 2025/09-11 資格賽、2026/03 友誼）
-   資料截止：2026-04-20（球員俱樂部依 2025 夏窗/冬窗轉會）
+   資料截止：2026-04-21（球員俱樂部依 2025 夏窗/冬窗轉會）
    註：13 支附加賽出線隊（RSA/BIH/HAI/CUW/SWE/CPV/NOR/IRQ/JOR/COD/TUR/PAR/CZE）於 data-fix.js 補入，
        並以 Object.assign 合併入 TEAMS；小組賽真實賽程（realMD1/2/3）亦在 data-fix.js 覆蓋 SCHEDULE。
    ============================================= */
@@ -14,11 +14,11 @@ const TEAMS = {
     name:'Mexico', nameCN:'墨西哥', flag:'🇲🇽', group:'A', conf:'CONCACAF', fifaRank:15,
     coach:'Javier Aguirre', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Santiago Giménez',pos:'中鋒',club:'費耶諾德'},
+      {name:'Santiago Giménez',pos:'中鋒',club:'AC米蘭'},
       {name:'Edson Álvarez',pos:'後腰',club:'西漢姆聯'},
       {name:'Hirving Lozano',pos:'右翼',club:'自由身'},
       {name:'Raúl Jiménez',pos:'前鋒',club:'富勒姆'},
-      {name:'Guillermo Ochoa',pos:'門將',club:'待定'}
+      {name:'Guillermo Ochoa',pos:'門將',club:'AEL Limassol'}
     ],
     radar:{attack:74,defense:72,midfield:74,speed:76,experience:84},
     style:'控球組織，中場串聯，利用邊路空間',
@@ -74,7 +74,7 @@ const TEAMS = {
       {name:'Manuel Akanji',pos:'後衛',club:'曼城'},
       {name:'Yann Sommer',pos:'門將',club:'國際米蘭'},
       {name:'Remo Freuler',pos:'中場',club:'諾丁漢森林'},
-      {name:'Ruben Vargas',pos:'左翼',club:'奧格斯堡'}
+      {name:'Ruben Vargas',pos:'左翼',club:'塞維利亞'}
     ],
     radar:{attack:72,defense:76,midfield:76,speed:70,experience:84},
     style:'三後衛穩固防線，中場積極搶斷，快速直傳',
@@ -148,7 +148,7 @@ const TEAMS = {
       {name:'Scott McTominay',pos:'中場',club:'那不勒斯'},
       {name:'John McGinn',pos:'中場',club:'阿斯頓維拉'},
       {name:'Callum McGregor',pos:'中場',club:'凱爾特人'},
-      {name:'Lyndon Dykes',pos:'前鋒',club:'待定'}
+      {name:'Lyndon Dykes',pos:'前鋒',club:'伯明翰城'}
     ],
     radar:{attack:68,defense:72,midfield:72,speed:70,experience:68},
     style:'三後衛穩固防線，中場積極搶斷，快速推進',
@@ -182,10 +182,10 @@ const TEAMS = {
     name:'Australia', nameCN:'澳洲', flag:'🇦🇺', group:'D', conf:'AFC', fifaRank:27,
     coach:'Tony Popović', formation:'4-4-2',
     keyPlayers:[
-      {name:'Mat Ryan',pos:'門將',club:'哥本哈根'},
+      {name:'Mat Ryan',pos:'門將',club:'Levante'},
       {name:'Harry Souttar',pos:'後衛',club:'萊切斯特城'},
       {name:'Mathew Leckie',pos:'右翼',club:'墨爾本城'},
-      {name:'Martin Boyle',pos:'翼鋒',club:'帕納辛奈科斯'},
+      {name:'Martin Boyle',pos:'翼鋒',club:'Hibernian'},
       {name:'Riley McGree',pos:'中場',club:'米德斯堡'}
     ],
     radar:{attack:66,defense:72,midfield:64,speed:70,experience:70},
@@ -202,7 +202,7 @@ const TEAMS = {
     name:'Germany', nameCN:'德國', flag:'🇩🇪', group:'E', conf:'UEFA', fifaRank:10,
     coach:'Julian Nagelsmann', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Florian Wirtz',pos:'攻擊中場',club:'拜耳勒沃庫森'},
+      {name:'Florian Wirtz',pos:'攻擊中場',club:'利物浦'},
       {name:'Jamal Musiala',pos:'中場',club:'拜仁慕尼黑'},
       {name:'Joshua Kimmich',pos:'右後衛/後腰',club:'拜仁慕尼黑'},
       {name:'Kai Havertz',pos:'前鋒',club:'兵工廠'},
@@ -223,7 +223,7 @@ const TEAMS = {
       {name:'Moisés Caicedo',pos:'防守中場',club:'切爾西'},
       {name:'Piero Hincapié',pos:'後衛',club:'拜耳勒沃庫森'},
       {name:'Gonzalo Plata',pos:'翼鋒',club:'待定'},
-      {name:'Jeremy Sarmiento',pos:'翼鋒',club:'布萊頓'},
+      {name:'Jeremy Sarmiento',pos:'翼鋒',club:'米德斯堡(租借)'},
       {name:'Alexander Domínguez',pos:'門將',club:'待定'}
     ],
     radar:{attack:70,defense:70,midfield:68,speed:72,experience:68},
@@ -239,10 +239,10 @@ const TEAMS = {
     coach:'Emerse Faé', formation:'4-3-3',
     keyPlayers:[
       {name:'Sébastien Haller',pos:'中鋒',club:'烏特勒支'},
-      {name:'Simon Adingra',pos:'翼鋒',club:'布萊頓'},
+      {name:'Simon Adingra',pos:'翼鋒',club:'摩納哥(租借)'},
       {name:'Franck Kessié',pos:'中場',club:'Al-Ahli'},
       {name:'Yahia Fofana',pos:'門將',club:'昂熱'},
-      {name:'Serge Aurier',pos:'右後衛',club:'待定'}
+      {name:'Serge Aurier',pos:'右後衛',club:'Persepolis'}
     ],
     radar:{attack:70,defense:66,midfield:68,speed:74,experience:72},
     style:'快速邊路進攻，Haller禁區終結',
@@ -279,8 +279,8 @@ const TEAMS = {
       {name:'Takefusa Kubo',pos:'右翼',club:'皇家社會'},
       {name:'Wataru Endo',pos:'後腰',club:'利物浦'},
       {name:'Hiroki Ito',pos:'後衛',club:'拜仁慕尼黑'},
-      {name:'Junya Ito',pos:'翼鋒',club:'蘭斯'},
-      {name:'Daichi Kamada',pos:'中場',club:'待定'}
+      {name:'Junya Ito',pos:'翼鋒',club:'亨克'},
+      {name:'Daichi Kamada',pos:'中場',club:'水晶宮'}
     ],
     radar:{attack:76,defense:74,midfield:78,speed:82,experience:78},
     style:'高強度壓迫，快速短傳滲透，歐洲頂聯風格',
@@ -294,11 +294,11 @@ const TEAMS = {
     name:'Tunisia', nameCN:'突尼西亞', flag:'🇹🇳', group:'F', conf:'CAF', fifaRank:44,
     coach:'Faouzi Benzarti', formation:'4-3-3',
     keyPlayers:[
-      {name:'Hannibal Mejbri',pos:'中場',club:'塞維利亞'},
-      {name:'Wahbi Khazri',pos:'前鋒',club:'待定'},
+      {name:'Hannibal Mejbri',pos:'中場',club:'伯恩利'},
+      {name:'Wahbi Khazri',pos:'前鋒',club:'已退役'},
       {name:'Ellyes Skhiri',pos:'中場',club:'法蘭克福'},
-      {name:'Aïssa Laïdouni',pos:'中場',club:'待定'},
-      {name:'Aymen Dahmen',pos:'門將',club:'待定'}
+      {name:'Aïssa Laïdouni',pos:'中場',club:'Al-Wakrah'},
+      {name:'Aymen Dahmen',pos:'門將',club:'CS Sfaxien'}
     ],
     radar:{attack:62,defense:66,midfield:62,speed:66,experience:72},
     style:'防守嚴密，整體戰術，邊路快速反擊',
@@ -318,7 +318,7 @@ const TEAMS = {
       {name:'Romelu Lukaku',pos:'中鋒',club:'拿坡里'},
       {name:'Jeremy Doku',pos:'右翼',club:'曼城'},
       {name:'Thibaut Courtois',pos:'門將',club:'皇家馬德里'},
-      {name:'Arthur Theate',pos:'後衛',club:'雷恩'}
+      {name:'Arthur Theate',pos:'後衛',club:'法蘭克福'}
     ],
     radar:{attack:82,defense:76,midfield:86,speed:78,experience:90},
     style:'De Bruyne組織，Lukaku終結，攻守皆強',
@@ -333,10 +333,10 @@ const TEAMS = {
     coach:'Amir Ghalenoei', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Mehdi Taremi',pos:'中鋒',club:'奧林匹亞科斯'},
-      {name:'Alireza Jahanbakhsh',pos:'翼鋒',club:'費內巴切'},
-      {name:'Sardar Azmoun',pos:'前鋒',club:'待定'},
+      {name:'Alireza Jahanbakhsh',pos:'翼鋒',club:'FCV Dender'},
+      {name:'Sardar Azmoun',pos:'前鋒',club:'Shabab Al-Ahli'},
       {name:'Ali Gholizadeh',pos:'翼鋒',club:'待定'},
-      {name:'Alireza Beiranvand',pos:'門將',club:'待定'}
+      {name:'Alireza Beiranvand',pos:'門將',club:'Tractor SC'}
     ],
     radar:{attack:66,defense:72,midfield:65,speed:68,experience:76},
     style:'防守嚴密，依靠Taremi個人終結能力',
@@ -353,8 +353,8 @@ const TEAMS = {
       {name:'Mohamed Salah',pos:'右翼/前鋒',club:'利物浦'},
       {name:'Omar Marmoush',pos:'前鋒',club:'曼城'},
       {name:'Mohamed El-Shenawy',pos:'門將',club:'Al-Ahly'},
-      {name:'Ahmed Hegazi',pos:'後衛',club:'待定'},
-      {name:'Mostafa Mohamed',pos:'中鋒',club:'待定'}
+      {name:'Ahmed Hegazi',pos:'後衛',club:'NEOM SC'},
+      {name:'Mostafa Mohamed',pos:'中鋒',club:'南特'}
     ],
     radar:{attack:76,defense:68,midfield:68,speed:72,experience:72},
     style:'以Salah為核心的進攻，強調邊路突破',
@@ -371,7 +371,7 @@ const TEAMS = {
       {name:'Chris Wood',pos:'中鋒',club:'諾丁漢森林'},
       {name:'Joe Bell',pos:'中場',club:'待定'},
       {name:'Clayton Lewis',pos:'中場',club:'待定'},
-      {name:'Liberato Cacace',pos:'後衛',club:'埃姆波利'},
+      {name:'Liberato Cacace',pos:'後衛',club:'雷克斯漢姆'},
       {name:'Michael Woud',pos:'門將',club:'待定'}
     ],
     radar:{attack:56,defense:58,midfield:54,speed:62,experience:52},
@@ -427,8 +427,8 @@ const TEAMS = {
       {name:'Salem Al-Dawsari',pos:'翼鋒',club:'Al-Hilal'},
       {name:'Mohammed Al-Owais',pos:'門將',club:'Al-Hilal'},
       {name:'Saleh Al-Shehri',pos:'前鋒',club:'Al-Hilal'},
-      {name:'Saud Abdulhamid',pos:'後衛',club:'羅馬'},
-      {name:'Mohammed Al-Qashawihe',pos:'中場',club:'Al-Nassr'}
+      {name:'Saud Abdulhamid',pos:'後衛',club:'朗斯(租借)'},
+      {name:'Mohammed Al-Qahtani',pos:'中場',club:'Al-Taawoun(租借)'}
     ],
     radar:{attack:65,defense:66,midfield:62,speed:66,experience:62},
     style:'緊密防守，尋找快速反擊與定位球機會',
@@ -504,7 +504,7 @@ const TEAMS = {
       {name:'Konrad Laimer',pos:'中場',club:'拜仁慕尼黑'},
       {name:'Christoph Baumgartner',pos:'攻擊中場',club:'萊比錫'},
       {name:'Marko Arnautović',pos:'前鋒',club:'貝爾格勒紅星'},
-      {name:'Patrick Pentz',pos:'門將',club:'雷恩'}
+      {name:'Patrick Pentz',pos:'門將',club:'Brøndby'}
     ],
     radar:{attack:74,defense:74,midfield:74,speed:74,experience:70},
     style:'Rangnick高強度全場壓迫體系，注重整體高效',
@@ -519,10 +519,10 @@ const TEAMS = {
     coach:'Vladimir Petković', formation:'4-3-3',
     keyPlayers:[
       {name:'Riyad Mahrez',pos:'翼鋒',club:'Al-Ahli'},
-      {name:'Ismaël Bennacer',pos:'中場',club:'AC米蘭'},
+      {name:'Ismaël Bennacer',pos:'中場',club:'Dinamo Zagreb(租借)'},
       {name:'Ramy Bensebaini',pos:'後衛',club:'多特蒙德'},
       {name:'Mohamed Amoura',pos:'前鋒',club:'沃爾夫斯堡'},
-      {name:'Houssem Aouar',pos:'中場',club:'貝蒂斯'}
+      {name:'Houssem Aouar',pos:'中場',club:'Al-Ittihad'}
     ],
     radar:{attack:68,defense:66,midfield:68,speed:72,experience:74},
     style:'Mahrez個人能力主導，快速邊路進攻',
@@ -558,9 +558,9 @@ const TEAMS = {
     keyPlayers:[
       {name:'Luis Díaz',pos:'左翼',club:'利物浦'},
       {name:'James Rodríguez',pos:'攻擊中場',club:'明尼蘇達聯'},
-      {name:'Richard Ríos',pos:'中場',club:'帕梅拉斯'},
-      {name:'Davinson Sánchez',pos:'後衛',club:'待定'},
-      {name:'Camilo Vargas',pos:'門將',club:'待定'}
+      {name:'Richard Ríos',pos:'中場',club:'本菲卡'},
+      {name:'Davinson Sánchez',pos:'後衛',club:'加拉塔薩雷'},
+      {name:'Camilo Vargas',pos:'門將',club:'Atlas'}
     ],
     radar:{attack:82,defense:72,midfield:80,speed:82,experience:80},
     style:'進攻創意豐富，James組織加Díaz突破',
@@ -630,15 +630,15 @@ const TEAMS = {
     name:'Panama', nameCN:'巴拿馬', flag:'🇵🇦', group:'L', conf:'CONCACAF', fifaRank:33,
     coach:'Thomas Christiansen', formation:'4-4-2',
     keyPlayers:[
-      {name:'Ismael Díaz',pos:'前鋒',club:'波爾圖'},
+      {name:'Ismael Díaz',pos:'前鋒',club:'Club León'},
       {name:'Adalberto Carrasquilla',pos:'中場',club:'待定'},
-      {name:'Rolando Blackburn',pos:'前鋒',club:'待定'},
+      {name:'Rolando Blackburn',pos:'前鋒',club:'San Francisco FC'},
       {name:'José Luis Rodríguez',pos:'後衛',club:'待定'},
-      {name:'Orlando Mosquera',pos:'門將',club:'待定'}
+      {name:'Orlando Mosquera',pos:'門將',club:'Al-Fayha'}
     ],
     radar:{attack:60,defense:64,midfield:58,speed:64,experience:60},
     style:'防守組織嚴密，五中場反擊',
-    strengths:['防守紀律嚴明','Ismael Díaz是波爾圖新星','整體拼勁十足'],
+    strengths:['防守紀律嚴明','Ismael Díaz在Liga MX持續進球','整體拼勁十足'],
     weaknesses:['進攻火力嚴重不足','個人技術有限','缺乏改變比賽的球員'],
     history:'2018年首次世界盃；2024年達到美洲盃四強',
     recentForm:['D','W','D','D','W'],
@@ -649,8 +649,8 @@ const TEAMS = {
     coach:'Otto Addo', formation:'4-3-3',
     keyPlayers:[
       {name:'Mohammed Kudus',pos:'攻擊中場/翼鋒',club:'熱刺'},
-      {name:'Thomas Partey',pos:'後腰',club:'兵工廠'},
-      {name:'Antoine Semenyo',pos:'翼鋒',club:'伯恩茅斯'},
+      {name:'Thomas Partey',pos:'後腰',club:'比利亞雷阿爾'},
+      {name:'Antoine Semenyo',pos:'翼鋒',club:'曼城'},
       {name:'Jordan Ayew',pos:'前鋒',club:'待定'},
       {name:'Lawrence Ati-Zigi',pos:'門將',club:'聖加侖'}
     ],
