@@ -6020,6 +6020,10 @@
       html += '</div>';
       html += `<div class="rogue-lb-panel" id="rogue-lb-weekly">${wRows.length ? buildTable(wRows) : '<div class="rogue-home-lb-empty">本週還沒有紀錄</div>'}</div>`;
       html += `<div class="rogue-lb-panel" id="rogue-lb-alltime" style="display:none">${aRows.length ? buildTable(aRows) : '<div class="rogue-home-lb-empty">還沒有紀錄</div>'}</div>`;
+      // 首頁只顯示前 5 名，進遊戲內排行榜可看前 10 名
+      if (wRows.length >= 5 || aRows.length >= 5) {
+        html += `<button class="rogue-lb-more" onclick="startRogueGame()">看完整排行（前 10 名） →</button>`;
+      }
 
       el.innerHTML = html;
 
