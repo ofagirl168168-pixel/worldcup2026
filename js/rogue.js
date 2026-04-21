@@ -174,12 +174,13 @@
 
     // ── 進階卡 (epic) ──────────────────────
     { id:'power2',   name:'重砲射擊',   desc:'傷害 ×2',                  rarity:'epic',     apply(s){ s.dmgMul *= 2; }},
-    { id:'split',    name:'分裂射擊',   desc:'命中敵人後分裂成 2 顆小球', rarity:'epic',     apply(s){ s.split = true; }},
+    { id:'split',    name:'分裂射擊',   desc:'命中敵人 +20% 機率分裂成 2 顆小球（上限60%）', rarity:'epic',     apply(s){ s.splitPct = Math.min(0.6, (s.splitPct||0) + 0.2); }},
     { id:'timeSlow', name:'時間壓迫',   desc:'敵人全體速度永久 -20%',    rarity:'epic',     apply(s){ s.globalSlow = (s.globalSlow||1) * 0.8; }},
 
     // ── 傳說卡 (legendary) ─────────────────
     { id:'ghost',      name:'幽靈球',     desc:'+10% 機率穿過敵人（上限30%）', rarity:'legendary', apply(s){ s.ghostPct = Math.min(0.3, (s.ghostPct||0) + 0.1); }},
     { id:'vampire',    name:'吸血足球',   desc:'擊殺敵人回復 1 條命',      rarity:'legendary', apply(s){ s.vampire = true; }},
+    { id:'split2',     name:'爆裂分裂',   desc:'命中敵人 +35% 機率分裂成 2 顆小球（上限60%）', rarity:'legendary', apply(s){ s.splitPct = Math.min(0.6, (s.splitPct||0) + 0.35); }},
   ];
 
   // ═══════════════════════════════════════════════════════════
@@ -772,12 +773,12 @@
           if (G.freeze) d.frozen  = 3000;
           if (G.explode) explodeAOE(d, dmg);
           if (d.hp <= 0) onDefKill(d);
-          // 分裂：命中時產生 2 顆小球繼續飛
-          if (G.split && !b._split) {
+          // 分裂：命中時有機率產生 2 顆小球繼續飛（不含已分裂的小球）
+          if (G.splitPct > 0 && !b._split && Math.random() < G.splitPct) {
             for (let si = 0; si < 2; si++) {
-              const angle = (si === 0 ? -0.4 : 0.4);
+              const angle = (si === 0 ? -1.1 : 1.1);
               const cos = Math.cos(angle), sin = Math.sin(angle);
-              const spd = Math.sqrt(b.vx * b.vx + b.vz * b.vz) * 0.8;
+              const spd = Math.sqrt(b.vx * b.vx + b.vz * b.vz) * 0.65;
               const nvx = cos * b.vx - sin * b.vz;
               const nvz = sin * b.vx + cos * b.vz;
               const len = Math.sqrt(nvx * nvx + nvz * nvz) || 1;
