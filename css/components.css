@@ -883,8 +883,8 @@ img.flag-img {
   .nav-streak-widget { padding: 4px 8px; gap: 2px; }
   .nav-streak-flame  { font-size: 13px; }
   .nav-streak-num    { font-size: 12px; letter-spacing: 0; }
-  /* 手機：寶石已在漢堡選單內顯示，主列隱藏以騰空間 */
-  .nav-gem-widget { display: none; }
+  /* 手機：寶石已在漢堡選單內顯示，主列隱藏以騰空間（用 !important 壓過 JS 設的 inline style） */
+  #nav-gem-widget.nav-gem-widget { display: none !important; }
 }
 @media (max-width: 420px) {
   /* 非常窄：賽事切換器僅顯示 logo、按鈕貼緊 */
