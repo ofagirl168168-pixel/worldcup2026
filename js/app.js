@@ -3520,6 +3520,13 @@ function closeArticleModal() {
       history.replaceState({}, '', url.pathname + url.search);
     }
   } catch(e) {}
+  // 文章落地訪客：關閉文章後才彈每日任務
+  if (window.__pendingDailyTaskAfterArticle) {
+    window.__pendingDailyTaskAfterArticle = false;
+    setTimeout(() => {
+      if (typeof showDailyTaskPopup === 'function') showDailyTaskPopup();
+    }, 400);
+  }
 }
 
 function _pushArticleUrl(id) {

@@ -353,21 +353,26 @@ window.addEventListener('load', () => {
   _safe(() => updateArenaBadge(), 'updateArenaBadge');
   _safe(() => updateNavXP(), 'updateNavXP');
   _safe(() => window.renderOpinionStreakWidget && window.renderOpinionStreakWidget(), 'renderOpinionStreakWidget');
-  _safe(() => showArenaWelcomeIfNeeded(), 'showArenaWelcomeIfNeeded');
   // 觀點投票 → 每日任務彈窗（延遲 3 秒，合併流程）
+  // 若從 /article/<id> 或 ?article= 落地：每日任務彈窗延後到文章關閉後才彈（不打擾閱讀）
   // 若 URL 帶 ?poll=<id>（分享連結落地）→ 強制開該題，忽略「今日已彈過」旗標
   setTimeout(() => {
-    if (!document.getElementById('arena-welcome-overlay')) {
-      let pollId = null;
-      try {
-        const p = new URLSearchParams(location.search).get('poll');
-        if (p) pollId = p;
-      } catch (e) {}
-      const pollOpts = pollId ? { pollId } : undefined;
-      _safe(() => showOpinionPoll(() => {
+    let pollId = null;
+    let isArticleLanding = false;
+    try {
+      const p = new URLSearchParams(location.search).get('poll');
+      if (p) pollId = p;
+      if (/^\/article\//.test(location.pathname)) isArticleLanding = true;
+      if (new URLSearchParams(location.search).get('article')) isArticleLanding = true;
+    } catch (e) {}
+    const pollOpts = pollId ? { pollId } : undefined;
+    _safe(() => showOpinionPoll(() => {
+      if (isArticleLanding) {
+        window.__pendingDailyTaskAfterArticle = true;
+      } else {
         _safe(() => showDailyTaskPopup(), 'showDailyTaskPopup');
-      }, pollOpts), 'showOpinionPoll');
-    }
+      }
+    }, pollOpts), 'showOpinionPoll');
   }, 3000);
   // 預測結算（延遲執行，避免阻塞初始渲染）
   setTimeout(() => {
