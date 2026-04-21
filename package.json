@@ -1,0 +1,15 @@
+{
+  "name": "soccermaddy-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Soccer麥迪-足球情報站 — 建置用腳本（OG 縮圖、articles-index 等）",
+  "scripts": {
+    "build:og": "node scripts/build-og-images.js",
+    "build:index": "node scripts/build-articles-index.js",
+    "build:og-template": "node scripts/build-og-generator.js"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.99"
+  }
+}
