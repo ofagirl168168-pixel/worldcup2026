@@ -194,7 +194,6 @@
   function _handleVote(opinion, chosenIdx, cards, overlay, onClose) {
     // 本機先記（立即生效，網路失敗也保留用戶立場）
     localStorage.setItem(STORAGE_PREFIX + opinion.id, chosenIdx);
-    _cleanOldKeys(STORAGE_PREFIX);
 
     // 連續天數 +1（同日重複投不會重算）→ 供 _showResult 渲染
     overlay.dataset.streakBump = JSON.stringify(_bumpStreakToday());
@@ -980,7 +979,6 @@
         _renderComment(listEl, data, opinion, chosenIdx, { prepend: true });
         _bumpCount(countEl, +1);
         localStorage.setItem(commentedKey, '1');
-        _cleanOldKeys(STORAGE_COMMENT);
         input.value = '';
         input.disabled = true;
         submitBtn.textContent = '已留言';
@@ -1092,7 +1090,6 @@
       if (likeBtn.classList.contains('liked')) return;
       likeBtn.classList.add('liked');
       localStorage.setItem(likedKey, '1');
-      _cleanOldKeys(STORAGE_LIKE);
       // 樂觀更新
       const m = likeBtn.textContent.match(/\d+/);
       const cur = m ? parseInt(m[0]) : 0;
