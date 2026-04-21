@@ -121,7 +121,14 @@
       const prevIdx = parseInt(existingVote);
       const preCards = overlay.querySelectorAll('.opinion-card');
       preCards.forEach((card, i) => {
-        card.classList.add(i === prevIdx ? 'voted-yes' : 'voted-no');
+        if (i === prevIdx) {
+          card.classList.add('voted-yes');
+        } else {
+          card.classList.add('voted-no');
+          // 再次打開時稍微延後飛走動畫，讓使用者先看清兩張卡
+          card.style.animationDelay = '0.45s';
+          card.style.animationDuration = '0.7s';
+        }
         card.style.pointerEvents = 'none';
       });
       const preSkip = overlay.querySelector('#opinion-skip');
@@ -129,7 +136,7 @@
       overlay.dataset.voted = '1';
       setTimeout(() => {
         _showResult(opinion, prevIdx, overlay, onClose);
-      }, 500);
+      }, 1100);
       return;
     }
 
