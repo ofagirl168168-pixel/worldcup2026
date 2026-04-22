@@ -97,7 +97,7 @@ const EPL_TEAMS = {
     history:'6次英格蘭頂級聯賽冠軍，2次歐冠冠軍',
     injuries:[
       {name:'Reece James',pos:'右後衛',status:'腿後肌傷',returnDate:'五月初'},
-      {name:'Cole Palmer',pos:'攻擊中場/右翼',status:'傷缺（缺席 vs 布萊頓）',returnDate:'評估中'},
+      {name:'Cole Palmer',pos:'攻擊中場/右翼',status:'腿後腱緊繃（缺席 vs 布萊頓）',returnDate:'短期內'},
       {name:'Levi Colwill',pos:'中後衛',status:'長期傷缺',returnDate:'未定'}
     ]
   },
