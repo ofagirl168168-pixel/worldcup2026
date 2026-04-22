@@ -397,7 +397,7 @@ window.EPL_MATCHES = [
   // ===== 第 32 輪 (2026-04-10 ~ 04-14 台灣時間) =====
 
   // 西漢姆 4-0 狼隊 | 04/11 01:30 台灣時間 | 裁判 Sam Barrott
-  {id:'EPL-MW32-WHU-WOL', matchday:32, date:'2026-04-11', time:'01:30', home:'WHU', away:'WOL', stage:'league',
+  {id:'EPL-MW32-WHU-WOL', matchday:32, date:'2026-04-11', time:'03:00', home:'WHU', away:'WOL', stage:'league',
    status:'finished', score:{h:4,a:0}, halfTime:{h:1,a:0},
    goals:[
      {min:'42',player:'Konstantinos Mavropanos',side:'h'},
@@ -407,7 +407,7 @@ window.EPL_MATCHES = [
    ]},
 
   // 兵工廠 1-2 伯恩茅斯 | 04/11 04:00 台灣時間
-  {id:'EPL-MW32-ARS-BOU', matchday:32, date:'2026-04-11', time:'04:00', home:'ARS', away:'BOU', stage:'league',
+  {id:'EPL-MW32-ARS-BOU', matchday:32, date:'2026-04-11', time:'19:30', home:'ARS', away:'BOU', stage:'league',
    status:'finished', score:{h:1,a:2}, halfTime:{h:1,a:1},
    goals:[
      {min:'17',player:'Junior Kroupi',side:'a'},
@@ -416,7 +416,7 @@ window.EPL_MATCHES = [
    ]},
 
   // 布倫特福德 2-2 愛華頓 | 04/11 04:00 台灣時間
-  {id:'EPL-MW32-BRE-EVE', matchday:32, date:'2026-04-11', time:'04:00', home:'BRE', away:'EVE', stage:'league',
+  {id:'EPL-MW32-BRE-EVE', matchday:32, date:'2026-04-11', time:'22:00', home:'BRE', away:'EVE', stage:'league',
    status:'finished', score:{h:2,a:2}, halfTime:{h:1,a:1},
    goals:[
      {min:'3',player:'Igor Thiago',side:'h',type:'pen'},
@@ -426,7 +426,7 @@ window.EPL_MATCHES = [
    ]},
 
   // 伯恩利 0-2 布萊頓 | 04/11 04:00 台灣時間
-  {id:'EPL-MW32-BUR-BHA', matchday:32, date:'2026-04-11', time:'04:00', home:'BUR', away:'BHA', stage:'league',
+  {id:'EPL-MW32-BUR-BHA', matchday:32, date:'2026-04-11', time:'22:00', home:'BUR', away:'BHA', stage:'league',
    status:'finished', score:{h:0,a:2}, halfTime:{h:0,a:1},
    goals:[
      {min:'43',player:'Mats Wieffer',side:'a'},
@@ -442,14 +442,14 @@ window.EPL_MATCHES = [
    ]},
 
   // 桑德蘭 1-0 熱刺 | 04/12 03:00 台灣時間
-  {id:'EPL-MW32-SUN-TOT', matchday:32, date:'2026-04-12', time:'03:00', home:'SUN', away:'TOT', stage:'league',
+  {id:'EPL-MW32-SUN-TOT', matchday:32, date:'2026-04-12', time:'21:00', home:'SUN', away:'TOT', stage:'league',
    status:'finished', score:{h:1,a:0}, halfTime:{h:0,a:0},
    goals:[
      {min:'61',player:'Nordi Mukiele',side:'h'}
    ]},
 
   // 水晶宮 2-1 紐卡索 | 04/12 03:00 台灣時間
-  {id:'EPL-MW32-CRY-NEW', matchday:32, date:'2026-04-12', time:'03:00', home:'CRY', away:'NEW', stage:'league',
+  {id:'EPL-MW32-CRY-NEW', matchday:32, date:'2026-04-12', time:'21:00', home:'CRY', away:'NEW', stage:'league',
    status:'finished', score:{h:2,a:1}, halfTime:{h:0,a:1},
    goals:[
      {min:'43',player:'William Osula',side:'a'},
@@ -458,7 +458,7 @@ window.EPL_MATCHES = [
    ]},
 
   // 諾丁漢森林 1-1 阿斯頓維拉 | 04/12 03:00 台灣時間
-  {id:'EPL-MW32-NFO-AVL', matchday:32, date:'2026-04-12', time:'03:00', home:'NFO', away:'AVL', stage:'league',
+  {id:'EPL-MW32-NFO-AVL', matchday:32, date:'2026-04-12', time:'21:00', home:'NFO', away:'AVL', stage:'league',
    status:'finished', score:{h:1,a:1}, halfTime:{h:1,a:1},
    goals:[
      {min:'23',player:'Murillo',side:'a',type:'og'},
@@ -572,14 +572,14 @@ window.EPL_MATCHES = [
    ]},
 
   // 水晶宮 0-0 西漢姆 | 04/21 04:00 台灣時間
-  {id:'EPL-MW33-CRY-WHU', matchday:33, date:'2026-04-21', time:'04:00', home:'CRY', away:'WHU', stage:'league',
+  {id:'EPL-MW33-CRY-WHU', matchday:33, date:'2026-04-21', time:'03:00', home:'CRY', away:'WHU', stage:'league',
    status:'finished', score:{h:0,a:0}, halfTime:{h:0,a:0},
    goals:[]},
 
   // ===== 第 34 輪 (2026-04-21 ~ 04-25 台灣時間) =====
 
   // 布萊頓 3-0 乙爾西 | 04/21 19:30 台灣時間
-  {id:'EPL-MW34-BHA-CHE', matchday:34, date:'2026-04-21', time:'19:30', home:'BHA', away:'CHE', stage:'league',
+  {id:'EPL-MW34-BHA-CHE', matchday:34, date:'2026-04-22', time:'03:00', home:'BHA', away:'CHE', stage:'league',
    status:'finished', score:{h:3,a:0}, halfTime:{h:1,a:0},
    goals:[
      {min:'3',player:'Ferdi Kadioglu',side:'h'},
@@ -587,20 +587,20 @@ window.EPL_MATCHES = [
      {min:'90+1',player:'Danny Welbeck',side:'h'}
    ]},
 
-  // 伯恩茅斯 vs 里茲聯 | 04/22 20:00 台灣時間
-  {id:'EPL-MW34-BOU-LEE', matchday:34, date:'2026-04-22', time:'20:00', home:'BOU', away:'LEE', stage:'league',
+  // 伯恩茅斯 vs 里茲聯 | 04/23 03:00 台灣時間
+  {id:'EPL-MW34-BOU-LEE', matchday:34, date:'2026-04-23', time:'03:00', home:'BOU', away:'LEE', stage:'league',
    status:'scheduled', score:{h:null,a:null}},
 
-  // 伯恩利 vs 曼城 | 04/22 20:00 台灣時間
-  {id:'EPL-MW34-BUR-MCI', matchday:34, date:'2026-04-22', time:'20:00', home:'BUR', away:'MCI', stage:'league',
+  // 伯恩利 vs 曼城 | 04/23 03:00 台灣時間
+  {id:'EPL-MW34-BUR-MCI', matchday:34, date:'2026-04-23', time:'03:00', home:'BUR', away:'MCI', stage:'league',
    status:'scheduled', score:{h:null,a:null}},
 
-  // 桑德蘭 vs 諾丁漢森林 | 04/24 03:00 台灣時間
-  {id:'EPL-MW34-SUN-NFO', matchday:34, date:'2026-04-24', time:'03:00', home:'SUN', away:'NFO', stage:'league',
+  // 桑德蘭 vs 諾丁漢森林 | 04/25 03:00 台灣時間
+  {id:'EPL-MW34-SUN-NFO', matchday:34, date:'2026-04-25', time:'03:00', home:'SUN', away:'NFO', stage:'league',
    status:'scheduled', score:{h:null,a:null}},
 
-  // 富勒姆 vs 阿斯頓維拉 | 04/25 22:00 台灣時間
-  {id:'EPL-MW34-FUL-AVL', matchday:34, date:'2026-04-25', time:'22:00', home:'FUL', away:'AVL', stage:'league',
+  // 富勒姆 vs 阿斯頓維拉 | 04/25 19:30 台灣時間
+  {id:'EPL-MW34-FUL-AVL', matchday:34, date:'2026-04-25', time:'19:30', home:'FUL', away:'AVL', stage:'league',
    status:'scheduled', score:{h:null,a:null}},
 
   // 利物浦 vs 水晶宮 | 04/25 22:00 台灣時間
