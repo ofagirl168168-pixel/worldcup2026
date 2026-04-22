@@ -1450,6 +1450,25 @@ function saveGroupPicks() {
 
 // ── 每日一題分享圖 ────────────────────────────────────────
 async function shareDailyImage() {
+  // 防 re-entrance（使用者狂點也只跑一次）
+  if (shareDailyImage._running) return
+  shareDailyImage._running = true
+  const btn = document.getElementById('btn-share-daily')
+  const btnOrig = btn ? btn.innerHTML : null
+  const btnEnabled = btn ? !btn.disabled : true
+  if (btn) { btn.innerHTML = '⏳ 產生中...'; btn.disabled = true }
+  try {
+    return await _shareDailyImageImpl()
+  } catch (err) {
+    console.error('[shareDailyImage] 失敗', err)
+    try { showToast?.('分享失敗：' + (err?.message || err)) } catch {}
+  } finally {
+    if (btn) { btn.innerHTML = btnOrig; btn.disabled = !btnEnabled }
+    shareDailyImage._running = false
+  }
+}
+
+async function _shareDailyImageImpl() {
   completeDailyTask?.('share_any');
   const { q, opts } = getTodayQuestion()
   const dailyState  = getDailyState()
@@ -1623,27 +1642,31 @@ async function shareDailyImage() {
   ctx.fillText(shareLink, ctaX, ctaY + 90)
 
   // ── 輸出 ──────────────────────────────────────────────
-  canvas.toBlob(async blob => {
-    const file = new File([blob], 'daily-challenge.png', { type: 'image/png' })
-    const link = await getMyRefLink?.() || _shareBaseUrl()
-    const shareText = `🧠 今日${_ctx.label}挑戰題，你知道答案嗎？快來挑戰！\n${link}`
-    if (_isMobile() && navigator.share) {
-      // LINE 等 App 在有 files 時不顯示 text，所以先複製文字到剪貼簿
-      try { await navigator.clipboard.writeText(shareText) } catch {}
-      // 分享圖片（帶 text 給支援的 App，如 iMessage、Telegram）
-      const shareData = navigator.canShare?.({ files: [file], text: shareText })
-        ? { files: [file], title: '🧠 每日一題挑戰', text: shareText }
-        : navigator.canShare?.({ files: [file] })
-          ? { files: [file] }
-          : { title: '🧠 每日一題挑戰', text: shareText }
-      showToast('📋 文字已複製！分享圖片後可在聊天室貼上文字')
-      try {
-        await navigator.share(shareData)
-      } catch { /* 用戶取消分享 */ }
-    } else {
-      showDesktopShareModal({ blob, link, filename: 'daily-challenge.png', title: '🧠 出題挑戰', text: shareText })
-    }
-  }, 'image/png')
+  // toBlob 的 callback async 錯誤會變成 unhandled rejection、看不到 → 包一層 Promise 把它 await 起來
+  const blob = await new Promise((resolve, reject) => {
+    try {
+      canvas.toBlob(b => b ? resolve(b) : reject(new Error('canvas.toBlob 回傳 null')), 'image/png')
+    } catch (e) { reject(e) }
+  })
+  const file = new File([blob], 'daily-challenge.png', { type: 'image/png' })
+  const link = await getMyRefLink?.() || _shareBaseUrl()
+  const shareText = `🧠 今日${_ctx.label}挑戰題，你知道答案嗎？快來挑戰！\n${link}`
+  if (_isMobile() && navigator.share) {
+    // LINE 等 App 在有 files 時不顯示 text，所以先複製文字到剪貼簿
+    try { await navigator.clipboard.writeText(shareText) } catch {}
+    // 分享圖片（帶 text 給支援的 App，如 iMessage、Telegram）
+    const shareData = navigator.canShare?.({ files: [file], text: shareText })
+      ? { files: [file], title: '🧠 每日一題挑戰', text: shareText }
+      : navigator.canShare?.({ files: [file] })
+        ? { files: [file] }
+        : { title: '🧠 每日一題挑戰', text: shareText }
+    showToast('📋 文字已複製！分享圖片後可在聊天室貼上文字')
+    try {
+      await navigator.share(shareData)
+    } catch { /* 用戶取消分享 */ }
+  } else {
+    showDesktopShareModal({ blob, link, filename: 'daily-challenge.png', title: '🧠 出題挑戰', text: shareText })
+  }
 }
 
 // ── 電腦版分享 Modal ─────────────────────────────────────
