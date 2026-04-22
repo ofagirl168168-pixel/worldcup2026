@@ -1597,7 +1597,14 @@ async function _shareDailyImageImpl() {
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle'
     const maxOptW = oW - 60
     let optTxt = opt
-    while (ctx.measureText(optTxt).width > maxOptW && optTxt.length > 4) optTxt = optTxt.slice(0,-1) + '…'
+    // 太寬就截斷加「…」；每輪切原字串（不切已加的 …），否則會無窮迴圈
+    if (ctx.measureText(optTxt).width > maxOptW) {
+      let core = opt
+      while (core.length > 4 && ctx.measureText(core + '…').width > maxOptW) {
+        core = core.slice(0, -1)
+      }
+      optTxt = core + '…'
+    }
     ctx.fillText(optTxt, ox + 50, oy + oH/2)
   })
 
