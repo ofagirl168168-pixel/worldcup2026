@@ -19,8 +19,40 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 // Windows 上 undici 預設 IPv6 優先、若無法連通會卡住 → 強制 IPv4 優先
 require('dns').setDefaultResultOrder('ipv4first');
+
+// 倉庫根（本檔在 scripts/ 下）
+const REPO_ROOT = path.join(__dirname, '..');
+
+// 成功寫入題庫後自動 commit & push（由 bot.py detached 啟動時沒人會手動 commit）
+function autoCommitAndPush(targetDate, chosenQ) {
+  try {
+    execFileSync('git', ['add', 'js/data-opinions.js', 'scripts/opinion-candidates.json'], {
+      cwd: REPO_ROOT, stdio: 'inherit',
+    });
+    // 先看還有沒有 staged 變更，避免空 commit
+    let hasChanges = true;
+    try {
+      execFileSync('git', ['diff', '--cached', '--quiet'], { cwd: REPO_ROOT });
+      hasChanges = false; // exit 0 = 沒變更
+    } catch (e) { /* exit 1 = 有變更 */ }
+    if (!hasChanges) {
+      console.log('ℹ️ 沒有 staged 變更，跳過 commit');
+      return;
+    }
+    const short = (chosenQ || '').replace(/\s+/g, ' ').slice(0, 50);
+    const msg =
+      `arena(${targetDate}): ${short}\n\n` +
+      `Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>\n`;
+    execFileSync('git', ['commit', '-m', msg], { cwd: REPO_ROOT, stdio: 'inherit' });
+    execFileSync('git', ['push'], { cwd: REPO_ROOT, stdio: 'inherit' });
+    console.log('🚀 已 git commit & push');
+  } catch (err) {
+    console.error('⚠️ git commit/push 失敗:', err.message);
+  }
+}
 
 // ─── 讀 .env.local ──────────────────────────────────────────
 const envPath = path.join(__dirname, '.env.local');
@@ -296,7 +328,7 @@ async function main() {
           parse_mode: 'MarkdownV2',
         }).catch(() => {});
         console.log(`📝 已寫入 ${path.relative(process.cwd(), filePath)}`);
-        console.log(`💡 接下來請自行 git commit & push`);
+        autoCommitAndPush(targetDate, chosen.q);
         process.exit(0);
       }
 
@@ -369,6 +401,7 @@ async function main() {
   }).catch(() => {});
   const filePath = appendToDataFile(fallback);
   console.log(`📝 已寫入 ${path.relative(process.cwd(), filePath)}`);
+  autoCommitAndPush(targetDate, fallback.q);
   process.exit(0);
 }
 
