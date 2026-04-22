@@ -55,6 +55,10 @@ const REST = `${SUPA_URL}/rest/v1`;
 const CURSOR_PATH = path.join(__dirname, '.comments-cursor');
 const POLL_INTERVAL_MS = 15000;
 const TELEGRAM_POLL_TIMEOUT = 30; // seconds
+// 共用 MADDY bot token 的 opinion-telegram.js 啟動時寫這個 lock；
+// 存在時本腳本暫停 telegram polling，避免互搶 /getUpdates
+const LOCK_PATH = path.join(__dirname, '.opinion-telegram.lock');
+const LOCK_WAIT_MS = 5000;
 
 // 讀/寫 cursor
 function readCursor() {
@@ -215,8 +219,22 @@ async function commentPollLoop() {
 
 async function telegramPollLoop() {
   let offset = 0;
+  let pausedLogged = false;
   console.log('📡 開始長輪詢 Telegram...');
   while (true) {
+    // opinion-telegram.js 正在跑時讓開，不要互搶 /getUpdates
+    if (fs.existsSync(LOCK_PATH)) {
+      if (!pausedLogged) {
+        console.log('🔒 opinion-telegram.js 執行中，暫停 telegram polling');
+        pausedLogged = true;
+      }
+      await sleep(LOCK_WAIT_MS);
+      continue;
+    }
+    if (pausedLogged) {
+      console.log('🔓 lock 已釋放，恢復 telegram polling');
+      pausedLogged = false;
+    }
     try {
       const updates = await tg('getUpdates', {
         offset,

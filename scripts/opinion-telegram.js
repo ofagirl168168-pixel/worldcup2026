@@ -39,6 +39,28 @@ if (!TOKEN || !CHAT_ID) {
 }
 
 const API = `https://api.telegram.org/bot${TOKEN}`;
+
+// 鎖檔：跟 opinion-comments-bot.js 共用同一個 MADDY bot token，
+// 同時 polling 會互搶 callback。本腳本啟動時寫 lock，
+// comments-bot 偵測到 lock 就暫停自己的 polling，退出前清掉。
+const LOCK_PATH = path.join(__dirname, '.opinion-telegram.lock');
+function writeLock() {
+  try { fs.writeFileSync(LOCK_PATH, String(process.pid), 'utf8'); } catch (e) {}
+}
+function clearLock() {
+  try { fs.unlinkSync(LOCK_PATH); } catch (e) {}
+}
+// 正常退出 + 各種信號 + 未捕捉例外都要清 lock，避免卡死 comments-bot
+process.on('exit', clearLock);
+['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK'].forEach(sig => {
+  process.on(sig, () => { clearLock(); process.exit(130); });
+});
+process.on('uncaughtException', err => {
+  console.error('💥 uncaughtException:', err);
+  clearLock();
+  process.exit(1);
+});
+
 // 執行的期限 = 今天 23:59:59（本機時區）
 // 若跨日仍沒選，自動寫入 candidates[0] 當預設
 function endOfToday() {
@@ -170,6 +192,7 @@ async function main() {
     console.error('用法：node scripts/opinion-telegram.js <candidates.json>');
     process.exit(1);
   }
+  writeLock();
   const rawCandidates = JSON.parse(fs.readFileSync(candidatesPath, 'utf8'));
   if (!Array.isArray(rawCandidates) || !rawCandidates.length) {
     console.error('❌ 候選題檔案格式錯誤或空的');
