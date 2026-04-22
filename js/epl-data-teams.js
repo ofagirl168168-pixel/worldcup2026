@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-04-21 日更）
+   資料截止：2025/26 賽季（2026-04-22 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -76,12 +76,12 @@ const EPL_TEAMS = {
       {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢',returnDate:'四月底（本月報銷）'},
       {name:'John Stones',pos:'中後衛',status:'小腿傷，已部分訓練',returnDate:'短期內'},
       {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷（vs Chelsea下半場受傷）',returnDate:'評估中，已輕度訓練'},
-      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（vs 兵工廠 88 分鐘退場）',returnDate:'檢查中，可能缺陣 1-6 週'}
+      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（vs 兵工廠 88 分鐘退場）',returnDate:'可能 4/22 vs 伯恩利回歸，待確認'}
     ]
   },
   'CHE': {
     name:'Chelsea', nameCN:'乙爾西', flag:'https://crests.football-data.org/61.png',
-    league:'Premier League', eplRank:6, coach:'Liam Rosenior', formation:'4-2-3-1',
+    league:'Premier League', eplRank:7, coach:'Liam Rosenior', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Cole Palmer',pos:'攻擊中場/右翼',club:'乙爾西'},
       {name:'Enzo Fernández',pos:'中場',club:'乙爾西'},
@@ -93,12 +93,12 @@ const EPL_TEAMS = {
     style:'控球導向，中場掌控，快速轉換進攻',
     strengths:['Cole Palmer創造力爆表','年輕陣容潛力無限','中場組合強悍'],
     weaknesses:['陣容磨合仍在進行','經驗不足影響穩定性','防守偶有失誤'],
-    recentForm:['W','L','L','L','L'],
+    recentForm:['L','L','L','L','L'],
     history:'6次英格蘭頂級聯賽冠軍，2次歐冠冠軍',
     injuries:[
-      {name:'Reece James',pos:'右後衛',status:'腿後肌傷',returnDate:'評估中'},
-      {name:'Levi Colwill',pos:'中後衛',status:'長期傷缺',returnDate:'未定'},
-      {name:'Trevoh Chalobah',pos:'後衛',status:'傷缺約6週',returnDate:'五月'}
+      {name:'Reece James',pos:'右後衛',status:'腿後肌傷',returnDate:'五月初'},
+      {name:'Cole Palmer',pos:'攻擊中場/右翼',status:'傷缺（缺席 vs 布萊頓）',returnDate:'評估中'},
+      {name:'Levi Colwill',pos:'中後衛',status:'長期傷缺',returnDate:'未定'}
     ]
   },
   'MUN': {
@@ -180,7 +180,7 @@ const EPL_TEAMS = {
   // ===== 中游球隊 =====
   'BHA': {
     name:'Brighton & Hove Albion', nameCN:'布萊頓', flag:'https://crests.football-data.org/397.png',
-    league:'Premier League', eplRank:9, coach:'Fabian Hürzeler', formation:'4-2-3-1',
+    league:'Premier League', eplRank:6, coach:'Fabian Hürzeler', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Kaoru Mitoma',pos:'左翼',club:'布萊頓'},
       {name:'Carlos Baleba',pos:'中場',club:'布萊頓'},
@@ -192,7 +192,7 @@ const EPL_TEAMS = {
     style:'後場組織出球，控球進攻，數據驅動招募',
     strengths:['球探系統發掘天才','戰術執行力高','年輕球員發展好'],
     weaknesses:['關鍵球員被挖角風險','經驗不足','進攻終結效率偶有波動'],
-    recentForm:['W','L','W','D','D'],
+    recentForm:['L','W','D','D','W'],
     history:'近年從英甲升至英超穩定中游，數據化管理典範'
   },
   'BOU': {
@@ -575,6 +575,49 @@ window.EPL_MATCHES = [
   {id:'EPL-MW33-CRY-WHU', matchday:33, date:'2026-04-21', time:'04:00', home:'CRY', away:'WHU', stage:'league',
    status:'finished', score:{h:0,a:0}, halfTime:{h:0,a:0},
    goals:[]},
+
+  // ===== 第 34 輪 (2026-04-21 ~ 04-25 台灣時間) =====
+
+  // 布萊頓 3-0 乙爾西 | 04/21 19:30 台灣時間
+  {id:'EPL-MW34-BHA-CHE', matchday:34, date:'2026-04-21', time:'19:30', home:'BHA', away:'CHE', stage:'league',
+   status:'finished', score:{h:3,a:0}, halfTime:{h:1,a:0},
+   goals:[
+     {min:'3',player:'Ferdi Kadioglu',side:'h'},
+     {min:'56',player:'Jack Hinshelwood',side:'h'},
+     {min:'90+1',player:'Danny Welbeck',side:'h'}
+   ]},
+
+  // 伯恩茅斯 vs 里茲聯 | 04/22 20:00 台灣時間
+  {id:'EPL-MW34-BOU-LEE', matchday:34, date:'2026-04-22', time:'20:00', home:'BOU', away:'LEE', stage:'league',
+   status:'scheduled', score:{h:null,a:null}},
+
+  // 伯恩利 vs 曼城 | 04/22 20:00 台灣時間
+  {id:'EPL-MW34-BUR-MCI', matchday:34, date:'2026-04-22', time:'20:00', home:'BUR', away:'MCI', stage:'league',
+   status:'scheduled', score:{h:null,a:null}},
+
+  // 桑德蘭 vs 諾丁漢森林 | 04/24 03:00 台灣時間
+  {id:'EPL-MW34-SUN-NFO', matchday:34, date:'2026-04-24', time:'03:00', home:'SUN', away:'NFO', stage:'league',
+   status:'scheduled', score:{h:null,a:null}},
+
+  // 富勒姆 vs 阿斯頓維拉 | 04/25 22:00 台灣時間
+  {id:'EPL-MW34-FUL-AVL', matchday:34, date:'2026-04-25', time:'22:00', home:'FUL', away:'AVL', stage:'league',
+   status:'scheduled', score:{h:null,a:null}},
+
+  // 利物浦 vs 水晶宮 | 04/25 22:00 台灣時間
+  {id:'EPL-MW34-LIV-CRY', matchday:34, date:'2026-04-25', time:'22:00', home:'LIV', away:'CRY', stage:'league',
+   status:'scheduled', score:{h:null,a:null}},
+
+  // 西漢姆 vs 艾佛頓 | 04/25 22:00 台灣時間
+  {id:'EPL-MW34-WHU-EVE', matchday:34, date:'2026-04-25', time:'22:00', home:'WHU', away:'EVE', stage:'league',
+   status:'scheduled', score:{h:null,a:null}},
+
+  // 狼隊 vs 熱刺 | 04/25 22:00 台灣時間
+  {id:'EPL-MW34-WOL-TOT', matchday:34, date:'2026-04-25', time:'22:00', home:'WOL', away:'TOT', stage:'league',
+   status:'scheduled', score:{h:null,a:null}},
+
+  // 兵工廠 vs 紐卡索 | 04/26 00:30 台灣時間
+  {id:'EPL-MW34-ARS-NEW', matchday:34, date:'2026-04-26', time:'00:30', home:'ARS', away:'NEW', stage:'league',
+   status:'scheduled', score:{h:null,a:null}},
 
 ];
 
