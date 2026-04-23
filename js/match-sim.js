@@ -404,10 +404,15 @@
         const near = findNearestOpponent(pos);
         const hasSpace = near.dist > 0.05;
         const dangerMul = distToGoal < 0.15 ? 1.5 : distToGoal < 0.22 ? 0.7 : 0.25;
-        // 基礎射門率 + 持球太久的緊迫加成
-        const shootChance = hasSpace
-          ? (atkStats.attack / 100) * 0.08 * dangerMul + urgency * 0.06
-          : urgency * 0.02;
+        let shootChance;
+        if (hasSpace) {
+          shootChance = (atkStats.attack / 100) * 0.08 * dangerMul + urgency * 0.06;
+        } else if (distToGoal < 0.18) {
+          // 禁區內即使被防守者貼身也要「勉強射門」— 真實前鋒不會等完美空間
+          shootChance = (atkStats.attack / 100) * 0.05 * dangerMul + urgency * 0.05;
+        } else {
+          shootChance = urgency * 0.02;
+        }
         if (Math.random() < shootChance) {
           startShoot();
           return;
@@ -455,8 +460,9 @@
         }
       }
 
-      // 4) 一直沒動作 → 強制出手（前場射、其他傳）
-      if (framesInPossession > 50) {
+      // 4) 一直沒動作 → 強制出手（門前縮到 25 幀即射、中後場 45 幀才強制傳）
+      const forceThreshold = distToGoal < 0.22 ? 25 : 45;
+      if (framesInPossession > forceThreshold) {
         if (distToGoal < 0.35) {
           startShoot();
         } else {
