@@ -120,7 +120,7 @@
     container.innerHTML = `
       <div class="msim-hud">
         <div class="msim-hud-side">
-          <div class="msim-hud-label">WIN CHANCE</div>
+          <div class="msim-hud-label">${teams.home.nameCN} 勝率</div>
           <div class="msim-hud-val msim-h-chance" style="color:#90caf9">—</div>
         </div>
         <div class="msim-hud-center">
@@ -132,11 +132,16 @@
           </div>
         </div>
         <div class="msim-hud-side msim-hud-side-r">
-          <div class="msim-hud-label">POWER</div>
-          <div class="msim-hud-val msim-a-power" style="color:#ef9a9a">—</div>
+          <div class="msim-hud-label">${teams.away.nameCN} 勝率</div>
+          <div class="msim-hud-val msim-a-chance" style="color:#ef9a9a">—</div>
         </div>
       </div>
       <canvas class="msim-canvas"></canvas>
+      <div class="msim-speed-bar">
+        <button class="msim-speed-btn" data-speed="0.5" title="慢放">🐢 0.5×</button>
+        <button class="msim-speed-btn active" data-speed="1" title="正常">▶️ 1×</button>
+        <button class="msim-speed-btn" data-speed="2" title="快轉">⏩ 2×</button>
+      </div>
       <div class="msim-teamline">
         <span style="color:#2196f3;font-weight:800">${teams.home.nameCN}</span>
         <span style="opacity:0.5;font-size:11px;margin:0 6px">${teams.home.formation || ''} · vs · ${teams.away.formation || ''}</span>
@@ -146,12 +151,13 @@
     `;
     return {
       hChance: container.querySelector('.msim-h-chance'),
-      aPower: container.querySelector('.msim-a-power'),
+      aChance: container.querySelector('.msim-a-chance'),
       hScore: container.querySelector('.msim-h-score'),
       aScore: container.querySelector('.msim-a-score'),
       time: container.querySelector('.msim-time'),
       canvas: container.querySelector('.msim-canvas'),
       summary: container.querySelector('.msim-summary'),
+      speedBtns: container.querySelectorAll('.msim-speed-btn'),
     };
   }
 
@@ -185,9 +191,15 @@
     ];
     const ball = { x: 0.5, y: 0.5 };
 
-    // Power 指標
-    const aPow = Object.values(away.radar).reduce((s, v) => s + v, 0);
-    ui.aPower.textContent = (aPow / 100).toFixed(2) + 'K';
+    // 速度倍率（0.5x / 1x / 2x）
+    let speedMult = 1;
+    let speedSubFrame = 0; // 0.5x 用的累加器
+    ui.speedBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        speedMult = parseFloat(btn.dataset.speed);
+        ui.speedBtns.forEach(b => b.classList.toggle('active', b === btn));
+      });
+    });
 
     // 比賽狀態
     const state = {
@@ -537,45 +549,34 @@
       }
     }
 
-    // ── 主 tick ────────────────────────────────────────
-    function tick() {
-      if (state.frame >= TOTAL_FRAMES) { showSummary(); return; }
-
-      // 暫停中
+    // 單幀邏輯（不含渲染，速度倍率會多次呼叫）
+    function stepOneFrame() {
       if (state.pauseFrames > 0) {
         state.pauseFrames--;
-        state.flashAlpha = Math.max(0, state.flashAlpha - 0.03);
-        render(ctx, state);
         if (state.pauseFrames === 0 && state.phase === 'celebrate') {
-          // 進球方換另一隊開球
           kickoff(state.possession === 'h' ? 'a' : 'h');
         }
         state.frame++;
-        requestAnimationFrame(tick);
         return;
       }
 
       const gameMin = (state.frame / TOTAL_FRAMES) * MATCH_MINUTES;
       const gameMinInt = Math.floor(gameMin);
 
-      // 半場中斷
       if (!state.halftimeDone && gameMinInt >= 45) {
         state.halftimeDone = true;
         state.pauseFrames = Math.round(FPS * HT_PAUSE_SEC);
-        kickoff(Math.random() < hMidPoss ? 'a' : 'h'); // 下半場換球
-        // 不 return，讓這幀也能先畫（pauseFrames > 0 會在下一幀生效）
+        kickoff(Math.random() < hMidPoss ? 'a' : 'h');
       }
 
-      // 決策（dribble 時才跑 AI）
-      if (state.phase === 'dribble') {
-        tickDribble();
-      }
-
+      if (state.phase === 'dribble') tickDribble();
       updatePlayerTargets();
       movePlayers();
       moveBall();
+      state.frame++;
+    }
 
-      // 即時 WIN CHANCE
+    function updateHUD() {
       const remaining = Math.max(0, 1 - state.frame / TOTAL_FRAMES);
       const scoreDiff = state.score.h - state.score.a;
       const attackRatio = home.radar.attack / (home.radar.attack + away.radar.attack);
@@ -583,16 +584,41 @@
       const scoreBoost = scoreDiff * 0.08 * (1 - remaining * 0.5);
       const hChance = Math.max(0.05, Math.min(0.95, baseChance + scoreBoost));
       ui.hChance.textContent = Math.round(hChance * 100) + '%';
+      ui.aChance.textContent = Math.round((1 - hChance) * 100) + '%';
 
+      const gameMin = (state.frame / TOTAL_FRAMES) * MATCH_MINUTES;
       const totalGameSec = Math.floor(gameMin * 60);
       const mm = String(Math.floor(totalGameSec / 60)).padStart(2, '0');
       const ss = String(totalGameSec % 60).padStart(2, '0');
       ui.time.textContent = `${mm}:${ss}`;
+    }
 
+    // ── 主 tick（考慮速度倍率：1x 每 rAF 跑 1 幀、2x 跑 2 幀、0.5x 兩 rAF 跑 1 幀）─
+    function tick() {
+      if (state.frame >= TOTAL_FRAMES) { showSummary(); return; }
+
+      let framesThisRAF;
+      if (speedMult >= 1) {
+        framesThisRAF = Math.round(speedMult);
+      } else {
+        // 0.5x：每 1/speedMult 次 rAF 才走一幀
+        speedSubFrame++;
+        if (speedSubFrame < Math.round(1 / speedMult)) {
+          render(ctx, state);
+          state.flashAlpha = Math.max(0, state.flashAlpha - 0.03);
+          requestAnimationFrame(tick);
+          return;
+        }
+        speedSubFrame = 0;
+        framesThisRAF = 1;
+      }
+
+      for (let k = 0; k < framesThisRAF && state.frame < TOTAL_FRAMES; k++) {
+        stepOneFrame();
+      }
+      updateHUD();
       render(ctx, state);
-      state.flashAlpha = Math.max(0, state.flashAlpha - 0.04);
-
-      state.frame++;
+      state.flashAlpha = Math.max(0, state.flashAlpha - 0.04 * framesThisRAF);
       requestAnimationFrame(tick);
     }
 
