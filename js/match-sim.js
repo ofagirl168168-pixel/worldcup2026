@@ -608,18 +608,28 @@
 
     function movePlayers() {
       // 剛換邊 20 幀內降低 smoothness，讓角色翻轉時球員用「小碎步」過渡
-      // 不是立刻往新戰術位置衝
       const flipFrames = state.frame - (state.possessionChangeFrame || -999);
       const justFlipped = flipFrames >= 0 && flipFrames < 20;
-      const flipEase = justFlipped ? 0.5 : 1; // 0.5 × 速率、越早越慢
+      const flipEase = justFlipped ? 0.5 : 1;
 
       players.forEach((p, i) => {
-        let smoothness = 0.045; // 非緊急：漸進走位（原 0.08 太快）
-        if (i === state.possessorIdx) smoothness = 0.15; // 持球者靈活
-        else if (p._urgent) smoothness = 0.11;          // 壓迫/接應者（原 0.13）
+        // smoothness 決定「以多少比例逼近目標」
+        // maxStep 決定「單幀最大位移」— 避免 target 大幅跳動時第一幀飛越過去
+        let smoothness = 0.045;
+        let maxStep = 0.010;      // 非緊急：慢跑
+        if (i === state.possessorIdx) { smoothness = 0.15; maxStep = 0.013; } // 持球者靈活
+        else if (p._urgent) { smoothness = 0.11; maxStep = 0.016; }           // 壓迫/衝刺
         smoothness *= flipEase;
-        p.x += (p.tx - p.x) * smoothness;
-        p.y += (p.ty - p.y) * smoothness;
+
+        let stepX = (p.tx - p.x) * smoothness;
+        let stepY = (p.ty - p.y) * smoothness;
+        // 每幀最大位移 clamp — 即使 target 瞬間跳 0.5，每幀最多走 maxStep
+        const stepMag = Math.hypot(stepX, stepY);
+        if (stepMag > maxStep) {
+          const r = maxStep / stepMag;
+          stepX *= r; stepY *= r;
+        }
+        p.x += stepX; p.y += stepY;
         p.x = Math.max(0.01, Math.min(0.99, p.x));
         p.y = Math.max(0.04, Math.min(0.96, p.y));
       });
