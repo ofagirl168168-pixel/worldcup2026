@@ -374,60 +374,110 @@
       }
     }
 
-    // 更新球員 target 位置
+    // 更新球員 target 位置（最近的人壓球、次近的覆蓋、其他補位）
     function updatePlayerTargets() {
       const atkTeam = state.possession;
+      const possessor = players[state.possessorIdx];
+
+      // 先把非持球球員依「離球距離」排序（分隊）
+      const rank = { h: [], a: [] };
       players.forEach((p, i) => {
+        if (i === state.possessorIdx) return;
+        if (p.role === 'GK') return; // GK 另行處理
+        const dist = Math.hypot(p.x - ball.x, p.y - ball.y);
+        rank[p.team].push({ i, dist });
+      });
+      rank.h.sort((a, b) => a.dist - b.dist);
+      rank.a.sort((a, b) => a.dist - b.dist);
+
+      const rankIdx = {};
+      rank.h.forEach((r, n) => rankIdx[r.i] = n);
+      rank.a.forEach((r, n) => rankIdx[r.i] = n);
+
+      players.forEach((p, i) => {
+        p._urgent = false; // 每幀重置
+        // 持球者：朝對方球門盤帶
         if (i === state.possessorIdx) {
-          // 持球者：朝對方球門走
           const goalX = p.team === 'h' ? 1 : 0;
           const dx = goalX - p.x;
-          // 稍微向中路收斂
           const dy = 0.5 - p.y;
           const role = ROLE[p.role] || ROLE.MID;
           const speed = 0.012 * role.sprint * (getTeam(p.team).radar.speed / 80);
           p.tx = p.x + Math.sign(dx) * Math.min(Math.abs(dx), speed);
           p.ty = p.y + dy * 0.08;
-          // 小幅左右晃動（盤帶感）
           p.tx += (Math.random() - 0.5) * 0.004;
           p.ty += (Math.random() - 0.5) * 0.006;
-        } else {
-          // 非持球者：依角色 + 球位移動
-          const myTeamAttacking = p.team === atkTeam;
-          const role = ROLE[p.role] || ROLE.MID;
-          const sideSign = p.team === 'h' ? 1 : -1;
-
-          let xShift;
-          if (myTeamAttacking) {
-            // 進攻方：前插
-            xShift = role.pushOn * sideSign;
-          } else {
-            // 防守方：回防
-            xShift = -role.pullBack * sideSign;
-          }
-
-          // 整條隊形依球的 x 前後移動（壓迫）
-          const lineShift = (ball.x - 0.5) * (myTeamAttacking ? 0.25 : 0.18);
-
-          p.tx = p.baseX + xShift + lineShift * sideSign * 0.5;
-          // y 向球靠近（有限度，保持隊形）
-          p.ty = p.baseY + (ball.y - p.baseY) * 0.35 * role.sprint;
-
-          // 特別處理 GK：永遠站球門邊
-          if (p.role === 'GK') {
-            p.tx = p.baseX;
-            p.ty = 0.5 + (ball.y - 0.5) * 0.2;
-          }
+          return;
         }
+
+        // GK：永遠站門線、跟球左右
+        if (p.role === 'GK') {
+          p.tx = p.baseX;
+          p.ty = 0.5 + (ball.y - 0.5) * 0.25;
+          return;
+        }
+
+        const role = ROLE[p.role] || ROLE.MID;
+        const sideSign = p.team === 'h' ? 1 : -1; // 己方球門在左=1 / 在右=-1
+        const myTeamAttacking = p.team === atkTeam;
+        const myRank = rankIdx[i] != null ? rankIdx[i] : 99;
+
+        if (!myTeamAttacking) {
+          // ── 防守方 ──────────────────────────
+          // 最近的去壓持球者（必定追球）
+          if (myRank === 0) {
+            p._urgent = true;
+            p.tx = ball.x - sideSign * 0.015;
+            p.ty = ball.y;
+            p.tx += (Math.random() - 0.5) * 0.006;
+            p.ty += (Math.random() - 0.5) * 0.008;
+            return;
+          }
+          // 第二近的做覆蓋
+          if (myRank === 1) {
+            p._urgent = true;
+            p.tx = ball.x - sideSign * 0.08;
+            p.ty = p.baseY + (ball.y - p.baseY) * 0.7;
+            return;
+          }
+          // 其他：維持陣型但依球位壓迫（x 回防 + 整體橫移往球側）
+          p.tx = p.baseX - role.pullBack * sideSign + (ball.x - 0.5) * 0.22;
+          p.ty = p.baseY + (ball.y - p.baseY) * 0.45;
+          return;
+        }
+
+        // ── 進攻方（非持球者）───────────────
+        // 最近/次近的兩位跑出接應位置
+        if (myRank < 2 && possessor) {
+          p._urgent = true;
+          const goalX = p.team === 'h' ? 1 : 0;
+          // 接應點：比持球者更前 + 稍微側向拉開
+          const fwdOffset = (myRank === 0 ? 0.12 : 0.18) * sideSign;
+          const sideOffset = (p.baseY < 0.5 ? -0.08 : 0.08) * (myRank === 0 ? 1 : 0.4);
+          p.tx = possessor.x + fwdOffset;
+          p.ty = possessor.y + sideOffset;
+          // 限制在對方半場不要太極端
+          const limitX = p.team === 'h' ? 0.95 : 0.05;
+          p.tx = p.team === 'h'
+            ? Math.min(limitX, Math.max(possessor.x, p.tx))
+            : Math.max(limitX, Math.min(possessor.x, p.tx));
+          p.tx += (Math.random() - 0.5) * 0.008;
+          p.ty += (Math.random() - 0.5) * 0.008;
+          return;
+        }
+        // 其他前插 + 依球位整體橫移
+        p.tx = p.baseX + role.pushOn * sideSign + (ball.x - 0.5) * 0.25;
+        p.ty = p.baseY + (ball.y - p.baseY) * 0.4 * role.sprint;
       });
     }
 
     function movePlayers() {
       players.forEach((p, i) => {
-        const smoothness = (i === state.possessorIdx) ? 0.15 : 0.08;
+        let smoothness = 0.08;
+        if (i === state.possessorIdx) smoothness = 0.15;
+        else if (p._urgent) smoothness = 0.13;
         p.x += (p.tx - p.x) * smoothness;
         p.y += (p.ty - p.y) * smoothness;
-        // 邊界
         p.x = Math.max(0.01, Math.min(0.99, p.x));
         p.y = Math.max(0.04, Math.min(0.96, p.y));
       });
