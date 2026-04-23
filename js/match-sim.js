@@ -303,6 +303,15 @@
           if (iAmInBox && targetInBox) {
             score -= 0.55;
           }
+          // (4) 長傳懲罰：避免 GK→FWD 一腳直塞跳過中場。真實足球絕大多數是短/中傳
+          //     0-0.15 距離：無懲罰（短傳）
+          //     0.15-0.30：輕懲罰（中傳）
+          //     0.30+：重懲罰（長球，少見）
+          const passDist = Math.hypot(p.x - possessor.x, p.y - possessor.y);
+          let distPenalty = 0;
+          if (passDist > 0.30) distPenalty = 0.40 + (passDist - 0.30) * 1.2;
+          else if (passDist > 0.15) distPenalty = (passDist - 0.15) * 0.8;
+          score -= distPenalty;
           return { p, i, score };
         })
         .sort((a, b) => b.score - a.score);
