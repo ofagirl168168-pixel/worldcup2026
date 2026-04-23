@@ -173,9 +173,15 @@
 
     const hF = buildFormation(parseFormation(home.formation), true);
     const aF = buildFormation(parseFormation(away.formation), false);
+    // 給每個球員獨特的 flair（站位微差 + 反應速度）讓整條線不再像旗
+    const makeFlair = () => ({
+      xJitter: (Math.random() - 0.5) * 0.035,
+      yJitter: (Math.random() - 0.5) * 0.025,
+      laziness: 0.78 + Math.random() * 0.44, // 0.78 ~ 1.22
+    });
     const players = [
-      ...hF.map(p => ({ ...p, team: 'h', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y })),
-      ...aF.map(p => ({ ...p, team: 'a', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y })),
+      ...hF.map(p => ({ ...p, team: 'h', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y, flair: makeFlair() })),
+      ...aF.map(p => ({ ...p, team: 'a', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y, flair: makeFlair() })),
     ];
     const ball = { x: 0.5, y: 0.5 };
 
@@ -325,19 +331,20 @@
       const goalX = pos.team === 'h' ? 1 : 0;
       const distToGoal = Math.abs(pos.x - goalX);
 
-      // 1) 射門決策（只在禁區附近）
-      if (distToGoal < 0.28) {
-        const shootChance = (atkStats.attack / 100) * 0.055 * (0.7 + distToGoal < 0.15 ? 0.5 : 0);
+      // 1) 射門決策（只在禁區附近；越近越可能射）
+      if (distToGoal < 0.25) {
+        const proximityBonus = distToGoal < 0.15 ? 0.04 : 0;
+        const shootChance = (atkStats.attack / 100) * 0.04 + proximityBonus;
         if (Math.random() < shootChance) {
           startShoot();
           return;
         }
       }
 
-      // 2) 傳球決策（持球 10+ 幀後才考慮傳，避免即時傳球顯得亂）
+      // 2) 傳球決策（持球 15+ 幀後才考慮，讓中場有時間 build-up）
       const framesInPossession = state.frame - state.lastActionFrame;
-      if (framesInPossession > 10) {
-        const passChance = 0.02 + (atkStats.midfield / 100) * 0.03;
+      if (framesInPossession > 15) {
+        const passChance = 0.012 + (atkStats.midfield / 100) * 0.018;
         if (Math.random() < passChance) {
           const candidates = rankPassTargets(pos);
           if (candidates.length && candidates[0].score > -0.2) {
@@ -348,14 +355,12 @@
         }
       }
 
-      // 3) 搶斷判定（持球者身邊有對手時）
+      // 3) 搶斷（降強度：搶斷比例降到每幀 1-8%）
       const near = findNearestOpponent(pos);
       if (near.player && near.dist < ROLE[near.player.role].tackleRange + 0.01) {
-        // 搶斷機率：對方 defense - 我方 midfield（護球）
-        let tackleChance = (defStats.defense / 100) * 0.12 - (atkStats.midfield / 100) * 0.06;
-        tackleChance = Math.max(0.01, Math.min(0.25, tackleChance));
+        let tackleChance = (defStats.defense / 100) * 0.06 - (atkStats.midfield / 100) * 0.025;
+        tackleChance = Math.max(0.008, Math.min(0.08, tackleChance));
         if (Math.random() < tackleChance) {
-          // 被搶，換人持球
           state.possession = near.player.team;
           state.possessorIdx = players.indexOf(near.player);
           state.phase = 'dribble';
@@ -365,7 +370,7 @@
       }
 
       // 4) 一直沒動作 → 強制傳球避免卡死
-      if (framesInPossession > 60) {
+      if (framesInPossession > 75) {
         const candidates = rankPassTargets(pos);
         if (candidates.length) {
           startPass(candidates[0]);
@@ -394,17 +399,25 @@
       rank.h.forEach((r, n) => rankIdx[r.i] = n);
       rank.a.forEach((r, n) => rankIdx[r.i] = n);
 
+      // 攻方「站位上限」— 不能超過對方 GK（GK 在 0.05 / 0.95）
+      const ATK_LIMIT_H = 0.88; // home 攻 right goal，攻方上限 0.88
+      const ATK_LIMIT_A = 0.12; // away 攻 left goal，攻方上限 0.12
+
       players.forEach((p, i) => {
-        p._urgent = false; // 每幀重置
-        // 持球者：朝對方球門盤帶
+        p._urgent = false;
+        // 持球者：朝對方球門盤帶（但不能踩到 GK）
         if (i === state.possessorIdx) {
           const goalX = p.team === 'h' ? 1 : 0;
           const dx = goalX - p.x;
           const dy = 0.5 - p.y;
           const role = ROLE[p.role] || ROLE.MID;
-          const speed = 0.012 * role.sprint * (getTeam(p.team).radar.speed / 80);
+          // 速度降一點，不要兩秒就到門前
+          const speed = 0.008 * role.sprint * (getTeam(p.team).radar.speed / 80);
           p.tx = p.x + Math.sign(dx) * Math.min(Math.abs(dx), speed);
-          p.ty = p.y + dy * 0.08;
+          p.ty = p.y + dy * 0.06;
+          // 硬上限：不能超過 0.92 / 小於 0.08（給 GK 空間）
+          if (p.team === 'h') p.tx = Math.min(0.92, p.tx);
+          else p.tx = Math.max(0.08, p.tx);
           p.tx += (Math.random() - 0.5) * 0.004;
           p.ty += (Math.random() - 0.5) * 0.006;
           return;
@@ -418,14 +431,15 @@
         }
 
         const role = ROLE[p.role] || ROLE.MID;
-        const sideSign = p.team === 'h' ? 1 : -1; // 己方球門在左=1 / 在右=-1
+        const sideSign = p.team === 'h' ? 1 : -1;
         const myTeamAttacking = p.team === atkTeam;
         const myRank = rankIdx[i] != null ? rankIdx[i] : 99;
+        const fl = p.flair || { xJitter: 0, yJitter: 0, laziness: 1 };
 
         if (!myTeamAttacking) {
           // ── 防守方 ──────────────────────────
-          // 最近的去壓持球者（必定追球）
           if (myRank === 0) {
+            // 最近的去壓持球者
             p._urgent = true;
             p.tx = ball.x - sideSign * 0.015;
             p.ty = ball.y;
@@ -433,41 +447,44 @@
             p.ty += (Math.random() - 0.5) * 0.008;
             return;
           }
-          // 第二近的做覆蓋
           if (myRank === 1) {
+            // 第二近的覆蓋
             p._urgent = true;
             p.tx = ball.x - sideSign * 0.08;
             p.ty = p.baseY + (ball.y - p.baseY) * 0.7;
             return;
           }
-          // 其他：維持陣型但依球位壓迫（x 回防 + 整體橫移往球側）
-          p.tx = p.baseX - role.pullBack * sideSign + (ball.x - 0.5) * 0.22;
-          p.ty = p.baseY + (ball.y - p.baseY) * 0.45;
+          // 其他：維持陣型但個人差異 + 近球側踩高/遠球側收腳
+          // ball 在你 y 半邊（0.25 內）→ 踩高；在遠半邊 → 收腳更深
+          const sameSide = Math.abs(ball.y - p.baseY) < 0.22;
+          const stepAdj = sameSide ? 0.06 : -0.03;
+          p.tx = p.baseX - role.pullBack * sideSign + (ball.x - 0.5) * 0.20
+                 + stepAdj * sideSign + fl.xJitter;
+          p.ty = p.baseY + (ball.y - p.baseY) * 0.42 + fl.yJitter;
           return;
         }
 
         // ── 進攻方（非持球者）───────────────
-        // 最近/次近的兩位跑出接應位置
         if (myRank < 2 && possessor) {
           p._urgent = true;
-          const goalX = p.team === 'h' ? 1 : 0;
-          // 接應點：比持球者更前 + 稍微側向拉開
-          const fwdOffset = (myRank === 0 ? 0.12 : 0.18) * sideSign;
+          const fwdOffset = (myRank === 0 ? 0.10 : 0.15) * sideSign;
           const sideOffset = (p.baseY < 0.5 ? -0.08 : 0.08) * (myRank === 0 ? 1 : 0.4);
           p.tx = possessor.x + fwdOffset;
           p.ty = possessor.y + sideOffset;
-          // 限制在對方半場不要太極端
-          const limitX = p.team === 'h' ? 0.95 : 0.05;
-          p.tx = p.team === 'h'
-            ? Math.min(limitX, Math.max(possessor.x, p.tx))
-            : Math.max(limitX, Math.min(possessor.x, p.tx));
+          // 接應者不能超過對方 GK
+          const atkLimit = p.team === 'h' ? ATK_LIMIT_H : ATK_LIMIT_A;
+          p.tx = p.team === 'h' ? Math.min(atkLimit, p.tx) : Math.max(atkLimit, p.tx);
           p.tx += (Math.random() - 0.5) * 0.008;
           p.ty += (Math.random() - 0.5) * 0.008;
           return;
         }
-        // 其他前插 + 依球位整體橫移
-        p.tx = p.baseX + role.pushOn * sideSign + (ball.x - 0.5) * 0.25;
-        p.ty = p.baseY + (ball.y - p.baseY) * 0.4 * role.sprint;
+        // 其他：依角色前插 + 個人差異
+        p.tx = p.baseX + role.pushOn * sideSign + (ball.x - 0.5) * 0.22 + fl.xJitter;
+        p.ty = p.baseY + (ball.y - p.baseY) * 0.38 * role.sprint + fl.yJitter;
+        // 攻方通用站位上限
+        const atkLimit = p.team === 'h' ? ATK_LIMIT_H : ATK_LIMIT_A;
+        if (p.team === 'h') p.tx = Math.min(atkLimit, p.tx);
+        else p.tx = Math.max(atkLimit, p.tx);
       });
     }
 
