@@ -369,9 +369,10 @@
         state.lastActionFrame = state.frame;
         ball.x = players[gk].x;
         ball.y = players[gk].y;
-        // 換邊 → 清最近經手傳球者記錄
+        // 換邊 → 清最近經手傳球者記錄、並記錄換邊時機（movePlayers 會降速避免瞬移）
         state.recentPassers = [];
         state.recentPassersSet = new Set();
+        state.possessionChangeFrame = state.frame;
       }
     }
 
@@ -436,9 +437,10 @@
             state.possessorIdx = players.indexOf(near.player);
             state.phase = 'dribble';
             state.lastActionFrame = state.frame;
-            // 換邊 → 清最近經手傳球者記錄
+            // 換邊 → 清最近經手傳球者記錄、記錄換邊時機讓 movePlayers 降速
             state.recentPassers = [];
             state.recentPassersSet = new Set();
+            state.possessionChangeFrame = state.frame;
             return;
           }
         }
@@ -568,10 +570,17 @@
     }
 
     function movePlayers() {
+      // 剛換邊 20 幀內降低 smoothness，讓角色翻轉時球員用「小碎步」過渡
+      // 不是立刻往新戰術位置衝
+      const flipFrames = state.frame - (state.possessionChangeFrame || -999);
+      const justFlipped = flipFrames >= 0 && flipFrames < 20;
+      const flipEase = justFlipped ? 0.5 : 1; // 0.5 × 速率、越早越慢
+
       players.forEach((p, i) => {
-        let smoothness = 0.08;
-        if (i === state.possessorIdx) smoothness = 0.15;
-        else if (p._urgent) smoothness = 0.13;
+        let smoothness = 0.045; // 非緊急：漸進走位（原 0.08 太快）
+        if (i === state.possessorIdx) smoothness = 0.15; // 持球者靈活
+        else if (p._urgent) smoothness = 0.11;          // 壓迫/接應者（原 0.13）
+        smoothness *= flipEase;
         p.x += (p.tx - p.x) * smoothness;
         p.y += (p.ty - p.y) * smoothness;
         p.x = Math.max(0.01, Math.min(0.99, p.x));
