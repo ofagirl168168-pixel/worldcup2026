@@ -1438,6 +1438,16 @@ async function openPredModal(id) {
           </div>`).join('')}
       </div>
 
+      <!-- 🎮 90 分鐘模擬賽（已完賽也能模擬「假如數據對打會怎樣」）-->
+      <div class="modal-section-title">🎮 90 分鐘模擬賽</div>
+      <div class="msim-wrap" id="sim-wrap-${m.id}" style="text-align:center">
+        <div style="color:var(--text-muted);font-size:12px;margin-bottom:10px;line-height:1.5">
+          用雙方 5 項數據 + 陣型跑一場縮時 90 分鐘<br>
+          <span style="opacity:0.7">每次結果不同，長期分布符合數據優勢（約 1 分鐘）</span>
+        </div>
+        <button class="msim-start-btn" onclick="MatchSim.run('${m.id}')">▶️ 開始模擬</button>
+      </div>
+
       <!-- 你的預測回顧 -->
       ${mine ? `
       <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.08)">
@@ -1613,6 +1623,15 @@ async function openPredModal(id) {
               <div style="width:${aVal/(hVal+aVal)*100}%;background:linear-gradient(90deg,var(--red),#ff7043)"></div>
             </div>
           </div>`).join('')}
+      </div>
+
+      <!-- 🎮 90 分鐘模擬賽（進行中也能跑模擬對照真實走勢）-->
+      <div class="modal-section-title">🎮 90 分鐘模擬賽</div>
+      <div class="msim-wrap" id="sim-wrap-${m.id}" style="text-align:center">
+        <div style="color:var(--text-muted);font-size:12px;margin-bottom:10px;line-height:1.5">
+          用雙方 5 項數據 + 陣型跑一場縮時 90 分鐘
+        </div>
+        <button class="msim-start-btn" onclick="MatchSim.run('${m.id}')">▶️ 開始模擬</button>
       </div>
 
       <div style="text-align:center;padding:12px;font-size:12px;color:var(--text-muted);border-top:1px solid rgba(255,255,255,0.06)">
