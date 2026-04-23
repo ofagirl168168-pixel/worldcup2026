@@ -792,14 +792,18 @@
       const container = document.getElementById(containerId);
       if (!container) { console.warn('[MatchSim] container not found:', containerId); return; }
 
-      const schedule = (window.Tournament?.isEPL?.() ? window.EPL_MATCHES
-        : window.Tournament?.isUCL?.() ? window.UCL_MATCHES
-        : window.SCHEDULE) || [];
+      // WC 的 SCHEDULE / TEAMS 是 var / const 宣告，不一定會附到 window 上，
+      // 需要用 typeof 檢查 fallback，不能只靠 window.SCHEDULE / window.TEAMS
+      const isEPL = window.Tournament?.isEPL?.();
+      const isUCL = window.Tournament?.isUCL?.();
+      const schedule = isEPL ? (window.EPL_MATCHES || [])
+        : isUCL ? (window.UCL_MATCHES || [])
+        : (typeof SCHEDULE !== 'undefined' ? SCHEDULE : []);
       const m = schedule.find(x => x.id === matchId);
       if (!m) { console.warn('[MatchSim] match not found:', matchId); return; }
-      const T = window.Tournament?.isEPL?.() ? window.EPL_TEAMS
-        : window.Tournament?.isUCL?.() ? window.UCL_TEAMS
-        : window.TEAMS;
+      const T = isEPL ? (window.EPL_TEAMS || {})
+        : isUCL ? (window.UCL_TEAMS || {})
+        : (typeof TEAMS !== 'undefined' ? TEAMS : {});
       const home = T[m.home];
       const away = T[m.away];
       if (!home || !away || !home.radar || !away.radar) {
