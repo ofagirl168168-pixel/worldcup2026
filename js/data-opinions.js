@@ -19,6 +19,11 @@ const DAILY_OPINIONS = [
     opts:["穩了，Guardiola 收割模式 🏆","還早，Rodri 傷缺是隱患 ⚠️","兵工廠還有機會反撲 🔴"],
     context:"曼城 1-0 伯恩利後升至榜首，領先兵工廠（少賽一場）。但 Rodri 腹股溝傷缺 1-6 週，曼城得靠 O'Reilly 和 Bernardo Silva 頂住中場。" },
 
+  { id:'op-20260424-a', date:'2026-04-24', type:'trending',
+    q:"曼城登頂！Haaland 5 分鐘破門送伯恩利降級，曼城能一路衝冠嗎？",
+    opts:["穩了，Guardiola 收割模式 🏆","還早，Rodri 傷缺是隱患 ⚠️","兵工廠還有機會反撲 🔴"],
+    context:"曼城 1-0 伯恩利後升至榜首，領先兵工廠（少賽一場）。但 Rodri 腹股溝傷缺 1-6 週，曼城得靠 O'Reilly 和 Bernardo Silva 頂住中場。" },
+
   { id:'op-20260423-a', date:'2026-04-23', type:'trending',
     q:"布萊頓 3-0 乙爾西！乙爾西連 5 場零進球創 114 年最差，Rosenior 該下課嗎？",
     opts:["該換了，毫無起色 🔴","再給機會，傷兵太多 🟡","問題在管理層不是教練 🏢"],
