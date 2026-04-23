@@ -240,11 +240,28 @@
         || players.map((p, i) => ({ p, i })).find(x => x.p.team === whoHasBall && x.p.role !== 'GK');
       state.possessorIdx = chosen ? chosen.i : 0;
       ball.x = 0.5; ball.y = 0.5;
-      // 球員復位
-      players.forEach(p => { p.x = p.baseX; p.y = p.baseY; });
-      // 稍微讓持球者靠近中圈
+      // 開球時：所有球員退回己方半場（前鋒不會站在對方門前等開球）
+      // home 己方半場 x<0.5、away 己方半場 x>0.5
+      players.forEach(p => {
+        p.x = p.baseX;
+        p.y = p.baseY;
+        if (p.team === 'h') p.x = Math.min(0.48, p.x);
+        else p.x = Math.max(0.52, p.x);
+        // tx/ty 也同步，避免下一幀 updatePlayerTargets 還沒跑就 render 到舊位置
+        p.tx = p.x; p.ty = p.y;
+      });
+      // 持球者站到中圈
       const pos = players[state.possessorIdx];
-      if (pos) { pos.x = 0.5; pos.y = 0.5; }
+      if (pos) { pos.x = 0.5; pos.y = 0.5; pos.tx = 0.5; pos.ty = 0.5; }
+      // 己方一位前鋒上來接應（真實開球兩人站中圈）
+      const myFwd = players
+        .map((p, i) => ({ p, i }))
+        .filter(x => x.p.team === whoHasBall && x.p.role === 'FWD')[0];
+      if (myFwd) {
+        myFwd.p.x = whoHasBall === 'h' ? 0.52 : 0.48;
+        myFwd.p.y = 0.5;
+        myFwd.p.tx = myFwd.p.x; myFwd.p.ty = myFwd.p.y;
+      }
     }
 
     function findNearestOpponent(p) {
