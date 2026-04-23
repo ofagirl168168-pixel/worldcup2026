@@ -42,6 +42,13 @@ if (window.Tournament) {
     _s(() => renderHighlights());
     _s(() => { if (typeof renderHomeDailyChallenge === 'function') renderHomeDailyChallenge(); });
     _s(() => renderSchedule('all','all'));
+    // 若正在賽程頁，切換賽事後也重新滑到該賽事的「即將進行」比賽
+    _s(() => {
+      if (document.getElementById('section-schedule')?.classList.contains('active')) {
+        const el = document.getElementById('schedule-list');
+        if (el) _scrollToUpcoming(el);
+      }
+    });
     _s(() => renderTeams('all',''));
     _s(() => renderStats('standings'));
     _s(() => renderFocus());
@@ -839,7 +846,11 @@ function showSection(id, scrollToId) {
     _r(() => renderHighlights());
     _r(() => { if (typeof renderHomeDailyChallenge === 'function') renderHomeDailyChallenge(); });
   }
-  if (id === 'schedule')    _r(() => renderSchedule('all','all'));
+  if (id === 'schedule') {
+    _r(() => renderSchedule('all','all'));
+    // 僅進入賽程頁時自動滑到「即將進行」的比賽；之後的 re-render（篩選、即時資料）不動
+    _r(() => { const el = document.getElementById('schedule-list'); if (el) _scrollToUpcoming(el); });
+  }
   if (id === 'teams')       _r(() => renderTeams('all',''));
   if (id === 'stats')       _r(() => renderStats('standings'));
   if (id === 'focus')       _r(() => renderFocus());
@@ -981,7 +992,17 @@ function renderPredictions() {
     </div>`;
   }).join('');
 
-  const allMatches = schedule.filter(m => m.home && m.away && m.home !== 'TBD').slice(0,30);
+  // AI 預測列表：優先顯示「今天起未來的比賽」(asc)，不足 30 場再補最近已結束的 (desc)
+  // 原本是把整個賽程 slice(0,30)，結果只看到季初賽事
+  const _todayStr = localDateStr();
+  const _validMatches = schedule.filter(m => m.home && m.away && m.home !== 'TBD');
+  const _upcoming = _validMatches
+    .filter(m => (m.date || '') >= _todayStr)
+    .sort((a, b) => ((a.date||'') + (a.time||'')).localeCompare((b.date||'') + (b.time||'')));
+  const _recent = _validMatches
+    .filter(m => (m.date || '') < _todayStr)
+    .sort((a, b) => ((b.date||'') + (b.time||'')).localeCompare((a.date||'') + (a.time||'')));
+  const allMatches = _upcoming.concat(_recent).slice(0, 30);
   listEl.innerHTML = allMatches.map(m => {
     const ht = _T[m.home], at = _T[m.away];
     if (!ht||!at) return '';
@@ -2703,7 +2724,6 @@ function renderSchedule(phaseFilter, groupFilter) {
         </div>
       </div>`;
     }).join('');
-    _scrollToUpcoming(el);
     return;
   }
 
@@ -2779,7 +2799,6 @@ function renderSchedule(phaseFilter, groupFilter) {
         </div>
       </div>`;
     }).join('');
-    _scrollToUpcoming(el);
     return;
   }
 
@@ -2843,7 +2862,6 @@ function renderSchedule(phaseFilter, groupFilter) {
       </div>
     </div>`;
   }).join('');
-  _scrollToUpcoming(el);
 }
 
 // 歐冠賽程篩選器
