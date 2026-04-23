@@ -134,7 +134,7 @@
                 <span class="opinion-card-diamond top"></span>
                 <span class="opinion-card-diamond bottom"></span>
               </div>
-              ${parts.emoji ? `<div class="opinion-card-icon">${parts.emoji}</div>` : ''}
+              ${_optIconHtml(opt, parts.emoji)}
               <div class="opinion-card-divider"></div>
               <div class="opinion-card-text">${parts.text}</div>
               <div class="opinion-card-label">${romans[i] || ''}</div>
@@ -652,7 +652,7 @@
           <span class="opinion-card-diamond top" style="width:12px;height:12px;top:28px"></span>
           <span class="opinion-card-diamond bottom" style="width:12px;height:12px;bottom:28px"></span>
         </div>
-        ${parts.emoji ? `<div class="opinion-card-icon" style="font-size:${isMulti ? '72px' : '90px'};animation:none !important">${parts.emoji}</div>` : ''}
+        ${_optIconHtml(opt, parts.emoji, { size: isMulti ? 82 : 104, share: true })}
         <div class="opinion-card-divider" style="width:60%"></div>
         <div class="opinion-card-text">${parts.text}</div>
         <div class="opinion-card-label" style="bottom:40px;font-size:14px">${romans[i] || ''}</div>
@@ -983,6 +983,85 @@
     const emojis = opt.match(emojiRegex) || [];
     const text = opt.replace(emojiRegex, '').trim();
     return { emoji: emojis.join(''), text: text || opt };
+  }
+
+  // 選項含「兵工廠/巴黎/曼城/拜仁...」等球會中文名 → 轉成隊徽 URL 陣列
+  // 國家隊用 emoji flag 就好（TEAMS.flag 是 emoji 字串、不是 URL），這裡不處理
+  let _clubCrestMapCache = null;
+  function _buildClubCrestMap() {
+    // 只快取「非空」結果，避免資料還沒載入時把空 map 鎖死
+    if (_clubCrestMapCache && Object.keys(_clubCrestMapCache).length > 0) return _clubCrestMapCache;
+    const map = {};
+    const sources = [window.EPL_TEAMS, window.UCL_TEAMS];
+    for (const src of sources) {
+      if (!src) continue;
+      for (const code of Object.keys(src)) {
+        const t = src[code];
+        if (t && t.nameCN && t.flag && /^https?:/.test(t.flag)) {
+          map[t.nameCN] = t.flag;
+        }
+      }
+    }
+    // 常見縮寫 → 正式中文名
+    const aliases = {
+      'PSG': '巴黎聖日耳曼', '巴黎': '巴黎聖日耳曼',
+      '拜仁': '拜仁慕尼黑',
+      '馬競': '馬德里競技', '馬德里競技': '馬德里競技',
+      '皇馬': '皇家馬德里',
+      '巴薩': '巴塞隆納', 'Barca': '巴塞隆納',
+      '國米': '國際米蘭',
+      '多特': '多特蒙德',
+      '熱刺': '托特納姆熱刺', '托特納姆': '托特納姆熱刺',
+    };
+    for (const alias of Object.keys(aliases)) {
+      const full = aliases[alias];
+      if (map[full] && !map[alias]) map[alias] = map[full];
+    }
+    _clubCrestMapCache = map;
+    return map;
+  }
+
+  // 從選項文字抽出球會隊徽 URL 陣列（最多 2 個，避免卡片塞爆）
+  function _extractCrests(opt) {
+    const map = _buildClubCrestMap();
+    const names = Object.keys(map).sort((a, b) => b.length - a.length); // 長字串先比，避免「米」誤命中
+    const hits = [];
+    const seenUrls = new Set();
+    let remaining = opt;
+    for (const name of names) {
+      if (remaining.includes(name)) {
+        const url = map[name];
+        if (!seenUrls.has(url)) {
+          hits.push({ name, url });
+          seenUrls.add(url);
+          // 從字串中移掉這個名字，避免別名又重比
+          remaining = remaining.split(name).join(' ');
+          if (hits.length >= 2) break;
+        }
+      }
+    }
+    return hits;
+  }
+
+  // 產 icon HTML：有隊徽用隊徽、否則用原 emoji
+  // share=false（live card）用 em 讓 CSS 的 3-opt/4-opt 縮放生效；
+  // share=true（分享圖）用 px，以 opts 數量決定大小
+  function _optIconHtml(opt, emoji, { size = 90, share = false } = {}) {
+    const crests = _extractCrests(opt);
+    if (crests.length === 0) {
+      return emoji
+        ? `<div class="opinion-card-icon"${share ? ` style="font-size:${size}px;animation:none !important"` : ''}>${emoji}</div>`
+        : '';
+    }
+    const imgStyle = share
+      ? `width:${crests.length > 1 ? Math.round(size * 0.78) : size}px;height:${crests.length > 1 ? Math.round(size * 0.78) : size}px;object-fit:contain;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.5))`
+      : `width:${crests.length > 1 ? '0.82em' : '1em'};height:${crests.length > 1 ? '0.82em' : '1em'};object-fit:contain;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.45))`;
+    const gap = crests.length > 1 ? (share ? '8px' : '0.12em') : '0';
+    const wrapStyle = `display:flex;gap:${gap};align-items:center;justify-content:center;${share ? 'animation:none !important;' : ''}`;
+    const imgs = crests.map(c =>
+      `<img src="${c.url}" alt="${c.name}" style="${imgStyle}" />`
+    ).join('');
+    return `<div class="opinion-card-icon opinion-card-icon--crests" style="${wrapStyle}">${imgs}</div>`;
   }
 
   function _closeOverlay(overlay, onClose) {
