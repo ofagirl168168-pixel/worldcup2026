@@ -76,7 +76,7 @@ const EPL_TEAMS = {
       {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢',returnDate:'四月底（本月報銷）'},
       {name:'John Stones',pos:'中後衛',status:'小腿傷，已部分訓練',returnDate:'短期內'},
       {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷（vs Chelsea下半場受傷）',returnDate:'評估中，已輕度訓練'},
-      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（vs 兵工廠退場，缺席 vs 伯恩利）',returnDate:'評估中，預計缺陣 1-6 週'}
+      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（掃描確認輕微）',returnDate:'最快 4/25 足總盃半決賽復出'}
     ]
   },
   'CHE': {

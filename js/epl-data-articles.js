@@ -1306,6 +1306,151 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <li><strong>乙爾西</strong>：5 連敗零進球是災難性的。Palmer 和 James 的缺陣讓球隊失去靈魂。Rosenior 需要在剩餘賽程中找到答案，否則乙爾西的賽季將以恥辱收場。James 預計五月初回歸，Palmer 的傷情仍在評估中。</li>
 </ul>`,
     tags: ['賽後回顧', '布萊頓', '乙爾西', 'Kadioglu', 'Hinshelwood', 'Welbeck', '第34輪']
+  },
+  {
+    id: 'epl-029',
+    title: '【賽後回顧】伯恩茅斯 2-2 里茲聯：Longstaff 第 97 分鐘絕平，櫻桃隊歐洲夢受挫',
+    date: '2026-04-23',
+    category: '賽後深度回顧',
+    summary: 'Vitality Stadium 爆冷平局！Kroupi 60 分鐘破門打破僵局、Hill 烏龍扳平、Rayan 86 分鐘看似絕殺，但 Longstaff 第 97 分鐘凌空抽射救主。里茲聯領先降級區 9 分，伯恩茅斯歐冠夢想大受打擊。',
+    content: `<h2>伯恩茅斯 2-2 里茲聯｜第34輪・Vitality Stadium</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">60' ⚽</td>
+<td style="padding:8px"><strong>Junior Kroupi（伯恩茅斯）</strong> — Marcos Senesi 推進一腳穿透傳球送到禁區，Kroupi 挑射得手（本季第 11 球）</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">68' ⚽</td>
+<td style="padding:8px"><strong>James Hill（伯恩茅斯，烏龍）</strong> — Gnonto 射門被 Hill 腳跟偏折入網</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">86' ⚽</td>
+<td style="padding:8px"><strong>Rayan（伯恩茅斯）</strong> — 伯恩茅斯中場 Tyler Adams（前里茲）從右路傳中，Rayan 後插跟進推射破門，看似絕殺</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">90+7' ⚽</td>
+<td style="padding:8px"><strong>Sean Longstaff（里茲聯）</strong> — Ethan Ampadu 長距離手球拋入禁區被解圍，Longstaff 接應凌空抽射扳平</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-0 ∣ 終場 2-2</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>上半場悶平：60 分鐘打破僵局</h4>
+
+<p>比賽首 60 分鐘相對沉悶，雙方你來我往但都缺乏決定性一擊。直到第 60 分鐘，伯恩茅斯阿根廷中衛 Marcos Senesi 帶球推進，一腳精準的穿透性傳球送進禁區，Kroupi 從容挑射，Vitality Stadium 爆發歡呼——這是 Kroupi 本賽季第 11 球。</p>
+
+<p>然而歡呼未完，里茲聯僅 8 分鐘後就扳平：Wilfried Gnonto 接球射門，皮球擦中伯恩茅斯中衛 James Hill 的腳跟偏折入網，記為烏龍。對 Hill 來說這是殘酷的一擊。</p>
+
+<h4>Rayan 看似絕殺，Longstaff 第 97 分鐘救主</h4>
+
+<p>第 86 分鐘，伯恩茅斯中場 Tyler Adams（他 2023 年從里茲轉投伯恩茅斯）從右路傳中，巴西小將 Rayan 迎球推射破網——這個時間點的進球看似已經鎖定勝局。伯恩茅斯替補席慶祝、看台上的櫻桃隊球迷已經在高唱勝利之歌。</p>
+
+<p>但里茲聯拒絕放棄。第四官員高舉「補時 6 分鐘」的牌子，但比賽踢到第 97 分鐘、也就是補時第 7 分鐘才真正結束。那一刻，隊長 Ethan Ampadu 從左路擲出長距離手球、伯恩茅斯解圍不徹底、Sean Longstaff 在禁區邊緣迎球凌空抽射，皮球貫穿網窩。</p>
+
+<p>這是 Longstaff 連續兩場對陣伯恩茅斯都攻入進球，他夏季從紐卡索以超過 1200 萬英鎊轉會加盟里茲以來最重要的一球。里茲聯板凳全體衝入場中慶祝，伯恩茅斯球員則癱坐在地。</p>
+
+<h3>保級與歐戰影響</h3>
+
+<ul>
+<li><strong>里茲聯</strong>：Longstaff 的第 97 分鐘扳平進球將里茲領先降級區的差距擴大到 <strong>9 分</strong>，基本確保本賽季成功保級。Daniel Farke 的球隊近期狀態回升，從降級候選人變成安全區成員。</li>
+<li><strong>伯恩茅斯</strong>：失去 2 分對爭取歐冠資格是巨大打擊。Andoni Iraola（賽季結束將離任、由 Marco Rose 接棒）的球隊在比賽最後時刻的崩潰讓櫻桃隊的歐洲夢變得更遙遠。Kroupi、Rayan 等年輕球員表現亮眼，但防線在補時時刻的鬆懈讓球隊付出代價。</li>
+</ul>
+
+<h3>亮眼球員</h3>
+
+<p>里茲聯替補上陣的 Longstaff 以兩連場對伯恩茅斯破門證明自己是夏季轉會市場被低估的簽約。而 Gnonto 的射門雖然被記為烏龍，但也展現出他在反攻中的決定性作用。伯恩茅斯的 Alex Scott 表現據傳受到曼聯球探持續觀察，他的控場能力再次讓頂級球會動心。</p>`,
+    tags: ['賽後回顧', '伯恩茅斯', '里茲聯', 'Longstaff', 'Kroupi', 'Rayan', '第34輪']
+  },
+  {
+    id: 'epl-030',
+    title: '【賽後回顧】伯恩利 0-1 曼城：Haaland 5 分鐘閃擊，曼城登頂 + 伯恩利降級',
+    date: '2026-04-23',
+    category: '賽後深度回顧',
+    summary: 'Turf Moor 決定性一役！Haaland 第 5 分鐘接 Doku 直傳推射得手（本季英超第 24 球），曼城全場 28 次射門僅進 1 球，但已足夠：終結兵工廠領先榜首 200 天的歷程、讓伯恩利重返英超一季後確定降級。',
+    content: `<h2>伯恩利 0-1 曼城｜第34輪・Turf Moor</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">5' ⚽</td>
+<td style="padding:8px"><strong>Erling Haaland（曼城）</strong> — Jeremy Doku 直塞，Haaland 後插跟進巧妙推射破門（本季英超第 24 球、聯賽金靴領跑）</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-1 ∣ 終場 0-1</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>閃電開局：Doku 助攻 Haaland 5 分鐘破門</h4>
+
+<p>Turf Moor 的空氣還沒熱起來，曼城就先下一城。第 5 分鐘，Jeremy Doku 在中場接球後一腳直塞撕開伯恩利防線，Haaland 從身後後插跟進、面對門將冷靜巧妙推射入網。這是 Haaland 本賽季英超第 24 球，穩居聯賽金靴寶座。</p>
+
+<p>開場僅 5 分鐘就丟球，等同於給伯恩利判了死刑——他們本賽季已經遭遇 22 場失利，距離安全區有 13 分差距、剩下 4 場比賽。這一球打進，伯恩利的英超之旅也就此告一段落。</p>
+
+<h4>曼城狂攻未果：28 次射門僅進 1 球</h4>
+
+<p>取得領先後，曼城展開壓倒性攻勢，試圖擴大領先優勢並提升淨勝球（這場之後與兵工廠積分相同、淨勝球相同，僅靠進球數領先）。全場曼城射門數達 <strong>28 次</strong>，但運氣不佳：</p>
+
+<ul>
+<li>Rayan Cherki 的射門被伯恩利門將 Dubravka 撲出後彈中橫樑</li>
+<li>Haaland 下半場一記射門擊中門柱（險些完成梅開二度）</li>
+<li>Nico O'Reilly 空門機會弱射被門將救下</li>
+</ul>
+
+<p>賽後 Pep Guardiola 談到運氣：「在這種類型的比賽裡，如果你能把應得的第二球或第三球打進，一切會變得更順暢、更自然。」然後他補充：「但最重要的目標是贏球。」雖然沒能進更多球，但目標達成——曼城終於登頂。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">伯恩利</th>
+<th style="padding:8px">曼城</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">進球</td><td>0</td><td>1</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">半場</td><td>0</td><td>1</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">曼城總射門</td><td colspan="2">28 次（僅 1 球，門柱 + 橫樑各 1）</td>
+</tr>
+</table>
+
+<h3>積分榜大洗牌：曼城登頂、兵工廠 200 天領跑結束</h3>
+
+<p>這場勝利將曼城送上英超榜首，終結了兵工廠長達 <strong>200 天</strong>的領先歷程。兩隊現在：</p>
+
+<ul>
+<li>積分：同為 <strong>70 分</strong></li>
+<li>淨勝球：同為 <strong>+37</strong></li>
+<li>進球數：曼城 <strong>66</strong>、兵工廠 <strong>63</strong> → 曼城靠進球數領先</li>
+</ul>
+
+<p>本賽季剩下 4 場比賽，曼城 vs 兵工廠的冠軍爭奪將延續到最後一輪。另外 Rodri 本場因腹股溝傷勢缺陣，掃描結果確認傷情不嚴重、Guardiola 表示最快可能在 4 月 25 日足總盃半決賽對南安普頓時復出——對曼城冠軍衝刺是正面消息。</p>
+
+<h3>伯恩利降級：美資老闆接手後首季墜入泥沼</h3>
+
+<p>伯恩利本賽季以升班馬身份重回英超，但成績單殘酷：<strong>22 場失利</strong>、距離安全區 <strong>13 分</strong>、<strong>4 場剩餘</strong>——無論怎麼算，他們已經不可能保級。Scott Parker 的球隊在 Turf Moor 接受這個現實。</p>
+
+<p>由 Alan Pace 領軍的 ALK Capital（美資）自 2020 年起成為伯恩利大股東，本季重回頂級聯賽卻以降級作結。重建計畫得從英冠開始：一如對面的里茲、桑德蘭今年走過的老路。</p>
+
+<h3>影響與展望</h3>
+
+<ul>
+<li><strong>曼城</strong>：時隔 200 多天重返榜首。Guardiola 的球隊即使在 Rodri 短暫缺陣下仍能在關鍵比賽保持勝利，Haaland 則以 24 球再次證明自己是世界最致命的射手。剩 4 場，穩住陣腳就有望封王。</li>
+<li><strong>伯恩利</strong>：降級已成定局，接下來 4 場成為年輕球員的試鏡舞台。管理層面臨重建決策——是否保留 Parker、如何處理合約中有降級條款的主力球員，都是夏季重點。</li>
+</ul>`,
+    tags: ['賽後回顧', '伯恩利', '曼城', 'Haaland', 'Doku', '降級', '登頂', '第34輪']
   }
 ];
 
