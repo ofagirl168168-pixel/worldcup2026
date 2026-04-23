@@ -564,7 +564,12 @@
 
     function moveBall() {
       if (state.phase === 'pass' || state.phase === 'shoot') {
-        // 球沿直線飛，加一點拋物線
+        // 傳球時持續追蹤目標球員當下位置（接球者在飛行中可能位移，
+        // 不鎖死起飛時的舊座標，否則球抵達時會 snap 到新位置變成突然彈跳）
+        if (state.phase === 'pass' && state.passTargetIdx != null) {
+          const t = players[state.passTargetIdx];
+          if (t) { state.ballTargetX = t.x; state.ballTargetY = t.y; }
+        }
         state.ballTravelLeft--;
         const t = 1 - (state.ballTravelLeft / Math.max(1, state.ballTravelTotal));
         ball.x = state.ballFromX + (state.ballTargetX - state.ballFromX) * t;
@@ -575,13 +580,14 @@
           if (state.phase === 'shoot') {
             resolveShot();
           } else {
-            // pass 抵達：那個人變成持球者
+            // pass 抵達：那個人變成持球者（ball 位置已經貼近目標當下位置，不 snap）
             const newIdx = state.passTargetIdx;
             if (newIdx != null && players[newIdx]) {
               state.possessorIdx = newIdx;
               state.possession = players[newIdx].team;
-              ball.x = players[newIdx].x;
-              ball.y = players[newIdx].y;
+              // 只輕微校正到球員腳下，避免殘留幾 px 誤差
+              ball.x += (players[newIdx].x - ball.x) * 0.5;
+              ball.y += (players[newIdx].y - ball.y) * 0.5;
             }
             state.phase = 'dribble';
             state.lastActionFrame = state.frame;
