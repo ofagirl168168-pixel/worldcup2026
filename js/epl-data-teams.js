@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-04-22 日更）
+   資料截止：2025/26 賽季（2026-04-23 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -9,7 +9,7 @@ const EPL_TEAMS = {
   // ===== BIG SIX + 強隊 =====
   'ARS': {
     name:'Arsenal', nameCN:'兵工廠', flag:'https://crests.football-data.org/57.png',
-    league:'Premier League', eplRank:1, coach:'Mikel Arteta', formation:'4-3-3',
+    league:'Premier League', eplRank:2, coach:'Mikel Arteta', formation:'4-3-3',
     keyPlayers:[
       {name:'Bukayo Saka',pos:'右翼',club:'兵工廠'},
       {name:'Declan Rice',pos:'中場',club:'兵工廠'},
@@ -57,7 +57,7 @@ const EPL_TEAMS = {
   },
   'MCI': {
     name:'Manchester City', nameCN:'曼城', flag:'https://crests.football-data.org/65.png',
-    league:'Premier League', eplRank:2, coach:'Pep Guardiola', formation:'4-3-3',
+    league:'Premier League', eplRank:1, coach:'Pep Guardiola', formation:'4-3-3',
     keyPlayers:[
       {name:'Erling Haaland',pos:'中鋒',club:'曼城'},
       {name:'Tijjani Reijnders',pos:'中場',club:'曼城'},
@@ -69,19 +69,19 @@ const EPL_TEAMS = {
     style:'極致控球，位置輪轉，高位壓迫',
     strengths:['Haaland進球效率恐怖','Guardiola戰術無人能及','板凳深度聯賽最強'],
     weaknesses:['Rodri傷癒後狀態仍在回升','夏季新援（Reijnders/Cherki）磨合中','後防傷兵影響輪替'],
-    recentForm:['W','L','W','W','W'],
+    recentForm:['L','W','W','W','W'],
     history:'9次英格蘭頂級聯賽冠軍，2022/23三冠王',
     injuries:[
       {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末可望回歸'},
       {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢',returnDate:'四月底（本月報銷）'},
       {name:'John Stones',pos:'中後衛',status:'小腿傷，已部分訓練',returnDate:'短期內'},
       {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷（vs Chelsea下半場受傷）',returnDate:'評估中，已輕度訓練'},
-      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（vs 兵工廠 88 分鐘退場）',returnDate:'可能 4/22 vs 伯恩利回歸，待確認'}
+      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（vs 兵工廠退場，缺席 vs 伯恩利）',returnDate:'評估中，預計缺陣 1-6 週'}
     ]
   },
   'CHE': {
     name:'Chelsea', nameCN:'乙爾西', flag:'https://crests.football-data.org/61.png',
-    league:'Premier League', eplRank:7, coach:'Liam Rosenior', formation:'4-2-3-1',
+    league:'Premier League', eplRank:7, coach:'Calum McFarlane (interim)', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Cole Palmer',pos:'攻擊中場/右翼',club:'乙爾西'},
       {name:'Enzo Fernández',pos:'中場',club:'乙爾西'},
@@ -209,7 +209,7 @@ const EPL_TEAMS = {
     style:'高壓逼搶，快速轉換，直接進攻',
     strengths:['Iraola壓迫體系有效','球員拼搶意志強','反擊速度快'],
     weaknesses:['陣容深度不足','對陣強隊經驗少','定位球防守不穩'],
-    recentForm:['L','D','W','L','W'],
+    recentForm:['D','W','L','W','D'],
     history:'2015年首次升上英超，近年穩定在英超中游'
   },
   'FUL': {
@@ -347,7 +347,7 @@ const EPL_TEAMS = {
     style:'控球進攻，高位壓迫，年輕有活力',
     strengths:['年輕球員速度快','主場氣氛狂熱','進攻人才儲備不錯'],
     weaknesses:['英超經驗不足','防守是最大弱點','對頂級球隊差距大'],
-    recentForm:['W','L','L','D','W'],
+    recentForm:['L','L','D','W','D'],
     history:'3次英格蘭頂級聯賽冠軍，Don Revie時代傳奇，睽違一年重返英超'
   },
   'BUR': {
@@ -364,7 +364,7 @@ const EPL_TEAMS = {
     style:'硬朗防守，直接打法，身體對抗',
     strengths:['防守意志頑強','主場難以攻克','定位球戰術有效'],
     weaknesses:['進攻創造力嚴重不足','英超水平球員不夠','升班馬經驗限制'],
-    recentForm:['L','D','L','L','L'],
+    recentForm:['D','L','L','L','L'],
     history:'2次英格蘭頂級聯賽冠軍，近年在英超與英冠間來回'
   },
   'SUN': {
@@ -587,13 +587,22 @@ window.EPL_MATCHES = [
      {min:'90+1',player:'Danny Welbeck',side:'h'}
    ]},
 
-  // 伯恩茅斯 vs 里茲聯 | 04/23 03:00 台灣時間
+  // 伯恩茅斯 2-2 里茲聯 | 04/23 03:00 台灣時間
   {id:'EPL-MW34-BOU-LEE', matchday:34, date:'2026-04-23', time:'03:00', home:'BOU', away:'LEE', stage:'league',
-   status:'scheduled', score:{h:null,a:null}},
+   status:'finished', score:{h:2,a:2}, halfTime:{h:0,a:0},
+   goals:[
+     {min:'60',player:'Junior Kroupi',side:'h'},
+     {min:'68',player:'James Hill',side:'a',type:'og'},
+     {min:'86',player:'Rayan',side:'h'},
+     {min:'90+7',player:'Sean Longstaff',side:'a'}
+   ]},
 
-  // 伯恩利 vs 曼城 | 04/23 03:00 台灣時間
+  // 伯恩利 0-1 曼城 | 04/23 03:00 台灣時間 | 伯恩利確定降級
   {id:'EPL-MW34-BUR-MCI', matchday:34, date:'2026-04-23', time:'03:00', home:'BUR', away:'MCI', stage:'league',
-   status:'scheduled', score:{h:null,a:null}},
+   status:'finished', score:{h:0,a:1}, halfTime:{h:0,a:1},
+   goals:[
+     {min:'5',player:'Erling Haaland',side:'a'}
+   ]},
 
   // 桑德蘭 vs 諾丁漢森林 | 04/25 03:00 台灣時間
   {id:'EPL-MW34-SUN-NFO', matchday:34, date:'2026-04-25', time:'03:00', home:'SUN', away:'NFO', stage:'league',

@@ -88,7 +88,7 @@ const UCL_TEAMS = {
     history:'6次歐冠冠軍，2019/20最近一次奪冠',
     injuries:[
       {name:'Lennart Karl',pos:'前鋒',status:'右大腿肌肉撕裂',returnDate:'未定'},
-      {name:'Serge Gnabry',pos:'翼鋒',status:'膝傷（帶護具訓練）',returnDate:'評估中'}
+      {name:'Serge Gnabry',pos:'翼鋒',status:'右大腿內收肌撕裂',returnDate:'賽季報銷（確定缺席世界盃）'}
     ]
   },
   'LIV': {
