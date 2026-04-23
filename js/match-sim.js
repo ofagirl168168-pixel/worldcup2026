@@ -312,6 +312,14 @@
           if (passDist > 0.30) distPenalty = 0.40 + (passDist - 0.30) * 1.2;
           else if (passDist > 0.15) distPenalty = (passDist - 0.15) * 0.8;
           score -= distPenalty;
+          // (5) 拉邊加成：中路持球 → 傳給邊路隊友拉開空間（真實足球「找邊鋒」戰術）
+          const iAmCentral = Math.abs(possessor.y - 0.5) < 0.18;
+          const targetIsWide = Math.abs(p.y - 0.5) > 0.22;
+          if (iAmCentral && targetIsWide) score += 0.12;
+          // 反之：邊路持球 → 如果目標在中路且在前場，加成（內切傳中給中路前鋒）
+          const iAmWide = Math.abs(possessor.y - 0.5) > 0.22;
+          const targetIsCentral = Math.abs(p.y - 0.5) < 0.18;
+          if (iAmWide && targetIsCentral && ahead) score += 0.10;
           return { p, i, score };
         })
         .sort((a, b) => b.score - a.score);
@@ -505,13 +513,14 @@
         if (i === state.possessorIdx) {
           const goalX = p.team === 'h' ? 1 : 0;
           const dx = goalX - p.x;
-          const dy = 0.5 - p.y;
           const role = ROLE[p.role] || ROLE.MID;
-          // 速度降一點，不要兩秒就到門前
+          // y 目標：60% 自己天然 lane + 40% 中線
+          // 邊鋒 baseY=0.25 的人拿到球會保持在左側（~0.35），不會一直朝中間收
+          const laneY = p.baseY * 0.6 + 0.5 * 0.4;
+          const dy = laneY - p.y;
           const speed = 0.008 * role.sprint * (getTeam(p.team).radar.speed / 80);
           p.tx = p.x + Math.sign(dx) * Math.min(Math.abs(dx), speed);
           p.ty = p.y + dy * 0.06;
-          // 硬上限：不能超過 0.92 / 小於 0.08（給 GK 空間）
           if (p.team === 'h') p.tx = Math.min(0.92, p.tx);
           else p.tx = Math.max(0.08, p.tx);
           p.tx += (Math.random() - 0.5) * 0.004;
@@ -581,9 +590,9 @@
           p.ty += (Math.random() - 0.5) * 0.008;
           return;
         }
-        // 其他：依角色前插 + 個人差異
+        // 其他：依角色前插 + 個人差異（y 維持自身 lane 為主，只微幅跟球）
         p.tx = p.baseX + role.pushOn * sideSign + (ball.x - 0.5) * 0.22 + fl.xJitter;
-        p.ty = p.baseY + (ball.y - p.baseY) * 0.38 * role.sprint + fl.yJitter;
+        p.ty = p.baseY + (ball.y - p.baseY) * 0.22 * role.sprint + fl.yJitter;
         // 攻方通用站位上限
         const atkLimit = p.team === 'h' ? ATK_LIMIT_H : ATK_LIMIT_A;
         if (p.team === 'h') p.tx = Math.min(atkLimit, p.tx);
