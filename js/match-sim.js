@@ -550,7 +550,14 @@
           p._urgent = true;
           const fwdOffset = (myRank === 0 ? 0.10 : 0.15) * sideSign;
           const sideOffset = (p.baseY < 0.5 ? -0.08 : 0.08) * (myRank === 0 ? 1 : 0.4);
-          p.tx = possessor.x + fwdOffset;
+          let newTx = possessor.x + fwdOffset;
+          // FWD/AMC 傳球後不應被「拉回來接應」，要繼續前壓。
+          // 只讓 MID/DEF 這類回撤支援，前鋒保持在當前位置或更前。
+          if (p.role === 'FWD' || p.role === 'AMC') {
+            if (p.team === 'h') newTx = Math.max(newTx, p.x);
+            else newTx = Math.min(newTx, p.x);
+          }
+          p.tx = newTx;
           p.ty = possessor.y + sideOffset;
           // 接應者不能超過對方 GK
           const atkLimit = p.team === 'h' ? ATK_LIMIT_H : ATK_LIMIT_A;
