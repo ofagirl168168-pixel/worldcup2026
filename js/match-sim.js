@@ -570,20 +570,21 @@
         }
 
         // ── 進攻方（非持球者）───────────────
-        if (myRank < 2 && possessor) {
+        // 只有 rank 0（最近的隊友）跑短接應路線，其他人維持陣型拉開空間
+        // 原本 rank 0+1 都跑向持球者 → 視覺上「兩個進攻球員圍住持球者」不合理
+        if (myRank === 0 && possessor) {
           p._urgent = true;
-          const fwdOffset = (myRank === 0 ? 0.10 : 0.15) * sideSign;
-          const sideOffset = (p.baseY < 0.5 ? -0.08 : 0.08) * (myRank === 0 ? 1 : 0.4);
+          const fwdOffset = 0.10 * sideSign;
+          // 接應角度拉寬一點（0.12 而不是 0.08），讓接應者離持球者有橫向空間，不是貼身
+          const sideOffset = (p.baseY < 0.5 ? -0.12 : 0.12);
           let newTx = possessor.x + fwdOffset;
-          // FWD/AMC 傳球後不應被「拉回來接應」，要繼續前壓。
-          // 只讓 MID/DEF 這類回撤支援，前鋒保持在當前位置或更前。
+          // FWD/AMC 不要被拉回來，保持前壓
           if (p.role === 'FWD' || p.role === 'AMC') {
             if (p.team === 'h') newTx = Math.max(newTx, p.x);
             else newTx = Math.min(newTx, p.x);
           }
           p.tx = newTx;
           p.ty = possessor.y + sideOffset;
-          // 接應者不能超過對方 GK
           const atkLimit = p.team === 'h' ? ATK_LIMIT_H : ATK_LIMIT_A;
           p.tx = p.team === 'h' ? Math.min(atkLimit, p.tx) : Math.max(atkLimit, p.tx);
           p.tx += (Math.random() - 0.5) * 0.008;
