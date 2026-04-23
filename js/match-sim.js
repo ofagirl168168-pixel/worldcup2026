@@ -344,21 +344,26 @@
       const distToGoal = Math.abs(pos.x - goalX);
 
       const framesInPossession = state.frame - state.lastActionFrame;
+      // 持球時間越久，「出手壓力」越高 — 避免原地盤球過久
+      // 0 幀時 0、25 幀時 0.5、50+ 幀時 1
+      const urgency = Math.max(0, Math.min(1, (framesInPossession - 10) / 40));
 
       // 1) 射門決策（放寬到前場三分之一、距離越近機率越高）
       if (distToGoal < 0.32) {
         const near = findNearestOpponent(pos);
         const hasSpace = near.dist > 0.05;
-        // 距離加權：禁區內 ×1.5、禁區外一點 ×0.7、前場邊緣 ×0.25
         const dangerMul = distToGoal < 0.15 ? 1.5 : distToGoal < 0.22 ? 0.7 : 0.25;
-        const shootChance = hasSpace ? (atkStats.attack / 100) * 0.08 * dangerMul : 0;
+        // 基礎射門率 + 持球太久的緊迫加成
+        const shootChance = hasSpace
+          ? (atkStats.attack / 100) * 0.08 * dangerMul + urgency * 0.06
+          : urgency * 0.02;
         if (Math.random() < shootChance) {
           startShoot();
           return;
         }
       }
 
-      // 2) 傳球決策（中場積極傳、攻擊三分之一較保守、持球 8+ 幀後考慮）
+      // 2) 傳球決策（持球 8+ 幀後考慮，持球越久越積極傳）
       if (framesInPossession > 8) {
         const inMidfield = pos.x > 0.3 && pos.x < 0.7;
         const inAttackThird = (pos.team === 'h' && pos.x > 0.65) || (pos.team === 'a' && pos.x < 0.35);
@@ -366,6 +371,7 @@
         if (inMidfield) passChance = 0.12 + (atkStats.midfield / 100) * 0.04;
         else if (inAttackThird) passChance = 0.03 + (atkStats.midfield / 100) * 0.02;
         else passChance = 0.08 + (atkStats.midfield / 100) * 0.03;
+        passChance += urgency * 0.10; // 持球太久 → 積極找人傳
         if (Math.random() < passChance) {
           const candidates = rankPassTargets(pos);
           if (candidates.length && candidates[0].score > -0.3) {
@@ -392,12 +398,16 @@
         }
       }
 
-      // 4) 一直沒動作 → 強制傳球避免卡死
-      if (framesInPossession > 75) {
-        const candidates = rankPassTargets(pos);
-        if (candidates.length) {
-          startPass(candidates[0]);
-          state.lastActionFrame = state.frame;
+      // 4) 一直沒動作 → 強制出手（前場射、其他傳）
+      if (framesInPossession > 50) {
+        if (distToGoal < 0.35) {
+          startShoot();
+        } else {
+          const candidates = rankPassTargets(pos);
+          if (candidates.length) {
+            startPass(candidates[0]);
+            state.lastActionFrame = state.frame;
+          }
         }
       }
     }
@@ -468,22 +478,22 @@
             p.ty = ball.y;
             p.tx += (Math.random() - 0.5) * 0.006;
             p.ty += (Math.random() - 0.5) * 0.008;
-            return;
-          }
-          if (myRank === 1) {
+          } else if (myRank === 1) {
             // 第二近的覆蓋
             p._urgent = true;
             p.tx = ball.x - sideSign * 0.08;
             p.ty = p.baseY + (ball.y - p.baseY) * 0.7;
-            return;
+          } else {
+            // 其他：維持陣型但個人差異 + 近球側踩高/遠球側收腳
+            const sameSide = Math.abs(ball.y - p.baseY) < 0.22;
+            const stepAdj = sameSide ? 0.06 : -0.03;
+            p.tx = p.baseX - role.pullBack * sideSign + (ball.x - 0.5) * 0.20
+                   + stepAdj * sideSign + fl.xJitter;
+            p.ty = p.baseY + (ball.y - p.baseY) * 0.42 + fl.yJitter;
           }
-          // 其他：維持陣型但個人差異 + 近球側踩高/遠球側收腳
-          // ball 在你 y 半邊（0.25 內）→ 踩高；在遠半邊 → 收腳更深
-          const sameSide = Math.abs(ball.y - p.baseY) < 0.22;
-          const stepAdj = sameSide ? 0.06 : -0.03;
-          p.tx = p.baseX - role.pullBack * sideSign + (ball.x - 0.5) * 0.20
-                 + stepAdj * sideSign + fl.xJitter;
-          p.ty = p.baseY + (ball.y - p.baseY) * 0.42 + fl.yJitter;
+          // 所有防守者都不能跑到自家 GK 後面（GK 在 0.05 / 0.95）
+          if (p.team === 'h') p.tx = Math.max(0.10, p.tx);
+          else p.tx = Math.min(0.90, p.tx);
           return;
         }
 
