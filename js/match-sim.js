@@ -259,20 +259,30 @@
 
     function rankPassTargets(possessor) {
       const goalX = possessor.team === 'h' ? 1 : 0;
+      const myDistToGoal = Math.abs(goalX - possessor.x);
       const teammates = players
         .map((p, i) => ({ p, i }))
         .filter(x => x.p.team === possessor.team && x.i !== state.possessorIdx);
       return teammates
         .map(({ p, i }) => {
-          // 分數 = 比持球者更靠近對方球門者 +
-          //       與附近對手的距離 +
-          //       不在 GK
           const ahead = possessor.team === 'h' ? p.x > possessor.x : p.x < possessor.x;
           const distToGoal = Math.abs(goalX - p.x);
           const nearest = findNearestOpponent(p);
           const openness = Math.min(0.15, nearest.dist);
           const roleBonus = p.role === 'FWD' ? 0.15 : p.role === 'AMC' ? 0.12 : p.role === 'MID' ? 0.05 : 0;
-          const score = (ahead ? 0.3 : 0) + openness + roleBonus - distToGoal * 0.4;
+          let score = (ahead ? 0.3 : 0) + openness + roleBonus - distToGoal * 0.4;
+          // 前場反向傳球嚴重扣分：持球者已在前場時，往後傳（距離球門更遠）要避免
+          if (myDistToGoal < 0.3 && distToGoal > myDistToGoal + 0.05) {
+            score -= 0.35;
+          }
+          // 剛剛才傳球給我的人、30 幀內不要傳回去（避免無限來回）
+          if (state.lastPassFromIdx === i && state.frame - state.lastPassFrame < 30) {
+            score -= 0.5;
+          }
+          // 禁區內兩個隊友互傳：只要目標離球門距離跟我幾乎一樣（同排），再扣
+          if (myDistToGoal < 0.2 && Math.abs(distToGoal - myDistToGoal) < 0.05) {
+            score -= 0.25;
+          }
           return { p, i, score };
         })
         .sort((a, b) => b.score - a.score);
@@ -288,6 +298,9 @@
       state.ballTravelLeft = state.ballTravelTotal;
       state.phase = 'pass';
       state.passTargetIdx = target.i;
+      // 記錄這次傳球的「發球者」— 下次挑傳球對象時會避開他（30 幀內）
+      state.lastPassFromIdx = state.possessorIdx;
+      state.lastPassFrame = state.frame;
       state.stats[state.possession].passes++;
     }
 
@@ -374,7 +387,7 @@
         passChance += urgency * 0.10; // 持球太久 → 積極找人傳
         if (Math.random() < passChance) {
           const candidates = rankPassTargets(pos);
-          if (candidates.length && candidates[0].score > -0.3) {
+          if (candidates.length && candidates[0].score > -0.15) {
             startPass(candidates[0]);
             state.lastActionFrame = state.frame;
             return;
