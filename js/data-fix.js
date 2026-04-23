@@ -353,6 +353,8 @@ window.addEventListener('load', () => {
   _safe(() => updateArenaBadge(), 'updateArenaBadge');
   _safe(() => updateNavXP(), 'updateNavXP');
   _safe(() => window.renderOpinionStreakWidget && window.renderOpinionStreakWidget(), 'renderOpinionStreakWidget');
+  // 擂台預測結算（已投過+已開獎+未結算 → 發 XP + toast）
+  _safe(() => window.checkOpinionPredictResolutions && window.checkOpinionPredictResolutions(), 'checkOpinionPredictResolutions');
   // 觀點投票 → 每日任務彈窗（延遲 3 秒，合併流程）
   // 若從 /article/<id> 或 ?article= 落地：每日任務彈窗延後到文章關閉後才彈（不打擾閱讀）
   // 若 URL 帶 ?poll=<id>（分享連結落地）→ 強制開該題，忽略「今日已彈過」旗標

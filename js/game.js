@@ -459,6 +459,8 @@ function calcXPLevel() {
   });
   // 射門遊戲累積 XP
   xp += parseInt(localStorage.getItem('rogue_total_xp') || '0') || 0;
+  // 麥迪擂台累積 XP（投票基礎 + 連勝里程碑 + 預測答對）
+  xp += parseInt(localStorage.getItem('opinion_total_xp') || '0') || 0;
   const xpPerLv = 100;
   const level   = Math.floor(xp / xpPerLv) + 1;
   const xpInLv  = xp % xpPerLv;

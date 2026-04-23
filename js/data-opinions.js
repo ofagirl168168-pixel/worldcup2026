@@ -2,6 +2,12 @@
    DATA-OPINIONS.JS — 每日觀點投票題庫
    type: 'trending'=時事 | 'classic'=永恆 | 'fun'=趣味 | 'predict'=預測
    opts: 2~4 個選項
+
+   predict 型題目可在事後揭曉時加兩個欄位：
+     resolveDate:'YYYY-MM-DD'  預計揭曉日（只是給人看，不影響結算）
+     correctAnswer: N          opts[] 的正確選項 index (0-based)
+   網站載入時會自動掃描：只要此題有 correctAnswer 且使用者投過、還沒領過獎，
+   答對發 +20 XP，答錯也會 toast 告知正解。任何時點揭曉都可（隔天、一週、賽季末都 OK）。
    ============================================= */
 
 const DAILY_OPINIONS = [

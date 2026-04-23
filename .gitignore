@@ -20,3 +20,6 @@ node_modules/
 
 # 留言審核機器人游標
 scripts/.comments-cursor
+
+# opinion-telegram 執行時互斥鎖（內含 PID，comments-bot 用它來讓開 /getUpdates）
+scripts/.opinion-telegram.lock

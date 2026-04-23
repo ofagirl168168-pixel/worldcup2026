@@ -12,10 +12,58 @@
   const STORAGE_LIKE = 'opinion_liked_';
   const STORAGE_VOTER_KEY = 'opinion_voter_key';
   const STORAGE_STREAK = 'opinion_streak'; // {current, longest, lastDate}
+  const STORAGE_TOTAL_XP = 'opinion_total_xp'; // 擂台累積 XP（game.js:calcXPLevel 讀）
+  const STORAGE_VOTE_XP_CLAIMED = 'opinion_vote_xp_claimed_'; // +id：基礎投票 XP 已發
+  const STORAGE_PREDICT_CLAIMED = 'opinion_predict_claimed_'; // +id：預測題結果 XP 已發
+  const VOTE_BASE_XP = 5;           // 每題首次投票
+  const PREDICT_WIN_XP = 20;        // 預測答對
+  const STREAK_BONUS = { 3: 15, 7: 50, 30: 200 }; // 連勝里程碑額外 XP
   const TAG_LABELS = { trending: '🔥 時事', classic: '⚽ 經典', fun: '🎉 趣味', predict: '🔮 預測' };
   const MAX_COMMENT_LEN = 100;
   let _commentChannel = null; // realtime subscription
   let _voteChannel = null;    // realtime vote tally 訂閱
+
+  /* ---------- XP 發放（純 localStorage，calcXPLevel 會自動納入總 XP） ---------- */
+  function _addOpinionXP(amount) {
+    if (!amount) return;
+    const cur = parseInt(localStorage.getItem(STORAGE_TOTAL_XP) || '0') || 0;
+    localStorage.setItem(STORAGE_TOTAL_XP, String(cur + amount));
+    try { if (typeof updateNavXP === 'function') updateNavXP(); } catch (e) {}
+  }
+
+  /* ---------- 掃描「已開獎」的預測題，結算 XP ---------- */
+  // DAILY_OPINIONS 裡的 predict 題可加 correctAnswer（0-based index）和 resolveDate
+  // 使用者投過但還沒結算過 → 對則 +20 XP，不論對錯都 toast 一次、標記已結算
+  function _checkPredictResolutions() {
+    const opinions = window.DAILY_OPINIONS || [];
+    const results = [];
+    for (const o of opinions) {
+      if (o.type !== 'predict') continue;
+      if (o.correctAnswer == null) continue;          // 還沒開獎
+      const claimKey = STORAGE_PREDICT_CLAIMED + o.id;
+      if (localStorage.getItem(claimKey)) continue;   // 已結算過
+      const voteRaw = localStorage.getItem(STORAGE_PREFIX + o.id);
+      if (voteRaw == null) continue;                  // 沒投不結算
+      const myVote = parseInt(voteRaw);
+      const won = myVote === o.correctAnswer;
+      if (won) _addOpinionXP(PREDICT_WIN_XP);
+      localStorage.setItem(claimKey, '1');
+      results.push({ opinion: o, won, myVote });
+    }
+    // 逐個 toast 通知（排隊避免一次湧出）
+    if (results.length && typeof showToast === 'function') {
+      results.forEach((r, i) => setTimeout(() => {
+        const correctOpt = r.opinion.opts[r.opinion.correctAnswer] || '';
+        if (r.won) {
+          showToast(`🎯 預測命中「${_trim(r.opinion.q, 20)}」+${PREDICT_WIN_XP} XP`);
+        } else {
+          showToast(`📣 開獎：「${_trim(r.opinion.q, 20)}」正解是 ${correctOpt}`);
+        }
+      }, i * 2500));
+    }
+    return results;
+  }
+  function _trim(s, n) { return s && s.length > n ? s.slice(0, n) + '…' : (s || ''); }
 
   /* ---------- 顯示觀點投票彈窗 ---------- */
   function showOpinionPoll(onClose, opts) {
@@ -198,9 +246,22 @@
     localStorage.setItem(STORAGE_PREFIX + opinion.id, chosenIdx);
 
     // 連續天數 +1（同日重複投不會重算）→ 供 _showResult 渲染
-    overlay.dataset.streakBump = JSON.stringify(_bumpStreakToday());
+    const bumped = _bumpStreakToday();
+    overlay.dataset.streakBump = JSON.stringify(bumped);
     // 同步 nav 徽章（票後立即顯示新數字、清 pending 狀態）
     try { renderStreakWidget(); } catch (e) {}
+
+    // 發 XP（首次投票 +5；streak 里程碑額外加碼）
+    const xpKey = STORAGE_VOTE_XP_CLAIMED + opinion.id;
+    if (!localStorage.getItem(xpKey)) {
+      localStorage.setItem(xpKey, '1');
+      _addOpinionXP(VOTE_BASE_XP);
+      if (bumped && bumped.bumped && STREAK_BONUS[bumped.current]) {
+        const bonus = STREAK_BONUS[bumped.current];
+        _addOpinionXP(bonus);
+        try { if (typeof showToast === 'function') setTimeout(() => showToast(`🔥 連勝 ${bumped.current} 天里程碑！+${bonus} XP`), 800); } catch (e) {}
+      }
+    }
 
     // 送到 Supabase（失敗不擋 UI）
     _insertVote(opinion.id, chosenIdx);
@@ -1194,4 +1255,10 @@
   /* ---------- 匯出 ---------- */
   window.showOpinionPoll = showOpinionPoll;
   window.renderOpinionStreakWidget = renderStreakWidget;
+  window.checkOpinionPredictResolutions = _checkPredictResolutions;
+
+  // 網站載入完成後掃一次預測題開獎（由 data-fix.js 在題庫載好後呼叫效果最穩，但這裡也補一次作為 fallback）
+  setTimeout(() => {
+    try { _checkPredictResolutions(); } catch (e) { console.warn('[opinion] predict check err', e); }
+  }, 4000);
 })();
