@@ -343,23 +343,32 @@
       const goalX = pos.team === 'h' ? 1 : 0;
       const distToGoal = Math.abs(pos.x - goalX);
 
-      // 1) 射門決策（只在禁區附近；越近越可能射）
-      if (distToGoal < 0.25) {
-        const proximityBonus = distToGoal < 0.15 ? 0.04 : 0;
-        const shootChance = (atkStats.attack / 100) * 0.04 + proximityBonus;
+      const framesInPossession = state.frame - state.lastActionFrame;
+
+      // 1) 射門決策（放寬到前場三分之一、距離越近機率越高）
+      if (distToGoal < 0.32) {
+        const near = findNearestOpponent(pos);
+        const hasSpace = near.dist > 0.05;
+        // 距離加權：禁區內 ×1.5、禁區外一點 ×0.7、前場邊緣 ×0.25
+        const dangerMul = distToGoal < 0.15 ? 1.5 : distToGoal < 0.22 ? 0.7 : 0.25;
+        const shootChance = hasSpace ? (atkStats.attack / 100) * 0.08 * dangerMul : 0;
         if (Math.random() < shootChance) {
           startShoot();
           return;
         }
       }
 
-      // 2) 傳球決策（持球 15+ 幀後才考慮，讓中場有時間 build-up）
-      const framesInPossession = state.frame - state.lastActionFrame;
-      if (framesInPossession > 15) {
-        const passChance = 0.012 + (atkStats.midfield / 100) * 0.018;
+      // 2) 傳球決策（中場積極傳、攻擊三分之一較保守、持球 8+ 幀後考慮）
+      if (framesInPossession > 8) {
+        const inMidfield = pos.x > 0.3 && pos.x < 0.7;
+        const inAttackThird = (pos.team === 'h' && pos.x > 0.65) || (pos.team === 'a' && pos.x < 0.35);
+        let passChance;
+        if (inMidfield) passChance = 0.12 + (atkStats.midfield / 100) * 0.04;
+        else if (inAttackThird) passChance = 0.03 + (atkStats.midfield / 100) * 0.02;
+        else passChance = 0.08 + (atkStats.midfield / 100) * 0.03;
         if (Math.random() < passChance) {
           const candidates = rankPassTargets(pos);
-          if (candidates.length && candidates[0].score > -0.2) {
+          if (candidates.length && candidates[0].score > -0.3) {
             startPass(candidates[0]);
             state.lastActionFrame = state.frame;
             return;
@@ -367,17 +376,19 @@
         }
       }
 
-      // 3) 搶斷（降強度：搶斷比例降到每幀 1-8%）
-      const near = findNearestOpponent(pos);
-      if (near.player && near.dist < ROLE[near.player.role].tackleRange + 0.01) {
-        let tackleChance = (defStats.defense / 100) * 0.06 - (atkStats.midfield / 100) * 0.025;
-        tackleChance = Math.max(0.008, Math.min(0.08, tackleChance));
-        if (Math.random() < tackleChance) {
-          state.possession = near.player.team;
-          state.possessorIdx = players.indexOf(near.player);
-          state.phase = 'dribble';
-          state.lastActionFrame = state.frame;
-          return;
+      // 3) 搶斷（加入「剛接到球 15 幀保護期」避免還沒穩球就被搶）
+      if (framesInPossession > 15) {
+        const near = findNearestOpponent(pos);
+        if (near.player && near.dist < ROLE[near.player.role].tackleRange + 0.005) {
+          let tackleChance = (defStats.defense / 100) * 0.04 - (atkStats.midfield / 100) * 0.02;
+          tackleChance = Math.max(0.005, Math.min(0.06, tackleChance));
+          if (Math.random() < tackleChance) {
+            state.possession = near.player.team;
+            state.possessorIdx = players.indexOf(near.player);
+            state.phase = 'dribble';
+            state.lastActionFrame = state.frame;
+            return;
+          }
         }
       }
 
@@ -637,8 +648,8 @@
           ${winner === '平手' ? '🤝 平手' : `🏆 ${winner} 勝`}
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;color:var(--text-muted)">
-          <div>射門 ${h.shots}・傳球 ${h.passes}</div>
-          <div style="text-align:right">射門 ${a.shots}・傳球 ${a.passes}</div>
+          <div>射正 ${h.shots}・關鍵傳球 ${h.passes}</div>
+          <div style="text-align:right">射正 ${a.shots}・關鍵傳球 ${a.passes}</div>
           <div>進球 ${h.goals}</div>
           <div style="text-align:right">進球 ${a.goals}</div>
         </div>
@@ -646,7 +657,7 @@
           🔁 再跑一次
         </button>
         <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.35)">
-          持球者有白邊，球黏著持球者/傳球時在球員間飛行
+          模擬只計「威脅事件」(shots on target + key passes)，不是真實總傳球
         </div>
       `;
     }
