@@ -1,20 +1,21 @@
 /* =============================================
-   MATCH-SIM.JS — 90 分鐘模擬賽
-   以雙方 radar.{attack,defense,midfield,speed,experience} + formation
-   產生一場壓縮到 60 秒的縮時比賽，伴隨 canvas 動畫
+   MATCH-SIM.JS — 90 分鐘模擬賽（持球者狀態機版）
+   球員有真正的運動邏輯：持球者盤帶/傳球/射門、非持球者依角色回防或前插、
+   對方靠近會搶斷、球跟著持球者或在傳球時沿直線飛行。
    ============================================= */
 
 (function () {
   'use strict';
 
   // ── 視覺參數 ────────────────────────────────────────────
-  const PITCH_W = 320;        // 球場 CSS 寬（內部會 × DPR 渲染）
-  const PITCH_H = 200;        // 球場 CSS 高（橫向，比例 8:5）
+  const PITCH_W = 320;
+  const PITCH_H = 200;
   const FPS = 30;
   const MATCH_MINUTES = 90;
-  const REAL_SECONDS = 60;    // 壓縮到 60 秒
-  const HT_PAUSE_SEC = 0.8;   // 半場中斷時間（real）
-  const GOAL_PAUSE_SEC = 0.6; // 進球慶祝時間（real）
+  const REAL_SECONDS = 60;
+  const HT_PAUSE_SEC = 0.8;
+  const GOAL_PAUSE_SEC = 0.8;
+  const TOTAL_FRAMES = FPS * REAL_SECONDS;
 
   // ── 陣型解析 ────────────────────────────────────────────
   function parseFormation(f) {
@@ -24,7 +25,6 @@
     return { def: 4, mid: 3, amc: 0, fwd: 3 };
   }
 
-  // 生成球員位置（相對 0-1，x=0 己方球門、x=1 對方球門；isHome 為 true 保留原座標、false 鏡像）
   function buildFormation(f, isHome) {
     const positions = [];
     positions.push({ x: 0.05, y: 0.5, role: 'GK' });
@@ -42,53 +42,18 @@
     return positions;
   }
 
-  // ── 模擬器：產生 90 分鐘事件表 ─────────────────────────
-  function simulateTimeline(home, away) {
-    const h = home.radar, a = away.radar;
-    const events = [];
-    // 中場強度（含速度加成）
-    const hMid = h.midfield + h.speed * 0.5;
-    const aMid = a.midfield + a.speed * 0.5;
-    const hPossBase = hMid / (hMid + aMid);
-    // 主場優勢 + 夾 0.28-0.72 避免極端
-    const hPoss = Math.min(0.72, Math.max(0.28, hPossBase + 0.04));
+  // 每個角色的戰術參數：前插能力、回防程度、搶斷意願、持球速度
+  const ROLE = {
+    GK:  { pushOn: 0.02, pullBack: 0.02, tackleRange: 0.03, sprint: 0.5 },
+    DEF: { pushOn: 0.12, pullBack: 0.18, tackleRange: 0.055, sprint: 0.7 },
+    MID: { pushOn: 0.20, pullBack: 0.15, tackleRange: 0.05, sprint: 0.85 },
+    AMC: { pushOn: 0.28, pullBack: 0.10, tackleRange: 0.045, sprint: 0.9 },
+    FWD: { pushOn: 0.32, pullBack: 0.06, tackleRange: 0.04, sprint: 1.0 },
+  };
 
-    // 逐分鐘跑
-    for (let min = 1; min <= MATCH_MINUTES; min++) {
-      // 決定這分鐘誰在進攻
-      const attackIsHome = Math.random() < hPoss;
-      const atk = attackIsHome ? h : a;
-      const def = attackIsHome ? a : h;
-      const team = attackIsHome ? 'h' : 'a';
-
-      // 射門機率（attack 越強越常射，經驗微調）— 常數經模擬校準，見 match-sim tuning notes
-      const shotProb = (atk.attack / 100) * 0.22 * (0.65 + atk.experience / 300);
-      if (Math.random() < shotProb) {
-        // 進球機率：atk.attack 減掉 def.defense×0.7，再乘 0.5
-        const goalProb = Math.max(0.05, Math.min(0.55,
-          ((atk.attack - def.defense * 0.7) / 100) * 0.5
-        ));
-        const isGoal = Math.random() < goalProb;
-        events.push({ min, type: isGoal ? 'goal' : 'shot', team });
-      }
-    }
-    return { events, hPoss };
-  }
-
-  // 預計算統計：用於進度條 + 最終報告
-  function summarize(events) {
-    const s = { h: { goals: 0, shots: 0 }, a: { goals: 0, shots: 0 } };
-    events.forEach(e => {
-      s[e.team].shots++;
-      if (e.type === 'goal') s[e.team].goals++;
-    });
-    return s;
-  }
-
-  // ── 渲染 ────────────────────────────────────────────────
+  // ── 繪製 ────────────────────────────────────────────────
   function render(ctx, state) {
-    const { players, ball, flashTeam, flashAlpha, score, time, hWinChance, teams } = state;
-    // 背景
+    const { players, ball, flashTeam, flashAlpha, possessorIdx } = state;
     const grad = ctx.createLinearGradient(0, 0, 0, PITCH_H);
     grad.addColorStop(0, '#2e7d32');
     grad.addColorStop(1, '#1b5e20');
@@ -97,7 +62,7 @@
 
     // 草紋
     for (let i = 0; i < PITCH_W; i += 40) {
-      ctx.fillStyle = (i / 40) % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)';
+      ctx.fillStyle = (i / 40) % 2 === 0 ? 'rgba(255,255,255,0.035)' : 'rgba(0,0,0,0.04)';
       ctx.fillRect(i, 0, 40, PITCH_H);
     }
 
@@ -112,7 +77,6 @@
     ctx.beginPath();
     ctx.arc(PITCH_W / 2, PITCH_H / 2, 22, 0, Math.PI * 2);
     ctx.stroke();
-    // 兩邊禁區
     ctx.strokeRect(4, PITCH_H * 0.22, 32, PITCH_H * 0.56);
     ctx.strokeRect(PITCH_W - 36, PITCH_H * 0.22, 32, PITCH_H * 0.56);
     // 球門
@@ -129,21 +93,22 @@
     }
 
     // 球員
-    players.forEach(p => {
+    players.forEach((p, i) => {
+      const isPos = i === possessorIdx;
       ctx.fillStyle = p.team === 'h' ? '#2196f3' : '#e53935';
       ctx.beginPath();
-      ctx.arc(p.x * PITCH_W, p.y * PITCH_H, p.role === 'GK' ? 4.5 : 4, 0, Math.PI * 2);
+      const r = p.role === 'GK' ? 4.5 : 4;
+      ctx.arc(p.x * PITCH_W, p.y * PITCH_H, isPos ? r + 1 : r, 0, Math.PI * 2);
       ctx.fill();
-      // 邊框
-      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-      ctx.lineWidth = 0.8;
+      ctx.strokeStyle = isPos ? '#fff' : 'rgba(255,255,255,0.7)';
+      ctx.lineWidth = isPos ? 1.3 : 0.8;
       ctx.stroke();
     });
 
-    // 球
+    // 球（帶陰影）
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0,0,0,0.4)';
-    ctx.shadowBlur = 4;
+    ctx.shadowColor = 'rgba(0,0,0,0.45)';
+    ctx.shadowBlur = 5;
     ctx.beginPath();
     ctx.arc(ball.x * PITCH_W, ball.y * PITCH_H, 3, 0, Math.PI * 2);
     ctx.fill();
@@ -190,7 +155,7 @@
     };
   }
 
-  // ── 執行一場 ────────────────────────────────────────────
+  // ── 主模擬 ──────────────────────────────────────────────
   function runSim(container, home, away, matchId) {
     const ui = buildHUD(container, { home, away });
     const canvas = ui.canvas;
@@ -209,144 +174,369 @@
     const hF = buildFormation(parseFormation(home.formation), true);
     const aF = buildFormation(parseFormation(away.formation), false);
     const players = [
-      ...hF.map(p => ({ ...p, team: 'h', baseX: p.x, baseY: p.y, x: p.x, y: p.y })),
-      ...aF.map(p => ({ ...p, team: 'a', baseX: p.x, baseY: p.y, x: p.x, y: p.y })),
+      ...hF.map(p => ({ ...p, team: 'h', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y })),
+      ...aF.map(p => ({ ...p, team: 'a', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y })),
     ];
     const ball = { x: 0.5, y: 0.5 };
-    const score = { h: 0, a: 0 };
-    const { events, hPoss } = simulateTimeline(home, away);
 
-    // Power 指標（大約代表整體實力，取 radar 5 項加總）
-    const hPow = Object.values(home.radar).reduce((s, v) => s + v, 0);
+    // Power 指標
     const aPow = Object.values(away.radar).reduce((s, v) => s + v, 0);
     ui.aPower.textContent = (aPow / 100).toFixed(2) + 'K';
 
-    const TOTAL_FRAMES = FPS * REAL_SECONDS;
-    let frame = 0;
-    let flashAlpha = 0;
-    let flashTeam = null;
-    let ballPhase = 'kickoff';
-    let ballTargetX = 0.5, ballTargetY = 0.5;
-    let lastPhaseSwitch = 0;
-    let paused = 0; // 半場或進球暫停的剩餘 real frames
-    let halftimeDone = false;
+    // 比賽狀態
+    const state = {
+      possession: 'h',       // 'h' | 'a'
+      possessorIdx: -1,      // index into players[]
+      phase: 'kickoff',      // 'kickoff' | 'dribble' | 'pass' | 'shoot' | 'celebrate' | 'halftime'
+      ballFromX: 0.5, ballFromY: 0.5,
+      ballTargetX: 0.5, ballTargetY: 0.5,
+      ballTravelTotal: 0, ballTravelLeft: 0,
+      score: { h: 0, a: 0 },
+      stats: { h: { shots: 0, goals: 0, passes: 0 }, a: { shots: 0, goals: 0, passes: 0 } },
+      frame: 0,
+      pauseFrames: 0,
+      flashAlpha: 0, flashTeam: null,
+      halftimeDone: false,
+      lastActionFrame: 0,
+      players, ball,
+      get possessorIdx() { return this._possessorIdx; },
+      set possessorIdx(v) { this._possessorIdx = v; },
+    };
+    state.possessorIdx = -1;
 
-    function setNewBallTarget(attackTeam) {
-      // 進攻方的半場隨機位置
-      ballTargetX = attackTeam === 'h'
-        ? 0.55 + Math.random() * 0.4
-        : 0.05 + Math.random() * 0.4;
-      ballTargetY = 0.2 + Math.random() * 0.6;
+    const hMidPoss = Math.min(0.72, Math.max(0.28,
+      (home.radar.midfield + home.radar.speed * 0.5) /
+      (home.radar.midfield + home.radar.speed * 0.5 + away.radar.midfield + away.radar.speed * 0.5) + 0.04
+    ));
+
+    function getTeam(code) { return code === 'h' ? home : away; }
+
+    function kickoff(whoHasBall) {
+      state.possession = whoHasBall;
+      state.phase = 'dribble';
+      // 找中場球員持球
+      const mids = players
+        .map((p, i) => ({ p, i }))
+        .filter(x => x.p.team === whoHasBall && x.p.role === 'MID');
+      const chosen = mids[Math.floor(mids.length / 2)] || mids[0]
+        || players.map((p, i) => ({ p, i })).find(x => x.p.team === whoHasBall && x.p.role !== 'GK');
+      state.possessorIdx = chosen ? chosen.i : 0;
+      ball.x = 0.5; ball.y = 0.5;
+      // 球員復位
+      players.forEach(p => { p.x = p.baseX; p.y = p.baseY; });
+      // 稍微讓持球者靠近中圈
+      const pos = players[state.possessorIdx];
+      if (pos) { pos.x = 0.5; pos.y = 0.5; }
     }
 
+    function findNearestOpponent(p) {
+      let best = null, bestD = Infinity;
+      for (const q of players) {
+        if (q.team === p.team) continue;
+        const d = Math.hypot(q.x - p.x, q.y - p.y);
+        if (d < bestD) { bestD = d; best = q; }
+      }
+      return { player: best, dist: bestD };
+    }
+
+    function rankPassTargets(possessor) {
+      const goalX = possessor.team === 'h' ? 1 : 0;
+      const teammates = players
+        .map((p, i) => ({ p, i }))
+        .filter(x => x.p.team === possessor.team && x.i !== state.possessorIdx);
+      return teammates
+        .map(({ p, i }) => {
+          // 分數 = 比持球者更靠近對方球門者 +
+          //       與附近對手的距離 +
+          //       不在 GK
+          const ahead = possessor.team === 'h' ? p.x > possessor.x : p.x < possessor.x;
+          const distToGoal = Math.abs(goalX - p.x);
+          const nearest = findNearestOpponent(p);
+          const openness = Math.min(0.15, nearest.dist);
+          const roleBonus = p.role === 'FWD' ? 0.15 : p.role === 'AMC' ? 0.12 : p.role === 'MID' ? 0.05 : 0;
+          const score = (ahead ? 0.3 : 0) + openness + roleBonus - distToGoal * 0.4;
+          return { p, i, score };
+        })
+        .sort((a, b) => b.score - a.score);
+    }
+
+    function startPass(target) {
+      state.ballFromX = ball.x;
+      state.ballFromY = ball.y;
+      state.ballTargetX = target.p.x;
+      state.ballTargetY = target.p.y;
+      const dist = Math.hypot(target.p.x - ball.x, target.p.y - ball.y);
+      state.ballTravelTotal = Math.max(5, Math.round(dist * 60));
+      state.ballTravelLeft = state.ballTravelTotal;
+      state.phase = 'pass';
+      state.passTargetIdx = target.i;
+      state.stats[state.possession].passes++;
+    }
+
+    function startShoot() {
+      state.ballFromX = ball.x;
+      state.ballFromY = ball.y;
+      const goalX = state.possession === 'h' ? 1 : 0;
+      // 射向球門範圍內一個點（稍微偏左右，不永遠中路）
+      state.ballTargetX = goalX;
+      state.ballTargetY = 0.38 + Math.random() * 0.24;
+      const dist = Math.hypot(state.ballTargetX - ball.x, state.ballTargetY - ball.y);
+      state.ballTravelTotal = Math.max(5, Math.round(dist * 50));
+      state.ballTravelLeft = state.ballTravelTotal;
+      state.phase = 'shoot';
+      state.stats[state.possession].shots++;
+    }
+
+    function resolveShot() {
+      const atk = getTeam(state.possession).radar;
+      const def = getTeam(state.possession === 'h' ? 'a' : 'h').radar;
+      const goalProb = Math.max(0.18, Math.min(0.58,
+        ((atk.attack - def.defense * 0.65) / 100) * 0.6
+      ));
+      const isGoal = Math.random() < goalProb;
+      if (isGoal) {
+        state.score[state.possession]++;
+        state.stats[state.possession].goals++;
+        state.flashTeam = state.possession;
+        state.flashAlpha = 1;
+        state.pauseFrames = Math.round(FPS * GOAL_PAUSE_SEC);
+        state.phase = 'celebrate';
+        ui.hScore.textContent = state.score.h;
+        ui.aScore.textContent = state.score.a;
+      } else {
+        // 被撲 / 沒中 → 對方球門員帶球
+        const newTeam = state.possession === 'h' ? 'a' : 'h';
+        state.possession = newTeam;
+        const gk = players.findIndex(p => p.team === newTeam && p.role === 'GK');
+        state.possessorIdx = gk;
+        state.phase = 'dribble';
+        state.lastActionFrame = state.frame;
+        ball.x = players[gk].x;
+        ball.y = players[gk].y;
+      }
+    }
+
+    // 每幀決策邏輯（dribble 階段）
+    function tickDribble() {
+      const pos = players[state.possessorIdx];
+      if (!pos) return;
+      const atkStats = getTeam(pos.team).radar;
+      const defStats = getTeam(pos.team === 'h' ? 'a' : 'h').radar;
+      const goalX = pos.team === 'h' ? 1 : 0;
+      const distToGoal = Math.abs(pos.x - goalX);
+
+      // 1) 射門決策（只在禁區附近）
+      if (distToGoal < 0.28) {
+        const shootChance = (atkStats.attack / 100) * 0.055 * (0.7 + distToGoal < 0.15 ? 0.5 : 0);
+        if (Math.random() < shootChance) {
+          startShoot();
+          return;
+        }
+      }
+
+      // 2) 傳球決策（持球 10+ 幀後才考慮傳，避免即時傳球顯得亂）
+      const framesInPossession = state.frame - state.lastActionFrame;
+      if (framesInPossession > 10) {
+        const passChance = 0.02 + (atkStats.midfield / 100) * 0.03;
+        if (Math.random() < passChance) {
+          const candidates = rankPassTargets(pos);
+          if (candidates.length && candidates[0].score > -0.2) {
+            startPass(candidates[0]);
+            state.lastActionFrame = state.frame;
+            return;
+          }
+        }
+      }
+
+      // 3) 搶斷判定（持球者身邊有對手時）
+      const near = findNearestOpponent(pos);
+      if (near.player && near.dist < ROLE[near.player.role].tackleRange + 0.01) {
+        // 搶斷機率：對方 defense - 我方 midfield（護球）
+        let tackleChance = (defStats.defense / 100) * 0.12 - (atkStats.midfield / 100) * 0.06;
+        tackleChance = Math.max(0.01, Math.min(0.25, tackleChance));
+        if (Math.random() < tackleChance) {
+          // 被搶，換人持球
+          state.possession = near.player.team;
+          state.possessorIdx = players.indexOf(near.player);
+          state.phase = 'dribble';
+          state.lastActionFrame = state.frame;
+          return;
+        }
+      }
+
+      // 4) 一直沒動作 → 強制傳球避免卡死
+      if (framesInPossession > 60) {
+        const candidates = rankPassTargets(pos);
+        if (candidates.length) {
+          startPass(candidates[0]);
+          state.lastActionFrame = state.frame;
+        }
+      }
+    }
+
+    // 更新球員 target 位置
+    function updatePlayerTargets() {
+      const atkTeam = state.possession;
+      players.forEach((p, i) => {
+        if (i === state.possessorIdx) {
+          // 持球者：朝對方球門走
+          const goalX = p.team === 'h' ? 1 : 0;
+          const dx = goalX - p.x;
+          // 稍微向中路收斂
+          const dy = 0.5 - p.y;
+          const role = ROLE[p.role] || ROLE.MID;
+          const speed = 0.012 * role.sprint * (getTeam(p.team).radar.speed / 80);
+          p.tx = p.x + Math.sign(dx) * Math.min(Math.abs(dx), speed);
+          p.ty = p.y + dy * 0.08;
+          // 小幅左右晃動（盤帶感）
+          p.tx += (Math.random() - 0.5) * 0.004;
+          p.ty += (Math.random() - 0.5) * 0.006;
+        } else {
+          // 非持球者：依角色 + 球位移動
+          const myTeamAttacking = p.team === atkTeam;
+          const role = ROLE[p.role] || ROLE.MID;
+          const sideSign = p.team === 'h' ? 1 : -1;
+
+          let xShift;
+          if (myTeamAttacking) {
+            // 進攻方：前插
+            xShift = role.pushOn * sideSign;
+          } else {
+            // 防守方：回防
+            xShift = -role.pullBack * sideSign;
+          }
+
+          // 整條隊形依球的 x 前後移動（壓迫）
+          const lineShift = (ball.x - 0.5) * (myTeamAttacking ? 0.25 : 0.18);
+
+          p.tx = p.baseX + xShift + lineShift * sideSign * 0.5;
+          // y 向球靠近（有限度，保持隊形）
+          p.ty = p.baseY + (ball.y - p.baseY) * 0.35 * role.sprint;
+
+          // 特別處理 GK：永遠站球門邊
+          if (p.role === 'GK') {
+            p.tx = p.baseX;
+            p.ty = 0.5 + (ball.y - 0.5) * 0.2;
+          }
+        }
+      });
+    }
+
+    function movePlayers() {
+      players.forEach((p, i) => {
+        const smoothness = (i === state.possessorIdx) ? 0.15 : 0.08;
+        p.x += (p.tx - p.x) * smoothness;
+        p.y += (p.ty - p.y) * smoothness;
+        // 邊界
+        p.x = Math.max(0.01, Math.min(0.99, p.x));
+        p.y = Math.max(0.04, Math.min(0.96, p.y));
+      });
+    }
+
+    function moveBall() {
+      if (state.phase === 'pass' || state.phase === 'shoot') {
+        // 球沿直線飛，加一點拋物線
+        state.ballTravelLeft--;
+        const t = 1 - (state.ballTravelLeft / Math.max(1, state.ballTravelTotal));
+        ball.x = state.ballFromX + (state.ballTargetX - state.ballFromX) * t;
+        ball.y = state.ballFromY + (state.ballTargetY - state.ballFromY) * t;
+        // 拋物線弧度（4×t×(1-t) = 中段 peak）
+        ball.y -= 0.03 * (4 * t * (1 - t));
+        if (state.ballTravelLeft <= 0) {
+          if (state.phase === 'shoot') {
+            resolveShot();
+          } else {
+            // pass 抵達：那個人變成持球者
+            const newIdx = state.passTargetIdx;
+            if (newIdx != null && players[newIdx]) {
+              state.possessorIdx = newIdx;
+              state.possession = players[newIdx].team;
+              ball.x = players[newIdx].x;
+              ball.y = players[newIdx].y;
+            }
+            state.phase = 'dribble';
+            state.lastActionFrame = state.frame;
+          }
+        }
+      } else if (state.phase === 'dribble') {
+        // 球跟著持球者
+        const pos = players[state.possessorIdx];
+        if (pos) {
+          const goalX = pos.team === 'h' ? 1 : 0;
+          const dirSign = goalX > pos.x ? 1 : -1;
+          ball.x += (pos.x + dirSign * 0.012 - ball.x) * 0.35;
+          ball.y += (pos.y - ball.y) * 0.35;
+        }
+      }
+    }
+
+    // ── 主 tick ────────────────────────────────────────
     function tick() {
-      if (paused > 0) {
-        paused--;
-        render(ctx, { players, ball, flashTeam, flashAlpha, score, time: frame / FPS, teams: { home, away } });
-        flashAlpha = Math.max(0, flashAlpha - 0.04);
+      if (state.frame >= TOTAL_FRAMES) { showSummary(); return; }
+
+      // 暫停中
+      if (state.pauseFrames > 0) {
+        state.pauseFrames--;
+        state.flashAlpha = Math.max(0, state.flashAlpha - 0.03);
+        render(ctx, state);
+        if (state.pauseFrames === 0 && state.phase === 'celebrate') {
+          // 進球方換另一隊開球
+          kickoff(state.possession === 'h' ? 'a' : 'h');
+        }
+        state.frame++;
         requestAnimationFrame(tick);
         return;
       }
 
-      if (frame >= TOTAL_FRAMES) {
-        showSummary();
-        return;
-      }
-
-      // 進度比例 → 當前遊戲分鐘
-      const gameMin = (frame / TOTAL_FRAMES) * MATCH_MINUTES;
+      const gameMin = (state.frame / TOTAL_FRAMES) * MATCH_MINUTES;
       const gameMinInt = Math.floor(gameMin);
 
       // 半場中斷
-      if (!halftimeDone && gameMinInt >= 45) {
-        halftimeDone = true;
-        paused = Math.round(FPS * HT_PAUSE_SEC);
+      if (!state.halftimeDone && gameMinInt >= 45) {
+        state.halftimeDone = true;
+        state.pauseFrames = Math.round(FPS * HT_PAUSE_SEC);
+        kickoff(Math.random() < hMidPoss ? 'a' : 'h'); // 下半場換球
+        // 不 return，讓這幀也能先畫（pauseFrames > 0 會在下一幀生效）
       }
 
-      // 檢查本分鐘的事件
-      const pending = events.filter(e => !e._done && e.min <= gameMinInt + 1);
-      pending.forEach(e => {
-        e._done = true;
-        setNewBallTarget(e.team);
-        if (e.type === 'goal') {
-          score[e.team]++;
-          flashTeam = e.team;
-          flashAlpha = 1;
-          paused = Math.round(FPS * GOAL_PAUSE_SEC);
-          // 球飛向球門
-          ball.x = e.team === 'h' ? 0.98 : 0.02;
-          ball.y = 0.5;
-          // 同步 HUD
-          ui.hScore.textContent = score.h;
-          ui.aScore.textContent = score.a;
-        } else {
-          // shot 也把球拉近球門
-          ball.x = e.team === 'h' ? 0.9 : 0.1;
-        }
-      });
-
-      // 每 ~1.2 秒換一次控球（隨機帶主場偏向）
-      if (frame - lastPhaseSwitch > FPS * 1.2) {
-        lastPhaseSwitch = frame;
-        const isHomeAttack = Math.random() < hPoss;
-        ballPhase = isHomeAttack ? 'h-attack' : 'a-attack';
-        setNewBallTarget(isHomeAttack ? 'h' : 'a');
+      // 決策（dribble 時才跑 AI）
+      if (state.phase === 'dribble') {
+        tickDribble();
       }
 
-      // 球朝目標飄移 + 抖動
-      ball.x += (ballTargetX - ball.x) * 0.04;
-      ball.y += (ballTargetY - ball.y) * 0.04;
-      ball.x += (Math.random() - 0.5) * 0.008;
-      ball.y += (Math.random() - 0.5) * 0.008;
-      ball.x = Math.max(0.02, Math.min(0.98, ball.x));
-      ball.y = Math.max(0.05, Math.min(0.95, ball.y));
+      updatePlayerTargets();
+      movePlayers();
+      moveBall();
 
-      // 球員朝向球 + 回站位之間平衡
-      players.forEach(p => {
-        const pullToBall = (p.role === 'FWD' || p.role === 'AMC') ? 0.28
-          : p.role === 'MID' ? 0.18
-          : p.role === 'DEF' ? 0.08
-          : 0.02; // GK
-        const targetX = p.baseX + (ball.x - p.baseX) * pullToBall;
-        const targetY = p.baseY + (ball.y - p.baseY) * pullToBall;
-        p.x += (targetX - p.x) * 0.06;
-        p.y += (targetY - p.y) * 0.06;
-      });
-
-      // 即時 WIN CHANCE：根據當前比分 + 剩餘時間 + 雙方攻擊差
-      const remaining = Math.max(0, 1 - frame / TOTAL_FRAMES);
-      const scoreDiff = score.h - score.a;
+      // 即時 WIN CHANCE
+      const remaining = Math.max(0, 1 - state.frame / TOTAL_FRAMES);
+      const scoreDiff = state.score.h - state.score.a;
       const attackRatio = home.radar.attack / (home.radar.attack + away.radar.attack);
-      const baseChance = attackRatio * 0.6 + 0.2; // 40-60% 區間為底
+      const baseChance = attackRatio * 0.6 + 0.2;
       const scoreBoost = scoreDiff * 0.08 * (1 - remaining * 0.5);
       const hChance = Math.max(0.05, Math.min(0.95, baseChance + scoreBoost));
       ui.hChance.textContent = Math.round(hChance * 100) + '%';
 
-      // 時間 HUD（顯示 MM:SS 遊戲分鐘）
       const totalGameSec = Math.floor(gameMin * 60);
       const mm = String(Math.floor(totalGameSec / 60)).padStart(2, '0');
       const ss = String(totalGameSec % 60).padStart(2, '0');
       ui.time.textContent = `${mm}:${ss}`;
 
-      // 渲染
-      render(ctx, {
-        players, ball, flashTeam, flashAlpha, score, time: frame / FPS,
-        hWinChance: hChance, teams: { home, away },
-      });
-      flashAlpha = Math.max(0, flashAlpha - 0.04);
+      render(ctx, state);
+      state.flashAlpha = Math.max(0, state.flashAlpha - 0.04);
 
-      frame++;
+      state.frame++;
       requestAnimationFrame(tick);
     }
 
     function showSummary() {
       ui.time.textContent = '全場';
-      const s = summarize(events);
-      const winner = score.h > score.a ? home.nameCN
-        : score.a > score.h ? away.nameCN
+      const { h, a } = state.stats;
+      const winner = state.score.h > state.score.a ? home.nameCN
+        : state.score.a > state.score.h ? away.nameCN
         : '平手';
-      const winnerColor = score.h > score.a ? '#2196f3'
-        : score.a > score.h ? '#e53935'
+      const winnerColor = state.score.h > state.score.a ? '#2196f3'
+        : state.score.a > state.score.h ? '#e53935'
         : 'rgba(255,255,255,0.7)';
       ui.summary.style.display = 'block';
       ui.summary.innerHTML = `
@@ -354,20 +544,22 @@
           ${winner === '平手' ? '🤝 平手' : `🏆 ${winner} 勝`}
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;color:var(--text-muted)">
-          <div>射門 ${s.h.shots} 次</div>
-          <div style="text-align:right">射門 ${s.a.shots} 次</div>
-          <div>進球 ${s.h.goals}</div>
-          <div style="text-align:right">進球 ${s.a.goals}</div>
+          <div>射門 ${h.shots}・傳球 ${h.passes}</div>
+          <div style="text-align:right">射門 ${a.shots}・傳球 ${a.passes}</div>
+          <div>進球 ${h.goals}</div>
+          <div style="text-align:right">進球 ${a.goals}</div>
         </div>
         <button onclick="MatchSim.run('${matchId}')" style="margin-top:10px;padding:8px 18px;background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:12px;cursor:pointer">
           🔁 再跑一次
         </button>
         <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.35)">
-          每次結果都不同，但長期分布會符合數據優勢
+          持球者有白邊，球黏著持球者/傳球時在球員間飛行
         </div>
       `;
     }
 
+    // 開球
+    kickoff(Math.random() < hMidPoss ? 'h' : 'a');
     tick();
   }
 
@@ -378,7 +570,6 @@
       const container = document.getElementById(containerId);
       if (!container) { console.warn('[MatchSim] container not found:', containerId); return; }
 
-      // 取賽事 + 球隊
       const schedule = (window.Tournament?.isEPL?.() ? window.EPL_MATCHES
         : window.Tournament?.isUCL?.() ? window.UCL_MATCHES
         : window.SCHEDULE) || [];
