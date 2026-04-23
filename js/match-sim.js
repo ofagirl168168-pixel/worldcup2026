@@ -222,10 +222,13 @@
     };
     state.possessorIdx = -1;
 
-    const hMidPoss = Math.min(0.72, Math.max(0.28,
-      (home.radar.midfield + home.radar.speed * 0.5) /
-      (home.radar.midfield + home.radar.speed * 0.5 + away.radar.midfield + away.radar.speed * 0.5) + 0.04
-    ));
+    // 控球率計算：強弱差放大 2.5× 讓實力落差反映在控球時間
+    // 原本近乎 50/50、強隊只有 ~55%；放大後 BIG 6 vs 保級可達 ~65%
+    const _hMidRaw = home.radar.midfield + home.radar.speed * 0.5;
+    const _aMidRaw = away.radar.midfield + away.radar.speed * 0.5;
+    const _hPossRaw = _hMidRaw / (_hMidRaw + _aMidRaw);
+    const _hPossAmplified = 0.5 + (_hPossRaw - 0.5) * 2.5;
+    const hMidPoss = Math.min(0.75, Math.max(0.25, _hPossAmplified + 0.04));
 
     function getTeam(code) { return code === 'h' ? home : away; }
 
@@ -363,8 +366,10 @@
     function resolveShot() {
       const atk = getTeam(state.possession).radar;
       const def = getTeam(state.possession === 'h' ? 'a' : 'h').radar;
-      const goalProb = Math.max(0.18, Math.min(0.58,
-        ((atk.attack - def.defense * 0.65) / 100) * 0.6
+      // 攻防差放大：def 權重 0.65 → 0.55（攻方 attack 影響更大）、
+      // 轉換係數 0.6 → 0.75、min 0.18 → 0.12（弱隊機會少）、max 0.58 → 0.68
+      const goalProb = Math.max(0.12, Math.min(0.68,
+        ((atk.attack - def.defense * 0.55) / 100) * 0.75
       ));
       const isGoal = Math.random() < goalProb;
       if (isGoal) {
@@ -451,9 +456,9 @@
         const near = findNearestOpponent(pos);
         if (near.player && near.dist < ROLE[near.player.role].tackleRange + 0.005) {
           let tackleChance = (defStats.defense / 100) * 0.04 - (atkStats.midfield / 100) * 0.02;
-          // 防守方在自家禁區內壓迫更兇（球推到你家門口、全員上前解圍）
-          if (distToGoal < 0.22) tackleChance *= 1.6;
-          tackleChance = Math.max(0.005, Math.min(0.10, tackleChance));
+          // 防守方在自家禁區內壓迫更兇、但不要太誇張（避免弱隊在禁區內一直搶到球）
+          if (distToGoal < 0.22) tackleChance *= 1.3;
+          tackleChance = Math.max(0.005, Math.min(0.08, tackleChance));
           if (Math.random() < tackleChance) {
             state.possession = near.player.team;
             state.possessorIdx = players.indexOf(near.player);
