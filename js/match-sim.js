@@ -260,6 +260,7 @@
     function rankPassTargets(possessor) {
       const goalX = possessor.team === 'h' ? 1 : 0;
       const myDistToGoal = Math.abs(goalX - possessor.x);
+      const iAmInBox = myDistToGoal < 0.22;
       const teammates = players
         .map((p, i) => ({ p, i }))
         .filter(x => x.p.team === possessor.team && x.i !== state.possessorIdx);
@@ -267,21 +268,23 @@
         .map(({ p, i }) => {
           const ahead = possessor.team === 'h' ? p.x > possessor.x : p.x < possessor.x;
           const distToGoal = Math.abs(goalX - p.x);
+          const targetInBox = distToGoal < 0.22;
           const nearest = findNearestOpponent(p);
           const openness = Math.min(0.15, nearest.dist);
           const roleBonus = p.role === 'FWD' ? 0.15 : p.role === 'AMC' ? 0.12 : p.role === 'MID' ? 0.05 : 0;
           let score = (ahead ? 0.3 : 0) + openness + roleBonus - distToGoal * 0.4;
-          // 前場反向傳球嚴重扣分：持球者已在前場時，往後傳（距離球門更遠）要避免
+          // (1) 前場反向傳球扣分
           if (myDistToGoal < 0.3 && distToGoal > myDistToGoal + 0.05) {
             score -= 0.35;
           }
-          // 剛剛才傳球給我的人、30 幀內不要傳回去（避免無限來回）
-          if (state.lastPassFromIdx === i && state.frame - state.lastPassFrame < 30) {
-            score -= 0.5;
+          // (2) 最近 3 個經手過球的隊友、60 幀內不要傳回去（避免 2/3 人繞圈）
+          if (state.recentPassersSet && state.recentPassersSet.has(i)
+              && state.frame - state.lastPassFrame < 60) {
+            score -= 0.55;
           }
-          // 禁區內兩個隊友互傳：只要目標離球門距離跟我幾乎一樣（同排），再扣
-          if (myDistToGoal < 0.2 && Math.abs(distToGoal - myDistToGoal) < 0.05) {
-            score -= 0.25;
+          // (3) 禁區內互傳硬懲罰：兩邊都在禁區 → 應該要射、不要傳
+          if (iAmInBox && targetInBox) {
+            score -= 0.55;
           }
           return { p, i, score };
         })
@@ -298,9 +301,14 @@
       state.ballTravelLeft = state.ballTravelTotal;
       state.phase = 'pass';
       state.passTargetIdx = target.i;
-      // 記錄這次傳球的「發球者」— 下次挑傳球對象時會避開他（30 幀內）
+      // 記錄最近 3 個經手過球的隊友（不只上一個）
+      // 避免「A→B→C→A」繞圈傳 — 60 幀內 A/B/C 互傳都會被扣分
       state.lastPassFromIdx = state.possessorIdx;
       state.lastPassFrame = state.frame;
+      if (!state.recentPassers) state.recentPassers = [];
+      state.recentPassers.push(state.possessorIdx);
+      if (state.recentPassers.length > 3) state.recentPassers.shift();
+      state.recentPassersSet = new Set(state.recentPassers);
       state.stats[state.possession].passes++;
     }
 
@@ -344,6 +352,9 @@
         state.lastActionFrame = state.frame;
         ball.x = players[gk].x;
         ball.y = players[gk].y;
+        // 換邊 → 清最近經手傳球者記錄
+        state.recentPassers = [];
+        state.recentPassersSet = new Set();
       }
     }
 
@@ -400,12 +411,17 @@
         const near = findNearestOpponent(pos);
         if (near.player && near.dist < ROLE[near.player.role].tackleRange + 0.005) {
           let tackleChance = (defStats.defense / 100) * 0.04 - (atkStats.midfield / 100) * 0.02;
-          tackleChance = Math.max(0.005, Math.min(0.06, tackleChance));
+          // 防守方在自家禁區內壓迫更兇（球推到你家門口、全員上前解圍）
+          if (distToGoal < 0.22) tackleChance *= 1.6;
+          tackleChance = Math.max(0.005, Math.min(0.10, tackleChance));
           if (Math.random() < tackleChance) {
             state.possession = near.player.team;
             state.possessorIdx = players.indexOf(near.player);
             state.phase = 'dribble';
             state.lastActionFrame = state.frame;
+            // 換邊 → 清最近經手傳球者記錄
+            state.recentPassers = [];
+            state.recentPassersSet = new Set();
             return;
           }
         }
