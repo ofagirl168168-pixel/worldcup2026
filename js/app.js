@@ -1785,6 +1785,18 @@ async function openPredModal(id) {
           ${pts.map(pt=>`<li>${pt}</li>`).join('')}
         </ul>
 
+        <!-- 🎮 90 分鐘模擬賽（以賽前分析數據跑一場） -->
+        <div class="modal-section-title">🎮 90 分鐘模擬賽</div>
+        <div class="msim-wrap" id="sim-wrap-${m.id}" style="text-align:center">
+          <div style="color:var(--text-muted);font-size:12px;margin-bottom:10px;line-height:1.5">
+            用雙方 5 項數據（攻/防/中場/速度/經驗）+ 陣型跑一場縮時 90 分鐘<br>
+            <span style="opacity:0.7">每次結果不同，長期分布符合數據優勢（約 1 分鐘）</span>
+          </div>
+          <button class="msim-start-btn" onclick="MatchSim.run('${m.id}')">
+            ▶️ 開始模擬
+          </button>
+        </div>
+
         <!-- 球隊風格 -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
           <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:12px">
