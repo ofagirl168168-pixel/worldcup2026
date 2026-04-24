@@ -981,7 +981,7 @@ function renderArena() {
 
     <!-- 射門挑戰入口 -->
     <div class="rogue-arena-banner-wrap">
-      <div class="rogue-arena-banner${typeof rogueHasUnclaimedMilestone === 'function' && rogueHasUnclaimedMilestone() ? ' has-unclaimed' : ''}" onclick="goalBannerShoot(event)">
+      <div class="rogue-arena-banner" onclick="goalBannerShoot(event)">
         <div class="rogue-arena-banner-bg"></div>
         <div class="goal-post-left"></div>
         <div class="goal-post-right"></div>
@@ -994,7 +994,7 @@ function renderArena() {
               <div class="rogue-arena-banner-desc">射門 × 卡牌 Build × 無盡生存｜週排行前六名贏寶石</div>
             </div>
           </div>
-          <div class="rogue-arena-banner-btn"><i class="fas fa-futbol"></i> 射門！</div>
+          <div class="rogue-arena-banner-btn${typeof rogueHasUnclaimedMilestone === 'function' && rogueHasUnclaimedMilestone() ? ' has-unclaimed' : ''}"><i class="fas fa-futbol"></i> 射門！</div>
         </div>
       </div>
     </div>
