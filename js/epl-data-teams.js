@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-04-23 日更）
+   資料截止：2025/26 賽季（2026-04-24 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -24,7 +24,7 @@ const EPL_TEAMS = {
     recentForm:['D','W','W','L','L'],
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
     injuries:[
-      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題',returnDate:'持續評估中'},
+      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題（已開始輕度訓練）',returnDate:'最快下週回歸，4/25 vs NEW 仍存疑'},
       {name:'Jurrien Timber',pos:'後衛',status:'腳踝傷勢（缺陣超過一個月）',returnDate:'存疑'},
       {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢（上次出場為歐冠 vs Sporting）',returnDate:'存疑'},
       {name:'Mikel Merino',pos:'中場',status:'已脫護具但本季不預期回歸',returnDate:'賽季報銷'},
@@ -74,9 +74,9 @@ const EPL_TEAMS = {
     injuries:[
       {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末可望回歸'},
       {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢',returnDate:'四月底（本月報銷）'},
-      {name:'John Stones',pos:'中後衛',status:'小腿傷，已部分訓練',returnDate:'短期內'},
+      {name:'John Stones',pos:'中後衛',status:'已回歸訓練，可出場',returnDate:'已歸隊'},
       {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷（vs Chelsea下半場受傷）',returnDate:'評估中，已輕度訓練'},
-      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（掃描確認輕微）',returnDate:'最快 4/25 足總盃半決賽復出'}
+      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（掃描確認輕微，缺席 vs 伯恩利）',returnDate:'最快 4/25 足總盃半決賽復出'}
     ]
   },
   'CHE': {
@@ -145,7 +145,7 @@ const EPL_TEAMS = {
   },
   'NEW': {
     name:'Newcastle United', nameCN:'紐卡索', flag:'https://crests.football-data.org/67.png',
-    league:'Premier League', eplRank:13, coach:'Eddie Howe', formation:'4-3-3',
+    league:'Premier League', eplRank:14, coach:'Eddie Howe', formation:'4-3-3',
     keyPlayers:[
       {name:'Bruno Guimarães',pos:'中場',club:'紐卡索'},
       {name:'Anthony Gordon',pos:'左翼',club:'紐卡索'},
@@ -157,7 +157,12 @@ const EPL_TEAMS = {
     strengths:['中場Bruno+Tonali雙核強勢','Gordon速度突破','整體戰術執行力高'],
     weaknesses:['失去 Isak 後火力明顯下滑','板凳深度仍不夠頂級','近期狀態持續下探'],
     recentForm:['W','W','L','L','L'],
-    history:'4次英格蘭頂級聯賽冠軍，近年在沙特資金注入後重返強隊行列'
+    history:'4次英格蘭頂級聯賽冠軍，近年在沙特資金注入後重返強隊行列',
+    injuries:[
+      {name:'Joelinton',pos:'中場',status:'停賽（第2場/共2場）',returnDate:'停賽結束後'},
+      {name:'Tino Livramento',pos:'右後衛',status:'肌肉傷',returnDate:'賽季報銷'},
+      {name:'Callum Wilson',pos:'前鋒',status:'長期傷缺',returnDate:'未定'}
+    ]
   },
   'AVL': {
     name:'Aston Villa', nameCN:'阿斯頓維拉', flag:'https://crests.football-data.org/58.png',
