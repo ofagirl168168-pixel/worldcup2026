@@ -1128,6 +1128,15 @@
       localStorage.setItem('rogue_best', JSON.stringify(best));
     }
 
+    // 自動領取未領過的分數里程碑寶石（sequential 避免 localStorage race）
+    (async () => {
+      try {
+        for (const ms of MILESTONES) {
+          if (G.score >= ms.score) await claimMilestone(ms);
+        }
+      } catch (e) { console.warn('[rogue] auto-claim milestone', e); }
+    })();
+
     // 檢查並頒發遊戲徽章（徽章附帶 XP）
     const newBadges = checkBadges(G.score, G.wave, G.collected.length, G._revived);
     if (newBadges.length > 0) {
@@ -4932,17 +4941,19 @@
 
   // 領取里程碑寶箱
   async function claimMilestone(ms) {
-    const claimed = _loadMilestones();
-    if (claimed.includes(ms.score)) return;
-    // 先嘗試伺服器發放寶石
+    if (_loadMilestones().includes(ms.score)) return;
     if (typeof awardGem === 'function') {
       const r = await awardGem(`rogue_milestone_${ms.score}`);
-      if (r) {
-        if (typeof showToast === 'function') showToast(`💎 里程碑 ${ms.score} 分！+${r.awarded} 寶石`);
+      if (r && typeof showToast === 'function') {
+        showToast(`💎 里程碑 ${ms.score} 分！+${r.awarded} 寶石`);
       }
     }
-    claimed.push(ms.score);
-    _saveMilestones(claimed);
+    // 重新讀一次 latest 避免 parallel claim race（寫入時合併）
+    const latest = _loadMilestones();
+    if (!latest.includes(ms.score)) {
+      latest.push(ms.score);
+      _saveMilestones(latest);
+    }
   }
 
   // 遊戲結束時檢查並頒發徽章

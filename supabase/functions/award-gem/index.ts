@@ -51,6 +51,8 @@ const AWARD_RULES: Record<string, { amount: number; unique: boolean; dailyLimit?
   level_10:         { amount: 5,  unique: true },                     // 升到 Lv.10
   level_15:         { amount: 5,  unique: true },                     // 升到 Lv.15
   level_20:         { amount: 10, unique: true },                     // 升到 Lv.20
+  opinion_predict:  { amount: 1,  unique: false, refUnique: true },    // 擂台 predict 題答對（per opinion.id）
+  daily_tasks_done: { amount: 2,  unique: false, dailyLimit: true },   // 每日任務全完成（1 天 1 次、bumped 1→2）
 }
 
 Deno.serve(async (req) => {

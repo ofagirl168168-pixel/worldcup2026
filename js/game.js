@@ -2866,7 +2866,7 @@ const DAILY_CHEST_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64
 
 const DAILY_TASK_XP = 5;
 const DAILY_TASK_BONUS_XP = 15;
-const DAILY_TASK_BONUS_GEM = 1;
+const DAILY_TASK_BONUS_GEM = 2;
 
 function _getDailyTaskKey() { return 'daily_tasks_' + localDateStr(); }
 
@@ -2950,9 +2950,9 @@ function claimDailyTaskBonus() {
   const cur = parseInt(localStorage.getItem(bonusKey)||'0') || 0;
   localStorage.setItem(bonusKey, String(cur + DAILY_TASK_BONUS_XP));
 
-  // 寶石（透過 Supabase edge function）
+  // 寶石（透過 Supabase edge function，用正式 type + dailyLimit 保證一天一次）
   if (typeof awardGem === 'function') {
-    awardGem('daily_tasks_' + localDateStr());
+    awardGem('daily_tasks_done');
   }
 
   updateNavXP?.();

@@ -15,8 +15,12 @@
   const STORAGE_TOTAL_XP = 'opinion_total_xp'; // 擂台累積 XP（game.js:calcXPLevel 讀）
   const STORAGE_VOTE_XP_CLAIMED = 'opinion_vote_xp_claimed_'; // +id：基礎投票 XP 已發
   const STORAGE_PREDICT_CLAIMED = 'opinion_predict_claimed_'; // +id：預測題結果 XP 已發
+  const STORAGE_COMMENT_XP = 'opinion_comment_xp_'; // +date：每日首次留言 XP 已發
+  const STORAGE_LIKE_XP = 'opinion_like_xp_';       // +date：每日首次按讚 XP 已發
   const VOTE_BASE_XP = 5;           // 每題首次投票
   const PREDICT_WIN_XP = 20;        // 預測答對
+  const COMMENT_DAILY_XP = 5;       // 每日首次留言
+  const LIKE_DAILY_XP = 2;          // 每日首次按讚
   const STREAK_BONUS = { 3: 15, 7: 50, 30: 200 }; // 連勝里程碑額外 XP
   const TAG_LABELS = { trending: '🔥 時事', classic: '⚽ 經典', fun: '🎉 趣味', predict: '🔮 預測' };
   const MAX_COMMENT_LEN = 100;
@@ -46,7 +50,13 @@
       if (voteRaw == null) continue;                  // 沒投不結算
       const myVote = parseInt(voteRaw);
       const won = myVote === o.correctAnswer;
-      if (won) _addOpinionXP(PREDICT_WIN_XP);
+      if (won) {
+        _addOpinionXP(PREDICT_WIN_XP);
+        // 伺服器驗證的寶石獎勵（per opinion.id 只發一次）
+        try {
+          if (typeof awardGem === 'function') awardGem('opinion_predict', o.id);
+        } catch (e) {}
+      }
       localStorage.setItem(claimKey, '1');
       results.push({ opinion: o, won, myVote });
     }
@@ -55,7 +65,7 @@
       results.forEach((r, i) => setTimeout(() => {
         const correctOpt = r.opinion.opts[r.opinion.correctAnswer] || '';
         if (r.won) {
-          showToast(`🎯 預測命中「${_trim(r.opinion.q, 20)}」+${PREDICT_WIN_XP} XP`);
+          showToast(`🎯 預測命中「${_trim(r.opinion.q, 20)}」+${PREDICT_WIN_XP} XP +1 💎`);
         } else {
           showToast(`📣 開獎：「${_trim(r.opinion.q, 20)}」正解是 ${correctOpt}`);
         }
@@ -1121,6 +1131,15 @@
         _renderComment(listEl, data, opinion, chosenIdx, { prepend: true });
         _bumpCount(countEl, +1);
         localStorage.setItem(commentedKey, '1');
+        // 每日首次留言 +XP（防 spam：每天只發一次）
+        try {
+          const cxpKey = STORAGE_COMMENT_XP + localDateStr();
+          if (!localStorage.getItem(cxpKey)) {
+            localStorage.setItem(cxpKey, '1');
+            _addOpinionXP(COMMENT_DAILY_XP);
+            if (typeof showToast === 'function') setTimeout(() => showToast(`💬 每日首次留言 +${COMMENT_DAILY_XP} XP`), 500);
+          }
+        } catch (e) {}
         input.value = '';
         input.disabled = true;
         submitBtn.textContent = '已留言';
@@ -1232,6 +1251,15 @@
       if (likeBtn.classList.contains('liked')) return;
       likeBtn.classList.add('liked');
       localStorage.setItem(likedKey, '1');
+      // 每日首次按讚 +XP（防 spam）
+      try {
+        const lxpKey = STORAGE_LIKE_XP + localDateStr();
+        if (!localStorage.getItem(lxpKey)) {
+          localStorage.setItem(lxpKey, '1');
+          _addOpinionXP(LIKE_DAILY_XP);
+          if (typeof showToast === 'function') setTimeout(() => showToast(`👍 每日首次按讚 +${LIKE_DAILY_XP} XP`), 400);
+        }
+      } catch (e) {}
       // 樂觀更新
       const m = likeBtn.textContent.match(/\d+/);
       const cur = m ? parseInt(m[0]) : 0;
