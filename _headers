@@ -1,0 +1,41 @@
+# Cloudflare Pages Cache-Control 設定
+# 資料檔每天會由日更任務更新，不能被長期快取否則使用者看不到新題/新資料
+
+/js/data-opinions.js
+  Cache-Control: public, max-age=300
+
+/js/data-matches.js
+  Cache-Control: public, max-age=300
+
+/js/data-teams.js
+  Cache-Control: public, max-age=300
+
+/js/data-articles.js
+  Cache-Control: public, max-age=300
+
+/js/epl-data-teams.js
+  Cache-Control: public, max-age=300
+
+/js/epl-data-matches.js
+  Cache-Control: public, max-age=300
+
+/js/epl-data-articles.js
+  Cache-Control: public, max-age=300
+
+/js/epl-data-daily.js
+  Cache-Control: public, max-age=300
+
+/js/ucl-data-teams.js
+  Cache-Control: public, max-age=300
+
+/js/ucl-data-matches.js
+  Cache-Control: public, max-age=300
+
+/js/ucl-data-articles.js
+  Cache-Control: public, max-age=300
+
+/js/ucl-data-daily.js
+  Cache-Control: public, max-age=300
+
+/js/data-live.json
+  Cache-Control: public, max-age=120
