@@ -1465,7 +1465,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px;width:100px"><strong>開賽時間</strong></td>
-<td style="padding:8px">台灣時間 4/26（六）00:30</td>
+<td style="padding:8px">台灣時間 4/26（日）00:30</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px"><strong>場地</strong></td>
