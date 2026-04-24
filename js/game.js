@@ -981,7 +981,7 @@ function renderArena() {
 
     <!-- 射門挑戰入口 -->
     <div class="rogue-arena-banner-wrap">
-      <div class="rogue-arena-banner" onclick="goalBannerShoot(event)">
+      <div class="rogue-arena-banner${typeof rogueHasUnclaimedMilestone === 'function' && rogueHasUnclaimedMilestone() ? ' has-unclaimed' : ''}" onclick="goalBannerShoot(event)">
         <div class="rogue-arena-banner-bg"></div>
         <div class="goal-post-left"></div>
         <div class="goal-post-right"></div>

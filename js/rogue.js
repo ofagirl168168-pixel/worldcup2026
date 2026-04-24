@@ -1128,15 +1128,6 @@
       localStorage.setItem('rogue_best', JSON.stringify(best));
     }
 
-    // 自動領取未領過的分數里程碑寶石（sequential 避免 localStorage race）
-    (async () => {
-      try {
-        for (const ms of MILESTONES) {
-          if (G.score >= ms.score) await claimMilestone(ms);
-        }
-      } catch (e) { console.warn('[rogue] auto-claim milestone', e); }
-    })();
-
     // 檢查並頒發遊戲徽章（徽章附帶 XP）
     const newBadges = checkBadges(G.score, G.wave, G.collected.length, G._revived);
     if (newBadges.length > 0) {
@@ -3996,6 +3987,19 @@
         ctx.fillStyle = '#ffd700';
         ctx.fillRect(tx + tabW * 0.1, tabStartY + tabH - 2, tabW * 0.8, 2);
       }
+      // 里程碑 tab 有未領取寶箱 → 右上角紅點
+      if (tab.key === 'miles' && hasUnclaimedMilestone()) {
+        const dotR = Math.min(5, W * 0.012);
+        const dotX = tx + tabW - dotR * 2.5;
+        const dotY = tabStartY + dotR * 2;
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff3b30';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
       G._titleTabR[ti] = { x: tx, y: tabStartY, w: tabW, h: tabH, key: tab.key };
     });
 
@@ -4955,6 +4959,21 @@
       _saveMilestones(latest);
     }
   }
+
+  // 對外 API：是否有可領取的里程碑寶石（分數達到但未領）
+  // 給 nav 紅點、arena 射門入口 banner 紅點使用
+  function hasUnclaimedMilestone() {
+    try {
+      const bestRaw = localStorage.getItem('rogue_best');
+      if (!bestRaw) return false;
+      const best = JSON.parse(bestRaw);
+      const bestScore = best?.score || 0;
+      if (!bestScore) return false;
+      const claimed = _loadMilestones();
+      return MILESTONES.some(ms => bestScore >= ms.score && !claimed.includes(ms.score));
+    } catch (e) { return false; }
+  }
+  window.rogueHasUnclaimedMilestone = hasUnclaimedMilestone;
 
   // 遊戲結束時檢查並頒發徽章
   function checkBadges(score, wave, cardsCount, revived) {

@@ -3976,3 +3976,22 @@ body.opinion-open .btn-arena-float { display: none; }
   border-color: var(--accent, #f0c040);
   color: var(--accent, #f0c040);
 }
+
+/* 射門挑戰 banner 可領取寶箱通知紅點 */
+.rogue-arena-banner.has-unclaimed { position: relative; }
+.rogue-arena-banner.has-unclaimed::after {
+  content: '';
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: #ff3b30;
+  border: 2px solid #fff;
+  box-shadow: 0 0 8px rgba(255,59,48,0.6);
+  z-index: 10;
+  animation: rogue-dot-pulse 1.4s ease-in-out infinite;
+}
+@keyframes rogue-dot-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 0.85; }
+}
