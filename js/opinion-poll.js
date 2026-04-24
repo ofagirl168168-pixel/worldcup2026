@@ -9,6 +9,7 @@
   const STORAGE_PREFIX = 'opinion_vote_';
   const STORAGE_SHOWN = 'opinion_shown_';
   const STORAGE_COMMENT = 'opinion_commented_';
+  const STORAGE_MY_COMMENT_ID = 'opinion_my_comment_'; // +opinion.id = comment.id（認自己的那則）
   const STORAGE_LIKE = 'opinion_liked_';
   const STORAGE_VOTER_KEY = 'opinion_voter_key';
   const STORAGE_STREAK = 'opinion_streak'; // {current, longest, lastDate}
@@ -1127,6 +1128,8 @@
           content: text,
         }).select().single();
         if (error) throw error;
+        // 記下這是「自己的」留言 id，_renderComment 才能正確標「我」
+        try { localStorage.setItem(STORAGE_MY_COMMENT_ID + opinion.id, String(data.id)); } catch (e) {}
         // 本機立即渲染（realtime 也會送同一筆，用 id 去重）
         _renderComment(listEl, data, opinion, chosenIdx, { prepend: true });
         _bumpCount(countEl, +1);
@@ -1227,7 +1230,10 @@
     if (!listEl) return;
     // 去重
     if (opt.dedupe && listEl.querySelector(`[data-cid="${c.id}"]`)) return;
-    const mine = c.side === chosenIdx;
+    // 「我」=「自己留言的那則」，靠 comment.id 比對（原本 c.side === chosenIdx 是 bug，
+    // 會把立場相同的他人留言也標成「我」）
+    const myCommentId = localStorage.getItem(STORAGE_MY_COMMENT_ID + opinion.id);
+    const mine = myCommentId && String(c.id) === myCommentId;
     const sideLabel = _shortLabel(opinion.opts[c.side] || '');
     const likedKey = STORAGE_LIKE + c.id;
     const alreadyLiked = !!localStorage.getItem(likedKey);
