@@ -2,6 +2,76 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-032",
+    "tournament": "epl",
+    "title": "【賽後回顧】桑德蘭 0-5 諾丁漢森林：21 分鐘灌四球，森林保級大躍進",
+    "summary": "諾丁漢森林在光明球場上演 20 分鐘內四球狂潮（17'-37'），Chris Wood、Morgan Gibbs-White、Igor Jesus 聯袂建功，Elliot Anderson 補時錦上添花。森林拉開降級區 8 分差距，桑德蘭遭隊史主場最慘敗。",
+    "date": "2026-04-25",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "ucl-018",
+    "tournament": "ucl",
+    "title": "【賽前分析】歐冠四強雙雄對決：巴黎 vs 拜仁、馬競 vs 兵工廠 — 矛盾大戰一觸即發",
+    "summary": "歐冠半決賽首回合即將登場：4/29 巴黎主場迎戰拜仁，衛冕冠軍的銅牆鐵壁 vs 全歐最恐怖火力；4/30 馬競主場對兵工廠，Simeone 的生存哲學 vs Arteta 的控制足球。四支球隊、兩場經典對決的完整前瞻。",
+    "date": "2026-04-25",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-031",
+    "tournament": "epl",
+    "title": "【賽前分析】兵工廠 vs 紐卡索：失去榜首後的反撲戰，Arteta 主場必須拿三分",
+    "summary": "第34輪焦點戰，兵工廠被曼城超車後急需三分。紐卡索 4 連敗 + Howe 壓力山大，近 13 次作客酋長球場 0 勝。Saka 仍缺、Bruno 回歸，爭冠 vs 求生的碰撞。",
+    "date": "2026-04-24",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "9",
+    "tournament": "wc",
+    "title": "倒數49天：史上最嚴重的世界盃賽前傷兵潮",
+    "summary": "Rodrygo、Ekitike、Gnabry 確定缺席，Rodri、Neymar 狀態成疑——傷兵潮如何重塑世界盃格局？",
+    "date": "2026-04-23",
+    "category": "傷兵分析",
+    "readTime": "8分鐘",
+    "shareable": true
+  },
+  {
+    "id": "epl-029",
+    "tournament": "epl",
+    "title": "【賽後回顧】伯恩茅斯 2-2 里茲聯：Longstaff 第 97 分鐘絕平，櫻桃隊歐洲夢受挫",
+    "summary": "Vitality Stadium 爆冷平局！Kroupi 60 分鐘破門打破僵局、Hill 烏龍扳平、Rayan 86 分鐘看似絕殺，但 Longstaff 第 97 分鐘凌空抽射救主。里茲聯領先降級區 9 分，伯恩茅斯歐冠夢想大受打擊。",
+    "date": "2026-04-23",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-030",
+    "tournament": "epl",
+    "title": "【賽後回顧】伯恩利 0-1 曼城：Haaland 5 分鐘閃擊，曼城登頂 + 伯恩利降級",
+    "summary": "Turf Moor 決定性一役！Haaland 第 5 分鐘接 Doku 直傳推射得手（本季英超第 24 球），曼城全場 28 次射門僅進 1 球，但已足夠：終結兵工廠領先榜首 200 天的歷程、讓伯恩利重返英超一季後確定降級。",
+    "date": "2026-04-23",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-028",
+    "tournament": "epl",
+    "title": "【賽後回顧】布萊頓 3-0 乙爾西：Kadioglu 閃擊 + 乙爾西創 1912 年以來最慘紀錄",
+    "summary": "Kadioglu 3 分鐘頭鎚破門、Hinshelwood 56 分鐘擴大比分、Welbeck 補時封殺。乙爾西連 5 場英超零進球，1912 年以來首次。布萊頓升至第 6，歐冠資格觸手可及。",
+    "date": "2026-04-22",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-027",
     "tournament": "epl",
     "title": "【賽後回顧】水晶宮 0-0 西漢姆：Henderson 神撲保白卷，狼隊確認降級",
@@ -109,7 +179,7 @@ export default [
     "date": "2026-04-17",
     "category": "賽前分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-015",
@@ -119,7 +189,7 @@ export default [
     "date": "2026-04-17",
     "category": "賽前分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-016",
@@ -129,7 +199,7 @@ export default [
     "date": "2026-04-17",
     "category": "賽前分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-017",
@@ -139,7 +209,7 @@ export default [
     "date": "2026-04-17",
     "category": "賽前分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-018",
@@ -149,7 +219,7 @@ export default [
     "date": "2026-04-17",
     "category": "賽前分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-011",
@@ -159,7 +229,7 @@ export default [
     "date": "2026-04-17",
     "category": "賽前分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-012",
@@ -169,7 +239,7 @@ export default [
     "date": "2026-04-17",
     "category": "賽前分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-013",
@@ -179,7 +249,7 @@ export default [
     "date": "2026-04-17",
     "category": "賽前分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-017",
@@ -189,7 +259,7 @@ export default [
     "date": "2026-04-17",
     "category": "賽事回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-013",
@@ -199,7 +269,7 @@ export default [
     "date": "2026-04-16",
     "category": "賽後回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-014",
@@ -209,7 +279,7 @@ export default [
     "date": "2026-04-16",
     "category": "賽後回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-015",
@@ -219,7 +289,7 @@ export default [
     "date": "2026-04-16",
     "category": "四強前瞻",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-016",
@@ -229,7 +299,7 @@ export default [
     "date": "2026-04-16",
     "category": "四強前瞻",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-011",
@@ -239,7 +309,7 @@ export default [
     "date": "2026-04-15",
     "category": "賽後回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-012",
@@ -249,7 +319,7 @@ export default [
     "date": "2026-04-15",
     "category": "賽後回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-010",
@@ -259,7 +329,7 @@ export default [
     "date": "2026-04-14",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "6",
