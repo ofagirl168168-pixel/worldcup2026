@@ -1531,6 +1531,96 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p><strong>兵工廠 2-0 紐卡索</strong>。兵工廠主場 + 爭冠壓力下的求勝慾，紐卡索客場低迷的歷史延續。Havertz 與 Martinelli 有望建功，Saliba/Gabriel 的後防足以封鎖目前火力大減的紐卡索鋒線。但需留意 Bruno Guimaraes 回歸可能帶來的反擊威脅。</p>`,
     tags: ['賽前分析', '兵工廠', '紐卡索', 'Saka', 'Bruno Guimaraes', '爭冠', '第34輪']
+  },
+  {
+    id: 'epl-032',
+    title: '【賽後回顧】桑德蘭 0-5 諾丁漢森林：21 分鐘灌四球，森林保級大躍進',
+    date: '2026-04-25',
+    category: '賽後深度回顧',
+    summary: '諾丁漢森林在光明球場上演 20 分鐘內四球狂潮（17\'-37\'），Chris Wood、Morgan Gibbs-White、Igor Jesus 聯袂建功，Elliot Anderson 補時錦上添花。森林拉開降級區 8 分差距，桑德蘭遭隊史主場最慘敗。',
+    content: `<h2>桑德蘭 0-5 諾丁漢森林｜第34輪・Stadium of Light</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">17' ⚽</td>
+<td style="padding:8px"><strong>Trai Hume（桑德蘭，烏龍球）</strong> — 森林施壓下，Hume 試圖解圍卻將球送入自家球門，光明球場陷入沉默</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">31' ⚽</td>
+<td style="padding:8px"><strong>Chris Wood（森林）</strong> — Morgan Gibbs-White 送出助攻，Wood 攔截門將 Robin Roefs 的傳球後冷靜推射入網（傷癒復出後首球）</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">34' ⚽</td>
+<td style="padding:8px"><strong>Morgan Gibbs-White（森林）</strong> — 在禁區前沿一腳勁射，球穿過多名防守者破門，進球助攻全包辦</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">37' ⚽</td>
+<td style="padding:8px"><strong>Igor Jesus（森林）</strong> — Neco Williams 右路送出精準傳中，Igor Jesus 門前控制後凌空抽射入網，半場前已 4-0</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">90+5' ⚽</td>
+<td style="padding:8px"><strong>Elliot Anderson（森林）</strong> — 補時最後時刻的錦上添花，前紐卡索青訓出身的 Anderson 面對東北德比宿敵毫不留情</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-4 ∣ 終場 0-5</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>噩夢般的 21 分鐘：桑德蘭防線全面崩潰</h4>
+
+<p>光明球場的球迷大概沒想到，這場對保級區球隊的主場賽事會演變成一場慘劇。第 17 分鐘 Trai Hume 的烏龍球打開了潘朵拉的盒子，隨後短短 20 分鐘內森林再灌三球，將比賽在半場前就提前殺死。</p>
+
+<p>第 31 分鐘的第二球最能說明桑德蘭當時的混亂：門將 Robin Roefs 一次冒險的傳球被 Chris Wood 直接攔截，Wood 帶球推射輕鬆得手——這是他因膝傷缺席近 8 個月後的首個進球。三分鐘後 Gibbs-White 遠射破門，又三分鐘 Igor Jesus 接 Neco Williams 傳中凌空建功——17 分鐘到 37 分鐘，0-1 變成 0-4。</p>
+
+<h4>下半場：桑德蘭的進球被取消</h4>
+
+<p>下半場桑德蘭試圖找回尊嚴。Daniel Ballard 一度頭球破網，但 VAR 介入後判定在進球前序中 Nordi Mukiele 對森林門將 Matz Sels 犯規，進球被取消。這是桑德蘭在這場比賽中最接近得分的時刻。</p>
+
+<p>補時階段，前桑德蘭青訓球員 Elliot Anderson 打入第五球，為森林的狂歡畫上句號——這也是桑德蘭自 1997 年搬入光明球場以來<strong>最慘的主場聯賽失利</strong>。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">桑德蘭</th>
+<th style="padding:8px">森林</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">進球</td><td>0</td><td>5</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">半場比分</td><td>0</td><td>4</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>61%</td><td>39%</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">關鍵數據</td><td colspan="2">森林以 39% 控球率打出 5-0，經典反擊型勝利</td>
+</tr>
+</table>
+
+<h3>保級形勢：森林拉開 8 分安全距離</h3>
+
+<p>這場大勝讓 Vítor Pereira 的球隊暫時脫離險境：森林目前距離降級區有 <strong>8 分</strong>差距，剩餘 4 場比賽。雖然數學上還未完全確定保級，但這場表現——尤其是 Chris Wood 和 Gibbs-White 的進攻組合——讓球迷看到了留在英超的希望。</p>
+
+<p>森林本季保級之路跌宕起伏：年初一度掉入降級區，Pereira 接手後逐步穩住防守，近 5 場取得 2 勝 3 平的不敗戰績。Wood 傷癒回歸後立刻建功，Gibbs-White 則在創造力方面愈發成熟。</p>
+
+<h3>桑德蘭的困境：升班馬高開低走</h3>
+
+<p>桑德蘭在升班首季一度令人驚豔——賽季中段曾躋身前 8，讓人看到爭取歐戰的可能。但 Régis Le Bris 的球隊近期狀態明顯下滑，這場 0-5 慘敗更是光明球場啟用以來最慘的主場聯賽失利，嚴重打擊士氣和歐戰夢想。</p>
+
+<h3>影響與展望</h3>
+
+<ul>
+<li><strong>諾丁漢森林</strong>：剩 4 場，8 分緩衝幾乎等於宣告保級。Pereira 可以更大膽地鍛煉年輕球員，為下季做準備。Hudson-Odoi 賽季報銷（大腿手術）是唯一陰影。</li>
+<li><strong>桑德蘭</strong>：需要在最後 4 場找回信心。下一場對手更加艱鉅——面對爭冠或搶歐戰的強隊。Le Bris 必須盡快止血，避免賽季在恥辱中收場。</li>
+</ul>`,
+    tags: ['賽後回顧', '桑德蘭', '諾丁漢森林', 'Chris Wood', 'Gibbs-White', 'Igor Jesus', '保級', '第34輪']
   }
 ];
 

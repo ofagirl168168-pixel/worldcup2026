@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-04-24 日更）
+   資料截止：2025/26 賽季（2026-04-25 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -49,7 +49,8 @@ const EPL_TEAMS = {
     history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍',
     injuries:[
       {name:'Hugo Ekitike',pos:'前鋒',status:'阿基里斯腱斷裂（vs PSG受傷）',returnDate:'賽季報銷＋世界盃缺席'},
-      {name:'Alisson',pos:'門將',status:'傷勢恢復中，尚未隨隊訓練',returnDate:'短期內可望回歸'},
+      {name:'Alisson',pos:'門將',status:'肌肉拉傷（缺席一個月），有機會回歸',returnDate:'評估中'},
+      {name:'Mamardashvili',pos:'門將',status:'傷缺數週',returnDate:'評估中'},
       {name:'Wataru Endo',pos:'中場',status:'足部手術',returnDate:'賽季報銷（目標世界盃）'},
       {name:'Conor Bradley',pos:'右後衛',status:'膝蓋重傷手術',returnDate:'賽季報銷'},
       {name:'Giovanni Leoni',pos:'後衛',status:'前十字韌帶',returnDate:'賽季報銷'}
@@ -98,7 +99,10 @@ const EPL_TEAMS = {
     injuries:[
       {name:'Reece James',pos:'右後衛',status:'腿後肌傷',returnDate:'五月初'},
       {name:'Cole Palmer',pos:'攻擊中場/右翼',status:'腿後腱緊繃（缺席 vs 布萊頓）',returnDate:'短期內'},
-      {name:'Levi Colwill',pos:'中後衛',status:'長期傷缺',returnDate:'未定'}
+      {name:'Levi Colwill',pos:'中後衛',status:'長期傷缺',returnDate:'未定'},
+      {name:'Estevao',pos:'翼鋒',status:'嚴重腿後肌傷（vs 曼聯退場），可能需手術',returnDate:'賽季報銷，世界盃存疑'},
+      {name:'Filip Jorgensen',pos:'門將',status:'傷勢反覆',returnDate:'賽季報銷'},
+      {name:'Jamie Gittens',pos:'翼鋒',status:'傷勢反覆',returnDate:'賽季報銷'}
     ]
   },
   'MUN': {
@@ -265,8 +269,11 @@ const EPL_TEAMS = {
     style:'紀律防守，快速反擊，硬朗對抗',
     strengths:['Pereira接手後防守體系重整中','Gibbs-White近期狀態回暖','定位球戰術仍有威脅'],
     weaknesses:['創造力不足','過度依賴反擊','關鍵球員深度不夠'],
-    recentForm:['W','L','W','D','W'],
-    history:'2次歐冠冠軍（1979、1980），英格蘭足球傳奇俱樂部'
+    recentForm:['L','W','D','W','W'],
+    history:'2次歐冠冠軍（1979、1980），英格蘭足球傳奇俱樂部',
+    injuries:[
+      {name:'Callum Hudson-Odoi',pos:'翼鋒',status:'大腿手術',returnDate:'賽季報銷'}
+    ]
   },
   'CRY': {
     name:'Crystal Palace', nameCN:'水晶宮', flag:'https://crests.football-data.org/354.png',
@@ -386,7 +393,7 @@ const EPL_TEAMS = {
     style:'年輕快速，高壓逼搶，團隊足球',
     strengths:['Xhaka中場穩定軍心','年輕陣容潛力爆發','主場光明球場氛圍狂熱'],
     weaknesses:['英超經驗稍嫌不足','面對頂級強隊仍有差距','陣容深度需觀察'],
-    recentForm:['L','W','L','L','L'],
+    recentForm:['W','L','L','L','L'],
     history:'6次英格蘭頂級聯賽冠軍，英格蘭東北老牌豪門，睽違多年重返英超'
   }
 };
@@ -609,9 +616,16 @@ window.EPL_MATCHES = [
      {min:'5',player:'Erling Haaland',side:'a'}
    ]},
 
-  // 桑德蘭 vs 諾丁漢森林 | 04/25 03:00 台灣時間
+  // 桑德蘭 0-5 諾丁漢森林 | 04/25 03:00 台灣時間 | 森林保級大捷
   {id:'EPL-MW34-SUN-NFO', matchday:34, date:'2026-04-25', time:'03:00', home:'SUN', away:'NFO', stage:'league',
-   status:'scheduled', score:{h:null,a:null}},
+   status:'finished', score:{h:0,a:5}, halfTime:{h:0,a:4},
+   goals:[
+     {min:'17',player:'Trai Hume',side:'h',type:'og'},
+     {min:'31',player:'Chris Wood',side:'a'},
+     {min:'34',player:'Morgan Gibbs-White',side:'a'},
+     {min:'37',player:'Igor Jesus',side:'a'},
+     {min:'90+5',player:'Elliot Anderson',side:'a'}
+   ]},
 
   // 富勒姆 vs 阿斯頓維拉 | 04/25 19:30 台灣時間
   {id:'EPL-MW34-FUL-AVL', matchday:34, date:'2026-04-25', time:'19:30', home:'FUL', away:'AVL', stage:'league',

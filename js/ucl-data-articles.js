@@ -643,6 +643,77 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 </table>
 <p>決賽：5/31（日）03:00 台灣時間・布達佩斯普斯卡什球場</p>`,
     tags: ['八強', '回顧', '戰報', '拜仁', '皇馬', '巴黎', '利物浦', '馬競', '巴薩', '兵工廠', '士砵亭']
+  },
+  {
+    id: 'ucl-018',
+    title: '【賽前分析】歐冠四強雙雄對決：巴黎 vs 拜仁、馬競 vs 兵工廠 — 矛盾大戰一觸即發',
+    date: '2026-04-25',
+    category: '賽前深度分析',
+    summary: '歐冠半決賽首回合即將登場：4/29 巴黎主場迎戰拜仁，衛冕冠軍的銅牆鐵壁 vs 全歐最恐怖火力；4/30 馬競主場對兵工廠，Simeone 的生存哲學 vs Arteta 的控制足球。四支球隊、兩場經典對決的完整前瞻。',
+    content: `<h2>歐冠半決賽首回合前瞻</h2>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:100px"><strong>第一場</strong></td>
+<td style="padding:8px">巴黎 vs 拜仁 — 4/29（二）03:00 台灣時間・王子公園球場</td>
+</tr>
+<tr>
+<td style="padding:8px"><strong>第二場</strong></td>
+<td style="padding:8px">馬競 vs 兵工廠 — 4/30（三）03:00 台灣時間・大都會球場</td>
+</tr>
+</table>
+
+<h3>巴黎 vs 拜仁：衛冕冠軍的不敗防線 vs 全歐最強火力</h3>
+
+<h4>巴黎的底氣：淘汰賽四場不失一球</h4>
+
+<p>上屆冠軍巴黎本季歐冠的防守數據令人窒息：八強兩回合對利物浦<strong>零失球</strong>（4-0 總比分碾壓），四場淘汰賽僅失 2 球（R16 首回合 5-2 勝乙爾西時被攻入 2 球）。Luis Enrique 的高位壓迫體系讓對手在禁區前幾乎找不到空間。Marquinhos 和後防線的默契配合，加上門將 Safonov 的穩定發揮，讓巴黎成為本屆歐冠最難攻破的堡壘之一。</p>
+
+<p>進攻端，Dembélé 在八強次回合對利物浦梅開二度展現了巨星成色。但巴黎的隱憂同樣明顯：Vitinha 因傷出戰存疑、Nuno Mendes 傷勢恢復中但能否上場仍未確定，中場調度和左路推進可能受影響。</p>
+
+<h4>拜仁的武器：場均 3.4 球的毀滅性攻擊</h4>
+
+<p>拜仁本季各項賽事場均進 3.6 球，是全歐洲最恐怖的攻擊機器。八強兩回合對皇馬攻入 6 球（總比分 6-4），其中次回合 4-3 的瘋狂大戰堪稱本季歐冠最精彩的比賽。Harry Kane 打入本季第 50 球，但真正改變比賽的是替補上陣的 Luis Díaz 和 Olise。</p>
+
+<p>歷史對拜仁有利：兩隊過去 16 次交手，拜仁 9 勝 7 負、<strong>從未踢平</strong>。近 6 次對決更是贏了 5 場，包括 2025 年 11 月聯賽階段 2-1 客場勝出——就在巴黎的主場。</p>
+
+<h4>關鍵對決：Dembélé vs Davies / Kane vs Marquinhos</h4>
+
+<p>Dembélé 的速度和突破 vs 拜仁左後衛 Davies 的防守覆蓋，將是比賽的微觀勝負手。中路則是 Kane 面對 Marquinhos 的正面對抗——這兩人的表現將直接決定比分走向。</p>
+
+<h3>馬競 vs 兵工廠：Simeone 的堡壘 vs Arteta 的控制</h3>
+
+<h4>馬競的蛻變：不再只是「鐵桶陣」</h4>
+
+<p>Diego Simeone 的馬競本季展現了進化。本季歐冠展現了驚人的進攻火力。Julián Álvarez 在八強首回合以精彩自由球破門助馬競客場 2-0 獲勝，本季歐冠已攻入 9 球創隊史紀錄，是馬競歐冠征程的絕對核心。Griezmann 的經驗、Sørloth 的衝擊力、加上 Llorente 的跑動覆蓋，讓馬競的進攻多點開花。</p>
+
+<p>大都會球場的主場優勢不容忽視：馬競本季歐冠主場全勝，Simeone 在這座球場營造的氣氛堪稱全歐最令人畏懼。</p>
+
+<h4>兵工廠的傲人紀錄：12 場歐冠不敗</h4>
+
+<p>兵工廠本季歐冠聯賽階段 8 戰全勝、打入 23 球僅失 4 球，加上淘汰賽的穩健表現，已累積 <strong>12 場歐冠不敗</strong>（10 勝 2 平），是本屆賽事唯一保持不敗的球隊。</p>
+
+<p>但隱憂巨大：<strong>Bukayo Saka</strong> 因阿基里斯腱傷勢已缺陣超過一個月，雖然已開始輕度訓練，但半決賽首回合是否能上場仍存疑。沒有 Saka 的兵工廠在英超近期明顯失速（近 5 場僅 1 勝）。Merino 賽季報銷、Timber 和 Calafiori 存疑，傷兵名單令人擔憂。</p>
+
+<p>聯賽階段兵工廠曾 4-0 大勝馬競（Gyökeres 兩球、Gabriel 和 Martinelli 各一球），但那場比賽在倫敦進行。客場作戰的兵工廠能否複製同樣表現？歷史經驗告訴我們：淘汰賽的馬競和聯賽階段的馬競是兩支完全不同的球隊。</p>
+
+<h4>雙線作戰的考驗</h4>
+
+<p>兵工廠目前在英超與曼城爭冠（同積 70 分），同時要應付歐冠半決賽——雙線壓力是 Arteta 執教生涯最大的考驗。馬競雖然在西甲排名靠前，但壓力相對較小，體能和專注度上可能佔優。</p>
+
+<h3>本站預測</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px"><strong>巴黎 vs 拜仁</strong></td>
+<td style="padding:8px">巴黎 1-2 拜仁。拜仁的進攻火力太強，即使巴黎主場也難以全場封鎖 Kane 和 Olise。但巴黎的防守紀律會讓比分保持緊繃。</td>
+</tr>
+<tr>
+<td style="padding:8px"><strong>馬競 vs 兵工廠</strong></td>
+<td style="padding:8px">馬競 1-1 兵工廠。大都會球場的氣氛會給兵工廠帶來極大壓力，但 Arteta 的球隊擅長在客場偷一個進球。平局對兩隊都算可以接受的結果。</td>
+</tr>
+</table>`,
+    tags: ['賽前分析', '半決賽', '巴黎', '拜仁', '馬競', '兵工廠', 'Kane', 'Dembélé', 'Álvarez', 'Saka']
   }
 ];
 
