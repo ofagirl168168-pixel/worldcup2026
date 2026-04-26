@@ -2,6 +2,26 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-033",
+    "tournament": "epl",
+    "title": "【賽後回顧】兵工廠 1-0 紐卡索：Eze 世界波重返榜首，角球進球破英超紀錄",
+    "summary": "Eberechi Eze 第 9 分鐘角球戰術配合後禁區邊緣抽射破門，兵工廠以 73 分重返英超榜首。但 Havertz 與 Eze 先後傷退，歐冠半決賽 vs 馬競蒙上陰影。",
+    "date": "2026-04-26",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-034",
+    "tournament": "epl",
+    "title": "【賽後回顧】利物浦 3-1 水晶宮：Isak 傷癒復出首球，Salah 傷退蒙陰影",
+    "summary": "Alexander Isak 腓骨骨折傷癒後首球、Robertson 與 Wirtz 各建一功，利物浦升至第 4。但 Salah 腿後肌傷退，他在安菲爾德的告別之旅蒙上陰影。",
+    "date": "2026-04-26",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-032",
     "tournament": "epl",
     "title": "【賽後回顧】桑德蘭 0-5 諾丁漢森林：21 分鐘灌四球，森林保級大躍進",
@@ -129,7 +149,7 @@ export default [
     "date": "2026-04-18",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-020",
@@ -139,7 +159,7 @@ export default [
     "date": "2026-04-18",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-021",
@@ -149,7 +169,7 @@ export default [
     "date": "2026-04-18",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-022",
@@ -159,7 +179,7 @@ export default [
     "date": "2026-04-18",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-023",
@@ -169,7 +189,7 @@ export default [
     "date": "2026-04-18",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-014",

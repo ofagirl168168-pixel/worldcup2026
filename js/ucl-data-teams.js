@@ -24,8 +24,8 @@ const UCL_TEAMS = {
     history:'2019/20首進歐冠決賽，歷史最佳成績亞軍',
     injuries:[
       {name:'Fabián Ruiz',pos:'中場',status:'膝傷',returnDate:'未定'},
-      {name:'Nuno Mendes',pos:'左後衛',status:'肌肉傷（QF次回合退場）',returnDate:'評估中'},
-      {name:'Désiré Doué',pos:'翼鋒',status:'碰撞傷（QF次回合退場）',returnDate:'評估中'}
+      {name:'Vitinha',pos:'中場',status:'右腳跟發炎，半決賽首回合出場存疑',returnDate:'評估中'},
+      {name:'Nuno Mendes',pos:'左後衛',status:'大腿傷已康復，可出場',returnDate:'已恢復'}
     ]
   },
   'RMA': {

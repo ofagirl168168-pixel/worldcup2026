@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-04-25 日更）
+   資料截止：2025/26 賽季（2026-04-26 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -9,7 +9,7 @@ const EPL_TEAMS = {
   // ===== BIG SIX + 強隊 =====
   'ARS': {
     name:'Arsenal', nameCN:'兵工廠', flag:'https://crests.football-data.org/57.png',
-    league:'Premier League', eplRank:2, coach:'Mikel Arteta', formation:'4-3-3',
+    league:'Premier League', eplRank:1, coach:'Mikel Arteta', formation:'4-3-3',
     keyPlayers:[
       {name:'Bukayo Saka',pos:'右翼',club:'兵工廠'},
       {name:'Declan Rice',pos:'中場',club:'兵工廠'},
@@ -21,19 +21,21 @@ const EPL_TEAMS = {
     style:'高位壓迫，控球為主，邊路突破與定位球',
     strengths:['Arteta戰術體系成熟','Saka+Ødegaard創造力頂級','英超最穩固後防之一'],
     weaknesses:['關鍵戰偶有緊張','板凳深度不如曼城','Gyökeres體系磨合中'],
-    recentForm:['D','W','W','L','L'],
+    recentForm:['W','W','L','L','W'],
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
     injuries:[
-      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題（已開始輕度訓練）',returnDate:'最快下週回歸，4/25 vs NEW 仍存疑'},
+      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題（已開始輕度訓練）',returnDate:'評估中'},
+      {name:'Kai Havertz',pos:'前鋒',status:'上半場退場（vs NEW 4/25），傷勢待評估',returnDate:'評估中'},
+      {name:'Eberechi Eze',pos:'攻擊中場',status:'下半場退場（vs NEW 4/25），傷勢待評估',returnDate:'評估中'},
       {name:'Jurrien Timber',pos:'後衛',status:'腳踝傷勢（缺陣超過一個月）',returnDate:'存疑'},
-      {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢（上次出場為歐冠 vs Sporting）',returnDate:'存疑'},
+      {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢',returnDate:'存疑'},
       {name:'Mikel Merino',pos:'中場',status:'已脫護具但本季不預期回歸',returnDate:'賽季報銷'},
       {name:'Noni Madueke',pos:'右翼',status:'膝傷（歐冠八強次回合退場）',returnDate:'評估中'}
     ]
   },
   'LIV': {
     name:'Liverpool', nameCN:'利物浦', flag:'https://crests.football-data.org/64.png',
-    league:'Premier League', eplRank:5, coach:'Arne Slot', formation:'4-3-3',
+    league:'Premier League', eplRank:4, coach:'Arne Slot', formation:'4-3-3',
     keyPlayers:[
       {name:'Mohamed Salah',pos:'右翼',club:'利物浦'},
       {name:'Virgil van Dijk',pos:'中後衛',club:'利物浦'},
@@ -45,9 +47,10 @@ const EPL_TEAMS = {
     style:'高強度壓迫，快速轉換，邊路推進',
     strengths:['Salah持續高效輸出','Slot體系穩定成熟','中場跑動覆蓋全場'],
     weaknesses:['Salah年齡漸長','傷兵時輪換選擇有限','對陣低位防守隊時偶有困難'],
-    recentForm:['L','D','L','W','W'],
+    recentForm:['D','L','W','W','W'],
     history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍',
     injuries:[
+      {name:'Mohamed Salah',pos:'右翼',status:'左腿後肌拉傷（vs CRY 4/25 下半場退場）',returnDate:'評估中'},
       {name:'Hugo Ekitike',pos:'前鋒',status:'阿基里斯腱斷裂（vs PSG受傷）',returnDate:'賽季報銷＋世界盃缺席'},
       {name:'Alisson',pos:'門將',status:'肌肉拉傷（缺席一個月），有機會回歸',returnDate:'評估中'},
       {name:'Mamardashvili',pos:'門將',status:'傷缺數週',returnDate:'評估中'},
@@ -58,7 +61,7 @@ const EPL_TEAMS = {
   },
   'MCI': {
     name:'Manchester City', nameCN:'曼城', flag:'https://crests.football-data.org/65.png',
-    league:'Premier League', eplRank:1, coach:'Pep Guardiola', formation:'4-3-3',
+    league:'Premier League', eplRank:2, coach:'Pep Guardiola', formation:'4-3-3',
     keyPlayers:[
       {name:'Erling Haaland',pos:'中鋒',club:'曼城'},
       {name:'Tijjani Reijnders',pos:'中場',club:'曼城'},
@@ -140,9 +143,11 @@ const EPL_TEAMS = {
     style:'進攻足球，高位壓迫，後場出球',
     strengths:['De Zerbi 戰術體系導入中','後防線速度極快','Solanke/Maddison 進攻核心'],
     weaknesses:['賽季中三度換帥陣容動盪','傷兵名單長期居高不下','關鍵戰心態不穩'],
-    recentForm:['L','D','L','L','D'],
+    recentForm:['D','L','L','D','W'],
     history:'2次英格蘭頂級聯賽冠軍，2019歐冠亞軍',
     injuries:[
+      {name:'Dominic Solanke',pos:'前鋒',status:'比賽中傷退（vs WOL 4/25）',returnDate:'評估中'},
+      {name:'Xavi Simons',pos:'攻擊中場',status:'比賽中傷退（vs WOL 4/25）',returnDate:'評估中'},
       {name:'James Maddison',pos:'攻擊中場',status:'前十字韌帶傷（恢復中）',returnDate:'賽季末'},
       {name:'Mathys Tel',pos:'翼鋒',status:'大腿傷',returnDate:'評估中'}
     ]
@@ -160,7 +165,7 @@ const EPL_TEAMS = {
     style:'快速反擊，邊路衝擊，高強度防守',
     strengths:['中場Bruno+Tonali雙核強勢','Gordon速度突破','整體戰術執行力高'],
     weaknesses:['失去 Isak 後火力明顯下滑','板凳深度仍不夠頂級','近期狀態持續下探'],
-    recentForm:['W','W','L','L','L'],
+    recentForm:['W','L','L','L','L'],
     history:'4次英格蘭頂級聯賽冠軍，近年在沙特資金注入後重返強隊行列',
     injuries:[
       {name:'Joelinton',pos:'中場',status:'停賽（第2場/共2場）',returnDate:'停賽結束後'},
@@ -170,7 +175,7 @@ const EPL_TEAMS = {
   },
   'AVL': {
     name:'Aston Villa', nameCN:'阿斯頓維拉', flag:'https://crests.football-data.org/58.png',
-    league:'Premier League', eplRank:4, coach:'Unai Emery', formation:'4-2-3-1',
+    league:'Premier League', eplRank:5, coach:'Unai Emery', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Ollie Watkins',pos:'前鋒',club:'阿斯頓維拉'},
       {name:'Morgan Rogers',pos:'攻擊中場',club:'阿斯頓維拉'},
@@ -182,7 +187,7 @@ const EPL_TEAMS = {
     style:'Emery體系，緊湊防守反擊，定位球威脅大',
     strengths:['Watkins全面的前鋒能力','Emery歐戰經驗豐富','團隊凝聚力強'],
     weaknesses:['頂級球星不足','多線作戰體能考驗','客場表現波動'],
-    recentForm:['W','W','L','W','W'],
+    recentForm:['W','L','W','W','L'],
     history:'7次英格蘭頂級聯賽冠軍，1982年歐冠冠軍'
   },
 
@@ -235,7 +240,7 @@ const EPL_TEAMS = {
     style:'控球穩健，邊路推進，防守組織嚴謹',
     strengths:['Marco Silva戰術紀律好','Robinson邊路推進犀利','整體平衡性佳'],
     weaknesses:['進攻火力不夠頂尖','板凳深度一般','客場表現較弱'],
-    recentForm:['D','W','L','W','D'],
+    recentForm:['W','L','W','D','W'],
     history:'倫敦老牌球會，曾在2010年打進歐霸決賽'
   },
   'BRE': {
@@ -289,7 +294,7 @@ const EPL_TEAMS = {
     style:'邊路速度衝擊，定位球戰術，反擊犀利',
     strengths:['Sarr+Pino邊路速度優勢','Mateta終結效率穩定','Glasner戰術執行力佳'],
     weaknesses:['Eze夏窗轉兵工廠、Guéhi轉曼城後創造力與中衛深度雙降','進攻過度依賴個人能力','客場拿分困難'],
-    recentForm:['D','L','D','W','W'],
+    recentForm:['L','D','W','W','L'],
     history:'倫敦南部老牌球會，從未贏得頂級聯賽冠軍'
   },
   'WHU': {
@@ -306,7 +311,7 @@ const EPL_TEAMS = {
     style:'直接進攻，邊路傳中，定位球',
     strengths:['Bowen進攻穩定','Paquetá創造力仍在','Diouf夏窗補強左路'],
     weaknesses:['Kudus夏窗轉熱刺、Álvarez租借費內巴切，中前場創造力銳減','防守不夠穩固','陣容融合仍在進行'],
-    recentForm:['D','L','L','W','D'],
+    recentForm:['L','L','W','D','W'],
     history:'1965年歐洲盃賽冠軍盃冠軍，2023年歐協聯冠軍'
   },
   'WOL': {
@@ -323,7 +328,7 @@ const EPL_TEAMS = {
     style:'快速轉換，反擊為主，身體對抗',
     strengths:['Rob Edwards接手後防守紀律改善','反擊速度快','葡萄牙系球員默契好'],
     weaknesses:['失去Cunha後進攻核心真空','陣容厚度不足','墊底球隊心態低迷'],
-    recentForm:['D','L','W','D','L'],
+    recentForm:['L','W','D','L','L'],
     history:'3次英格蘭頂級聯賽冠軍，1970年代黃金時期'
   },
   'EVE': {
@@ -340,7 +345,7 @@ const EPL_TEAMS = {
     style:'硬朗防守，直接長球，定位球',
     strengths:['Moyes防守紀律嚴明','Pickford撲救穩定','團隊拼搏精神強'],
     weaknesses:['進攻火力嚴重不足','財政公平法限制引援','創造力匱乏'],
-    recentForm:['D','L','D','L','L'],
+    recentForm:['L','D','L','L','L'],
     history:'9次英格蘭頂級聯賽冠軍，利物浦同城宿敵'
   },
 
@@ -627,25 +632,45 @@ window.EPL_MATCHES = [
      {min:'90+5',player:'Elliot Anderson',side:'a'}
    ]},
 
-  // 富勒姆 vs 阿斯頓維拉 | 04/25 19:30 台灣時間
+  // 富勒姆 1-0 阿斯頓維拉 | 04/25 19:30 台灣時間
   {id:'EPL-MW34-FUL-AVL', matchday:34, date:'2026-04-25', time:'19:30', home:'FUL', away:'AVL', stage:'league',
-   status:'scheduled', score:{h:null,a:null}},
+   status:'finished', score:{h:1,a:0}, halfTime:{h:1,a:0},
+   goals:[
+     {min:'43',player:'Ryan Sessegnon',side:'h'}
+   ]},
 
-  // 利物浦 vs 水晶宮 | 04/25 22:00 台灣時間
+  // 利物浦 3-1 水晶宮 | 04/25 22:00 台灣時間
   {id:'EPL-MW34-LIV-CRY', matchday:34, date:'2026-04-25', time:'22:00', home:'LIV', away:'CRY', stage:'league',
-   status:'scheduled', score:{h:null,a:null}},
+   status:'finished', score:{h:3,a:1}, halfTime:{h:2,a:0},
+   goals:[
+     {min:'35',player:'Alexander Isak',side:'h'},
+     {min:'40',player:'Andrew Robertson',side:'h'},
+     {min:'71',player:'Daniel Muñoz',side:'a'},
+     {min:'90+6',player:'Florian Wirtz',side:'h'}
+   ]},
 
-  // 西漢姆 vs 艾佛頓 | 04/25 22:00 台灣時間
+  // 西漢姆 2-1 艾佛頓 | 04/25 22:00 台灣時間
   {id:'EPL-MW34-WHU-EVE', matchday:34, date:'2026-04-25', time:'22:00', home:'WHU', away:'EVE', stage:'league',
-   status:'scheduled', score:{h:null,a:null}},
+   status:'finished', score:{h:2,a:1}, halfTime:{h:0,a:0},
+   goals:[
+     {min:'52',player:'Tomáš Souček',side:'h'},
+     {min:'88',player:'Kalvin Dewsbury-Hall',side:'a'},
+     {min:'90+3',player:'Callum Wilson',side:'h'}
+   ]},
 
-  // 狼隊 vs 熱刺 | 04/25 22:00 台灣時間
+  // 狼隊 0-1 熱刺 | 04/25 22:00 台灣時間 | 熱刺終結15場不勝
   {id:'EPL-MW34-WOL-TOT', matchday:34, date:'2026-04-25', time:'22:00', home:'WOL', away:'TOT', stage:'league',
-   status:'scheduled', score:{h:null,a:null}},
+   status:'finished', score:{h:0,a:1}, halfTime:{h:0,a:0},
+   goals:[
+     {min:'82',player:'João Palhinha',side:'a'}
+   ]},
 
-  // 兵工廠 vs 紐卡索 | 04/26 00:30 台灣時間
+  // 兵工廠 1-0 紐卡索 | 04/26 00:30 台灣時間 | 兵工廠重返榜首
   {id:'EPL-MW34-ARS-NEW', matchday:34, date:'2026-04-26', time:'00:30', home:'ARS', away:'NEW', stage:'league',
-   status:'scheduled', score:{h:null,a:null}},
+   status:'finished', score:{h:1,a:0}, halfTime:{h:1,a:0},
+   goals:[
+     {min:'9',player:'Eberechi Eze',side:'h'}
+   ]},
 
 ];
 

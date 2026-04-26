@@ -1621,6 +1621,164 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <li><strong>桑德蘭</strong>：需要在最後 4 場找回信心。下一場對手更加艱鉅——面對爭冠或搶歐戰的強隊。Le Bris 必須盡快止血，避免賽季在恥辱中收場。</li>
 </ul>`,
     tags: ['賽後回顧', '桑德蘭', '諾丁漢森林', 'Chris Wood', 'Gibbs-White', 'Igor Jesus', '保級', '第34輪']
+  },
+  {
+    id: 'epl-033',
+    title: '【賽後回顧】兵工廠 1-0 紐卡索：Eze 世界波重返榜首，角球進球破英超紀錄',
+    date: '2026-04-26',
+    category: '賽後深度回顧',
+    summary: 'Eberechi Eze 第 9 分鐘角球戰術配合後禁區邊緣抽射破門，兵工廠以 73 分重返英超榜首。但 Havertz 與 Eze 先後傷退，歐冠半決賽 vs 馬競蒙上陰影。',
+    content: `<h2>兵工廠 1-0 紐卡索｜第34輪・酋長球場</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">9' ⚽</td>
+<td style="padding:8px"><strong>Eberechi Eze（兵工廠）</strong> — 角球戰術配合，Havertz 在禁區內將球做給 Eze，Eze 禁區邊緣大力抽射直入右上角，門將毫無反應</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 1-0 ∣ 終場 1-0</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>Eze 的世界波：角球紀錄之夜</h4>
+
+<p>酋長球場的球迷只等了 9 分鐘就迎來了今晚的高潮。一個精心設計的角球戰術，Noni Madueke 開出短角球，球到了 Kai Havertz 腳下，他在禁區內將球做給了埋伏在禁區邊緣的 Eberechi Eze。這位前水晶宮球星毫不猶豫起腳抽射，皮球帶著旋轉飛入右上角，紐卡索門將 Nick Pope 毫無反應，只能目送球飛入網窩。</p>
+
+<p>這是兵工廠本賽季英超第 17 個角球進球，<strong>打破了英超歷史紀錄</strong>。Arteta 的定位球教練 Nicolas Jover 再次證明了他的價值。</p>
+
+<h4>紐卡索的反撲與兵工廠的堅守</h4>
+
+<p>進球之後，比賽的節奏卻沒有如兵工廠球迷所期望的那樣展開。紐卡索在上半場中段逐漸找到了自己的節奏，全場控球率達到 55%，反而壓制了兵工廠。Bruno Guimaraes 的回歸為喜鵲中場注入了急需的控制力，他與 Tonali 的雙核運轉讓兵工廠中場承受了不小壓力。</p>
+
+<p>更讓人擔心的是兵工廠的傷病問題。Kai Havertz 在上半場就因傷被換下，而進球功臣 Eze 也在下半場突然倒地，最終被擔架抬離場——儘管 Arteta 賽後表示兩人的傷勢不嚴重，但在賽季衝刺階段，任何傷兵都是壞消息。</p>
+
+<h4>終場前的驚險</h4>
+
+<p>下半場紐卡索加強了攻勢，Yoane Wissa 在補時階段獲得了一次絕佳的單刀機會，但他的射門偏出了門框——這一腳射失讓所有兵工廠球迷長舒一口氣。終場哨響，兵工廠以 1-0 險勝，重新登上英超積分榜榜首，領先曼城 3 分（多賽一場）。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">兵工廠</th>
+<th style="padding:8px">紐卡索</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>45%</td><td>55%</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">射門</td><td>11</td><td>13</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">預期進球 (xG)</td><td>0.64</td><td>0.92</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">角球進球紀錄</td><td colspan="2">兵工廠本季角球進球達 17 球，英超歷史新高</td>
+</tr>
+</table>
+
+<h3>焦點人物</h3>
+
+<p><strong>Eberechi Eze</strong>（全場最佳）：第 9 分鐘的世界波是本輪英超最精彩的進球之一。這位前水晶宮攻擊中場加盟兵工廠後持續發揮創造力，今晚更以一記重砲回報了 Arteta 的信任。可惜下半場傷退為他的完美表現蒙上陰影。</p>
+
+<p><strong>William Saliba &amp; Gabriel</strong>：又一場零封。這對中衛搭檔在紐卡索的攻勢中保持了一貫的冷靜與果斷，是兵工廠爭冠的基石。</p>
+
+<h3>積分榜影響</h3>
+
+<p>兵工廠以 73 分重返榜首，領先曼城 3 分（曼城少賽一場）。在聯賽僅剩 4 輪的情況下，爭冠戰局依然膠著。但 Havertz 和 Eze 的傷情將是 Arteta 接下來最頭痛的問題——尤其是歐冠半決賽即將在 4 月 29 日登場（馬競 vs 兵工廠）。</p>`,
+    tags: ['賽後回顧', '兵工廠', '紐卡索', 'Eze', '角球紀錄', '爭冠', '第34輪']
+  },
+  {
+    id: 'epl-034',
+    title: '【賽後回顧】利物浦 3-1 水晶宮：Isak 傷癒復出首球，Salah 傷退蒙陰影',
+    date: '2026-04-26',
+    category: '賽後深度回顧',
+    summary: 'Alexander Isak 腓骨骨折傷癒後首球、Robertson 與 Wirtz 各建一功，利物浦升至第 4。但 Salah 腿後肌傷退，他在安菲爾德的告別之旅蒙上陰影。',
+    content: `<h2>利物浦 3-1 水晶宮｜第34輪・安菲爾德</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">35' ⚽</td>
+<td style="padding:8px"><strong>Alexander Isak（利物浦）</strong> — Mac Allister 的遠射被門將擋出後彈到 Isak 腳下，Isak 冷靜控球後一腳勁射破網，這是他自去年 12 月腓骨骨折傷癒後的首個進球</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">40' ⚽</td>
+<td style="padding:8px"><strong>Andrew Robertson（利物浦）</strong> — Curtis Jones 快速反擊中送出精準直塞，Robertson 插上後沉穩地將球射入右下角</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">71' ⚽</td>
+<td style="padding:8px"><strong>Daniel Munoz（水晶宮）</strong> — 門將 Woodman 在撲救 Sarr 射門時膝蓋受傷倒地，Munoz 趁機將球挑過受傷的門將入網</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">90+6' ⚽</td>
+<td style="padding:8px"><strong>Florian Wirtz（利物浦）</strong> — Mac Allister 妙傳，Wirtz 禁區內從容射門得手，為安菲爾德的夜晚畫上句號</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 2-0 ∣ 終場 3-1</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>Isak 的回歸之夜</h4>
+
+<p>這場比賽的主角毫無疑問是 Alexander Isak。這位瑞典前鋒在去年 12 月對陣熱刺時因 Micky van de Ven 的犯規導致腓骨骨折，缺席了超過四個月。今晚在安菲爾德，他終於破門——Mac Allister 一腳歪掉的遠射意外彈到 Isak 腳下，後者展現了頂級前鋒的冷靜，控球後一腳射入球網。全場起立鼓掌，安菲爾德的 Kop 看台為這位復出英雄送上了最熱烈的歡呼。</p>
+
+<h4>Robertson 的突襲與半場 2-0</h4>
+
+<p>第 40 分鐘，替補門將 Freddie Woodman 做出了一次精彩撲救後，利物浦立即發動快速反擊。Curtis Jones 在中場接球後直塞左路，Andrew Robertson 全速插上，在禁區左側以精準的射門將球送入右下角——半場 2-0，利物浦完全掌控了比賽節奏。</p>
+
+<h4>Salah 傷退與水晶宮的反撲</h4>
+
+<p>下半場利物浦遭遇打擊：Mohamed Salah 在第 59 分鐘因左腿後肌不適被換下。考慮到 Salah 已宣布將在本季結束後離開利物浦，這可能是他在安菲爾德的最後幾場比賽之一，傷退的畫面令人感傷。</p>
+
+<p>第 71 分鐘出現了爭議一幕：門將 Woodman 在撲救 Sarr 射門時膝蓋受傷倒地，Daniel Munoz 趁機將球挑過受傷的門將入網。儘管主場球迷不滿，但裁判判定進球有效。Woodman 在治療後繼續堅守，甚至被 Kop 看台球迷高喊為「英格蘭一號門將」。</p>
+
+<h4>Wirtz 的句號</h4>
+
+<p>補時第 6 分鐘，Florian Wirtz 接到 Mac Allister 的妙傳，在禁區內從容射門得手，3-1 的終場比分讓利物浦安心拿下三分。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">利物浦</th>
+<th style="padding:8px">水晶宮</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>53%</td><td>47%</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">射門</td><td>9</td><td>14</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">預期進球 (xG)</td><td>0.91</td><td>2.32</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">射正</td><td>5</td><td>4</td>
+</tr>
+</table>
+
+<h3>焦點人物</h3>
+
+<p><strong>Alexander Isak</strong>（全場最佳）：傷癒復出後的首球意義重大。Isak 展現了他作為利物浦隊史最高身價球員的價值，即便身體狀態還未達到巔峰，他的跑位和終結能力依然是頂級水準。</p>
+
+<p><strong>Freddie Woodman</strong>：三號門將的英雄表現。在 Alisson 和 Mamardashvili 雙雙受傷的情況下，Woodman 挺身而出，做出了多次關鍵撲救，尤其是擋出 Lacroix 的頭球那一刻堪稱經典。</p>
+
+<p><strong>Alexis Mac Allister</strong>：兩次助攻（Isak 和 Wirtz 的進球），阿根廷中場的傳球視野和執行力是利物浦今晚最穩定的輸出。</p>
+
+<h3>積分榜影響</h3>
+
+<p>利物浦升至第 4 名，超越阿斯頓維拉。在聯賽僅剩 4 輪的情況下，歐冠資格爭奪依然激烈。但 Salah 的傷情是利物浦最大的隱憂——在他即將告別安菲爾德的賽季尾聲，球迷們最不願看到的就是他因傷提前結束這段旅程。</p>`,
+    tags: ['賽後回顧', '利物浦', '水晶宮', 'Isak', 'Salah', 'Wirtz', '第34輪']
   }
 ];
 
