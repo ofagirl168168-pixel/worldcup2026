@@ -28,6 +28,34 @@
   let _commentChannel = null; // realtime subscription
   let _voteChannel = null;    // realtime vote tally 訂閱
 
+  /* ---------- 跨日偵測：使用者掛網過 00:00 後重新抓 data-opinions.js ---------- */
+  // 否則記憶體裡的 window.DAILY_OPINIONS 還是昨天版的、找不到今天的題、fallback 到 undated 池
+  let _opinionDataDate = (function() { try { return localDateStr(); } catch (e) { return null; } })();
+  let _refreshInFlight = false;
+  async function _refreshOpinionDataIfDateChanged() {
+    if (_refreshInFlight) return;
+    let today;
+    try { today = localDateStr(); } catch (e) { return; }
+    if (today === _opinionDataDate) return;
+    _refreshInFlight = true;
+    try {
+      const res = await fetch('/js/data-opinions.js?_=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;
+      const text = await res.text();
+      // 用 new Function 跑（const 在 IIFE-like 範圍內、不會跟原本的 const 衝突）
+      // 內部 `if (typeof window) { window.DAILY_OPINIONS = ...; window.getTodayOpinion = ...; }` 會更新 window 變數
+      new Function(text)();
+      _opinionDataDate = today;
+      console.log('[opinion] data refreshed for new day:', today);
+    } catch (e) {
+      console.warn('[opinion] refresh failed', e);
+    } finally {
+      _refreshInFlight = false;
+    }
+  }
+  // 每分鐘檢查一次（背景跑，不阻塞 UI）
+  setInterval(_refreshOpinionDataIfDateChanged, 60 * 1000);
+
   /* ---------- XP 發放（純 localStorage，calcXPLevel 會自動納入總 XP） ---------- */
   function _addOpinionXP(amount) {
     if (!amount) return;
@@ -77,13 +105,15 @@
   function _trim(s, n) { return s && s.length > n ? s.slice(0, n) + '…' : (s || ''); }
 
   /* ---------- 顯示觀點投票彈窗 ---------- */
-  function showOpinionPoll(onClose, opts) {
+  async function showOpinionPoll(onClose, opts) {
     opts = opts || {};
     // 同時間已有 overlay 就不重開
     if (document.getElementById('opinion-overlay')) {
       if (onClose) onClose();
       return;
     }
+    // 跨日 → 抓最新 data-opinions.js（避免顯示昨天的題或 fallback 到 undated 池）
+    try { await _refreshOpinionDataIfDateChanged(); } catch (e) {}
     const today = localDateStr();
     const shownKey = STORAGE_SHOWN + today;
     // 指定 pollId 時視同強制開啟（分享連結、歷史題永久連結）
