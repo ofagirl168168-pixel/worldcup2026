@@ -7,6 +7,24 @@
 (function () {
   'use strict';
 
+  // ── Seedable RNG ────────────────────────────────────────
+  // 給「直播同步」功能用：相同 seed 必定產出相同比分/事件/球員位置
+  // 沒帶 seed 時 fallback 到 Math.random，保留原有「每次模擬都不同」行為
+  function makeSeededRng(seedStr) {
+    let h = 2166136261 >>> 0;
+    const s = String(seedStr);
+    for (let i = 0; i < s.length; i++) {
+      h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+    }
+    let state = h >>> 0;
+    return function () {
+      state = (state + 0x6D2B79F5) | 0;
+      let t = Math.imul(state ^ (state >>> 15), 1 | state);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
   // ── 視覺參數 ────────────────────────────────────────────
   const PITCH_W = 320;
   const PITCH_H = 200;
@@ -162,7 +180,11 @@
   }
 
   // ── 主模擬 ──────────────────────────────────────────────
-  function runSim(container, home, away, matchId) {
+  function runSim(container, home, away, matchId, seed) {
+    // 帶 seed → 用 seedable RNG（朋友直播房需要每人結果一致）
+    // 不帶 seed → 沿用 Math.random（單機隨便看的維持「每次不同」）
+    const rng = seed ? makeSeededRng(seed) : Math.random;
+
     const ui = buildHUD(container, { home, away });
     const canvas = ui.canvas;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -181,9 +203,9 @@
     const aF = buildFormation(parseFormation(away.formation), false);
     // 給每個球員獨特的 flair（站位微差 + 反應速度）讓整條線不再像旗
     const makeFlair = () => ({
-      xJitter: (Math.random() - 0.5) * 0.035,
-      yJitter: (Math.random() - 0.5) * 0.025,
-      laziness: 0.78 + Math.random() * 0.44, // 0.78 ~ 1.22
+      xJitter: (rng() - 0.5) * 0.035,
+      yJitter: (rng() - 0.5) * 0.025,
+      laziness: 0.78 + rng() * 0.44, // 0.78 ~ 1.22
     });
     const players = [
       ...hF.map(p => ({ ...p, team: 'h', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y, flair: makeFlair() })),
@@ -355,7 +377,7 @@
       const goalX = state.possession === 'h' ? 1 : 0;
       // 射向球門範圍內一個點（稍微偏左右，不永遠中路）
       state.ballTargetX = goalX;
-      state.ballTargetY = 0.38 + Math.random() * 0.24;
+      state.ballTargetY = 0.38 + rng() * 0.24;
       const dist = Math.hypot(state.ballTargetX - ball.x, state.ballTargetY - ball.y);
       state.ballTravelTotal = Math.max(5, Math.round(dist * 50));
       state.ballTravelLeft = state.ballTravelTotal;
@@ -371,7 +393,7 @@
       const goalProb = Math.max(0.12, Math.min(0.68,
         ((atk.attack - def.defense * 0.55) / 100) * 0.75
       ));
-      const isGoal = Math.random() < goalProb;
+      const isGoal = rng() < goalProb;
       if (isGoal) {
         state.score[state.possession]++;
         state.stats[state.possession].goals++;
@@ -426,7 +448,7 @@
         } else {
           shootChance = urgency * 0.02;
         }
-        if (Math.random() < shootChance) {
+        if (rng() < shootChance) {
           startShoot();
           return;
         }
@@ -441,7 +463,7 @@
         else if (inAttackThird) passChance = 0.03 + (atkStats.midfield / 100) * 0.02;
         else passChance = 0.08 + (atkStats.midfield / 100) * 0.03;
         passChance += urgency * 0.10; // 持球太久 → 積極找人傳
-        if (Math.random() < passChance) {
+        if (rng() < passChance) {
           const candidates = rankPassTargets(pos);
           if (candidates.length && candidates[0].score > -0.15) {
             startPass(candidates[0]);
@@ -459,7 +481,7 @@
           // 防守方在自家禁區內壓迫更兇、但不要太誇張（避免弱隊在禁區內一直搶到球）
           if (distToGoal < 0.22) tackleChance *= 1.3;
           tackleChance = Math.max(0.005, Math.min(0.08, tackleChance));
-          if (Math.random() < tackleChance) {
+          if (rng() < tackleChance) {
             state.possession = near.player.team;
             state.possessorIdx = players.indexOf(near.player);
             state.phase = 'dribble';
@@ -528,8 +550,8 @@
           p.ty = p.y + dy * 0.06;
           if (p.team === 'h') p.tx = Math.min(0.92, p.tx);
           else p.tx = Math.max(0.08, p.tx);
-          p.tx += (Math.random() - 0.5) * 0.004;
-          p.ty += (Math.random() - 0.5) * 0.006;
+          p.tx += (rng() - 0.5) * 0.004;
+          p.ty += (rng() - 0.5) * 0.006;
           return;
         }
 
@@ -553,8 +575,8 @@
             p._urgent = true;
             p.tx = ball.x - sideSign * 0.015;
             p.ty = ball.y;
-            p.tx += (Math.random() - 0.5) * 0.006;
-            p.ty += (Math.random() - 0.5) * 0.008;
+            p.tx += (rng() - 0.5) * 0.006;
+            p.ty += (rng() - 0.5) * 0.008;
           } else if (myRank === 1) {
             // 第二近的覆蓋
             p._urgent = true;
@@ -592,8 +614,8 @@
           p.ty = possessor.y + sideOffset;
           const atkLimit = p.team === 'h' ? ATK_LIMIT_H : ATK_LIMIT_A;
           p.tx = p.team === 'h' ? Math.min(atkLimit, p.tx) : Math.max(atkLimit, p.tx);
-          p.tx += (Math.random() - 0.5) * 0.008;
-          p.ty += (Math.random() - 0.5) * 0.008;
+          p.tx += (rng() - 0.5) * 0.008;
+          p.ty += (rng() - 0.5) * 0.008;
           return;
         }
         // 其他：依角色前插 + 個人差異（y 維持自身 lane 為主，只微幅跟球）
@@ -695,7 +717,7 @@
       if (!state.halftimeDone && gameMinInt >= 45) {
         state.halftimeDone = true;
         state.pauseFrames = Math.round(FPS * HT_PAUSE_SEC);
-        kickoff(Math.random() < hMidPoss ? 'a' : 'h');
+        kickoff(rng() < hMidPoss ? 'a' : 'h');
       }
 
       if (state.phase === 'dribble') tickDribble();
@@ -781,13 +803,14 @@
     }
 
     // 開球
-    kickoff(Math.random() < hMidPoss ? 'h' : 'a');
+    kickoff(rng() < hMidPoss ? 'h' : 'a');
     tick();
   }
 
   // ── 公開 API ────────────────────────────────────────────
   window.MatchSim = {
-    run(matchId) {
+    // opts.seed: 給朋友直播房用的 seed，相同 seed 產出完全相同的比賽
+    run(matchId, opts = {}) {
       const containerId = `sim-wrap-${matchId}`;
       const container = document.getElementById(containerId);
       if (!container) { console.warn('[MatchSim] container not found:', containerId); return; }
@@ -811,7 +834,7 @@
         return;
       }
 
-      runSim(container, home, away, matchId);
+      runSim(container, home, away, matchId, opts.seed);
     }
   };
 })();
