@@ -438,9 +438,9 @@
   async function _showResult(opinion, chosenIdx, overlay, onClose) {
     const resultEl = overlay.querySelector('#opinion-result');
     if (!resultEl) return;
-    // 投票後把選項卡區段收起來，讓結果 + 留言可以直接看到（不用手動往下捲）
-    const cardsEl = overlay.querySelector('#opinion-cards');
-    if (cardsEl) cardsEl.classList.add('opinion-cards--collapsed');
+    // 投票後只把沒選的卡收掉、選中的留著（讓使用者還能看到自己選的那張）
+    // 容器 justify-content: center 會自動把剩下那張置中
+    overlay.querySelectorAll('.opinion-card.voted-no').forEach(c => c.classList.add('opinion-card--gone'));
 
     // 先拉真實票數（RPC 聚合）
     const votes = await _fetchTally(opinion.id, opinion.opts.length);

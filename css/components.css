@@ -3425,15 +3425,22 @@ img.flag-img {
 .opinion-cards {
   display: flex; gap: 20px; justify-content: center;
   perspective: 1200px;
-  max-height: 1500px; overflow: hidden;
-  transition: max-height 0.5s cubic-bezier(.6,.04,.44,.96), opacity 0.4s ease, margin 0.4s ease;
 }
-/* 投票後收起卡片區，讓結果 + 留言區自然上移、使用者不用手動捲 */
-.opinion-cards.opinion-cards--collapsed {
-  max-height: 0;
-  opacity: 0;
-  margin-top: 0; margin-bottom: 0;
-  pointer-events: none;
+/* 投票後沒選的卡收掉 slot（保留選中那張、容器 justify-content: center 自動把它居中）
+   delay 0.45s 等 voted-no 飛走動畫先跑完、再 0.4s collapse */
+.opinion-card.opinion-card--gone {
+  flex: 0 0 0 !important;
+  max-width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  overflow: hidden;
+  transition:
+    flex-basis 0.4s ease 0.45s,
+    max-width 0.4s ease 0.45s,
+    padding 0.4s ease 0.45s,
+    margin 0.4s ease 0.45s;
 }
 .opinion-cards--multi {
   flex-wrap: wrap; gap: 14px;
