@@ -4241,27 +4241,25 @@ body.opinion-open .btn-arena-float { display: none; }
   .fr-lobby-thead { display: none; }
   .fr-lobby-table { background: transparent; border: 0; padding: 0; }
 
-  /* 卡片重新設計：3 欄 grid + named areas
-     第 1 排：房名 + 對戰 (左)  |  類型 badge (右上)
-     第 2 排：開賽倒數          |  人數          |  押注（細線分隔）
-     第 3 排：加入按鈕（全寬主 CTA）
-     房號 ID：absolute 放卡片左上角小字，不擠 grid */
+  /* 卡片重新設計：4 欄 grid + named areas
+     第 1 排：房名 + 對戰（左 2/4）  |  ID  |  類型 badge
+     第 2 排：開賽倒數 | 人數 | 押注（細線分隔）
+     第 3 排：加入按鈕（全寬主 CTA） */
   .fr-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr auto auto;
     grid-template-areas:
-      "match match type"
-      "cd    count bet"
-      "act   act   act";
-    gap: 12px 10px;
-    padding: 24px 16px 16px; /* 上方留位給 ID label */
+      "match match id    type"
+      "cd    count bet   bet"
+      "act   act   act   act";
+    gap: 12px 8px;
+    padding: 16px;
     background: linear-gradient(180deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.018) 100%);
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 14px;
     margin-bottom: 12px;
     box-shadow: 0 4px 14px rgba(0,0,0,0.22);
     align-items: center;
-    position: relative;
   }
   .fr-row:first-child { border-top: 1px solid rgba(255,255,255,0.1); }
 
@@ -4275,17 +4273,18 @@ body.opinion-open .btn-arena-float { display: none; }
     border-color: rgba(184,164,255,0.22);
   }
 
-  /* 房號 ID：左上角小灰字（不佔 grid 空間，方便辨識/分享用） */
+  /* 房號 ID：跟類型 badge 同行右側 */
   .fr-cell--id {
+    grid-area: id;
     display: block;
-    position: absolute;
-    top: 8px; left: 16px;
-    font-size: 10px;
+    align-self: center;
+    justify-self: end;
+    font-size: 10.5px;
     font-family: ui-monospace, 'Courier New', monospace;
-    color: rgba(255,255,255,0.42);
+    color: rgba(255,255,255,0.5);
     letter-spacing: 1.2px;
-    line-height: 1;
-    pointer-events: none;
+    line-height: 1.4;
+    white-space: nowrap;
   }
 
   /* 第 1 排左：房名 + 對戰 (兩行) */
@@ -4320,11 +4319,11 @@ body.opinion-open .btn-arena-float { display: none; }
   }
   .fr-cell--match:not(:has(.fr-cell-name)) .fr-crest { width: 20px; height: 20px; }
 
-  /* 第 1 排右：類型 badge */
+  /* 第 1 排右：類型 badge（緊貼 ID） */
   .fr-cell--type {
     grid-area: type;
     justify-self: end;
-    align-self: start;
+    align-self: center;
   }
 
   /* 第 2 排：3 個 meta 等寬，上方細線跟第 1 排做視覺分隔 */
@@ -4336,7 +4335,7 @@ body.opinion-open .btn-arena-float { display: none; }
   }
   .fr-cell--cd    { grid-area: cd; }
   .fr-cell--count { grid-area: count; justify-self: center; }
-  .fr-cell--bet   { grid-area: bet; justify-self: end; }
+  .fr-cell--bet   { grid-area: bet; justify-self: end; white-space: nowrap; }
   /* 倒數比較重要，加重一些 */
   .fr-cell--cd .fr-cd { font-weight: 700; color: rgba(255,255,255,0.88); }
 
