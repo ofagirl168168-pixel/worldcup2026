@@ -106,6 +106,13 @@
     return `<span class="fr-type fr-type--public">公開</span>`;
   }
 
+  // 官方房沒設 room_name 時用 fallback 名稱
+  function _displayRoomName(room) {
+    if (room.room_name) return room.room_name;
+    if (room.is_official) return '麥迪官方聯賽';
+    return null;
+  }
+
   function _matchTitle(room) {
     const meta = room.match_meta || {};
     const home = meta.home_name || meta.home_code || '主隊';
@@ -113,9 +120,9 @@
     const homeFlag = meta.home_flag ? `<img src="${meta.home_flag}" alt="" class="fr-crest" />` : '';
     const awayFlag = meta.away_flag ? `<img src="${meta.away_flag}" alt="" class="fr-crest" />` : '';
     const matchLine = `${homeFlag}${home} <span class="fr-vs">vs</span> ${awayFlag}${away}`;
-    // 有房名 → 房名為主，比賽當副標
-    if (room.room_name) {
-      const safeName = room.room_name.replace(/[<>"'&]/g, c => ({
+    const name = _displayRoomName(room);
+    if (name) {
+      const safeName = name.replace(/[<>"'&]/g, c => ({
         '<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','&':'&amp;'
       }[c]));
       return `<div class="fr-cell-name">${safeName}</div><div class="fr-cell-sub">${matchLine}</div>`;
@@ -526,7 +533,7 @@
 
       <div class="fr-room-box">
         <div class="fr-room-header">
-          ${room.room_name ? `<div class="fr-room-name">${_escapeHtml(room.room_name)}</div>` : ''}
+          ${(() => { const n = _displayRoomName(room); return n ? `<div class="fr-room-name">${_escapeHtml(n)}</div>` : ''; })()}
           <div class="fr-room-id-row">
             <div class="fr-room-id">#${room.room_code}</div>
           </div>
@@ -552,6 +559,10 @@
 
         <div class="fr-room-status" id="fr-room-status">
           <!-- 倒數/狀態文字，每秒更新 -->
+        </div>
+
+        <div class="fr-team-data" id="fr-team-data" style="display:none">
+          <!-- 兩隊能力 / 近況 / 主力 / 教練 / 傷兵 — pick 階段預設展開 -->
         </div>
 
         <div class="fr-participants" id="fr-participants" style="display:none">
@@ -661,6 +672,9 @@
       });
     }
 
+    // ── 兩隊資料 ─────────────────────────────────────────
+    _renderTeamData(overlay, state);
+
     // ── 聊天 ─────────────────────────────────────────────
     _initChat(overlay, room.room_code, ch => { chatChannel = ch; });
 
@@ -673,12 +687,157 @@
       if (phase !== state.lastPhase) {
         _renderRoomBody(overlay, state, phase);
         if (state._rerenderParticipants) state._rerenderParticipants();
+        // 兩隊資料：離開 open 階段自動收合（比賽要開始了，資料看完了）
+        if (state._teamDataEl) {
+          state._teamDataEl.classList.toggle('fr-data--collapsed', phase !== 'open');
+        }
         state.lastPhase = phase;
       }
     }
     state._rerender = rerender;
     rerender();
     _roomTickInterval = setInterval(rerender, 1000);
+  }
+
+  // ── 兩隊資料區（攻防能力、近況、主力、教練、傷兵） ──
+  function _renderTeamData(overlay, state) {
+    const el = overlay.querySelector('#fr-team-data');
+    if (!el) return;
+    const meta = state.room.match_meta || {};
+    const { home, away } = _resolveTeamsForRoom(state.room);
+    if (!home || !away || !home.radar || !away.radar) {
+      el.style.display = 'none';
+      return;
+    }
+
+    const safe = (s) => _escapeHtml(s == null ? '' : s);
+    const homeName = meta.home_name || home.nameCN || '主隊';
+    const awayName = meta.away_name || away.nameCN || '客隊';
+
+    // 能力 5 維 — 兩條由中央向外的對比 bar
+    function radarRow(label, hv, av) {
+      hv = hv || 0; av = av || 0;
+      const total = Math.max(hv, av, 1);
+      // bar 寬度按該邊與較大值的比例（讓視覺差距清楚）
+      const hPct = (hv / total) * 100;
+      const aPct = (av / total) * 100;
+      return `
+        <div class="fr-radar-row">
+          <div class="fr-radar-val">${hv}</div>
+          <div class="fr-radar-bar fr-radar-bar--h">
+            <div class="fr-radar-fill" style="width:${hPct}%"></div>
+          </div>
+          <div class="fr-radar-label">${label}</div>
+          <div class="fr-radar-bar fr-radar-bar--a">
+            <div class="fr-radar-fill" style="width:${aPct}%"></div>
+          </div>
+          <div class="fr-radar-val">${av}</div>
+        </div>
+      `;
+    }
+
+    const rH = home.radar, rA = away.radar;
+
+    // 近 5 場 W/D/L badges
+    function formBadges(arr) {
+      const list = (arr || []).slice(-5);
+      if (!list.length) return '<span class="fr-data-muted">—</span>';
+      return list.map(r => {
+        const cls = r === 'W' ? 'fr-fb fr-fb--w' : r === 'L' ? 'fr-fb fr-fb--l' : 'fr-fb fr-fb--d';
+        return `<span class="${cls}">${safe(r)}</span>`;
+      }).join('');
+    }
+
+    // 主力球員（最多 3 個）
+    function keyPlayerList(team) {
+      const list = (team.keyPlayers || []).slice(0, 3);
+      if (!list.length) return '<span class="fr-data-muted">—</span>';
+      return list.map(p =>
+        `<div class="fr-kp"><span class="fr-kp-name">${safe(p.name)}</span><span class="fr-kp-pos">${safe(p.pos || '')}</span></div>`
+      ).join('');
+    }
+
+    // 主要傷兵（最多 3 個）
+    function injuryList(team) {
+      const list = (team.injuries || []).slice(0, 3);
+      if (!list.length) return '<span class="fr-data-muted">無</span>';
+      return list.map(p =>
+        `<div class="fr-inj"><span class="fr-inj-name">${safe(p.name)}</span><span class="fr-inj-status">${safe(p.status || '養傷中')}</span></div>`
+      ).join('');
+    }
+
+    const hasInjuries = (home.injuries && home.injuries.length) || (away.injuries && away.injuries.length);
+
+    el.innerHTML = `
+      <button class="fr-data-toggle" type="button" id="fr-data-toggle">
+        <span><i class="fas fa-chart-bar"></i> 兩隊資料</span>
+        <i class="fas fa-chevron-down fr-data-chevron"></i>
+      </button>
+      <div class="fr-data-content">
+        <div class="fr-data-team-head">
+          <div class="fr-data-team-name fr-data-team-name--h">${safe(homeName)}</div>
+          <div class="fr-data-vs">vs</div>
+          <div class="fr-data-team-name fr-data-team-name--a">${safe(awayName)}</div>
+        </div>
+
+        <div class="fr-radar-list">
+          ${radarRow('攻擊', rH.attack,     rA.attack)}
+          ${radarRow('中場', rH.midfield,   rA.midfield)}
+          ${radarRow('防守', rH.defense,    rA.defense)}
+          ${radarRow('速度', rH.speed,      rA.speed)}
+          ${radarRow('經驗', rH.experience, rA.experience)}
+        </div>
+
+        <div class="fr-data-section">
+          <div class="fr-data-section-title">近 5 場戰績</div>
+          <div class="fr-data-cols">
+            <div class="fr-data-col">${formBadges(home.recentForm)}</div>
+            <div class="fr-data-col fr-data-col--a">${formBadges(away.recentForm)}</div>
+          </div>
+        </div>
+
+        <div class="fr-data-section">
+          <div class="fr-data-section-title">主力</div>
+          <div class="fr-data-cols">
+            <div class="fr-data-col fr-kp-list">${keyPlayerList(home)}</div>
+            <div class="fr-data-col fr-kp-list">${keyPlayerList(away)}</div>
+          </div>
+        </div>
+
+        <div class="fr-data-section">
+          <div class="fr-data-section-title">教練 / 陣型</div>
+          <div class="fr-data-cols">
+            <div class="fr-data-col">
+              ${safe(home.coach || '—')}
+              ${home.formation ? `<div class="fr-data-muted">${safe(home.formation)}</div>` : ''}
+            </div>
+            <div class="fr-data-col">
+              ${safe(away.coach || '—')}
+              ${away.formation ? `<div class="fr-data-muted">${safe(away.formation)}</div>` : ''}
+            </div>
+          </div>
+        </div>
+
+        ${hasInjuries ? `
+        <div class="fr-data-section">
+          <div class="fr-data-section-title">主要傷兵</div>
+          <div class="fr-data-cols">
+            <div class="fr-data-col fr-inj-list">${injuryList(home)}</div>
+            <div class="fr-data-col fr-inj-list">${injuryList(away)}</div>
+          </div>
+        </div>` : ''}
+      </div>
+    `;
+    el.style.display = 'block';
+
+    // pick (open) 階段預設展開（讓使用者看資料判斷比分）；其他階段預設收合
+    const phase = _phaseOf(state);
+    el.classList.toggle('fr-data--collapsed', phase !== 'open');
+
+    el.querySelector('#fr-data-toggle').addEventListener('click', () => {
+      el.classList.toggle('fr-data--collapsed');
+    });
+    state._teamDataEl = el; // 給 phase 切換時重設收合用
   }
 
   // ── 參賽者名單（pick + locked 階段顯示，live/ended 隱藏） ──
