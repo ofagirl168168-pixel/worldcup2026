@@ -4416,3 +4416,170 @@ body.opinion-open .btn-arena-float { display: none; }
   .fr-form-opt { padding: 7px 10px; font-size: 12.5px; }
   .fr-invite-code { font-size: 22px; letter-spacing: 3px; }
 }
+
+/* ── 房間頁 overlay ───────────────────────────────── */
+.fr-room-overlay {
+  position: fixed; inset: 0; z-index: 1100;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5, 8, 20, 0.88);
+  backdrop-filter: blur(10px);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+  padding: 20px; overflow-y: auto;
+}
+.fr-room-overlay.open { opacity: 1; pointer-events: auto; }
+
+.fr-room-box {
+  position: relative;
+  width: 100%; max-width: 540px;
+  background: linear-gradient(180deg, #1a2240 0%, #0e1430 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+  transform: translateY(14px) scale(0.98);
+  transition: transform 0.35s cubic-bezier(.22,1,.36,1);
+}
+.fr-room-overlay.open .fr-room-box { transform: translateY(0) scale(1); }
+
+.fr-room-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 14px;
+}
+.fr-room-id {
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-weight: 800; font-size: 18px;
+  color: #ffd700; letter-spacing: 2px;
+}
+.fr-room-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.fr-type--bet { color: #b6c5ff; background: rgba(91,115,255,0.12); }
+.fr-room-host { font-size: 12px; color: var(--text-muted); width: 100%; }
+
+.fr-room-match {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; flex-wrap: wrap;
+  padding: 14px 0 6px;
+  font-size: 18px; font-weight: 700; color: #fff;
+}
+.fr-room-crest { width: 36px; height: 36px; object-fit: contain; }
+.fr-room-vs { color: var(--text-muted); font-weight: 400; font-size: 13px; }
+.fr-room-times {
+  text-align: center;
+  font-size: 12px; color: var(--text-muted);
+  margin-bottom: 16px;
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+}
+
+.fr-room-status {
+  text-align: center;
+  font-size: 14px;
+  padding: 10px 14px;
+  background: rgba(91,115,255,0.08);
+  border: 1px solid rgba(91,115,255,0.2);
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+.fr-cd-label { color: var(--text-muted); }
+.fr-cd-num { color: #fff; font-weight: 800; font-size: 16px; margin-left: 6px; }
+.fr-cd-live { color: #ff5757; font-weight: 800; animation: fr-pulse 1.5s ease-in-out infinite; }
+.fr-cd-ended { color: var(--text-muted); }
+
+/* 猜比分區塊 */
+.fr-pick-title {
+  text-align: center;
+  font-size: 14px; font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 14px;
+}
+
+.fr-pick-grid {
+  display: grid;
+  grid-template-columns: 36px repeat(5, 1fr);
+  gap: 4px;
+  margin-bottom: 14px;
+}
+.fr-grid-corner { /* 空格 */ }
+.fr-grid-head {
+  text-align: center;
+  font-size: 11px; font-weight: 700;
+  color: var(--text-muted);
+  padding: 6px 0;
+  letter-spacing: 1px;
+}
+.fr-grid-head--row {
+  align-self: center;
+}
+.fr-grid-cell {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  color: rgba(255,255,255,0.85);
+  font-size: 12px; font-weight: 700;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.fr-grid-cell:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-1px);
+}
+.fr-grid-cell--sel {
+  background: linear-gradient(135deg, #5b73ff 0%, #2d4ec8 100%);
+  border-color: rgba(91,115,255,0.7);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(91,115,255,0.45);
+}
+
+.fr-pick-over-btn {
+  width: 100%;
+  background: rgba(255,215,0,0.06);
+  border: 1px dashed rgba(255,215,0,0.3);
+  color: #ffd47a;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.fr-pick-over-btn:hover { background: rgba(255,215,0,0.12); }
+
+.fr-pick-actions {
+  display: flex; justify-content: center;
+  margin-top: 16px;
+}
+.fr-pick-actions .fr-btn--submit {
+  min-width: 200px; padding: 11px 24px; font-size: 14px;
+}
+
+.fr-custom-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; margin: 14px 0 4px;
+  font-size: 22px; font-weight: 800;
+}
+.fr-custom-row input[type="number"] {
+  width: 70px; padding: 10px;
+  text-align: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #fff; font-size: 22px; font-weight: 800;
+}
+
+.fr-room-stub {
+  text-align: center;
+  padding: 30px 16px;
+  color: rgba(255,255,255,0.85);
+}
+
+@media (max-width: 480px) {
+  .fr-room-box { padding: 22px 16px 18px; }
+  .fr-room-match { font-size: 15px; gap: 8px; }
+  .fr-room-crest { width: 28px; height: 28px; }
+  .fr-pick-grid { grid-template-columns: 28px repeat(5, 1fr); }
+  .fr-grid-cell { font-size: 11px; padding: 9px 0; }
+  .fr-custom-row input[type="number"] { width: 56px; font-size: 18px; }
+}

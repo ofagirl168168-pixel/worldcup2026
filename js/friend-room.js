@@ -209,20 +209,20 @@
   }
 
   function _kickoffOptionsFor(match) {
-    // 真實開球時間扣 30 / 5 分；如果現在已經很接近真實開球（<30 分），
-    // 自動加「現在開賽」「+10 分」備援，避免使用者選了過去
+    // 順序：立即派 → 對齊真實比賽派
+    // 立即派（先）：5 分後 / 10 分後 — 給「想現在跟朋友玩」的人，不等真實比賽
+    // 對齊派（後）：真實前 30 / 前 5 / 真實結束後 — 過去的時間自動隱藏
     const now = Date.now();
     const real = match.kickoff_ts;
     const opts = [];
+    opts.push({ key: 'now+5',  label: `5 分鐘後立刻開（${_formatTime(now + 5 * 60000)}）`,  ts: now + 5  * 60000 });
+    opts.push({ key: 'now+10', label: `10 分鐘後立刻開（${_formatTime(now + 10 * 60000)}）`, ts: now + 10 * 60000 });
     const t30 = real - 30 * 60000;
     const t5  = real - 5  * 60000;
     if (t30 > now + 30000) opts.push({ key: 'real-30', label: `真實比賽前 30 分（${_formatTime(t30)}）`, ts: t30 });
     if (t5  > now + 30000) opts.push({ key: 'real-5',  label: `真實比賽前 5 分（${_formatTime(t5)}）`,   ts: t5 });
-    // 真實比賽結束後（賽後重看）— +120 分大概是 90 分鐘比賽結束後
     const tEnd = real + 120 * 60000;
     opts.push({ key: 'real+end', label: `真實比賽結束後（${_formatTime(tEnd)}）`, ts: tEnd });
-    // 立即模式：5 分鐘後直接開（有些朋友想馬上玩，不等真實比賽）
-    opts.push({ key: 'now+5', label: `5 分鐘後立刻開（${_formatTime(now + 5 * 60000)}）`, ts: now + 5 * 60000 });
     return opts;
   }
 
@@ -399,14 +399,333 @@
     overlay.querySelector('#fr-invite-ok').addEventListener('click', close);
   }
 
-  // ── 公開 API（後續 PR 會把 joinRoom/viewReplay 補上實作） ──
+  // ── 進房間 + 猜比分 ─────────────────────────────────────
+  let _roomTickInterval = null;
+
+  async function joinRoom(roomCode) {
+    if (!window.DB) { alert('連線中…請稍後再試'); return; }
+    try {
+      const { data: room, error } = await window.DB
+        .from('friend_rooms')
+        .select('*')
+        .eq('room_code', roomCode)
+        .maybeSingle();
+      if (error) throw error;
+      if (!room) { alert('找不到此房間，可能已被取消或房號有誤'); return; }
+      if (room.status === 'cancelled') { alert('此房間已被取消'); return; }
+
+      const myKey = _voterKey();
+      const { data: existing } = await window.DB
+        .from('friend_picks')
+        .select('*')
+        .eq('room_code', roomCode)
+        .eq('voter_key', myKey)
+        .maybeSingle();
+
+      _renderRoomOverlay(room, existing || null);
+      // URL hash 同步，讓 refresh / 分享連結 work
+      try { history.replaceState(null, '', `#fr-room-${roomCode}`); } catch (e) {}
+    } catch (e) {
+      console.warn('[friend-room] joinRoom failed', e);
+      alert('進房失敗：' + (e.message || '未知錯誤'));
+    }
+  }
+
+  function _phaseOf(room) {
+    const now = Date.now();
+    const lockTs = new Date(room.lock_at).getTime();
+    const kickTs = new Date(room.kickoff_at).getTime();
+    if (room.status === 'ended') return 'ended';
+    if (now >= kickTs) return 'live';
+    if (now >= lockTs) return 'locked';
+    return 'open';
+  }
+
+  function _formatCountdown(ms) {
+    if (ms <= 0) return '已截止';
+    const s = Math.floor(ms / 1000);
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const ss = s % 60;
+    if (h > 0) return `${h} 小時 ${m} 分`;
+    if (m > 0) return `${m} 分 ${ss} 秒`;
+    return `${ss} 秒`;
+  }
+
+  function _renderRoomOverlay(room, existingPick) {
+    const meta = room.match_meta || {};
+    const overlay = document.createElement('div');
+    overlay.className = 'fr-room-overlay';
+    overlay.innerHTML = `
+      <div class="fr-room-box">
+        <button class="fr-modal-close" type="button" aria-label="關閉">&times;</button>
+
+        <div class="fr-room-header">
+          <div class="fr-room-id">#${room.room_code}</div>
+          <div class="fr-room-tags">
+            ${room.is_official ? '<span class="fr-type fr-type--official">官方</span>' : ''}
+            ${!room.is_public ? '<span class="fr-type fr-type--private">私人 🔒</span>' : '<span class="fr-type fr-type--public">公開</span>'}
+            ${room.bet_amount > 0 ? `<span class="fr-type fr-type--bet">押 ${room.bet_amount} 💎</span>` : ''}
+          </div>
+          <div class="fr-room-host">房主 · ${_escapeHtml(room.host_nickname || '匿名')}</div>
+        </div>
+
+        <div class="fr-room-match">
+          ${meta.home_flag ? `<img src="${meta.home_flag}" class="fr-room-crest" alt="" />` : ''}
+          <div class="fr-room-team-name">${_escapeHtml(meta.home_name || '主隊')}</div>
+          <div class="fr-room-vs">vs</div>
+          <div class="fr-room-team-name">${_escapeHtml(meta.away_name || '客隊')}</div>
+          ${meta.away_flag ? `<img src="${meta.away_flag}" class="fr-room-crest" alt="" />` : ''}
+        </div>
+        <div class="fr-room-times">
+          <div>真實開球：${_formatTime(meta.real_kickoff_ts || Date.parse(`${meta.date}T${meta.time}:00+08:00`))}</div>
+          <div>同步開賽：${_formatTime(new Date(room.kickoff_at).getTime())}</div>
+        </div>
+
+        <div class="fr-room-status" id="fr-room-status">
+          <!-- 倒數/狀態文字，每秒更新 -->
+        </div>
+
+        <div class="fr-room-body" id="fr-room-body">
+          <!-- 依 phase 渲染 -->
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    // State
+    const state = {
+      room,
+      pick: existingPick ? {
+        sh: existingPick.score_home,
+        sa: existingPick.score_away,
+        over: existingPick.is_over,
+      } : null,
+      lastPhase: null,
+    };
+
+    function close() {
+      if (_roomTickInterval) { clearInterval(_roomTickInterval); _roomTickInterval = null; }
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 250);
+      try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    }
+    overlay.querySelector('.fr-modal-close').addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+
+    function rerender() {
+      const phase = _phaseOf(state.room);
+      _renderRoomStatus(overlay, state.room, phase);
+      if (phase !== state.lastPhase) {
+        _renderRoomBody(overlay, state, phase);
+        state.lastPhase = phase;
+      }
+    }
+    rerender();
+    _roomTickInterval = setInterval(rerender, 1000);
+  }
+
+  function _renderRoomStatus(overlay, room, phase) {
+    const el = overlay.querySelector('#fr-room-status');
+    if (!el) return;
+    const now = Date.now();
+    const lockTs = new Date(room.lock_at).getTime();
+    const kickTs = new Date(room.kickoff_at).getTime();
+    if (phase === 'open') {
+      el.innerHTML = `<span class="fr-cd-label">報名截止剩</span> <span class="fr-cd-num">${_formatCountdown(lockTs - now)}</span>`;
+    } else if (phase === 'locked') {
+      el.innerHTML = `<span class="fr-cd-label">直播開賽剩</span> <span class="fr-cd-num">${_formatCountdown(kickTs - now)}</span>`;
+    } else if (phase === 'live') {
+      el.innerHTML = `<span class="fr-cd-live">🔴 直播中</span>`;
+    } else {
+      el.innerHTML = `<span class="fr-cd-ended">已結束</span>`;
+    }
+  }
+
+  function _renderRoomBody(overlay, state, phase) {
+    const body = overlay.querySelector('#fr-room-body');
+    if (!body) return;
+    if (phase === 'open') {
+      _renderPickPhase(body, state);
+    } else if (phase === 'locked') {
+      _renderLockedPhase(body, state);
+    } else if (phase === 'live') {
+      body.innerHTML = `
+        <div class="fr-room-stub">
+          <div style="font-size:32px;margin-bottom:8px">📺</div>
+          <div>直播中…（同步觀賽功能 PR-3 上線）</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:8px">
+            你的猜測：${state.pick ? _formatPick(state.pick) : '（沒投）'}
+          </div>
+        </div>`;
+    } else {
+      body.innerHTML = `
+        <div class="fr-room-stub">
+          <div style="font-size:32px;margin-bottom:8px">🏁</div>
+          <div>比賽結束</div>
+          ${state.room.result_home != null && state.room.result_away != null
+            ? `<div style="margin-top:8px;font-size:18px;font-weight:800">${state.room.result_home} - ${state.room.result_away}</div>`
+            : ''}
+        </div>`;
+    }
+  }
+
+  function _formatPick(pick) {
+    if (pick.over) return `${pick.sh} - ${pick.sa}（>4 客製）`;
+    return `${pick.sh} - ${pick.sa}`;
+  }
+
+  function _renderPickPhase(body, state) {
+    const sel = state.pick;
+    body.innerHTML = `
+      <div class="fr-pick-title">你猜最終比分（含延長 / PK）</div>
+      <div class="fr-pick-grid" id="fr-pick-grid"></div>
+      <button class="fr-pick-over-btn" id="fr-pick-over">${sel && sel.over ? `自訂：${sel.sh} - ${sel.sa}` : '其他比分（>4 任一邊）'}</button>
+      <div class="fr-pick-actions">
+        <button class="fr-btn fr-btn--submit" id="fr-pick-submit" ${sel ? '' : 'disabled'}>${sel ? '更新猜測' : '送出'}</button>
+      </div>
+    `;
+    _drawGrid(body, state);
+
+    body.querySelector('#fr-pick-over').addEventListener('click', () => _openCustomScore(body, state));
+    body.querySelector('#fr-pick-submit').addEventListener('click', () => _submitPick(body, state));
+  }
+
+  function _drawGrid(body, state) {
+    const grid = body.querySelector('#fr-pick-grid');
+    if (!grid) return;
+    const cells = [];
+    // 表頭：客隊比分
+    cells.push('<div class="fr-grid-corner"></div>');
+    for (let a = 0; a <= 4; a++) cells.push(`<div class="fr-grid-head">${a}</div>`);
+    for (let h = 0; h <= 4; h++) {
+      cells.push(`<div class="fr-grid-head fr-grid-head--row">${h}</div>`);
+      for (let a = 0; a <= 4; a++) {
+        const isSel = state.pick && !state.pick.over && state.pick.sh === h && state.pick.sa === a;
+        cells.push(`<button class="fr-grid-cell ${isSel ? 'fr-grid-cell--sel' : ''}" data-h="${h}" data-a="${a}">${h}-${a}</button>`);
+      }
+    }
+    grid.innerHTML = cells.join('');
+    grid.querySelectorAll('.fr-grid-cell').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const h = parseInt(btn.dataset.h);
+        const a = parseInt(btn.dataset.a);
+        state.pick = { sh: h, sa: a, over: false };
+        // 重畫高亮
+        grid.querySelectorAll('.fr-grid-cell').forEach(b => b.classList.remove('fr-grid-cell--sel'));
+        btn.classList.add('fr-grid-cell--sel');
+        // 解鎖送出鍵
+        const sub = body.querySelector('#fr-pick-submit');
+        if (sub) { sub.disabled = false; sub.textContent = '送出'; }
+        // 清掉 >4 自訂顯示
+        const overBtn = body.querySelector('#fr-pick-over');
+        if (overBtn) overBtn.textContent = '其他比分（>4 任一邊）';
+      });
+    });
+  }
+
+  function _openCustomScore(body, state) {
+    const overlay = document.createElement('div');
+    overlay.className = 'fr-modal-overlay';
+    overlay.innerHTML = `
+      <div class="fr-modal fr-modal--narrow" role="dialog">
+        <button class="fr-modal-close" type="button">&times;</button>
+        <h3 class="fr-modal-title">自訂比分（>4 任一邊）</h3>
+        <p class="fr-modal-sub">必須完全猜中（含延長 / PK）才算中</p>
+        <div class="fr-custom-row">
+          <input type="number" id="fr-custom-h" min="0" max="20" value="${state.pick && state.pick.over ? state.pick.sh : 5}" />
+          <span>-</span>
+          <input type="number" id="fr-custom-a" min="0" max="20" value="${state.pick && state.pick.over ? state.pick.sa : 0}" />
+        </div>
+        <p class="fr-modal-sub" style="margin-top:6px">至少一邊要 ≥ 5 才需要走這個</p>
+        <div class="fr-form-actions">
+          <button class="fr-btn fr-btn--cancel" id="fr-custom-cancel">取消</button>
+          <button class="fr-btn fr-btn--submit" id="fr-custom-ok">確定</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 250);
+    };
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    overlay.querySelector('.fr-modal-close').addEventListener('click', close);
+    overlay.querySelector('#fr-custom-cancel').addEventListener('click', close);
+    overlay.querySelector('#fr-custom-ok').addEventListener('click', () => {
+      const h = parseInt(overlay.querySelector('#fr-custom-h').value);
+      const a = parseInt(overlay.querySelector('#fr-custom-a').value);
+      if (isNaN(h) || isNaN(a) || h < 0 || a < 0 || h > 20 || a > 20) {
+        alert('比分必須在 0–20 之間');
+        return;
+      }
+      if (h <= 4 && a <= 4) {
+        alert('5 球以下請直接點上面的格子');
+        return;
+      }
+      state.pick = { sh: h, sa: a, over: true };
+      // 反映回 grid + 按鈕
+      const grid = body.querySelector('#fr-pick-grid');
+      if (grid) grid.querySelectorAll('.fr-grid-cell').forEach(b => b.classList.remove('fr-grid-cell--sel'));
+      const overBtn = body.querySelector('#fr-pick-over');
+      if (overBtn) overBtn.textContent = `自訂：${h} - ${a}`;
+      const sub = body.querySelector('#fr-pick-submit');
+      if (sub) { sub.disabled = false; sub.textContent = '送出'; }
+      close();
+    });
+  }
+
+  async function _submitPick(body, state) {
+    if (!state.pick) return;
+    const sub = body.querySelector('#fr-pick-submit');
+    sub.disabled = true;
+    sub.textContent = '送出中…';
+    try {
+      const { error } = await window.DB.from('friend_picks').upsert({
+        room_code: state.room.room_code,
+        voter_key: _voterKey(),
+        nickname: _resolveNickname(),
+        score_home: state.pick.sh,
+        score_away: state.pick.sa,
+        is_over: !!state.pick.over,
+      }, { onConflict: 'room_code,voter_key' });
+      if (error) throw error;
+      sub.textContent = '已送出 ✓';
+      sub.disabled = false;
+      // 強制重抓大廳人數（非必要，realtime 也會推）
+      loadLobby();
+    } catch (e) {
+      console.warn('[friend-room] submit pick failed', e);
+      alert('送出失敗：' + (e.message || '未知錯誤'));
+      sub.disabled = false;
+      sub.textContent = '送出';
+    }
+  }
+
+  function _renderLockedPhase(body, state) {
+    body.innerHTML = `
+      <div class="fr-room-stub">
+        <div style="font-size:32px;margin-bottom:8px">🔒</div>
+        <div>報名已截止，等待開賽</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:10px">
+          你的猜測：${state.pick ? _formatPick(state.pick) : '（沒投，純看戲）'}
+        </div>
+      </div>`;
+  }
+
+  function _escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  // ── 公開 API（後續 PR 會把 viewReplay 補上實作） ──
   window.FriendRoom = {
     loadLobby,
     openCreateModal,
-    joinRoom(roomCode) {
-      // PR-2d
-      alert(`加入房間 #${roomCode}（PR-2d 接 score grid）`);
-    },
+    joinRoom,
     viewReplay(roomCode) {
       // PR-4
       alert(`回放 #${roomCode}（PR-4 接 deterministic 重跑）`);
@@ -428,6 +747,11 @@
         loadLobby();
         _subscribeRealtime();
       }, 200);
+    }
+    // 邀請連結：#fr-room-XXXXXX → 自動進房
+    const m = location.hash.match(/^#fr-room-([A-Z0-9]+)$/i);
+    if (m) {
+      setTimeout(() => joinRoom(m[1].toUpperCase()), 300);
     }
   });
 })();
