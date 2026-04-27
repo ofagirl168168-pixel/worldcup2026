@@ -556,24 +556,111 @@
     } else if (phase === 'locked') {
       _renderLockedPhase(body, state);
     } else if (phase === 'live') {
-      body.innerHTML = `
-        <div class="fr-room-stub">
-          <div style="font-size:32px;margin-bottom:8px">📺</div>
-          <div>直播中…（同步觀賽功能 PR-3 上線）</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:8px">
-            你的猜測：${state.pick ? _formatPick(state.pick) : '（沒投）'}
-          </div>
-        </div>`;
+      _renderLivePhase(body, state);
     } else {
-      body.innerHTML = `
-        <div class="fr-room-stub">
-          <div style="font-size:32px;margin-bottom:8px">🏁</div>
-          <div>比賽結束</div>
-          ${state.room.result_home != null && state.room.result_away != null
-            ? `<div style="margin-top:8px;font-size:18px;font-weight:800">${state.room.result_home} - ${state.room.result_away}</div>`
-            : ''}
-        </div>`;
+      _renderEndedPhase(body, state);
     }
+  }
+
+  // 拿房間綁定的真實隊伍資料（含 radar 等 sim 需要的欄位）
+  function _resolveTeamsForRoom(room) {
+    const meta = room.match_meta || {};
+    const lg = meta.league;
+    const T = lg === 'epl' ? (window.EPL_TEAMS || {})
+      : lg === 'ucl' ? (window.UCL_TEAMS || {})
+      : (typeof TEAMS !== 'undefined' ? TEAMS : {});
+    const home = T[meta.home_code];
+    const away = T[meta.away_code];
+    return { home, away };
+  }
+
+  function _renderLivePhase(body, state) {
+    const matchId = `fr-${state.room.room_code}`;
+    body.innerHTML = `
+      <div class="fr-live-wrap">
+        <div class="fr-live-header">
+          <span class="fr-cd-live">🔴 直播中</span>
+          <span class="fr-live-pick-tag">你猜：${state.pick ? _formatPick(state.pick) : '（沒投）'}</span>
+        </div>
+        <div id="sim-wrap-${matchId}" class="fr-live-sim"></div>
+      </div>
+    `;
+    const container = body.querySelector(`#sim-wrap-${matchId}`);
+    const { home, away } = _resolveTeamsForRoom(state.room);
+    if (!home || !away) {
+      container.innerHTML = '<div style="color:#ef9a9a;text-align:center;padding:16px">⚠️ 找不到此比賽的隊伍資料，無法模擬</div>';
+      return;
+    }
+    if (!window.MatchSim || typeof window.MatchSim.runDirect !== 'function') {
+      container.innerHTML = '<div style="color:#ef9a9a;text-align:center;padding:16px">⚠️ 模擬引擎未載入</div>';
+      return;
+    }
+    window.MatchSim.runDirect(container, home, away, {
+      seed: state.room.seed,           // 房號當 seed → 所有人結果一致
+      hideReplay: true,                // 朋友局不要「再跑一次」
+      matchId,
+      onEnd: (score) => _onSimEnd(state, score),
+    });
+  }
+
+  async function _onSimEnd(state, score) {
+    // 本地立刻知道結果（因為 sim 是 deterministic，所有 client 算出同樣結果）
+    state.room.result_home = score.h;
+    state.room.result_away = score.a;
+    state.room.status = 'ended';
+    if (state._rerender) state._rerender();
+    // 持久化到 DB（race-safe：已經 ended 就不再寫）
+    try {
+      await window.DB.from('friend_rooms').update({
+        status: 'ended',
+        result_home: score.h,
+        result_away: score.a,
+      })
+      .eq('room_code', state.room.room_code)
+      .neq('status', 'ended');
+    } catch (e) {
+      console.warn('[friend-room] result persist failed', e);
+    }
+  }
+
+  function _renderEndedPhase(body, state) {
+    const meta = state.room.match_meta || {};
+    const rh = state.room.result_home;
+    const ra = state.room.result_away;
+    const haveResult = rh != null && ra != null;
+    const myPick = state.pick;
+    let myStatus = '';
+    if (myPick && haveResult) {
+      const exact = myPick.sh === rh && myPick.sa === ra;
+      const winSide = rh > ra ? 'h' : ra > rh ? 'a' : 'd';
+      const myWinSide = myPick.sh > myPick.sa ? 'h' : myPick.sa > myPick.sh ? 'a' : 'd';
+      if (exact) myStatus = '<div class="fr-end-mine fr-end-mine--exact">🎯 完全猜中！</div>';
+      else if (winSide === myWinSide) myStatus = '<div class="fr-end-mine fr-end-mine--side">✅ 猜中勝負</div>';
+      else myStatus = '<div class="fr-end-mine fr-end-mine--miss">❌ 沒中</div>';
+    }
+    body.innerHTML = `
+      <div class="fr-ended">
+        <div class="fr-ended-icon">🏁</div>
+        <div class="fr-ended-title">比賽結束</div>
+        ${haveResult ? `
+          <div class="fr-ended-score">
+            <span>${_escapeHtml(meta.home_name || '主隊')}</span>
+            <b>${rh}</b>
+            <span class="fr-ended-dash">-</span>
+            <b>${ra}</b>
+            <span>${_escapeHtml(meta.away_name || '客隊')}</span>
+          </div>
+        ` : '<div class="fr-ended-tip">結果計算中…</div>'}
+        ${myPick ? `<div class="fr-ended-mypick">你猜：${_formatPick(myPick)}</div>` : ''}
+        ${myStatus}
+        <div class="fr-pick-actions" style="margin-top:18px">
+          <button class="fr-btn fr-btn--submit" id="fr-end-back">回大廳</button>
+        </div>
+      </div>
+    `;
+    body.querySelector('#fr-end-back').addEventListener('click', () => {
+      if (state._close) state._close();
+    });
   }
 
   function _formatPick(pick) {

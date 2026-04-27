@@ -180,10 +180,12 @@
   }
 
   // ── 主模擬 ──────────────────────────────────────────────
-  function runSim(container, home, away, matchId, seed) {
+  // opts: { seed?: string, onEnd?: (score) => void, hideReplay?: boolean }
+  function runSim(container, home, away, matchId, opts) {
+    opts = opts || {};
     // 帶 seed → 用 seedable RNG（朋友直播房需要每人結果一致）
     // 不帶 seed → 沿用 Math.random（單機隨便看的維持「每次不同」）
-    const rng = seed ? makeSeededRng(seed) : Math.random;
+    const rng = opts.seed ? makeSeededRng(opts.seed) : Math.random;
 
     const ui = buildHUD(container, { home, away });
     const canvas = ui.canvas;
@@ -783,6 +785,10 @@
         : state.score.a > state.score.h ? '#e53935'
         : 'rgba(255,255,255,0.7)';
       ui.summary.style.display = 'block';
+      const replayBtn = opts.hideReplay ? '' :
+        `<button onclick="MatchSim.run('${matchId}')" style="margin-top:10px;padding:8px 18px;background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:12px;cursor:pointer">
+          🔁 再跑一次
+        </button>`;
       ui.summary.innerHTML = `
         <div style="font-size:14px;font-weight:800;color:${winnerColor};margin-bottom:6px">
           ${winner === '平手' ? '🤝 平手' : `🏆 ${winner} 勝`}
@@ -793,13 +799,15 @@
           <div>進球 ${h.goals}</div>
           <div style="text-align:right">進球 ${a.goals}</div>
         </div>
-        <button onclick="MatchSim.run('${matchId}')" style="margin-top:10px;padding:8px 18px;background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:12px;cursor:pointer">
-          🔁 再跑一次
-        </button>
+        ${replayBtn}
         <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.35)">
           模擬只計「威脅事件」(shots on target + key passes)，不是真實總傳球
         </div>
       `;
+      // 朋友直播房用：sim 跑完通知外層算結果
+      if (typeof opts.onEnd === 'function') {
+        try { opts.onEnd({ h: state.score.h, a: state.score.a }); } catch (e) { console.warn('[MatchSim] onEnd threw', e); }
+      }
     }
 
     // 開球
@@ -834,7 +842,18 @@
         return;
       }
 
-      runSim(container, home, away, matchId, opts.seed);
+      runSim(container, home, away, matchId, opts);
+    },
+
+    // 朋友直播房用：直接給 container + 隊伍資料 + opts，不走 schedule lookup
+    // opts: { seed, onEnd(score), hideReplay, matchId? }
+    runDirect(container, home, away, opts = {}) {
+      if (!container) { console.warn('[MatchSim] runDirect: no container'); return; }
+      if (!home || !away || !home.radar || !away.radar) {
+        if (container) container.innerHTML = '<div style="color:#ef9a9a;text-align:center;padding:16px">⚠️ 此比賽缺少數據，無法模擬</div>';
+        return;
+      }
+      runSim(container, home, away, opts.matchId || 'fr-direct', opts);
     }
   };
 })();
