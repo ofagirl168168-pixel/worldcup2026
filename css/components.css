@@ -4999,3 +4999,172 @@ body.opinion-open .btn-arena-float { display: none; }
   animation: rogue-dot-pulse 1.4s ease-in-out infinite;
   z-index: 2;
 }
+
+/* ── 房間 action bar（close + share，浮動在 viewport，不被 box transform 卡住）── */
+.fr-room-action-bar {
+  position: fixed;
+  top: 14px; right: 14px;
+  display: flex; gap: 8px;
+  z-index: 1101;
+  pointer-events: auto;
+}
+.fr-room-action {
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  border-radius: 22px;
+  padding: 8px 14px;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+  transition: background 0.15s ease, border-color 0.15s ease;
+  font-family: inherit;
+}
+.fr-room-action:hover { background: rgba(0,0,0,0.75); }
+.fr-room-action--close {
+  width: 38px; height: 38px;
+  padding: 0;
+  font-size: 22px; line-height: 1;
+  justify-content: center;
+}
+.fr-room-action--copied {
+  background: rgba(107,208,158,0.22) !important;
+  border-color: rgba(107,208,158,0.5) !important;
+  color: #6bd09e !important;
+}
+@media (max-width: 480px) {
+  /* 手機版分享按鈕只留 icon 省空間 */
+  .fr-room-action-label { display: none; }
+  .fr-room-action--share {
+    width: 38px; height: 38px;
+    padding: 0; justify-content: center;
+  }
+}
+
+/* 房名（room overlay 標題上方） */
+.fr-room-name {
+  font-size: 17px; font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+/* 開房 modal 房名輸入 */
+.fr-form-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+}
+.fr-form-input:focus {
+  outline: none;
+  border-color: rgba(91,115,255,0.6);
+}
+.fr-form-input::placeholder { color: rgba(255,255,255,0.35); }
+.fr-form-err {
+  font-size: 12px; color: #ff8888;
+  margin-top: 4px;
+  min-height: 16px;
+}
+
+/* 大廳 row 房名 + 比賽副標 */
+.fr-cell-name {
+  font-weight: 800; font-size: 14px;
+  color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fr-cell-sub {
+  font-size: 12px; color: var(--text-muted);
+  font-weight: 500;
+  display: flex; align-items: center; gap: 4px;
+  margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fr-cell-sub .fr-crest { width: 14px; height: 14px; }
+
+/* ── 「你已加入房間」浮動通知 panel ───────────────────── */
+.fr-notif-panel {
+  position: fixed;
+  top: 70px; right: 16px;
+  width: 360px; max-width: calc(100vw - 32px);
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #1a3a8e 0%, #2d4ec8 100%);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+  z-index: 900;
+  color: #fff;
+  animation: fr-notif-in 0.35s cubic-bezier(.22,1,.36,1);
+}
+@keyframes fr-notif-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fr-notif-icon {
+  font-size: 22px;
+  flex: 0 0 auto;
+}
+.fr-notif-main {
+  flex: 1; min-width: 0;
+}
+.fr-notif-head {
+  font-size: 13px; font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.fr-notif-desc {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.82);
+  margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fr-notif-action {
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  font-size: 12px; font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  flex: 0 0 auto;
+  font-family: inherit;
+}
+.fr-notif-action:hover { background: rgba(255,255,255,0.28); }
+.fr-notif-close {
+  background: transparent; border: 0;
+  color: rgba(255,255,255,0.6);
+  font-size: 18px; line-height: 1;
+  width: 22px; height: 22px;
+  cursor: pointer;
+  padding: 0;
+  flex: 0 0 auto;
+}
+.fr-notif-close:hover { color: #fff; }
+
+/* imminent 狀態加紅光呼吸提示 */
+.fr-notif-panel[data-state="imminent"] {
+  background: linear-gradient(135deg, #c0392b 0%, #ff5757 100%);
+  animation: fr-notif-in 0.35s cubic-bezier(.22,1,.36,1), fr-notif-pulse 1.6s ease-in-out infinite 0.5s;
+}
+@keyframes fr-notif-pulse {
+  0%, 100% { box-shadow: 0 12px 32px rgba(0,0,0,0.45), 0 0 0 0 rgba(255,87,87,0.6); }
+  50%      { box-shadow: 0 12px 32px rgba(0,0,0,0.45), 0 0 0 8px rgba(255,87,87,0); }
+}
+.fr-notif-panel[data-state="ended"] {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+}
+
+/* 手機：通知 panel 改放在頁頂下方滿寬 */
+@media (max-width: 600px) {
+  .fr-notif-panel {
+    top: 60px; right: 8px; left: 8px;
+    width: auto; max-width: none;
+  }
+}

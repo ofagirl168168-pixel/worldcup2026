@@ -112,7 +112,15 @@
     const away = meta.away_name || meta.away_code || '客隊';
     const homeFlag = meta.home_flag ? `<img src="${meta.home_flag}" alt="" class="fr-crest" />` : '';
     const awayFlag = meta.away_flag ? `<img src="${meta.away_flag}" alt="" class="fr-crest" />` : '';
-    return `${homeFlag}${home} <span class="fr-vs">vs</span> ${awayFlag}${away}`;
+    const matchLine = `${homeFlag}${home} <span class="fr-vs">vs</span> ${awayFlag}${away}`;
+    // 有房名 → 房名為主，比賽當副標
+    if (room.room_name) {
+      const safeName = room.room_name.replace(/[<>"'&]/g, c => ({
+        '<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','&':'&amp;'
+      }[c]));
+      return `<div class="fr-cell-name">${safeName}</div><div class="fr-cell-sub">${matchLine}</div>`;
+    }
+    return matchLine;
   }
 
   function _countdown(kickoffISO) {
@@ -226,6 +234,35 @@
     return opts;
   }
 
+  // 房名檢查：禁不雅文字 + 宣傳文字
+  function _validateRoomName(rawName) {
+    const name = (rawName || '').trim();
+    if (!name) return '請輸入房名';
+    if (name.length > 30) return '房名 30 字內';
+    const lower = name.toLowerCase();
+    // 不雅 / 宣傳關鍵字（小集合，可日後擴增）
+    const blocked = [
+      // 中文不雅
+      '幹你', '操你', '靠北', '靠杯', '三小', '智障', '腦殘', '白癡', '低能',
+      '媽的', '機掰', '雞掰', '雞八', '幹爆', '草泥馬', '草尼馬', '幹他媽',
+      // 英文
+      'fuck', 'shit', 'bitch', 'asshole', 'cunt',
+      // 性
+      '色情', '援交', '一夜情', '上門', '叫小姐', '茶莊', '魚訊',
+      // 宣傳/賭
+      '加賴', '加我line', '加微信', 'wechat', 'wx:', 'qq:', '電報', 'telegram',
+      '賭博', '博彩', '彩票', '六合彩', '北京賽車', '幸運飛艇', '彩金',
+      '兼職', '日入', '日進', '輕鬆賺', '日領', '線上博',
+    ];
+    for (const w of blocked) {
+      if (lower.includes(w.toLowerCase())) return `房名不能包含「${w}」這類字眼`;
+    }
+    if (/https?:\/\//i.test(name) || /www\./i.test(name)) return '房名不能放網址';
+    if (/@[A-Za-z0-9_]{2,}/.test(name)) return '房名不能放 @ID';
+    if (/\d{8,}/.test(name)) return '房名不能放電話 / 長串數字';
+    return null;
+  }
+
   function openCreateModal() {
     if (!window.DB) {
       alert('連線中…請稍後再試');
@@ -246,7 +283,14 @@
         <p class="fr-modal-sub">跟朋友一起猜真實比賽、看模擬賽直播決勝負</p>
 
         <div class="fr-form-section">
-          <label class="fr-form-label">1. 選比賽</label>
+          <label class="fr-form-label">1. 房名（讓朋友認得，最多 30 字）</label>
+          <input class="fr-form-input" id="fr-form-name" type="text" maxlength="30"
+            placeholder="例：哥們週末挑戰賽" />
+          <div class="fr-form-err" id="fr-form-name-err"></div>
+        </div>
+
+        <div class="fr-form-section">
+          <label class="fr-form-label">2. 選比賽</label>
           <select class="fr-form-select" id="fr-form-match">
             ${matches.map(m =>
               `<option value="${m.league}|${m.id}">${_leagueIcon(m.league)} ${_formatTime(m.kickoff_ts)} · ${m.home_name} vs ${m.away_name}</option>`
@@ -255,12 +299,12 @@
         </div>
 
         <div class="fr-form-section">
-          <label class="fr-form-label">2. 同步開賽時間</label>
+          <label class="fr-form-label">3. 同步開賽時間</label>
           <div class="fr-form-options" id="fr-form-time-options"></div>
         </div>
 
         <div class="fr-form-section">
-          <label class="fr-form-label">3. 押注（每人）</label>
+          <label class="fr-form-label">4. 押注（每人）</label>
           <div class="fr-form-options">
             <label class="fr-form-opt"><input type="radio" name="fr-bet" value="0" checked /> <span>純娛樂</span></label>
             <label class="fr-form-opt"><input type="radio" name="fr-bet" value="1" /> <span>1 💎</span></label>
@@ -270,7 +314,7 @@
         </div>
 
         <div class="fr-form-section">
-          <label class="fr-form-label">4. 房型</label>
+          <label class="fr-form-label">5. 房型</label>
           <div class="fr-form-options">
             <label class="fr-form-opt"><input type="radio" name="fr-pub" value="public" checked /> <span>🔥 公開（任何人可加入）</span></label>
             <label class="fr-form-opt"><input type="radio" name="fr-pub" value="private" /> <span>🔒 私人（只有持邀請連結的人能進）</span></label>
@@ -327,6 +371,18 @@
   }
 
   async function _submitCreate(matches, overlay) {
+    // 房名驗證
+    const nameInput = overlay.querySelector('#fr-form-name');
+    const nameErrEl = overlay.querySelector('#fr-form-name-err');
+    const roomName = (nameInput?.value || '').trim();
+    const nameErr = _validateRoomName(roomName);
+    if (nameErr) {
+      if (nameErrEl) nameErrEl.textContent = nameErr;
+      nameInput?.focus();
+      throw new Error(nameErr);
+    }
+    if (nameErrEl) nameErrEl.textContent = '';
+
     const [lg, id] = overlay.querySelector('#fr-form-match').value.split('|');
     const match = matches.find(x => x.league === lg && x.id === id);
     if (!match) throw new Error('找不到比賽');
@@ -340,6 +396,7 @@
 
     const { error } = await window.DB.from('friend_rooms').insert({
       room_code: roomCode,
+      room_name: roomName,
       host_voter_key: _voterKey(),
       host_nickname: _resolveNickname(),
       match_ref: `${lg}-${id}`,
@@ -460,15 +517,18 @@
     const overlay = document.createElement('div');
     overlay.className = 'fr-room-overlay';
     overlay.innerHTML = `
-      <div class="fr-room-box">
-        <button class="fr-modal-close fr-modal-close--floating" type="button" aria-label="關閉">&times;</button>
+      <div class="fr-room-action-bar">
+        <button class="fr-room-action fr-room-action--share" id="fr-room-share" type="button" title="分享房間">
+          <i class="fas fa-share-alt"></i><span class="fr-room-action-label"> 分享</span>
+        </button>
+        <button class="fr-room-action fr-room-action--close" type="button" aria-label="關閉">&times;</button>
+      </div>
 
+      <div class="fr-room-box">
         <div class="fr-room-header">
+          ${room.room_name ? `<div class="fr-room-name">${_escapeHtml(room.room_name)}</div>` : ''}
           <div class="fr-room-id-row">
             <div class="fr-room-id">#${room.room_code}</div>
-            <button class="fr-room-share" type="button" id="fr-room-share" title="分享房間">
-              <i class="fas fa-share-alt"></i> 分享
-            </button>
           </div>
           <div class="fr-room-tags">
             ${room.is_official ? '<span class="fr-type fr-type--official">官方</span>' : ''}
@@ -571,7 +631,7 @@
       }
     }
     state._close = close;
-    overlay.querySelector('.fr-modal-close').addEventListener('click', close);
+    overlay.querySelector('.fr-room-action--close').addEventListener('click', close);
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
 
     // 分享按鈕：複製邀請連結（私人房特別重要，因為要連結才進得去）
@@ -581,22 +641,19 @@
         e.stopPropagation();
         const url = `${location.origin}${location.pathname}#fr-room-${room.room_code}`;
         const shareText = `來陪我猜這場比賽！${room.match_meta?.home_name || ''} vs ${room.match_meta?.away_name || ''}`;
-        // 行動裝置先試系統 share，桌機 fallback 複製剪貼簿
         if (navigator.share) {
           try {
             await navigator.share({ title: '麥迪挑戰賽', text: shareText, url });
             return;
-          } catch (err) {
-            // 使用者取消 share 也走 fallback
-          }
+          } catch (err) { /* 使用者取消 share 也走 fallback */ }
         }
         try {
           await navigator.clipboard.writeText(url);
-          shareBtn.classList.add('fr-room-share--copied');
-          shareBtn.innerHTML = '<i class="fas fa-check"></i> 已複製';
+          shareBtn.classList.add('fr-room-action--copied');
+          shareBtn.innerHTML = '<i class="fas fa-check"></i><span class="fr-room-action-label"> 已複製</span>';
           setTimeout(() => {
-            shareBtn.classList.remove('fr-room-share--copied');
-            shareBtn.innerHTML = '<i class="fas fa-share-alt"></i> 分享';
+            shareBtn.classList.remove('fr-room-action--copied');
+            shareBtn.innerHTML = '<i class="fas fa-share-alt"></i><span class="fr-room-action-label"> 分享</span>';
           }, 1800);
         } catch (err) {
           alert('連結：\n' + url);
@@ -1298,23 +1355,131 @@
     const has = rooms && rooms.length > 0;
     navBtns.forEach(btn => btn.classList.toggle('fr-has-active', has));
     if (homeBanner) homeBanner.classList.toggle('fr-has-active', has);
-    // 把最近一場的開賽倒數塞到 home banner 副標題
-    if (homeBanner && has) {
-      const next = rooms[0];
-      const ms = new Date(next.kickoff_at).getTime() - Date.now();
-      const desc = homeBanner.querySelector('.fr-home-banner-desc');
-      if (desc) {
-        if (ms <= 0) {
-          desc.textContent = `🔴 直播中：${next.match_meta?.home_name || ''} vs ${next.match_meta?.away_name || ''}`;
-        } else {
-          const totalMin = Math.floor(ms / 60000);
-          const h = Math.floor(totalMin / 60);
-          const m = totalMin % 60;
-          const left = h > 0 ? `${h} 小時 ${m} 分` : `${m} 分鐘`;
-          desc.textContent = `⏱ 你已加入：${next.match_meta?.home_name || ''} vs ${next.match_meta?.away_name || ''} · ${left}後開賽`;
-        }
-      }
+    _renderNotifPanel(rooms);
+  }
+
+  // 通知面板「已 dismiss」紀錄（依 (room_code, state) 去重）
+  function _isNotifDismissed(roomCode, state) {
+    try {
+      const m = JSON.parse(localStorage.getItem('fr_notif_dismissed') || '{}');
+      return m[`${roomCode}|${state}`] === true;
+    } catch (e) { return false; }
+  }
+  function _markNotifDismissed(roomCode, state) {
+    try {
+      const m = JSON.parse(localStorage.getItem('fr_notif_dismissed') || '{}');
+      m[`${roomCode}|${state}`] = true;
+      const keys = Object.keys(m);
+      if (keys.length > 50) keys.slice(0, keys.length - 50).forEach(k => delete m[k]);
+      localStorage.setItem('fr_notif_dismissed', JSON.stringify(m));
+    } catch (e) {}
+  }
+
+  function _classifyNotifState(room) {
+    const ms = new Date(room.kickoff_at).getTime() - Date.now();
+    if (room.status === 'ended') return 'ended';
+    if (room.status === 'live' || ms <= 0) return 'live';
+    if (ms <= 60000) return 'imminent'; // 倒數 1 分鐘內
+    return 'joined';
+  }
+
+  function _findNotifRoom(rooms, ended) {
+    // 優先順序：imminent > live > joined > ended
+    const order = ['imminent', 'live', 'joined', 'ended'];
+    const candidates = [
+      ...((rooms || []).map(r => ({ r, s: _classifyNotifState(r) }))),
+      ...((ended || []).map(r => ({ r, s: 'ended' }))),
+    ];
+    for (const ord of order) {
+      const hit = candidates.find(c => c.s === ord && !_isNotifDismissed(c.r.room_code, c.s));
+      if (hit) return hit;
     }
+    return null;
+  }
+
+  async function _renderNotifPanel(rooms) {
+    let panel = document.getElementById('fr-notif-panel');
+    // 抓 24h 內已結束 + 我有 pick 的房（讓「已結束」也能彈通知）
+    let endedRooms = [];
+    try {
+      const myKey = _voterKey();
+      const { data: myPicks } = await window.DB
+        .from('friend_picks')
+        .select('room_code')
+        .eq('voter_key', myKey);
+      if (myPicks && myPicks.length) {
+        const codes = [...new Set(myPicks.map(p => p.room_code))];
+        const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+        const { data } = await window.DB
+          .from('friend_rooms')
+          .select('room_code, kickoff_at, status, settled_at, result_home, result_away, match_meta, room_name')
+          .in('room_code', codes)
+          .eq('status', 'ended')
+          .gte('settled_at', since);
+        endedRooms = data || [];
+      }
+    } catch (e) { /* 無聲失敗，沒結束通知就算了 */ }
+
+    const hit = _findNotifRoom(rooms, endedRooms);
+    if (!hit) {
+      if (panel) panel.remove();
+      return;
+    }
+
+    const meta = hit.r.match_meta || {};
+    const teams = `${meta.home_name || ''} vs ${meta.away_name || ''}`;
+    const title = hit.r.room_name ? hit.r.room_name : teams;
+    const sub = hit.r.room_name ? teams : '';
+
+    let icon, head, desc, action;
+    if (hit.s === 'imminent') {
+      const sec = Math.max(0, Math.ceil((new Date(hit.r.kickoff_at).getTime() - Date.now()) / 1000));
+      icon = '⏰'; head = '準備開賽'; desc = `${title}${sub ? ' · ' + sub : ''} · ${sec} 秒後直播`;
+      action = { label: '進入', onClick: () => joinRoom(hit.r.room_code) };
+    } else if (hit.s === 'live') {
+      icon = '🔴'; head = '直播中'; desc = `${title}${sub ? ' · ' + sub : ''}`;
+      action = { label: '進入', onClick: () => joinRoom(hit.r.room_code) };
+    } else if (hit.s === 'ended') {
+      const rh = hit.r.result_home, ra = hit.r.result_away;
+      icon = '🏁'; head = '已結束'; desc = `${title} · ${rh}-${ra}`;
+      action = { label: '查看', onClick: () => joinRoom(hit.r.room_code) };
+    } else { // joined
+      const ms = new Date(hit.r.kickoff_at).getTime() - Date.now();
+      const totalMin = Math.floor(ms / 60000);
+      const h = Math.floor(totalMin / 60);
+      const m = totalMin % 60;
+      const left = h > 0 ? `${h} 小時 ${m} 分` : `${m} 分`;
+      icon = '✅'; head = '你已加入'; desc = `${title}${sub ? ' · ' + sub : ''} · ${left}後開賽`;
+      action = { label: '進入', onClick: () => joinRoom(hit.r.room_code) };
+    }
+
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.id = 'fr-notif-panel';
+      panel.className = 'fr-notif-panel';
+      document.body.appendChild(panel);
+    }
+    // imminent 狀態不給關（只能進入）；其他狀態才有 ×
+    const closeBtn = (hit.s === 'imminent')
+      ? ''
+      : `<button class="fr-notif-close" type="button" aria-label="關閉">&times;</button>`;
+    panel.dataset.room = hit.r.room_code;
+    panel.dataset.state = hit.s;
+    panel.innerHTML = `
+      <div class="fr-notif-icon">${icon}</div>
+      <div class="fr-notif-main">
+        <div class="fr-notif-head">${_escapeHtml(head)}</div>
+        <div class="fr-notif-desc">${_escapeHtml(desc)}</div>
+      </div>
+      <button class="fr-notif-action" type="button">${_escapeHtml(action.label)} →</button>
+      ${closeBtn}
+    `;
+    panel.querySelector('.fr-notif-action').onclick = () => { action.onClick(); };
+    const cb = panel.querySelector('.fr-notif-close');
+    if (cb) cb.onclick = () => {
+      _markNotifDismissed(hit.r.room_code, hit.s);
+      panel.remove();
+    };
   }
 
   let _activeBadgeTimer = null;
