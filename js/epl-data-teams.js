@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-04-26 日更）
+   資料截止：2025/26 賽季（2026-04-27 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -25,8 +25,8 @@ const EPL_TEAMS = {
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
     injuries:[
       {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題（已開始輕度訓練）',returnDate:'評估中'},
-      {name:'Kai Havertz',pos:'前鋒',status:'上半場退場（vs NEW 4/25），傷勢待評估',returnDate:'評估中'},
-      {name:'Eberechi Eze',pos:'攻擊中場',status:'下半場退場（vs NEW 4/25），傷勢待評估',returnDate:'評估中'},
+      {name:'Kai Havertz',pos:'前鋒',status:'肌肉不適（vs NEW 4/25），Arteta 稱「不嚴重」',returnDate:'歐冠半決賽（4/30）待定'},
+      {name:'Eberechi Eze',pos:'攻擊中場',status:'肌肉不適（vs NEW 4/25），本人稱為預防性換人',returnDate:'歐冠半決賽（4/30）待定'},
       {name:'Jurrien Timber',pos:'後衛',status:'腳踝傷勢（缺陣超過一個月）',returnDate:'存疑'},
       {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢',returnDate:'存疑'},
       {name:'Mikel Merino',pos:'中場',status:'已脫護具但本季不預期回歸',returnDate:'賽季報銷'},
@@ -50,7 +50,7 @@ const EPL_TEAMS = {
     recentForm:['D','L','W','W','W'],
     history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍',
     injuries:[
-      {name:'Mohamed Salah',pos:'右翼',status:'左腿後肌拉傷（vs CRY 4/25 下半場退場）',returnDate:'評估中'},
+      {name:'Mohamed Salah',pos:'右翼',status:'左腿後肌撕裂（vs CRY 4/25），埃及助教稱缺席4週',returnDate:'賽季報銷（世界盃可趕上）'},
       {name:'Hugo Ekitike',pos:'前鋒',status:'阿基里斯腱斷裂（vs PSG受傷）',returnDate:'賽季報銷＋世界盃缺席'},
       {name:'Alisson',pos:'門將',status:'肌肉拉傷（缺席一個月），有機會回歸',returnDate:'評估中'},
       {name:'Mamardashvili',pos:'門將',status:'傷缺數週',returnDate:'評估中'},
@@ -80,7 +80,7 @@ const EPL_TEAMS = {
       {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢',returnDate:'四月底（本月報銷）'},
       {name:'John Stones',pos:'中後衛',status:'已回歸訓練，可出場',returnDate:'已歸隊'},
       {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷（vs Chelsea下半場受傷）',returnDate:'評估中，已輕度訓練'},
-      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（掃描確認輕微，缺席 vs 伯恩利）',returnDate:'最快 4/25 足總盃半決賽復出'}
+      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（足總盃半決賽未冒險上陣）',returnDate:'下場聯賽（5/4 vs 艾弗頓）目標復出'}
     ]
   },
   'CHE': {
@@ -125,9 +125,8 @@ const EPL_TEAMS = {
     recentForm:['L','W','D','L','W'],
     history:'20次英格蘭頂級聯賽冠軍，3次歐冠冠軍，英格蘭最成功俱樂部',
     injuries:[
-      {name:'Patrick Dorgu',pos:'翼衛',status:'傷勢復健中（一月受傷）',returnDate:'賽季末'},
-      {name:'Lisandro Martínez',pos:'中後衛',status:'小腿傷（恢復訓練中）',returnDate:'即將回歸'},
-      {name:'Harry Maguire',pos:'中後衛',status:'停賽',returnDate:'下一場'}
+      {name:'Patrick Dorgu',pos:'翼衛',status:'肌肉傷復健中，恢復進度中',returnDate:'賽季末'},
+      {name:'Lisandro Martínez',pos:'中後衛',status:'停賽（第2場/共3場禁賽）',returnDate:'禁賽結束後'}
     ]
   },
   'TOT': {
@@ -146,9 +145,10 @@ const EPL_TEAMS = {
     recentForm:['D','L','L','D','W'],
     history:'2次英格蘭頂級聯賽冠軍，2019歐冠亞軍',
     injuries:[
-      {name:'Dominic Solanke',pos:'前鋒',status:'比賽中傷退（vs WOL 4/25）',returnDate:'評估中'},
-      {name:'Xavi Simons',pos:'攻擊中場',status:'比賽中傷退（vs WOL 4/25）',returnDate:'評估中'},
-      {name:'James Maddison',pos:'攻擊中場',status:'前十字韌帶傷（恢復中）',returnDate:'賽季末'},
+      {name:'Dominic Solanke',pos:'前鋒',status:'肌肉傷（vs WOL 4/25），De Zerbi 稱不嚴重',returnDate:'評估中'},
+      {name:'Xavi Simons',pos:'攻擊中場',status:'膝傷（vs WOL 4/25），較為擔憂',returnDate:'缺席 vs AVL，數日內評估'},
+      {name:'James Maddison',pos:'攻擊中場',status:'前十字韌帶傷（恢復中）',returnDate:'賽季報銷'},
+      {name:'Cristian Romero',pos:'中後衛',status:'膝傷',returnDate:'賽季報銷（世界盃存疑）'},
       {name:'Mathys Tel',pos:'翼鋒',status:'大腿傷',returnDate:'評估中'}
     ]
   },
