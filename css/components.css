@@ -3425,6 +3425,15 @@ img.flag-img {
 .opinion-cards {
   display: flex; gap: 20px; justify-content: center;
   perspective: 1200px;
+  max-height: 1500px; overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(.6,.04,.44,.96), opacity 0.4s ease, margin 0.4s ease;
+}
+/* 投票後收起卡片區，讓結果 + 留言區自然上移、使用者不用手動捲 */
+.opinion-cards.opinion-cards--collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0; margin-bottom: 0;
+  pointer-events: none;
 }
 .opinion-cards--multi {
   flex-wrap: wrap; gap: 14px;

@@ -438,6 +438,9 @@
   async function _showResult(opinion, chosenIdx, overlay, onClose) {
     const resultEl = overlay.querySelector('#opinion-result');
     if (!resultEl) return;
+    // 投票後把選項卡區段收起來，讓結果 + 留言可以直接看到（不用手動往下捲）
+    const cardsEl = overlay.querySelector('#opinion-cards');
+    if (cardsEl) cardsEl.classList.add('opinion-cards--collapsed');
 
     // 先拉真實票數（RPC 聚合）
     const votes = await _fetchTally(opinion.id, opinion.opts.length);
