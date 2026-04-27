@@ -180,7 +180,7 @@
   }
 
   // ── 主模擬 ──────────────────────────────────────────────
-  // opts: { seed?: string, onEnd?: (score) => void, hideReplay?: boolean }
+  // opts: { seed?: string, onEnd?: (score) => void, hideReplay?: boolean, hideSpeed?: boolean }
   function runSim(container, home, away, matchId, opts) {
     opts = opts || {};
     // 帶 seed → 用 seedable RNG（朋友直播房需要每人結果一致）
@@ -188,6 +188,11 @@
     const rng = opts.seed ? makeSeededRng(opts.seed) : Math.random;
 
     const ui = buildHUD(container, { home, away });
+    // 朋友直播房強制 1x 同步：藏掉速度鍵 + speedMult 鎖死
+    if (opts.hideSpeed) {
+      const bar = container.querySelector('.msim-speed-bar');
+      if (bar) bar.style.display = 'none';
+    }
     const canvas = ui.canvas;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = PITCH_W * dpr;

@@ -431,11 +431,14 @@
     }
   }
 
-  function _phaseOf(room) {
+  // 進入 ended phase 的條件：本人的 sim 真的跑完（state.simEnded）
+  // 而不是 DB 的 status='ended'（會讓較慢的 client 被切掉沒看完）
+  function _phaseOf(state) {
     const now = Date.now();
+    const room = state.room;
     const lockTs = new Date(room.lock_at).getTime();
     const kickTs = new Date(room.kickoff_at).getTime();
-    if (room.status === 'ended') return 'ended';
+    if (state.simEnded) return 'ended';
     if (now >= kickTs) return 'live';
     if (now >= lockTs) return 'locked';
     return 'open';
@@ -505,6 +508,11 @@
       // submitted=true → 顯示「已送出」確認頁；false → 顯示比分 grid
       submitted: !!existingPick,
       lastPhase: null,
+      // 本人的 sim 是否已跑完。沒跑完的話即使 DB.status='ended' 也不切結果頁
+      // → 速度慢 / 0.5x / 遲到加入的人都能看完整場才出結果
+      // 注意：每次進房都從 false 開始；DB.status='ended' 只代表別人寫入結果，
+      // 但本人沒看完就不該知道結果（符合「回放看完才出最終結果」設計）
+      simEnded: false,
       _close: null, // 由下方 close fn 補
     };
 
@@ -519,7 +527,7 @@
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
 
     function rerender() {
-      const phase = _phaseOf(state.room);
+      const phase = _phaseOf(state);
       _renderRoomStatus(overlay, state.room, phase);
       if (phase !== state.lastPhase) {
         _renderRoomBody(overlay, state, phase);
@@ -598,13 +606,15 @@
     window.MatchSim.runDirect(container, home, away, {
       seed: state.room.seed,           // 房號當 seed → 所有人結果一致
       hideReplay: true,                // 朋友局不要「再跑一次」
+      hideSpeed: true,                 // 強制 1x 同步（速度鍵會破壞「同時看到一樣畫面」的體驗）
       matchId,
       onEnd: (score) => _onSimEnd(state, score),
     });
   }
 
   async function _onSimEnd(state, score) {
-    // 本地立刻知道結果（因為 sim 是 deterministic，所有 client 算出同樣結果）
+    // 本人看完才標記 → _phaseOf 會切到 ended phase
+    state.simEnded = true;
     state.room.result_home = score.h;
     state.room.result_away = score.a;
     state.room.status = 'ended';
