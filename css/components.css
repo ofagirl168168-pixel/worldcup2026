@@ -3680,9 +3680,11 @@ img.flag-img {
   letter-spacing: 2.5px;
 }
 
-/* 桌機 4 選項（比例對齊 2 選項版本：font 15 / icon 46 ≈ 0.33） */
+/* 桌機 4 選項（強制 2x2、避免一排被擠到只剩 100px 寬） */
 .opinion-cards--opts-4 .opinion-card {
-  max-width: 220px;
+  flex: 0 1 calc(50% - 7px);   /* gap 14px 攤兩邊各 7 → 兩張塞滿 */
+  max-width: calc(50% - 7px);
+  min-width: 0;
   padding: 40px 14px 56px;
   font-size: 15px;
   gap: 13px;
