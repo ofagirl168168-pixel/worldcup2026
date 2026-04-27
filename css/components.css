@@ -3680,19 +3680,19 @@ img.flag-img {
   letter-spacing: 2.5px;
 }
 
-/* 桌機 4 選項 */
+/* 桌機 4 選項（比例對齊 2 選項版本：font 15 / icon 46 ≈ 0.33） */
 .opinion-cards--opts-4 .opinion-card {
-  max-width: 165px;
-  padding: 36px 10px 50px;
-  font-size: 13px;
-  gap: 10px;
+  max-width: 220px;
+  padding: 40px 14px 56px;
+  font-size: 15px;
+  gap: 13px;
 }
 .opinion-cards--opts-4 .opinion-card-icon {
-  font-size: 34px;
+  font-size: 46px;
 }
 .opinion-cards--opts-4 .opinion-card-label {
-  bottom: 30px;
-  font-size: 9px;
+  bottom: 32px;
+  font-size: 10px;
   letter-spacing: 2.5px;
 }
 
