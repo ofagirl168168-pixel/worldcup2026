@@ -502,7 +502,10 @@
         sa: existingPick.score_away,
         over: existingPick.is_over,
       } : null,
+      // submitted=true → 顯示「已送出」確認頁；false → 顯示比分 grid
+      submitted: !!existingPick,
       lastPhase: null,
+      _close: null, // 由下方 close fn 補
     };
 
     function close() {
@@ -511,6 +514,7 @@
       setTimeout(() => overlay.remove(), 250);
       try { history.replaceState(null, '', location.pathname); } catch (e) {}
     }
+    state._close = close;
     overlay.querySelector('.fr-modal-close').addEventListener('click', close);
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
 
@@ -522,6 +526,7 @@
         state.lastPhase = phase;
       }
     }
+    state._rerender = rerender;
     rerender();
     _roomTickInterval = setInterval(rerender, 1000);
   }
@@ -577,19 +582,55 @@
   }
 
   function _renderPickPhase(body, state) {
+    if (state.submitted && state.pick) {
+      _renderSubmittedView(body, state);
+    } else {
+      _renderPickGrid(body, state);
+    }
+  }
+
+  function _renderPickGrid(body, state) {
     const sel = state.pick;
     body.innerHTML = `
       <div class="fr-pick-title">你猜最終比分（含延長 / PK）</div>
       <div class="fr-pick-grid" id="fr-pick-grid"></div>
-      <button class="fr-pick-over-btn" id="fr-pick-over">${sel && sel.over ? `自訂：${sel.sh} - ${sel.sa}` : '其他比分（>4 任一邊）'}</button>
+      <button class="fr-pick-over-btn" id="fr-pick-over">${sel && sel.over ? `自訂：${sel.sh} - ${sel.sa}` : '其他比分（>4，需指定主隊/客隊）'}</button>
       <div class="fr-pick-actions">
-        <button class="fr-btn fr-btn--submit" id="fr-pick-submit" ${sel ? '' : 'disabled'}>${sel ? '更新猜測' : '送出'}</button>
+        <button class="fr-btn fr-btn--submit" id="fr-pick-submit" ${sel ? '' : 'disabled'}>${sel ? '送出' : '送出'}</button>
       </div>
     `;
     _drawGrid(body, state);
-
     body.querySelector('#fr-pick-over').addEventListener('click', () => _openCustomScore(body, state));
     body.querySelector('#fr-pick-submit').addEventListener('click', () => _submitPick(body, state));
+  }
+
+  function _renderSubmittedView(body, state) {
+    const meta = state.room.match_meta || {};
+    body.innerHTML = `
+      <div class="fr-submitted">
+        <div class="fr-submitted-icon">✅</div>
+        <div class="fr-submitted-title">已送出</div>
+        <div class="fr-submitted-pick">${state.pick.sh} <span class="fr-submitted-dash">-</span> ${state.pick.sa}</div>
+        <div class="fr-submitted-side-row">
+          <span>${_escapeHtml(meta.home_name || '主隊')} <b>${state.pick.sh}</b></span>
+          <span class="fr-submitted-mid">vs</span>
+          <span>${_escapeHtml(meta.away_name || '客隊')} <b>${state.pick.sa}</b></span>
+        </div>
+        ${state.pick.over ? '<div class="fr-submitted-tag">自訂（>4）</div>' : ''}
+        <div class="fr-submitted-tip">開賽前都可以改</div>
+        <div class="fr-submitted-actions">
+          <button class="fr-btn fr-btn--cancel" id="fr-back-pick">改猜測</button>
+          <button class="fr-btn fr-btn--submit" id="fr-back-lobby">回大廳</button>
+        </div>
+      </div>
+    `;
+    body.querySelector('#fr-back-pick').addEventListener('click', () => {
+      state.submitted = false;
+      _renderPickGrid(body, state);
+    });
+    body.querySelector('#fr-back-lobby').addEventListener('click', () => {
+      if (state._close) state._close();
+    });
   }
 
   function _drawGrid(body, state) {
@@ -631,12 +672,18 @@
     overlay.innerHTML = `
       <div class="fr-modal fr-modal--narrow" role="dialog">
         <button class="fr-modal-close" type="button">&times;</button>
-        <h3 class="fr-modal-title">自訂比分（>4 任一邊）</h3>
-        <p class="fr-modal-sub">必須完全猜中（含延長 / PK）才算中</p>
+        <h3 class="fr-modal-title">自訂比分（5 球以上）</h3>
+        <p class="fr-modal-sub">主隊 / 客隊必須完全對才算中（含延長 / PK）</p>
         <div class="fr-custom-row">
-          <input type="number" id="fr-custom-h" min="0" max="20" value="${state.pick && state.pick.over ? state.pick.sh : 5}" />
-          <span>-</span>
-          <input type="number" id="fr-custom-a" min="0" max="20" value="${state.pick && state.pick.over ? state.pick.sa : 0}" />
+          <div class="fr-custom-side">
+            <div class="fr-custom-side-label">${_escapeHtml(state.room.match_meta?.home_name || '主隊')}</div>
+            <input type="number" id="fr-custom-h" min="0" max="20" value="${state.pick && state.pick.over ? state.pick.sh : 5}" />
+          </div>
+          <span class="fr-custom-dash">-</span>
+          <div class="fr-custom-side">
+            <div class="fr-custom-side-label">${_escapeHtml(state.room.match_meta?.away_name || '客隊')}</div>
+            <input type="number" id="fr-custom-a" min="0" max="20" value="${state.pick && state.pick.over ? state.pick.sa : 0}" />
+          </div>
         </div>
         <p class="fr-modal-sub" style="margin-top:6px">至少一邊要 ≥ 5 才需要走這個</p>
         <div class="fr-form-actions">
@@ -692,9 +739,10 @@
         is_over: !!state.pick.over,
       }, { onConflict: 'room_code,voter_key' });
       if (error) throw error;
-      sub.textContent = '已送出 ✓';
-      sub.disabled = false;
-      // 強制重抓大廳人數（非必要，realtime 也會推）
+      // 切到「已送出」頁（保留房間 overlay，使用者可選回大廳或改猜測）
+      state.submitted = true;
+      _renderSubmittedView(body, state);
+      // 重抓大廳人數（非必要，realtime 也會推）
       loadLobby();
     } catch (e) {
       console.warn('[friend-room] submit pick failed', e);
