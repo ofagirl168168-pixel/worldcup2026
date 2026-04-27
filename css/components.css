@@ -4254,3 +4254,165 @@ body.opinion-open .btn-arena-float { display: none; }
   .fr-cell--act { grid-column: 1 / -1; justify-content: stretch; }
   .fr-cell--act .fr-btn { width: 100%; }
 }
+
+/* ── 開房 modal ──────────────────────────────────── */
+.fr-modal-overlay {
+  position: fixed; inset: 0;
+  z-index: 1100;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5, 8, 20, 0.78);
+  backdrop-filter: blur(8px);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+  padding: 20px;
+  overflow-y: auto;
+}
+.fr-modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+.fr-modal {
+  position: relative;
+  width: 100%; max-width: 460px;
+  background: linear-gradient(180deg, #1a2240 0%, #0e1430 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 28px 24px 22px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  transform: translateY(12px) scale(0.98);
+  transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+  max-height: 92vh;
+  overflow-y: auto;
+}
+.fr-modal-overlay.open .fr-modal {
+  transform: translateY(0) scale(1);
+}
+.fr-modal--narrow { max-width: 380px; text-align: center; }
+
+.fr-modal-close {
+  position: absolute; top: 10px; right: 12px;
+  background: transparent; border: 0;
+  color: rgba(255,255,255,0.55);
+  font-size: 24px; cursor: pointer;
+  width: 32px; height: 32px; line-height: 1;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.fr-modal-close:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.fr-modal-title {
+  margin: 0 0 4px; font-size: 20px; font-weight: 800;
+  color: #fff;
+}
+.fr-modal-sub {
+  margin: 0 0 20px;
+  font-size: 12.5px; color: var(--text-muted);
+}
+
+.fr-form-section {
+  margin-bottom: 18px;
+}
+.fr-form-label {
+  display: block;
+  font-size: 13px; font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+.fr-form-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.fr-form-select:focus {
+  outline: none;
+  border-color: rgba(91,115,255,0.6);
+}
+.fr-form-select option { background: #1a2240; color: #fff; }
+
+.fr-form-options {
+  display: flex; flex-wrap: wrap;
+  gap: 8px;
+}
+.fr-form-opt {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  user-select: none;
+}
+.fr-form-opt:hover { background: rgba(255,255,255,0.08); }
+.fr-form-opt input[type="radio"] { accent-color: #5b73ff; cursor: pointer; }
+.fr-form-opt:has(input:checked) {
+  background: rgba(91,115,255,0.18);
+  border-color: rgba(91,115,255,0.55);
+  color: #fff;
+}
+
+.fr-form-actions {
+  display: flex; gap: 10px; justify-content: flex-end;
+  margin-top: 22px;
+}
+.fr-btn--cancel {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.75);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 9px 18px;
+}
+.fr-btn--submit {
+  background: linear-gradient(135deg, #5b73ff 0%, #2d4ec8 100%);
+  color: #fff;
+  padding: 9px 22px;
+  box-shadow: 0 4px 14px rgba(45,78,200,0.4);
+}
+.fr-btn--submit:disabled {
+  opacity: 0.6; cursor: not-allowed;
+}
+
+/* 邀請結果頁 */
+.fr-invite-icon {
+  font-size: 48px;
+  margin: 4px 0 12px;
+}
+.fr-invite-code {
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 28px; font-weight: 800;
+  letter-spacing: 4px;
+  color: #ffd700;
+  background: rgba(255,215,0,0.08);
+  border: 1px solid rgba(255,215,0,0.25);
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin: 6px 0 12px;
+  display: inline-block;
+}
+.fr-invite-link {
+  font-size: 11.5px;
+  font-family: ui-monospace, 'Courier New', monospace;
+  color: var(--text-muted);
+  background: rgba(0,0,0,0.25);
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin: 4px 0 8px;
+  word-break: break-all;
+  text-align: left;
+}
+
+@media (max-width: 480px) {
+  .fr-modal { padding: 22px 18px 18px; }
+  .fr-modal-title { font-size: 18px; }
+  .fr-form-opt { padding: 7px 10px; font-size: 12.5px; }
+  .fr-invite-code { font-size: 22px; letter-spacing: 3px; }
+}
