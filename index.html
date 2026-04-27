@@ -206,6 +206,7 @@
       <button class="nav-btn" data-section="stats"><i class="fas fa-chart-bar"></i> 數據</button>
       <button class="nav-btn" data-section="focus"><i class="fas fa-newspaper"></i> 賽事解讀</button>
       <button class="nav-btn" data-section="arena"><i class="fas fa-gamepad"></i> 競技場</button>
+      <button class="nav-btn" data-section="friend-room"><i class="fas fa-trophy"></i> 麥迪挑戰賽</button>
       <div class="mobile-nav-status" id="mobile-nav-status">
         <div class="mobile-nav-stat" id="mobile-nav-streak-stat" style="display:none"><span class="mobile-nav-stat-icon">🔥</span> <span id="mobile-nav-streak">0</span> 天</div>
         <div class="mobile-nav-stat"><span class="mobile-nav-stat-icon">⭐</span> <span id="mobile-nav-xp">0 XP</span></div>
@@ -329,6 +330,21 @@
         <!-- 排行榜（JS 動態填入，預設收合） -->
         <div id="rogue-home-leaderboard" class="rogue-home-lb rogue-lb-collapsed"></div>
         <button class="link-btn" id="rogue-lb-toggle" onclick="toggleRogueLb()" style="margin:8px auto;display:block">展開排行榜 ↓</button>
+      </div>
+
+      <!-- 麥迪挑戰賽入口 -->
+      <div class="home-section home-section--compact">
+        <div class="fr-home-banner" onclick="showSection('friend-room')">
+          <div class="fr-home-banner-bg"></div>
+          <div class="fr-home-banner-content">
+            <div class="fr-home-banner-icon"><i class="fas fa-trophy"></i></div>
+            <div class="fr-home-banner-main">
+              <div class="fr-home-banner-title">麥迪挑戰賽 <span class="fr-home-banner-tag">NEW</span></div>
+              <div class="fr-home-banner-desc">跟朋友一起猜真實比賽比分 · 開球前 30 分同步直播模擬</div>
+            </div>
+            <div class="fr-home-banner-btn">進入大廳 →</div>
+          </div>
+        </div>
       </div>
 
       <!-- 近期賽事 -->
@@ -528,6 +544,41 @@
       <div id="focus-articles" class="focus-articles-grid"></div>
     </section>
 
+    <!-- ===== 麥迪挑戰賽（朋友直播房） ===== -->
+    <section id="section-friend-room" class="page-section">
+      <div class="fr-lobby-wrap">
+        <div class="fr-lobby-header">
+          <div class="fr-lobby-title">
+            <h2><i class="fas fa-trophy"></i> 麥迪挑戰賽</h2>
+            <p class="fr-lobby-sub">跟朋友猜比分、看模擬賽直播決勝負</p>
+          </div>
+          <button class="btn-primary fr-lobby-create" onclick="FriendRoom.openCreateModal()">
+            <i class="fas fa-plus"></i> 開房
+          </button>
+        </div>
+
+        <div class="fr-lobby-filter">
+          <span class="fr-pill fr-pill--active">本週開放中</span>
+          <input class="fr-search" id="fr-search-input" placeholder="搜尋房號或對戰" />
+        </div>
+
+        <div class="fr-lobby-table">
+          <div class="fr-lobby-thead">
+            <span>房號</span>
+            <span>類型</span>
+            <span>對戰</span>
+            <span>開賽倒數</span>
+            <span>押注</span>
+            <span>人數</span>
+            <span></span>
+          </div>
+          <div class="fr-lobby-tbody" id="fr-lobby-list">
+            <div class="fr-loading">載入大廳中…</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ========== 全域比賽預測彈窗（放在 main 外，避免被 section display:none 隱藏）========== -->
@@ -594,6 +645,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="js/opinion-poll.js"></script>
   <script src="js/match-sim.js"></script>
+  <script src="js/friend-room.js"></script>
   <script src="js/data-fix.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/gems.js"></script>
