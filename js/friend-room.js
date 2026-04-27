@@ -161,7 +161,7 @@
         <span class="fr-cell fr-cell--type">${_typeBadge(room)}</span>
         <span class="fr-cell fr-cell--match">${_matchTitle(room)}</span>
         <span class="fr-cell fr-cell--cd">${_countdown(room.kickoff_at)}</span>
-        <span class="fr-cell fr-cell--bet">${room.bet_amount > 0 ? `💎 ${room.bet_amount}` : '—'}</span>
+        <span class="fr-cell fr-cell--bet">${room.bet_amount > 0 ? `💎 ${room.bet_amount}` : '<span class="fr-cell-bet-free">純娛樂</span>'}</span>
         <span class="fr-cell fr-cell--count">${room.pick_count} 人</span>
         <span class="fr-cell fr-cell--act">${_joinButton(room)}</span>
       </div>`;
@@ -311,13 +311,20 @@
         </div>
 
         <div class="fr-form-section">
-          <label class="fr-form-label">4. 押注（每人）</label>
+          <label class="fr-form-label">4. 押注（決定贏家可領的寶石）</label>
           <div class="fr-form-options">
             <label class="fr-form-opt"><input type="radio" name="fr-bet" value="0" checked /> <span>純娛樂</span></label>
             <label class="fr-form-opt"><input type="radio" name="fr-bet" value="1" /> <span>1 💎</span></label>
             <label class="fr-form-opt"><input type="radio" name="fr-bet" value="2" /> <span>2 💎</span></label>
             <label class="fr-form-opt"><input type="radio" name="fr-bet" value="3" /> <span>3 💎</span></label>
           </div>
+          <p class="fr-form-hint">
+            猜中後本人可領寶石（需登入）：<br>
+            ・<b>純娛樂</b>：純好玩，沒寶石獎勵<br>
+            ・<b>1💎</b>：完全猜中比分 +1<br>
+            ・<b>2💎</b>：完全猜中 +2 ／ 猜中勝負 +1<br>
+            ・<b>3💎</b>：完全猜中 +3 ／ 猜中勝負 +1
+          </p>
         </div>
 
         <div class="fr-form-section">
