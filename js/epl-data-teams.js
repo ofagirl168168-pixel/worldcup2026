@@ -672,5 +672,10 @@ window.EPL_MATCHES = [
      {min:'9',player:'Eberechi Eze',side:'h'}
    ]},
 
+  // ===== 第 35 輪 (2026-04-28 ~ 開始) =====
+  // 曼聯 vs 布倫特福德 | 04/28 03:00 台灣時間 (Old Trafford 20:00 BST)
+  {id:'EPL-MW35-MUN-BRE', matchday:35, date:'2026-04-28', time:'03:00', home:'MUN', away:'BRE', stage:'league',
+   status:'upcoming'},
+
 ];
 
