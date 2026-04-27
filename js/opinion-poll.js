@@ -205,27 +205,25 @@
       }
     }, 800);
 
-    // 如果已投過票：當初選的卡片放大、其他縮小飛走，再進結果頁
+    // 如果已投過票：跟首次投票一樣的流程（入場 → 退場 → 平滑滑到中間 → 顯示結果）
     if (existingVote !== null) {
       const prevIdx = parseInt(existingVote);
       const preCards = overlay.querySelectorAll('.opinion-card');
-      preCards.forEach((card, i) => {
-        if (i === prevIdx) {
-          card.classList.add('voted-yes');
-        } else {
-          card.classList.add('voted-no');
-          // 再次打開時稍微延後飛走動畫，讓使用者先看清兩張卡
-          card.style.animationDelay = '0.45s';
-          card.style.animationDuration = '0.7s';
-        }
-        card.style.pointerEvents = 'none';
-      });
       const preSkip = overlay.querySelector('#opinion-skip');
       if (preSkip) preSkip.style.display = 'none';
       overlay.dataset.voted = '1';
+      preCards.forEach(c => { c.style.pointerEvents = 'none'; });
+      // 等入場 stagger 動畫差不多跑完（最後一張 ~0.95s）才觸發退場
+      setTimeout(() => {
+        preCards.forEach((card, i) => {
+          if (i === prevIdx) card.classList.add('voted-yes');
+          else card.classList.add('voted-no');
+        });
+      }, 1000);
+      // 1000ms 退場觸發 + 600ms voted 動畫 ≈ 1600ms 後再進結果頁（含 FLIP 滑動）
       setTimeout(() => {
         _showResult(opinion, prevIdx, overlay, onClose);
-      }, 500);
+      }, 1600);
       return;
     }
 
@@ -438,9 +436,25 @@
   async function _showResult(opinion, chosenIdx, overlay, onClose) {
     const resultEl = overlay.querySelector('#opinion-result');
     if (!resultEl) return;
-    // 投票後只把沒選的卡收掉、選中的留著（讓使用者還能看到自己選的那張）
-    // 容器 justify-content: center 會自動把剩下那張置中
+    // FLIP 平滑滑動：先量選中卡舊位置 → 沒選的卡瞬間 collapse → 量新位置 →
+    // 套 translateX 把選中卡視覺鎖回舊位置 → 過渡到 translateX(0) 平滑滑到中央
+    const allCards = overlay.querySelectorAll('.opinion-card');
+    const chosenCard = allCards[chosenIdx];
+    const rectBefore = chosenCard ? chosenCard.getBoundingClientRect() : null;
     overlay.querySelectorAll('.opinion-card.voted-no').forEach(c => c.classList.add('opinion-card--gone'));
+    if (chosenCard && rectBefore) {
+      const rectAfter = chosenCard.getBoundingClientRect();
+      const dx = rectBefore.left - rectAfter.left;
+      const dy = rectBefore.top  - rectAfter.top;
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+        chosenCard.style.transition = 'none';
+        chosenCard.style.transform = `translate(${dx}px, ${dy}px) scale(1.05)`;
+        // 強制 reflow 讓上面那行立刻生效
+        void chosenCard.offsetHeight;
+        chosenCard.style.transition = 'transform 0.65s cubic-bezier(.22,1,.36,1)';
+        chosenCard.style.transform = 'translate(0, 0) scale(1.05)';
+      }
+    }
 
     // 先拉真實票數（RPC 聚合）
     const votes = await _fetchTally(opinion.id, opinion.opts.length);

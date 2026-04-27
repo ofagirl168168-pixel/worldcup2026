@@ -3426,8 +3426,8 @@ img.flag-img {
   display: flex; gap: 20px; justify-content: center;
   perspective: 1200px;
 }
-/* 投票後沒選的卡收掉 slot（保留選中那張、容器 justify-content: center 自動把它居中）
-   delay 0.55s 等 voted-no 同步退出動畫（無 stagger）跑完才開始 collapse */
+/* 投票後沒選的卡瞬間收掉 slot（不做過渡）；
+   選中的卡改由 JS FLIP（量舊位置 → 套 translateX → 動畫滑到新位置）平滑滑到中間 */
 .opinion-card.opinion-card--gone {
   flex: 0 0 0 !important;
   max-width: 0 !important;
@@ -3436,11 +3436,6 @@ img.flag-img {
   margin: 0 !important;
   border: 0 !important;
   overflow: hidden;
-  transition:
-    flex-basis 0.45s ease 0.55s,
-    max-width 0.45s ease 0.55s,
-    padding 0.45s ease 0.55s,
-    margin 0.45s ease 0.55s;
 }
 .opinion-cards--multi {
   flex-wrap: wrap; gap: 14px;
