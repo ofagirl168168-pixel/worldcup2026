@@ -319,11 +319,12 @@
             <label class="fr-form-opt"><input type="radio" name="fr-bet" value="3" /> <span>3 💎</span></label>
           </div>
           <p class="fr-form-hint">
-            猜中後本人可領寶石（需登入）：<br>
-            ・<b>純娛樂</b>：純好玩，沒寶石獎勵<br>
-            ・<b>1💎</b>：完全猜中比分 +1<br>
-            ・<b>2💎</b>：完全猜中 +2 ／ 猜中勝負 +1<br>
-            ・<b>3💎</b>：完全猜中 +3 ／ 猜中勝負 +1
+            <b>瓜分池機制</b>（需登入才能領）：<br>
+            池子 = 押注額 × 登入參與人數<br>
+            ・<b>60% 平分</b>給「完全猜中比分」的人<br>
+            ・<b>40% 平分</b>給「猜中勝負」的人<br>
+            ・沒人完全猜中 → 100% 給猜中勝負的人<br>
+            ・人越多獎金越大；押越高池子越深
           </p>
         </div>
 
@@ -1226,18 +1227,21 @@
       `;
     };
 
+    // 每組的實際獎金（從 RPC awarded 欄位讀，瓜分後的數字）
+    const exactPer = exact.find(r => r.awarded > 0)?.awarded || 0;
+    const sidePer  = side.find(r => r.awarded > 0)?.awarded || 0;
+
     const groups = [];
     if (exact.length) groups.push(`
       <div class="fr-winner-group fr-winner-group--exact">
-        <div class="fr-winner-head">🎯 完全猜中（${exact.length} 人）${state.room.bet_amount > 0 ? ` · 每人 +${state.room.bet_amount} 💎` : ''}</div>
+        <div class="fr-winner-head">🎯 完全猜中（${exact.length} 人）${exactPer > 0 ? ` · 每人 +${exactPer} 💎` : (state.room.bet_amount > 0 ? ' · 沒人登入瓜分' : '')}</div>
         <div class="fr-winner-list">${exact.map(renderRow).join('')}</div>
       </div>
     `);
     if (side.length) {
-      const sidePerWin = state.room.bet_amount >= 2 ? Math.max(1, Math.floor(state.room.bet_amount / 2)) : 0;
       groups.push(`
         <div class="fr-winner-group fr-winner-group--side">
-          <div class="fr-winner-head">✅ 猜中勝負（${side.length} 人）${sidePerWin > 0 ? ` · 每人 +${sidePerWin} 💎` : ''}</div>
+          <div class="fr-winner-head">✅ 猜中勝負（${side.length} 人）${sidePer > 0 ? ` · 每人 +${sidePer} 💎` : ''}</div>
           <div class="fr-winner-list">${side.map(renderRow).join('')}</div>
         </div>
       `);
