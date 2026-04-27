@@ -7,9 +7,11 @@
   "scripts": {
     "build:og": "node scripts/build-og-images.js",
     "build:index": "node scripts/build-articles-index.js",
-    "build:og-template": "node scripts/build-og-generator.js"
+    "build:og-template": "node scripts/build-og-generator.js",
+    "build:official-rooms": "node scripts/build-official-rooms.js"
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.99"
+    "@napi-rs/canvas": "^0.1.99",
+    "@supabase/supabase-js": "^2.104.1"
   }
 }
