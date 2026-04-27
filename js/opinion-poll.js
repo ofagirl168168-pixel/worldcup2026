@@ -136,7 +136,7 @@
 
     // 建立 overlay
     const overlay = document.createElement('div');
-    overlay.className = 'opinion-overlay';
+    overlay.className = 'opinion-overlay opinion-overlay--opts-' + opinion.opts.length;
     overlay.id = 'opinion-overlay';
 
     const isMulti = opinion.opts.length > 2;
