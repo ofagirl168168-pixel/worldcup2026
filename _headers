@@ -39,3 +39,7 @@
 
 /js/data-live.json
   Cache-Control: public, max-age=120
+
+# OG 縮圖：Cloudflare CDN 端短快取，之後重畫圖也能快點生效
+/img/og-cover.png
+  Cache-Control: public, max-age=3600
