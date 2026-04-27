@@ -561,16 +561,16 @@
           <!-- 倒數/狀態文字，每秒更新 -->
         </div>
 
-        <div class="fr-team-data" id="fr-team-data" style="display:none">
-          <!-- 兩隊能力 / 近況 / 主力 / 教練 / 傷兵 — pick 階段預設展開 -->
-        </div>
-
         <div class="fr-participants" id="fr-participants" style="display:none">
           <!-- pick / locked 階段顯示已投票名單 -->
         </div>
 
         <div class="fr-room-body" id="fr-room-body">
-          <!-- 依 phase 渲染 -->
+          <!-- 依 phase 渲染（pick grid / 結果頁 / 直播）— 一進來先看到要猜比分 -->
+        </div>
+
+        <div class="fr-team-data" id="fr-team-data" style="display:none">
+          <!-- 兩隊資料當參考，放 pick grid 下方 -->
         </div>
 
         <div class="fr-chat" id="fr-chat">
@@ -687,10 +687,6 @@
       if (phase !== state.lastPhase) {
         _renderRoomBody(overlay, state, phase);
         if (state._rerenderParticipants) state._rerenderParticipants();
-        // 兩隊資料：離開 open 階段自動收合（比賽要開始了，資料看完了）
-        if (state._teamDataEl) {
-          state._teamDataEl.classList.toggle('fr-data--collapsed', phase !== 'open');
-        }
         state.lastPhase = phase;
       }
     }
@@ -830,14 +826,14 @@
     `;
     el.style.display = 'block';
 
-    // pick (open) 階段預設展開（讓使用者看資料判斷比分）；其他階段預設收合
-    const phase = _phaseOf(state);
-    el.classList.toggle('fr-data--collapsed', phase !== 'open');
+    // 放在 pick grid 下方了 → 預設收合所有階段，要看的人主動展開
+    // (一進房先看到 pick grid 比較直覺，數據是可選參考)
+    el.classList.add('fr-data--collapsed');
 
     el.querySelector('#fr-data-toggle').addEventListener('click', () => {
       el.classList.toggle('fr-data--collapsed');
     });
-    state._teamDataEl = el; // 給 phase 切換時重設收合用
+    state._teamDataEl = el;
   }
 
   // ── 參賽者名單（pick + locked 階段顯示，live/ended 隱藏） ──

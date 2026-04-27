@@ -4250,7 +4250,22 @@ body.opinion-open .btn-arena-float { display: none; }
     margin-bottom: 10px;
   }
   .fr-row:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
-  .fr-cell--match { grid-column: 1 / -1; font-size: 15px; }
+  /* match 強制放第 1 列、跨整行；房名比較顯眼 */
+  .fr-cell--match {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed rgba(255,255,255,0.08);
+    margin-bottom: 4px;
+  }
+  /* 行動裝置：房名字大、比賽當副標 */
+  .fr-cell--match .fr-cell-name {
+    font-size: 16px; font-weight: 800; color: #fff;
+    margin-bottom: 4px;
+  }
+  .fr-cell--match .fr-cell-sub {
+    font-size: 13px;
+  }
   .fr-cell--act { grid-column: 1 / -1; justify-content: stretch; }
   .fr-cell--act .fr-btn { width: 100%; }
 }
@@ -4461,6 +4476,12 @@ body.opinion-open .btn-arena-float { display: none; }
   box-shadow: 0 24px 80px rgba(0,0,0,0.55);
   transform: translateY(14px) scale(0.98);
   transition: transform 0.35s cubic-bezier(.22,1,.36,1);
+  /* 內容超過 viewport 時可在 box 內 scroll；min-height:0 是解 flex item 的 default
+     min-height:auto 阻止 max-height 生效的經典問題 */
+  max-height: 95vh;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .fr-room-overlay.open .fr-room-box { transform: translateY(0) scale(1); }
 
