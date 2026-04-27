@@ -3290,42 +3290,48 @@ img.flag-img {
   -webkit-mask-image: none;
   mask-image: none;
 }
-/* 預設：四角全亮（對戰氛圍） */
-.opinion-overlay--opts-4 .opinion-glow::before {
+/* 跨所有狀態固定 layout（覆蓋掉基礎 hover-active 的 transform/scale，
+   不然 ::before 會被拉到游標位置、corner gradient 跑出視窗外） */
+.opinion-overlay--opts-4 .opinion-glow::before,
+.opinion-overlay--opts-4.hover-active .opinion-glow::before,
+.opinion-overlay--opts-4.burst-active .opinion-glow::before {
   width: 100%; height: 100%;
   left: 0; top: 0;
   transform: none;
   border-radius: 0;
   filter: blur(70px);
+  animation: none;
+  transition: background 0.25s ease, opacity 0.25s ease;
+}
+/* 預設（沒 hover/burst）：四角全亮 */
+.opinion-overlay--opts-4:not(.hover-active):not(.burst-active) .opinion-glow::before {
   opacity: 0.85;
   background:
     radial-gradient(circle at 0% 0%, rgba(255,107,107,0.55) 0%, transparent 38%),    /* 左上 紅 (c0) */
     radial-gradient(circle at 100% 0%, rgba(127,115,255,0.55) 0%, transparent 38%),  /* 右上 紫 (c1) */
     radial-gradient(circle at 0% 100%, rgba(46,213,115,0.55) 0%, transparent 38%),   /* 左下 綠 (c2) */
     radial-gradient(circle at 100% 100%, rgba(255,165,2,0.55) 0%, transparent 38%);  /* 右下 橘 (c3) */
-  animation: none;
-  transition: background 0.25s ease, opacity 0.25s ease;
 }
 /* hover 或已選某張卡時：只剩該對應角的光（其他三角隱藏） */
 .opinion-overlay--opts-4.hover-active.glow-0 .opinion-glow::before,
 .opinion-overlay--opts-4.burst-active.glow-0 .opinion-glow::before {
-  background: radial-gradient(circle at 0% 0%, rgba(255,107,107,0.78) 0%, transparent 55%);
   opacity: 1;
+  background: radial-gradient(circle at 0% 0%, rgba(255,107,107,0.78) 0%, transparent 55%);
 }
 .opinion-overlay--opts-4.hover-active.glow-1 .opinion-glow::before,
 .opinion-overlay--opts-4.burst-active.glow-1 .opinion-glow::before {
-  background: radial-gradient(circle at 100% 0%, rgba(127,115,255,0.78) 0%, transparent 55%);
   opacity: 1;
+  background: radial-gradient(circle at 100% 0%, rgba(127,115,255,0.78) 0%, transparent 55%);
 }
 .opinion-overlay--opts-4.hover-active.glow-2 .opinion-glow::before,
 .opinion-overlay--opts-4.burst-active.glow-2 .opinion-glow::before {
-  background: radial-gradient(circle at 0% 100%, rgba(46,213,115,0.78) 0%, transparent 55%);
   opacity: 1;
+  background: radial-gradient(circle at 0% 100%, rgba(46,213,115,0.78) 0%, transparent 55%);
 }
 .opinion-overlay--opts-4.hover-active.glow-3 .opinion-glow::before,
 .opinion-overlay--opts-4.burst-active.glow-3 .opinion-glow::before {
-  background: radial-gradient(circle at 100% 100%, rgba(255,165,2,0.78) 0%, transparent 55%);
   opacity: 1;
+  background: radial-gradient(circle at 100% 100%, rgba(255,165,2,0.78) 0%, transparent 55%);
 }
 
 /* 底層細小亮點（星塵） */
