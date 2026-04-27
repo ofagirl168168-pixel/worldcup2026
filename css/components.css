@@ -5190,8 +5190,9 @@ body.opinion-open .btn-arena-float { display: none; }
   }
 }
 
-/* ── 兩隊資料區（房間 overlay，pick 階段預設展開，幫助使用者判斷比分） ── */
+/* ── 兩隊資料區（房間 overlay，現在放 pick grid 下方做為參考） ── */
 .fr-team-data {
+  margin-top: 22px;     /* 跟上方 pick / 送出按鈕保持距離 */
   margin-bottom: 14px;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.08);

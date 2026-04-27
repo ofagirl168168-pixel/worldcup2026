@@ -33,15 +33,25 @@
   // ── 合併比賽到 EPL_MATCHES ──
   function mergeMatches(liveMatches) {
     if (!window.EPL_MATCHES) window.EPL_MATCHES = [];
+    // 去重保護：若 EPL_MATCHES 已有同 (home, away, date) 的多筆（之前 bug 留下的）
+    // 保留最早一筆，其他刪掉
+    const seen = new Set();
+    window.EPL_MATCHES = window.EPL_MATCHES.filter(m => {
+      const k = `${m.home}|${m.away}|${m.date}`;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
     if (!liveMatches?.length) return 0;
 
     let updated = 0;
     for (const live of liveMatches) {
       if (!live.home || !live.away || live.home === 'TBD') continue;
 
-      // 找已有比賽
+      // 找已有比賽（改用 home+away+date 合併 key；
+      // 之前用 matchday 但 API 跟手動寫的 matchday 偶爾不一致 → 重複新增同場比賽）
       const idx = window.EPL_MATCHES.findIndex(m =>
-        m.home === live.home && m.away === live.away && m.matchday === live.matchday
+        m.home === live.home && m.away === live.away && m.date === live.date
       );
 
       if (idx >= 0) {
