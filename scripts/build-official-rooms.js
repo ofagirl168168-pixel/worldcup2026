@@ -63,10 +63,25 @@ function isUpcoming(m) {
 }
 
 const targets = [];
-for (const m of EPL_MATCHES) if (isUpcoming(m)) targets.push({ m, teams: EPL_TEAMS, league: 'epl' });
-for (const m of UCL_MATCHES) if (isUpcoming(m)) targets.push({ m, teams: UCL_TEAMS, league: 'ucl' });
+let eplCount = 0, uclCount = 0;
+for (const m of EPL_MATCHES) {
+  if (isUpcoming(m)) { targets.push({ m, teams: EPL_TEAMS, league: 'epl' }); eplCount++; }
+}
+for (const m of UCL_MATCHES) {
+  if (isUpcoming(m)) { targets.push({ m, teams: UCL_TEAMS, league: 'ucl' }); uclCount++; }
+}
 
-console.log(`Found ${targets.length} upcoming matches in next 36h`);
+console.log(`Found ${targets.length} upcoming matches in next 36h (EPL: ${eplCount}, UCL: ${uclCount})`);
+
+// 若 EPL 為 0，可能是資料檔沒同步 → 提醒（日更腳本看到這行就知道要去 WebSearch 補資料）
+if (eplCount === 0) {
+  console.warn(
+    '⚠️  No EPL match found in next 36h. ' +
+    'Check js/epl-data-teams.js — is the next matchweek added with status:\'upcoming\'? ' +
+    'Daily flow should WebSearch + append upcoming fixtures to EPL_MATCHES before running this.'
+  );
+}
+
 if (targets.length === 0) {
   console.log('Nothing to do.');
   process.exit(0);
