@@ -3427,7 +3427,7 @@ img.flag-img {
   perspective: 1200px;
 }
 /* 投票後沒選的卡收掉 slot（保留選中那張、容器 justify-content: center 自動把它居中）
-   delay 0.45s 等 voted-no 飛走動畫先跑完、再 0.4s collapse */
+   delay 0.7s 等 voted-no fade + stagger 全部跑完（最後一張 0.18+0.55s）才開始 collapse */
 .opinion-card.opinion-card--gone {
   flex: 0 0 0 !important;
   max-width: 0 !important;
@@ -3437,10 +3437,10 @@ img.flag-img {
   border: 0 !important;
   overflow: hidden;
   transition:
-    flex-basis 0.4s ease 0.45s,
-    max-width 0.4s ease 0.45s,
-    padding 0.4s ease 0.45s,
-    margin 0.4s ease 0.45s;
+    flex-basis 0.45s ease 0.7s,
+    max-width 0.45s ease 0.7s,
+    padding 0.45s ease 0.7s,
+    margin 0.45s ease 0.7s;
 }
 .opinion-cards--multi {
   flex-wrap: wrap; gap: 14px;
@@ -3590,13 +3590,19 @@ img.flag-img {
   100% { transform: scale(1.05); opacity: 1; }
 }
 
-/* 投票動畫：未選中縮小飛走 */
+/* 投票動畫：未選中淡出（柔和版本，不再大幅縮小+下墜，改成微沉+模糊+漸隱）*/
 .opinion-card.voted-no {
-  animation: opinionDismiss 0.5s cubic-bezier(.55,.06,.68,.19) forwards;
+  animation: opinionDismiss 0.55s cubic-bezier(.4,0,.6,1) forwards;
+  pointer-events: none;
 }
+/* 各卡 stagger，不要全部同時消失（自然感）*/
+.opinion-card.voted-no:nth-child(2) { animation-delay: 0.06s; }
+.opinion-card.voted-no:nth-child(3) { animation-delay: 0.12s; }
+.opinion-card.voted-no:nth-child(4) { animation-delay: 0.18s; }
 @keyframes opinionDismiss {
-  0%   { transform: scale(1); opacity: 1; }
-  100% { transform: scale(0.3) translateY(40px); opacity: 0; pointer-events: none; }
+  0%   { transform: scale(1) translateY(0);          opacity: 1;    filter: blur(0); }
+  60%  { transform: scale(0.94) translateY(10px);    opacity: 0.45; filter: blur(2px); }
+  100% { transform: scale(0.88) translateY(22px);    opacity: 0;    filter: blur(6px); }
 }
 
 /* 結果區域 */
