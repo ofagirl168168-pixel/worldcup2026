@@ -489,6 +489,10 @@
           <!-- 倒數/狀態文字，每秒更新 -->
         </div>
 
+        <div class="fr-participants" id="fr-participants" style="display:none">
+          <!-- pick / locked 階段顯示已投票名單 -->
+        </div>
+
         <div class="fr-room-body" id="fr-room-body">
           <!-- 依 phase 渲染 -->
         </div>
@@ -531,15 +535,35 @@
     };
 
     let chatChannel = null;
+    let picksChannel = null;
     function close() {
       if (_roomTickInterval) { clearInterval(_roomTickInterval); _roomTickInterval = null; }
       if (chatChannel && window.DB && window.DB.removeChannel) {
         try { window.DB.removeChannel(chatChannel); } catch (e) {}
         chatChannel = null;
       }
+      if (picksChannel && window.DB && window.DB.removeChannel) {
+        try { window.DB.removeChannel(picksChannel); } catch (e) {}
+        picksChannel = null;
+      }
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 250);
       try { history.replaceState(null, '', location.pathname); } catch (e) {}
+      // 邀請連結進來時 daily popup 被延後到現在 → 補彈
+      if (window.__pendingDailyAfterFriendRoom) {
+        window.__pendingDailyAfterFriendRoom = false;
+        setTimeout(() => {
+          if (typeof window.showOpinionPoll === 'function') {
+            try {
+              window.showOpinionPoll(() => {
+                if (typeof window.showDailyTaskPopup === 'function') {
+                  try { window.showDailyTaskPopup(); } catch (e) {}
+                }
+              });
+            } catch (e) {}
+          }
+        }, 400);
+      }
     }
     state._close = close;
     overlay.querySelector('.fr-modal-close').addEventListener('click', close);
@@ -548,17 +572,93 @@
     // ── 聊天 ─────────────────────────────────────────────
     _initChat(overlay, room.room_code, ch => { chatChannel = ch; });
 
+    // ── 參賽者名單（pick / locked 階段顯示）──────────────
+    _initParticipants(overlay, state, ch => { picksChannel = ch; });
+
     function rerender() {
       const phase = _phaseOf(state);
       _renderRoomStatus(overlay, state.room, phase);
       if (phase !== state.lastPhase) {
         _renderRoomBody(overlay, state, phase);
+        if (state._rerenderParticipants) state._rerenderParticipants();
         state.lastPhase = phase;
       }
     }
     state._rerender = rerender;
     rerender();
     _roomTickInterval = setInterval(rerender, 1000);
+  }
+
+  // ── 參賽者名單（pick + locked 階段顯示，live/ended 隱藏） ──
+  async function _initParticipants(overlay, state, onChannel) {
+    const el = overlay.querySelector('#fr-participants');
+    if (!el) return;
+    const myKey = _voterKey();
+    const picks = new Map(); // voter_key → { nickname }
+
+    function rerender() {
+      const phase = _phaseOf(state);
+      // 只在 pick / locked 階段顯示，live/ended 不顯示（會被結果頁取代）
+      if (phase !== 'open' && phase !== 'locked') {
+        el.style.display = 'none';
+        return;
+      }
+      const list = Array.from(picks.values());
+      if (!list.length) {
+        el.style.display = 'block';
+        el.innerHTML = '<div class="fr-participants-empty">還沒有人猜，第一個下注吧 👇</div>';
+        return;
+      }
+      el.style.display = 'block';
+      el.innerHTML = `
+        <div class="fr-participants-head">已猜（${list.length} 人）</div>
+        <div class="fr-participants-list">
+          ${list.map(p => {
+            const me = p.voter_key === myKey ? ' fr-participant--me' : '';
+            return `<span class="fr-participant${me}">${_escapeHtml(p.nickname || '匿名')}</span>`;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    // 載入既有 picks
+    try {
+      const { data } = await window.DB
+        .from('friend_picks')
+        .select('voter_key, nickname')
+        .eq('room_code', state.room.room_code);
+      (data || []).forEach(p => picks.set(p.voter_key, p));
+      rerender();
+    } catch (e) {
+      console.warn('[friend-room] participants load failed', e);
+    }
+
+    // realtime 訂閱：新 pick 即時加進名單
+    try {
+      const ch = window.DB
+        .channel('fr-picks-' + state.room.room_code)
+        .on('postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'friend_picks', filter: `room_code=eq.${state.room.room_code}` },
+          (payload) => {
+            const m = payload.new;
+            if (!m) return;
+            picks.set(m.voter_key, { voter_key: m.voter_key, nickname: m.nickname });
+            rerender();
+          })
+        .on('postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'friend_picks', filter: `room_code=eq.${state.room.room_code}` },
+          (payload) => {
+            const m = payload.new;
+            if (!m) return;
+            picks.set(m.voter_key, { voter_key: m.voter_key, nickname: m.nickname });
+            rerender();
+          })
+        .subscribe();
+      if (onChannel) onChannel(ch);
+    } catch (e) { console.warn('[friend-room] picks sub failed', e); }
+
+    // phase 換頁時也要 rerender 一次（讓 live/ended 隱藏起來）
+    state._rerenderParticipants = rerender;
   }
 
   // ── 聊天 ───────────────────────────────────────────────

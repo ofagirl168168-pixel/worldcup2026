@@ -357,16 +357,24 @@ window.addEventListener('load', () => {
   _safe(() => window.checkOpinionPredictResolutions && window.checkOpinionPredictResolutions(), 'checkOpinionPredictResolutions');
   // 觀點投票 → 每日任務彈窗（延遲 3 秒，合併流程）
   // 若從 /article/<id> 或 ?article= 落地：每日任務彈窗延後到文章關閉後才彈（不打擾閱讀）
+  // 若從 #fr-room-XXX 邀請連結落地：彈窗延後到房間關閉後才彈
   // 若 URL 帶 ?poll=<id>（分享連結落地）→ 強制開該題，忽略「今日已彈過」旗標
   setTimeout(() => {
     let pollId = null;
     let isArticleLanding = false;
+    let isFriendRoomLanding = false;
     try {
       const p = new URLSearchParams(location.search).get('poll');
       if (p) pollId = p;
       if (/^\/article\//.test(location.pathname)) isArticleLanding = true;
       if (new URLSearchParams(location.search).get('article')) isArticleLanding = true;
+      if (/^#fr-room-/i.test(location.hash)) isFriendRoomLanding = true;
     } catch (e) {}
+    // 邀請連結進來 → 把 daily popup chain 整個延後給 friend-room.js close 後觸發
+    if (isFriendRoomLanding) {
+      window.__pendingDailyAfterFriendRoom = true;
+      return;
+    }
     const pollOpts = pollId ? { pollId } : undefined;
     _safe(() => showOpinionPoll(() => {
       if (isArticleLanding) {

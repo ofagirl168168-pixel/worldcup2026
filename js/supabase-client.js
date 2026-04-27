@@ -43,6 +43,7 @@ function loginWithGoogle() {
 async function logout() {
   await DB.auth.signOut();
   currentUser = null;
+  window.currentProfile = null;
   updateAuthUI();
   renderArena?.();
 }
@@ -51,6 +52,9 @@ async function logout() {
 async function handleUserLoggedIn(isNew) {
   const profile = await getOrCreateProfile();
   if (!profile) return;
+
+  // 暴露給其他 IIFE 模組（opinion-poll / friend-room 的 _resolveNickname 都讀這個）
+  window.currentProfile = profile;
 
   const nameEl = document.getElementById('nav-user-name');
   if (nameEl) nameEl.textContent = profile.nickname || '設定暱稱';
@@ -155,6 +159,8 @@ async function saveNickname(raw) {
     .update({ nickname: name, updated_at: new Date().toISOString() })
     .eq('id', currentUser.id);
   if (error) return { error: '儲存失敗，請再試一次' };
+  // 同步更新全域 profile（聊天/挑戰賽 _resolveNickname 才會讀到新暱稱）
+  if (window.currentProfile) window.currentProfile.nickname = name;
   return { ok: true };
 }
 

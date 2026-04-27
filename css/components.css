@@ -4885,3 +4885,41 @@ body.opinion-open .btn-arena-float { display: none; }
 }
 .fr-chat-input input::placeholder { color: rgba(255,255,255,0.35); }
 .fr-chat-input .fr-btn { padding: 8px 16px; min-width: auto; }
+
+/* 參賽者名單（pick / locked 階段顯示已投票的人） */
+.fr-participants {
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+}
+.fr-participants-empty {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+.fr-participants-head {
+  font-size: 12px; font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.fr-participants-list {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.fr-participant {
+  font-size: 12px;
+  padding: 3px 9px;
+  background: rgba(91,115,255,0.1);
+  border: 1px solid rgba(91,115,255,0.25);
+  border-radius: 12px;
+  color: #c0cdff;
+  font-weight: 600;
+}
+.fr-participant--me {
+  background: rgba(255,215,0,0.15);
+  border-color: rgba(255,215,0,0.45);
+  color: #ffd47a;
+}

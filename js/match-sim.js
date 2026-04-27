@@ -220,9 +220,8 @@
     ];
     const ball = { x: 0.5, y: 0.5 };
 
-    // 速度倍率（0.5x / 1x / 2x）
+    // 速度倍率（0.5x / 1x / 2x）— accumulator 在下方 tick() 內處理
     let speedMult = 1;
-    let speedSubFrame = 0; // 0.5x 用的累加器
     ui.speedBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         speedMult = parseFloat(btn.dataset.speed);
@@ -751,32 +750,37 @@
       ui.time.textContent = `${mm}:${ss}`;
     }
 
-    // ── 主 tick（考慮速度倍率：1x 每 rAF 跑 1 幀、2x 跑 2 幀、0.5x 兩 rAF 跑 1 幀）─
-    function tick() {
+    // ── 主 tick（fixed-timestep accumulator）─────────────────
+    // 用 wall clock 累加而非 rAF 次數，避免 120Hz 螢幕跑兩倍速。
+    // 60Hz 螢幕：~16.7ms 累一次 → 每 rAF 推 1 幀（同舊行為）
+    // 120Hz 螢幕：~8.3ms 累一次 → 每 2 個 rAF 才推 1 幀（鎖到 60 步/秒）
+    // 1x = 60 步/秒；2x = 120 步/秒；0.5x = 30 步/秒
+    const STEP_INTERVAL_MS = 1000 / 60;
+    let stepAccumulator = 0;
+    let prevTickMs = 0;
+
+    function tick(nowMs) {
       if (state.frame >= TOTAL_FRAMES) { showSummary(); return; }
+      // 第一個 rAF 的 nowMs 拿來當基準（或瀏覽器某些情況不傳 → fallback performance.now）
+      if (typeof nowMs !== 'number') nowMs = performance.now();
+      if (!prevTickMs) prevTickMs = nowMs;
 
-      let framesThisRAF;
-      if (speedMult >= 1) {
-        framesThisRAF = Math.round(speedMult);
-      } else {
-        // 0.5x：每 1/speedMult 次 rAF 才走一幀
-        speedSubFrame++;
-        if (speedSubFrame < Math.round(1 / speedMult)) {
-          render(ctx, state);
-          state.flashAlpha = Math.max(0, state.flashAlpha - 0.03);
-          requestAnimationFrame(tick);
-          return;
-        }
-        speedSubFrame = 0;
-        framesThisRAF = 1;
-      }
+      let elapsed = nowMs - prevTickMs;
+      prevTickMs = nowMs;
+      // 上限保護：tab 在背景 → 回前景時不要瞬間衝幾百格
+      if (elapsed > 100) elapsed = 100;
 
-      for (let k = 0; k < framesThisRAF && state.frame < TOTAL_FRAMES; k++) {
+      stepAccumulator += elapsed * speedMult;
+      let stepsTaken = 0;
+      while (stepAccumulator >= STEP_INTERVAL_MS && state.frame < TOTAL_FRAMES) {
         stepOneFrame();
+        stepAccumulator -= STEP_INTERVAL_MS;
+        stepsTaken++;
       }
+
       updateHUD();
       render(ctx, state);
-      state.flashAlpha = Math.max(0, state.flashAlpha - 0.04 * framesThisRAF);
+      state.flashAlpha = Math.max(0, state.flashAlpha - 0.04 * Math.max(1, stepsTaken));
       requestAnimationFrame(tick);
     }
 
