@@ -4425,9 +4425,31 @@ body.opinion-open .btn-arena-float { display: none; }
   backdrop-filter: blur(10px);
   opacity: 0; pointer-events: none;
   transition: opacity 0.3s ease;
-  padding: 20px; overflow-y: auto;
+  padding: 20px;
+  /* 不 scroll，內部 .fr-room-box 自己 scroll → 浮動關閉鍵才能固定在 viewport */
+  overflow: hidden;
 }
 .fr-room-overlay.open { opacity: 1; pointer-events: auto; }
+
+/* 浮動關閉鍵：手機長內容時 scroll 不會把它捲走 */
+.fr-modal-close--floating {
+  position: fixed !important;
+  top: 14px; right: 14px;
+  width: 38px; height: 38px;
+  background: rgba(0,0,0,0.55) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  border-radius: 50%;
+  font-size: 22px;
+  color: #fff !important;
+  z-index: 1101;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.fr-modal-close--floating:hover {
+  background: rgba(0,0,0,0.7) !important;
+  color: #fff !important;
+}
 
 .fr-room-box {
   position: relative;
@@ -4449,10 +4471,33 @@ body.opinion-open .btn-arena-float { display: none; }
   border-bottom: 1px solid rgba(255,255,255,0.08);
   margin-bottom: 14px;
 }
+.fr-room-id-row {
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+}
 .fr-room-id {
   font-family: ui-monospace, 'Courier New', monospace;
   font-weight: 800; font-size: 18px;
   color: #ffd700; letter-spacing: 2px;
+}
+.fr-room-share {
+  background: rgba(91,115,255,0.14);
+  border: 1px solid rgba(91,115,255,0.35);
+  color: #b6c5ff;
+  font-size: 12px; font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.fr-room-share:hover {
+  background: rgba(91,115,255,0.25);
+}
+.fr-room-share--copied {
+  background: rgba(107,208,158,0.18) !important;
+  border-color: rgba(107,208,158,0.45) !important;
+  color: #6bd09e !important;
 }
 .fr-room-tags { display: flex; gap: 6px; flex-wrap: wrap; }
 .fr-type--bet { color: #b6c5ff; background: rgba(91,115,255,0.12); }
@@ -4922,4 +4967,35 @@ body.opinion-open .btn-arena-float { display: none; }
   background: rgba(255,215,0,0.15);
   border-color: rgba(255,215,0,0.45);
   color: #ffd47a;
+}
+
+/* 「你已加入房間」紅點：nav button + home banner（沿用 rogue 的 dot-pulse 動畫） */
+.nav-btn.fr-has-active { position: relative; }
+.nav-btn.fr-has-active::after {
+  content: '';
+  position: absolute;
+  top: 4px; right: 6px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #ff3b30;
+  border: 2px solid var(--bg-base, #0e1430);
+  box-shadow: 0 0 8px rgba(255,59,48,0.7);
+  animation: rogue-dot-pulse 1.4s ease-in-out infinite;
+}
+/* home banner 整個邊框微亮 + 右上紅點，明顯一點 */
+.fr-home-banner.fr-has-active {
+  box-shadow:
+    0 0 0 2px rgba(255,59,48,0.45),
+    0 8px 24px rgba(45,78,200,0.35);
+}
+.fr-home-banner.fr-has-active::after {
+  content: '';
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #ff3b30;
+  box-shadow: 0 0 12px rgba(255,59,48,0.9);
+  animation: rogue-dot-pulse 1.4s ease-in-out infinite;
+  z-index: 2;
 }

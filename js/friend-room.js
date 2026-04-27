@@ -461,10 +461,15 @@
     overlay.className = 'fr-room-overlay';
     overlay.innerHTML = `
       <div class="fr-room-box">
-        <button class="fr-modal-close" type="button" aria-label="關閉">&times;</button>
+        <button class="fr-modal-close fr-modal-close--floating" type="button" aria-label="關閉">&times;</button>
 
         <div class="fr-room-header">
-          <div class="fr-room-id">#${room.room_code}</div>
+          <div class="fr-room-id-row">
+            <div class="fr-room-id">#${room.room_code}</div>
+            <button class="fr-room-share" type="button" id="fr-room-share" title="分享房間">
+              <i class="fas fa-share-alt"></i> 分享
+            </button>
+          </div>
           <div class="fr-room-tags">
             ${room.is_official ? '<span class="fr-type fr-type--official">官方</span>' : ''}
             ${!room.is_public ? '<span class="fr-type fr-type--private">私人 🔒</span>' : '<span class="fr-type fr-type--public">公開</span>'}
@@ -568,6 +573,36 @@
     state._close = close;
     overlay.querySelector('.fr-modal-close').addEventListener('click', close);
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+
+    // 分享按鈕：複製邀請連結（私人房特別重要，因為要連結才進得去）
+    const shareBtn = overlay.querySelector('#fr-room-share');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const url = `${location.origin}${location.pathname}#fr-room-${room.room_code}`;
+        const shareText = `來陪我猜這場比賽！${room.match_meta?.home_name || ''} vs ${room.match_meta?.away_name || ''}`;
+        // 行動裝置先試系統 share，桌機 fallback 複製剪貼簿
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: '麥迪挑戰賽', text: shareText, url });
+            return;
+          } catch (err) {
+            // 使用者取消 share 也走 fallback
+          }
+        }
+        try {
+          await navigator.clipboard.writeText(url);
+          shareBtn.classList.add('fr-room-share--copied');
+          shareBtn.innerHTML = '<i class="fas fa-check"></i> 已複製';
+          setTimeout(() => {
+            shareBtn.classList.remove('fr-room-share--copied');
+            shareBtn.innerHTML = '<i class="fas fa-share-alt"></i> 分享';
+          }, 1800);
+        } catch (err) {
+          alert('連結：\n' + url);
+        }
+      });
+    }
 
     // ── 聊天 ─────────────────────────────────────────────
     _initChat(overlay, room.room_code, ch => { chatChannel = ch; });
@@ -1193,6 +1228,10 @@
       state.submitted = true;
       _renderSubmittedView(body, state);
       loadLobby();
+      // 立刻更新「已加入房間」提示（nav / banner badge）
+      if (window.FriendRoom && window.FriendRoom._refreshActiveBadge) {
+        try { window.FriendRoom._refreshActiveBadge(); } catch (e) {}
+      }
     } catch (e) {
       console.warn('[friend-room] submit pick failed', e);
       alert('送出失敗：' + (e.message || '未知錯誤'));
@@ -1229,6 +1268,70 @@
     },
   };
 
+  // 我已加入但還沒結束的房間（讓使用者開賽時間還久時也不會忘記）
+  async function _checkActiveRooms() {
+    if (!window.DB) return [];
+    const myKey = _voterKey();
+    try {
+      const { data: myPicks } = await window.DB
+        .from('friend_picks')
+        .select('room_code')
+        .eq('voter_key', myKey);
+      if (!myPicks || !myPicks.length) return [];
+      const codes = [...new Set(myPicks.map(p => p.room_code))];
+      const { data: rooms } = await window.DB
+        .from('friend_rooms')
+        .select('room_code, kickoff_at, status, match_meta')
+        .in('room_code', codes)
+        .in('status', ['open', 'locked', 'live'])
+        .order('kickoff_at', { ascending: true });
+      return rooms || [];
+    } catch (e) {
+      console.warn('[friend-room] active rooms check failed', e);
+      return [];
+    }
+  }
+
+  function _renderActiveBadge(rooms) {
+    const navBtns = document.querySelectorAll('[data-section="friend-room"]');
+    const homeBanner = document.querySelector('.fr-home-banner');
+    const has = rooms && rooms.length > 0;
+    navBtns.forEach(btn => btn.classList.toggle('fr-has-active', has));
+    if (homeBanner) homeBanner.classList.toggle('fr-has-active', has);
+    // 把最近一場的開賽倒數塞到 home banner 副標題
+    if (homeBanner && has) {
+      const next = rooms[0];
+      const ms = new Date(next.kickoff_at).getTime() - Date.now();
+      const desc = homeBanner.querySelector('.fr-home-banner-desc');
+      if (desc) {
+        if (ms <= 0) {
+          desc.textContent = `🔴 直播中：${next.match_meta?.home_name || ''} vs ${next.match_meta?.away_name || ''}`;
+        } else {
+          const totalMin = Math.floor(ms / 60000);
+          const h = Math.floor(totalMin / 60);
+          const m = totalMin % 60;
+          const left = h > 0 ? `${h} 小時 ${m} 分` : `${m} 分鐘`;
+          desc.textContent = `⏱ 你已加入：${next.match_meta?.home_name || ''} vs ${next.match_meta?.away_name || ''} · ${left}後開賽`;
+        }
+      }
+    }
+  }
+
+  let _activeBadgeTimer = null;
+  async function _refreshActiveBadge() {
+    const rooms = await _checkActiveRooms();
+    _renderActiveBadge(rooms);
+    // 如果有正要開賽的（< 5 分鐘），加快檢查頻率
+    const next = rooms[0];
+    let nextDelay = 60000; // 1 分鐘
+    if (next) {
+      const ms = new Date(next.kickoff_at).getTime() - Date.now();
+      if (ms < 5 * 60000 && ms > -2 * 60000) nextDelay = 10000; // 接近開賽 / 剛開 → 10 秒
+    }
+    if (_activeBadgeTimer) clearTimeout(_activeBadgeTimer);
+    _activeBadgeTimer = setTimeout(_refreshActiveBadge, nextDelay);
+  }
+
   // 切到該 section 時才載入大廳，避免首頁 noise
   document.addEventListener('DOMContentLoaded', () => {
     const navBtns = document.querySelectorAll('[data-section="friend-room"]');
@@ -1250,5 +1353,11 @@
     if (m) {
       setTimeout(() => joinRoom(m[1].toUpperCase()), 300);
     }
+    // 已加入房間提示：頁面載入後檢查一次，之後每 1 分鐘 refresh
+    setTimeout(_refreshActiveBadge, 1500);
   });
+
+  // 暴露給其他模組（投完票後可以呼叫立刻 refresh badge）
+  window.FriendRoom = window.FriendRoom || {};
+  window.FriendRoom._refreshActiveBadge = _refreshActiveBadge;
 })();
