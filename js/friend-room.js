@@ -702,44 +702,70 @@
   }
 
   async function _renderWinnerList(body, state, rh, ra) {
-    const picks = await _fetchAllPicks(state.room.room_code);
-    const myKey = _voterKey();
-    const exact = [], side = [], miss = [];
-    for (const p of picks) {
-      const k = _classifyPick(p, rh, ra);
-      if (k === 'exact') exact.push(p);
-      else if (k === 'side') side.push(p);
-      else miss.push(p);
+    // 用 RPC：第一個 caller 鎖房間發獎、後續 caller 只回讀
+    let rows = [];
+    try {
+      const { data, error } = await window.DB.rpc('friend_room_settle', {
+        p_room_code: state.room.room_code,
+      });
+      if (error) throw error;
+      rows = data || [];
+    } catch (e) {
+      console.warn('[friend-room] settle rpc failed, fallback to direct fetch', e);
+      // Fallback：RPC 失敗就 client side 自己分類（沒寶石發但畫面還能看）
+      const picks = await _fetchAllPicks(state.room.room_code);
+      rows = picks.map(p => ({
+        ...p,
+        classification: _classifyPick(p, rh, ra),
+        awarded: 0,
+      }));
     }
+
+    const myKey = _voterKey();
+    const exact = rows.filter(r => r.classification === 'exact');
+    const side  = rows.filter(r => r.classification === 'side');
+    const miss  = rows.filter(r => r.classification === 'miss');
+
     const winnersEl = body.querySelector('#fr-winners');
     if (!winnersEl) return;
-    if (!picks.length) {
+    if (!rows.length) {
       winnersEl.innerHTML = '<div class="fr-winners-empty">本場沒人下注 🤷</div>';
       return;
     }
+
     const renderRow = p => {
       const me = p.voter_key === myKey ? ' fr-winner-row--me' : '';
       const overTag = p.is_over ? ' <span class="fr-winner-tag">自訂</span>' : '';
+      const noLogin = (p.classification === 'exact' || p.classification === 'side')
+        && state.room.bet_amount > 0 && !p.user_id
+        ? ' <span class="fr-winner-tag fr-winner-tag--warn">未登入</span>' : '';
+      const award = p.awarded > 0
+        ? `<span class="fr-winner-award">+${p.awarded} 💎</span>`
+        : '';
       return `
         <div class="fr-winner-row${me}">
-          <span class="fr-winner-name">${_escapeHtml(p.nickname || '匿名')}${overTag}</span>
-          <span class="fr-winner-score">${p.score_home}-${p.score_away}</span>
+          <span class="fr-winner-name">${_escapeHtml(p.nickname || '匿名')}${overTag}${noLogin}</span>
+          <span class="fr-winner-score">${p.score_home}-${p.score_away}${award}</span>
         </div>
       `;
     };
+
     const groups = [];
     if (exact.length) groups.push(`
       <div class="fr-winner-group fr-winner-group--exact">
-        <div class="fr-winner-head">🎯 完全猜中（${exact.length} 人）</div>
+        <div class="fr-winner-head">🎯 完全猜中（${exact.length} 人）${state.room.bet_amount > 0 ? ` · 每人 +${state.room.bet_amount} 💎` : ''}</div>
         <div class="fr-winner-list">${exact.map(renderRow).join('')}</div>
       </div>
     `);
-    if (side.length) groups.push(`
-      <div class="fr-winner-group fr-winner-group--side">
-        <div class="fr-winner-head">✅ 猜中勝負（${side.length} 人）</div>
-        <div class="fr-winner-list">${side.map(renderRow).join('')}</div>
-      </div>
-    `);
+    if (side.length) {
+      const sidePerWin = state.room.bet_amount >= 2 ? Math.max(1, Math.floor(state.room.bet_amount / 2)) : 0;
+      groups.push(`
+        <div class="fr-winner-group fr-winner-group--side">
+          <div class="fr-winner-head">✅ 猜中勝負（${side.length} 人）${sidePerWin > 0 ? ` · 每人 +${sidePerWin} 💎` : ''}</div>
+          <div class="fr-winner-list">${side.map(renderRow).join('')}</div>
+        </div>
+      `);
+    }
     if (miss.length) groups.push(`
       <div class="fr-winner-group fr-winner-group--miss">
         <div class="fr-winner-head">❌ 沒中（${miss.length} 人）</div>
@@ -747,6 +773,12 @@
       </div>
     `);
     winnersEl.innerHTML = groups.join('');
+
+    // 結算後若本人有領寶石，敲一次 gem balance 重抓（讓 nav 上的 💎 數字立刻更新）
+    const myRow = rows.find(r => r.voter_key === myKey);
+    if (myRow && myRow.awarded > 0 && typeof window.refreshGemBalance === 'function') {
+      try { window.refreshGemBalance(); } catch (e) {}
+    }
   }
 
   function _formatPick(pick) {
@@ -897,25 +929,47 @@
     });
   }
 
+  // 抓登入用戶 id（沒登入回 null；押注房贏家發獎金需要它）
+  function _currentUserId() {
+    try {
+      // supabase-client.js 的 module-level let → 對其他 script 可見
+      if (typeof currentUser !== 'undefined' && currentUser && currentUser.id) {
+        return currentUser.id;
+      }
+    } catch (e) {}
+    return null;
+  }
+
   async function _submitPick(body, state) {
     if (!state.pick) return;
     const sub = body.querySelector('#fr-pick-submit');
     sub.disabled = true;
     sub.textContent = '送出中…';
     try {
+      const userId = _currentUserId();
+      // 押注房沒登入會白玩（贏了沒寶石），先提醒一下
+      if (state.room.bet_amount > 0 && !userId) {
+        const proceed = confirm(
+          `這是押 ${state.room.bet_amount} 💎 的房間。沒登入的話即使猜中也拿不到寶石，要繼續送出嗎？`
+        );
+        if (!proceed) {
+          sub.disabled = false;
+          sub.textContent = '送出';
+          return;
+        }
+      }
       const { error } = await window.DB.from('friend_picks').upsert({
         room_code: state.room.room_code,
         voter_key: _voterKey(),
+        user_id: userId,
         nickname: _resolveNickname(),
         score_home: state.pick.sh,
         score_away: state.pick.sa,
         is_over: !!state.pick.over,
       }, { onConflict: 'room_code,voter_key' });
       if (error) throw error;
-      // 切到「已送出」頁（保留房間 overlay，使用者可選回大廳或改猜測）
       state.submitted = true;
       _renderSubmittedView(body, state);
-      // 重抓大廳人數（非必要，realtime 也會推）
       loadLobby();
     } catch (e) {
       console.warn('[friend-room] submit pick failed', e);
