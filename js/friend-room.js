@@ -633,6 +633,27 @@
     }
   }
 
+  function _classifyPick(p, rh, ra) {
+    if (p.score_home === rh && p.score_away === ra) return 'exact';
+    const win = rh > ra ? 'h' : ra > rh ? 'a' : 'd';
+    const my = p.score_home > p.score_away ? 'h' : p.score_away > p.score_home ? 'a' : 'd';
+    return win === my ? 'side' : 'miss';
+  }
+
+  async function _fetchAllPicks(roomCode) {
+    if (!window.DB) return [];
+    try {
+      const { data } = await window.DB
+        .from('friend_picks')
+        .select('voter_key, nickname, score_home, score_away, is_over, created_at')
+        .eq('room_code', roomCode);
+      return data || [];
+    } catch (e) {
+      console.warn('[friend-room] fetch picks failed', e);
+      return [];
+    }
+  }
+
   function _renderEndedPhase(body, state) {
     const meta = state.room.match_meta || {};
     const rh = state.room.result_home;
@@ -641,11 +662,11 @@
     const myPick = state.pick;
     let myStatus = '';
     if (myPick && haveResult) {
-      const exact = myPick.sh === rh && myPick.sa === ra;
-      const winSide = rh > ra ? 'h' : ra > rh ? 'a' : 'd';
-      const myWinSide = myPick.sh > myPick.sa ? 'h' : myPick.sa > myPick.sh ? 'a' : 'd';
-      if (exact) myStatus = '<div class="fr-end-mine fr-end-mine--exact">🎯 完全猜中！</div>';
-      else if (winSide === myWinSide) myStatus = '<div class="fr-end-mine fr-end-mine--side">✅ 猜中勝負</div>';
+      const klass = _classifyPick(
+        { score_home: myPick.sh, score_away: myPick.sa }, rh, ra
+      );
+      if (klass === 'exact') myStatus = '<div class="fr-end-mine fr-end-mine--exact">🎯 完全猜中！</div>';
+      else if (klass === 'side') myStatus = '<div class="fr-end-mine fr-end-mine--side">✅ 猜中勝負</div>';
       else myStatus = '<div class="fr-end-mine fr-end-mine--miss">❌ 沒中</div>';
     }
     body.innerHTML = `
@@ -663,6 +684,9 @@
         ` : '<div class="fr-ended-tip">結果計算中…</div>'}
         ${myPick ? `<div class="fr-ended-mypick">你猜：${_formatPick(myPick)}</div>` : ''}
         ${myStatus}
+        <div class="fr-winners" id="fr-winners">
+          <div class="fr-winners-loading">載入大家的猜測…</div>
+        </div>
         <div class="fr-pick-actions" style="margin-top:18px">
           <button class="fr-btn fr-btn--submit" id="fr-end-back">回大廳</button>
         </div>
@@ -671,6 +695,58 @@
     body.querySelector('#fr-end-back').addEventListener('click', () => {
       if (state._close) state._close();
     });
+    // 非同步拉所有 picks 渲染得獎名單
+    if (haveResult) {
+      _renderWinnerList(body, state, rh, ra);
+    }
+  }
+
+  async function _renderWinnerList(body, state, rh, ra) {
+    const picks = await _fetchAllPicks(state.room.room_code);
+    const myKey = _voterKey();
+    const exact = [], side = [], miss = [];
+    for (const p of picks) {
+      const k = _classifyPick(p, rh, ra);
+      if (k === 'exact') exact.push(p);
+      else if (k === 'side') side.push(p);
+      else miss.push(p);
+    }
+    const winnersEl = body.querySelector('#fr-winners');
+    if (!winnersEl) return;
+    if (!picks.length) {
+      winnersEl.innerHTML = '<div class="fr-winners-empty">本場沒人下注 🤷</div>';
+      return;
+    }
+    const renderRow = p => {
+      const me = p.voter_key === myKey ? ' fr-winner-row--me' : '';
+      const overTag = p.is_over ? ' <span class="fr-winner-tag">自訂</span>' : '';
+      return `
+        <div class="fr-winner-row${me}">
+          <span class="fr-winner-name">${_escapeHtml(p.nickname || '匿名')}${overTag}</span>
+          <span class="fr-winner-score">${p.score_home}-${p.score_away}</span>
+        </div>
+      `;
+    };
+    const groups = [];
+    if (exact.length) groups.push(`
+      <div class="fr-winner-group fr-winner-group--exact">
+        <div class="fr-winner-head">🎯 完全猜中（${exact.length} 人）</div>
+        <div class="fr-winner-list">${exact.map(renderRow).join('')}</div>
+      </div>
+    `);
+    if (side.length) groups.push(`
+      <div class="fr-winner-group fr-winner-group--side">
+        <div class="fr-winner-head">✅ 猜中勝負（${side.length} 人）</div>
+        <div class="fr-winner-list">${side.map(renderRow).join('')}</div>
+      </div>
+    `);
+    if (miss.length) groups.push(`
+      <div class="fr-winner-group fr-winner-group--miss">
+        <div class="fr-winner-head">❌ 沒中（${miss.length} 人）</div>
+        <div class="fr-winner-list">${miss.map(renderRow).join('')}</div>
+      </div>
+    `);
+    winnersEl.innerHTML = groups.join('');
   }
 
   function _formatPick(pick) {

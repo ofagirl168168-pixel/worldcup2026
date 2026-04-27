@@ -4724,3 +4724,71 @@ body.opinion-open .btn-arena-float { display: none; }
   color: #ff8888;
 }
 .fr-ended-tip { font-size: 12px; color: var(--text-muted); }
+
+/* 結果頁：所有人猜的名單 */
+.fr-winners {
+  margin-top: 18px;
+  text-align: left;
+}
+.fr-winners-loading, .fr-winners-empty {
+  text-align: center;
+  font-size: 12px; color: var(--text-muted);
+  padding: 14px 0;
+}
+.fr-winner-group {
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.fr-winner-head {
+  font-size: 12px; font-weight: 800;
+  padding: 8px 14px;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.fr-winner-group--exact { border-color: rgba(255,215,0,0.35); }
+.fr-winner-group--exact .fr-winner-head {
+  background: rgba(255,215,0,0.08); color: #ffd47a;
+}
+.fr-winner-group--side { border-color: rgba(107,208,158,0.3); }
+.fr-winner-group--side .fr-winner-head {
+  background: rgba(107,208,158,0.08); color: #6bd09e;
+}
+.fr-winner-group--miss .fr-winner-head {
+  color: var(--text-muted);
+}
+.fr-winner-list { padding: 4px 0; }
+.fr-winner-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 7px 14px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  transition: background 0.15s ease;
+}
+.fr-winner-row + .fr-winner-row {
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+.fr-winner-row--me {
+  background: rgba(91,115,255,0.1);
+}
+.fr-winner-row--me .fr-winner-name::before {
+  content: '👈 ';
+}
+.fr-winner-name { font-weight: 600; }
+.fr-winner-tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: rgba(255,215,0,0.12);
+  color: #ffd47a;
+  margin-left: 6px;
+  font-weight: 700;
+}
+.fr-winner-score {
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+}
