@@ -1521,6 +1521,21 @@
     const has = rooms && rooms.length > 0;
     navBtns.forEach(btn => btn.classList.toggle('fr-has-active', has));
     if (homeBanner) homeBanner.classList.toggle('fr-has-active', has);
+    // 漢堡選單聚合通知：任何模組要在 hamburger 顯示紅點時把 source 加進這個 Set
+    // window.__hamburgerNotifSources.add('your-key') / .delete('your-key')
+    // 之後呼叫 window.__refreshHamburgerNotif() 重畫
+    window.__hamburgerNotifSources = window.__hamburgerNotifSources || new Set();
+    if (has) window.__hamburgerNotifSources.add('friend-room');
+    else window.__hamburgerNotifSources.delete('friend-room');
+    if (typeof window.__refreshHamburgerNotif === 'function') {
+      window.__refreshHamburgerNotif();
+    } else {
+      window.__refreshHamburgerNotif = () => {
+        const ham = document.getElementById('hamburger-btn');
+        if (ham) ham.classList.toggle('has-notif', window.__hamburgerNotifSources.size > 0);
+      };
+      window.__refreshHamburgerNotif();
+    }
     _renderNotifPanel(rooms);
   }
 

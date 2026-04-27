@@ -220,6 +220,20 @@ ul { list-style: none; }
 .hamburger {
   display: none; flex-direction: column; gap: 5px;
   padding: 8px; margin-left: auto;
+  position: relative;
+}
+/* 任何模組註冊通知（friend-room / rogue / 任務...）→ 漢堡按鈕右上紅點 */
+.hamburger.has-notif::after {
+  content: '';
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 9px; height: 9px;
+  background: #ff3b30;
+  border-radius: 50%;
+  border: 2px solid var(--bg-base, #0e1430);
+  box-shadow: 0 0 8px rgba(255,59,48,0.75);
+  animation: rogue-dot-pulse 1.4s ease-in-out infinite;
+  z-index: 1;
 }
 .hamburger span {
   display: block; width: 24px; height: 2px;
