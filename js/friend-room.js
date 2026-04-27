@@ -492,6 +492,20 @@
         <div class="fr-room-body" id="fr-room-body">
           <!-- 依 phase 渲染 -->
         </div>
+
+        <div class="fr-chat" id="fr-chat">
+          <div class="fr-chat-head">
+            <span>💬 聊天室</span>
+            <span class="fr-chat-tip">最近 50 則</span>
+          </div>
+          <div class="fr-chat-list" id="fr-chat-list">
+            <div class="fr-chat-loading">載入中…</div>
+          </div>
+          <div class="fr-chat-input">
+            <input type="text" id="fr-chat-input" maxlength="200" placeholder="說點什麼…（200 字內）" />
+            <button class="fr-btn fr-btn--submit" id="fr-chat-send">送出</button>
+          </div>
+        </div>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -516,8 +530,13 @@
       _close: null, // 由下方 close fn 補
     };
 
+    let chatChannel = null;
     function close() {
       if (_roomTickInterval) { clearInterval(_roomTickInterval); _roomTickInterval = null; }
+      if (chatChannel && window.DB && window.DB.removeChannel) {
+        try { window.DB.removeChannel(chatChannel); } catch (e) {}
+        chatChannel = null;
+      }
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 250);
       try { history.replaceState(null, '', location.pathname); } catch (e) {}
@@ -525,6 +544,9 @@
     state._close = close;
     overlay.querySelector('.fr-modal-close').addEventListener('click', close);
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+
+    // ── 聊天 ─────────────────────────────────────────────
+    _initChat(overlay, room.room_code, ch => { chatChannel = ch; });
 
     function rerender() {
       const phase = _phaseOf(state);
@@ -537,6 +559,106 @@
     state._rerender = rerender;
     rerender();
     _roomTickInterval = setInterval(rerender, 1000);
+  }
+
+  // ── 聊天 ───────────────────────────────────────────────
+  async function _initChat(overlay, roomCode, onChannel) {
+    const listEl = overlay.querySelector('#fr-chat-list');
+    const inputEl = overlay.querySelector('#fr-chat-input');
+    const sendBtn = overlay.querySelector('#fr-chat-send');
+    if (!listEl || !inputEl || !sendBtn) return;
+
+    function timeLabel(ts) {
+      const d = new Date(ts);
+      const h = String(d.getHours()).padStart(2, '0');
+      const m = String(d.getMinutes()).padStart(2, '0');
+      return `${h}:${m}`;
+    }
+    function append(msg, prepend) {
+      const myKey = _voterKey();
+      const me = msg.voter_key === myKey;
+      const div = document.createElement('div');
+      div.className = 'fr-chat-msg' + (me ? ' fr-chat-msg--me' : '');
+      div.innerHTML = `
+        <div class="fr-chat-meta">
+          <span class="fr-chat-nick">${_escapeHtml(msg.nickname || '匿名')}</span>
+          <span class="fr-chat-time">${timeLabel(msg.created_at)}</span>
+        </div>
+        <div class="fr-chat-text">${_escapeHtml(msg.content)}</div>
+      `;
+      if (prepend) listEl.prepend(div);
+      else listEl.appendChild(div);
+    }
+
+    // 歷史訊息
+    try {
+      const { data } = await window.DB
+        .from('friend_room_messages')
+        .select('voter_key, nickname, content, created_at')
+        .eq('room_code', roomCode)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      listEl.innerHTML = '';
+      const msgs = (data || []).reverse(); // 重排成舊→新
+      msgs.forEach(m => append(m, false));
+      listEl.scrollTop = listEl.scrollHeight;
+    } catch (e) {
+      console.warn('[friend-room] chat history failed', e);
+      listEl.innerHTML = '<div class="fr-chat-loading">無法載入聊天記錄</div>';
+    }
+
+    // realtime 訂閱
+    try {
+      const ch = window.DB
+        .channel('fr-chat-' + roomCode)
+        .on('postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'friend_room_messages', filter: `room_code=eq.${roomCode}` },
+          (payload) => {
+            const m = payload.new;
+            if (!m) return;
+            append({
+              voter_key: m.voter_key,
+              nickname: m.nickname,
+              content: m.content,
+              created_at: m.created_at,
+            }, false);
+            listEl.scrollTop = listEl.scrollHeight;
+          })
+        .subscribe();
+      if (onChannel) onChannel(ch);
+    } catch (e) {
+      console.warn('[friend-room] chat sub failed', e);
+    }
+
+    // 送出訊息
+    async function sendMsg() {
+      const text = (inputEl.value || '').trim();
+      if (!text || text.length > 200) return;
+      sendBtn.disabled = true;
+      try {
+        const { error } = await window.DB.from('friend_room_messages').insert({
+          room_code: roomCode,
+          voter_key: _voterKey(),
+          nickname: _resolveNickname(),
+          content: text,
+        });
+        if (error) throw error;
+        inputEl.value = '';
+      } catch (e) {
+        console.warn('[friend-room] send failed', e);
+        alert('送出失敗：' + (e.message || '未知錯誤'));
+      } finally {
+        sendBtn.disabled = false;
+        inputEl.focus();
+      }
+    }
+    sendBtn.addEventListener('click', sendMsg);
+    inputEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMsg();
+      }
+    });
   }
 
   function _renderRoomStatus(overlay, room, phase) {

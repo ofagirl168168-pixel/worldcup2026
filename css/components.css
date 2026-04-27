@@ -4807,3 +4807,81 @@ body.opinion-open .btn-arena-float { display: none; }
   background: rgba(255,87,87,0.12);
   color: #ff8888;
 }
+
+/* 聊天室 */
+.fr-chat {
+  margin-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 14px;
+}
+.fr-chat-head {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 8px;
+}
+.fr-chat-tip { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+.fr-chat-list {
+  height: 180px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 8px;
+  scroll-behavior: smooth;
+}
+.fr-chat-loading {
+  text-align: center; padding: 20px 0;
+  font-size: 12px; color: var(--text-muted);
+}
+.fr-chat-msg {
+  display: flex; flex-direction: column;
+  font-size: 12.5px;
+  max-width: 85%;
+  align-self: flex-start;
+}
+.fr-chat-msg--me {
+  align-self: flex-end;
+  text-align: right;
+}
+.fr-chat-meta {
+  display: flex; gap: 6px; align-items: baseline;
+  font-size: 10px; color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.fr-chat-msg--me .fr-chat-meta {
+  flex-direction: row-reverse;
+}
+.fr-chat-nick { color: rgba(255,255,255,0.85); font-weight: 700; }
+.fr-chat-text {
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  word-break: break-word;
+  text-align: left;
+  color: rgba(255,255,255,0.92);
+}
+.fr-chat-msg--me .fr-chat-text {
+  background: linear-gradient(135deg, #5b73ff 0%, #2d4ec8 100%);
+  border-color: transparent;
+  color: #fff;
+}
+
+.fr-chat-input {
+  display: flex; gap: 8px;
+  margin-top: 8px;
+}
+.fr-chat-input input[type="text"] {
+  flex: 1;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+}
+.fr-chat-input input::placeholder { color: rgba(255,255,255,0.35); }
+.fr-chat-input .fr-btn { padding: 8px 16px; min-width: auto; }
