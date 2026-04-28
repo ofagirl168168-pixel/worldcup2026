@@ -363,7 +363,7 @@
 
         <div class="fr-form-actions">
           <button type="button" class="fr-btn fr-btn--cancel" id="fr-form-cancel">取消</button>
-          <button type="button" class="fr-btn fr-btn--submit" id="fr-form-submit">建立房間</button>
+          <button type="button" class="fr-btn fr-btn--submit" id="fr-form-submit">下一步：投自己的比分</button>
         </div>
       </div>
     `;
@@ -399,13 +399,13 @@
     overlay.querySelector('#fr-form-submit').addEventListener('click', async () => {
       const submitBtn = overlay.querySelector('#fr-form-submit');
       submitBtn.disabled = true;
-      submitBtn.textContent = '建立中…';
+      submitBtn.textContent = '處理中…';
       try {
         await _submitCreate(matches, overlay);
         close();
       } catch (e) {
         submitBtn.disabled = false;
-        submitBtn.textContent = '建立房間';
+        submitBtn.textContent = '下一步：投自己的比分';
       }
     });
   }
@@ -428,6 +428,7 @@
     if (!match) throw new Error('找不到比賽');
 
     const tInput = overlay.querySelector('input[name="fr-time"]:checked');
+    const kickoffKey = tInput.value;             // 'now+5'/'now+10'/'real-30'... 給後面 onPickSaved 重算 now+X
     const kickoffTs = parseInt(tInput.dataset.ts);
     const betAmount = parseInt(overlay.querySelector('input[name="fr-bet"]:checked').value);
     const isPublic = overlay.querySelector('input[name="fr-pub"]:checked').value === 'public';
@@ -447,6 +448,8 @@
         home_name: match.home_name, away_name: match.away_name,
         home_flag: match.home_flag, away_flag: match.away_flag,
         real_kickoff_ts: match.kickoff_ts,
+        // 給 host 投完比分後重算 kickoff_at 用（now+5/now+10 才需要重算，real-X 不變）
+        kickoff_option_key: kickoffKey,
       },
       seed: roomCode,
       is_official: false,
@@ -466,13 +469,10 @@
     // 標記房主，讓他在大廳能看到「進入」按鈕（不是 disabled「邀請制」）
     _markAsHost(roomCode);
 
-    // 背景跑 OG 縮圖 render + upload Supabase Storage（房主投比分時並行跑，~1 秒就好）
-    // 失敗只 warn 不 throw — function 會 fallback 到靜態檔或通用圖
-    if (window.FriendRoomOGClient && window.FriendRoomOGClient.generateAndUpload) {
-      window.FriendRoomOGClient.generateAndUpload(newRoom).catch(() => {});
-    }
+    // OG render 延後到 onPickSaved（投完比分後）才跑 → kickoff_at 重算後才是定的時間，
+    // 縮圖上的「同步開賽 XX:XX」才會正確
 
-    // 流程：建房後不進房，跳獨立投比分 modal（強制房主自己投到 + 給 OG render 時間）
+    // 流程：建房後不進房，跳獨立投比分 modal（強制房主自己投到）
     // 此時 host_picked=false → 大廳不顯示這房 → 其他人看不到。送出後才打開
     _showHostFirstPickModal(newRoom);
     // 注意：loadLobby 在這時刻會把房主自己列表中也排除（因為 host_picked=false），
@@ -541,19 +541,37 @@
       lastPhase: null,
       simEnded: false,
       _close: close,
+      // 送出按鈕標題：房主第一次投比分這刻才真正「建立房間」
+      submitLabel: '建立房間',
       // 投比分 upsert 成功後跑這個（覆蓋掉預設的「已送出」確認頁）
       onPickSaved: async (st) => {
-        // 1. 標 host_picked=true → 大廳開放給其他人
+        // 對「now+X 分鐘後立刻開」的選項，把 kickoff_at 從「現在」開始重算
+        // → 房主慢慢投比分也不會吃掉朋友能加入的時間
+        // 「real-X」「real+end」依然錨定真實比賽時間，不重算
+        const meta = st.room.match_meta || {};
+        const update = { host_picked: true };
+        const key = meta.kickoff_option_key || '';
+        const m = /^now\+(\d+)$/.exec(key);
+        if (m) {
+          const minutes = parseInt(m[1]);
+          const newKick = Date.now() + minutes * 60_000;
+          update.kickoff_at = new Date(newKick).toISOString();
+          update.lock_at = new Date(newKick - 60_000).toISOString();
+        }
+        // 1. 一次更新 host_picked + 重算 kickoff（把房主的等待時間吃掉）
         try {
-          await window.DB.from('friend_rooms')
-            .update({ host_picked: true })
-            .eq('room_code', st.room.room_code);
-        } catch (e) { console.warn('[friend-room] mark host_picked failed', e); }
-        // 2. refresh lobby（讓房主也看到自己的房在列表中）
+          await window.DB.from('friend_rooms').update(update).eq('room_code', st.room.room_code);
+        } catch (e) { console.warn('[friend-room] update host_picked + kickoff failed', e); }
+        // 2. 用重算後的 kickoff render OG 縮圖 → 上 Storage（這時候才知道真正的開賽時間）
+        if (window.FriendRoomOGClient && window.FriendRoomOGClient.generateAndUpload) {
+          const finalRoom = { ...st.room, ...update };
+          await window.FriendRoomOGClient.generateAndUpload(finalRoom).catch(() => {});
+        }
+        // 3. refresh lobby（讓房主也看到自己的房在列表中）
         loadLobby();
-        // 3. 關掉本 modal
+        // 4. 關掉本 modal
         close();
-        // 4. 跳分享連結 modal（OG render 此時應已 ready）
+        // 5. 跳分享連結 modal（OG render 已上完）
         _showInviteResult(st.room.room_code, st.room.is_public);
       },
     };
@@ -1406,12 +1424,14 @@
 
   function _renderPickGrid(body, state) {
     const sel = state.pick;
+    // 房主第一次投比分（state.submitLabel）→「建立房間」；一般投比分（後進的人）→「送出」
+    const submitText = state.submitLabel || '送出';
     body.innerHTML = `
       <div class="fr-pick-title">你猜最終比分（含延長 / PK）</div>
       <div class="fr-pick-grid" id="fr-pick-grid"></div>
       <button class="fr-pick-over-btn" id="fr-pick-over">${sel && sel.over ? `自訂：${sel.sh} - ${sel.sa}` : '其他比分（>4，需指定主隊/客隊）'}</button>
       <div class="fr-pick-actions">
-        <button class="fr-btn fr-btn--submit" id="fr-pick-submit" ${sel ? '' : 'disabled'}>${sel ? '送出' : '送出'}</button>
+        <button class="fr-btn fr-btn--submit" id="fr-pick-submit" ${sel ? '' : 'disabled'}>${submitText}</button>
       </div>
     `;
     _drawGrid(body, state);
@@ -1553,8 +1573,9 @@
   async function _submitPick(body, state) {
     if (!state.pick) return;
     const sub = body.querySelector('#fr-pick-submit');
+    const restoreLabel = state.submitLabel || '送出';
     sub.disabled = true;
-    sub.textContent = '送出中…';
+    sub.textContent = '處理中…';
     try {
       const userId = _currentUserId();
       // 押注房沒登入會白玩（贏了沒寶石），先提醒一下
@@ -1564,7 +1585,7 @@
         );
         if (!proceed) {
           sub.disabled = false;
-          sub.textContent = '送出';
+          sub.textContent = restoreLabel;
           return;
         }
       }
@@ -1594,7 +1615,7 @@
       console.warn('[friend-room] submit pick failed', e);
       alert('送出失敗：' + (e.message || '未知錯誤'));
       sub.disabled = false;
-      sub.textContent = '送出';
+      sub.textContent = restoreLabel;
     }
   }
 
