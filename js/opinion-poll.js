@@ -436,41 +436,13 @@
   async function _showResult(opinion, chosenIdx, overlay, onClose) {
     const resultEl = overlay.querySelector('#opinion-result');
     if (!resultEl) return;
-    // FLIP 平滑滑動：先量選中卡舊位置 → 沒選的卡瞬間 collapse → 量新位置 →
-    // 套 translateX 把選中卡視覺鎖回舊位置 → 過渡到 translateX(0) 平滑滑到中央
     const allCards = overlay.querySelectorAll('.opinion-card');
     const chosenCard = allCards[chosenIdx];
     const cardsContainer = overlay.querySelector('.opinion-cards');
-    // 4 選項時，3 張卡 collapse 後容器會從 2 排塌成 1 排 → 下方 result 整個往上跳
-    // 先鎖定當前高度，再 transition 平滑縮回自然高度（避免 result 跳動 + 視覺平滑）
-    // align-items:flex-start 防剩下那張卡被預設 stretch 拉高（高度=容器高的 bug）
-    if (cardsContainer) {
-      cardsContainer.style.alignItems = 'flex-start';
-      cardsContainer.style.minHeight = cardsContainer.offsetHeight + 'px';
-      cardsContainer.style.transition = 'min-height 0.6s cubic-bezier(.22,1,.36,1)';
-    }
-    const rectBefore = chosenCard ? chosenCard.getBoundingClientRect() : null;
-    overlay.querySelectorAll('.opinion-card.voted-no').forEach(c => c.classList.add('opinion-card--gone'));
-    // 兩個 rAF 後解鎖 minHeight，讓容器平滑 transition 縮到 1 卡的自然高度
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if (cardsContainer) cardsContainer.style.minHeight = '0';
-      });
-    });
-    if (chosenCard && rectBefore) {
-      const rectAfter = chosenCard.getBoundingClientRect();
-      const dx = rectBefore.left - rectAfter.left;
-      const dy = rectBefore.top  - rectAfter.top;
-      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
-        chosenCard.style.transition = 'none';
-        chosenCard.style.transform = `translate(${dx}px, ${dy}px) scale(1.05)`;
-        // 強制 reflow 讓上面那行立刻生效
-        void chosenCard.offsetHeight;
-        chosenCard.style.transition = 'transform 0.65s cubic-bezier(.22,1,.36,1)';
-        chosenCard.style.transform = 'translate(0, 0) scale(1.05)';
-      }
-    }
 
+    // 順序很重要：先 fetch 票數 → render result → 才動 cards
+    // 否則 cards 收合期間 result 還沒插入，scrollHeight 會暫時 < viewport，
+    // scrollbar 從有變沒（再變回有）→ 用戶感受到「上下跳一下」
     // 先拉真實票數（RPC 聚合）
     const votes = await _fetchTally(opinion.id, opinion.opts.length);
     const totalVotes = votes.reduce((a, b) => a + b, 0);
@@ -538,9 +510,34 @@
 
     resultEl.classList.add('show');
 
+    // 現在 result 在 DOM 裡了，scrollHeight 已經是「最終值」。
+    // 開始 cards 收合 + FLIP — 收合過程 scrollHeight 只會減少不會中斷 scrollbar。
+    if (cardsContainer) {
+      cardsContainer.style.alignItems = 'flex-start';
+      cardsContainer.style.minHeight = cardsContainer.offsetHeight + 'px';
+      cardsContainer.style.transition = 'min-height 0.6s cubic-bezier(.22,1,.36,1)';
+    }
+    const rectBefore = chosenCard ? chosenCard.getBoundingClientRect() : null;
+    overlay.querySelectorAll('.opinion-card.voted-no').forEach(c => c.classList.add('opinion-card--gone'));
+    if (chosenCard && rectBefore) {
+      const rectAfter = chosenCard.getBoundingClientRect();
+      const dx = rectBefore.left - rectAfter.left;
+      const dy = rectBefore.top  - rectAfter.top;
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+        chosenCard.style.transition = 'none';
+        chosenCard.style.transform = `translate(${dx}px, ${dy}px) scale(1.05)`;
+        void chosenCard.offsetHeight;
+        chosenCard.style.transition = 'transform 0.65s cubic-bezier(.22,1,.36,1)';
+        chosenCard.style.transform = 'translate(0, 0) scale(1.05)';
+      }
+    }
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (cardsContainer) cardsContainer.style.minHeight = '0';
+      });
+    });
+
     // 結果顯示後把 overlay 捲回頂部（避免投完票後停在下方看不到結果）
-    // 必須瞬間：smooth scroll 跟 cards 容器 minHeight transition 互相干擾，
-    // 用戶會看到「往下跳一下再回來」。已經在頂部就不動，避免不必要的視覺跳動。
     if (overlay.scrollTop > 0) {
       overlay.scrollTop = 0;
     }
