@@ -82,11 +82,44 @@ function _matches() {
   if (t === 'epl') return (window.EPL_MATCHES||[]);
   return (typeof SCHEDULE!=='undefined' && SCHEDULE.length) ? SCHEDULE : [];
 }
+// 平台級「跨賽事」文章（tournament:'all'）— 三個賽事頁都會看到
+// 自動 normalize 欄位名（WC 用 cat/desc/body；UCL/EPL 用 category/summary/content）
+function _platformArticles() {
+  const all = []
+    .concat((typeof ARTICLES !== 'undefined' ? ARTICLES : []))
+    .concat(window.EPL_ARTICLES || [])
+    .concat(window.UCL_ARTICLES || []);
+  return all
+    .filter(a => a && a.tournament === 'all')
+    .map(a => ({
+      ...a,
+      // 兩套欄位都備齊，render branch 不論 WC / UCL / EPL 都讀得到
+      category: a.category || a.cat,
+      summary:  a.summary  || a.desc,
+      content:  a.content  || a.body,
+      cat:      a.cat      || a.category,
+      desc:     a.desc     || a.summary,
+      body:     a.body     || a.content,
+    }));
+}
+
 function _articles() {
   const t = _tid();
-  if (t === 'ucl') return (window.UCL_ARTICLES||[]);
-  if (t === 'epl') return (window.EPL_ARTICLES||[]);
-  return (typeof ARTICLES!=='undefined' ? ARTICLES : []);
+  let pool;
+  if (t === 'ucl') pool = (window.UCL_ARTICLES || []);
+  else if (t === 'epl') pool = (window.EPL_ARTICLES || []);
+  else pool = (typeof ARTICLES !== 'undefined' ? ARTICLES : []);
+  // 合併平台級文章，依 id 去重（避免本身在 pool 又出現第二次）
+  const platform = _platformArticles();
+  const seen = new Set();
+  const merged = [];
+  for (const a of [...platform, ...pool]) {
+    const k = String(a.id);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    merged.push(a);
+  }
+  return merged;
 }
 function _dailyQ() {
   const t = _tid();
