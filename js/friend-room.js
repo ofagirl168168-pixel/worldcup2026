@@ -469,8 +469,12 @@
     // 標記房主，讓他在大廳能看到「進入」按鈕（不是 disabled「邀請制」）
     _markAsHost(roomCode);
 
-    // OG render 延後到 onPickSaved（投完比分後）才跑 → kickoff_at 重算後才是定的時間，
-    // 縮圖上的「同步開賽 XX:XX」才會正確
+    // 背景跑 OG 縮圖 render + upload Supabase Storage（房主投比分時並行跑，~1 秒就好）
+    // 對 now+X 選項，OG 上的時間是「建房當下 +X 分」(HH:MM 精度)；之後重算 kickoff_at
+    // 房主投比分通常 < 1 分鐘，HH:MM 顯示通常不變；極端情況 ±1 分誤差，房內倒數還是準的
+    if (window.FriendRoomOGClient && window.FriendRoomOGClient.generateAndUpload) {
+      window.FriendRoomOGClient.generateAndUpload(newRoom).catch(() => {});
+    }
 
     // 流程：建房後不進房，跳獨立投比分 modal（強制房主自己投到）
     // 此時 host_picked=false → 大廳不顯示這房 → 其他人看不到。送出後才打開
@@ -558,22 +562,16 @@
           update.kickoff_at = new Date(newKick).toISOString();
           update.lock_at = new Date(newKick - 60_000).toISOString();
         }
-        // 1. 一次更新 host_picked + 重算 kickoff（把房主的等待時間吃掉）
+        // 一次更新 host_picked + 重算 kickoff（把房主的等待時間吃掉）
+        // OG 已在 _submitCreate 開房瞬間就 fire-and-forget render 了，這裡不重 render
         try {
           await window.DB.from('friend_rooms').update(update).eq('room_code', st.room.room_code);
         } catch (e) { console.warn('[friend-room] update host_picked + kickoff failed', e); }
-        // 2. 用重算後的 kickoff render OG 縮圖 → 上 Storage（背景跑，~1 秒完）
-        //    不 await：避免房主按完「建立房間」要等 1.5 秒才看到分享 modal
-        //    等社群 bot 抓 /r/CODE 的時候（通常分享後幾秒）OG 都早就 ready 了
-        if (window.FriendRoomOGClient && window.FriendRoomOGClient.generateAndUpload) {
-          const finalRoom = { ...st.room, ...update };
-          window.FriendRoomOGClient.generateAndUpload(finalRoom).catch(() => {});
-        }
-        // 3. refresh lobby（讓房主也看到自己的房在列表中）
+        // refresh lobby（讓房主也看到自己的房在列表中）
         loadLobby();
-        // 4. 關掉本 modal
+        // 關掉本 modal
         close();
-        // 5. 跳分享連結 modal（OG render 已上完）
+        // 跳分享連結 modal（OG 早就 ready 了，房主投比分這段時間夠用）
         _showInviteResult(st.room.room_code, st.room.is_public);
       },
     };
