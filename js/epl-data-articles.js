@@ -1779,6 +1779,61 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p>利物浦升至第 4 名，超越阿斯頓維拉。在聯賽僅剩 4 輪的情況下，歐冠資格爭奪依然激烈。但 Salah 的傷情是利物浦最大的隱憂——在他即將告別安菲爾德的賽季尾聲，球迷們最不願看到的就是他因傷提前結束這段旅程。</p>`,
     tags: ['賽後回顧', '利物浦', '水晶宮', 'Isak', 'Salah', 'Wirtz', '第34輪']
+  },
+  {
+    id: 'epl-035',
+    title: '【賽後回顧】曼聯 2-1 布倫特福德：Casemiro 與 Sesko 聯手，紅魔鎖定歐冠席位在望',
+    date: '2026-04-28',
+    category: '賽後深度回顧',
+    summary: 'Casemiro 頭槌與 Sesko 半場前破門為曼聯奠定勝局，Jensen 遠射挽回顏面。Fernandes 助攻王紀錄逼近 De Bruyne／Henry。',
+    content: `<h2>曼聯 2-1 布倫特福德｜第35輪・Old Trafford</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">11' ⚽</td>
+<td style="padding:8px"><strong>Casemiro（曼聯）</strong> — Fernandes 開出任意球，Maguire 頭槌回做，Casemiro 門前搶點頭槌破網，本季英超第 9 球</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">43' ⚽</td>
+<td style="padding:8px"><strong>Benjamin Sesko（曼聯）</strong> — Fernandes 精準直塞禁區，Sesko 從容推射入網，本季英超第 10 球</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">87' ⚽</td>
+<td style="padding:8px"><strong>Mathias Jensen（布倫特福德）</strong> — 禁區外一腳精彩遠射直掛死角，為蜜蜂軍團挽回顏面</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 2-0 ∣ 終場 2-1</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>Carrick 的務實勝利</h4>
+
+<p>Michael Carrick 對陣容做了兩處調整——Maguire 回歸中後衛、Amad 頂替髖屈肌不適的 Matheus Cunha 出任邊路。事實證明這兩個決定都是正確的：Maguire 在首球中提供了關鍵的頭槌回做，而 Amad 在右路的突破不斷製造威脅。</p>
+
+<p>開場 11 分鐘，Fernandes 的任意球開到禁區，Maguire 力壓對手頭槌向後擺渡，Casemiro 後點無人看防、輕鬆點頭入網。這是巴西老將本季的第 9 個英超進球，也是他在定位球中第 4 次建功——Casemiro 在爭頂得分上依然是英超最可靠的中場之一。</p>
+
+<h4>Sesko 鎖定勝局</h4>
+
+<p>半場結束前兩分鐘，Fernandes 在中場接球後一腳穿越 Brentford 整條防線的直塞球，找到了前插的 Sesko。斯洛維尼亞前鋒面對門將不慌不忙地推射入網，將比分拉開到 2-0。這是 Sesko 本季的第 10 個英超進球，這筆冬窗轉會正在持續回饋。</p>
+
+<h4>Jensen 遠射扳回一城</h4>
+
+<p>比賽在大部分時間裡都在曼聯的控制之下，直到第 87 分鐘 Mathias Jensen 在禁區外一腳世界級遠射直掛死角，讓 Old Trafford 的氣氛一度緊張。不過最終三分依然留在了曼徹斯特。</p>
+
+<h3>焦點人物</h3>
+
+<p><strong>Bruno Fernandes</strong>：一場比賽貢獻兩次助攻，本季英超助攻數來到 19 次，距離 Kevin De Bruyne 與 Thierry Henry 共同保持的單季 20 次助攻紀錄僅差一步。葡萄牙隊長的創造力依然是曼聯最重要的武器。</p>
+
+<p><strong>Casemiro</strong>：35 歲的巴西中場用一記定位球頭槌再次證明自己的價值。Carrick 體系下的 Casemiro 從控球型中場轉型為禁區威脅點，效果顯著。</p>
+
+<h3>積分榜影響</h3>
+
+<p>曼聯穩居第 3 名，再拿 2 分就能鎖定前五、確保歐冠資格。在 Carrick 接手後的穩定發揮下（近 4 場拿 10 分），紅魔的歐冠回歸之路越來越清晰。布倫特福德則以第 7 名的身份繼續追趕前五，但距離歐冠門檻仍有差距。</p>`,
+    tags: ['賽後回顧', '曼聯', '布倫特福德', 'Casemiro', 'Sesko', 'Fernandes', '第35輪']
   }
 ];
 

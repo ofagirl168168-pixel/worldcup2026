@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-035",
+    "tournament": "epl",
+    "title": "【賽後回顧】曼聯 2-1 布倫特福德：Casemiro 與 Sesko 聯手，紅魔鎖定歐冠席位在望",
+    "summary": "Casemiro 頭槌與 Sesko 半場前破門為曼聯奠定勝局，Jensen 遠射挽回顏面。Fernandes 助攻王紀錄逼近 De Bruyne／Henry。",
+    "date": "2026-04-28",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-033",
     "tournament": "epl",
     "title": "【賽後回顧】兵工廠 1-0 紐卡索：Eze 世界波重返榜首，角球進球破英超紀錄",
@@ -109,7 +119,7 @@ export default [
     "date": "2026-04-20",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-026",
@@ -119,7 +129,7 @@ export default [
     "date": "2026-04-20",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "8",
@@ -129,7 +139,7 @@ export default [
     "date": "2026-04-19",
     "category": "小組分析",
     "readTime": "7分鐘",
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-024",
@@ -139,7 +149,7 @@ export default [
     "date": "2026-04-19",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-019",

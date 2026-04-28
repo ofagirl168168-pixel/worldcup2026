@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-04-27 日更）
+   資料截止：2025/26 賽季（2026-04-28 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -122,11 +122,12 @@ const EPL_TEAMS = {
     style:'三後衛體系，翼衛推進，快速反擊',
     strengths:['Bruno Fernandes核心創造力','年輕球員快速成長','Amorim戰術改造進行中'],
     weaknesses:['體系轉換需要時間','防守穩定性不足','傷兵問題嚴重'],
-    recentForm:['L','W','D','L','W'],
+    recentForm:['W','D','L','W','W'],
     history:'20次英格蘭頂級聯賽冠軍，3次歐冠冠軍，英格蘭最成功俱樂部',
     injuries:[
       {name:'Patrick Dorgu',pos:'翼衛',status:'肌肉傷復健中，恢復進度中',returnDate:'賽季末'},
-      {name:'Lisandro Martínez',pos:'中後衛',status:'停賽（第2場/共3場禁賽）',returnDate:'禁賽結束後'}
+      {name:'Lisandro Martínez',pos:'中後衛',status:'停賽（第3場/共3場禁賽）',returnDate:'下場解禁'},
+      {name:'Matheus Cunha',pos:'翼鋒',status:'髖屈肌不適（缺席 vs BRE 4/27），Carrick 稱不嚴重',returnDate:'vs LIV（5/3）待定'}
     ]
   },
   'TOT': {
@@ -146,7 +147,7 @@ const EPL_TEAMS = {
     history:'2次英格蘭頂級聯賽冠軍，2019歐冠亞軍',
     injuries:[
       {name:'Dominic Solanke',pos:'前鋒',status:'肌肉傷（vs WOL 4/25），De Zerbi 稱不嚴重',returnDate:'評估中'},
-      {name:'Xavi Simons',pos:'攻擊中場',status:'膝傷（vs WOL 4/25），較為擔憂',returnDate:'缺席 vs AVL，數日內評估'},
+      {name:'Xavi Simons',pos:'攻擊中場',status:'右膝前十字韌帶斷裂（vs WOL 4/25），需手術',returnDate:'賽季報銷＋世界盃報銷'},
       {name:'James Maddison',pos:'攻擊中場',status:'前十字韌帶傷（恢復中）',returnDate:'賽季報銷'},
       {name:'Cristian Romero',pos:'中後衛',status:'膝傷',returnDate:'賽季報銷（世界盃存疑）'},
       {name:'Mathys Tel',pos:'翼鋒',status:'大腿傷',returnDate:'評估中'}
@@ -257,7 +258,7 @@ const EPL_TEAMS = {
     style:'直接打法，定位球威脅大，邊路傳中',
     strengths:['Igor Thiago獨撐前線終結力穩','Andrews延續Frank戰術遺產','定位球得分率高'],
     weaknesses:['失去Wissa(紐卡)與Nørgaard(兵工廠)攻守同減','對陣強隊防守壓力大','陣容深度有限'],
-    recentForm:['L','W','D','L','D'],
+    recentForm:['W','D','L','D','L'],
     history:'2021年首次升上英超，以數據化管理聞名'
   },
   'NFO': {
@@ -675,7 +676,12 @@ window.EPL_MATCHES = [
   // ===== 第 35 輪 (2026-04-28 ~ 開始) =====
   // 曼聯 vs 布倫特福德 | 04/28 03:00 台灣時間 (Old Trafford 20:00 BST)
   {id:'EPL-MW35-MUN-BRE', matchday:35, date:'2026-04-28', time:'03:00', home:'MUN', away:'BRE', stage:'league',
-   status:'upcoming'},
+   status:'finished', score:{h:2,a:1}, halfTime:{h:2,a:0},
+   goals:[
+     {min:'11',player:'Casemiro',side:'h'},
+     {min:'43',player:'Benjamin Sesko',side:'h'},
+     {min:'87',player:'Mathias Jensen',side:'a'}
+   ]},
 
 ];
 
