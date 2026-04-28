@@ -246,7 +246,7 @@ const EPL_TEAMS = {
   },
   'BRE': {
     name:'Brentford', nameCN:'布倫特福德', flag:'https://crests.football-data.org/402.png',
-    league:'Premier League', eplRank:7, coach:'Keith Andrews', formation:'4-3-3',
+    league:'Premier League', eplRank:9, coach:'Keith Andrews', formation:'4-3-3',
     keyPlayers:[
       {name:'Igor Thiago',pos:'前鋒',club:'布倫特福德'},
       {name:'Kevin Schade',pos:'翼鋒',club:'布倫特福德'},
