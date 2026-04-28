@@ -3550,7 +3550,9 @@ function openArticle(id) {
 
 function openUCLArticle(id) {
   const arts = _articles();
-  const a = arts.find(x => x.id === id);
+  // 用 String() 比較：UCL/EPL 文章 id 是字串（'epl-001'），但跨賽事的 WC 文章
+  // id 是數字（如 10），onclick 傳進來是字串，數字!==字串會 fail
+  const a = arts.find(x => String(x.id) === String(id));
   if (!a) return;
   completeDailyTask?.('read_article');
   _pushArticleUrl(a.id);
