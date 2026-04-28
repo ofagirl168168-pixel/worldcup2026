@@ -33,6 +33,27 @@
     return k;
   }
 
+  // 房主自己建的房存 localStorage → 大廳列表上能看到「進入」而不是 disabled「邀請制」
+  // (host_voter_key 是裝置指紋，不該回傳給 client，所以走這條 local 旁路)
+  const _HOSTING_KEY = 'fr_hosting_rooms';
+  function _markAsHost(roomCode) {
+    try {
+      const list = JSON.parse(localStorage.getItem(_HOSTING_KEY) || '[]');
+      if (!list.includes(roomCode)) {
+        list.push(roomCode);
+        // 上限 20 個（建超多房的話只記最近的）
+        while (list.length > 20) list.shift();
+        localStorage.setItem(_HOSTING_KEY, JSON.stringify(list));
+      }
+    } catch (e) {}
+  }
+  function _isHostOfRoom(roomCode) {
+    try {
+      const list = JSON.parse(localStorage.getItem(_HOSTING_KEY) || '[]');
+      return list.includes(roomCode);
+    } catch (e) { return false; }
+  }
+
   function _resolveNickname() {
     // 同 opinion-poll.js:1329 邏輯：登入暱稱 → localStorage anon nick → 自動生成
     try {
@@ -148,6 +169,10 @@
       return `<button class="fr-btn fr-btn--ended" onclick="FriendRoom.viewReplay('${room.room_code}')">看回放</button>`;
     }
     if (!room.is_public) {
+      // 房主自己建的私人房 → 顯示「進入」，否則 disabled「邀請制」
+      if (_isHostOfRoom(room.room_code)) {
+        return `<button class="fr-btn fr-btn--join" onclick="FriendRoom.joinRoom('${room.room_code}')">進入</button>`;
+      }
       return `<button class="fr-btn fr-btn--locked" disabled>邀請制 🔒</button>`;
     }
     if (full) return `<button class="fr-btn fr-btn--full" disabled>已額滿</button>`;
@@ -409,7 +434,7 @@
     const lockTs = kickoffTs - 60000; // lock 1 分鐘前
     const roomCode = _genRoomCode();
 
-    const { error } = await window.DB.from('friend_rooms').insert({
+    const newRoom = {
       room_code: roomCode,
       room_name: roomName,
       host_voter_key: _voterKey(),
@@ -430,15 +455,27 @@
       lock_at: new Date(lockTs).toISOString(),
       kickoff_at: new Date(kickoffTs).toISOString(),
       status: 'open',
-    });
+    };
+    const { error } = await window.DB.from('friend_rooms').insert(newRoom);
     if (error) {
       console.warn('[friend-room] create failed', error);
       alert('建立失敗：' + (error.message || '未知錯誤'));
       throw error;
     }
 
+    // 標記房主，讓他在大廳能看到「進入」按鈕（不是 disabled「邀請制」）
+    _markAsHost(roomCode);
+
+    // 背景跑 OG 縮圖 render + upload Supabase Storage（房主投比分時並行跑，~1 秒就好）
+    // 失敗只 warn 不 throw — function 會 fallback 到靜態檔或通用圖
+    if (window.FriendRoomOGClient && window.FriendRoomOGClient.generateAndUpload) {
+      window.FriendRoomOGClient.generateAndUpload(newRoom).catch(() => {});
+    }
+
     loadLobby();
-    _showInviteResult(roomCode, isPublic);
+    // 流程：直接進房讓房主先選比分 → 選完才跳分享 modal + 倒數開始
+    // 為什麼：(1) 強制房主自己投到 (2) 給 OG render 時間（30 秒以內 PNG 就 ready）
+    joinRoom(roomCode, { showInviteAfterPick: true });
   }
 
   function _showInviteResult(roomCode, isPublic) {
@@ -474,8 +511,9 @@
   // ── 進房間 + 猜比分 ─────────────────────────────────────
   let _roomTickInterval = null;
 
-  async function joinRoom(roomCode) {
+  async function joinRoom(roomCode, opts) {
     if (!window.DB) { alert('連線中…請稍後再試'); return; }
+    opts = opts || {};
     try {
       const { data: room, error } = await window.DB
         .from('friend_rooms')
@@ -494,7 +532,7 @@
         .eq('voter_key', myKey)
         .maybeSingle();
 
-      _renderRoomOverlay(room, existing || null);
+      _renderRoomOverlay(room, existing || null, opts);
       // URL 同步成 /r/CODE，refresh 會走 Cloudflare function 拿客製 OG
       try { history.replaceState(null, '', `/r/${roomCode}`); } catch (e) {}
     } catch (e) {
@@ -527,7 +565,8 @@
     return `${ss} 秒`;
   }
 
-  function _renderRoomOverlay(room, existingPick) {
+  function _renderRoomOverlay(room, existingPick, opts) {
+    opts = opts || {};
     const meta = room.match_meta || {};
     const overlay = document.createElement('div');
     overlay.className = 'fr-room-overlay';
@@ -610,6 +649,8 @@
       // submitted=true → 顯示「已送出」確認頁；false → 顯示比分 grid
       submitted: !!existingPick,
       lastPhase: null,
+      // 房主剛建房 → 進來先選比分，選完才跳分享 modal（給 OG render 時間 + 強制房主投到）
+      showInviteAfterPick: !!opts.showInviteAfterPick,
       // 本人的 sim 是否已跑完。沒跑完的話即使 DB.status='ended' 也不切結果頁
       // → 速度慢 / 0.5x / 遲到加入的人都能看完整場才出結果
       // 注意：每次進房都從 false 開始；DB.status='ended' 只代表別人寫入結果，
@@ -1460,6 +1501,11 @@
       // 立刻更新「已加入房間」提示（nav / banner badge）
       if (window.FriendRoom && window.FriendRoom._refreshActiveBadge) {
         try { window.FriendRoom._refreshActiveBadge(); } catch (e) {}
+      }
+      // 房主剛建完房第一次送出比分 → 跳出分享 modal（OG render 應該已經 ready）
+      if (state.showInviteAfterPick) {
+        state.showInviteAfterPick = false; // 只跳一次
+        _showInviteResult(state.room.room_code, state.room.is_public);
       }
     } catch (e) {
       console.warn('[friend-room] submit pick failed', e);

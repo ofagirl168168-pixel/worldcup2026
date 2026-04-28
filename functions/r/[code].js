@@ -73,12 +73,21 @@ export async function onRequest(context) {
   let ogDesc = '跟朋友一起猜真實比賽比分、看模擬賽直播決勝負';
   let ogImage = `${origin}/img/og-cover.png?v=4`;
 
-  // 如果有客製 OG 縮圖（scripts/build-room-og.js 產的），優先用
-  // 找不到（例如使用者自建的房沒預生成）就 fallback 到通用圖
+  // OG 縮圖選擇順序：
+  // 1. Supabase Storage `og-images/r/CODE.png`（房主建房時 client 即時 render，~1 秒就 ready）
+  // 2. 靜態 `/og/r/CODE.png`（官方房 cron 產的、commit 進 repo 的）
+  // 3. 通用 og-cover（最後 fallback）
   if (room) {
+    const storageUrl = `${SUPA_URL}/storage/v1/object/public/og-images/r/${code}.png`;
     try {
-      const head = await env.ASSETS.fetch(`${origin}/og/r/${code}.png`, { method: 'HEAD' });
-      if (head.ok) ogImage = `${origin}/og/r/${code}.png`;
+      const r = await fetch(storageUrl, { method: 'HEAD' });
+      if (r.ok) {
+        ogImage = storageUrl;
+      } else {
+        // 試靜態檔
+        const head = await env.ASSETS.fetch(`${origin}/og/r/${code}.png`, { method: 'HEAD' });
+        if (head.ok) ogImage = `${origin}/og/r/${code}.png`;
+      }
     } catch (e) { /* fallback 通用圖 */ }
   }
 
