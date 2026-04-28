@@ -192,7 +192,7 @@ async function renderRoom(room) {
     statusText = '🏁 已結束';
     statusColor = '#aaa';
   } else if (room.status === 'live') {
-    statusText = '🔴 直播中';
+    statusText = '🔴 進行中';
     statusColor = '#ff5757';
   } else if (kickoff) {
     statusText = `⏱ ${kickoff} 同步開賽`;

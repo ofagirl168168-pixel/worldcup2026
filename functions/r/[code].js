@@ -96,7 +96,7 @@ export async function onRequest(context) {
     if (room.status === 'ended' && room.result_home != null && room.result_away != null) {
       ogDesc = `${home} ${room.result_home}-${room.result_away} ${away}（已結束）· 點開看結果與留言`;
     } else if (room.status === 'live') {
-      ogDesc = `🔴 直播中：${home} vs ${away}，跟朋友一起看模擬賽決勝負！`;
+      ogDesc = `🔴 進行中：${home} vs ${away}，跟朋友一起看模擬賽決勝負！`;
     } else if (kickoff) {
       ogDesc = `來陪我猜這場！${home} vs ${away}，${kickoff} 同步開賽 · ${bet}`;
     } else {

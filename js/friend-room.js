@@ -132,7 +132,7 @@
 
   function _countdown(kickoffISO) {
     const t = new Date(kickoffISO).getTime() - Date.now();
-    if (t <= 0) return '<span class="fr-cd fr-cd--live">直播中</span>';
+    if (t <= 0) return '<span class="fr-cd fr-cd--live">進行中</span>';
     const m = Math.floor(t / 60000);
     if (m < 60) return `<span class="fr-cd">${m} 分後開賽</span>`;
     const h = Math.floor(m / 60);
@@ -1031,9 +1031,9 @@
     if (phase === 'open') {
       el.innerHTML = `<span class="fr-cd-label">報名截止剩</span> <span class="fr-cd-num">${_formatCountdown(lockTs - now)}</span>`;
     } else if (phase === 'locked') {
-      el.innerHTML = `<span class="fr-cd-label">直播開賽剩</span> <span class="fr-cd-num">${_formatCountdown(kickTs - now)}</span>`;
+      el.innerHTML = `<span class="fr-cd-label">開賽剩</span> <span class="fr-cd-num">${_formatCountdown(kickTs - now)}</span>`;
     } else if (phase === 'live') {
-      el.innerHTML = `<span class="fr-cd-live">🔴 直播中</span>`;
+      el.innerHTML = `<span class="fr-cd-live">🔴 進行中</span>`;
     } else {
       el.innerHTML = `<span class="fr-cd-ended">已結束</span>`;
     }
@@ -1070,7 +1070,7 @@
     body.innerHTML = `
       <div class="fr-live-wrap">
         <div class="fr-live-header">
-          <span class="fr-cd-live">🔴 直播中</span>
+          <span class="fr-cd-live">🔴 進行中</span>
           <span class="fr-live-pick-tag">你猜：${state.pick ? _formatPick(state.pick) : '（沒投）'}</span>
         </div>
         <div id="sim-wrap-${matchId}" class="fr-live-sim"></div>
@@ -1621,10 +1621,10 @@
     let icon, head, desc, action;
     if (hit.s === 'imminent') {
       const sec = Math.max(0, Math.ceil((new Date(hit.r.kickoff_at).getTime() - Date.now()) / 1000));
-      icon = '⏰'; head = '準備開賽'; desc = `${title}${sub ? ' · ' + sub : ''} · ${sec} 秒後直播`;
+      icon = '⏰'; head = '準備開賽'; desc = `${title}${sub ? ' · ' + sub : ''} · ${sec} 秒後開始`;
       action = { label: '進入', onClick: () => joinRoom(hit.r.room_code) };
     } else if (hit.s === 'live') {
-      icon = '🔴'; head = '直播中'; desc = `${title}${sub ? ' · ' + sub : ''}`;
+      icon = '🔴'; head = '進行中'; desc = `${title}${sub ? ' · ' + sub : ''}`;
       action = { label: '進入', onClick: () => joinRoom(hit.r.room_code) };
     } else if (hit.s === 'ended') {
       const rh = hit.r.result_home, ra = hit.r.result_away;
