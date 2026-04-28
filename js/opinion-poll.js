@@ -538,8 +538,12 @@
 
     resultEl.classList.add('show');
 
-    // 結果顯示後把 overlay 捲回頂部（避免投完票後停在下方看不到題目/結果）
-    try { overlay.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { overlay.scrollTop = 0; }
+    // 結果顯示後把 overlay 捲回頂部（避免投完票後停在下方看不到結果）
+    // 必須瞬間：smooth scroll 跟 cards 容器 minHeight transition 互相干擾，
+    // 用戶會看到「往下跳一下再回來」。已經在頂部就不動，避免不必要的視覺跳動。
+    if (overlay.scrollTop > 0) {
+      overlay.scrollTop = 0;
+    }
 
     // 動畫填充百分比條
     requestAnimationFrame(() => {
