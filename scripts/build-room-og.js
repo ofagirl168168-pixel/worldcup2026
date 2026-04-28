@@ -33,6 +33,24 @@ const FONT_BOLD = '"JhengHei Bold", "JhengHei", sans-serif';
 
 const W = 1200, H = 630;
 
+// 麥迪 logo（左上角品牌標）— 載入一次重複用
+const LOGO_PATH = path.join(ROOT, 'img', 'logo-soccermaddy.png');
+let LOGO_IMAGE = null;
+async function getLogo() {
+  if (LOGO_IMAGE !== null) return LOGO_IMAGE;
+  try {
+    if (fs.existsSync(LOGO_PATH)) {
+      LOGO_IMAGE = await loadImage(fs.readFileSync(LOGO_PATH));
+    } else {
+      LOGO_IMAGE = false;
+    }
+  } catch (e) {
+    console.warn('[logo fail]', e.message);
+    LOGO_IMAGE = false;
+  }
+  return LOGO_IMAGE;
+}
+
 // Supabase
 const SUPA_URL = process.env.SUPABASE_URL || 'https://dwlngkspwtcsnacbsgct.supabase.co';
 const SUPA_KEY = process.env.SUPABASE_KEY || 'sb_publishable_XOYghSiO49fG8nMsztm-cQ_l_Tt6V1u';
@@ -107,10 +125,19 @@ async function renderRoom(room) {
   ctx.fillRect(0, 0, W, H);
 
   // ── 上方：品牌 + 房型 ──
-  ctx.font = `bold 30px ${FONT_BOLD}`;
+  // 麥迪 logo + 「麥迪挑戰賽」文字
+  const logo = await getLogo();
+  let textX = 60;
+  if (logo) {
+    const logoSize = 64;
+    const logoY = 80 - logoSize / 2 - 10; // 對齊文字 baseline
+    ctx.drawImage(logo, 60, logoY, logoSize, logoSize);
+    textX = 60 + logoSize + 14;
+  }
+  ctx.font = `bold 32px ${FONT_BOLD}`;
   ctx.fillStyle = '#ffd700';
   ctx.textAlign = 'left';
-  ctx.fillText('🏆 麥迪挑戰賽', 60, 80);
+  ctx.fillText('麥迪挑戰賽', textX, 80);
 
   // 右上：房型 badge
   let badgeText = room.is_official ? '官方' : (room.is_public ? '公開' : '私人');
