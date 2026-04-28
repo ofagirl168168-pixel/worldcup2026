@@ -472,10 +472,93 @@
       window.FriendRoomOGClient.generateAndUpload(newRoom).catch(() => {});
     }
 
-    loadLobby();
-    // 流程：直接進房讓房主先選比分 → 選完才跳分享 modal + 倒數開始
-    // 為什麼：(1) 強制房主自己投到 (2) 給 OG render 時間（30 秒以內 PNG 就 ready）
-    joinRoom(roomCode, { showInviteAfterPick: true });
+    // 流程：建房後不進房，跳獨立投比分 modal（強制房主自己投到 + 給 OG render 時間）
+    // 此時 host_picked=false → 大廳不顯示這房 → 其他人看不到。送出後才打開
+    _showHostFirstPickModal(newRoom);
+    // 注意：loadLobby 在這時刻會把房主自己列表中也排除（因為 host_picked=false），
+    // 等送出後 _submitPick 會 update host_picked=true 再 loadLobby
+  }
+
+  // ── 房主建房後的獨立「先投比分」modal ─────────────────────
+  // 不進入房間 overlay，只彈一個聚焦在「你先投自己的」的 modal
+  // 投完才把 host_picked=true（大廳開放給其他人）+ 跳出分享連結 modal
+  function _showHostFirstPickModal(room) {
+    const meta = room.match_meta || {};
+
+    const overlay = document.createElement('div');
+    overlay.className = 'fr-modal-overlay';
+    overlay.innerHTML = `
+      <div class="fr-modal" role="dialog" style="max-width:540px">
+        <div style="text-align:center;padding:8px 0 18px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:18px">
+          <div style="font-size:38px;line-height:1;margin-bottom:8px">🎯</div>
+          <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:6px">等等，先投你的！</div>
+          <div style="font-size:13px;color:var(--text-muted);line-height:1.6">
+            投完比分才會 <b style="color:#ffd700">開放讓朋友加入</b><br>並 <b style="color:#ffd700">複製分享連結</b>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-size:15px;color:var(--text-secondary);margin-bottom:14px">
+          ${meta.home_flag ? `<img src="${meta.home_flag}" alt="" style="width:24px;height:24px;border-radius:50%;object-fit:cover" />` : ''}
+          <span>${_escapeHtml(meta.home_name || '主隊')}</span>
+          <span style="color:var(--text-muted);font-size:12px">vs</span>
+          <span>${_escapeHtml(meta.away_name || '客隊')}</span>
+          ${meta.away_flag ? `<img src="${meta.away_flag}" alt="" style="width:24px;height:24px;border-radius:50%;object-fit:cover" />` : ''}
+        </div>
+        <div id="fr-host-pick-body"></div>
+        <div style="text-align:center;margin-top:12px">
+          <button type="button" id="fr-host-pick-cancel"
+            style="background:none;border:none;color:var(--text-muted);font-size:12px;cursor:pointer;text-decoration:underline">
+            取消這次建房
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 250);
+    };
+
+    // 取消建房 → 把剛 insert 的房 status 改 cancelled（lobby 自動排除）
+    overlay.querySelector('#fr-host-pick-cancel').addEventListener('click', async () => {
+      if (!confirm('要取消這次建房嗎？沒投比分前還能取消。')) return;
+      try {
+        await window.DB.from('friend_rooms')
+          .update({ status: 'cancelled' })
+          .eq('room_code', room.room_code);
+      } catch (e) { console.warn('[friend-room] cancel failed', e); }
+      close();
+      loadLobby();
+    });
+
+    // 復用 _renderPickGrid 邏輯：build 一個 mini state，掛 onPickSaved callback
+    const body = overlay.querySelector('#fr-host-pick-body');
+    const state = {
+      room,
+      pick: null,
+      submitted: false,
+      lastPhase: null,
+      simEnded: false,
+      _close: close,
+      // 投比分 upsert 成功後跑這個（覆蓋掉預設的「已送出」確認頁）
+      onPickSaved: async (st) => {
+        // 1. 標 host_picked=true → 大廳開放給其他人
+        try {
+          await window.DB.from('friend_rooms')
+            .update({ host_picked: true })
+            .eq('room_code', st.room.room_code);
+        } catch (e) { console.warn('[friend-room] mark host_picked failed', e); }
+        // 2. refresh lobby（讓房主也看到自己的房在列表中）
+        loadLobby();
+        // 3. 關掉本 modal
+        close();
+        // 4. 跳分享連結 modal（OG render 此時應已 ready）
+        _showInviteResult(st.room.room_code, st.room.is_public);
+      },
+    };
+
+    _renderPickGrid(body, state);
   }
 
   function _showInviteResult(roomCode, isPublic) {
@@ -1496,16 +1579,16 @@
       }, { onConflict: 'room_code,voter_key' });
       if (error) throw error;
       state.submitted = true;
+      // 「房主先投」獨立 modal 用：成功送出後跑 onPickSaved（會關 modal、把 host_picked 標起來、跳分享）
+      if (typeof state.onPickSaved === 'function') {
+        try { await state.onPickSaved(state); } catch (cbe) { console.warn('onPickSaved cb', cbe); }
+        return;
+      }
       _renderSubmittedView(body, state);
       loadLobby();
       // 立刻更新「已加入房間」提示（nav / banner badge）
       if (window.FriendRoom && window.FriendRoom._refreshActiveBadge) {
         try { window.FriendRoom._refreshActiveBadge(); } catch (e) {}
-      }
-      // 房主剛建完房第一次送出比分 → 跳出分享 modal（OG render 應該已經 ready）
-      if (state.showInviteAfterPick) {
-        state.showInviteAfterPick = false; // 只跳一次
-        _showInviteResult(state.room.room_code, state.room.is_public);
       }
     } catch (e) {
       console.warn('[friend-room] submit pick failed', e);

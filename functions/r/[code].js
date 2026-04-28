@@ -77,16 +77,20 @@ export async function onRequest(context) {
   // 1. Supabase Storage `og-images/r/CODE.png`（房主建房時 client 即時 render，~1 秒就 ready）
   // 2. 靜態 `/og/r/CODE.png`（官方房 cron 產的、commit 進 repo 的）
   // 3. 通用 og-cover（最後 fallback）
+  // 注意：env.ASSETS.fetch 找不到檔會回 SPA fallback（200 + index.html），不能單純看 r.ok →
+  //      必須檢查 Content-Type 確保真的是 image
   if (room) {
     const storageUrl = `${SUPA_URL}/storage/v1/object/public/og-images/r/${code}.png`;
     try {
       const r = await fetch(storageUrl, { method: 'HEAD' });
-      if (r.ok) {
+      if (r.ok && (r.headers.get('content-type') || '').startsWith('image/')) {
         ogImage = storageUrl;
       } else {
-        // 試靜態檔
+        // 試靜態檔（防 SPA fallback 假陽性）
         const head = await env.ASSETS.fetch(`${origin}/og/r/${code}.png`, { method: 'HEAD' });
-        if (head.ok) ogImage = `${origin}/og/r/${code}.png`;
+        if (head.ok && (head.headers.get('content-type') || '').startsWith('image/')) {
+          ogImage = `${origin}/og/r/${code}.png`;
+        }
       }
     } catch (e) { /* fallback 通用圖 */ }
   }
