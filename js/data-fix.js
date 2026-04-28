@@ -369,6 +369,7 @@ window.addEventListener('load', () => {
       if (/^\/article\//.test(location.pathname)) isArticleLanding = true;
       if (new URLSearchParams(location.search).get('article')) isArticleLanding = true;
       if (/^#fr-room-/i.test(location.hash)) isFriendRoomLanding = true;
+      if (/^\/r\/[A-Z0-9]+\/?$/i.test(location.pathname)) isFriendRoomLanding = true;
     } catch (e) {}
     // 邀請連結進來 → 把 daily popup chain 整個延後給 friend-room.js close 後觸發
     if (isFriendRoomLanding) {

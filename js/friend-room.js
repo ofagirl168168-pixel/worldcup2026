@@ -632,7 +632,11 @@
       }
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 250);
-      try { history.replaceState(null, '', location.pathname); } catch (e) {}
+      // 清掉 hash (#fr-room-XXX) 跟 path (/r/XXX) 兩種邀請 URL，讓使用者回首頁
+      try {
+        const cleanPath = /^\/r\//i.test(location.pathname) ? '/' : location.pathname;
+        history.replaceState(null, '', cleanPath);
+      } catch (e) {}
       // 邀請連結進來時 daily popup 被延後到現在 → 補彈
       if (window.__pendingDailyAfterFriendRoom) {
         window.__pendingDailyAfterFriendRoom = false;
@@ -654,11 +658,13 @@
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
 
     // 分享按鈕：複製邀請連結（私人房特別重要，因為要連結才進得去）
+    // 使用 path-based URL /r/CODE — Cloudflare function 能讀到 code 並回客製 OG meta
+    // 社群預覽會顯示房名 + 對戰隊伍 + 開賽時間（不再是首頁通用預覽）
     const shareBtn = overlay.querySelector('#fr-room-share');
     if (shareBtn) {
       shareBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        const url = `${location.origin}${location.pathname}#fr-room-${room.room_code}`;
+        const url = `${location.origin}/r/${room.room_code}`;
         const shareText = `來陪我猜這場比賽！${room.match_meta?.home_name || ''} vs ${room.match_meta?.away_name || ''}`;
         if (navigator.share) {
           try {
@@ -1694,10 +1700,15 @@
         _subscribeRealtime();
       }, 200);
     }
-    // 邀請連結：#fr-room-XXXXXX → 自動進房
-    const m = location.hash.match(/^#fr-room-([A-Z0-9]+)$/i);
-    if (m) {
-      setTimeout(() => joinRoom(m[1].toUpperCase()), 300);
+    // 邀請連結 → 自動進房（兩種 URL 形式都支援）：
+    //   舊：#fr-room-XXXXXX（hash，無 OG 預覽）
+    //   新：/r/XXXXXX（path，Cloudflare function 給客製 OG，server inject <meta name="fr-room-code">）
+    const hashM = location.hash.match(/^#fr-room-([A-Z0-9]+)$/i);
+    const pathM = location.pathname.match(/^\/r\/([A-Z0-9]+)\/?$/i);
+    const metaCode = document.querySelector('meta[name="fr-room-code"]');
+    const code = (hashM && hashM[1]) || (pathM && pathM[1]) || (metaCode && metaCode.content) || null;
+    if (code) {
+      setTimeout(() => joinRoom(String(code).toUpperCase()), 300);
     }
     // 已加入房間提示：頁面載入後檢查一次，之後每 1 分鐘 refresh
     setTimeout(_refreshActiveBadge, 1500);
