@@ -562,10 +562,12 @@
         try {
           await window.DB.from('friend_rooms').update(update).eq('room_code', st.room.room_code);
         } catch (e) { console.warn('[friend-room] update host_picked + kickoff failed', e); }
-        // 2. 用重算後的 kickoff render OG 縮圖 → 上 Storage（這時候才知道真正的開賽時間）
+        // 2. 用重算後的 kickoff render OG 縮圖 → 上 Storage（背景跑，~1 秒完）
+        //    不 await：避免房主按完「建立房間」要等 1.5 秒才看到分享 modal
+        //    等社群 bot 抓 /r/CODE 的時候（通常分享後幾秒）OG 都早就 ready 了
         if (window.FriendRoomOGClient && window.FriendRoomOGClient.generateAndUpload) {
           const finalRoom = { ...st.room, ...update };
-          await window.FriendRoomOGClient.generateAndUpload(finalRoom).catch(() => {});
+          window.FriendRoomOGClient.generateAndUpload(finalRoom).catch(() => {});
         }
         // 3. refresh lobby（讓房主也看到自己的房在列表中）
         loadLobby();
