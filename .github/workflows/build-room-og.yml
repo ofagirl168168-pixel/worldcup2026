@@ -1,0 +1,42 @@
+name: 補產朋友房 OG 縮圖
+
+# 使用者建房後，他們的房沒有 PNG 縮圖（只官方房日更會跑 build-room-og）。
+# 這個 workflow 每 5 分鐘掃 DB，把缺縮圖的 open/locked/live 房補上。
+# Cloudflare Pages 看到 og/r/ 有新檔會自動 redeploy → 分享立刻有客製預覽。
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # 每 5 分鐘
+  workflow_dispatch:        # 允許手動觸發
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Noto CJK font (中文渲染需要)
+        run: sudo apt-get update -y && sudo apt-get install -y fonts-noto-cjk
+
+      - name: Install npm deps
+        run: npm ci || npm install
+
+      - name: Render missing OG images
+        # Supabase URL/key 走 script 內 fallback（publishable key、讀 RLS 開放）
+        run: node scripts/build-room-og.js --skip-existing
+
+      - name: Commit and push if any new PNG
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add og/r/
+          git diff --staged --quiet || (git commit -m "chore(og): auto-render new room OG images $(date -u '+%Y-%m-%d %H:%M UTC')" && git push)

@@ -8,6 +8,7 @@
  *   node scripts/build-room-og.js                          # 為所有 open/locked/live 房產縮圖
  *   node scripts/build-room-og.js OCEQ2X OSHM27            # 指定特定房號
  *   node scripts/build-room-og.js --include-ended          # 連已結束的（24h 內）也產
+ *   node scripts/build-room-og.js --skip-existing          # 已有 PNG 的房直接跳過（cron 用）
  */
 
 const { createCanvas, GlobalFonts, loadImage } = require('@napi-rs/canvas');
@@ -19,15 +20,21 @@ const ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'og', 'r');
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
-// 字型
+// 字型 — 本機 Windows 用微軟正黑、CI/Linux 用 Noto Sans CJK（apt: fonts-noto-cjk）
 const FONTS = [
   { p: 'C:/Windows/Fonts/msjh.ttc',   name: 'JhengHei' },
   { p: 'C:/Windows/Fonts/msjhbd.ttc', name: 'JhengHei Bold' },
+  { p: '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', name: 'JhengHei' },
+  { p: '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc',    name: 'JhengHei Bold' },
 ];
+let fontLoaded = false;
 for (const f of FONTS) {
-  if (fs.existsSync(f.p)) GlobalFonts.registerFromPath(f.p, f.name);
-  else console.warn('[WARN] 找不到字型:', f.p);
+  if (fs.existsSync(f.p)) {
+    GlobalFonts.registerFromPath(f.p, f.name);
+    fontLoaded = true;
+  }
 }
+if (!fontLoaded) console.warn('[WARN] 沒載到任何 CJK 字型 — 中文將顯示為豆腐方塊');
 const FONT = '"JhengHei", sans-serif';
 const FONT_BOLD = '"JhengHei Bold", "JhengHei", sans-serif';
 
@@ -255,6 +262,7 @@ async function renderRoom(room) {
 (async () => {
   const args = process.argv.slice(2);
   const includeEnded = args.includes('--include-ended');
+  const skipExisting = args.includes('--skip-existing');
   const codes = args.filter(a => !a.startsWith('--'));
 
   let rooms;
@@ -273,6 +281,13 @@ async function renderRoom(room) {
       .in('status', statuses);
     if (error) { console.error(error); process.exit(1); }
     rooms = data || [];
+  }
+
+  // --skip-existing：cron 用，已存在 PNG 的房就跳過（避免每 5 min 重畫）
+  if (skipExisting) {
+    const before = rooms.length;
+    rooms = rooms.filter(r => !fs.existsSync(path.join(OUT_DIR, `${r.room_code}.png`)));
+    console.log(`Skip-existing: ${before - rooms.length} already rendered, ${rooms.length} new to render.`);
   }
 
   console.log(`Rendering ${rooms.length} room OG image(s)...`);
