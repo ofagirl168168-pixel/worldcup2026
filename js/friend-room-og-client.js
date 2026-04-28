@@ -205,7 +205,8 @@
     ctx.textAlign = 'left';
     ctx.fillText(`#${room.room_code}`, 60, footerY + 50);
 
-    return new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/png', 0.92));
+    // PNG 是無損格式，quality 參數會被忽略（瀏覽器 canvas.toBlob 不做進階壓縮 → 比 @napi-rs/canvas 大）
+    return new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/png'));
   }
 
   async function uploadOG(roomCode, blob) {
