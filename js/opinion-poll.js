@@ -442,12 +442,21 @@
     const chosenCard = allCards[chosenIdx];
     const cardsContainer = overlay.querySelector('.opinion-cards');
     // 4 選項時，3 張卡 collapse 後容器會從 2 排塌成 1 排 → 下方 result 整個往上跳
-    // 先鎖定當前高度防晃動（值會在 modal 關閉時隨整個 overlay 一起被 GC）
+    // 先鎖定當前高度，再 transition 平滑縮回自然高度（避免 result 跳動 + 視覺平滑）
+    // align-items:flex-start 防剩下那張卡被預設 stretch 拉高（高度=容器高的 bug）
     if (cardsContainer) {
+      cardsContainer.style.alignItems = 'flex-start';
       cardsContainer.style.minHeight = cardsContainer.offsetHeight + 'px';
+      cardsContainer.style.transition = 'min-height 0.6s cubic-bezier(.22,1,.36,1)';
     }
     const rectBefore = chosenCard ? chosenCard.getBoundingClientRect() : null;
     overlay.querySelectorAll('.opinion-card.voted-no').forEach(c => c.classList.add('opinion-card--gone'));
+    // 兩個 rAF 後解鎖 minHeight，讓容器平滑 transition 縮到 1 卡的自然高度
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (cardsContainer) cardsContainer.style.minHeight = '0';
+      });
+    });
     if (chosenCard && rectBefore) {
       const rectAfter = chosenCard.getBoundingClientRect();
       const dx = rectBefore.left - rectAfter.left;
