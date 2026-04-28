@@ -9,6 +9,7 @@
 
   const RT = { rooms: null, picks: null };
   let _lobbyCache = [];
+  let _lobbyView = 'all'; // 'all' = 大廳全部開放中房 / 'mine' = 我參與過的房（包括已結束）
 
   // 房號字元池（去掉容易混淆的 0/O/1/I/L）
   const CODE_POOL = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -120,6 +121,31 @@
     }
   }
 
+  // 我參與過的房：抓 friend_picks where voter_key = my key，連同 friend_rooms 一起拿
+  // 包含已結束的房，按建房時間倒序（最新在前）
+  async function _fetchMyRooms() {
+    if (!window.DB) return [];
+    try {
+      const myKey = _voterKey();
+      const { data, error } = await window.DB
+        .from('friend_picks')
+        .select('score_home, score_away, is_over, created_at, room:friend_rooms!inner(*)')
+        .eq('voter_key', myKey)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      // 把 nested room 解構成 row + 我的猜測欄位
+      return (data || []).map(p => ({
+        ...p.room,
+        my_pick: { sh: p.score_home, sa: p.score_away, over: !!p.is_over },
+        my_pick_at: p.created_at,
+      }));
+    } catch (e) {
+      console.warn('[friend-room] my rooms fetch failed', e);
+      return [];
+    }
+  }
+
   // ── 渲染 ────────────────────────────────────────────────
   function _typeBadge(room) {
     if (room.is_official) return `<span class="fr-type fr-type--official">官方 <i class="fas fa-check-circle"></i></span>`;
@@ -192,27 +218,102 @@
       </div>`;
   }
 
+  // 「我的紀錄」用的 row：把「人數 / 押注」換成「我的猜測 / 結果」
+  function _renderMyRow(room) {
+    const pick = room.my_pick || {};
+    const myPickStr = `<b>${pick.sh}-${pick.sa}</b>${pick.over ? ' <span class="fr-cell-bet-free">自訂</span>' : ''}`;
+    let resultStr = '';
+    if (room.status === 'ended' && room.result_home != null && room.result_away != null) {
+      const exact = pick.sh === room.result_home && pick.sa === room.result_away;
+      const dirHomeWin = pick.sh > pick.sa, realHomeWin = room.result_home > room.result_away;
+      const dirDraw = pick.sh === pick.sa, realDraw = room.result_home === room.result_away;
+      const sideHit = !exact && (
+        (dirHomeWin && realHomeWin) ||
+        (!dirHomeWin && !dirDraw && !realHomeWin && !realDraw) ||
+        (dirDraw && realDraw)
+      );
+      const tag = exact ? '🎯 完全猜中' : (sideHit ? '✅ 猜中勝負' : '❌ 沒中');
+      resultStr = `${room.result_home}-${room.result_away} <span class="fr-cell-bet-free">${tag}</span>`;
+    } else if (room.status === 'live') {
+      resultStr = '<span class="fr-cd fr-cd--live">進行中</span>';
+    } else if (room.status === 'locked') {
+      resultStr = '<span class="fr-cd">已鎖定</span>';
+    } else if (room.status === 'cancelled') {
+      resultStr = '<span class="fr-cell-bet-free">已取消</span>';
+    } else {
+      resultStr = `<span class="fr-cd">等待開賽</span>`;
+    }
+    // 「我的紀錄」一律可看（自己投過 = 有權限）→ 進入 / 看回放
+    const action = (room.status === 'ended' || room.status === 'cancelled')
+      ? `<button class="fr-btn fr-btn--ended" onclick="FriendRoom.viewReplay('${room.room_code}')">看回放</button>`
+      : `<button class="fr-btn fr-btn--join" onclick="FriendRoom.joinRoom('${room.room_code}')">進入</button>`;
+    return `
+      <div class="fr-row" data-room="${room.room_code}">
+        <span class="fr-cell fr-cell--id">#${room.room_code}</span>
+        <span class="fr-cell fr-cell--type">${_typeBadge(room)}</span>
+        <span class="fr-cell fr-cell--match">${_matchTitle(room)}</span>
+        <span class="fr-cell fr-cell--cd">${_countdown(room.kickoff_at)}</span>
+        <span class="fr-cell fr-cell--bet">${myPickStr}</span>
+        <span class="fr-cell fr-cell--count">${resultStr}</span>
+        <span class="fr-cell fr-cell--act">${action}</span>
+      </div>`;
+  }
+
   function _renderLobby(rooms) {
     const list = document.getElementById('fr-lobby-list');
     if (!list) return;
     if (!rooms || !rooms.length) {
+      const isMine = _lobbyView === 'mine';
       list.innerHTML = `
         <div class="fr-empty">
-          <div class="fr-empty-icon">🏟️</div>
-          <div class="fr-empty-title">目前沒有開放中的房間</div>
-          <div class="fr-empty-desc">點右上角「+ 開房」當第一個房主</div>
+          <div class="fr-empty-icon">${isMine ? '🗒️' : '🏟️'}</div>
+          <div class="fr-empty-title">${isMine ? '你還沒參加過任何挑戰賽' : '目前沒有開放中的房間'}</div>
+          <div class="fr-empty-desc">${isMine ? '到「大廳」找一場玩玩看吧' : '點右上角「+ 開房」當第一個房主'}</div>
         </div>`;
       return;
     }
-    list.innerHTML = rooms.map(_renderRow).join('');
+    const rowFn = _lobbyView === 'mine' ? _renderMyRow : _renderRow;
+    list.innerHTML = rooms.map(rowFn).join('');
+  }
+
+  // 把現有 filter row 裡的 pill 換成 「大廳 / 我的紀錄」雙 tab。Idempotent，多次呼叫不重複注入
+  function _ensureLobbyTabs() {
+    const filterRow = document.querySelector('.fr-lobby-filter');
+    if (!filterRow) return;
+    if (filterRow.querySelector('[data-fr-tab]')) return; // 已注入過
+
+    // 拿掉原本的「本週開放中」靜態 pill（如果有）
+    const oldPill = filterRow.querySelector('.fr-pill');
+    if (oldPill && !oldPill.dataset.frTab) oldPill.remove();
+
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap';
+    wrap.innerHTML = `
+      <button type="button" class="fr-pill fr-pill--active" data-fr-tab="all">大廳</button>
+      <button type="button" class="fr-pill" data-fr-tab="mine">我的紀錄</button>
+    `;
+    filterRow.insertBefore(wrap, filterRow.firstChild);
+
+    wrap.querySelectorAll('[data-fr-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.dataset.frTab;
+        if (view === _lobbyView) return;
+        _lobbyView = view;
+        wrap.querySelectorAll('[data-fr-tab]').forEach(b =>
+          b.classList.toggle('fr-pill--active', b.dataset.frTab === view));
+        _lobbyCache = []; // 換 view 強制顯示「載入中」
+        loadLobby();
+      });
+    });
   }
 
   async function loadLobby() {
+    _ensureLobbyTabs();
     const list = document.getElementById('fr-lobby-list');
     if (list && !_lobbyCache.length) {
-      list.innerHTML = `<div class="fr-loading">載入大廳中…</div>`;
+      list.innerHTML = `<div class="fr-loading">${_lobbyView === 'mine' ? '載入紀錄中…' : '載入大廳中…'}</div>`;
     }
-    const rooms = await _fetchLobby();
+    const rooms = _lobbyView === 'mine' ? await _fetchMyRooms() : await _fetchLobby();
     _lobbyCache = rooms;
     _renderLobby(rooms);
   }
