@@ -1828,7 +1828,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p><strong>Bruno Fernandes</strong>：一場比賽貢獻兩次助攻，本季英超助攻數來到 19 次，距離 Kevin De Bruyne 與 Thierry Henry 共同保持的單季 20 次助攻紀錄僅差一步。葡萄牙隊長的創造力依然是曼聯最重要的武器。</p>
 
-<p><strong>Casemiro</strong>：35 歲的巴西中場用一記定位球頭槌再次證明自己的價值。Carrick 體系下的 Casemiro 從控球型中場轉型為禁區威脅點，效果顯著。</p>
+<p><strong>Casemiro</strong>：34 歲的巴西中場用一記定位球頭槌再次證明自己的價值。Carrick 體系下的 Casemiro 從控球型中場轉型為禁區威脅點，效果顯著。</p>
 
 <h3>積分榜影響</h3>
 
