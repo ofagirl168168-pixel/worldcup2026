@@ -440,6 +440,12 @@
     // 套 translateX 把選中卡視覺鎖回舊位置 → 過渡到 translateX(0) 平滑滑到中央
     const allCards = overlay.querySelectorAll('.opinion-card');
     const chosenCard = allCards[chosenIdx];
+    const cardsContainer = overlay.querySelector('.opinion-cards');
+    // 4 選項時，3 張卡 collapse 後容器會從 2 排塌成 1 排 → 下方 result 整個往上跳
+    // 先鎖定當前高度防晃動（值會在 modal 關閉時隨整個 overlay 一起被 GC）
+    if (cardsContainer) {
+      cardsContainer.style.minHeight = cardsContainer.offsetHeight + 'px';
+    }
     const rectBefore = chosenCard ? chosenCard.getBoundingClientRect() : null;
     overlay.querySelectorAll('.opinion-card.voted-no').forEach(c => c.classList.add('opinion-card--gone'));
     if (chosenCard && rectBefore) {
@@ -501,6 +507,11 @@
           繼續 →
         </button>
       </div>
+      <div class="opinion-history-link-wrap">
+        <a href="#" class="opinion-history-link" id="opinion-history-link">
+          <i class="fas fa-scroll"></i> 看過去擂台題目與留言
+        </a>
+      </div>
       <div class="opinion-comments" id="opinion-comments">
         <div class="opinion-comments-header">
           <span class="opinion-comments-title">💬 擂台留言</span>
@@ -532,6 +543,18 @@
     resultEl.querySelector('#opinion-close-btn').addEventListener('click', () => {
       _closeOverlay(overlay, onClose);
     });
+
+    // 擂台歷史連結：先關掉這個 modal 再開歷史 modal（避免 modal 疊 modal）
+    const historyLink = resultEl.querySelector('#opinion-history-link');
+    if (historyLink) {
+      historyLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        _closeOverlay(overlay, onClose);
+        if (typeof window.showOpinionHistory === 'function') {
+          setTimeout(() => window.showOpinionHistory(), 300);
+        }
+      });
+    }
 
     // 分享按鈕
     const shareBtn = resultEl.querySelector('#opinion-share-btn');
