@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "10",
+    "tournament": "wc",
+    "title": "麥迪擂台首週戰報：96 票看懂台灣球迷在想什麼",
+    "summary": "擂台運作首週累積 7 題、96 票、15 則留言。看哪題最熱、哪題最分裂、誰留下了全週最讚的一句話。",
+    "date": "2026-04-28",
+    "category": "社群觀察",
+    "readTime": "5分鐘",
+    "shareable": true
+  },
+  {
     "id": "epl-035",
     "tournament": "epl",
     "title": "【賽後回顧】曼聯 2-1 布倫特福德：Casemiro 與 Sesko 聯手，紅魔鎖定歐冠席位在望",
