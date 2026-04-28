@@ -3201,6 +3201,10 @@ img.flag-img {
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  /* 投票後 result 內容塞進來會超過 viewport → scrollbar 從無到有 → viewport
+     寬度縮 ~15px → 內容左右偏移看起來「跳一下」。永遠預留 scrollbar 空間
+     避免這個 layout shift（scrollbar 不存在時也保留軌道空間） */
+  scrollbar-gutter: stable;
 }
 .opinion-overlay.open {
   opacity: 1; pointer-events: auto;
