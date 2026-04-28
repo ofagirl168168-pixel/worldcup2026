@@ -471,13 +471,8 @@
       }
     }
 
-    // 先拉真實票數（RPC 聚合）；同時等 cards 容器收合 transition 跑完（~0.6s）
-    // 兩者都完成才 render result，避免 result HTML 在 cards 還在 shrink 中插入
-    // 造成 layout 半路改變、視覺上「跳一下」
-    const [votes] = await Promise.all([
-      _fetchTally(opinion.id, opinion.opts.length),
-      new Promise(r => setTimeout(r, 650)),
-    ]);
+    // 先拉真實票數（RPC 聚合）
+    const votes = await _fetchTally(opinion.id, opinion.opts.length);
     const totalVotes = votes.reduce((a, b) => a + b, 0);
 
     // 找少數派（至少有 2 人投票才判斷，避免首票就被叫少數派）

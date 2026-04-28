@@ -3595,13 +3595,14 @@ img.flag-img {
   100% { transform: scale(0.7);  opacity: 0; filter: blur(8px); }
 }
 
-/* 結果區域 */
+/* 結果區域 — 純 fade-in，不再用 translateY(20→0) 滑入
+   （那個滑入動畫會讓使用者感覺結果頁「先往下出現再彈回來」） */
 .opinion-result {
-  margin-top: 24px; opacity: 0; transform: translateY(20px);
-  transition: opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s;
+  margin-top: 24px; opacity: 0;
+  transition: opacity 0.4s ease 0.2s;
 }
 .opinion-result.show {
-  opacity: 1; transform: translateY(0);
+  opacity: 1;
 }
 
 .opinion-result-bar {
