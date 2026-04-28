@@ -5469,3 +5469,236 @@ body.opinion-open .btn-arena-float { display: none; }
   .fr-data-cols { gap: 8px; }
   .fr-kp-name, .fr-inj-name { font-size: 11.5px; }
 }
+
+/* ==============================================
+   OPINION-HISTORY — 擂台歷史 modal
+   ============================================== */
+.oh-overlay {
+  position: fixed; inset: 0; z-index: 1100;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5,8,20,0.88);
+  backdrop-filter: blur(10px);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+  padding: 20px;
+  overflow: hidden;
+}
+.oh-overlay.open { opacity: 1; pointer-events: auto; }
+.oh-box {
+  position: relative;
+  width: 100%; max-width: 540px;
+  background: linear-gradient(180deg, #1a2240 0%, #0e1430 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 28px 24px 22px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+  max-height: 92vh; min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateY(12px) scale(0.98);
+  transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+}
+.oh-overlay.open .oh-box { transform: translateY(0) scale(1); }
+.oh-close {
+  position: absolute; top: 10px; right: 12px;
+  background: transparent; border: 0;
+  color: rgba(255,255,255,0.55);
+  font-size: 24px; cursor: pointer;
+  width: 32px; height: 32px; line-height: 1;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.oh-close:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+.oh-title {
+  margin: 0 0 4px;
+  font-size: 20px; font-weight: 800;
+  color: #fff;
+  display: flex; align-items: center; gap: 10px;
+}
+.oh-title--detail { font-size: 17px; line-height: 1.4; }
+.oh-count {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-muted);
+}
+.oh-sub {
+  margin: 0 0 14px;
+  font-size: 12px; color: var(--text-muted);
+}
+.oh-loading, .oh-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--text-muted); font-size: 13px;
+}
+.oh-empty--small { padding: 16px 0; }
+
+/* 列表 */
+.oh-list {
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.oh-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  font-family: inherit;
+  color: inherit;
+}
+.oh-item:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(91,115,255,0.35);
+  transform: translateY(-1px);
+}
+.oh-item-meta {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 5px;
+  font-size: 11px;
+}
+.oh-item-date {
+  font-family: ui-monospace, 'Courier New', monospace;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+.oh-item-q {
+  font-size: 14px; font-weight: 700;
+  color: rgba(255,255,255,0.92);
+  line-height: 1.4;
+}
+
+/* type badges */
+.oh-type {
+  font-size: 10px; font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}
+.oh-type--trending { background: rgba(255,107,107,0.14); color: #ff8888; }
+.oh-type--classic  { background: rgba(91,115,255,0.16); color: #b6c5ff; }
+.oh-type--fun      { background: rgba(107,208,158,0.14); color: #6bd09e; }
+.oh-type--predict  { background: rgba(255,215,0,0.14); color: #ffd47a; }
+
+/* 詳情頁 */
+.oh-back {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: transparent; border: 0;
+  color: rgba(255,255,255,0.65);
+  font-size: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 0;
+}
+.oh-back:hover { color: #fff; }
+.oh-meta-row {
+  display: flex; align-items: center; gap: 10px;
+  margin: 6px 0 12px;
+}
+.oh-context {
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.6;
+  background: rgba(255,255,255,0.03);
+  border-left: 3px solid rgba(91,115,255,0.45);
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 0 0 16px;
+}
+
+/* 結果條 */
+.oh-bars {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 12px;
+}
+.oh-bar-row {
+  font-size: 13px;
+}
+.oh-bar-label {
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: rgba(255,255,255,0.88);
+}
+.oh-bar-row--win .oh-bar-label { color: #ffd47a; }
+.oh-bar-row--correct .oh-bar-label { color: #6bd09e; }
+.oh-bar-track {
+  position: relative;
+  height: 22px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 11px;
+  overflow: hidden;
+}
+.oh-bar-fill {
+  position: absolute; inset: 0 auto 0 0;
+  height: 100%;
+  border-radius: 11px;
+  transition: width 0.5s ease;
+}
+.oh-bar-fill--0 { background: linear-gradient(90deg, #ff6b6b 0%, #ff8888 100%); }
+.oh-bar-fill--1 { background: linear-gradient(90deg, #5b73ff 0%, #8ba2ff 100%); }
+.oh-bar-fill--2 { background: linear-gradient(90deg, #ffd47a 0%, #ffea99 100%); }
+.oh-bar-fill--3 { background: linear-gradient(90deg, #6bd09e 0%, #91dfb6 100%); }
+.oh-bar-row--win .oh-bar-fill,
+.oh-bar-row--correct .oh-bar-fill {
+  box-shadow: 0 0 14px rgba(255,215,0,0.3);
+}
+.oh-bar-pct {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11.5px; font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
+  pointer-events: none;
+}
+.oh-total {
+  text-align: right;
+  font-size: 11px; color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+/* 留言 */
+.oh-comments {
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding-top: 14px;
+  margin-top: 8px;
+}
+.oh-comments-head {
+  font-size: 13px; font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 10px;
+}
+.oh-comments-list {
+  display: flex; flex-direction: column; gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.oh-comment {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.oh-comment-head {
+  display: flex; gap: 8px; align-items: baseline;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+.oh-comment-nick { color: rgba(255,255,255,0.85); font-weight: 700; }
+.oh-comment-side { color: var(--text-muted); }
+.oh-comment-likes { margin-left: auto; color: #ff8888; }
+.oh-comment-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.88);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+@media (max-width: 480px) {
+  .oh-box { padding: 22px 18px 18px; }
+  .oh-title { font-size: 17px; }
+  .oh-title--detail { font-size: 15px; }
+  .oh-bar-track { height: 26px; }
+  .oh-bar-pct { font-size: 12px; }
+}
