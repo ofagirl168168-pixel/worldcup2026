@@ -84,14 +84,14 @@ const EPL_TEAMS = {
     ]
   },
   'CHE': {
-    name:'Chelsea', nameCN:'乙爾西', flag:'https://crests.football-data.org/61.png',
+    name:'Chelsea', nameCN:'切爾西', flag:'https://crests.football-data.org/61.png',
     league:'Premier League', eplRank:7, coach:'Calum McFarlane (interim)', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Cole Palmer',pos:'攻擊中場/右翼',club:'乙爾西'},
-      {name:'Enzo Fernández',pos:'中場',club:'乙爾西'},
-      {name:'Moisés Caicedo',pos:'防守中場',club:'乙爾西'},
-      {name:'Reece James',pos:'右後衛',club:'乙爾西'},
-      {name:'Robert Sánchez',pos:'門將',club:'乙爾西'}
+      {name:'Cole Palmer',pos:'攻擊中場/右翼',club:'切爾西'},
+      {name:'Enzo Fernández',pos:'中場',club:'切爾西'},
+      {name:'Moisés Caicedo',pos:'防守中場',club:'切爾西'},
+      {name:'Reece James',pos:'右後衛',club:'切爾西'},
+      {name:'Robert Sánchez',pos:'門將',club:'切爾西'}
     ],
     radar:{attack:86,defense:82,midfield:85,speed:86,experience:72},
     style:'控球導向，中場掌控，快速轉換進攻',
@@ -483,7 +483,7 @@ window.EPL_MATCHES = [
      {min:'38',player:'Neco Williams',side:'h'}
    ]},
 
-  // 乙爾西 0-3 曼城 | 04/12 23:30 台灣時間
+  // 切爾西 0-3 曼城 | 04/12 23:30 台灣時間
   {id:'EPL-MW32-CHE-MCI', matchday:32, date:'2026-04-12', time:'23:30', home:'CHE', away:'MCI', stage:'league',
    status:'finished', score:{h:0,a:3}, halfTime:{h:0,a:0},
    goals:[
@@ -596,7 +596,7 @@ window.EPL_MATCHES = [
 
   // ===== 第 34 輪 (2026-04-21 ~ 04-25 台灣時間) =====
 
-  // 布萊頓 3-0 乙爾西 | 04/21 19:30 台灣時間
+  // 布萊頓 3-0 切爾西 | 04/21 19:30 台灣時間
   {id:'EPL-MW34-BHA-CHE', matchday:34, date:'2026-04-22', time:'03:00', home:'BHA', away:'CHE', stage:'league',
    status:'finished', score:{h:3,a:0}, halfTime:{h:1,a:0},
    goals:[

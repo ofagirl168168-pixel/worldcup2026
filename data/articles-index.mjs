@@ -104,8 +104,8 @@ export default [
   {
     "id": "epl-028",
     "tournament": "epl",
-    "title": "【賽後回顧】布萊頓 3-0 乙爾西：Kadioglu 閃擊 + 乙爾西創 1912 年以來最慘紀錄",
-    "summary": "Kadioglu 3 分鐘頭鎚破門、Hinshelwood 56 分鐘擴大比分、Welbeck 補時封殺。乙爾西連 5 場英超零進球，1912 年以來首次。布萊頓升至第 6，歐冠資格觸手可及。",
+    "title": "【賽後回顧】布萊頓 3-0 切爾西：Kadioglu 閃擊 + 切爾西創 1912 年以來最慘紀錄",
+    "summary": "Kadioglu 3 分鐘頭鎚破門、Hinshelwood 56 分鐘擴大比分、Welbeck 補時封殺。切爾西連 5 場英超零進球，1912 年以來首次。布萊頓升至第 6，歐冠資格觸手可及。",
     "date": "2026-04-22",
     "category": "賽後深度回顧",
     "readTime": null,
