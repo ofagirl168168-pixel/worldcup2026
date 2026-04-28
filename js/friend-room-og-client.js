@@ -61,13 +61,15 @@
     return `${m}/${dd} ${hh}:${mm}`;
   }
 
-  // 把 home/away 隊徽 try 用 CORS 載；失敗就回 null（畫面不畫 crest）
+  // 把 home/away 隊徽透過自家 /cors-img proxy 載 → upstream 沒 CORS 也能畫到 canvas
   async function loadCrest(url) {
     if (!url || !/^https?:/.test(url)) return null;
+    const proxied = `${location.origin}/cors-img?u=${encodeURIComponent(url)}`;
     try {
-      return await loadImage(url, true);
+      return await loadImage(proxied, true);
     } catch (e) {
-      console.warn('[og-client] crest CORS fail (will skip)', url);
+      // proxy 失敗（host 不在白名單 / upstream 503）就 skip 不畫 crest
+      console.warn('[og-client] crest proxy fail (will skip)', url, e);
       return null;
     }
   }
