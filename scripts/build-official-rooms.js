@@ -19,6 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { spawnSync } = require('child_process');
 const { createClient } = require('@supabase/supabase-js');
 
 const ROOT = path.join(__dirname, '..');
@@ -177,6 +178,18 @@ const sb = createClient(SUPA_URL, SUPA_KEY);
   }
 
   console.log(`\nDone. created=${created} exists=${exists} skipped=${skipped} errs=${errs}`);
+
+  // 產 OG 縮圖：所有 open/locked/live 房（含這次新建的、+ 舊房沒縮圖的也順便補上）
+  try {
+    console.log('\n→ Generating OG images for active rooms...');
+    const r = spawnSync(process.execPath, [path.join(__dirname, 'build-room-og.js')], {
+      stdio: 'inherit',
+    });
+    if (r.status !== 0) console.warn('[og-warn] build-room-og.js exited with', r.status);
+  } catch (e) {
+    console.warn('[og-warn]', e.message);
+  }
+
   process.exit(errs > 0 ? 1 : 0);
 })().catch(e => {
   console.error(e);
