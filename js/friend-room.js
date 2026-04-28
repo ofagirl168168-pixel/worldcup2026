@@ -442,7 +442,7 @@
   }
 
   function _showInviteResult(roomCode, isPublic) {
-    const url = `${location.origin}${location.pathname}#fr-room-${roomCode}`;
+    const url = `${location.origin}/r/${roomCode}`;
     if (navigator.clipboard) navigator.clipboard.writeText(url).catch(() => {});
 
     const overlay = document.createElement('div');
@@ -495,8 +495,8 @@
         .maybeSingle();
 
       _renderRoomOverlay(room, existing || null);
-      // URL hash 同步，讓 refresh / 分享連結 work
-      try { history.replaceState(null, '', `#fr-room-${roomCode}`); } catch (e) {}
+      // URL 同步成 /r/CODE，refresh 會走 Cloudflare function 拿客製 OG
+      try { history.replaceState(null, '', `/r/${roomCode}`); } catch (e) {}
     } catch (e) {
       console.warn('[friend-room] joinRoom failed', e);
       alert('進房失敗：' + (e.message || '未知錯誤'));
