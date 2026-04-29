@@ -855,9 +855,8 @@
       showInviteAfterPick: !!opts.showInviteAfterPick,
       // 本人的 sim 是否已跑完。沒跑完的話即使 DB.status='ended' 也不切結果頁
       // → 速度慢 / 0.5x / 遲到加入的人都能看完整場才出結果
-      // 注意：每次進房都從 false 開始；DB.status='ended' 只代表別人寫入結果，
-      // 但本人沒看完就不該知道結果（符合「回放看完才出最終結果」設計）
-      simEnded: false,
+      // 例外：opts.skipSim=true（看回放）時直接 = true，跳過重看 sim 直接到結果頁
+      simEnded: !!(opts.skipSim && room.status === 'ended' && room.result_home != null),
       _close: null, // 由下方 close fn 補
     };
 
@@ -1836,14 +1835,14 @@
     }[c]));
   }
 
-  // ── 公開 API（後續 PR 會把 viewReplay 補上實作） ──
+  // ── 公開 API ──
   window.FriendRoom = {
     loadLobby,
     openCreateModal,
     joinRoom,
+    // 看回放：進已結束的房直接到結果頁（不重看 sim 90 秒），看結果 + 大家的猜測 + 自己領的 💎
     viewReplay(roomCode) {
-      // PR-4
-      alert(`回放 #${roomCode}（PR-4 接 deterministic 重跑）`);
+      joinRoom(roomCode, { skipSim: true });
     },
   };
 
