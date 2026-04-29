@@ -1523,19 +1523,22 @@
     }
   }
 
+  // 送出鍵 label：房主第一次投 →「建立房間 (押 N 💎)」/ 一般 →「送出 (押 N 💎)」
+  // 押注金額無論點不點選比分都要持續顯示
+  function _pickSubmitLabel(state) {
+    const submitText = state.submitLabel || '送出';
+    const bet = state.room.bet_amount || 0;
+    return submitText + (bet > 0 ? ` (押 ${bet} 💎)` : '');
+  }
+
   function _renderPickGrid(body, state) {
     const sel = state.pick;
-    // 房主第一次投比分（state.submitLabel）→「建立房間」；一般投比分（後進的人）→「送出」
-    const submitText = state.submitLabel || '送出';
-    // 押注房：在按鈕上顯示要消耗的寶石數，房主跟參加者都要知道
-    const bet = state.room.bet_amount || 0;
-    const betSuffix = bet > 0 ? ` (押 ${bet} 💎)` : '';
     body.innerHTML = `
       <div class="fr-pick-title">你猜最終比分（含延長 / PK）</div>
       <div class="fr-pick-grid" id="fr-pick-grid"></div>
       <button class="fr-pick-over-btn" id="fr-pick-over">${sel && sel.over ? `自訂：${sel.sh} - ${sel.sa}` : '其他比分（>4，需指定主隊/客隊）'}</button>
       <div class="fr-pick-actions">
-        <button class="fr-btn fr-btn--submit" id="fr-pick-submit" ${sel ? '' : 'disabled'}>${submitText}${betSuffix}</button>
+        <button class="fr-btn fr-btn--submit" id="fr-pick-submit" ${sel ? '' : 'disabled'}>${_pickSubmitLabel(state)}</button>
       </div>
     `;
     _drawGrid(body, state);
@@ -1595,9 +1598,9 @@
         // 重畫高亮
         grid.querySelectorAll('.fr-grid-cell').forEach(b => b.classList.remove('fr-grid-cell--sel'));
         btn.classList.add('fr-grid-cell--sel');
-        // 解鎖送出鍵
+        // 解鎖送出鍵（保留 submitLabel + 押注顯示，不能寫死「送出」）
         const sub = body.querySelector('#fr-pick-submit');
-        if (sub) { sub.disabled = false; sub.textContent = '送出'; }
+        if (sub) { sub.disabled = false; sub.textContent = _pickSubmitLabel(state); }
         // 清掉 >4 自訂顯示
         const overBtn = body.querySelector('#fr-pick-over');
         if (overBtn) overBtn.textContent = '其他比分（>4 任一邊）';
@@ -1658,7 +1661,7 @@
       const overBtn = body.querySelector('#fr-pick-over');
       if (overBtn) overBtn.textContent = `自訂：${h} - ${a}`;
       const sub = body.querySelector('#fr-pick-submit');
-      if (sub) { sub.disabled = false; sub.textContent = '送出'; }
+      if (sub) { sub.disabled = false; sub.textContent = _pickSubmitLabel(state); }
       close();
     });
   }
@@ -1677,9 +1680,7 @@
   async function _submitPick(body, state) {
     if (!state.pick) return;
     const sub = body.querySelector('#fr-pick-submit');
-    const bet = state.room.bet_amount || 0;
-    const betSuffix = bet > 0 ? ` (押 ${bet} 💎)` : '';
-    const restoreLabel = (state.submitLabel || '送出') + betSuffix;
+    const restoreLabel = _pickSubmitLabel(state);
     sub.disabled = true;
     sub.textContent = '處理中…';
     try {
