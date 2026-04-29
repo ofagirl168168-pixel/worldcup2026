@@ -1419,7 +1419,7 @@
       </div>
     `;
     body.querySelector('#fr-end-back').addEventListener('click', () => {
-      if (state._close) state._close();
+      _backToLobby(state);
     });
     // 非同步拉所有 picks 渲染得獎名單
     if (haveResult) {
@@ -1531,9 +1531,47 @@
     return submitText + (bet > 0 ? ` (押 ${bet} 💎)` : '');
   }
 
+  // 押注規則說明：給投比分前/後的參加者看清楚消耗多少、能贏什麼
+  // 池子 = 全部人下注總和；🎯 完全猜中平分 60%、✅ 猜中勝負平分 40%
+  function _betInfoBlock(state) {
+    const bet = state.room.bet_amount || 0;
+    if (bet <= 0) return '';
+    return `
+      <div class="fr-bet-info">
+        <div class="fr-bet-info-title">💎 押注獎金規則</div>
+        <div class="fr-bet-info-row">押 <b>${bet}</b> 💎 玩這場（池 = 人數 × ${bet}）</div>
+        <div class="fr-bet-info-row"><span class="fr-bet-info-tag fr-bet-info-tag--exact">🎯 完全猜中</span> 平分池子 <b>60%</b></div>
+        <div class="fr-bet-info-row"><span class="fr-bet-info-tag fr-bet-info-tag--side">✅ 猜中勝負</span> 平分池子 <b>40%</b></div>
+        <div class="fr-bet-info-foot">沒登入仍可玩，但贏了無法領獎</div>
+      </div>
+    `;
+  }
+
+  // 共用樣式 inject 一次（避開 PQ 工作中的 css/components.css）
+  function _ensureBetInfoStyle() {
+    if (document.getElementById('fr-bet-info-style')) return;
+    const s = document.createElement('style');
+    s.id = 'fr-bet-info-style';
+    s.textContent = `
+      .fr-bet-info { margin: 0 0 14px; padding: 12px 14px; border-radius: 10px;
+        background: rgba(255,215,0,0.06); border: 1px solid rgba(255,215,0,0.2); }
+      .fr-bet-info-title { font-size: 13px; font-weight: 700; color: #ffd700; margin-bottom: 8px; }
+      .fr-bet-info-row { font-size: 13px; color: var(--text-secondary); margin: 4px 0; line-height: 1.6; }
+      .fr-bet-info-row b { color: #ffd700; }
+      .fr-bet-info-tag { display: inline-block; padding: 1px 8px; border-radius: 999px;
+        font-size: 12px; margin-right: 4px; }
+      .fr-bet-info-tag--exact { background: rgba(255,87,87,0.15); color: #ff8888; }
+      .fr-bet-info-tag--side { background: rgba(107,208,158,0.15); color: #6bd09e; }
+      .fr-bet-info-foot { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+    `;
+    document.head.appendChild(s);
+  }
+
   function _renderPickGrid(body, state) {
+    _ensureBetInfoStyle();
     const sel = state.pick;
     body.innerHTML = `
+      ${_betInfoBlock(state)}
       <div class="fr-pick-title">你猜最終比分（含延長 / PK）</div>
       <div class="fr-pick-grid" id="fr-pick-grid"></div>
       <button class="fr-pick-over-btn" id="fr-pick-over">${sel && sel.over ? `自訂：${sel.sh} - ${sel.sa}` : '其他比分（>4，需指定主隊/客隊）'}</button>
@@ -1547,6 +1585,7 @@
   }
 
   function _renderSubmittedView(body, state) {
+    _ensureBetInfoStyle();
     const meta = state.room.match_meta || {};
     body.innerHTML = `
       <div class="fr-submitted">
@@ -1560,6 +1599,7 @@
         </div>
         ${state.pick.over ? '<div class="fr-submitted-tag">自訂（>4）</div>' : ''}
         <div class="fr-submitted-tip">開賽前都可以改</div>
+        ${_betInfoBlock(state)}
         <div class="fr-submitted-actions">
           <button class="fr-btn fr-btn--cancel" id="fr-back-pick">改猜測</button>
           <button class="fr-btn fr-btn--submit" id="fr-back-lobby">回大廳</button>
@@ -1571,8 +1611,19 @@
       _renderPickGrid(body, state);
     });
     body.querySelector('#fr-back-lobby').addEventListener('click', () => {
-      if (state._close) state._close();
+      _backToLobby(state);
     });
+  }
+
+  // 「回大廳」按鈕：先關房 overlay，再切到挑戰賽 section + reload 列表
+  // 為什麼：使用者可能從上方通知 / home banner 進來房間，回大廳要回到挑戰賽列表，
+  // 不能只 close overlay 把他丟回首頁
+  function _backToLobby(state) {
+    if (state && state._close) state._close();
+    if (typeof window.showSection === 'function') {
+      try { window.showSection('friend-room'); } catch (e) {}
+    }
+    loadLobby();
   }
 
   function _drawGrid(body, state) {
