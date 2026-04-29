@@ -1465,8 +1465,11 @@
       const noLogin = (p.classification === 'exact' || p.classification === 'side')
         && state.room.bet_amount > 0 && !p.user_id
         ? ' <span class="fr-winner-tag fr-winner-tag--warn">未登入</span>' : '';
+      // miss 但 awarded > 0 → 沒贏家退還，顯示文字不一樣（避免看起來像中獎）
       const award = p.awarded > 0
-        ? `<span class="fr-winner-award">+${p.awarded} 💎</span>`
+        ? (p.classification === 'miss'
+            ? `<span class="fr-winner-award fr-winner-award--refund">退回 ${p.awarded} 💎</span>`
+            : `<span class="fr-winner-award">+${p.awarded} 💎</span>`)
         : '';
       return `
         <div class="fr-winner-row${me}">
@@ -1495,9 +1498,12 @@
         </div>
       `);
     }
+    // 「都沒贏家」狀態：所有 miss 用戶都被退還押注 → header 顯示退還訊息
+    const noWinner = state.room.bet_amount > 0 && exact.length === 0 && side.length === 0;
+    const refundPer = noWinner ? (miss.find(r => r.awarded > 0)?.awarded || 0) : 0;
     if (miss.length) groups.push(`
       <div class="fr-winner-group fr-winner-group--miss">
-        <div class="fr-winner-head">❌ 沒中（${miss.length} 人）</div>
+        <div class="fr-winner-head">❌ 沒中（${miss.length} 人）${refundPer > 0 ? ` · 沒贏家 → 每人退回 ${refundPer} 💎` : ''}</div>
         <div class="fr-winner-list">${miss.map(renderRow).join('')}</div>
       </div>
     `);
