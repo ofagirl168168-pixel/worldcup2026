@@ -1505,8 +1505,13 @@
 
     // 結算後若本人有領寶石，敲一次 gem balance 重抓（讓 nav 上的 💎 數字立刻更新）
     const myRow = rows.find(r => r.voter_key === myKey);
-    if (myRow && myRow.awarded > 0 && typeof window.refreshGemBalance === 'function') {
-      try { window.refreshGemBalance(); } catch (e) {}
+    if (myRow && myRow.awarded > 0
+        && typeof window.fetchGemBalance === 'function'
+        && typeof window.updateGemUI === 'function') {
+      try {
+        const bal = await window.fetchGemBalance();
+        window.updateGemUI(bal);
+      } catch (e) {}
     }
   }
 
@@ -1747,17 +1752,44 @@
           return;
         }
       }
-      const { error } = await window.DB.from('friend_picks').upsert({
-        room_code: state.room.room_code,
-        voter_key: _voterKey(),
-        user_id: userId,
-        nickname: _resolveNickname(),
-        score_home: state.pick.sh,
-        score_away: state.pick.sa,
-        is_over: !!state.pick.over,
-      }, { onConflict: 'room_code,voter_key' });
-      if (error) throw error;
+      // 改 client direct upsert → RPC，把扣寶石跟 upsert pick 包在同一 transaction（餘額不夠會 rollback）
+      const { error } = await window.DB.rpc('friend_picks_upsert', {
+        p_room_code:  state.room.room_code,
+        p_voter_key:  _voterKey(),
+        p_nickname:   _resolveNickname(),
+        p_score_home: state.pick.sh,
+        p_score_away: state.pick.sa,
+        p_is_over:    !!state.pick.over,
+      });
+      if (error) {
+        // 餘額不足 → 友善提示 + 結束流程（不重試）
+        const msg = String(error.message || '');
+        if (msg.includes('INSUFFICIENT_GEMS')) {
+          const m = /need=(\d+),have=(\d+)/.exec(msg);
+          const need = m ? m[1] : state.room.bet_amount;
+          const have = m ? m[2] : '?';
+          alert(`寶石不足：需要 ${need} 💎，你有 ${have} 💎\n到擂台答題或登入領每日免費寶石後再來`);
+          sub.disabled = false;
+          sub.textContent = restoreLabel;
+          return;
+        }
+        if (msg.includes('ROOM_LOCKED')) {
+          alert('這場已經鎖定，無法再下注');
+          sub.disabled = false;
+          sub.textContent = restoreLabel;
+          return;
+        }
+        throw error;
+      }
       state.submitted = true;
+      // 押注房剛扣寶石 → 刷新 nav 上的 gem widget 顯示（同 spend-gem 流程）
+      if (state.room.bet_amount > 0 && typeof window.fetchGemBalance === 'function'
+          && typeof window.updateGemUI === 'function') {
+        try {
+          const bal = await window.fetchGemBalance();
+          window.updateGemUI(bal);
+        } catch (e) {}
+      }
       // 每日任務：玩一場挑戰賽 → 投到 1 場比分就算完成
       if (typeof window.completeDailyTask === 'function') {
         try { window.completeDailyTask('play_friend_room'); } catch (e) {}
