@@ -34,6 +34,18 @@ jobs:
         # Supabase URL/key 走 script 內 fallback（publishable key、讀 RLS 開放）
         run: node scripts/build-room-og.js --skip-existing
 
+      - name: Auto-settle ended rooms
+        # 沒人開頁的話 friend_room_settle 不會被觸發 → 寶石永遠不發
+        # 這裡 sweep 一次：對所有 status=ended AND settled_at IS NULL 的房 call friend_room_settle
+        # RPC 內已 race-safe lock，重複 call 不會重發
+        run: |
+          curl -s -X POST 'https://dwlngkspwtcsnacbsgct.supabase.co/rest/v1/rpc/friend_rooms_settle_all_unsettled' \
+            -H 'apikey: sb_publishable_XOYghSiO49fG8nMsztm-cQ_l_Tt6V1u' \
+            -H 'Authorization: Bearer sb_publishable_XOYghSiO49fG8nMsztm-cQ_l_Tt6V1u' \
+            -H 'Content-Type: application/json' \
+            -d '{}' | tee /tmp/settle.json
+          echo
+
       - name: Commit and push if any new PNG
         run: |
           git config user.email "actions@github.com"
