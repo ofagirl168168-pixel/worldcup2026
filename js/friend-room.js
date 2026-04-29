@@ -1527,12 +1527,15 @@
     const sel = state.pick;
     // 房主第一次投比分（state.submitLabel）→「建立房間」；一般投比分（後進的人）→「送出」
     const submitText = state.submitLabel || '送出';
+    // 押注房：在按鈕上顯示要消耗的寶石數，房主跟參加者都要知道
+    const bet = state.room.bet_amount || 0;
+    const betSuffix = bet > 0 ? ` (押 ${bet} 💎)` : '';
     body.innerHTML = `
       <div class="fr-pick-title">你猜最終比分（含延長 / PK）</div>
       <div class="fr-pick-grid" id="fr-pick-grid"></div>
       <button class="fr-pick-over-btn" id="fr-pick-over">${sel && sel.over ? `自訂：${sel.sh} - ${sel.sa}` : '其他比分（>4，需指定主隊/客隊）'}</button>
       <div class="fr-pick-actions">
-        <button class="fr-btn fr-btn--submit" id="fr-pick-submit" ${sel ? '' : 'disabled'}>${submitText}</button>
+        <button class="fr-btn fr-btn--submit" id="fr-pick-submit" ${sel ? '' : 'disabled'}>${submitText}${betSuffix}</button>
       </div>
     `;
     _drawGrid(body, state);
@@ -1674,7 +1677,9 @@
   async function _submitPick(body, state) {
     if (!state.pick) return;
     const sub = body.querySelector('#fr-pick-submit');
-    const restoreLabel = state.submitLabel || '送出';
+    const bet = state.room.bet_amount || 0;
+    const betSuffix = bet > 0 ? ` (押 ${bet} 💎)` : '';
+    const restoreLabel = (state.submitLabel || '送出') + betSuffix;
     sub.disabled = true;
     sub.textContent = '處理中…';
     try {
@@ -1701,6 +1706,10 @@
       }, { onConflict: 'room_code,voter_key' });
       if (error) throw error;
       state.submitted = true;
+      // 每日任務：玩一場挑戰賽 → 投到 1 場比分就算完成
+      if (typeof window.completeDailyTask === 'function') {
+        try { window.completeDailyTask('play_friend_room'); } catch (e) {}
+      }
       // 「房主先投」獨立 modal 用：成功送出後跑 onPickSaved（會關 modal、把 host_picked 標起來、跳分享）
       if (typeof state.onPickSaved === 'function') {
         try { await state.onPickSaved(state); } catch (cbe) { console.warn('onPickSaved cb', cbe); }

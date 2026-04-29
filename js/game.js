@@ -2846,9 +2846,10 @@ function setShowcaseBadge(icon) {
 
 const DAILY_TASK_POOL = {
   // 固定任務
-  daily_quiz:   { id:'daily_quiz',   icon:'<i class="fas fa-question-circle"></i>', label:'完成每日一題',           fixed:true,  go:'openDailyPick()' },
-  pred_match:   { id:'pred_match',   icon:'<i class="fas fa-bullseye"></i>',        label:'預測至少 1 場比賽',     fixed:true,  go:"showSection('schedule')" },
-  play_rogue:   { id:'play_rogue',   icon:'<i class="fas fa-futbol"></i>',          label:'玩一場射門挑戰',        fixed:true,  go:'startRogueGame()' },
+  daily_quiz:        { id:'daily_quiz',        icon:'<i class="fas fa-question-circle"></i>', label:'完成每日一題',           fixed:true,  go:'openDailyPick()' },
+  pred_match:        { id:'pred_match',        icon:'<i class="fas fa-bullseye"></i>',        label:'預測至少 1 場比賽',     fixed:true,  go:"showSection('schedule')" },
+  play_rogue:        { id:'play_rogue',        icon:'<i class="fas fa-futbol"></i>',          label:'玩一場射門挑戰',        fixed:true,  go:'startRogueGame()' },
+  play_friend_room:  { id:'play_friend_room',  icon:'<i class="fas fa-trophy"></i>',          label:'玩一場挑戰賽',          fixed:true,  go:"showSection('friend-room')" },
   // 輪替任務
   rogue_3000:   { id:'rogue_3000',   icon:'<i class="fas fa-medal"></i>',           label:'射門挑戰達 3000 分',    fixed:false, go:'startRogueGame()' },
   share_any:    { id:'share_any',    icon:'<i class="fas fa-share-alt"></i>',       label:'分享任一預測或成績',     fixed:false, go:"goShareTask()" },
@@ -2877,7 +2878,7 @@ function getDailyTasks() {
   if (saved && saved.date === localDateStr()) return saved;
 
   // 決定固定任務
-  const fixed = ['daily_quiz', 'play_rogue'];
+  const fixed = ['daily_quiz', 'play_rogue', 'play_friend_room'];
 
   // 檢查是否有可預測比賽
   const _tid = window.Tournament?.current?.() || 'wc';
