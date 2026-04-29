@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "ucl-019",
+    "tournament": "ucl",
+    "title": "【四強戰報】巴黎 5-4 拜仁：九球史詩！Kvaratskhelia 雙響 + Dembélé 梅開二度，衛冕冠軍驚險搶佔先機",
+    "summary": "歐冠史上最高比分的半決賽！巴黎在王子公園球場以 5-4 險勝拜仁，Kvaratskhelia 和 Dembélé 各進兩球，Kane 和 Olise 為拜仁建功。九球大戰讓次回合安聯球場之夜充滿懸念。",
+    "date": "2026-04-29",
+    "category": "賽後回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "10",
     "tournament": "wc",
     "title": "麥迪擂台首週戰報：96 票看懂台灣球迷在想什麼",
@@ -119,7 +129,7 @@ export default [
     "date": "2026-04-21",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-025",

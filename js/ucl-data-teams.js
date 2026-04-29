@@ -23,8 +23,8 @@ const UCL_TEAMS = {
     weaknesses:['Kvaratskhelia體系融合仍在進行','歐冠決賽經驗不足','關鍵戰抗壓能力存疑'],
     history:'2019/20首進歐冠決賽，歷史最佳成績亞軍',
     injuries:[
-      {name:'Fabián Ruiz',pos:'中場',status:'膝傷康復中，近三場已復出上場（vs 里昂先發踢 45 分鐘）',returnDate:'可出場'},
-      {name:'Vitinha',pos:'中場',status:'右腳跟發炎，個人訓練中，半決賽首回合出場存疑',returnDate:'評估中'}
+      {name:'Fabián Ruiz',pos:'中場',status:'已完全復出，半決賽首回合先發上場並獲黃牌',returnDate:'可出場'},
+      {name:'Vitinha',pos:'中場',status:'右腳跟發炎，半決賽首回合未上場',returnDate:'次回合評估中'}
     ]
   },
   'RMA': {
@@ -88,8 +88,8 @@ const UCL_TEAMS = {
     injuries:[
       {name:'Lennart Karl',pos:'前鋒',status:'右大腿肌肉撕裂',returnDate:'未定'},
       {name:'Serge Gnabry',pos:'翼鋒',status:'右大腿內收肌撕裂',returnDate:'賽季報銷（確定缺席世界盃）'},
-      {name:'Raphael Guerreiro',pos:'左後衛',status:'腿後肌輕微撕裂（vs 美因茨）',returnDate:'缺席半決賽首回合'},
-      {name:'Tom Bischof',pos:'中場',status:'傷勢',returnDate:'缺席半決賽首回合'}
+      {name:'Raphael Guerreiro',pos:'左後衛',status:'腿後肌輕微撕裂（vs 美因茨），缺席半決賽首回合',returnDate:'次回合評估中'},
+      {name:'Tom Bischof',pos:'中場',status:'傷勢，缺席半決賽首回合',returnDate:'次回合評估中'}
     ]
   },
   'LIV': {
@@ -234,10 +234,10 @@ const UCL_TEAMS = {
     weaknesses:['進攻創造力偶有不足','陣容老化趨勢','控球率低時易被壓制'],
     history:'2013/14、2015/16兩次歐冠亞軍',
     injuries:[
-      {name:'David Hancko',pos:'後衛',status:'腳踝傷（QF首回合退場）',returnDate:'存疑'},
-      {name:'Jan Oblak',pos:'門將',status:'腹部不適',returnDate:'評估中'},
-      {name:'Pablo Barrios',pos:'中場',status:'大腿傷',returnDate:'存疑'},
-      {name:'Johnny Cardoso',pos:'中場',status:'內收肌問題',returnDate:'評估中'}
+      {name:'David Hancko',pos:'後衛',status:'腳踝傷（QF首回合退場），半決賽首回合出場待評估',returnDate:'存疑'},
+      {name:'Pablo Barrios',pos:'中場',status:'大腿傷',returnDate:'缺陣'},
+      {name:'José Giménez',pos:'中後衛',status:'肌肉傷勢',returnDate:'缺陣'},
+      {name:'Ademola Lookman',pos:'前鋒',status:'內收肌傷（國王盃決賽後），個人訓練中，Simeone 稱仍有不適',returnDate:'半決賽首回合存疑'}
     ]
   },
   'BEN': {

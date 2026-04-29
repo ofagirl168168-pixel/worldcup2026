@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-04-28 日更）
+   資料截止：2025/26 賽季（2026-04-29 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -24,11 +24,11 @@ const EPL_TEAMS = {
     recentForm:['W','W','L','L','W'],
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
     injuries:[
-      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題（已開始輕度訓練）',returnDate:'評估中'},
-      {name:'Kai Havertz',pos:'前鋒',status:'肌肉不適（vs NEW 4/25），Arteta 稱「不嚴重」',returnDate:'歐冠半決賽（4/30）待定'},
-      {name:'Eberechi Eze',pos:'攻擊中場',status:'肌肉不適（vs NEW 4/25），本人稱為預防性換人',returnDate:'歐冠半決賽（4/30）待定'},
-      {name:'Jurrien Timber',pos:'後衛',status:'腳踝傷勢（缺陣超過一個月）',returnDate:'存疑'},
-      {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢',returnDate:'存疑'},
+      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題，已恢復訓練，Arteta 確認可出場',returnDate:'可出場'},
+      {name:'Kai Havertz',pos:'前鋒',status:'肌肉傷勢（vs NEW 4/25），Arteta 確認缺席馬競首回合',returnDate:'歐冠次回合（5/6）評估'},
+      {name:'Eberechi Eze',pos:'攻擊中場',status:'小不適已恢復，Arteta 確認可出場',returnDate:'可出場'},
+      {name:'Jurrien Timber',pos:'後衛',status:'腹股溝傷（3/14 起缺陣），確認缺席馬競首回合',returnDate:'賽季末評估'},
+      {name:'Riccardo Calafiori',pos:'左後衛',status:'Arteta 確認可出場',returnDate:'可出場'},
       {name:'Mikel Merino',pos:'中場',status:'已脫護具但本季不預期回歸',returnDate:'賽季報銷'},
       {name:'Noni Madueke',pos:'右翼',status:'膝傷（歐冠八強次回合退場）',returnDate:'評估中'}
     ]
@@ -682,6 +682,36 @@ window.EPL_MATCHES = [
      {min:'43',player:'Benjamin Sesko',side:'h'},
      {min:'87',player:'Mathias Jensen',side:'a'}
    ]},
+
+  // 利茲 vs 伯恩利 | 05/02 04:00 台灣時間 (05/01 21:00 BST)
+  {id:'EPL-MW35-LEE-BUR', matchday:35, date:'2026-05-02', time:'04:00', home:'LEE', away:'BUR', stage:'league', status:'upcoming'},
+
+  // 阿斯頓維拉 vs 熱刺 | 05/02 20:30 台灣時間 (05/02 13:30 BST)
+  {id:'EPL-MW35-AVL-TOT', matchday:35, date:'2026-05-02', time:'20:30', home:'AVL', away:'TOT', stage:'league', status:'upcoming'},
+
+  // 伯恩茅斯 vs 水晶宮 | 05/02 23:00 台灣時間 (05/02 16:00 BST)
+  {id:'EPL-MW35-BOU-CRY', matchday:35, date:'2026-05-02', time:'23:00', home:'BOU', away:'CRY', stage:'league', status:'upcoming'},
+
+  // 布倫特福德 vs 西漢姆 | 05/02 23:00 台灣時間
+  {id:'EPL-MW35-BRE-WHU', matchday:35, date:'2026-05-02', time:'23:00', home:'BRE', away:'WHU', stage:'league', status:'upcoming'},
+
+  // 紐卡索 vs 布萊頓 | 05/02 23:00 台灣時間
+  {id:'EPL-MW35-NEW-BHA', matchday:35, date:'2026-05-02', time:'23:00', home:'NEW', away:'BHA', stage:'league', status:'upcoming'},
+
+  // 狼隊 vs 桑德蘭 | 05/02 23:00 台灣時間
+  {id:'EPL-MW35-WOL-SUN', matchday:35, date:'2026-05-02', time:'23:00', home:'WOL', away:'SUN', stage:'league', status:'upcoming'},
+
+  // 兵工廠 vs 富勒姆 | 05/03 01:30 台灣時間 (05/02 18:30 BST)
+  {id:'EPL-MW35-ARS-FUL', matchday:35, date:'2026-05-03', time:'01:30', home:'ARS', away:'FUL', stage:'league', status:'upcoming'},
+
+  // 曼聯 vs 利物浦 | 05/03 23:30 台灣時間 (05/03 16:30 BST)
+  {id:'EPL-MW35-MUN-LIV', matchday:35, date:'2026-05-03', time:'23:30', home:'MUN', away:'LIV', stage:'league', status:'upcoming'},
+
+  // 切爾西 vs 諾丁漢森林 | 05/04 23:00 台灣時間 (05/04 16:00 BST)
+  {id:'EPL-MW35-CHE-NFO', matchday:35, date:'2026-05-04', time:'23:00', home:'CHE', away:'NFO', stage:'league', status:'upcoming'},
+
+  // 愛華頓 vs 曼城 | 05/05 04:00 台灣時間 (05/04 21:00 BST)
+  {id:'EPL-MW35-EVE-MCI', matchday:35, date:'2026-05-05', time:'04:00', home:'EVE', away:'MCI', stage:'league', status:'upcoming'},
 
 ];
 

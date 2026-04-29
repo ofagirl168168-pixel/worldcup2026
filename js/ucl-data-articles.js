@@ -715,6 +715,84 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 </table>`,
     tags: ['賽前分析', '半決賽', '巴黎', '拜仁', '馬競', '兵工廠', 'Kane', 'Dembélé', 'Álvarez', 'Saka']
   }
+  ,
+  {
+    id: 'ucl-019',
+    title: '【四強戰報】巴黎 5-4 拜仁：九球史詩！Kvaratskhelia 雙響 + Dembélé 梅開二度，衛冕冠軍驚險搶佔先機',
+    date: '2026-04-29',
+    category: '賽後回顧',
+    summary: '歐冠史上最高比分的半決賽！巴黎在王子公園球場以 5-4 險勝拜仁，Kvaratskhelia 和 Dembélé 各進兩球，Kane 和 Olise 為拜仁建功。九球大戰讓次回合安聯球場之夜充滿懸念。',
+    content: `<h2>巴黎 5-4 拜仁慕尼黑｜歐冠四強首回合・4/29（二）03:00 台灣時間</h2>
+<p><strong>王子公園球場</strong> ｜ 裁判：待確認</p>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">時間</th><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">進球者</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">比分</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">17'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Harry Kane（拜仁）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0-1</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">24'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Khvicha Kvaratskhelia（巴黎）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">1-1</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">33'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ João Neves（巴黎）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2-1</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">41'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Michael Olise（拜仁）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2-2</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">45+5' 🅿️</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Ousmane Dembélé（巴黎）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">3-2</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">56'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Khvicha Kvaratskhelia（巴黎）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">4-2</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">58'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Ousmane Dembélé（巴黎）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">5-2</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">65'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Dayot Upamecano（拜仁）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">5-3</td></tr>
+<tr><td style="padding:8px">68'</td><td style="padding:8px">⚽ Luis Díaz（拜仁）</td><td style="padding:8px;text-align:center">5-4</td></tr>
+<tr><td colspan="3" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 3-2 ∣ 終場 5-4</td></tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>瘋狂的上半場：五球轟炸</h4>
+
+<p>這注定是一場載入歐冠史冊的比賽。拜仁率先出招——第 17 分鐘 Harry Kane 接到傳球後冷靜破門，客隊 0-1 領先。但巴黎僅用 7 分鐘就扳平：Kvaratskhelia 在左路殺入禁區後精準射入遠角，展現了格魯吉亞魔翼的巨星級表現。</p>
+
+<p>第 33 分鐘，年僅 21 歲的 João Neves 在禁區前一腳遠射破網，巴黎反超。但 Olise 不甘示弱，第 41 分鐘以一記精彩入球將比分扳成 2-2——這位法國出生的球員延續著金球獎候選級的賽季表現。</p>
+
+<p>上半場傷停補時第 5 分鐘，Dembélé 冷靜主罰十二碼命中，巴黎帶著 3-2 的領先進入中場休息。上半場 5 球，兩隊球迷已經瘋狂。</p>
+
+<h4>143 秒的致命爆發（56'-58'）</h4>
+
+<p>下半場開始不到 11 分鐘，巴黎在 143 秒內連入兩球徹底改變了比賽走向。第 56 分鐘 Kvaratskhelia 完成梅開二度，兩分鐘後 Dembélé 再下一城——5-2！王子公園球場沸騰了，拜仁似乎已經崩潰。</p>
+
+<h4>拜仁的絕地反擊</h4>
+
+<p>但 Kompany 的球隊拒絕放棄。第 65 分鐘中後衛 Upamecano 頭球破門扳回一城，僅 3 分鐘後 Luis Díaz 再入一球，比分變成 5-4！拜仁在 3 分鐘內連追 2 球，讓巴黎的領先優勢瞬間縮水到僅 1 球。此後巴黎收縮防線、控制節奏，成功守住了 5-4 的比分。</p>
+
+<h3>關鍵數據</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">數據</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">巴黎</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">拜仁</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">控球率</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">42.6%</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">57.4%</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射門</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">12</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">10</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射正</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">5</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">8</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">角球</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">3</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">5</td></tr>
+<tr><td style="padding:8px">黃牌</td><td style="padding:8px;text-align:center">3</td><td style="padding:8px;text-align:center">1</td></tr>
+</table>
+
+<h3>歷史意義</h3>
+
+<p>這場比賽以 9 球打破歐冠半決賽單場最高進球紀錄，追平了 1960 年格拉斯哥流浪者 3-6 法蘭克福的歐冠盃半決賽紀錄。這也是歐冠歷史上首次半決賽雙方都攻入 4 球以上。40.1% 的射門轉化率令人咋舌——22 次射門中有 9 次變成進球。</p>
+
+<h3>賽後分析</h3>
+
+<h4>Kvaratskhelia：衛冕冠軍的新王牌</h4>
+
+<p>格魯吉亞翼鋒以兩球成為全場最佳球員。他的突破和射門讓拜仁右路防線疲於奔命，尤其是 56 分鐘的第二球展現了頂級前鋒的嗅覺和冷靜。Kvaratskhelia 正在證明自己配得上巴黎為他支付的轉會費。</p>
+
+<h4>Dembélé：大賽基因</h4>
+
+<p>金球獎得主繼八強次回合對利物浦梅開二度後，再次在關鍵比賽中交出雙響。Dembélé 本季歐冠已攻入 8 球，是巴黎最可靠的得分手。45+5 分鐘的點球和 58 分鐘的進球都展現了他在關鍵時刻的冰冷執行力。</p>
+
+<h4>拜仁的韌性——次回合懸念猶在</h4>
+
+<p>雖然一度 2-5 落後，拜仁仍能連追 2 球將比分縮小到 4-5。4 個客場進球意味著次回合在安聯球場，拜仁只需以 1-0 獲勝就能將比賽拖入加時。考慮到拜仁本季歐冠主場全勝的紀錄，以及八強對皇馬次回合 4-3 的瘋狂逆轉，沒有人敢提前宣判結果。</p>
+
+<h4>次回合展望：5/7 安聯球場</h4>
+
+<p>巴黎帶著 5-4 的微弱領先前往慕尼黑。拜仁需要在主場淨贏 1 球以上（或打進至少 5 球平手後拼加時）。以兩隊的進攻火力來看，次回合極有可能再次上演一場進球盛宴。</p>`,
+    tags: ['四強', '巴黎', '拜仁', '戰報', 'Kvaratskhelia', 'Dembélé', 'Kane', 'Olise', '九球大戰', '歷史紀錄']
+  }
 ];
 
 // 導出
