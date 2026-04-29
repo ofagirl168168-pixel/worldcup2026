@@ -729,7 +729,7 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 
 <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
 <tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">時間</th><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">進球者</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">比分</th></tr>
-<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">17'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Harry Kane（拜仁）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0-1</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">17' 🅿️</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Harry Kane（拜仁）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0-1</td></tr>
 <tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">24'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Khvicha Kvaratskhelia（巴黎）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">1-1</td></tr>
 <tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">33'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ João Neves（巴黎）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2-1</td></tr>
 <tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">41'</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Michael Olise（拜仁）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2-2</td></tr>
@@ -745,7 +745,7 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 
 <h4>瘋狂的上半場：五球轟炸</h4>
 
-<p>這注定是一場載入歐冠史冊的比賽。拜仁率先出招——第 17 分鐘 Harry Kane 接到傳球後冷靜破門，客隊 0-1 領先。但巴黎僅用 7 分鐘就扳平：Kvaratskhelia 在左路殺入禁區後精準射入遠角，展現了格魯吉亞魔翼的巨星級表現。</p>
+<p>這注定是一場載入歐冠史冊的比賽。拜仁率先出招——第 17 分鐘 William Pacho 禁區內絆倒 Díaz 送出點球，Harry Kane 主罰命中，客隊 0-1 領先。但巴黎僅用 7 分鐘就扳平：Kvaratskhelia 在左路殺入禁區後精準射入遠角，展現了格魯吉亞魔翼的巨星級表現。</p>
 
 <p>第 33 分鐘，年僅 21 歲的 João Neves 在禁區前一腳遠射破網，巴黎反超。但 Olise 不甘示弱，第 41 分鐘以一記精彩入球將比分扳成 2-2——這位代表法國出賽的球員延續著金球獎候選級的賽季表現。</p>
 
@@ -772,7 +772,7 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 
 <h3>歷史意義</h3>
 
-<p>這場比賽以 9 球打破歐冠半決賽單場最高進球紀錄，追平了 1960 年格拉斯哥流浪者 3-6 法蘭克福的歐冠盃半決賽紀錄。這也是歐冠歷史上首次半決賽雙方都攻入 4 球以上。40.1% 的射門轉化率令人咋舌——22 次射門中有 9 次變成進球。</p>
+<p>這場比賽以 9 球追平歐冠半決賽單場最高進球紀錄，與 1960 年法蘭克福 6-3 格拉斯哥流浪者並列史上最多。這也是歐冠歷史上首次半決賽雙方都攻入 4 球以上。40.9% 的射門轉化率令人咋舌——22 次射門中有 9 次變成進球。</p>
 
 <h3>賽後分析</h3>
 
