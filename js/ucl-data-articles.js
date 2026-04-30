@@ -792,6 +792,72 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 
 <p>巴黎帶著 5-4 的微弱領先前往慕尼黑。拜仁需要在主場淨贏 1 球以上（或打進至少 5 球平手後拼加時）。以兩隊的進攻火力來看，次回合極有可能再次上演一場進球盛宴。</p>`,
     tags: ['四強', '巴黎', '拜仁', '戰報', 'Kvaratskhelia', 'Dembélé', 'Kane', 'Olise', '九球大戰', '歷史紀錄']
+  },
+  {
+    id: 'ucl-020',
+    title: '【四強戰報】馬競 1-1 兵工廠：雙方互罰十二碼，VAR 爭議否決兵工廠致勝點球',
+    date: '2026-04-30',
+    category: '賽後回顧',
+    summary: '歐冠半決賽首回合在大都會球場上演一場充滿爭議的 1-1 平手。Gyökeres 和 Álvarez 各入一記十二碼，但最大焦點是第 78 分鐘 Eze 被 Hancko 絆倒後獲判的第三個點球遭 VAR 推翻，令兵工廠無法帶走勝利。次回合酋長球場之戰懸念十足。',
+    content: `<h2>馬競 1-1 兵工廠｜歐冠四強首回合・4/30（三）03:00 台灣時間</h2>
+<p><strong>Riyadh Air 大都會球場</strong> ｜ 裁判：Danny Makkelie（荷蘭）</p>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">時間</th><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">進球者</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">比分</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">44' 🅿️</td><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">⚽ Viktor Gyökeres（兵工廠）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">0-1</td></tr>
+<tr><td style="padding:8px">56' 🅿️</td><td style="padding:8px">⚽ Julián Álvarez（馬競）</td><td style="padding:8px;text-align:center">1-1</td></tr>
+<tr><td colspan="3" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-1 ∣ 終場 1-1</td></tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>前 40 分鐘：Simeone 的鐵幕 vs Arteta 的耐心</h4>
+
+<p>Simeone 排出 4-4-2 陣式，Hancko 和 Lookman 雙雙傷癒復出先發，展現了馬競的戰鬥精神。兵工廠方面，Havertz 因傷缺陣、Saka 傷癒但僅列替補（第 80 分鐘換下 Madueke），Arteta 排出 Madueke 和 Gyökeres 搭配 Martinelli 的前場組合，Zubimendi 和 Rice 坐鎮中場。</p>
+
+<p>上半場雙方都極為謹慎。馬競在大都會球場營造出令人窒息的氛圍，兵工廠則靠 Rice 和 Ødegaard 在中場穩住陣腳。Rice 全場完成 83 次傳球，是歐冠半決賽英格蘭中場第二高紀錄（僅次於 2011 年 Carrick 對沙爾克的 99 次），展現了頂級的中場控制力。</p>
+
+<h4>Gyökeres 的冰冷十二碼（43'）</h4>
+
+<p>比賽在上半場尾聲迎來轉折。第 44 分鐘，Gyökeres 與 Zubimendi 做了一次精妙的二過一配合後殺入禁區，Hancko 從背後笨拙地推倒了瑞典前鋒，裁判 Makkelie 果斷判罰點球。Gyökeres 親自操刀，一記勢大力沉的射門轟入球門，Oblak 雖然撲對了方向但毫無機會——兵工廠客場 0-1 領先！</p>
+
+<h4>Álvarez 扳平（55'）</h4>
+
+<p>下半場馬競明顯提升了侵略性。第 56 分鐘，一記角球開到禁區後造成混戰，兵工廠球員手球犯規被判十二碼。本季歐冠已攻入 9 球的 Álvarez 站上罰球點，將球狠狠砸入左上角，力量之大讓 Raya 只能望球興嘆——1-1！大都會球場瞬間沸騰。</p>
+
+<h4>VAR 爭議：被否決的第三個點球（78'）</h4>
+
+<p>第 78 分鐘上演了全場最具爭議的一幕。替補上場的 Eze 在禁區內被 Hancko 絆倒，主裁 Makkelie 第三次指向十二碼點。然而 VAR 介入後，Makkelie 親自到場邊觀看回放，最終認定 Eze 在接觸發生前就已經開始倒地，推翻了原判。兵工廠球員圍住裁判抗議，但判決已定。這是本場第三個點球判罰，而這一次是唯一被推翻的——耐人尋味。</p>
+
+<h3>關鍵數據</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">數據</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">馬競</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">兵工廠</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">點球判罰</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">1（罰進）</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2（1罰進，1被VAR推翻）</td></tr>
+<tr><td style="padding:8px">Rice 傳球數</td><td style="padding:8px;text-align:center">—</td><td style="padding:8px;text-align:center">83（歐冠半決賽英格蘭中場第二高）</td></tr>
+</table>
+
+<h3>先發陣容</h3>
+
+<p><strong>馬競（4-4-2）：</strong>Oblak; Llorente, Pubill, Hancko, Ruggeri; G. Simeone, Koke, Cardoso, Lookman; Griezmann, Álvarez</p>
+<p><strong>兵工廠（4-3-3）：</strong>Raya; White, Saliba, Gabriel, Hincapié; Ødegaard, Zubimendi, Rice; Madueke, Gyökeres, Martinelli</p>
+
+<h3>賽後分析</h3>
+
+<h4>Simeone 的生存哲學依然有效</h4>
+
+<p>被判兩個點球、丟掉一球、還被對手控制中場節奏——但 Simeone 的球隊依然帶著一個客場進球的優勢進入次回合。馬競在下半場展現出極強的進攻威脅，證明 Simeone 不只是「擺大巴」，而是有計畫地製造得分機會。</p>
+
+<h4>兵工廠的遺憾</h4>
+
+<p>在 Havertz 缺陣、Saka 僅能替補上場的情況下，兵工廠的表現值得肯定。Madueke 傷癒復出先發表現搶眼，Rice 在中場的控制力令人印象深刻。但被 VAR 否決的第三個點球無疑是最大遺憾——如果那球成立，兵工廠將以 2-1 帶走寶貴的客場勝利。</p>
+
+<h4>次回合展望：5/6 酋長球場</h4>
+
+<p>1-1 的比分讓次回合完全開放。兵工廠回到主場有絕對優勢，Saka 首回合已替補上場證明傷癒，次回合很可能先發。馬競的客場反擊能力不容小覷——他們在八強客場 2-0 擊敗巴薩的表現至今仍令人記憶猶新。Álvarez vs Saliba 的對決，將是決定誰進入決賽的關鍵。</p>`,
+    tags: ['四強', '馬競', '兵工廠', '戰報', 'Gyökeres', 'Álvarez', 'VAR', '十二碼', 'Rice', 'Hancko']
   }
 ];
 

@@ -64,10 +64,10 @@ const UCL_TEAMS = {
     weaknesses:['Rodri傷癒後狀態仍在回升','新援（Reijnders/Cherki）大賽經驗有限','後防傷兵影響輪替'],
     history:'2022/23首奪歐冠，近年穩定進入八強以上',
     injuries:[
-      {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末'},
+      {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末可望回歸'},
       {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢',returnDate:'四月底（本月報銷）'},
-      {name:'John Stones',pos:'中後衛',status:'小腿傷',returnDate:'恢復中'},
-      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（vs 兵工廠 88 分鐘退場）',returnDate:'檢查中，可能缺陣 1-6 週'}
+      {name:'John Stones',pos:'中後衛',status:'已回歸訓練，可出場',returnDate:'已歸隊'},
+      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（足總盃半決賽未冒險上陣）',returnDate:'下場聯賽（5/4 vs 艾弗頓）目標復出'}
     ]
   },
   'BAY': {
@@ -108,9 +108,11 @@ const UCL_TEAMS = {
     weaknesses:['陣容老化需要更新換代','Slot歐冠執教經驗有限','板凳深度不如曼城'],
     history:'6次歐冠冠軍，2018/19最近一次奪冠',
     injuries:[
-      {name:'Alisson',pos:'門將',status:'傷勢恢復中',returnDate:'未定'},
-      {name:'Wataru Endo',pos:'中場',status:'足部傷勢',returnDate:'賽季報銷'},
-      {name:'Conor Bradley',pos:'右後衛',status:'長期傷缺',returnDate:'賽季報銷'}
+      {name:'Mohamed Salah',pos:'右翼',status:'左腿後肌撕裂（vs CRY 4/25），缺席4週',returnDate:'賽季報銷（世界盃可趕上）'},
+      {name:'Hugo Ekitike',pos:'前鋒',status:'阿基里斯腱斷裂（vs PSG）',returnDate:'賽季報銷＋世界盃缺席'},
+      {name:'Alisson',pos:'門將',status:'肌肉拉傷',returnDate:'評估中'},
+      {name:'Wataru Endo',pos:'中場',status:'足部手術',returnDate:'賽季報銷'},
+      {name:'Conor Bradley',pos:'右後衛',status:'膝蓋重傷手術',returnDate:'賽季報銷'}
     ]
   },
   'INT': {
@@ -195,11 +197,12 @@ const UCL_TEAMS = {
     weaknesses:['歐冠經驗相對不足','Gyökeres體系融合仍在進行','面對低位防守時創造力不足'],
     history:'2005/06歐冠亞軍，近年重返歐冠行列',
     injuries:[
-      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題',returnDate:'持續評估中'},
-      {name:'Jurrien Timber',pos:'後衛',status:'腳踝傷勢（缺陣超過一個月）',returnDate:'存疑'},
-      {name:'Riccardo Calafiori',pos:'左後衛',status:'不明傷勢',returnDate:'存疑'},
+      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題，已恢復訓練，Arteta 確認可出場但未列入半決賽首回合先發',returnDate:'次回合可出場'},
+      {name:'Kai Havertz',pos:'前鋒',status:'肌肉傷勢（vs NEW 4/25），確認缺席馬競首回合',returnDate:'歐冠次回合（5/6）評估'},
+      {name:'Jurrien Timber',pos:'後衛',status:'腹股溝傷（3/14 起缺陣），確認缺席馬競首回合',returnDate:'賽季末評估'},
+      {name:'Riccardo Calafiori',pos:'左後衛',status:'已回歸，半決賽首回合未先發',returnDate:'可出場'},
       {name:'Mikel Merino',pos:'中場',status:'長期傷缺',returnDate:'賽季報銷'},
-      {name:'Noni Madueke',pos:'右翼',status:'膝傷（QF次回合退場）',returnDate:'評估中'}
+      {name:'Noni Madueke',pos:'右翼',status:'膝傷恢復，半決賽首回合先發上場',returnDate:'已回歸'}
     ]
   },
   'LEV': {
@@ -234,10 +237,10 @@ const UCL_TEAMS = {
     weaknesses:['進攻創造力偶有不足','陣容老化趨勢','控球率低時易被壓制'],
     history:'2013/14、2015/16兩次歐冠亞軍',
     injuries:[
-      {name:'David Hancko',pos:'後衛',status:'腳踝傷（QF首回合退場），半決賽首回合出場待評估',returnDate:'存疑'},
+      {name:'David Hancko',pos:'後衛',status:'腳踝傷恢復，半決賽首回合先發出場',returnDate:'已回歸'},
       {name:'Pablo Barrios',pos:'中場',status:'大腿傷',returnDate:'缺陣'},
       {name:'José Giménez',pos:'中後衛',status:'肌肉傷勢',returnDate:'缺陣'},
-      {name:'Ademola Lookman',pos:'前鋒',status:'內收肌傷（國王盃決賽後），個人訓練中，Simeone 稱仍有不適',returnDate:'半決賽首回合存疑'}
+      {name:'Ademola Lookman',pos:'前鋒',status:'內收肌傷恢復，半決賽首回合先發出場',returnDate:'已回歸'}
     ]
   },
   'BEN': {

@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "ucl-020",
+    "tournament": "ucl",
+    "title": "【四強戰報】馬競 1-1 兵工廠：雙方互罰十二碼，VAR 爭議否決兵工廠致勝點球",
+    "summary": "歐冠半決賽首回合在大都會球場上演一場充滿爭議的 1-1 平手。Gyökeres 和 Álvarez 各入一記十二碼，但最大焦點是第 78 分鐘 Eze 被 Hancko 絆倒後獲判的第三個點球遭 VAR 推翻，令兵工廠無法帶走勝利。次回合酋長球場之戰懸念十足。",
+    "date": "2026-04-30",
+    "category": "賽後回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "ucl-019",
     "tournament": "ucl",
     "title": "【四強戰報】巴黎 5-4 拜仁：九球史詩！Kvaratskhelia 雙響 + Dembélé 梅開二度，衛冕冠軍驚險搶佔先機",
@@ -119,7 +129,7 @@ export default [
     "date": "2026-04-22",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-027",
