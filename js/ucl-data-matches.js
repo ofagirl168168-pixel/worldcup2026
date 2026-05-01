@@ -65,7 +65,7 @@ const UCL_MATCHES = [
 
   // ===== 四強 (2026-04-29 / 04-30 & 05-06 / 05-07 台灣時間) =====
   {id:'UCL-SF-01', date:'2026-04-29', time:'03:00', home:'PSG', away:'BAY', stage:'sf', leg:1, status:'finished', score:{h:5,a:4}, halfTime:{h:3,a:2}, stats:{poss:[42.6,57.4],shots:[12,10],sot:[5,8],corners:[3,5],yellow:[3,1],saves:[4,0]}, goals:[{min:'17',player:'Harry Kane',side:'a',type:'pen'},{min:'24',player:'Khvicha Kvaratskhelia',side:'h'},{min:'33',player:'João Neves',side:'h'},{min:'41',player:'Michael Olise',side:'a'},{min:'45+5',player:'Ousmane Dembélé',side:'h',type:'pen'},{min:'56',player:'Khvicha Kvaratskhelia',side:'h'},{min:'58',player:'Ousmane Dembélé',side:'h'},{min:'65',player:'Dayot Upamecano',side:'a'},{min:'68',player:'Luis Díaz',side:'a'}]},
-  {id:'UCL-SF-02', date:'2026-04-30', time:'03:00', home:'ATM', away:'ARS', stage:'sf', leg:1, status:'scheduled', score:null},
+  {id:'UCL-SF-02', date:'2026-04-30', time:'03:00', home:'ATM', away:'ARS', stage:'sf', leg:1, status:'finished', score:{h:1,a:1}, halfTime:{h:0,a:1}, stats:{poss:[52,48],shots:[18,11],sot:[4,2]}, goals:[{min:'44',player:'Viktor Gyökeres',side:'a',type:'pen'},{min:'56',player:'Julián Álvarez',side:'h',type:'pen'}]},
   {id:'UCL-SF-03', date:'2026-05-06', time:'03:00', home:'ARS', away:'ATM', stage:'sf', leg:2, status:'scheduled', score:null},
   {id:'UCL-SF-04', date:'2026-05-07', time:'03:00', home:'BAY', away:'PSG', stage:'sf', leg:2, status:'scheduled', score:null},
 
