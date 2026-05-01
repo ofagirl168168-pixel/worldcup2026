@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-04-30 日更）
+   資料截止：2025/26 賽季（2026-05-01 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -25,7 +25,7 @@ const EPL_TEAMS = {
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
     injuries:[
       {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題，已恢復訓練，Arteta 確認可出場',returnDate:'可出場'},
-      {name:'Kai Havertz',pos:'前鋒',status:'肌肉傷勢（vs NEW 4/25），Arteta 確認缺席馬競首回合',returnDate:'歐冠次回合（5/6）評估'},
+      {name:'Kai Havertz',pos:'前鋒',status:'肌肉傷勢（vs NEW 4/25），缺席馬競首回合，vs FUL（5/2）出場存疑',returnDate:'歐冠次回合（5/6）目標復出'},
       {name:'Eberechi Eze',pos:'攻擊中場',status:'小不適已恢復，Arteta 確認可出場',returnDate:'可出場'},
       {name:'Jurrien Timber',pos:'後衛',status:'腹股溝傷（3/14 起缺陣），確認缺席馬競首回合',returnDate:'賽季末評估'},
       {name:'Riccardo Calafiori',pos:'左後衛',status:'Arteta 確認可出場',returnDate:'可出場'},

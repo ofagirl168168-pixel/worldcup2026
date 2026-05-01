@@ -23,6 +23,7 @@ const UCL_TEAMS = {
     weaknesses:['Kvaratskhelia體系融合仍在進行','歐冠決賽經驗不足','關鍵戰抗壓能力存疑'],
     history:'2019/20首進歐冠決賽，歷史最佳成績亞軍',
     injuries:[
+      {name:'Achraf Hakimi',pos:'右後衛',status:'大腿傷（半決賽首回合後確認），缺席數週',returnDate:'次回合缺席確定'},
       {name:'Fabián Ruiz',pos:'中場',status:'已完全復出，半決賽首回合先發上場並獲黃牌',returnDate:'可出場'},
       {name:'Vitinha',pos:'中場',status:'右腳跟發炎，半決賽首回合未上場',returnDate:'次回合評估中'}
     ]
@@ -237,6 +238,7 @@ const UCL_TEAMS = {
     weaknesses:['進攻創造力偶有不足','陣容老化趨勢','控球率低時易被壓制'],
     history:'2013/14、2015/16兩次歐冠亞軍',
     injuries:[
+      {name:'Julián Álvarez',pos:'前鋒',status:'腳踝扭傷（首回合 Rice 壓到），檢查確認無大礙，Simeone 確認可出場次回合',returnDate:'次回合可出場'},
       {name:'David Hancko',pos:'後衛',status:'腳踝傷恢復，半決賽首回合先發出場',returnDate:'已回歸'},
       {name:'Pablo Barrios',pos:'中場',status:'大腿傷',returnDate:'缺陣'},
       {name:'José Giménez',pos:'中後衛',status:'肌肉傷勢',returnDate:'缺陣'},
