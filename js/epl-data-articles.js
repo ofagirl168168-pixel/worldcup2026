@@ -1834,6 +1834,86 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p>曼聯穩居第 3 名，再拿 2 分就能鎖定前五、確保歐冠資格。在 Carrick 接手後的穩定發揮下（近 4 場拿 10 分），紅魔的歐冠回歸之路越來越清晰。布倫特福德則以第 9 名的身份繼續追趕前五，但距離歐冠門檻仍有差距。</p>`,
     tags: ['賽後回顧', '曼聯', '布倫特福德', 'Casemiro', 'Sesko', 'Fernandes', '第35輪']
+  },
+  {
+    id: 'epl-036',
+    title: '【賽後回顧】里茲聯 3-1 伯恩利：Stach 世界波領銜，里茲保級路上九分領先',
+    date: '2026-05-02',
+    category: '賽後深度回顧',
+    summary: 'Stach 開場 8 分鐘遠射破網定調，Okafor 與 Calvert-Lewin 下半場 4 分鐘內連入兩球殺死比賽。里茲聯領先降級區 9 分，保級幾乎鎖定。',
+    content: `<h2>里茲聯 3-1 伯恩利｜第35輪・Elland Road・觀眾 36,265</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">8' ⚽</td>
+<td style="padding:8px"><strong>Anton Stach（里茲）</strong> — 禁區外約 25 碼一腳勁射直飛球門死角，開場即轟出世界波</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">52' ⚽</td>
+<td style="padding:8px"><strong>Noah Okafor（里茲）</strong> — 接應隊友傳球後禁區內沉穩推射破門，近 4 場英超第 3 場進球</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">56' ⚽</td>
+<td style="padding:8px"><strong>Dominic Calvert-Lewin（里茲）</strong> — 對方門將撲救後球來到腳下，搶先補射入網</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">71' ⚽</td>
+<td style="padding:8px"><strong>Loum Tchaouna（伯恩利）</strong> — 為伯恩利攻入安慰球，挽回些許顏面</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 1-0 ∣ 終場 3-1</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>上半場：Stach 的世界波定調</h4>
+
+<p>Daniel Farke 的球隊從開場就展現了強烈的企圖心。第 8 分鐘，德國中場 Anton Stach 在禁區外接球後毫不猶豫起腳怒射，皮球劃出一道完美弧線直飛球門右上角，Dubravka 只能望球興嘆。這記約 25 碼的遠射為 Elland Road 點燃了第一把火。</p>
+
+<p>此後里茲繼續控制比賽節奏，James Justin 在右路的推進頻頻製造威脅，但上半場未能再次破門，以 1-0 的比分進入休息。伯恩利在 Scott Parker 離任後由 Mike Jackson 代理指揮，球隊明顯缺乏凝聚力，全場形同夢遊。</p>
+
+<h4>下半場：四分鐘連入兩球殺死懸念</h4>
+
+<p>下半場里茲聯再度加速。第 52 分鐘，Okafor 在禁區內接球後以標誌性的冷靜射門將球送入網窩——這已是瑞士前鋒連續第 4 場英超取得進球，從 AC 米蘭租借而來的他已成為本季英超最成功的租借之一。</p>
+
+<p>僅僅 4 分鐘後，Calvert-Lewin 門前嗅覺再次發揮，門將撲救後球落到他腳下，迅速補射得手。56 分鐘 3-0，比賽徹底失去懸念。</p>
+
+<p>第 71 分鐘 Tchaouna 為伯恩利射入安慰球，但已無力回天。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">里茲聯</th>
+<th style="padding:8px">伯恩利</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>58%</td><td>42%</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">射門/射正</td><td>14/8</td><td>7/2</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">觀眾</td><td colspan="2">36,265</td>
+</tr>
+</table>
+
+<h3>焦點人物</h3>
+
+<p><strong>Noah Okafor</strong>：近 4 場英超 3 場進球，從 AC 米蘭租借到里茲的他已打入雙位數進球。冬窗最划算的交易之一——若里茲保級成功，買斷條款極可能被觸發。</p>
+
+<p><strong>Anton Stach</strong>：除了那記世界波開場進球外，德國中場全場的推進和攔截也十分出色，獲得全場最高評分。</p>
+
+<h3>積分榜影響</h3>
+
+<p>里茲聯拿下關鍵三分後，領先降級區達 9 分，剩餘 3 輪比賽幾乎鎖定保級。Farke 近 6 場不敗（4 勝 2 平）的成績證明了球隊在逆境中的韌性。</p>
+
+<p>伯恩利方面，Parker 離任後球隊已無鬥志，確認降級只是時間問題。Mike Jackson 代理期間的首要任務是為年輕球員爭取出場機會，為下季英冠做準備。</p>`,
+    tags: ['賽後回顧', '里茲聯', '伯恩利', 'Stach', 'Okafor', 'Calvert-Lewin', '保級', '第35輪']
   }
 ];
 

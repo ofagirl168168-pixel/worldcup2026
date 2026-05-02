@@ -109,7 +109,7 @@ const UCL_TEAMS = {
     weaknesses:['陣容老化需要更新換代','Slot歐冠執教經驗有限','板凳深度不如曼城'],
     history:'6次歐冠冠軍，2018/19最近一次奪冠',
     injuries:[
-      {name:'Mohamed Salah',pos:'右翼',status:'左腿後肌撕裂（vs CRY 4/25），缺席4週',returnDate:'賽季報銷（世界盃可趕上）'},
+      {name:'Mohamed Salah',pos:'右翼',status:'左腿後肌撕裂（vs CRY 4/25），利物浦確認賽季結束前可復出',returnDate:'五月中旬（世界盃可趕上）'},
       {name:'Hugo Ekitike',pos:'前鋒',status:'阿基里斯腱斷裂（vs PSG）',returnDate:'賽季報銷＋世界盃缺席'},
       {name:'Alisson',pos:'門將',status:'肌肉拉傷',returnDate:'評估中'},
       {name:'Wataru Endo',pos:'中場',status:'足部手術',returnDate:'賽季報銷'},

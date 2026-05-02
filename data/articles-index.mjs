@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-036",
+    "tournament": "epl",
+    "title": "【賽後回顧】里茲聯 3-1 伯恩利：Stach 世界波領銜，里茲保級路上九分領先",
+    "summary": "Stach 開場 8 分鐘遠射破網定調，Okafor 與 Calvert-Lewin 下半場 4 分鐘內連入兩球殺死比賽。里茲聯領先降級區 9 分，保級幾乎鎖定。",
+    "date": "2026-05-02",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "ucl-020",
     "tournament": "ucl",
     "title": "【四強戰報】馬競 1-1 兵工廠：雙方互罰十二碼，VAR 爭議否決兵工廠致勝點球",
@@ -89,7 +99,7 @@ export default [
     "date": "2026-04-24",
     "category": "賽前深度分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "9",
@@ -99,7 +109,7 @@ export default [
     "date": "2026-04-23",
     "category": "傷兵分析",
     "readTime": "8分鐘",
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-029",
@@ -109,7 +119,7 @@ export default [
     "date": "2026-04-23",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-030",
@@ -119,7 +129,7 @@ export default [
     "date": "2026-04-23",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-028",
