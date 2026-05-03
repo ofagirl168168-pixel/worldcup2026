@@ -1953,7 +1953,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h4>下半場控制節奏</h4>
 
-<p>Arteta 下半場換下 Saka 和 Eze 保護兩人，讓年輕球員登場。富勒姆全場僅有 2 次射門、0 射正，Leno 面對老東家幾乎無事可做。</p>
+<p>Arteta 下半場換下 Saka 和 Eze 保護兩人，讓年輕球員登場。富勒姆全場僅有 10 次射門、1 射正，Leno 面對老東家幾乎無事可做。</p>
 
 <h3>數據速覽</h3>
 
@@ -1964,10 +1964,10 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <th style="padding:8px">富勒姆</th>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
-<td style="padding:6px 8px;text-align:left">控球率</td><td>64%</td><td>36%</td>
+<td style="padding:6px 8px;text-align:left">控球率</td><td>54%</td><td>46%</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
-<td style="padding:6px 8px;text-align:left">射門/射正</td><td>14/7</td><td>2/0</td>
+<td style="padding:6px 8px;text-align:left">射門/射正</td><td>18/9</td><td>10/1</td>
 </tr>
 <tr>
 <td style="padding:6px 8px;text-align:left">角球</td><td>6</td><td>1</td>
@@ -1978,7 +1978,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <ul>
 <li><strong>兵工廠</strong>：以 6 分差距領跑曼城，距英超冠軍愈來愈近。歐冠半決賽次回合（5/5 主場對馬競）前士氣大振。</li>
-<li><strong>富勒姆</strong>：Marco Silva 的球隊 0 射正，進攻端停擺問題依舊嚴重，中游位置無虞但季末表現令球迷失望。</li>
+<li><strong>富勒姆</strong>：Marco Silva 的球隊僅 1 射正，進攻端停擺問題依舊嚴重，中游位置無虞但季末表現令球迷失望。</li>
 <li><strong>Saka 復出</strong>：傷癒首發即進球，證明狀態無虞，對歐冠次回合是巨大利多。</li>
 </ul>`,
     tags: ['賽後回顧', '兵工廠', '富勒姆', 'Gyökeres', 'Saka', '爭冠', '第35輪']
