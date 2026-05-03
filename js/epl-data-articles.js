@@ -2042,7 +2042,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <ul>
 <li><strong>布倫特福德</strong>：7 場首勝，升至第 6 名，距歐冠區僅 3 分。Keith Andrews 的歐戰夢想還活著。</li>
-<li><strong>韋斯咸</strong>：降級區邊緣搖搖欲墜，Graham Potter 接手後依舊無力回天。明天熱刺若贏球將直接把韋斯咸踢入降級區。</li>
+<li><strong>韋斯咸</strong>：降級區邊緣搖搖欲墜，Nuno Espirito Santo 接手後依舊無力回天。明天熱刺若贏球將直接把韋斯咸踢入降級區。</li>
 </ul>`,
     tags: ['賽後回顧', '布倫特福德', '韋斯咸', 'Igor Thiago', 'Damsgaard', '降級', '第35輪']
   },
