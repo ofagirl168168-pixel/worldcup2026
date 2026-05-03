@@ -699,17 +699,41 @@ window.EPL_MATCHES = [
   // 伯恩茅斯 vs 水晶宮 | 05/02 23:00 台灣時間 (05/02 16:00 BST)
   {id:'EPL-MW35-BOU-CRY', matchday:35, date:'2026-05-02', time:'23:00', home:'BOU', away:'CRY', stage:'league', status:'upcoming'},
 
-  // 布倫特福德 vs 西漢姆 | 05/02 23:00 台灣時間
-  {id:'EPL-MW35-BRE-WHU', matchday:35, date:'2026-05-02', time:'23:00', home:'BRE', away:'WHU', stage:'league', status:'upcoming'},
+  // 布倫特福德 3-0 西漢姆 | 05/02 23:00 台灣時間
+  {id:'EPL-MW35-BRE-WHU', matchday:35, date:'2026-05-02', time:'23:00', home:'BRE', away:'WHU', stage:'league',
+   status:'finished', score:{h:3,a:0}, halfTime:{h:1,a:0},
+   goals:[
+     {min:'15',player:'Konstantinos Mavropanos',side:'h',type:'og'},
+     {min:'54',player:'Igor Thiago',side:'h',type:'pen'},
+     {min:'82',player:'Mikkel Damsgaard',side:'h'}
+   ]},
 
-  // 紐卡索 vs 布萊頓 | 05/02 23:00 台灣時間
-  {id:'EPL-MW35-NEW-BHA', matchday:35, date:'2026-05-02', time:'23:00', home:'NEW', away:'BHA', stage:'league', status:'upcoming'},
+  // 紐卡索 3-1 布萊頓 | 05/02 23:00 台灣時間
+  {id:'EPL-MW35-NEW-BHA', matchday:35, date:'2026-05-02', time:'23:00', home:'NEW', away:'BHA', stage:'league',
+   status:'finished', score:{h:3,a:1}, halfTime:{h:2,a:0},
+   goals:[
+     {min:'12',player:'William Osula',side:'h'},
+     {min:'24',player:'Dan Burn',side:'h'},
+     {min:'61',player:'Jack Hinshelwood',side:'a'},
+     {min:'90+5',player:'Harvey Barnes',side:'h'}
+   ]},
 
-  // 狼隊 vs 桑德蘭 | 05/02 23:00 台灣時間
-  {id:'EPL-MW35-WOL-SUN', matchday:35, date:'2026-05-02', time:'23:00', home:'WOL', away:'SUN', stage:'league', status:'upcoming'},
+  // 狼隊 1-1 桑德蘭 | 05/02 23:00 台灣時間
+  {id:'EPL-MW35-WOL-SUN', matchday:35, date:'2026-05-02', time:'23:00', home:'WOL', away:'SUN', stage:'league',
+   status:'finished', score:{h:1,a:1}, halfTime:{h:0,a:1},
+   goals:[
+     {min:'17',player:'Nordi Mukiele',side:'a'},
+     {min:'54',player:'Santiago Bueno',side:'h'}
+   ]},
 
-  // 兵工廠 vs 富勒姆 | 05/03 01:30 台灣時間 (05/02 18:30 BST)
-  {id:'EPL-MW35-ARS-FUL', matchday:35, date:'2026-05-03', time:'01:30', home:'ARS', away:'FUL', stage:'league', status:'upcoming'},
+  // 兵工廠 3-0 富勒姆 | 05/03 01:30 台灣時間 (05/02 18:30 BST)
+  {id:'EPL-MW35-ARS-FUL', matchday:35, date:'2026-05-03', time:'01:30', home:'ARS', away:'FUL', stage:'league',
+   status:'finished', score:{h:3,a:0}, halfTime:{h:3,a:0},
+   goals:[
+     {min:'9',player:'Viktor Gyökeres',side:'h'},
+     {min:'40',player:'Bukayo Saka',side:'h'},
+     {min:'45+4',player:'Viktor Gyökeres',side:'h'}
+   ]},
 
   // 曼聯 vs 利物浦 | 05/03 23:30 台灣時間 (05/03 16:30 BST)
   {id:'EPL-MW35-MUN-LIV', matchday:35, date:'2026-05-03', time:'23:30', home:'MUN', away:'LIV', stage:'league', status:'upcoming'},

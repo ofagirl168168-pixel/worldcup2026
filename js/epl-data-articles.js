@@ -1914,6 +1914,233 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p>伯恩利方面，Parker 離任後球隊已無鬥志，確認降級只是時間問題。Mike Jackson 代理期間的首要任務是為年輕球員爭取出場機會，為下季英冠做準備。</p>`,
     tags: ['賽後回顧', '里茲聯', '伯恩利', 'Stach', 'Okafor', 'Calvert-Lewin', '保級', '第35輪']
+  },
+  {
+    id: 'epl-037',
+    title: '【賽後回顧】兵工廠 3-0 富勒姆：Gyökeres 梅開二度，六分差領跑英超',
+    date: '2026-05-03',
+    category: '賽後深度回顧',
+    summary: 'Gyökeres 第 9、45+4 分鐘各入一球，Saka 傷癒回歸首發即進球。兵工廠拉開曼城 6 分差距，爭冠大業再進一步。',
+    content: `<h2>兵工廠 3-0 富勒姆｜第35輪・Emirates Stadium・觀眾 60,196</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">9' ⚽</td>
+<td style="padding:8px"><strong>Viktor Gyökeres（兵工廠）</strong> — Saka 右路過人後低平傳中，Gyökeres 門前搶點捅射破網</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">40' ⚽</td>
+<td style="padding:8px"><strong>Bukayo Saka（兵工廠）</strong> — Eze 精妙直塞穿越防線，Saka 切入禁區推射近柱入網，傷癒復出即建功</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">45+4' ⚽</td>
+<td style="padding:8px"><strong>Viktor Gyökeres（兵工廠）</strong> — Trossard 左路推進至禁區邊緣傳中，Gyökeres 後點頭槌頂入，梅開二度</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 3-0 ∣ 終場 3-0</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>上半場風暴：三球殺死懸念</h4>
+
+<p>Arteta 派出傷癒復出的 Saka 首發，這位英格蘭翼鋒上一次先發還是聯賽盃決賽。事實證明這是本場最關鍵的決定——Saka 第 9 分鐘右路連續變向晃過 Raúl Jiménez 後低傳，Gyökeres 門前搶先一步捅射入網。</p>
+
+<p>第 40 分鐘 Eze 中路一腳直塞球穿越富勒姆防線，Saka 接球後冷靜切入禁區、推射近柱得手，宣告自己王者歸來。補時階段 Trossard 左路突破至禁區邊緣送出傳中，Gyökeres 後點頭槌頂入完成梅開二度。上半場 3-0，Emirates 球迷已在慶祝。</p>
+
+<h4>下半場控制節奏</h4>
+
+<p>Arteta 下半場換下 Saka 和 Eze 保護兩人，讓年輕球員登場。富勒姆全場僅有 2 次射門、0 射正，Leno 面對老東家幾乎無事可做。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">兵工廠</th>
+<th style="padding:8px">富勒姆</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>64%</td><td>36%</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">射門/射正</td><td>14/7</td><td>2/0</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">角球</td><td>6</td><td>1</td>
+</tr>
+</table>
+
+<h3>積分榜影響</h3>
+
+<ul>
+<li><strong>兵工廠</strong>：以 6 分差距領跑曼城，距英超冠軍愈來愈近。歐冠半決賽次回合（5/5 主場對馬競）前士氣大振。</li>
+<li><strong>富勒姆</strong>：Marco Silva 的球隊 0 射正，進攻端停擺問題依舊嚴重，中游位置無虞但季末表現令球迷失望。</li>
+<li><strong>Saka 復出</strong>：傷癒首發即進球，證明狀態無虞，對歐冠次回合是巨大利多。</li>
+</ul>`,
+    tags: ['賽後回顧', '兵工廠', '富勒姆', 'Gyökeres', 'Saka', '爭冠', '第35輪']
+  },
+  {
+    id: 'epl-038',
+    title: '【賽後回顧】布倫特福德 3-0 韋斯咸：Igor Thiago 22 球領跑射手榜，蜜蜂軍團逼近歐戰',
+    date: '2026-05-03',
+    category: '賽後深度回顧',
+    summary: 'Mavropanos 烏龍開場，Igor Thiago 點球建功達 22 個英超進球，Damsgaard 封盤。韋斯咸降級危機加深。',
+    content: `<h2>布倫特福德 3-0 韋斯咸｜第35輪・Gtech Community Stadium・觀眾 17,194</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">15' ⚽ OG</td>
+<td style="padding:8px"><strong>Mavropanos（韋斯咸烏龍）</strong> — Kayode 右路低傳撞門柱彈回，Mavropanos 解圍不慎將球送入自家網窩</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">54' ⚽ PK</td>
+<td style="padding:8px"><strong>Igor Thiago（布倫特福德）</strong> — Diouf 禁區內魯莽滑鏟放倒 Ouattara，Thiago 主罰命中，本季英超第 22 球</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">82' ⚽</td>
+<td style="padding:8px"><strong>Mikkel Damsgaard（布倫特福德）</strong> — Lewis-Potter 左路回傳，Damsgaard 禁區邊弧線射入遠角</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 1-0 ∣ 終場 3-0</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>韋斯咸的夢魘</h4>
+
+<p>韋斯咸的降級危機在本場達到新高點。開場第 15 分鐘 Mavropanos 的烏龍球讓球隊信心崩塌，儘管上半場韋斯咸 4 次擊中門框、還有一球被 VAR 判越位取消，但運氣完全站在主隊這邊。</p>
+
+<p>下半場 Diouf 在禁區內的魯莽鏟球送給布倫特福德點球機會，Igor Thiago 冷靜命中——這是巴西射手本季英超第 22 球，高居射手榜前列。第 82 分鐘 Damsgaard 的弧線球鎖定勝局。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">布倫特福德</th>
+<th style="padding:8px">韋斯咸</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>47%</td><td>53%</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">射門/射正</td><td>10/5</td><td>13/3</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">門框</td><td>0</td><td>4</td>
+</tr>
+</table>
+
+<h3>積分榜影響</h3>
+
+<ul>
+<li><strong>布倫特福德</strong>：7 場首勝，升至第 6 名，距歐冠區僅 3 分。Keith Andrews 的歐戰夢想還活著。</li>
+<li><strong>韋斯咸</strong>：降級區邊緣搖搖欲墜，Graham Potter 接手後依舊無力回天。明天熱刺若贏球將直接把韋斯咸踢入降級區。</li>
+</ul>`,
+    tags: ['賽後回顧', '布倫特福德', '韋斯咸', 'Igor Thiago', 'Damsgaard', '降級', '第35輪']
+  },
+  {
+    id: 'epl-039',
+    title: '【賽後回顧】紐卡索 3-1 布萊頓：Osula 再破門，喜鵲終結五連敗',
+    date: '2026-05-03',
+    category: '賽後深度回顧',
+    summary: 'Verbruggen 失誤送禮 Osula 破門，Dan Burn 頭槌建功對前東家，Harvey Barnes 補時殺死比賽。紐卡索終於止血。',
+    content: `<h2>紐卡索 3-1 布萊頓｜第35輪・St James' Park・觀眾 52,099</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">12' ⚽</td>
+<td style="padding:8px"><strong>Will Osula（紐卡索）</strong> — Verbruggen 出擊失誤，Osula 門前搶到皮球輕鬆推射空門</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">24' ⚽</td>
+<td style="padding:8px"><strong>Dan Burn（紐卡索）</strong> — 角球開出，Burn 後點力壓防守球員頭槌砸地入網，對前東家建功</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">61' ⚽</td>
+<td style="padding:8px"><strong>Jack Hinshelwood（布萊頓）</strong> — 中場帶球推進後禁區邊緣射門，扳回一球</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">90+5' ⚽</td>
+<td style="padding:8px"><strong>Harvey Barnes（紐卡索）</strong> — 替補登場的 Barnes 反擊中接球後冷靜射入，殺死比賽</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 2-0 ∣ 終場 3-1</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>Howe 的救贖之夜</h4>
+
+<p>經歷英超 5 連敗的煎熬後，Eddie Howe 的球隊終於在主場找回勝利感覺。第 12 分鐘 Verbruggen 出擊判斷失誤，Osula 撿到大禮門前推射得手——這位丹麥前鋒近期狀態火燙，已連續多場破門。</p>
+
+<p>第 24 分鐘 Dan Burn 角球後力壓防守球員頭槌入網。這位前布萊頓隊長面對舊東家絲毫不手軟，全場起立歡呼。上半場 2-0，St James' Park 的壓抑終於釋放。</p>
+
+<h4>下半場驚魂</h4>
+
+<p>Hinshelwood 第 61 分鐘扳回一球後，紐卡索一度緊張——畢竟本季他們已丟掉太多領先優勢。但這次 Howe 的球隊守住了，補時階段替補 Barnes 反擊中一劍封喉，3-1 終結比賽。</p>
+
+<h3>積分榜影響</h3>
+
+<ul>
+<li><strong>紐卡索</strong>：從第 15 名升至第 13 名，止住下滑趨勢。Howe 暫時保住帥位。</li>
+<li><strong>布萊頓</strong>：歐戰夢遭受打擊，跌至第 7 名。Verbruggen 的失誤是轉折點。</li>
+</ul>`,
+    tags: ['賽後回顧', '紐卡索', '布萊頓', 'Osula', 'Dan Burn', 'Barnes', '第35輪']
+  },
+  {
+    id: 'epl-040',
+    title: '【賽後回顧】狼隊 1-1 桑德蘭：Ballard 扯頭髮紅牌，十人黑貓險守一分',
+    date: '2026-05-03',
+    category: '賽後深度回顧',
+    summary: 'Mukiele 頭槌先開紀錄，Ballard 因扯對手頭髮被紅牌罰下，Bueno 下半場頭槌扳平。狼隊降級幾乎確定。',
+    content: `<h2>狼隊 1-1 桑德蘭｜第35輪・Molineux・觀眾 31,012</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">17' ⚽</td>
+<td style="padding:8px"><strong>Nordi Mukiele（桑德蘭）</strong> — 角球後頭槌破門，為客隊率先取得領先</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">24' 🟥</td>
+<td style="padding:8px"><strong>Dan Ballard（桑德蘭）</strong> — VAR 回放確認拉扯 Arokodare 頭髮，直接紅牌被罰下場</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">54' ⚽</td>
+<td style="padding:8px"><strong>Santiago Bueno（狼隊）</strong> — 角球開出後門前頭槌頂入，扳平比分</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-1 ∣ 終場 1-1</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>Ballard 的愚蠢紅牌改變一切</h4>
+
+<p>桑德蘭原本打出完美開局——Mukiele 第 17 分鐘角球後頭槌破門，客隊 1-0 領先。但僅僅 7 分鐘後，Dan Ballard 在爭搶中拉扯 Arokodare 的頭髮，VAR 回放後裁判直接出示紅牌。這一愚蠢犯規徹底改變了比賽走向。</p>
+
+<p>下半場狼隊全面圍攻。第 54 分鐘，Santiago Bueno 在角球後門前頭槌頂入扳平。此後狼隊雖然佔據絕對優勢，但 10 人桑德蘭的防守韌性令人敬佩，最終守住 1 分。</p>
+
+<h3>積分榜影響</h3>
+
+<ul>
+<li><strong>狼隊</strong>：仍墊底，降級幾乎已成定局。Rob Edwards 上任後的首場平局，但為時已晚。</li>
+<li><strong>桑德蘭</strong>：升班馬首季英超拿到寶貴客場 1 分，保級形勢依然安全。Régis Le Bris 的球隊展現了頑強韌性。</li>
+</ul>`,
+    tags: ['賽後回顧', '狼隊', '桑德蘭', 'Ballard紅牌', 'Bueno', 'Mukiele', '第35輪']
   }
 ];
 

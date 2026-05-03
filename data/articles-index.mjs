@@ -2,6 +2,46 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-037",
+    "tournament": "epl",
+    "title": "【賽後回顧】兵工廠 3-0 富勒姆：Gyökeres 梅開二度，六分差領跑英超",
+    "summary": "Gyökeres 第 9、45+4 分鐘各入一球，Saka 傷癒回歸首發即進球。兵工廠拉開曼城 6 分差距，爭冠大業再進一步。",
+    "date": "2026-05-03",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-038",
+    "tournament": "epl",
+    "title": "【賽後回顧】布倫特福德 3-0 韋斯咸：Igor Thiago 22 球領跑射手榜，蜜蜂軍團逼近歐戰",
+    "summary": "Mavropanos 烏龍開場，Igor Thiago 點球建功達 22 個英超進球，Damsgaard 封盤。韋斯咸降級危機加深。",
+    "date": "2026-05-03",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-039",
+    "tournament": "epl",
+    "title": "【賽後回顧】紐卡索 3-1 布萊頓：Osula 再破門，喜鵲終結五連敗",
+    "summary": "Verbruggen 失誤送禮 Osula 破門，Dan Burn 頭槌建功對前東家，Harvey Barnes 補時殺死比賽。紐卡索終於止血。",
+    "date": "2026-05-03",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-040",
+    "tournament": "epl",
+    "title": "【賽後回顧】狼隊 1-1 桑德蘭：Ballard 扯頭髮紅牌，十人黑貓險守一分",
+    "summary": "Mukiele 頭槌先開紀錄，Ballard 因扯對手頭髮被紅牌罰下，Bueno 下半場頭槌扳平。狼隊降級幾乎確定。",
+    "date": "2026-05-03",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-036",
     "tournament": "epl",
     "title": "【賽後回顧】里茲聯 3-1 伯恩利：Stach 世界波領銜，里茲保級路上九分領先",
@@ -79,7 +119,7 @@ export default [
     "date": "2026-04-25",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-018",
@@ -89,7 +129,7 @@ export default [
     "date": "2026-04-25",
     "category": "賽前深度分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-031",
