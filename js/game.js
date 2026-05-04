@@ -253,7 +253,36 @@ function localDateStr() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-// ── 取今日題目：固定循環 話題→一般→話題→難題→話題→一般 ──────
+// 字串 seed 洗牌（FNV-1a + LCG，deterministic）— 用來把每年題目順序打亂
+function _seededShuffle(arr, seed) {
+  let h = 2166136261 >>> 0;
+  const s = String(seed);
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  let state = h || 1;
+  const out = arr.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    const j = state % (i + 1);
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+// 算 dayIdx 之前(含)該類型出現了幾次（type-instance index），讓 pool 連續被輪到
+// CYCLE = ['normal','viral','hard','viral'] → 每 4 天: normal 1, hard 1, viral 2
+function _typeInstanceIdx(dayIdx, poolType) {
+  const fullCycles = Math.floor(dayIdx / 4);
+  const offset = dayIdx % 4;
+  if (poolType === 'normal') return fullCycles + (offset >= 0 ? 0 : -1); // CYCLE[0]
+  if (poolType === 'hard')   return fullCycles + (offset >= 2 ? 0 : -1); // CYCLE[2]
+  // viral 在 CYCLE[1]、CYCLE[3]
+  return fullCycles * 2 + (offset >= 1 ? 1 : 0) + (offset >= 3 ? 1 : 0) - 1;
+}
+
+// ── 取今日題目：固定循環 normal→viral→hard→viral，每年用 seed shuffle 池內順序 ──────
 function getTodayQuestion() {
   const today  = localDateStr();
   const dayIdx = Math.floor((new Date(today) - new Date('2026-01-01')) / 86400000);
@@ -268,12 +297,18 @@ function getTodayQuestion() {
   const hards   = qBank.filter(q => q.type === 'hard');
   const virals  = qBank.filter(q => q.type === 'viral');
 
-  // 4天循環：normal → viral → hard → viral → normal → viral → hard → viral…
+  // 4 天循環
   const CYCLE = ['normal', 'viral', 'hard', 'viral'];
   const poolType = CYCLE[dayIdx % CYCLE.length];
   const pool = poolType === 'hard' ? hards : poolType === 'viral' ? virals : normals;
 
-  return { ...pool[dayIdx % pool.length], date: today };
+  // 之前 bug：用 dayIdx % pool.length，例如 EPL viral pool 5 題 → 每 10 天剛好同 idx 重複
+  // 改成「該類型出現的第 N 次」當 idx，且每年用 seed 打亂池內順序
+  // → 一年內題目以 shuffle 過的順序連續輪一遍才回頭、跨年自動換新順序
+  const year = today.slice(0, 4);
+  const shuffled = _seededShuffle(pool, `${tid}-${poolType}-${year}`);
+  const idx = _typeInstanceIdx(dayIdx, poolType);
+  return { ...shuffled[((idx % shuffled.length) + shuffled.length) % shuffled.length], date: today };
 }
 
 // ── 連勝天數計算 ──────────────────────────────────────────

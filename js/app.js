@@ -1765,7 +1765,10 @@ async function openPredModal(id) {
       else if (m.twDate && m.twTime) kickoffMs = new Date(m.twDate+'T'+m.twTime+':00+08:00').getTime();
       const now = Date.now();
       const matchStatus = m.status || (kickoffMs > 0 && now >= kickoffMs ? 'started' : 'scheduled');
-      const isLocked = matchStatus !== 'scheduled' || (kickoffMs > 0 && now >= kickoffMs);
+      // 鎖定條件：比賽真的已開賽（kickoff 已過）或狀態為已開始/結束（live/finished/started/ended）
+      // 修：之前用 `matchStatus !== 'scheduled'`，但 EPL/UCL 還沒開賽的場是 'upcoming'，會被誤判鎖
+      const _STARTED = new Set(['live','finished','ended','started']);
+      const isLocked = _STARTED.has(matchStatus) || (kickoffMs > 0 && now >= kickoffMs);
       const msLeft = kickoffMs > 0 ? kickoffMs - now : 0;
       const showCountdown = !isLocked && msLeft > 0 && msLeft < 48 * 3600000;
       const urgencyClass = msLeft < 30*60000 ? 'urgent' : msLeft < 2*3600000 ? 'warn' : '';
