@@ -1952,7 +1952,7 @@ async function openPredModal(id) {
               </div>
             </div>
             <button class="pred-unlock-btn" onclick="openDeepAnalysis('${m.id}','${m.home}','${m.away}')">
-              <span class="gem-ico" style="width:12px;height:12px"></span>×2 解鎖深度分析
+              <span class="gem-ico" style="width:12px;height:12px"></span>×1 解鎖深度分析
             </button>
           </div>
         </div>
@@ -1977,17 +1977,21 @@ async function openPredModal(id) {
           <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:14px;text-align:center">
             🔍 解鎖後可再升級深度分析（大小球、盤口、角球等）
           </div>
-          <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px;font-size:13px;color:rgba(255,255,255,0.5)">
-            消耗 <span class="gem-ico" style="width:13px;height:13px"></span> ×${cost} 解鎖
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center">解鎖方式</div>
           </div>
           ${currentUser
             ? (!window.firstFreeUsed
               ? `<button class="pred-unlock-btn" style="width:100%;background:linear-gradient(135deg,#43a047,#1b5e20)" onclick="unlockPredModal('${m.id}','first_free')">
                   🎁 首次免費解鎖
                 </button>
-                <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3)">每位用戶限一次，之後需消耗寶石</div>`
-              : `<button class="pred-unlock-btn" style="width:100%" onclick="unlockPredModal('${m.id}','${spendType}')">
-                  解鎖查看分析
+                <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.3);text-align:center">每位用戶限一次，之後可分享或用寶石解鎖</div>`
+              : `<button class="pred-unlock-btn" style="width:100%;background:linear-gradient(135deg,#42a5f5,#1976d2);margin-bottom:8px" onclick="shareUnlockPredModal('${m.id}')">
+                  📤 分享給朋友 → 免費解鎖
+                </button>
+                <div style="font-size:11px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:10px">每天最多 5 場，同場限一次</div>
+                <button class="pred-unlock-btn" style="width:100%;background:linear-gradient(135deg,#666,#444)" onclick="unlockPredModal('${m.id}','${spendType}')">
+                  💎 ×${cost} 解鎖
                 </button>`)
             : `<button class="pred-unlock-btn" onclick="loginWithGoogle();closeModal()" style="width:100%;background:linear-gradient(135deg,#fff,#ddd);color:#222">
                 <svg width="14" height="14" viewBox="0 0 24 24" style="flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -2030,6 +2034,66 @@ async function unlockPredModal(id, spendType) {
     completeDailyTask?.('unlock_match');
     openPredModal(id)
   }
+}
+
+// 分享解鎖：navigator.share() resolve 算 engage、call RPC 落地、刷新 modal
+// A+B 方案：信任點按完成、同 match 限一次、同日最多 5 場（RPC 內建）
+async function shareUnlockPredModal(id) {
+  if (!window.currentUser) {
+    if (typeof loginWithGoogle === 'function') loginWithGoogle();
+    return;
+  }
+  const m = (_matches() || []).find(x => x.id === id);
+  if (!m) return;
+  const _T = _teams();
+  const ht = _T[m.home], at = _T[m.away];
+  const homeName = (ht && ht.nameCN) || m.home;
+  const awayName = (at && at.nameCN) || m.away;
+  const url   = `${location.origin}/m/${id}`;
+  const title = `${homeName} vs ${awayName} | AI 預測 — Soccer麥迪`;
+  const text  = `來看 ${homeName} vs ${awayName} 的 AI 預測比分跟勝負率，準到嚇你 👀`;
+
+  let shared = false;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, text, url });
+      shared = true;
+    } catch (e) {
+      // 使用者取消（AbortError）→ 不解鎖
+      return;
+    }
+  } else {
+    // 沒原生 share API：複製到剪貼簿當 fallback
+    try {
+      await navigator.clipboard.writeText(`${text}\n${url}`);
+      if (typeof showToast === 'function') showToast('連結已複製，貼到 LINE/FB 跟朋友分享');
+      shared = true;
+    } catch (e) {
+      if (typeof showToast === 'function') showToast('分享失敗：' + (e.message || ''));
+      return;
+    }
+  }
+
+  if (!shared) return;
+
+  const result = await window.shareUnlockMatch?.(id);
+  if (result?.error) {
+    if (typeof showToast === 'function') showToast(result.error);
+    return;
+  }
+  if (!window.unlockedMatchSet) window.unlockedMatchSet = new Set();
+  window.unlockedMatchSet.add(id);
+  if (typeof completeDailyTask === 'function') {
+    try { completeDailyTask('unlock_match'); } catch (e) {}
+    try { completeDailyTask('share_any'); } catch (e) {}
+  }
+  if (typeof showToast === 'function') {
+    const remain = result?.remaining_today;
+    showToast(typeof remain === 'number'
+      ? `✅ 已解鎖！今日還剩 ${remain} 次免費分享解鎖`
+      : '✅ 已解鎖！');
+  }
+  openPredModal(id);
 }
 
 document.getElementById('hamburger-btn').addEventListener('click', () => {

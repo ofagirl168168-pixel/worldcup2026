@@ -103,9 +103,30 @@ async function fetchUnlockedMatches() {
   const { data } = await DB.from('gem_transactions')
     .select('ref_id')
     .eq('user_id', currentUser.id)
-    .in('type', ['unlock_match', 'unlock_knockout', 'first_free'])
+    .in('type', ['unlock_match', 'unlock_knockout', 'first_free', 'share_unlock'])
   return new Set((data ?? []).map(r => r.ref_id).filter(Boolean))
 }
+
+// 分享解鎖（A+B 方案）：navigator.share() resolve 後呼叫，免費解鎖一場
+// 限制：同 match 一輩子限一次、同日最多 5 場（RPC 內建）
+async function shareUnlockMatch(matchId) {
+  if (!currentUser) return { error: '請先登入' }
+  try {
+    const { data, error } = await DB.rpc('friend_share_unlock', { p_match_id: matchId })
+    if (error) {
+      const msg = String(error.message || '')
+      if (msg.includes('DAILY_LIMIT')) {
+        return { error: '今日免費分享解鎖已用完（每天 5 場），明天再來或用寶石解鎖' }
+      }
+      if (msg.includes('NOT_AUTHENTICATED')) return { error: '請先登入' }
+      return { error: msg || '解鎖失敗' }
+    }
+    return { ok: true, ...(data || {}) }
+  } catch (e) {
+    return { error: e.message || '解鎖失敗' }
+  }
+}
+window.shareUnlockMatch = shareUnlockMatch
 
 // ── 取得已解鎖深度分析的比賽清單 ────────────────────────
 async function fetchUnlockedDeep() {

@@ -370,6 +370,18 @@ window.addEventListener('load', () => {
       if (new URLSearchParams(location.search).get('article')) isArticleLanding = true;
       if (/^#fr-room-/i.test(location.hash)) isFriendRoomLanding = true;
       if (/^\/r\/[A-Z0-9]+\/?$/i.test(location.pathname)) isFriendRoomLanding = true;
+      // 從 /m/<match_id> 落地（朋友點分享連結進站）→ 自動打開該場預測 modal
+      // match_id 由 server 用 <meta name="prefill-match"> 傳進來
+      const matchMeta = document.querySelector('meta[name="prefill-match"]');
+      if (matchMeta && matchMeta.content) {
+        setTimeout(() => {
+          if (typeof window.openPredModal === 'function') {
+            try { window.openPredModal(matchMeta.content); } catch (e) {}
+          }
+          // 用過清掉 + 修網址讓回上一頁 work
+          try { history.replaceState(null, '', '/'); } catch (e) {}
+        }, 800);
+      }
     } catch (e) {}
     // 邀請連結進來 → 把 daily popup chain 整個延後給 friend-room.js close 後觸發
     if (isFriendRoomLanding) {

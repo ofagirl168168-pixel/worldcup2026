@@ -6,9 +6,9 @@ const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
 // 各類型費用
 const COSTS: Record<string, number> = {
-  unlock_match:       1,  // 小組賽預測
-  unlock_knockout:    2,  // 淘汰賽預測
-  unlock_deep:        2,  // 深度分析
+  unlock_match:       1,  // 小組賽預測（多了「分享解鎖」免費路徑）
+  unlock_knockout:    2,  // 淘汰賽預測（多了「分享解鎖」免費路徑）
+  unlock_deep:        1,  // 深度分析（從 2 降到 1，配合分享解鎖簡化付費階梯）
   first_free:         0,  // 首次免費（每用戶限一次）
   rogue_revive:       3,  // 射門挑戰：復活
   rogue_reroll:       1,  // 射門挑戰：重新抽卡

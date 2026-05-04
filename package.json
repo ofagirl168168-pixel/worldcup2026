@@ -9,7 +9,8 @@
     "build:index": "node scripts/build-articles-index.js",
     "build:og-template": "node scripts/build-og-generator.js",
     "build:official-rooms": "node scripts/build-official-rooms.js",
-    "build:room-og": "node scripts/build-room-og.js"
+    "build:room-og": "node scripts/build-room-og.js",
+    "build:matches-index": "node scripts/build-matches-index.js"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.99",
