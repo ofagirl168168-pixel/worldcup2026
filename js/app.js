@@ -2056,13 +2056,29 @@ async function shareUnlockPredModal(id) {
   const title = `${homeName} vs ${awayName} | AI 預測 — Soccer麥迪`;
   const text  = `來看 ${homeName} vs ${awayName} 的 AI 預測比分跟勝負率，準到嚇你 👀`;
 
+  // 蓋全螢幕「處理中」遮罩 — 防使用者透過分享面板邊緣看到底下模糊預測 → 取消分享白嫖
+  const blocker = document.createElement('div');
+  blocker.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.95);' +
+    'display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;' +
+    'backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);font-family:inherit';
+  blocker.innerHTML = `
+    <div style="font-size:48px;margin-bottom:16px">📤</div>
+    <div style="font-size:18px;font-weight:800;margin-bottom:8px">分享給朋友後自動解鎖</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.6);text-align:center;max-width:320px;line-height:1.6">
+      請選一個 app 把連結貼給朋友<br>分享完成後會自動顯示 AI 預測
+    </div>
+  `;
+  document.body.appendChild(blocker);
+  const removeBlocker = () => { try { blocker.remove(); } catch (e) {} };
+
   let shared = false;
   if (navigator.share) {
     try {
       await navigator.share({ title, text, url });
       shared = true;
     } catch (e) {
-      // 使用者取消（AbortError）→ 不解鎖
+      // 使用者取消（AbortError）→ 拆遮罩、不解鎖
+      removeBlocker();
       return;
     }
   } else {
@@ -2072,15 +2088,17 @@ async function shareUnlockPredModal(id) {
       if (typeof showToast === 'function') showToast('連結已複製，貼到 LINE/FB 跟朋友分享');
       shared = true;
     } catch (e) {
+      removeBlocker();
       if (typeof showToast === 'function') showToast('分享失敗：' + (e.message || ''));
       return;
     }
   }
 
-  if (!shared) return;
+  if (!shared) { removeBlocker(); return; }
 
   const result = await window.shareUnlockMatch?.(id);
   if (result?.error) {
+    removeBlocker();
     if (typeof showToast === 'function') showToast(result.error);
     return;
   }
@@ -2096,7 +2114,9 @@ async function shareUnlockPredModal(id) {
       ? `✅ 已解鎖！今日還剩 ${remain} 次免費分享解鎖`
       : '✅ 已解鎖！');
   }
+  // 解鎖成功 → 重新渲染 modal（會帶到 unlocked 內容），最後拆遮罩
   openPredModal(id);
+  setTimeout(removeBlocker, 200);   // 等一下讓 modal 重渲染再拆，避免閃過鎖定畫面
 }
 
 document.getElementById('hamburger-btn').addEventListener('click', () => {
