@@ -2096,6 +2096,33 @@ async function shareUnlockPredModal(id) {
 
   if (!shared) { removeBlocker(); return; }
 
+  // 桌機 Chrome 的 navigator.share resolve 太早（dialog 一彈就 resolve、沒等使用者選 app），
+  // 不能 share resolve 就直接解鎖 → 加一步顯式「我分享好了」確認，使用者必須明確點才解鎖
+  const userConfirmed = await new Promise((resolve) => {
+    blocker.innerHTML = `
+      <div style="font-size:48px;margin-bottom:16px">✅</div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:8px;color:#fff">分享完成了嗎？</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);text-align:center;max-width:320px;line-height:1.6;margin-bottom:24px">
+        確認你已經把連結貼到 LINE / FB / IG 給朋友<br>
+        我們相信你，點下面就解鎖預測
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+        <button id="_share_confirm_yes" style="padding:12px 24px;border-radius:10px;border:none;cursor:pointer;
+          background:linear-gradient(135deg,#42a5f5,#1976d2);color:#fff;font-size:15px;font-weight:800">
+          ✓ 我分享好了，解鎖
+        </button>
+        <button id="_share_confirm_no" style="padding:12px 24px;border-radius:10px;cursor:pointer;
+          background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);font-size:14px;border:1px solid rgba(255,255,255,0.15)">
+          取消
+        </button>
+      </div>
+    `;
+    blocker.querySelector('#_share_confirm_yes').onclick = () => resolve(true);
+    blocker.querySelector('#_share_confirm_no').onclick = () => resolve(false);
+  });
+
+  if (!userConfirmed) { removeBlocker(); return; }
+
   const result = await window.shareUnlockMatch?.(id);
   if (result?.error) {
     removeBlocker();
