@@ -380,9 +380,11 @@ async function main() {
     }
   }
 
-  // 跨日超時：自動寫入原候選第 1 題當預設
-  const fallback = rawCandidates[0];
-  console.log(`⏰ 已跨日未回應，自動採用候選第 1 題：${fallback.q}`);
+  // 跨日超時：採用「最後顯示的那題」（使用者看到什麼就用什麼，不用回頭找原候選）
+  // 之前用 rawCandidates[0]：洗牌+existing 一加進去 candidates[0] 就跟 rawCandidates[0] 不一定一樣，
+  // 而且使用者可能翻過頁了，期待「現在看到的就會用」才符合直覺
+  const fallback = candidates[currentIdx] || candidates[0];
+  console.log(`⏰ 已跨日未回應，自動採用最後顯示的那題（第 ${currentIdx + 1}/${candidates.length} 題）：${fallback.q}`);
   // 關掉所有訊息的按鈕
   for (const mid of sentMessages) {
     await tg('editMessageReplyMarkup', {
@@ -395,7 +397,7 @@ async function main() {
     chat_id: CHAT_ID,
     text:
       `⏰ *時間已到（跨日）*\n\n` +
-      `未選擇，自動採用原候選第 1 題：\n\n` +
+      `未選擇，自動採用最後顯示的這題：\n\n` +
       `${escapeMd(fallback.q)}`,
     parse_mode: 'MarkdownV2',
   }).catch(() => {});
