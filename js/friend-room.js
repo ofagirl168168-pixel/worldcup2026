@@ -177,21 +177,54 @@
     return matchLine;
   }
 
-  function _countdown(kickoffISO) {
+  // 顯示房間「現在處於哪個生命週期」label：
+  //   開賽前 → 倒數
+  //   開賽後 < 5 min → 🔴 進行中
+  //   開賽後 5min ~ 1hr → ⏳ 結算中
+  //   ended + 有比分 → 🏁 比分 X-Y
+  //   ended + 無比分 → 🏁 已結束（沒人觀戰）
+  //   1 小時後沒人觀戰 → 🏁 已結束（伺服器 cron 會把 stale live 標 ended）
+  function _countdown(kickoffISO, room) {
     const t = new Date(kickoffISO).getTime() - Date.now();
-    if (t <= 0) return '<span class="fr-cd fr-cd--live">進行中</span>';
-    const m = Math.floor(t / 60000);
-    if (m < 60) return `<span class="fr-cd">${m} 分後開賽</span>`;
-    const h = Math.floor(m / 60);
-    return `<span class="fr-cd">${h} 小時後</span>`;
+    if (t > 0) {
+      const m = Math.floor(t / 60000);
+      if (m < 60) return `<span class="fr-cd">${m} 分後開賽</span>`;
+      const h = Math.floor(m / 60);
+      return `<span class="fr-cd">${h} 小時後</span>`;
+    }
+    // kickoff 已過
+    const status = room && room.status;
+    if (status === 'cancelled') return '<span class="fr-cd-ended">已取消</span>';
+    if (status === 'ended') {
+      const rh = room.result_home, ra = room.result_away;
+      if (rh != null && ra != null) {
+        return `<span class="fr-cd-ended">🏁 ${rh}-${ra}</span>`;
+      }
+      return '<span class="fr-cd-ended">🏁 已結束</span>';
+    }
+    // status='live'/'locked'：依 kickoff 已過的時間分階段
+    const elapsedMin = Math.floor(-t / 60000);
+    if (elapsedMin < 5) return '<span class="fr-cd fr-cd--live">🔴 進行中</span>';
+    return '<span class="fr-cd">⏳ 結算中</span>';
   }
 
   function _joinButton(room) {
     const full = false; // 房間人數不限，預留欄位
-    if (room.status === 'live') {
+    const t = new Date(room.kickoff_at).getTime() - Date.now();
+    const elapsedMin = t < 0 ? Math.floor(-t / 60000) : 0;
+
+    if (room.status === 'ended') {
+      return `<button class="fr-btn fr-btn--ended" onclick="FriendRoom.viewReplay('${room.room_code}')">看回放</button>`;
+    }
+    if (room.status === 'cancelled') {
+      return `<button class="fr-btn fr-btn--ended" disabled>已取消</button>`;
+    }
+    if (room.status === 'live' && elapsedMin < 5) {
       return `<button class="fr-btn fr-btn--late" onclick="FriendRoom.joinRoom('${room.room_code}')">遲到加入</button>`;
     }
-    if (room.status === 'ended') {
+    // status='live'/'locked' 但 kickoff 過 5 分鐘以上 → 還沒被 cron 標 ended，等同結算中
+    // 給「看回放」按鈕讓使用者進去：sim 跑完才結算，UI 也會處理沒結果情況
+    if (t <= 0) {
       return `<button class="fr-btn fr-btn--ended" onclick="FriendRoom.viewReplay('${room.room_code}')">看回放</button>`;
     }
     if (!room.is_public) {
@@ -211,7 +244,7 @@
         <span class="fr-cell fr-cell--id">#${room.room_code}</span>
         <span class="fr-cell fr-cell--type">${_typeBadge(room)}</span>
         <span class="fr-cell fr-cell--match">${_matchTitle(room)}</span>
-        <span class="fr-cell fr-cell--cd">${_countdown(room.kickoff_at)}</span>
+        <span class="fr-cell fr-cell--cd">${_countdown(room.kickoff_at, room)}</span>
         <span class="fr-cell fr-cell--bet">${room.bet_amount > 0 ? `💎 ${room.bet_amount}` : '<span class="fr-cell-bet-free">純娛樂</span>'}</span>
         <span class="fr-cell fr-cell--count">${room.pick_count} 人</span>
         <span class="fr-cell fr-cell--act">${_joinButton(room)}</span>
@@ -252,7 +285,7 @@
         <span class="fr-cell fr-cell--id">#${room.room_code}</span>
         <span class="fr-cell fr-cell--type">${_typeBadge(room)}</span>
         <span class="fr-cell fr-cell--match">${_matchTitle(room)}</span>
-        <span class="fr-cell fr-cell--cd">${_countdown(room.kickoff_at)}</span>
+        <span class="fr-cell fr-cell--cd">${_countdown(room.kickoff_at, room)}</span>
         <span class="fr-cell fr-cell--bet">${myPickStr}</span>
         <span class="fr-cell fr-cell--count">${resultStr}</span>
         <span class="fr-cell fr-cell--act">${action}</span>
