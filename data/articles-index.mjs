@@ -32,6 +32,16 @@ export default [
     "shareable": true
   },
   {
+    "id": "ucl-021",
+    "tournament": "ucl",
+    "title": "【賽前分析】歐冠四強次回合：兵工廠 vs 馬競、拜仁 vs 巴黎 — 誰能搶下布達佩斯決賽門票？",
+    "summary": "歐冠半決賽次回合一觸即發：5/6 兵工廠主場迎馬競背負 1-1 平手包袱，Saka 首回合替補復出本場可望先發；5/7 拜仁主場追 1 球差距迎戰 PSG，後者雙傷 Hakimi + Chevalier 缺陣門將改靠 Safonov。誰能挺進布達佩斯決賽，本文一次拆解。",
+    "date": "2026-05-04",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-037",
     "tournament": "epl",
     "title": "【賽後回顧】兵工廠 3-0 富勒姆：Gyökeres 梅開二度，六分差領跑英超",

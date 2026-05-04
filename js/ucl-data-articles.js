@@ -858,6 +858,81 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 
 <p>1-1 的比分讓次回合完全開放。兵工廠回到主場有絕對優勢，Saka 首回合已替補上場證明傷癒，次回合很可能先發。馬競的客場反擊能力不容小覷——他們在八強客場 2-0 擊敗巴薩的表現至今仍令人記憶猶新。Álvarez vs Saliba 的對決，將是決定誰進入決賽的關鍵。</p>`,
     tags: ['四強', '馬競', '兵工廠', '戰報', 'Gyökeres', 'Álvarez', 'VAR', '十二碼', 'Rice', 'Hancko']
+  },
+  {
+    id: 'ucl-021',
+    title: '【賽前分析】歐冠四強次回合：兵工廠 vs 馬競、拜仁 vs 巴黎 — 誰能搶下布達佩斯決賽門票？',
+    date: '2026-05-04',
+    category: '賽前深度分析',
+    summary: '歐冠半決賽次回合一觸即發：5/6 兵工廠主場迎馬競背負 1-1 平手包袱，Saka 首回合替補復出本場可望先發；5/7 拜仁主場追 1 球差距迎戰 PSG，後者雙傷 Hakimi + Chevalier 缺陣門將改靠 Safonov。誰能挺進布達佩斯決賽，本文一次拆解。',
+    content: `<h2>歐冠半決賽次回合前瞻</h2>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:100px"><strong>第一場</strong></td>
+<td style="padding:8px">兵工廠 vs 馬競 — 5/6（三）03:00 台灣時間・酋長球場（首回合 1-1）</td>
+</tr>
+<tr>
+<td style="padding:8px"><strong>第二場</strong></td>
+<td style="padding:8px">拜仁 vs 巴黎 — 5/7（四）03:00 台灣時間・安聯球場（首回合 PSG 5-4 領先）</td>
+</tr>
+</table>
+
+<h3>兵工廠 vs 馬競：1-1 平手回主場，紅軍能否守住歷史一刻</h3>
+
+<h4>兵工廠的底氣：本季 UCL 主場全勝</h4>
+
+<p>兵工廠本季歐冠主場 6 戰 5 勝 1 平、無敗績，Emirates 已成為對手難以攻克的堡壘。Opta 超級電腦給兵工廠 56% 的法定時間勝出機率，反映了主場優勢加持。Arteta 距離隊史首座歐冠決賽只差 90 分鐘——這是俱樂部 21 年來最接近的一次。</p>
+
+<p>更值得一提的紀錄：兵工廠近 8 場對西甲球隊的歐冠賽事保持不敗（7 勝 1 平），且聯賽階段曾 4-0 大勝這支馬競（Gyökeres 兩球、Gabriel 與 Martinelli 各添一球）。Gyökeres 上一場英超對富勒姆梅開二度狀態火燙。</p>
+
+<h4>傷兵與隱憂</h4>
+
+<p>Mikel Merino 賽季已報銷（足部手術後）。Jurrien Timber 因鼠蹊部傷勢仍在恢復中。Kai Havertz 與 Martin Ødegaard 出戰存疑但有望復出。Saka 在首回合替補上場 30 分鐘，本場可望進入先發名單。</p>
+
+<h4>馬競的反擊牌</h4>
+
+<p>Diego Simeone 的球隊本季客場淘汰賽展現了不容小覷的爆發力——八強客場 2-0 擊敗巴薩晉級。首回合 Julián Álvarez 在第 56 分鐘罰入十二碼，本季歐冠累積 9 球，是球隊絕對核心。Álvarez 賽後雖被換下但傷勢無大礙、本場可望先發。</p>
+
+<p>第 78 分鐘 Eze 被 Hancko 絆倒獲判點球但被 VAR 推翻是首回合最大爭議——馬競全身而退帶著 1-1 比分回到客場，Simeone 的球隊將以「客場 1 球＋抗壓能力」為武器執行反擊計畫。</p>
+
+<h3>拜仁 vs 巴黎：5-4 落後 1 球，Kompany 能否在安聯翻盤</h3>
+
+<h4>拜仁的主場神話</h4>
+
+<p>拜仁本季歐冠主場 6 戰全勝，近 29 場主場僅輸 1 場。Allianz Arena 將成為他們翻盤 1 球差距的最大武器。八強曾在主場 4-3 逆轉皇馬，這場「第二回合大逆轉」的劇本，Kompany 渴望在 PSG 身上重演。</p>
+
+<p>Harry Kane 本季各項賽事 53 球 45 場，Kompany 為了次回合特意在週末聯賽輪休——七戰僅一場先發、把所有體力存在四強這場。拜仁本屆歐冠進球總數 42、PSG 43，是史上首次「兩隊單季都進球破 40」的歐冠對決。</p>
+
+<h4>傷兵清單</h4>
+
+<p>拜仁：Serge Gnabry、Tom Bischof、Sven Ulreich 全部缺陣，Raphaël Guerreiro 早在對美因茲時拉傷左腿後肌，兩回合均缺席。</p>
+
+<p>PSG 重大打擊更不止 Hakimi：原本希望靠主力 Lucas Chevalier 守住球門，但 Chevalier 訓練中拉傷右大腿、確定缺席，門將位置由曾被推到第二順位的 <strong>Matvey Safonov</strong> 接替。Hakimi 腿後肌撕裂 + Chevalier 大腿傷雙雙缺陣，PSG 後防右翼跟門將同時補位，是 Luis Enrique 帶兵以來最嚴峻的一次傷兵組合。</p>
+
+<h4>關鍵對位</h4>
+
+<p>拜仁邊路：Olise vs PSG 替補右後衛（Hakimi 缺陣後右路覆蓋下滑）→ 這是拜仁最有機會撕開的破口。Olise 在首回合就有出色表現，主場有望火力全開。</p>
+
+<p>PSG 反擊核心：Dembélé（首回合梅開二度、本季歐冠 8 球）+ Kvaratskhelia（首回合雙響）。拜仁高位壓迫的弱點就是反擊空間，PSG 只要打進 1 球就會讓拜仁需要再追 2 球。</p>
+
+<h3>本站預測</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px"><strong>兵工廠 vs 馬競</strong></td>
+<td style="padding:8px">兵工廠 2-1 馬競（總比分 3-2 晉級）。Arteta 主場戰術會逼迫馬競前壓，Saka 復出帶來邊路活力，Saliba/Gabriel 能限制 Álvarez。馬競客場進球能力不容忽視，但兩球以上難度太高。</td>
+</tr>
+<tr>
+<td style="padding:8px"><strong>拜仁 vs 巴黎</strong></td>
+<td style="padding:8px">拜仁 2-1 巴黎（總比分 6-6，PSG 客場進球規則晉級）。安聯球場魔咒延續、Kane 取分，但 PSG 的反擊一次就足夠。傷兵雖多，巴黎陣容深度仍能撐住一場 90 分鐘對決。</td>
+</tr>
+</table>
+
+<h3>布達佩斯決賽展望</h3>
+
+<p>本屆歐冠決賽 5/30 比賽（台灣時間 5/31 00:00）在布達佩斯普斯卡什球場舉行。從目前形勢看：兵工廠晉級的機率最高，PSG 緊追在後；馬競與拜仁則需要靠主場奇蹟。無論誰晉級，這都將是一場全歐洲足球熱潮級別的對決。</p>`,
+    tags: ['賽前分析', '半決賽', '次回合', '兵工廠', '馬競', '拜仁', '巴黎', 'Saka', 'Álvarez', 'Kane', 'Dembélé', 'Hakimi', 'Chevalier', 'Safonov']
   }
 ];
 
