@@ -377,23 +377,45 @@ window.addEventListener('load', () => {
         const matchId = matchMeta.content;
         // 標記跟 /r/ 一樣 defer 擂台 / 每日任務 popup，等 modal 關掉再彈
         isFriendRoomLanding = true;
-        setTimeout(() => {
-          // 先依 match_id 切到正確賽事 → 不然 _matches() 撈到 WC schedule、找不到 EPL/UCL 場
-          let targetTournament = null;
-          if (/^EPL-/.test(matchId)) targetTournament = 'epl';
-          else if (/^UCL-/.test(matchId)) targetTournament = 'ucl';
-          else targetTournament = 'wc';
-          if (window.Tournament && typeof window.Tournament.switch === 'function') {
-            try { window.Tournament.switch(targetTournament); } catch (e) {}
+
+        const targetTournament =
+            /^EPL-/.test(matchId) ? 'epl'
+          : /^UCL-/.test(matchId) ? 'ucl'
+          : 'wc';
+
+        const callOpenModal = () => {
+          if (typeof window.openPredModal === 'function') {
+            try { window.openPredModal(matchId); } catch (e) {}
           }
-          // 給 tournament switch + 資料載入一點時間再開 modal
+          // 保留 ?t=tournament 但移除 /m/<id> path，使用者重整不會回到分享頁
+          try {
+            const u = new URL(window.location.href);
+            u.pathname = '/';
+            history.replaceState(null, '', u);
+          } catch (e) {}
+        };
+
+        const curT = (window.Tournament && window.Tournament.current && window.Tournament.current()) || 'wc';
+        if (curT === targetTournament) {
+          // 已經對的賽事 → 直接開
+          setTimeout(callOpenModal, 600);
+        } else if (window.Tournament && typeof window.Tournament.switch === 'function') {
+          // 切換需要 350ms 動畫才會 swapGlobalData → 用 tournamentChanged 事件當訊號
+          // 失敗時 fallback 1500ms 強制開（動畫總長 1000ms + buffer）
+          let opened = false;
+          const handler = () => {
+            if (opened) return;
+            opened = true;
+            setTimeout(callOpenModal, 50);
+          };
+          window.addEventListener('tournamentChanged', handler, { once: true });
+          setTimeout(handler, 1500);  // 保險：事件沒觸發也要開
           setTimeout(() => {
-            if (typeof window.openPredModal === 'function') {
-              try { window.openPredModal(matchId); } catch (e) {}
-            }
-            try { history.replaceState(null, '', '/'); } catch (e) {}
-          }, 250);
-        }, 600);
+            try { window.Tournament.switch(targetTournament); } catch (e) {}
+          }, 100);
+        } else {
+          setTimeout(callOpenModal, 600);
+        }
       }
     } catch (e) {}
     // 邀請連結進來 → 把 daily popup chain 整個延後給 friend-room.js close 後觸發
