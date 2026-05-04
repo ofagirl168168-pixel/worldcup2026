@@ -1,45 +1,50 @@
 # Cloudflare Pages Cache-Control 設定
 # 資料檔每天會由日更任務更新，不能被長期快取否則使用者看不到新題/新資料
+#
+# `must-revalidate` 強制 browser 每次都打 conditional GET（with If-None-Match ETag）
+# Server 沒變更回 304 + 0 byte body 很便宜，有變更才重抓 → 解決手機/in-app browser cache 太黏的問題
 
+# 擂台題目 — 每天更新最敏感，max-age=0
 /js/data-opinions.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=0, must-revalidate
 
+# 其他每日資料檔 — 60 秒短 cache + must-revalidate
 /js/data-matches.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=60, must-revalidate
 
 /js/data-teams.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=60, must-revalidate
 
 /js/data-articles.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=60, must-revalidate
 
 /js/epl-data-teams.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=60, must-revalidate
 
 /js/epl-data-matches.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=60, must-revalidate
 
 /js/epl-data-articles.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=60, must-revalidate
 
 /js/epl-data-daily.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=60, must-revalidate
 
 /js/ucl-data-teams.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=60, must-revalidate
 
 /js/ucl-data-matches.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=60, must-revalidate
 
 /js/ucl-data-articles.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=60, must-revalidate
 
 /js/ucl-data-daily.js
-  Cache-Control: public, max-age=300
+  Cache-Control: public, max-age=60, must-revalidate
 
 /js/data-live.json
-  Cache-Control: public, max-age=120
+  Cache-Control: public, max-age=60, must-revalidate
 
-# OG 縮圖：Cloudflare CDN 端短快取，之後重畫圖也能快點生效
+# OG 縮圖：CDN 端短快取，之後重畫圖能快點生效
 /img/og-cover.png
   Cache-Control: public, max-age=3600
