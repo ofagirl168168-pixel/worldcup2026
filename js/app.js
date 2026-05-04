@@ -2039,7 +2039,10 @@ async function unlockPredModal(id, spendType) {
 // 分享解鎖：navigator.share() resolve 算 engage、call RPC 落地、刷新 modal
 // A+B 方案：信任點按完成、同 match 限一次、同日最多 5 場（RPC 內建）
 async function shareUnlockPredModal(id) {
-  if (!window.currentUser) {
+  // 注意：currentUser 在 supabase-client.js 是 let（lexical global），不是 window 屬性
+  // 用 typeof 安全讀；之前寫 window.currentUser 永遠 undefined → 已登入也被誤判去叫 Google 登入
+  const _user = (typeof currentUser !== 'undefined') ? currentUser : null;
+  if (!_user) {
     if (typeof loginWithGoogle === 'function') loginWithGoogle();
     return;
   }
