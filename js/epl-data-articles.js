@@ -2188,7 +2188,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h4>利物浦的瘋狂反撲</h4>
 
-<p>下半場開場僅 2 分鐘，Szoboszlai 就帶球突入禁區低射扳回一球。第 56 分鐘，三門門將 Lammens 出擊失誤，Gakpo 門前搶射將比分扳成 2-2。Old Trafford 一時間鴉雀無聲，曼聯彷彿又要重蹈本季多次丟掉領先優勢的覆轍。</p>
+<p>下半場開場僅 2 分鐘，Szoboszlai 就帶球突入禁區低射扳回一球。第 56 分鐘，門將 Lammens 出擊失誤，Gakpo 門前搶射將比分扳成 2-2。Old Trafford 一時間鴉雀無聲，曼聯彷彿又要重蹈本季多次丟掉領先優勢的覆轍。</p>
 
 <h4>Mainoo 的英雄時刻</h4>
 
@@ -2206,7 +2206,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <ul>
 <li><strong>曼聯</strong>：確認下賽季歐冠參賽資格，Carrick 接手後穩步上升。</li>
-<li><strong>利物浦</strong>：Salah 缺陣 + 三門門將出賽的困境下表現出韌性，但聯賽爭冠形勢更加嚴峻。</li>
+<li><strong>利物浦</strong>：Salah 與 Alisson 雙雙缺陣的困境下表現出韌性，但聯賽爭冠形勢更加嚴峻。</li>
 </ul>`,
     tags: ['賽後回顧', '曼聯', '利物浦', 'Mainoo', 'Cunha', 'Šeško', '雙紅會', '第35輪']
   },
