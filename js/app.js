@@ -2670,8 +2670,8 @@ function _scrollToUpcoming(container) {
     // 優先找 live 比賽
     let target = container.querySelector('.match-card[data-match-status="live"]');
     if (!target) {
-      // 找第一場 scheduled 比賽
-      target = container.querySelector('.match-card[data-match-status="scheduled"]');
+      // 找第一場「未開賽」比賽 — EPL/UCL 用 'upcoming'、WC 用 'scheduled'，兩個都要找
+      target = container.querySelector('.match-card[data-match-status="upcoming"], .match-card[data-match-status="scheduled"]');
     }
     if (!target) {
       // 所有比賽都結束了，找最後一場 finished
