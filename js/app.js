@@ -2721,6 +2721,21 @@ function closeModal() {
   document.getElementById('team-modal').classList.remove('open');
   window._lastLiveFormData = null;
   window._lastLiveFormTime = null;
+  // /m/<id> 分享連結落地時 daily popup 被延後 → modal 關掉後補彈一次（同 friend-room close 邏輯）
+  if (window.__pendingDailyAfterFriendRoom) {
+    window.__pendingDailyAfterFriendRoom = false;
+    setTimeout(() => {
+      if (typeof window.showOpinionPoll === 'function') {
+        try {
+          window.showOpinionPoll(() => {
+            if (typeof window.showDailyTaskPopup === 'function') {
+              try { window.showDailyTaskPopup(); } catch (e) {}
+            }
+          });
+        } catch (e) {}
+      }
+    }, 400);
+  }
 }
 
 // ── 首頁 Hero 區塊切換 ──────────────────────────────────

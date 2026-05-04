@@ -374,13 +374,26 @@ window.addEventListener('load', () => {
       // match_id 由 server 用 <meta name="prefill-match"> 傳進來
       const matchMeta = document.querySelector('meta[name="prefill-match"]');
       if (matchMeta && matchMeta.content) {
+        const matchId = matchMeta.content;
+        // 標記跟 /r/ 一樣 defer 擂台 / 每日任務 popup，等 modal 關掉再彈
+        isFriendRoomLanding = true;
         setTimeout(() => {
-          if (typeof window.openPredModal === 'function') {
-            try { window.openPredModal(matchMeta.content); } catch (e) {}
+          // 先依 match_id 切到正確賽事 → 不然 _matches() 撈到 WC schedule、找不到 EPL/UCL 場
+          let targetTournament = null;
+          if (/^EPL-/.test(matchId)) targetTournament = 'epl';
+          else if (/^UCL-/.test(matchId)) targetTournament = 'ucl';
+          else targetTournament = 'wc';
+          if (window.Tournament && typeof window.Tournament.switch === 'function') {
+            try { window.Tournament.switch(targetTournament); } catch (e) {}
           }
-          // 用過清掉 + 修網址讓回上一頁 work
-          try { history.replaceState(null, '', '/'); } catch (e) {}
-        }, 800);
+          // 給 tournament switch + 資料載入一點時間再開 modal
+          setTimeout(() => {
+            if (typeof window.openPredModal === 'function') {
+              try { window.openPredModal(matchId); } catch (e) {}
+            }
+            try { history.replaceState(null, '', '/'); } catch (e) {}
+          }, 250);
+        }, 600);
       }
     } catch (e) {}
     // 邀請連結進來 → 把 daily popup chain 整個延後給 friend-room.js close 後觸發
