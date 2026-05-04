@@ -2,6 +2,36 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-041",
+    "tournament": "epl",
+    "title": "【賽後回顧】曼聯 3-2 利物浦：Mainoo 絕殺！紅魔逆轉雙紅會鎖定歐冠資格",
+    "summary": "Cunha、Šeško 上半場連下兩城，利物浦 Szoboszlai 與 Gakpo 下半場扳平，Mainoo 第 77 分鐘一劍封喉，曼聯確定歐冠席位。",
+    "date": "2026-05-04",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-042",
+    "tournament": "epl",
+    "title": "【賽後回顧】伯恩茅斯 3-0 水晶宮：15 場不敗！櫻桃軍團殺入歐戰區",
+    "summary": "Lerma 烏龍揭幕、Kroupi 爭議點球、Rayan 鎖定勝局。Iraola 的伯恩茅斯延續不敗紀錄挺進歐戰行列。",
+    "date": "2026-05-04",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-043",
+    "tournament": "epl",
+    "title": "【賽後回顧】阿斯頓維拉 1-2 熱刺：Gallagher 遠射建功，熱刺奇蹟逃出降級區",
+    "summary": "Gallagher 25 碼遠射與 Richarlison 頭槌讓熱刺半場 2-0 領先，Buendía 補時扳回一球為時已晚。熱刺暫時脫離降級區。",
+    "date": "2026-05-04",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-037",
     "tournament": "epl",
     "title": "【賽後回顧】兵工廠 3-0 富勒姆：Gyökeres 梅開二度，六分差領跑英超",
@@ -99,7 +129,7 @@ export default [
     "date": "2026-04-26",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-034",
@@ -109,7 +139,7 @@ export default [
     "date": "2026-04-26",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-032",

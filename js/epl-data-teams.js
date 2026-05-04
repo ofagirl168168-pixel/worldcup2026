@@ -47,7 +47,7 @@ const EPL_TEAMS = {
     style:'高強度壓迫，快速轉換，邊路推進',
     strengths:['Salah持續高效輸出','Slot體系穩定成熟','中場跑動覆蓋全場'],
     weaknesses:['Salah年齡漸長','傷兵時輪換選擇有限','對陣低位防守隊時偶有困難'],
-    recentForm:['D','L','W','W','W'],
+    recentForm:['L','W','W','W','L'],
     history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍',
     injuries:[
       {name:'Mohamed Salah',pos:'右翼',status:'左腿後肌撕裂（vs CRY 4/25），利物浦確認賽季結束前可復出',returnDate:'五月中旬（世界盃可趕上）'},
@@ -122,12 +122,12 @@ const EPL_TEAMS = {
     style:'三後衛體系，翼衛推進，快速反擊',
     strengths:['Bruno Fernandes核心創造力','年輕球員快速成長','Amorim戰術改造進行中'],
     weaknesses:['體系轉換需要時間','防守穩定性不足','傷兵問題嚴重'],
-    recentForm:['W','D','L','W','W'],
+    recentForm:['D','L','W','W','W'],
     history:'20次英格蘭頂級聯賽冠軍，3次歐冠冠軍，英格蘭最成功俱樂部',
     injuries:[
       {name:'Patrick Dorgu',pos:'翼衛',status:'肌肉傷復健中，恢復進度中',returnDate:'賽季末'},
       {name:'Lisandro Martínez',pos:'中後衛',status:'MW35 停賽期滿，已可出場',returnDate:'已解禁'},
-      {name:'Matheus Cunha',pos:'翼鋒',status:'髖屈肌不適（缺席 vs BRE 4/27），恢復進展良好',returnDate:'vs LIV（5/3）有望出場'}
+      {name:'Matheus Cunha',pos:'翼鋒',status:'已復出（vs LIV 5/3 先發進球）',returnDate:'已復出'}
     ]
   },
   'TOT': {
@@ -143,14 +143,14 @@ const EPL_TEAMS = {
     style:'進攻足球，高位壓迫，後場出球',
     strengths:['De Zerbi 戰術體系導入中','後防線速度極快','Solanke/Maddison 進攻核心'],
     weaknesses:['賽季中三度換帥陣容動盪','傷兵名單長期居高不下','關鍵戰心態不穩'],
-    recentForm:['D','L','L','D','W'],
+    recentForm:['L','L','D','W','W'],
     history:'2次英格蘭頂級聯賽冠軍，2019歐冠亞軍',
     injuries:[
       {name:'Dominic Solanke',pos:'前鋒',status:'肌肉傷（vs WOL 4/25），De Zerbi 稱不嚴重',returnDate:'評估中'},
       {name:'Xavi Simons',pos:'攻擊中場',status:'右膝前十字韌帶斷裂（vs WOL 4/25），需手術',returnDate:'賽季報銷＋世界盃報銷'},
       {name:'James Maddison',pos:'攻擊中場',status:'前十字韌帶傷（恢復中）',returnDate:'賽季報銷'},
       {name:'Cristian Romero',pos:'中後衛',status:'膝傷',returnDate:'賽季報銷（世界盃存疑）'},
-      {name:'Mathys Tel',pos:'翼鋒',status:'大腿傷',returnDate:'評估中'}
+      {name:'Mathys Tel',pos:'翼鋒',status:'已復出（vs AVL 5/3 先發助攻）',returnDate:'已復出'}
     ]
   },
   'NEW': {
@@ -188,7 +188,7 @@ const EPL_TEAMS = {
     style:'Emery體系，緊湊防守反擊，定位球威脅大',
     strengths:['Watkins全面的前鋒能力','Emery歐戰經驗豐富','團隊凝聚力強'],
     weaknesses:['頂級球星不足','多線作戰體能考驗','客場表現波動'],
-    recentForm:['W','L','W','W','L'],
+    recentForm:['L','W','W','L','L'],
     history:'7次英格蘭頂級聯賽冠軍，1982年歐冠冠軍'
   },
 
@@ -224,7 +224,7 @@ const EPL_TEAMS = {
     style:'高壓逼搶，快速轉換，直接進攻',
     strengths:['Iraola壓迫體系有效','球員拼搶意志強','反擊速度快'],
     weaknesses:['陣容深度不足','對陣強隊經驗少','定位球防守不穩'],
-    recentForm:['D','W','L','W','D'],
+    recentForm:['W','L','W','D','W'],
     history:'2015年首次升上英超，近年穩定在英超中游'
   },
   'FUL': {
@@ -295,7 +295,7 @@ const EPL_TEAMS = {
     style:'邊路速度衝擊，定位球戰術，反擊犀利',
     strengths:['Sarr+Pino邊路速度優勢','Mateta終結效率穩定','Glasner戰術執行力佳'],
     weaknesses:['Eze夏窗轉兵工廠、Guéhi轉曼城後創造力與中衛深度雙降','進攻過度依賴個人能力','客場拿分困難'],
-    recentForm:['L','D','W','W','L'],
+    recentForm:['D','W','W','L','L'],
     history:'倫敦南部老牌球會，從未贏得頂級聯賽冠軍'
   },
   'WHU': {
@@ -693,11 +693,23 @@ window.EPL_MATCHES = [
      {min:'71',player:'Loum Tchaouna',side:'a'}
    ]},
 
-  // 阿斯頓維拉 vs 熱刺 | 05/02 20:30 台灣時間 (05/02 13:30 BST)
-  {id:'EPL-MW35-AVL-TOT', matchday:35, date:'2026-05-02', time:'20:30', home:'AVL', away:'TOT', stage:'league', status:'upcoming'},
+  // 阿斯頓維拉 1-2 熱刺 | 05/04 02:00 台灣時間 (05/03 19:00 BST)
+  {id:'EPL-MW35-AVL-TOT', matchday:35, date:'2026-05-04', time:'02:00', home:'AVL', away:'TOT', stage:'league',
+   status:'finished', score:{h:1,a:2}, halfTime:{h:0,a:2},
+   goals:[
+     {min:'12',player:'Conor Gallagher',side:'a'},
+     {min:'25',player:'Richarlison',side:'a'},
+     {min:'90',player:'Emi Buendía',side:'h'}
+   ]},
 
-  // 伯恩茅斯 vs 水晶宮 | 05/02 23:00 台灣時間 (05/02 16:00 BST)
-  {id:'EPL-MW35-BOU-CRY', matchday:35, date:'2026-05-02', time:'23:00', home:'BOU', away:'CRY', stage:'league', status:'upcoming'},
+  // 伯恩茅斯 3-0 水晶宮 | 05/03 21:00 台灣時間 (05/03 14:00 BST)
+  {id:'EPL-MW35-BOU-CRY', matchday:35, date:'2026-05-03', time:'21:00', home:'BOU', away:'CRY', stage:'league',
+   status:'finished', score:{h:3,a:0}, halfTime:{h:2,a:0},
+   goals:[
+     {min:'10',player:'Jefferson Lerma',side:'h',type:'og'},
+     {min:'32',player:'Eli Junior Kroupi',side:'h',type:'pen'},
+     {min:'77',player:'Rayan',side:'h'}
+   ]},
 
   // 布倫特福德 3-0 西漢姆 | 05/02 23:00 台灣時間
   {id:'EPL-MW35-BRE-WHU', matchday:35, date:'2026-05-02', time:'23:00', home:'BRE', away:'WHU', stage:'league',
@@ -735,8 +747,16 @@ window.EPL_MATCHES = [
      {min:'45+4',player:'Viktor Gyökeres',side:'h'}
    ]},
 
-  // 曼聯 vs 利物浦 | 05/03 23:30 台灣時間 (05/03 16:30 BST)
-  {id:'EPL-MW35-MUN-LIV', matchday:35, date:'2026-05-03', time:'23:30', home:'MUN', away:'LIV', stage:'league', status:'upcoming'},
+  // 曼聯 3-2 利物浦 | 05/03 22:30 台灣時間 (05/03 15:30 BST)
+  {id:'EPL-MW35-MUN-LIV', matchday:35, date:'2026-05-03', time:'22:30', home:'MUN', away:'LIV', stage:'league',
+   status:'finished', score:{h:3,a:2}, halfTime:{h:2,a:0},
+   goals:[
+     {min:'6',player:'Matheus Cunha',side:'h'},
+     {min:'14',player:'Benjamin Šeško',side:'h'},
+     {min:'47',player:'Dominik Szoboszlai',side:'a'},
+     {min:'56',player:'Cody Gakpo',side:'a'},
+     {min:'77',player:'Kobbie Mainoo',side:'h'}
+   ]},
 
   // 切爾西 vs 諾丁漢森林 | 05/04 23:00 台灣時間 (05/04 16:00 BST)
   {id:'EPL-MW35-CHE-NFO', matchday:35, date:'2026-05-04', time:'23:00', home:'CHE', away:'NFO', stage:'league', status:'upcoming'},

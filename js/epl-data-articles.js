@@ -2141,6 +2141,170 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <li><strong>桑德蘭</strong>：升班馬首季英超拿到寶貴客場 1 分，保級形勢依然安全。Régis Le Bris 的球隊展現了頑強韌性。</li>
 </ul>`,
     tags: ['賽後回顧', '狼隊', '桑德蘭', 'Ballard紅牌', 'Bueno', 'Mukiele', '第35輪']
+  },
+  {
+    id: 'epl-041',
+    title: '【賽後回顧】曼聯 3-2 利物浦：Mainoo 絕殺！紅魔逆轉雙紅會鎖定歐冠資格',
+    date: '2026-05-04',
+    category: '賽後深度回顧',
+    summary: 'Cunha、Šeško 上半場連下兩城，利物浦 Szoboszlai 與 Gakpo 下半場扳平，Mainoo 第 77 分鐘一劍封喉，曼聯確定歐冠席位。',
+    content: `<h2>曼聯 3-2 利物浦｜第35輪・Old Trafford・觀眾 74,027</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">6' ⚽</td>
+<td style="padding:8px"><strong>Matheus Cunha（曼聯）</strong> — 左腳射門折射 Mac Allister 後飛入遠角，髖屈肌傷復出即破門</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">14' ⚽</td>
+<td style="padding:8px"><strong>Benjamin Šeško（曼聯）</strong> — 本季聯賽第 10 球，禁區內冷靜推射入網</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">47' ⚽</td>
+<td style="padding:8px"><strong>Dominik Szoboszlai（利物浦）</strong> — 帶球推進後低射遠角得手，為利物浦扳回一球</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">56' ⚽</td>
+<td style="padding:8px"><strong>Cody Gakpo（利物浦）</strong> — 利用門將 Lammens 失誤搶到皮球射入空門扳平</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">77' ⚽</td>
+<td style="padding:8px"><strong>Kobbie Mainoo（曼聯）</strong> — Luke Shaw 傳中、Amad Diallo 頭球擺渡，Mainoo 第一時間冷靜推射入網</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 2-0 ∣ 終場 3-2</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>Carrick 的完美劇本</h4>
+
+<p>Michael Carrick 的球隊從第一分鐘就展現出侵略性。第 6 分鐘 Matheus Cunha 復出即進球——他的左腳射門折射 Mac Allister 後改變方向飛入球門遠角。僅 8 分鐘後，Benjamin Šeško 打入本季聯賽第 10 球，曼聯 14 分鐘內就建立起 2-0 的優勢。</p>
+
+<p>上半場曼聯完全掌控局面，利物浦在缺少 Salah、Alisson 的情況下幾乎找不到進攻節奏。但 Arne Slot 在中場休息時的調整立竿見影。</p>
+
+<h4>利物浦的瘋狂反撲</h4>
+
+<p>下半場開場僅 2 分鐘，Szoboszlai 就帶球突入禁區低射扳回一球。第 56 分鐘，三門門將 Lammens 出擊失誤，Gakpo 門前搶射將比分扳成 2-2。Old Trafford 一時間鴉雀無聲，曼聯彷彿又要重蹈本季多次丟掉領先優勢的覆轍。</p>
+
+<h4>Mainoo 的英雄時刻</h4>
+
+<p>但這次不同。第 77 分鐘，Luke Shaw 左路傳中，Amad Diallo 頭球擺渡到禁區中央，21 歲的 Kobbie Mainoo 第一時間推射入網——這一球不僅贏得了雙紅會，更為曼聯鎖定了下賽季歐冠參賽資格。全場 74,027 名觀眾瞬間引爆。</p>
+
+<h3>數據亮點</h3>
+
+<ul>
+<li><strong>控球率</strong>：曼聯 38% — 利物浦 62%（以少控多贏球）</li>
+<li><strong>射門</strong>：曼聯 18（6 射正）— 利物浦 13（5 射正）</li>
+<li><strong>xG</strong>：曼聯 2.14 — 利物浦 0.89</li>
+</ul>
+
+<h3>積分榜影響</h3>
+
+<ul>
+<li><strong>曼聯</strong>：確認下賽季歐冠參賽資格，Carrick 接手後穩步上升。</li>
+<li><strong>利物浦</strong>：Salah 缺陣 + 三門門將出賽的困境下表現出韌性，但聯賽爭冠形勢更加嚴峻。</li>
+</ul>`,
+    tags: ['賽後回顧', '曼聯', '利物浦', 'Mainoo', 'Cunha', 'Šeško', '雙紅會', '第35輪']
+  },
+  {
+    id: 'epl-042',
+    title: '【賽後回顧】伯恩茅斯 3-0 水晶宮：15 場不敗！櫻桃軍團殺入歐戰區',
+    date: '2026-05-04',
+    category: '賽後深度回顧',
+    summary: 'Lerma 烏龍揭幕、Kroupi 爭議點球、Rayan 鎖定勝局。Iraola 的伯恩茅斯延續不敗紀錄挺進歐戰行列。',
+    content: `<h2>伯恩茅斯 3-0 水晶宮｜第35輪・Vitality Stadium</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">10' ⚽</td>
+<td style="padding:8px"><strong>Jefferson Lerma（烏龍球）</strong> — Evanilson 頭球攻門，前櫻桃軍團中場 Lerma 試圖解圍卻將球送入自家球門</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">32' ⚽</td>
+<td style="padding:8px"><strong>Eli Junior Kroupi（伯恩茅斯，點球）</strong> — Henderson 撲角球時疑似碰撞 Senesi，VAR 判定點球，Kroupi 主罰命中</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">77' ⚽</td>
+<td style="padding:8px"><strong>Rayan（伯恩茅斯）</strong> — David Brooks 助攻，Rayan 斜射穿越 Henderson 入網鎖定勝局</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 2-0 ∣ 終場 3-0</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>Iraola 的不敗紀錄延續</h4>
+
+<p>Andoni Iraola 的球隊在主場展現出壓倒性實力。開場僅 10 分鐘，Evanilson 的頭球攻門被前隊友 Jefferson Lerma 試圖解圍時不慎送入自家球門——對前東家的尷尬烏龍讓 Vitality Stadium 瞬間沸騰。</p>
+
+<p>第 32 分鐘的點球判罰引發爭議：Henderson 在角球混戰中試圖抓住皮球，但被認定與 Marcos Senesi 碰撞犯規。儘管接觸極其輕微，VAR 仍維持原判。Kroupi 主罰一蹴而就，伯恩茅斯 2-0 領先。</p>
+
+<h4>水晶宮零射門的窘境</h4>
+
+<p>Oliver Glasner 的球隊儘管擁有 48% 的控球率，但全場竟交出了零次射門的尷尬數據。伯恩茅斯的高位壓迫讓水晶宮完全無法組織有效進攻。第 77 分鐘，替補上場的 David Brooks 助攻 Rayan 斜射入網，3-0 殺死比賽。</p>
+
+<h3>積分榜影響</h3>
+
+<ul>
+<li><strong>伯恩茅斯</strong>：聯賽 15 場不敗，躋身歐戰區域。Iraola 離開前（傳聞將執教其他球隊）為球隊留下最好的禮物。</li>
+<li><strong>水晶宮</strong>：中游穩定但缺乏上升動力，零射門的表現令人擔憂。</li>
+</ul>`,
+    tags: ['賽後回顧', '伯恩茅斯', '水晶宮', 'Kroupi', 'Rayan', 'Iraola', '第35輪']
+  },
+  {
+    id: 'epl-043',
+    title: '【賽後回顧】阿斯頓維拉 1-2 熱刺：Gallagher 遠射建功，熱刺奇蹟逃出降級區',
+    date: '2026-05-04',
+    category: '賽後深度回顧',
+    summary: 'Gallagher 25 碼遠射與 Richarlison 頭槌讓熱刺半場 2-0 領先，Buendía 補時扳回一球為時已晚。熱刺暫時脫離降級區。',
+    content: `<h2>阿斯頓維拉 1-2 熱刺｜第35輪・Villa Park</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">12' ⚽</td>
+<td style="padding:8px"><strong>Conor Gallagher（熱刺）</strong> — 定位球被清出後，Gallagher 約 25 碼外一腳低射直奔球門左下角入網</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">25' ⚽</td>
+<td style="padding:8px"><strong>Richarlison（熱刺）</strong> — Mathys Tel 右路傳中，Richarlison 後點頭槌力壓防守球員頂入遠角</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">90' ⚽</td>
+<td style="padding:8px"><strong>Emi Buendía（阿斯頓維拉）</strong> — Matty Cash 左腳傳中，Buendía 頭球頂入扳回一球，但為時已晚</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-2 ∣ 終場 1-2</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>De Zerbi 的保級決心</h4>
+
+<p>Roberto De Zerbi 的熱刺帶著保級的決心來到 Villa Park，從開場就展現出與近期低迷狀態截然不同的鬥志。第 12 分鐘，定位球被維拉防線清出後，Conor Gallagher 在 25 碼外不假思索一腳低射——皮球沿地面滾入球門左下角，Emiliano Martínez 鞭長莫及。</p>
+
+<p>第 25 分鐘，Mathys Tel 右路傳出精準低平球，Richarlison 在遠門柱力壓防守球員頭槌入網，熱刺半場結束前就建立起 2-0 的優勢。上半場熱刺佔據 64% 控球率，6 次射門全部來自客隊。</p>
+
+<h4>維拉的掙扎</h4>
+
+<p>Unai Emery 下半場換人調整試圖反撲，但熱刺的防線今天異常穩固，Micky van de Ven 的速度和覆蓋令維拉前鋒束手無策。直到第 90 分鐘，Matty Cash 傳中找到 Buendía 頭球扳回一城，但這只是顏面上的安慰分。</p>
+
+<h3>積分榜影響</h3>
+
+<ul>
+<li><strong>熱刺</strong>：本季第三度換帥後的 De Zerbi 終於交出關鍵勝場，熱刺暫時脫離降級區。但保級之路仍然凶險。</li>
+<li><strong>阿斯頓維拉</strong>：主場輸球令人失望，歐冠資格競爭承受壓力。Emery 的球隊近期狀態不佳，5 場僅 1 勝。</li>
+</ul>`,
+    tags: ['賽後回顧', '阿斯頓維拉', '熱刺', 'Gallagher', 'Richarlison', 'De Zerbi', '第35輪']
   }
 ];
 
