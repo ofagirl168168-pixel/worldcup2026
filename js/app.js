@@ -4025,13 +4025,15 @@ function adjustMyPred(side, delta) {
 }
 
 function saveMyPred(matchId) {
-  // 鎖定檢查：比賽已開始則拒絕
+  // 鎖定檢查：真的已開賽（live/finished/ended/started）或 kickoff 已過才鎖
+  // 修：之前用 `status !== 'scheduled'`，但 EPL/UCL 未開賽是 'upcoming' → 誤判為已開賽
   const match = _matches().find(m => m.id === matchId);
   if (match) {
     let ko = 0;
     if (_isClub() && match.date && match.time) ko = new Date(match.date+'T'+match.time+':00+08:00').getTime();
     else if (match.twDate && match.twTime) ko = new Date(match.twDate+'T'+match.twTime+':00+08:00').getTime();
-    const started = (match.status && match.status !== 'scheduled') || (ko > 0 && Date.now() >= ko);
+    const _STARTED = new Set(['live','finished','ended','started']);
+    const started = _STARTED.has(match.status) || (ko > 0 && Date.now() >= ko);
     if (started) {
       showToast?.('🔒 比賽已開始，無法修改預測');
       document.getElementById('my-pred-overlay')?.remove();
