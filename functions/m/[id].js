@@ -47,9 +47,17 @@ export async function onRequest(context) {
           ogTitle = `${m.home_name} vs ${m.away_name} | AI 預測 — Soccer麥迪`;
           ogDesc  = dt ? `${dt} 開賽 — 看 AI 預測比分、勝平負率、深度數據` : `看 AI 預測這場比賽的比分跟數據`;
         }
-        // 之後可改成 /og/m/<id>.png 客製縮圖；先 fallback 通用
       }
     }
+
+    // 客製 PNG 縮圖（scripts/build-match-og.js 預先產的）— 找不到就走預設
+    // 用 Content-Type image/* 防 Cloudflare Pages SPA fallback 200 回 index.html 的假陽性
+    try {
+      const head = await env.ASSETS.fetch(`${origin}/og/m/${id}.png`, { method: 'HEAD' });
+      if (head.ok && (head.headers.get('content-type') || '').startsWith('image/')) {
+        ogImage = `${origin}/og/m/${id}.png`;
+      }
+    } catch (e) { /* fallback 通用圖 */ }
   } catch (e) {
     // 拉不到 index 就走預設 OG，仍能正常顯示首頁
   }

@@ -34,6 +34,13 @@ jobs:
         # Supabase URL/key 走 script 內 fallback（publishable key、讀 RLS 開放）
         run: node scripts/build-room-og.js --skip-existing
 
+      - name: Build matches index + render match OG (skip-existing)
+        # data/matches-index.json 給 /m/<id> function 用
+        # og/m/<id>.png 給比賽分享連結客製縮圖（過去 7 天 + 未來 14 天）
+        run: |
+          node scripts/build-matches-index.js
+          node scripts/build-match-og.js
+
       - name: Mark stale live/locked rooms as ended
         # 沒人觀戰跑完 sim 的房會卡 status=live → 永遠不會被 settle 也不會從大廳消失
         # 先把 kickoff > 1h 的卡 live/locked 房強制設 ended（result 仍 null）
@@ -61,5 +68,5 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
-          git add og/r/
-          git diff --staged --quiet || (git commit -m "chore(og): auto-render new room OG images $(date -u '+%Y-%m-%d %H:%M UTC')" && git push)
+          git add og/r/ og/m/ data/matches-index.json
+          git diff --staged --quiet || (git commit -m "chore(og): auto-render OG images + matches-index $(date -u '+%Y-%m-%d %H:%M UTC')" && git push)
