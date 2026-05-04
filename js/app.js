@@ -2056,11 +2056,12 @@ async function shareUnlockPredModal(id) {
   const title = `${homeName} vs ${awayName} | AI 預測 — Soccer麥迪`;
   const text  = `來看 ${homeName} vs ${awayName} 的 AI 預測比分跟勝負率，準到嚇你 👀`;
 
-  // 蓋全螢幕「處理中」遮罩 — 防使用者透過分享面板邊緣看到底下模糊預測 → 取消分享白嫖
+  // 蓋遮罩 — 中央 (賽事視窗位置) 蓋實一點防偷看預測，外圍漸層半透明保留頁面感
   const blocker = document.createElement('div');
-  blocker.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.95);' +
+  blocker.style.cssText = 'position:fixed;inset:0;z-index:99999;' +
+    'background:radial-gradient(ellipse at center, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.92) 28%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.15) 100%);' +
     'display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;' +
-    'backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);font-family:inherit';
+    'font-family:inherit';
   blocker.innerHTML = `
     <div style="font-size:48px;margin-bottom:16px">📤</div>
     <div style="font-size:18px;font-weight:800;margin-bottom:8px">分享給朋友後自動解鎖</div>
