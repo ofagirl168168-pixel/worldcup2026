@@ -2104,7 +2104,7 @@ async function shareUnlockPredModal(id) {
       <div style="font-size:18px;font-weight:800;margin-bottom:8px;color:#fff">分享完成了嗎？</div>
       <div style="font-size:13px;color:rgba(255,255,255,0.6);text-align:center;max-width:320px;line-height:1.6;margin-bottom:24px">
         確認你已經把連結貼到 LINE / FB / IG 給朋友<br>
-        我們相信你，點下面就解鎖預測
+        點下方按鈕解鎖預測
       </div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
         <button id="_share_confirm_yes" style="padding:12px 24px;border-radius:10px;border:none;cursor:pointer;
