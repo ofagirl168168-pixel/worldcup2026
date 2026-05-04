@@ -2278,7 +2278,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <td style="padding:8px"><strong>Richarlison（熱刺）</strong> — Mathys Tel 右路傳中，Richarlison 後點頭槌力壓防守球員頂入遠角</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
-<td style="padding:8px;width:60px;white-space:nowrap">90' ⚽</td>
+<td style="padding:8px;width:60px;white-space:nowrap">90+6' ⚽</td>
 <td style="padding:8px"><strong>Emi Buendía（阿斯頓維拉）</strong> — Matty Cash 左腳傳中，Buendía 頭球頂入扳回一球，但為時已晚</td>
 </tr>
 <tr>
@@ -2296,7 +2296,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h4>維拉的掙扎</h4>
 
-<p>Unai Emery 下半場換人調整試圖反撲，但熱刺的防線今天異常穩固，Micky van de Ven 的速度和覆蓋令維拉前鋒束手無策。直到第 90 分鐘，Matty Cash 傳中找到 Buendía 頭球扳回一城，但這只是顏面上的安慰分。</p>
+<p>Unai Emery 下半場換人調整試圖反撲，但熱刺的防線今天異常穩固，Micky van de Ven 的速度和覆蓋令維拉前鋒束手無策。直到補時第 6 分鐘（90+6'），Matty Cash 傳中找到 Buendía 頭球扳回一城，但這只是顏面上的安慰分。</p>
 
 <h3>積分榜影響</h3>
 

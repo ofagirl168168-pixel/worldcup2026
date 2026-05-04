@@ -699,7 +699,7 @@ window.EPL_MATCHES = [
    goals:[
      {min:'12',player:'Conor Gallagher',side:'a'},
      {min:'25',player:'Richarlison',side:'a'},
-     {min:'90',player:'Emi Buendía',side:'h'}
+     {min:'90+6',player:'Emi Buendía',side:'h'}
    ]},
 
   // 伯恩茅斯 3-0 水晶宮 | 05/03 21:00 台灣時間 (05/03 14:00 BST)
