@@ -16,10 +16,11 @@
  *     "3": [...]
  *   }
  *
- * 時間分佈：
- *   - 從「24 小時前」到「現在 - 5 分鐘」之間隨機 + 加 jitter
- *   - 同個 side 的留言間隔 1-3 小時
- *   - 同時間有 < 0.1 機率衝撞（隨機 jitter ±15 min 防止同分鐘）
+ * 時間分佈（合理化）：
+ *   - 起點 = max(opinion_date 06:00, now-12h) — 不會早於題目上線當天
+ *   - 終點 = now - 5 min
+ *   - 等間距 + ±15 min jitter 自然分散
+ *   - 如果 opinion_date 是未來日期 → 中止（題目還沒上線就先 seed 沒意義）
  */
 
 'use strict';
@@ -84,10 +85,22 @@ function shuffle(arr) {
     process.exit(1);
   }
 
-  // 時間分佈：24 小時 - 5 分鐘，等間距 + ±15 min jitter
+  // 時間分佈：起點不能早於 opinion_date 06:00（TW 時間），不能晚於 now-5min
   const now = Date.now();
-  const earliest = now - 24 * 3600 * 1000;
+  // 從 opinion_id 抽日期（格式 op-YYYYMMDD-x）
+  const dateMatch = /^op-(\d{4})(\d{2})(\d{2})-/.exec(opinionId);
+  let opinionStartTs = now - 12 * 3600 * 1000; // fallback: 12h 前
+  if (dateMatch) {
+    // YYYY-MM-DD 06:00 +08:00（題目當天早上 6 點，使用者開始上線的時間）
+    const ymd = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+    opinionStartTs = new Date(`${ymd}T06:00:00+08:00`).getTime();
+  }
+  const earliest = Math.max(opinionStartTs, now - 12 * 3600 * 1000);
   const latest = now - 5 * 60 * 1000;
+  if (earliest >= latest) {
+    console.error(`opinion ${opinionId} 還沒上線（題目日期在未來或太晚）— 等到題目當天再跑 seed`);
+    process.exit(1);
+  }
   const slotMs = (latest - earliest) / all.length;
 
   const ordered = shuffle(all); // 打亂順序避免某 side 集中在同時段
