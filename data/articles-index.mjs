@@ -2,6 +2,26 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-044",
+    "tournament": "epl",
+    "title": "【賽後回顧】切爾西 1-3 諾丁漢森林：Awoniyi 梅開二度，藍軍六連敗創英超紀錄",
+    "summary": "Awoniyi 開場 2 分鐘破門、下半場再入一球，Igor Jesus 罰入十二碼，森林客場 3-1 大勝。切爾西遭遇英超時代最長六連敗，歐戰資格岌岌可危。",
+    "date": "2026-05-05",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-045",
+    "tournament": "epl",
+    "title": "【賽後回顧】愛華頓 3-3 曼城：Doku 第 97 分鐘絕平！曼城驚險搶分但爭冠主動權拱手讓出",
+    "summary": "曼城 1-0 領先後被愛華頓連灌三球，Haaland 和 Doku 在最後 7 分鐘連追兩球逼平。但這一平讓兵工廠在爭冠路上佔盡優勢。",
+    "date": "2026-05-05",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-041",
     "tournament": "epl",
     "title": "【賽後回顧】曼聯 3-2 利物浦：Mainoo 絕殺！紅魔逆轉雙紅會鎖定歐冠資格",

@@ -73,7 +73,7 @@ const EPL_TEAMS = {
     style:'極致控球，位置輪轉，高位壓迫',
     strengths:['Haaland進球效率恐怖','Guardiola戰術無人能及','板凳深度聯賽最強'],
     weaknesses:['Rodri傷癒後狀態仍在回升','夏季新援（Reijnders/Cherki）磨合中','後防傷兵影響輪替'],
-    recentForm:['L','W','W','W','W'],
+    recentForm:['D','L','W','W','W'],
     history:'9次英格蘭頂級聯賽冠軍，2022/23三冠王',
     injuries:[
       {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末可望回歸'},
@@ -275,7 +275,7 @@ const EPL_TEAMS = {
     style:'紀律防守，快速反擊，硬朗對抗',
     strengths:['Pereira接手後防守體系重整中','Gibbs-White近期狀態回暖','定位球戰術仍有威脅'],
     weaknesses:['創造力不足','過度依賴反擊','關鍵球員深度不夠'],
-    recentForm:['L','W','D','W','W'],
+    recentForm:['W','L','W','D','W'],
     history:'2次歐冠冠軍（1979、1980），英格蘭足球傳奇俱樂部',
     injuries:[
       {name:'Callum Hudson-Odoi',pos:'翼鋒',status:'大腿手術',returnDate:'賽季報銷'}
@@ -346,7 +346,7 @@ const EPL_TEAMS = {
     style:'硬朗防守，直接長球，定位球',
     strengths:['Moyes防守紀律嚴明','Pickford撲救穩定','團隊拼搏精神強'],
     weaknesses:['進攻火力嚴重不足','財政公平法限制引援','創造力匱乏'],
-    recentForm:['L','D','L','L','L'],
+    recentForm:['D','L','D','L','L'],
     history:'9次英格蘭頂級聯賽冠軍，利物浦同城宿敵'
   },
 
@@ -758,11 +758,27 @@ window.EPL_MATCHES = [
      {min:'77',player:'Kobbie Mainoo',side:'h'}
    ]},
 
-  // 切爾西 vs 諾丁漢森林 | 05/04 23:00 台灣時間 (05/04 16:00 BST)
-  {id:'EPL-MW35-CHE-NFO', matchday:35, date:'2026-05-04', time:'23:00', home:'CHE', away:'NFO', stage:'league', status:'upcoming'},
+  // 切爾西 1-3 諾丁漢森林 | 05/04 23:00 台灣時間 (05/04 16:00 BST)
+  {id:'EPL-MW35-CHE-NFO', matchday:35, date:'2026-05-04', time:'23:00', home:'CHE', away:'NFO', stage:'league',
+   status:'finished', score:{h:1,a:3}, halfTime:{h:0,a:2},
+   goals:[
+     {min:'2',player:'Taiwo Awoniyi',side:'a'},
+     {min:'15',player:'Igor Jesus',side:'a',type:'pen'},
+     {min:'52',player:'Taiwo Awoniyi',side:'a'},
+     {min:'90',player:'João Pedro',side:'h'}
+   ]},
 
-  // 愛華頓 vs 曼城 | 05/05 04:00 台灣時間 (05/04 21:00 BST)
-  {id:'EPL-MW35-EVE-MCI', matchday:35, date:'2026-05-05', time:'04:00', home:'EVE', away:'MCI', stage:'league', status:'upcoming'},
+  // 愛華頓 3-3 曼城 | 05/05 04:00 台灣時間 (05/04 21:00 BST)
+  {id:'EPL-MW35-EVE-MCI', matchday:35, date:'2026-05-05', time:'04:00', home:'EVE', away:'MCI', stage:'league',
+   status:'finished', score:{h:3,a:3}, halfTime:{h:0,a:1},
+   goals:[
+     {min:'43',player:'Jérémy Doku',side:'a'},
+     {min:'68',player:'Thierno Barry',side:'h'},
+     {min:'73',player:'Thierno Barry',side:'h'},
+     {min:'78',player:'Jake O\'Brien',side:'h'},
+     {min:'83',player:'Erling Haaland',side:'a'},
+     {min:'90+7',player:'Jérémy Doku',side:'a'}
+   ]},
 
   // ===== 第 36 輪 (2026-05-09 ~ 05-11 台灣時間) =====
 

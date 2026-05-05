@@ -2305,6 +2305,117 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <li><strong>阿斯頓維拉</strong>：主場輸球令人失望，歐冠資格競爭承受壓力。Emery 的球隊近期狀態不佳，5 場僅 1 勝。</li>
 </ul>`,
     tags: ['賽後回顧', '阿斯頓維拉', '熱刺', 'Gallagher', 'Richarlison', 'De Zerbi', '第35輪']
+  },
+  {
+    id: 'epl-044',
+    title: '【賽後回顧】切爾西 1-3 諾丁漢森林：Awoniyi 梅開二度，藍軍六連敗創英超紀錄',
+    date: '2026-05-05',
+    category: '賽後深度回顧',
+    summary: 'Awoniyi 開場 2 分鐘破門、下半場再入一球，Igor Jesus 罰入十二碼，森林客場 3-1 大勝。切爾西遭遇英超時代最長六連敗，歐戰資格岌岌可危。',
+    content: `<h2>切爾西 1-3 諾丁漢森林｜第35輪・史丹佛橋</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">2' ⚽</td>
+<td style="padding:8px"><strong>Taiwo Awoniyi（森林）</strong> — Dilane Bakwa 右路傳中，Awoniyi 後門柱頭球頂入，開場不到 2 分鐘先拔頭籌</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">15' ⚽</td>
+<td style="padding:8px"><strong>Igor Jesus（森林）</strong> — Malo Gusto 禁區內拉扯 Awoniyi 球衣犯規被吹十二碼（Gusto 吃到黃牌），Igor Jesus 主罰命中</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">52' ⚽</td>
+<td style="padding:8px"><strong>Taiwo Awoniyi（森林）</strong> — Morgan Gibbs-White 中路直塞，Awoniyi 近距離推射完成梅開二度</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">90+3' ⚽</td>
+<td style="padding:8px"><strong>João Pedro（切爾西）</strong> — 補時階段一記精彩的倒掛金鉤破門，但僅是安慰分</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-2 ∣ 終場 1-3</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>森林從開場就掌控節奏</h4>
+
+<p>諾丁漢森林從第一分鐘就展現出截然不同的精神面貌。開場僅 98 秒，Bakwa 右路傳中找到後門柱的 Awoniyi，尼日利亞前鋒頭球破門，讓史丹佛橋瞬間鴉雀無聲。第 15 分鐘 Gusto 禁區內拉人犯規送出十二碼，Igor Jesus 一蹴而就——半場結束前切爾西就已 0-2 落後。</p>
+
+<p>上半場切爾西唯一的亮點是 Cole Palmer 主罰十二碼，但被門將 Matz Sels 撲出，藍軍在主場的無力感一覽無遺。</p>
+
+<h4>Awoniyi 封殺懸念</h4>
+
+<p>下半場僅 7 分鐘，Gibbs-White 精準直塞撕開切爾西防線，Awoniyi 近距離推射完成梅開二度，比分變成 0-3。比賽在此刻已失去懸念。直到補時階段 João Pedro 一記漂亮的倒掛金鉤破門，才為切爾西挽回些許顏面——這是他本季第 20 球。</p>
+
+<h3>積分榜影響</h3>
+
+<ul>
+<li><strong>切爾西</strong>：英超六連敗追平隊史英超時代最差紀錄，歐戰資格前景堪憂。球迷已對本季表現極度失望。</li>
+<li><strong>諾丁漢森林</strong>：升至 42 分，領先降級區 6 分，保級形勢大為改善。Awoniyi 在關鍵時刻找回射門靴，森林最後三輪只需穩住就能確保英超席位。</li>
+</ul>`,
+    tags: ['賽後回顧', '切爾西', '諾丁漢森林', 'Awoniyi', 'Igor Jesus', 'João Pedro', 'Palmer', '第35輪']
+  },
+  {
+    id: 'epl-045',
+    title: '【賽後回顧】愛華頓 3-3 曼城：Doku 第 97 分鐘絕平！曼城驚險搶分但爭冠主動權拱手讓出',
+    date: '2026-05-05',
+    category: '賽後深度回顧',
+    summary: '曼城 1-0 領先後被愛華頓連灌三球，Haaland 和 Doku 在最後 7 分鐘連追兩球逼平。但這一平讓兵工廠在爭冠路上佔盡優勢。',
+    content: `<h2>愛華頓 3-3 曼城｜第35輪・Hill Dickinson Stadium</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">43' ⚽</td>
+<td style="padding:8px"><strong>Jérémy Doku（曼城）</strong> — 比利時邊鋒切入後一腳勁射破門，曼城半場領先</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">68' ⚽</td>
+<td style="padding:8px"><strong>Thierno Barry（愛華頓）</strong> — 替補上場的幾內亞前鋒首球，扳成 1-1</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">73' ⚽</td>
+<td style="padding:8px"><strong>Thierno Barry（愛華頓）</strong> — 5 分鐘內梅開二度，愛華頓反超比分至 2-1</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">78' ⚽</td>
+<td style="padding:8px"><strong>Jake O'Brien（愛華頓）</strong> — James Garner 角球開出，O'Brien 後門柱頭球頂入，3-1！</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">83' ⚽</td>
+<td style="padding:8px"><strong>Erling Haaland（曼城）</strong> — 挪威巨人在禁區內冷靜推射扳回一球，3-2</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">90+7' ⚽</td>
+<td style="padding:8px"><strong>Jérémy Doku（曼城）</strong> — 第 97 分鐘！Doku 完成梅開二度，禁區內搶點射入絕平球！曼城奇蹟搶下 1 分</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-1 ∣ 終場 3-3</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>從控制到崩盤</h4>
+
+<p>曼城帶著 75% 的控球率進入下半場，Doku 的進球看似讓 Guardiola 的球隊穩穩掌控比賽。但 David Moyes 的換人調度改變了一切——替補登場的 Thierno Barry 在 68 分鐘和 73 分鐘連入兩球，5 分鐘內將比分從 0-1 翻轉為 2-1。第 78 分鐘 O'Brien 角球頭球再入一球，曼城在 10 分鐘內從 1-0 領先變成 1-3 落後，令人難以置信。</p>
+
+<h4>Guardiola 的絕地反擊</h4>
+
+<p>面對 1-3 的絕境，曼城展現了冠軍級別的韌性。第 83 分鐘 Haaland 在禁區內推射入網扳回一球。此後曼城瘋狂進攻，終於在第 97 分鐘由 Doku 完成梅開二度，禁區內搶點射入——3-3！Hill Dickinson Stadium 從天堂跌入地獄，曼城球員瘋狂慶祝，但 Guardiola 賽後表情凝重，因為這 2 分的丟失可能是致命的。</p>
+
+<h3>積分榜影響</h3>
+
+<ul>
+<li><strong>曼城</strong>：71 分暫居第 2，落後兵工廠 5 分。以曼城的剩餘賽程來看，爭冠主動權已不在自己手上——即使全勝，也需要兵工廠在最後 3 輪犯錯。</li>
+<li><strong>愛華頓</strong>：替補 Barry 的梅開二度幾乎為太妃糖寫下傳奇一頁，但 Doku 的絕平球讓這場比賽只拿到 1 分。在保級戰中，這 2 分的差距可能決定命運。</li>
+<li><strong>兵工廠</strong>：今晚最大贏家。76 分高居榜首，手握 5 分領先優勢，爭冠形勢一片大好。</li>
+</ul>`,
+    tags: ['賽後回顧', '愛華頓', '曼城', 'Doku', 'Haaland', 'Barry', 'O\'Brien', '第35輪', '爭冠']
   }
 ];
 
