@@ -17,7 +17,7 @@
  *   }
  *
  * 時間分佈（合理化）：
- *   - 起點 = max(opinion_date 06:00, now-12h) — 不會早於題目上線當天
+ *   - 起點 = opinion_date 00:00 TW（題目當日午夜上線時間，網站 getTodayOpinion 也是午夜換題）
  *   - 終點 = now - 5 min
  *   - 等間距 + ±15 min jitter 自然分散
  *   - 如果 opinion_date 是未來日期 → 中止（題目還沒上線就先 seed 沒意義）
@@ -85,20 +85,19 @@ function shuffle(arr) {
     process.exit(1);
   }
 
-  // 時間分佈：起點不能早於 opinion_date 06:00（TW 時間），不能晚於 now-5min
+  // 時間分佈：起點 = opinion_date 00:00 TW（題目當日午夜上線），終點 = now-5min
   const now = Date.now();
-  // 從 opinion_id 抽日期（格式 op-YYYYMMDD-x）
   const dateMatch = /^op-(\d{4})(\d{2})(\d{2})-/.exec(opinionId);
-  let opinionStartTs = now - 12 * 3600 * 1000; // fallback: 12h 前
+  let earliest;
   if (dateMatch) {
-    // YYYY-MM-DD 06:00 +08:00（題目當天早上 6 點，使用者開始上線的時間）
     const ymd = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
-    opinionStartTs = new Date(`${ymd}T06:00:00+08:00`).getTime();
+    earliest = new Date(`${ymd}T00:00:00+08:00`).getTime();
+  } else {
+    earliest = now - 12 * 3600 * 1000; // 沒帶日期就用 12h 前 fallback
   }
-  const earliest = Math.max(opinionStartTs, now - 12 * 3600 * 1000);
   const latest = now - 5 * 60 * 1000;
   if (earliest >= latest) {
-    console.error(`opinion ${opinionId} 還沒上線（題目日期在未來或太晚）— 等到題目當天再跑 seed`);
+    console.error(`opinion ${opinionId} 還沒上線（題目日期在未來）— 等到題目當天 00:00 後再跑 seed`);
     process.exit(1);
   }
   const slotMs = (latest - earliest) / all.length;
