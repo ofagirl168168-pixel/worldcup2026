@@ -30,9 +30,17 @@ export async function onRequestGet(context) {
       }), { status: 502, headers });
     }
 
+    // football-data.org 用的是球員護照中段名，跟媒體 / 球迷慣稱不一定一樣 → 必要時對照
+    // 例：Igor Thiago Brentford 在 API 顯示 "Thiago Rodrigues"，但球迷認的是「Igor Thiago」
+    const NAME_OVERRIDES = {
+      'Thiago Rodrigues': 'Igor Thiago',
+    };
+
     const data = await res.json();
-    const scorers = (data.scorers || []).map(s => ({
-      name: s.player?.name || '?',
+    const scorers = (data.scorers || []).map(s => {
+      const apiName = s.player?.name || '?';
+      return {
+      name: NAME_OVERRIDES[apiName] || apiName,
       team: s.team?.shortName || s.team?.name || '?',
       teamCrest: s.team?.crest || null,
       nationality: s.player?.nationality || null,
@@ -40,7 +48,8 @@ export async function onRequestGet(context) {
       assists: s.assists ?? 0,
       penalties: s.penalties ?? 0,
       playedMatches: s.playedMatches ?? 0,
-    }));
+      };
+    });
 
     const topScorers = [...scorers].sort((a, b) => b.goals - a.goals || b.assists - a.assists);
     const topAssists = [...scorers].filter(s => s.assists > 0).sort((a, b) => b.assists - a.assists || b.goals - a.goals);
