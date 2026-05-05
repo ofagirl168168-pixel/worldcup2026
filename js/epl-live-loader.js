@@ -154,6 +154,11 @@
 
   // ── 頁面載入後執行 ──
   function init() {
+    // 清掉前次 session 留下的 stale cache（可能存的是還沒開賽的版本）→ 強制初次抓 API
+    try {
+      localStorage.removeItem(CACHE_KEY);
+      localStorage.removeItem(STANDINGS_CACHE_KEY);
+    } catch (e) {}
     // 延遲 1.5 秒讓靜態資料先渲染
     setTimeout(() => {
       loadLiveData();

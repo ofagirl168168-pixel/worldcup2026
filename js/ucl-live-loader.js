@@ -162,11 +162,16 @@
   }
 
   // ── 頁面載入後執行 ──
-  // 延遲 1 秒，讓靜態資料先渲染完
+  // 清掉前次 session 留下的 stale cache（可能存的是還沒開賽的版本）→ 強制初次抓 API
+  // 之前 bug：cache 內 status='scheduled'，loader 不會升 live；polling 又要等 5 分鐘 → 使用者完全看不到比分
+  function _initialLoad() {
+    try { localStorage.removeItem(CACHE_KEY); } catch (e) {}
+    loadLiveData();
+  }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(loadLiveData, 1000));
+    document.addEventListener('DOMContentLoaded', () => setTimeout(_initialLoad, 1000));
   } else {
-    setTimeout(loadLiveData, 1000);
+    setTimeout(_initialLoad, 1000);
   }
 
   // ── 自動輪詢：有進行中比賽 60 秒、有 8h 內即將開賽的場 2 分鐘、其他 5 分鐘 ──
