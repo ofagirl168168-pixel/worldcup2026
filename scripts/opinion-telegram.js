@@ -309,6 +309,24 @@ async function main() {
         console.log(`✅ 你選了：${chosen.q}${chosen._eternal ? `（永恆題 → 指派為 ${targetDate}）` : ''}`);
         const filePath = appendToDataFile(toWrite);
 
+        // 自動 seed 留言：候選題 JSON 若帶 seed_comments → 寫到 tmp file 跑 seeder
+        // toWrite.id = 真實寫入 DB 的 opinion_id（永恆題會改 id）
+        if (chosen.seed_comments && typeof chosen.seed_comments === 'object') {
+          try {
+            const tmpJson = path.join(REPO_ROOT, 'scripts', `seed-comments-${targetDate.replace(/-/g, '')}.json`);
+            fs.writeFileSync(tmpJson, JSON.stringify(chosen.seed_comments, null, 2));
+            console.log(`📝 寫 seed comments JSON → ${path.relative(REPO_ROOT, tmpJson)}`);
+            const seederResult = execFileSync(
+              process.execPath,
+              [path.join(REPO_ROOT, 'scripts', 'seed-arena-comments.js'), toWrite.id, tmpJson],
+              { encoding: 'utf-8', cwd: REPO_ROOT }
+            );
+            console.log(seederResult);
+          } catch (seedErr) {
+            console.warn(`⚠️ seed 留言失敗（不影響題目發佈）：${seedErr.message}`);
+          }
+        }
+
         // 先關掉其他訊息的按鈕，再把被選中的訊息改成已確認
         for (const mid of sentMessages) {
           if (mid === cb.message.message_id) continue;
