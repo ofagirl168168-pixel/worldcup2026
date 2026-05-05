@@ -925,7 +925,7 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 </tr>
 <tr>
 <td style="padding:8px"><strong>拜仁 vs 巴黎</strong></td>
-<td style="padding:8px">拜仁 2-1 巴黎（總比分 6-6，PSG 客場進球規則晉級）。安聯球場魔咒延續、Kane 取分，但 PSG 的反擊一次就足夠。傷兵雖多，巴黎陣容深度仍能撐住一場 90 分鐘對決。</td>
+<td style="padding:8px">拜仁 2-1 巴黎（總比分 6-6 拖入加時 → PK 大戰，本站偏向 PSG 撐到底晉級）。安聯魔咒讓拜仁主場拿下 90 分鐘，但 PSG 的反擊一次就夠拉到平手；UEFA 2021/22 起廢除客場進球規則，平手 → 30 分鐘加時 → 12 碼 PK。</td>
 </tr>
 </table>
 
