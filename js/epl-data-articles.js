@@ -2308,7 +2308,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
   },
   {
     id: 'epl-044',
-    title: '【賽後回顧】切爾西 1-3 諾丁漢森林：Awoniyi 梅開二度，藍軍六連敗創英超紀錄',
+    title: '【賽後回顧】切爾西 1-3 諾丁漢森林：Awoniyi 梅開二度，藍軍六連敗追平英超紀錄',
     date: '2026-05-05',
     category: '賽後深度回顧',
     summary: 'Awoniyi 開場 2 分鐘破門、下半場再入一球，Igor Jesus 罰入十二碼，森林客場 3-1 大勝。切爾西遭遇英超時代最長六連敗，歐戰資格岌岌可危。',
@@ -2379,11 +2379,11 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px;width:60px;white-space:nowrap">73' ⚽</td>
-<td style="padding:8px"><strong>Thierno Barry（愛華頓）</strong> — 5 分鐘內梅開二度，愛華頓反超比分至 2-1</td>
+<td style="padding:8px"><strong>Jake O'Brien（愛華頓）</strong> — James Garner 角球開出，O'Brien 後門柱頭球頂入，愛華頓反超 2-1！</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
-<td style="padding:8px;width:60px;white-space:nowrap">78' ⚽</td>
-<td style="padding:8px"><strong>Jake O'Brien（愛華頓）</strong> — James Garner 角球開出，O'Brien 後門柱頭球頂入，3-1！</td>
+<td style="padding:8px;width:60px;white-space:nowrap">81' ⚽</td>
+<td style="padding:8px"><strong>Thierno Barry（愛華頓）</strong> — 梅開二度！Barry 再下一城，3-1！</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px;width:60px;white-space:nowrap">83' ⚽</td>
@@ -2402,7 +2402,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h4>從控制到崩盤</h4>
 
-<p>曼城帶著 75% 的控球率進入下半場，Doku 的進球看似讓 Guardiola 的球隊穩穩掌控比賽。但 David Moyes 的換人調度改變了一切——替補登場的 Thierno Barry 在 68 分鐘和 73 分鐘連入兩球，5 分鐘內將比分從 0-1 翻轉為 2-1。第 78 分鐘 O'Brien 角球頭球再入一球，曼城在 10 分鐘內從 1-0 領先變成 1-3 落後，令人難以置信。</p>
+<p>曼城帶著 75% 的控球率進入下半場，Doku 的進球看似讓 Guardiola 的球隊穩穩掌控比賽。但 David Moyes 的換人調度改變了一切——替補登場的 Thierno Barry 在 68 分鐘扳平比分，第 73 分鐘 O'Brien 角球頭球反超，第 81 分鐘 Barry 梅開二度再下一城——曼城在 13 分鐘內從 1-0 領先變成 1-3 落後，令人難以置信。</p>
 
 <h4>Guardiola 的絕地反擊</h4>
 

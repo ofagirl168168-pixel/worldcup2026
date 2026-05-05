@@ -774,8 +774,8 @@ window.EPL_MATCHES = [
    goals:[
      {min:'43',player:'Jérémy Doku',side:'a'},
      {min:'68',player:'Thierno Barry',side:'h'},
-     {min:'73',player:'Thierno Barry',side:'h'},
-     {min:'78',player:'Jake O\'Brien',side:'h'},
+     {min:'73',player:'Jake O\'Brien',side:'h'},
+     {min:'81',player:'Thierno Barry',side:'h'},
      {min:'83',player:'Erling Haaland',side:'a'},
      {min:'90+7',player:'Jérémy Doku',side:'a'}
    ]},

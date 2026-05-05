@@ -4,7 +4,7 @@ export default [
   {
     "id": "epl-044",
     "tournament": "epl",
-    "title": "【賽後回顧】切爾西 1-3 諾丁漢森林：Awoniyi 梅開二度，藍軍六連敗創英超紀錄",
+    "title": "【賽後回顧】切爾西 1-3 諾丁漢森林：Awoniyi 梅開二度，藍軍六連敗追平英超紀錄",
     "summary": "Awoniyi 開場 2 分鐘破門、下半場再入一球，Igor Jesus 罰入十二碼，森林客場 3-1 大勝。切爾西遭遇英超時代最長六連敗，歐戰資格岌岌可危。",
     "date": "2026-05-05",
     "category": "賽後深度回顧",
