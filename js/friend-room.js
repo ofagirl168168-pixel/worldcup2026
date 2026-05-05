@@ -728,7 +728,7 @@
         <p class="fr-modal-sub">邀請連結已複製到剪貼簿</p>
         <div class="fr-invite-link">${url}</div>
         <div class="fr-form-actions">
-          <button type="button" class="fr-btn fr-btn--submit" id="fr-invite-ok">好</button>
+          <button type="button" class="fr-btn fr-btn--submit" id="fr-invite-ok">進入房間</button>
         </div>
       </div>
     `;
@@ -738,9 +738,16 @@
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 250);
     };
-    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
-    overlay.querySelector('.fr-modal-close').addEventListener('click', close);
-    overlay.querySelector('#fr-invite-ok').addEventListener('click', close);
+    // 按「進入房間」/ X / 點外面 → 關 invite modal 後自動 joinRoom 進房（房主停在房內看倒數、聊天，不會被丟回大廳）
+    const closeAndEnter = () => {
+      close();
+      setTimeout(() => {
+        try { joinRoom(roomCode); } catch (e) {}
+      }, 280);
+    };
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeAndEnter(); });
+    overlay.querySelector('.fr-modal-close').addEventListener('click', closeAndEnter);
+    overlay.querySelector('#fr-invite-ok').addEventListener('click', closeAndEnter);
   }
 
   // ── 進房間 + 猜比分 ─────────────────────────────────────
