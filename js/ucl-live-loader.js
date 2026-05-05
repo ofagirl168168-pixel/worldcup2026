@@ -169,21 +169,29 @@
     setTimeout(loadLiveData, 1000);
   }
 
-  // ── 自動輪詢：有進行中比賽 60 秒，否則 2 分鐘 ──
+  // ── 自動輪詢：有進行中比賽 60 秒、有 8h 內即將開賽的場 2 分鐘、其他 5 分鐘 ──
+  // 之前 bug：若初次 fetch 時 hasLive=false 就鎖定 hasLive，setInterval 檢查 stillLive||hasLive 永遠 false → 永遠不再 fetch
+  // → 開賽前打開頁面的使用者，到開賽時間後比分永遠不會更新
+  // 修：polling 永遠 fetch，間隔依當下狀況決定（live=60s / 即將開賽=2 min / 平時=5 min）
   let pollTimer = null;
   function startPolling() {
-    const hasLive = window.UCL_MATCHES?.some(m => m.status === 'live');
-    const interval = hasLive ? 60 * 1000 : 2 * 60 * 1000;
+    const matches = window.UCL_MATCHES || [];
+    const now = Date.now();
+    const hasLive = matches.some(m => m.status === 'live');
+    const hasUpcomingSoon = matches.some(m => {
+      if (m.status !== 'scheduled' || !m.date || !m.time) return false;
+      const ts = new Date(`${m.date}T${m.time}:00+08:00`).getTime();
+      return ts - now > 0 && ts - now < 8 * 3600 * 1000; // 8h 內
+    });
+    const interval = hasLive ? 60 * 1000
+                   : hasUpcomingSoon ? 2 * 60 * 1000
+                   : 5 * 60 * 1000;
     if (pollTimer) clearInterval(pollTimer);
     pollTimer = setInterval(() => {
-      const stillLive = window.UCL_MATCHES?.some(m => m.status === 'live');
-      if (stillLive || hasLive) {
-        localStorage.removeItem(CACHE_KEY);
-        loadLiveData().then(startPolling); // 重新調整間隔
-      }
+      localStorage.removeItem(CACHE_KEY);
+      loadLiveData().then(startPolling); // 取完依新狀態調整下一輪間隔
     }, interval);
   }
-  // 初始啟動輪詢
   setTimeout(startPolling, 3000);
 
   // 導出供手動呼叫
