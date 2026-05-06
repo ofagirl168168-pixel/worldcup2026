@@ -972,7 +972,7 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 
 <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
 <tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">數據</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">兵工廠</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">馬競</th></tr>
-<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">控球率</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">53%</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">47%</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">控球率</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">72.5%</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">27.5%</td></tr>
 <tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射門</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">11</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">9</td></tr>
 <tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射正</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2</td></tr>
 <tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">角球</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">6</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">3</td></tr>
@@ -984,11 +984,11 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 
 <h4>Saka：大賽球員的蛻變</h4>
 
-<p>從首回合替補上場 30 分鐘，到次回合先發並打進致勝球——Saka 的傷癒歸來時間點堪稱完美。這位 24 歲的英格蘭國腳本季歐冠已有 5 球 3 助攻，證明自己絕對是世界級的大賽球員。整場比賽他不僅奉獻了進球，右路的突破與牽制也讓馬競左後衛疲於奔命。</p>
+<p>從首回合替補上場 30 分鐘，到次回合先發並打進致勝球——Saka 的傷癒歸來時間點堪稱完美。這位 24 歲的英格蘭國腳本季歐冠已有 3 球 2 助攻，證明自己絕對是世界級的大賽球員。整場比賽他不僅奉獻了進球，右路的突破與牽制也讓馬競左後衛疲於奔命。</p>
 
 <h4>Arteta 的戰術勝利</h4>
 
-<p>面對 Simeone 這位淘汰賽大師，Arteta 選擇了最務實的策略——控制節奏、減少冒險、等待對手犯錯。兵工廠全場僅 2 次射正就拿下比賽，效率驚人。後防 Saliba + Gabriel 的組合幾乎封鎖了 Álvarez 所有威脅，Declan Rice 則是中場的定海神針。</p>
+<p>面對 Simeone 這位淘汰賽大師，Arteta 選擇了全面壓制的策略——72.5% 的控球率讓馬競幾乎拿不到球。兵工廠全場僅 2 次射正就拿下比賽，但這反映的不是缺乏機會，而是馬競龜縮式防守的密度。後防 Saliba + Gabriel 的組合幾乎封鎖了 Álvarez 所有威脅，Declan Rice 則是中場的定海神針。</p>
 
 <h4>Simeone 的遺憾</h4>
 
