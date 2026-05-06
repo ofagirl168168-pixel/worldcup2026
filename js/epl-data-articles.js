@@ -2417,6 +2417,74 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 </ul>`,
     tags: ['賽後回顧', '愛華頓', '曼城', 'Doku', 'Haaland', 'Barry', 'O\'Brien', '第35輪', '爭冠']
   }
+  ,
+  {
+    id: 'epl-046',
+    title: '【賽前分析】利物浦 vs 切爾西：安菲爾德的歐冠資格生死戰',
+    date: '2026-05-06',
+    category: '賽前深度分析',
+    summary: '第36輪焦點戰——利物浦主場迎戰切爾西，兩隊都在為歐冠資格拚命。紅軍傷兵滿營但主場氣勢強勁，藍軍近6戰輸5場跌入泥淖。安菲爾德之夜，誰能搶下關鍵3分？',
+    content: `<h2>利物浦 vs 切爾西｜英超第36輪・5/9（六）19:30 台灣時間・安菲爾德</h2>
+
+<h3>對戰背景</h3>
+
+<p>這場比賽的意義不僅是傳統強強對話——更是一場歐冠資格��生死對決。利物浦目前在積分榜上僅領先切爾西數分，兩隊都在為下賽季的歐冠門票殊死搏鬥。上輪利物浦在老特拉福德 2-3 不敵曼聯、切爾西則 1-3 慘敗於諾丁漢森林，兩支豪門都迫切需要一場勝利來止血。</p>
+
+<h3>利物浦：傷兵滿營的考驗</h3>
+
+<h4>傷兵清單</h4>
+<ul>
+<li><strong>Alisson</strong>：3月18日起因腿後肌問題缺陣，Slot 表示有望本場復出</li>
+<li><strong>Alexander Isak</strong>：訓練中輕傷，被形容為「非常小」的問題，預計可趕上本場</li>
+<li><strong>Mohamed Salah</strong>：對水晶宮時肌肉輕傷，缺席了曼聯之戰，能否上陣仍待評估</li>
+<li><strong>長期傷兵</strong>：Conor Bradley、Wataru Endo、Giovanni Leoni 本季報銷</li>
+</ul>
+
+<h4>利物浦主場優勢</h4>
+
+<p>即使本季利物浦整體表現不如前兩季，安菲爾德的主場魔力依然強大。Arne Slot 的球隊在主場的勝率明顯高於客場，本場若能找回陣腳，主場球迷的支持將是巨大的第六人。Ekitike 在 Isak/Salah 缺陣時能否扛起鋒線重任將是關鍵。</p>
+
+<h3>切爾西：近況令人擔憂</h3>
+
+<h4>六戰五敗的泥沼</h4>
+
+<p>切爾西近 6 場各項賽事輸了 5 場，信心跌入谷底。藍軍的問題出在防守端——失球數在這段時間急劇上升，後防線的組織性嚴重下滑。教練 Maresca 面臨著執教生涯最嚴峻的危機。</p>
+
+<h4>關鍵球員</h4>
+
+<p>Cole Palmer 依然是切爾西最具威脅的進攻武器，但他需要隊友的支援。Nicolas Jackson 的狀態起伏不定，能否在安菲爾德找到進球感覺是一大疑問。</p>
+
+<h3>歷史交鋒</h3>
+
+<p>利物浦在安菲爾德對切爾西的近況佔優，但本季首回合切爾西曾在斯坦福橋取得勝利。兩隊本季的碰面總是火花四濺，本場也不例外。</p>
+
+<h3>本站預測</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr>
+<td style="padding:8px"><strong>預測比分</strong></td>
+<td style="padding:8px">利物浦 2-0 切爾西。切爾西近期的低迷狀態難以在安菲爾德扭轉，利物浦即使傷兵眾多，主場的整體實力仍佔上風。紅軍的高壓逼搶會讓切爾西脆弱的後防線喘不過氣。</td>
+</tr>
+</table>
+
+<h3>第36輪其他焦點</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px"><strong>桑德蘭 vs 曼聯</strong></td>
+<td style="padding:8px">紅魔客場挑戰升班馬桑德蘭，上輪 3-2 勝利物浦士氣正旺，曼聯已確認回歸歐冠</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px"><strong>曼城 vs 布倫特福德</strong></td>
+<td style="padding:8px">Guardiola 的球隊需要全勝追趕兵工廠，對手布倫特福德不容小覷</td>
+</tr>
+<tr>
+<td style="padding:8px"><strong>水晶宮 vs 愛華頓</strong></td>
+<td style="padding:8px">兩支保級邊緣球隊的直接對話，輸者可能直接墜入降級區</td>
+</tr>
+</table>`,
+    tags: ['賽前分析', '利物浦', '切爾西', '歐冠資格', '第36輪', 'Salah', 'Palmer', 'Slot', 'Maresca']
+  }
 ];
 
 window.EPL_ARTICLES = EPL_ARTICLES;

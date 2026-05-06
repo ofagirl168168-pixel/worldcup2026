@@ -2,6 +2,26 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-046",
+    "tournament": "epl",
+    "title": "【賽前分析】利物浦 vs 切爾西：安菲爾德的歐冠資格生死戰",
+    "summary": "第36輪焦點戰——利物浦主場迎戰切爾西，兩隊都在為歐冠資格拚命。紅軍傷兵滿營但主場氣勢強勁，藍軍近6戰輸5場跌入泥淖。安菲爾德之夜，誰能搶下關鍵3分？",
+    "date": "2026-05-06",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "ucl-022",
+    "tournament": "ucl",
+    "title": "【四強戰報】兵工廠 1-0 馬競：Saka 絕殺！槍手 20 年後重返歐冠決賽",
+    "summary": "Bukayo Saka 在第 44 分鐘的門前補射成為歷史性一球——兵工廠以總比分 2-1 淘汰馬德里競技，隊史第二次、也是 2006 年以來首度晉級歐冠決賽。5 月 30 日布達佩斯，Arteta 的球隊將挑戰歐洲之巔。",
+    "date": "2026-05-06",
+    "category": "賽後回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-044",
     "tournament": "epl",
     "title": "【賽後回顧】切爾西 1-3 諾丁漢森林：Awoniyi 梅開二度，藍軍六連敗追平英超紀錄",
@@ -139,7 +159,7 @@ export default [
     "date": "2026-04-28",
     "category": "社群觀察",
     "readTime": "5分鐘",
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-035",
@@ -149,7 +169,7 @@ export default [
     "date": "2026-04-28",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-033",

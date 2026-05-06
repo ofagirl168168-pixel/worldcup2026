@@ -934,6 +934,71 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 <p>本屆歐冠決賽 5/30 比賽（台灣時間 5/31 00:00）在布達佩斯普斯卡什球場舉行。從目前形勢看：兵工廠晉級的機率最高，PSG 緊追在後；馬競與拜仁則需要靠主場奇蹟。無論誰晉級，這都將是一場全歐洲足球熱潮級別的對決。</p>`,
     tags: ['賽前分析', '半決賽', '次回合', '兵工廠', '馬競', '拜仁', '巴黎', 'Saka', 'Álvarez', 'Kane', 'Dembélé', 'Hakimi', 'Chevalier', 'Safonov']
   }
+  ,
+  {
+    id: 'ucl-022',
+    title: '【四強戰報】兵工廠 1-0 馬競：Saka 絕殺！槍手 20 年後重返歐冠決賽',
+    date: '2026-05-06',
+    category: '賽後回顧',
+    summary: 'Bukayo Saka 在第 44 分鐘的門前補射成為歷史性一球——兵工廠以總比分 2-1 淘汰馬德里競技，隊史第二次、也是 2006 年以來首度晉級歐冠決賽。5 月 30 日布達佩斯，Arteta 的球隊將挑戰歐洲之巔。',
+    content: `<h2>兵工廠 1-0 馬德里競技｜歐冠四強次回合・5/6（二）03:00 台灣時間</h2>
+<p><strong>總比分 2-1，兵工廠晉級決賽</strong> ｜ 酋長球場 ｜ 觀眾：60,704</p>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">時間</th><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">進球者</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">比分</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">總比分</th></tr>
+<tr><td style="padding:8px">44'</td><td style="padding:8px">⚽ Bukayo Saka（兵工廠）</td><td style="padding:8px;text-align:center">1-0</td><td style="padding:8px;text-align:center">2-1</td></tr>
+<tr><td colspan="4" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 1-0 ∣ 終場 1-0</td></tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>上半場：酋長球場的壓迫</h4>
+
+<p>帶著首回合 1-1 的比分回到主場，Arteta 排出了攻勢陣容——Saka 回歸先發右翼、Gyökeres 頂前鋒、Trossard 與 Eze 分列左翼與 10 號位。兵工廠開場便展現強烈的進攻意圖，Declan Rice 與 Myles Lewis-Skelly 在中場形成雙屏障，讓 Simeone 的球隊難以組織有效反擊。</p>
+
+<p>比賽在第 44 分鐘迎來決定性時刻。Leandro Trossard 從左側切入後一腳勢大力沉的遠射，Jan Oblak 雙拳將球擊出——但皮球恰好落在後點埋伏的 Saka 腳下，英格蘭翼鋒冷靜推射入空門。酋長球場瞬間沸騰，兵工廠帶著 1-0（總比分 2-1）的領先進入中場。</p>
+
+<h4>下半場：Simeone 的絕望反撲</h4>
+
+<p>Simeone 中場換上 Rodrigo De Paul 與 Samuel Lino 試圖加強攻勢。第 51 分鐘出現驚險一幕——一記長傳造成 William Saliba 誤判，差點自擺烏龍，幸好 Gabriel 及時滑鏟將球解圍。</p>
+
+<p>馬競在下半場加大了壓迫力度，Julián Álvarez 數次嘗試射門但都被兵工廠嚴密的防線封堵。David Raya 全場僅需做出 2 次撲救，反映了兵工廠後防線的組織之精良。</p>
+
+<p>比賽尾聲 Arteta 換上 Thomas Partey 和 Jakub Kiwior 穩固防線，成功守住 1-0 的比分。終場哨響那一刻，酋長球場全場起立鼓掌——等待了 20 年，兵工廠再次站上歐洲最高舞台的門口。</p>
+
+<h3>關鍵數據</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">數據</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">兵工廠</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">馬競</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">控球率</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">53%</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">47%</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射門</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">11</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">9</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射正</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">角球</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">6</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">3</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">黃牌</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">3</td></tr>
+<tr><td style="padding:8px">撲救</td><td style="padding:8px;text-align:center">2</td><td style="padding:8px;text-align:center">1</td></tr>
+</table>
+
+<h3>賽後分析</h3>
+
+<h4>Saka：大賽球員的蛻變</h4>
+
+<p>從首回合替補上場 30 分鐘，到次回合先發並打進致勝球——Saka 的傷癒歸來時間點堪稱完美。這位 24 歲的英格蘭國腳本季歐冠已有 5 球 3 助攻，證明自己絕對是世界級的大賽球員。整場比賽他不僅奉獻了進球，右路的突破與牽制也讓馬競左後衛疲於奔命。</p>
+
+<h4>Arteta 的戰術勝利</h4>
+
+<p>面對 Simeone 這位淘汰賽大師，Arteta 選擇了最務實的策略——控制節奏、減少冒險、等待對手犯錯。兵工廠全場僅 2 次射正就拿下比賽，效率驚人。後防 Saliba + Gabriel 的組合幾乎封鎖了 Álvarez 所有威脅，Declan Rice 則是中場的定海神針。</p>
+
+<h4>Simeone 的遺憾</h4>
+
+<p>馬競本季歐冠之旅值得尊重——淘汰了巴塞隆納、與兵工廠鏖戰到最後，Álvarez 整屆表現出色（9 球全隊最多）。但客場缺乏進攻創造力始終是他們的軟肋，全場 9 次射門僅 2 次射正，對頂級對手來說遠遠不夠。</p>
+
+<h4>決賽展望</h4>
+
+<p>兵工廠將在 5 月 30 日（台灣時間 5/31 03:00）前往布達佩斯普斯卡什球場，對手將是巴黎聖日耳曼與拜仁慕尼黑的勝者（5/7 次回合）。如果是 PSG——將是衛冕冠軍 vs 20 年磨一劍的挑戰者；如果是拜仁——Kane 對決 Gyökeres 的鋒線對決將是全歐最強矛尖碰撞。無論對手是誰，Arteta 的兵工廠已經創造了歷史。</p>`,
+    tags: ['四強', '兵工廠', '馬競', '戰報', 'Saka', 'Trossard', '決賽', '晉級', 'Arteta', 'Simeone']
+  }
 ];
 
 // 導出
