@@ -130,12 +130,11 @@ function shuffle(arr) {
   for (const k of Object.keys(byside)) console.log(`  side ${k}: ${byside[k]} 則`);
 
   // ── 同時 seed 對應票數（避免「留言比票還多」露餡）──
-  // 每 side 投票數 = 留言數 × 4 + jitter(0~3)，最少 4 票
+  // 每 side 投票數 = 留言數（1:1，每則留言代表一票）
   const voteRows = [];
   for (const sideStr of Object.keys(byside)) {
     const side = parseInt(sideStr);
-    const commentCount = byside[sideStr];
-    const voteCount = Math.max(4, commentCount * 4 + Math.floor(Math.random() * 4));
+    const voteCount = byside[sideStr];
     for (let i = 0; i < voteCount; i++) {
       voteRows.push({
         opinion_id: opinionId,

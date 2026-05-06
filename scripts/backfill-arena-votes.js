@@ -2,9 +2,10 @@
 /**
  * backfill-arena-votes.js
  *
- * 對指定 opinion_id（或不指定 → 全掃所有 opinion_comments）做反向 seed votes：
- * 計算每 side 留言數 → 投票 = 留言數 × 4 + jitter(0~3)，最少 4 票。
- * 已有 ≥10 票的 opinion 直接跳過（避免重複塞）。
+ * 對指定 opinion_id（或不指定 → 全掃所有 opinion_comments）對齊 seed 票數：
+ *   - 每 side 票數 = 留言數（1:1）
+ *   - 多的 seed 票（voter_key 以 'seed_' 開頭）會被刪除，少的會補上
+ *   - 真實使用者票（voter_key 不是 'seed_' 開頭）原封不動
  *
  * 用法：
  *   node scripts/backfill-arena-votes.js                  # 全掃
@@ -36,49 +37,74 @@ const sb = createClient(SUPA_URL, SUPA_KEY);
   }
 
   for (const oid of opinionIds) {
-    // 已有票數
-    const { count: existingVotes } = await sb
-      .from('opinion_votes')
-      .select('id', { count: 'exact', head: true })
-      .eq('opinion_id', oid);
-    if (existingVotes && existingVotes >= 10) {
-      console.log(`⏭️  ${oid}：已有 ${existingVotes} 票，跳過`);
-      continue;
-    }
-
-    // 各 side 留言統計
+    // 各 side 留言統計（目標票數）
     const { data: comments, error: cErr } = await sb
       .from('opinion_comments')
       .select('side')
       .eq('opinion_id', oid);
     if (cErr) { console.warn(`讀 ${oid} 留言失敗`, cErr); continue; }
 
-    const byside = {};
-    for (const c of comments || []) byside[c.side] = (byside[c.side] || 0) + 1;
-    if (!Object.keys(byside).length) { console.log(`⏭️  ${oid}：沒留言可參考`); continue; }
+    const targetBySide = {};
+    for (const c of comments || []) targetBySide[c.side] = (targetBySide[c.side] || 0) + 1;
+    if (!Object.keys(targetBySide).length) { console.log(`⏭️  ${oid}：沒留言可參考`); continue; }
 
-    // 投票公式：每 side 留言數 × 4 + 0~3 jitter，最少 4 票
-    const voteRows = [];
-    for (const sideStr of Object.keys(byside)) {
-      const side = parseInt(sideStr);
-      const commentCount = byside[sideStr];
-      const voteCount = Math.max(4, commentCount * 4 + Math.floor(Math.random() * 4));
-      for (let i = 0; i < voteCount; i++) {
-        voteRows.push({
-          opinion_id: oid,
-          side,
-          voter_key: 'seed_' + Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10),
-        });
+    // 全部現有票（含真實使用者）+ 分出 seed 票（可以刪）
+    const { data: allVotes, error: vReadErr } = await sb
+      .from('opinion_votes')
+      .select('id, side, voter_key')
+      .eq('opinion_id', oid);
+    if (vReadErr) { console.warn(`${oid} 讀票失敗`, vReadErr); continue; }
+
+    const votesBySide = {};      // 全部票（real + seed）
+    const seedsBySide = {};      // 只有 seed 票（可刪）
+    for (const v of allVotes || []) {
+      (votesBySide[v.side] = votesBySide[v.side] || []).push(v);
+      if (typeof v.voter_key === 'string' && v.voter_key.startsWith('seed_')) {
+        (seedsBySide[v.side] = seedsBySide[v.side] || []).push(v);
       }
     }
 
-    const { data: vData, error: vErr } = await sb.from('opinion_votes').insert(voteRows).select('id, side');
-    if (vErr) { console.warn(`${oid} insert 失敗`, vErr.message || vErr); continue; }
+    let inserted = 0, deleted = 0;
+    const allSides = new Set([...Object.keys(targetBySide), ...Object.keys(votesBySide)]);
 
-    const vByside = {};
-    for (const r of vData) vByside[r.side] = (vByside[r.side] || 0) + 1;
-    const summary = Object.keys(vByside).sort().map(k => `s${k}:${vByside[k]}`).join(' ');
-    console.log(`✅ ${oid}：seed ${vData.length} 票（${summary}）`);
+    for (const sideStr of allSides) {
+      const side = parseInt(sideStr);
+      const target = targetBySide[sideStr] || 0;          // 目標票數 = 該 side 留言數
+      const current = (votesBySide[sideStr] || []).length; // 目前總票數
+      const seedHere = (seedsBySide[sideStr] || []);
+
+      if (current > target) {
+        // 太多票：刪 seed 票（最多刪到 0；真實使用者票不動）
+        const overflow = current - target;
+        const toDelete = seedHere.slice(0, Math.min(overflow, seedHere.length)).map(v => v.id);
+        if (toDelete.length) {
+          const { error: dErr } = await sb.from('opinion_votes').delete().in('id', toDelete);
+          if (dErr) { console.warn(`${oid} side ${side} 刪票失敗`, dErr); continue; }
+          deleted += toDelete.length;
+        }
+      } else if (current < target) {
+        // 票太少：補 seed 票到目標
+        const need = target - current;
+        const rows = [];
+        for (let i = 0; i < need; i++) {
+          rows.push({
+            opinion_id: oid,
+            side,
+            voter_key: 'seed_' + Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10),
+          });
+        }
+        const { error: iErr } = await sb.from('opinion_votes').insert(rows);
+        if (iErr) { console.warn(`${oid} side ${side} 補票失敗`, iErr); continue; }
+        inserted += need;
+      }
+    }
+
+    if (inserted === 0 && deleted === 0) {
+      console.log(`✓ ${oid}：已對齊（每 side 票數 = 留言數）`);
+    } else {
+      const summary = Object.keys(targetBySide).sort().map(k => `s${k}:${targetBySide[k]}`).join(' ');
+      console.log(`✅ ${oid}：+${inserted} -${deleted}（目標 ${summary}）`);
+    }
   }
 
   console.log('done.');
