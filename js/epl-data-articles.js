@@ -2516,9 +2516,9 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h4>傷兵清單</h4>
 <ul>
-<li><strong>Martin Ødegaard</strong>：持續缺陣，中場創造力受影響</li>
-<li><strong>Kai Havertz</strong>：傷勢未癒，出戰成疑</li>
-<li><strong>Jurriën Timber</strong>：傷缺</li>
+<li><strong>Martin Ødegaard</strong>：近期缺陣，本場有望復出但仍待評估</li>
+<li><strong>Kai Havertz</strong>：肌肉傷勢未癒，出戰成疑</li>
+<li><strong>Jurriën Timber</strong>：歐冠四強缺陣，本場有機會歸隊</li>
 <li><strong>Mikel Merino</strong>：本季報銷</li>
 </ul>
 
