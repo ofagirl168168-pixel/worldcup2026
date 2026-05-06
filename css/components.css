@@ -3380,8 +3380,9 @@ img.flag-img {
   white-space: nowrap;
 }
 .opinion-nav-btn:hover:not(:disabled) {
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.32);
+  background: rgba(255,200,80,0.16);
+  border-color: rgba(255,200,80,0.55);
+  transform: translateY(-1px);
 }
 .opinion-nav-btn:active:not(:disabled) {
   transform: scale(0.97);
@@ -3391,10 +3392,47 @@ img.flag-img {
 }
 .opinion-nav-prev { justify-content: flex-start; }
 .opinion-nav-next { justify-content: flex-end; }
+/* 浮動呼吸效果 — 提示使用者「還有另一題」 */
+.opinion-nav-btn:not(:disabled) {
+  animation: opinionNavBreathe 2.4s ease-in-out infinite;
+}
+.opinion-nav-prev:not(:disabled) { animation-delay: -1.2s; }
+@keyframes opinionNavBreathe {
+  0%, 100% {
+    border-color: rgba(255,255,255,0.18);
+    box-shadow: 0 0 0 0 rgba(255,200,80,0);
+    background: rgba(255,255,255,0.05);
+  }
+  50% {
+    border-color: rgba(255,200,80,0.55);
+    box-shadow: 0 0 14px 2px rgba(255,200,80,0.32);
+    background: rgba(255,200,80,0.10);
+  }
+}
+.opinion-nav-btn:not(:disabled) .opinion-nav-arrow {
+  animation: opinionNavArrowSlideRight 1.6s ease-in-out infinite;
+}
+.opinion-nav-prev:not(:disabled) .opinion-nav-arrow {
+  animation-name: opinionNavArrowSlideLeft;
+}
+@keyframes opinionNavArrowSlideRight {
+  0%, 100% { transform: translateX(0); opacity: 0.7; }
+  50%      { transform: translateX(3px); opacity: 1; }
+}
+@keyframes opinionNavArrowSlideLeft {
+  0%, 100% { transform: translateX(0); opacity: 0.7; }
+  50%      { transform: translateX(-3px); opacity: 1; }
+}
+/* hover 時暫停動畫、突顯靜態高亮 */
+.opinion-nav-btn:hover:not(:disabled),
+.opinion-nav-btn:hover:not(:disabled) .opinion-nav-arrow {
+  animation-play-state: paused;
+}
 .opinion-nav-arrow {
   flex: 0 0 auto;
-  font-size: 11px;
-  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+  color: rgba(255,220,150,0.95);
+  font-weight: 700;
 }
 .opinion-nav-peek {
   flex: 1 1 auto; min-width: 0;

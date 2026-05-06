@@ -226,11 +226,14 @@ function _opinionMatchesDate(o, today) {
 }
 
 // 取得今日所有觀點題目（一天可有 1~2 題：主題 + 24h 回顧題）
+// 排序：依 id 字典順遞增（id 內含 YYYYMMDD-x，所以等同於建立時間先後 → 越早越前）
 function getTodayOpinions() {
   const today = localDateStr();
   // 1. 先找有指定日期的（date 單值或 dates 陣列含今天）
   const dated = DAILY_OPINIONS.filter(o => _opinionMatchesDate(o, today));
-  if (dated.length) return dated;
+  if (dated.length) {
+    return dated.slice().sort((a, b) => String(a.id).localeCompare(String(b.id)));
+  }
   // 2. 沒有指定日期的就從無日期題庫中按天數輪流（fallback）
   const undated = DAILY_OPINIONS.filter(o => !o.date && !o.dates);
   if (!undated.length) return [DAILY_OPINIONS[0]];

@@ -128,4 +128,31 @@ function shuffle(arr) {
   const byside = {};
   for (const r of data) byside[r.side] = (byside[r.side] || 0) + 1;
   for (const k of Object.keys(byside)) console.log(`  side ${k}: ${byside[k]} 則`);
+
+  // ── 同時 seed 對應票數（避免「留言比票還多」露餡）──
+  // 每 side 投票數 = 留言數 × 4 + jitter(0~3)，最少 4 票
+  const voteRows = [];
+  for (const sideStr of Object.keys(byside)) {
+    const side = parseInt(sideStr);
+    const commentCount = byside[sideStr];
+    const voteCount = Math.max(4, commentCount * 4 + Math.floor(Math.random() * 4));
+    for (let i = 0; i < voteCount; i++) {
+      voteRows.push({
+        opinion_id: opinionId,
+        side,
+        voter_key: 'seed_' + Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10),
+      });
+    }
+  }
+  if (voteRows.length) {
+    const { data: vData, error: vErr } = await sb.from('opinion_votes').insert(voteRows).select('id, side');
+    if (vErr) {
+      console.warn('⚠️ 投票 insert 失敗（不影響留言）：', vErr.message || vErr);
+    } else {
+      console.log(`🗳️ seed ${vData.length} 票 to ${opinionId}`);
+      const vByside = {};
+      for (const r of vData) vByside[r.side] = (vByside[r.side] || 0) + 1;
+      for (const k of Object.keys(vByside)) console.log(`  side ${k}: ${vByside[k]} 票`);
+    }
+  }
 })().catch(e => { console.error(e); process.exit(1); });
