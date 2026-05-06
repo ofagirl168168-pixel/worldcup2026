@@ -2,6 +2,26 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-047",
+    "tournament": "epl",
+    "title": "【賽前分析】西漢姆 vs 兵工廠：保級生死戰遇上歐冠決賽隊，倫敦德比火藥味十足",
+    "summary": "第36輪倫敦德比——第18名西漢姆主場迎戰榜首兵工廠。鐵鎚幫深陷降級區只剩3場求生，兵工廠則剛殺入歐冠決賽、英超冠軍近在咫尺。一邊是保級最後希望，一邊是雙冠王之夢，這場比賽的張力無與倫比。",
+    "date": "2026-05-07",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "ucl-023",
+    "tournament": "ucl",
+    "title": "【四強戰報】拜仁 1-1 PSG：Dembélé 閃擊定調！衛冕冠軍總比分 6-5 再闖決賽",
+    "summary": "Ousmane Dembélé 開場第 3 分鐘破門，巴黎聖日耳曼頂住拜仁全場圍攻，即使 Kane 補時扳平也為時已晚——PSG 以總比分 6-5 淘汰拜仁，連續第二年殺入歐冠決賽。5 月 30 日布達佩斯，衛冕冠軍將對決兵工廠。",
+    "date": "2026-05-07",
+    "category": "賽後回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-046",
     "tournament": "epl",
     "title": "【賽前分析】利物浦 vs 切爾西：安菲爾德傳統強強對話，紅軍能否止血？",
@@ -149,7 +169,7 @@ export default [
     "date": "2026-04-29",
     "category": "賽後回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "10",

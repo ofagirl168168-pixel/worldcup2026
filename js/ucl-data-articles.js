@@ -998,6 +998,69 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 
 <p>兵工廠將在 5 月 30 日（台灣時間 5/31 03:00）前往布達佩斯普斯卡什球場，對手將是巴黎聖日耳曼與拜仁慕尼黑的勝者（5/7 次回合）。如果是 PSG——將是衛冕冠軍 vs 20 年磨一劍的挑戰者；如果是拜仁——Kane 對決 Gyökeres 的鋒線對決將是全歐最強矛尖碰撞。無論對手是誰，Arteta 的兵工廠已經創造了歷史。</p>`,
     tags: ['四強', '兵工廠', '馬競', '戰報', 'Saka', 'Trossard', '決賽', '晉級', 'Arteta', 'Simeone']
+  },
+  {
+    id: 'ucl-023',
+    title: '【四強戰報】拜仁 1-1 PSG：Dembélé 閃擊定調！衛冕冠軍總比分 6-5 再闖決賽',
+    date: '2026-05-07',
+    category: '賽後回顧',
+    summary: 'Ousmane Dembélé 開場第 3 分鐘破門，巴黎聖日耳曼頂住拜仁全場圍攻，即使 Kane 補時扳平也為時已晚——PSG 以總比分 6-5 淘汰拜仁，連續第二年殺入歐冠決賽。5 月 30 日布達佩斯，衛冕冠軍將對決兵工廠。',
+    content: `<h2>拜仁 1-1 巴黎聖日耳曼｜歐冠四強次回合・5/7（三）03:00 台灣時間</h2>
+<p><strong>總比分 5-6，巴黎聖日耳曼晉級決賽</strong> ｜ 安聯球場 ｜</p>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">時間</th><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">進球者</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">比分</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">總比分</th></tr>
+<tr><td style="padding:8px">3'</td><td style="padding:8px">⚽ Ousmane Dembélé（PSG）</td><td style="padding:8px;text-align:center">0-1</td><td style="padding:8px;text-align:center">4-6</td></tr>
+<tr><td style="padding:8px">90+4'</td><td style="padding:8px">⚽ Harry Kane（拜仁）</td><td style="padding:8px;text-align:center">1-1</td><td style="padding:8px;text-align:center">5-6</td></tr>
+<tr><td colspan="4" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-1 ∣ 終場 1-1</td></tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>上半場：Dembélé 閃擊打懵安聯</h4>
+
+<p>首回合 5-4 的瘋狂比分讓所有人預期次回合又是一場進球大戰，但 Luis Enrique 顯然有不同計劃。開場僅 3 分鐘，Kvaratskhelia 左路突破後低傳禁區，Dembélé 前點搶射破門——PSG 瞬間將總比分拉開到 6-4，拜仁需要攻進 3 球才能翻盤。</p>
+
+<p>這個早期進球徹底改變了比賽節奏。Kompany 的拜仁不得不全力前壓，Kimmich 和 Pavlovic 雙後腰被迫提高站位，Musiala 頻繁回撤拿球試圖組織進攻。但 PSG 的防守紀律在 Marquinhos 的率領下滴水不漏——Pacho 和 Marquinhos 的中衛組合牢牢封鎖了 Kane 的活動空間，門將 Safonov 也做出了幾次關鍵撲救。</p>
+
+<h4>下半場：拜仁的絕望反撲</h4>
+
+<p>Kompany 下半場做出調整，Luis Díaz 和 Olise 兩翼加大了突破頻率，拜仁的控球率一度攀升至 65% 以上。但 PSG 的低位防守陣型讓拜仁的傳中和遠射都難以找到空檔——全場 33 次射門僅轉化為 2 球（6% 轉化率），與首回合 22 射 9 球（41%）形成鮮明對比。</p>
+
+<p>比賽在補時第 94 分鐘才迎來拜仁的安慰球——Laimer 右路傳中，Kane 門前搶點頭槌破門，將總比分追至 5-6。但為時已晚，終場哨響，PSG 球員們在安聯球場中央慶祝，衛冕冠軍再度闖入決賽。</p>
+
+<h3>關鍵數據</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="background:rgba(255,255,255,0.06)"><th style="padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)">數據</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">拜仁</th><th style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">PSG</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">控球率</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">58%</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">42%</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射門</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">18</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">15</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">射正</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">5</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">3</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">角球</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">7</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">3</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.05)">黃牌</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">2</td><td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05)">1</td></tr>
+<tr><td style="padding:8px">撲救</td><td style="padding:8px;text-align:center">2</td><td style="padding:8px;text-align:center">4</td></tr>
+</table>
+
+<h3>賽後分析</h3>
+
+<h4>Dembélé：歐冠淘汰賽之王</h4>
+
+<p>這位法國翼鋒在本屆歐冠淘汰賽中已攻入 5 球，八強次回合在安菲爾德梅開二度淘汰利物浦、四強兩回合各進一球——他已經成為 PSG 歐冠征途的核心引擎。開場第 3 分鐘的進球展現了他的速度與門前嗅覺，也徹底瓦解了拜仁的賽前部署。</p>
+
+<h4>Luis Enrique 的戰術大師課</h4>
+
+<p>首回合 5-4 的進球狂潮後，許多人預期次回合會是另一場攻防大戰。但 Luis Enrique 選擇了截然不同的策略——拿到 0-1 領先後，PSG 迅速收縮防線，用 Vitinha-Neves-Ruiz 的中場三人組切斷拜仁的推進路線。42% 的控球率看似被動，但每一次丟球都是有計劃的讓位，PSG 的反擊始終保持威脅。這種攻守轉換的靈活性，正是衛冕冠軍的底蘊。</p>
+
+<h4>Kompany 與拜仁的遺憾</h4>
+
+<p>拜仁本季歐冠之旅值得驕傲——八強淘汰皇馬（總比分 6-4）、四強與 PSG 踢出了歐冠史上最高比分的半決賽（兩回合 11 球）。Kane 本季歐冠 7 球穩居射手榜前列。但 Kompany 執教首季就帶隊殺入四強，已經超出了多數人的期望。問題在於防守端的不穩定——兩回合丟 6 球，首回合更是半場就被灌了 3 個，這在歐冠頂級較量中是致命的。</p>
+
+<h4>決賽前瞻：PSG vs 兵工廠</h4>
+
+<p>5 月 30 日（台灣時間 5/31 03:00）布達佩斯普斯卡什球場，衛冕冠軍 PSG 將對決 20 年來首次闖入決賽的兵工廠。PSG 能否成為歐冠改制後首支成功衛冕的球隊？兵工廠的鐵血防線（本季歐冠僅失 6 球）能否抵擋 Dembélé-Kvaratskhelia 的雙翼突襲？這場決賽將是攻守哲學的終極對決。</p>`,
+    tags: ['四強', 'PSG', '拜仁', '戰報', 'Dembélé', 'Kane', '決賽', '晉級', 'Luis Enrique', 'Kompany']
   }
 ];
 
