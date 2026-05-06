@@ -15,9 +15,9 @@ const DAILY_OPINIONS = [
   // ── 本週時事 ─────────────────────────────────────────
 
   { id:'op-20260507-b', date:'2026-05-07', type:'trending',
-    q:"兵工廠 20 年後重返歐冠決賽！Arteta 的兵工廠 vs 2006 年 Wenger 的兵工廠，哪一隊更強？",
-    opts:["2026 Arteta 版更強：陣容深度完勝，Saka+Gyökeres 史上最強鋒線 🔫","2006 Wenger 版更浪漫：Henry+Bergkamp 那種美學足球無可取代 👑","不好比較，但 Arteta 版本防守更恐怖、Wenger 版進攻更華麗 ⚖️","等決賽結果再說，拿冠軍的那隊才是最強 🏆"],
-    context:"兵工廠 1-0 淘汰馬競（總比分 2-1），隊史第二次晉級歐冠決賽、距離上次已整整 20 年。2006 年 Wenger 帶領 Henry、Ljungberg、Campbell 等人闖入決賽卻 1-2 不敵巴塞隆納。2026 年 Arteta 帶隊 6 年終於圓夢，陣中 Saka、Gyökeres、Rice、Saliba 等人撐起新一代紅白軍團。兩個時代的兵工廠各有魅力。" },
+    q:"兵工廠 1-0 馬競晉級決賽！Calafiori 那一腳踩到 Griezmann 沒被吹點球，VAR 的判決你怎麼看？",
+    opts:["肢體接觸很正常，兵工廠晉級沒有爭議 ⚪","根本就是犯規，馬競才應該進入決賽 🔴","馬競這屆歐冠也吃不少豆腐，這次剛好而已 ⚖️","VAR 制度有漏洞，類似爭議該介入卻沒介入 📺"],
+    context:"兵工廠主場 1-0（Saka 進球）淘汰馬競晉級歐冠決賽（總比分 2-1），20 年後重返決賽。下半場第 56 分鐘 Calafiori 在禁區內踩到 Griezmann 的腳沒被吹點球，加上稍早 Giuliano Simeone 對 Gabriel 的禁區動作，馬競下半場兩次點球聲請都被 VAR 駁回。前英格蘭裁判 Mark Clattenburg 分析指出：因主裁先吹了 Pubill 對 Gabriel 的犯規，VAR 不能回頭看後續動作。Simeone 賽後直言「那就是點球，很明顯」並踩到 Arsenal 隊徽抗議，但同時表示不會用裁判作為敗北的藉口。" },
 
   { id:'op-20260506-a', date:'2026-05-06', type:'predict',
     q:"歐冠半決賽次回合：拜仁主場迎 PSG，能逆轉 5-4 落後晉級嗎？",
