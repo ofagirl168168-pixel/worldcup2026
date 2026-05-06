@@ -14,7 +14,7 @@ const DAILY_OPINIONS = [
 
   // ── 本週時事 ─────────────────────────────────────────
 
-  { id:'op-20260507-b', date:'2026-05-07', type:'trending',
+  { id:'op-20260506-b', dates:['2026-05-06','2026-05-07'], type:'trending',
     q:"兵工廠 1-0 馬競晉級決賽！Calafiori 那一腳踩到 Griezmann 沒被吹點球，VAR 的判決你怎麼看？",
     opts:["肢體接觸很正常，兵工廠晉級沒有爭議 ⚪","根本就是犯規，馬競才應該進入決賽 🔴","馬競這屆歐冠也吃不少豆腐，這次剛好而已 ⚖️","VAR 制度有漏洞，類似爭議該介入卻沒介入 📺"],
     context:"兵工廠主場 1-0（Saka 進球）淘汰馬競晉級歐冠決賽（總比分 2-1），20 年後重返決賽。下半場第 56 分鐘 Calafiori 在禁區內踩到 Griezmann 的腳沒被吹點球，加上稍早 Giuliano Simeone 對 Gabriel 的禁區動作，馬競下半場兩次點球聲請都被 VAR 駁回。前英格蘭裁判 Mark Clattenburg 分析指出：因主裁先吹了 Pubill 對 Gabriel 的犯規，VAR 不能回頭看後續動作。Simeone 賽後直言「那就是點球，很明顯」並踩到 Arsenal 隊徽抗議，但同時表示不會用裁判作為敗北的藉口。" },
@@ -219,23 +219,35 @@ const DAILY_OPINIONS = [
     context:'日本、韓國、澳洲、沙烏地等都有機會創造歷史' }
 ];
 
-// 取得今日觀點題目
-function getTodayOpinion() {
+// 判斷某題在今天是否要顯示：date 單值 OR dates 陣列裡有今天
+function _opinionMatchesDate(o, today) {
+  if (Array.isArray(o.dates)) return o.dates.includes(today);
+  return o.date === today;
+}
+
+// 取得今日所有觀點題目（一天可有 1~2 題：主題 + 24h 回顧題）
+function getTodayOpinions() {
   const today = localDateStr();
-  // 1. 先找有指定日期的
-  const dated = DAILY_OPINIONS.find(o => o.date === today);
-  if (dated) return dated;
-  // 2. 沒有指定日期的就從無日期題庫中按天數輪流
-  const undated = DAILY_OPINIONS.filter(o => !o.date);
-  if (!undated.length) return DAILY_OPINIONS[0];
+  // 1. 先找有指定日期的（date 單值或 dates 陣列含今天）
+  const dated = DAILY_OPINIONS.filter(o => _opinionMatchesDate(o, today));
+  if (dated.length) return dated;
+  // 2. 沒有指定日期的就從無日期題庫中按天數輪流（fallback）
+  const undated = DAILY_OPINIONS.filter(o => !o.date && !o.dates);
+  if (!undated.length) return [DAILY_OPINIONS[0]];
   const dayNum = Math.floor((new Date() - new Date('2026-01-01')) / 86400000);
-  return undated[dayNum % undated.length];
+  return [undated[dayNum % undated.length]];
+}
+
+// 取得今日第一題（向後相容）
+function getTodayOpinion() {
+  return getTodayOpinions()[0] || null;
 }
 
 if (typeof window !== 'undefined') {
   window.DAILY_OPINIONS = DAILY_OPINIONS;
   window.getTodayOpinion = getTodayOpinion;
+  window.getTodayOpinions = getTodayOpinions;
 }
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { DAILY_OPINIONS, getTodayOpinion };
+  module.exports = { DAILY_OPINIONS, getTodayOpinion, getTodayOpinions };
 }

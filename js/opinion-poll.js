@@ -131,6 +131,14 @@
     if (!opinion) opinion = getTodayOpinion();
     if (!opinion) { if (onClose) onClose(); return; }
 
+    // 今日全部題（用於碳輪切換 — 一天可有 1~2 題：主題 + 24h 回顧）
+    const todayOpinions = (typeof getTodayOpinions === 'function')
+      ? getTodayOpinions()
+      : [opinion];
+    let todayIdx = todayOpinions.findIndex(o => o.id === opinion.id);
+    // 若打開的是非今日題（例：歷史題永久連結）則不顯示切換鈕
+    const showSwitcher = todayIdx >= 0 && todayOpinions.length > 1;
+
     const voteKey = STORAGE_PREFIX + opinion.id;
     const existingVote = localStorage.getItem(voteKey);
 
@@ -145,10 +153,27 @@
       : 'opinion-cards';
     const tagClass = 'opinion-tag opinion-tag--' + (opinion.type || 'classic');
 
+    // 預覽提示：下一題 / 上一題的標題前幾個字（縮短版）
+    const _nextOp = showSwitcher && todayIdx < todayOpinions.length - 1 ? todayOpinions[todayIdx + 1] : null;
+    const _prevOp = showSwitcher && todayIdx > 0 ? todayOpinions[todayIdx - 1] : null;
+    const _peekText = (op) => op ? `${(TAG_LABELS[op.type] || '⚽').split(' ')[0]} ${_trim(op.q, 14)}` : '';
+
     overlay.innerHTML = `
       <div class="opinion-glow"></div>
       <div class="opinion-stars"></div>
       <div class="opinion-container">
+        ${showSwitcher ? `
+        <div class="opinion-switcher" role="tablist" aria-label="今日題目切換">
+          <button class="opinion-nav-btn opinion-nav-prev" ${_prevOp ? '' : 'disabled'} aria-label="上一題">
+            <span class="opinion-nav-arrow">◀</span>
+            ${_prevOp ? `<span class="opinion-nav-peek">${_peekText(_prevOp)}</span>` : ''}
+          </button>
+          <span class="opinion-switcher-page">${todayIdx + 1}/${todayOpinions.length}</span>
+          <button class="opinion-nav-btn opinion-nav-next" ${_nextOp ? '' : 'disabled'} aria-label="下一題">
+            ${_nextOp ? `<span class="opinion-nav-peek">${_peekText(_nextOp)}</span>` : ''}
+            <span class="opinion-nav-arrow">▶</span>
+          </button>
+        </div>` : ''}
         <div class="opinion-brand">
           <div class="opinion-brand-line"></div>
           <div class="opinion-brand-title">
@@ -204,6 +229,21 @@
         _cleanOldKeys(STORAGE_SHOWN);
       }
     }, 800);
+
+    // 切換鈕（無論未投/已投都要綁）— 關掉當前 overlay → 立刻用指定 pollId 重開
+    if (showSwitcher) {
+      const _switchTo = (targetIdx) => {
+        const target = todayOpinions[targetIdx];
+        if (!target) return;
+        _closeOverlay(overlay, () => {
+          showOpinionPoll(onClose, { pollId: target.id, force: true });
+        });
+      };
+      const prevBtn = overlay.querySelector('.opinion-nav-prev');
+      const nextBtn = overlay.querySelector('.opinion-nav-next');
+      if (prevBtn && _prevOp) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); _switchTo(todayIdx - 1); });
+      if (nextBtn && _nextOp) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); _switchTo(todayIdx + 1); });
+    }
 
     // 如果已投過票：跟首次投票一樣的流程（入場 → 退場 → 平滑滑到中間 → 顯示結果）
     if (existingVote !== null) {

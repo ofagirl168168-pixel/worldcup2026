@@ -313,7 +313,10 @@ async function main() {
         // toWrite.id = 真實寫入 DB 的 opinion_id（永恆題會改 id）
         if (chosen.seed_comments && typeof chosen.seed_comments === 'object') {
           try {
-            const tmpJson = path.join(REPO_ROOT, 'scripts', `seed-comments-${targetDate.replace(/-/g, '')}.json`);
+            // 同日可有 2 題（主題 + 24h 回顧），用 id 命名避免覆蓋彼此
+            // op-20260506-b → seed-comments-20260506-b.json
+            const idStem = String(toWrite.id).replace(/^op-/, '');
+            const tmpJson = path.join(REPO_ROOT, 'scripts', `seed-comments-${idStem}.json`);
             fs.writeFileSync(tmpJson, JSON.stringify(chosen.seed_comments, null, 2));
             console.log(`📝 寫 seed comments JSON → ${path.relative(REPO_ROOT, tmpJson)}`);
             const seederResult = execFileSync(
