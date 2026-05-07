@@ -1303,6 +1303,7 @@ function _maybeShowDailyChallengeShareCard(chosenIdx) {
       bodyText: `${_trim(q, 36)}<br/>正解 <b>${_trim(opts[correct] || '', 24)}</b>`,
       reward: streak > 0 ? `+10 XP　🔥 連勝 ${streak} 天` : '+10 XP',
       themeColor: '#6bd09e',
+      previewLabel: '✅ 答對了！考考朋友看誰猜得到',
       shareText: `🎯 我今天每日一題答對了！「${_trim(q, 22)}」你猜得到嗎？`,
     });
   }, 800);

@@ -96,9 +96,10 @@
     const overlay = document.createElement('div');
     overlay.id = 'share-card-overlay';
     overlay.className = 'share-card-overlay';
+    const previewLabel = opts.previewLabel || '📤 把這份成果分享給朋友';
     overlay.innerHTML = `
       <div class="share-card-wrap">
-        <div class="share-card-preview-label">📤 預覽 · 下方按鈕分享的就是這張卡</div>
+        <div class="share-card-preview-label">${previewLabel}</div>
         <button class="share-card-close" aria-label="關閉">×</button>
         <div class="share-card share-card-v2" id="share-card-canvas" style="--theme:${themeColor}">
           <div class="sc-preview-tag">PREVIEW</div>

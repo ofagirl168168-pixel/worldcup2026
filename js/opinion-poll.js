@@ -140,6 +140,7 @@
         bodyText: `${_trim(r.opinion.q, 36)}<br/>我選 <b>${myOpt}</b>`,
         reward: `+${PREDICT_WIN_XP} XP　+1 💎`,
         themeColor: '#ffc850',
+        previewLabel: '🎯 預測命中！秀給朋友看你的眼光',
         shareText: `🎯 我預測中了「${_trim(r.opinion.q, 24)}」！你也來 Soccer麥迪 試試運氣？`,
       }), 5000);
     }
@@ -393,6 +394,7 @@
               bodyText: `麥迪擂台連續答題 <b>${bumped.current}</b> 天<br/>每日不間斷的決策訓練`,
               reward: `+${bonus} XP`,
               themeColor: '#ff6b35',
+              previewLabel: `🔥 連勝 ${bumped.current} 天，太強了！秀給朋友看`,
               shareText: `🔥 我在 Soccer麥迪 連勝 ${bumped.current} 天！每天一題擂台投票，你敢挑戰嗎？`,
             }), 4000);
           }
@@ -569,6 +571,7 @@
         bodyText: `${_trim(opinion.q, 36)}<br/>我選 <b>${myOpt}</b>`,
         reward: `只有 ${myPct}% 的人跟我同陣線`,
         themeColor: '#a78bfa',
+        previewLabel: `🤔 你跟多數人不一樣！分享看誰跟你同隊`,
         shareText: `🤔 麥迪擂台「${_trim(opinion.q, 22)}」我跟 ${myPct}% 少數派同陣線。你怎麼看？`,
       }), 5500);
     }

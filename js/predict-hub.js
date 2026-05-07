@@ -276,6 +276,7 @@
       subtitle: 'MY PREDICTION',
       bodyText: winText,
       themeColor: '#42a5f5',
+      previewLabel: `🎯 押好了 ${h}-${a}！告訴朋友你看好誰`,
       shareText: `🎯 我預測 ${homeName} ${h}-${a} ${awayName}！你猜呢？來 Soccer麥迪 較量比分準度。`,
     });
   }
@@ -293,6 +294,7 @@
       bodyText: `每天都來預測比分，連續 <b>${streak}</b> 天<br/>球迷直覺 + AI 分析，雙重決策訓練`,
       reward: `+${bonusXP} XP 里程碑`,
       themeColor: '#42a5f5',
+      previewLabel: `🔥 連 ${streak} 天每天預測！秀給朋友看`,
       shareText: `🎯 我在 Soccer麥迪 連續 ${streak} 天預測比賽！每天動腦不間斷，你也來挑戰？`,
     });
   }
