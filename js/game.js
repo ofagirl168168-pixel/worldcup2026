@@ -649,6 +649,8 @@ function submitDailyPickHome(idx) {
   // 同步更新競技場頁面（若已渲染）
   const arenaEl = document.getElementById('section-arena');
   if (arenaEl && arenaEl.innerHTML.trim()) renderArena();
+  // 答對 → 彈分享卡
+  _maybeShowDailyChallengeShareCard(idx);
 }
 
 // ── 首次進站提示（每 7 天出現一次）──────────────────────────
@@ -1277,7 +1279,35 @@ function submitDailyPick(idx) {
   checkAchievements();
   renderArena();
   openDailyPick();
+  // 答對 → 彈分享卡（跟首頁版本一致）
+  _maybeShowDailyChallengeShareCard(idx);
 }
+
+// ── 每日一題答對後彈分享卡 ──
+function _maybeShowDailyChallengeShareCard(chosenIdx) {
+  if (typeof window.showShareCard !== 'function') return;
+  const { q, opts, correct } = getTodayQuestion();
+  if (chosenIdx !== correct) return; // 答錯不彈
+  const today = (typeof localDateStr === 'function') ? localDateStr() : new Date().toISOString().slice(0,10);
+  const state = getDailyState ? getDailyState() : { streak: 0 };
+  const streak = state.streak || 0;
+
+  const _trim = (s, n) => s && s.length > n ? s.slice(0, n) + '…' : (s || '');
+  // 延遲 800ms 讓答對動畫先跑完
+  setTimeout(() => {
+    showShareCard({
+      eventKey: 'daily-quiz-correct-' + today,
+      icon: 'predict', // a4 magnifying-glass
+      title: '答對了！',
+      subtitle: 'DAILY QUIZ · CORRECT',
+      bodyText: `${_trim(q, 36)}<br/>正解 <b>${_trim(opts[correct] || '', 24)}</b>`,
+      reward: streak > 0 ? `+10 XP　🔥 連勝 ${streak} 天` : '+10 XP',
+      themeColor: '#6bd09e',
+      shareText: `🎯 我今天每日一題答對了！「${_trim(q, 22)}」你猜得到嗎？`,
+    });
+  }, 800);
+}
+window._maybeShowDailyChallengeShareCard = _maybeShowDailyChallengeShareCard;
 
 // ── 大神神諭 ──────────────────────────────────────────────
 const _ORACLE_LINES = [
