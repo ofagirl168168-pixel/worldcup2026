@@ -1297,7 +1297,12 @@ function _maybeShowDailyChallengeShareCard(chosenIdx) {
   setTimeout(() => {
     showShareCard({
       eventKey: 'daily-quiz-correct-' + today,
-      icon: 'predict', // a4 magnifying-glass
+      variant: 'quiz-correct',
+      imagesHtml: `<div class="sc-check-hero">
+        <div class="sc-check-burst-ring sc-check-burst-ring-1"></div>
+        <div class="sc-check-burst-ring sc-check-burst-ring-2"></div>
+        <div class="sc-check-mark">✓</div>
+      </div>`,
       title: '答對了！',
       subtitle: 'DAILY QUIZ · CORRECT',
       bodyText: `${_trim(q, 36)}<br/>正解 <b>${_trim(opts[correct] || '', 24)}</b>`,

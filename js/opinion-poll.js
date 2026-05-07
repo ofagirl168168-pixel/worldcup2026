@@ -134,10 +134,19 @@
     if (won && typeof showShareCard === 'function') {
       setTimeout(() => showShareCard({
         eventKey: 'predict-win-' + r.opinion.id,
-        icon: 'predict',
-        title: '預測命中',
-        subtitle: 'PREDICT WIN',
-        bodyText: `${_trim(r.opinion.q, 36)}<br/>我選 <b>${myOpt}</b>`,
+        variant: 'predict-win',
+        imagesHtml: `<div class="sc-target-hero">
+          <div class="sc-target-ring sc-target-ring-3"></div>
+          <div class="sc-target-ring sc-target-ring-2"></div>
+          <div class="sc-target-ring sc-target-ring-1"></div>
+          <div class="sc-target-bullseye">🎯</div>
+          <div class="sc-spark sc-spark-1">✦</div>
+          <div class="sc-spark sc-spark-2">✦</div>
+          <div class="sc-spark sc-spark-3">✦</div>
+        </div>`,
+        title: 'BULLSEYE',
+        subtitle: 'PREDICT · WIN',
+        bodyText: `${_trim(r.opinion.q, 36)}<br/>我選 <b>${myOpt}</b>　✓ 命中`,
         reward: `+${PREDICT_WIN_XP} XP　+1 💎`,
         themeColor: '#ffc850',
         previewLabel: '🎯 預測命中！秀給朋友看你的眼光',
@@ -387,11 +396,18 @@
           if (typeof showShareCard === 'function') {
             setTimeout(() => showShareCard({
               eventKey: 'streak-' + bumped.current,
-              icon: 'streak',
-              badge: bumped.current,
+              variant: 'streak',
+              imagesHtml: `<div class="sc-streak-hero">
+                <div class="sc-streak-flame sc-streak-flame--l">🔥</div>
+                <div class="sc-streak-num-wrap">
+                  <div class="sc-streak-num">${bumped.current}</div>
+                  <div class="sc-streak-days">DAYS</div>
+                </div>
+                <div class="sc-streak-flame sc-streak-flame--r">🔥</div>
+              </div>`,
               title: `連勝 ${bumped.current} 天`,
               subtitle: 'STREAK MILESTONE',
-              bodyText: `麥迪擂台連續答題 <b>${bumped.current}</b> 天<br/>每日不間斷的決策訓練`,
+              bodyText: `每日不間斷登入投票<br/>球迷意志力 <b>${bumped.current}</b> 天連發`,
               reward: `+${bonus} XP`,
               themeColor: '#ff6b35',
               previewLabel: `🔥 連勝 ${bumped.current} 天，太強了！秀給朋友看`,
@@ -564,8 +580,14 @@
       const myOpt = (opinion.opts[chosenIdx] || '').slice(0, 30);
       setTimeout(() => showShareCard({
         eventKey: 'minority-' + opinion.id,
-        icon: 'minority',
-        badge: myPct + '%',
+        variant: 'minority',
+        imagesHtml: `<div class="sc-minority-hero">
+          <div class="sc-minority-pct">${myPct}<span>%</span></div>
+          <div class="sc-minority-figures">
+            ${Array.from({length:10}).map((_,i)=>`<span class="sc-figure ${i < Math.max(1, Math.round(myPct/10)) ? 'on' : ''}">👤</span>`).join('')}
+          </div>
+          <div class="sc-minority-label">同陣線</div>
+        </div>`,
         title: '我是少數派',
         subtitle: 'MINORITY VOICE',
         bodyText: `${_trim(opinion.q, 36)}<br/>我選 <b>${myOpt}</b>`,

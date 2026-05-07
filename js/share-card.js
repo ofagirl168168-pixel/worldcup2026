@@ -97,11 +97,12 @@
     overlay.id = 'share-card-overlay';
     overlay.className = 'share-card-overlay';
     const previewLabel = opts.previewLabel || '📤 把這份成果分享給朋友';
+    const variantClass = opts.variant ? ` variant-${opts.variant}` : '';
     overlay.innerHTML = `
       <div class="share-card-wrap">
         <div class="share-card-preview-label">${previewLabel}</div>
         <button class="share-card-close" aria-label="關閉">×</button>
-        <div class="share-card share-card-v2" id="share-card-canvas" style="--theme:${themeColor}">
+        <div class="share-card share-card-v2${variantClass}" id="share-card-canvas" style="--theme:${themeColor}">
           <div class="sc-preview-tag">PREVIEW</div>
           <div class="sc-bg-glow"></div>
           <div class="sc-bg-rays"></div>

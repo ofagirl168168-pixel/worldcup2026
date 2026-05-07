@@ -1899,12 +1899,193 @@ img.flag-img {
 }
 .sc-vs-dash { font-size: 24px; opacity: 0.5; }
 
+/* ═══════ Variant 1: 連勝里程碑 streak ═══════ */
+.share-card-v2.variant-streak {
+  background:
+    radial-gradient(ellipse 100% 80% at 50% 0%, rgba(255,107,53,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(192,57,43,0.25) 0%, transparent 60%),
+    linear-gradient(180deg, #1a0a06 0%, #1d0c08 50%, #0a0405 100%) !important;
+}
+.sc-streak-hero {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px;
+  margin: 8px auto 4px;
+}
+.sc-streak-num-wrap { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.sc-streak-num {
+  font-size: 84px; font-weight: 900;
+  background: linear-gradient(180deg, #fff7e0 0%, #ff6b35 50%, #c0392b 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(255,107,53,0.7);
+  letter-spacing: -2px;
+  animation: scStreakNumPulse 1.6s ease-in-out infinite;
+}
+@keyframes scStreakNumPulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+.sc-streak-days {
+  font-size: 14px; font-weight: 800; letter-spacing: 6px;
+  color: #ff6b35;
+  text-shadow: 0 0 12px rgba(255,107,53,0.6);
+  margin-top: -4px;
+}
+.sc-streak-flame {
+  font-size: 56px;
+  filter: drop-shadow(0 0 16px rgba(255,107,53,0.8));
+  animation: scStreakFlameWobble 0.9s ease-in-out infinite;
+}
+.sc-streak-flame--l { animation-delay: -0.45s; transform-origin: bottom; }
+.sc-streak-flame--r { transform-origin: bottom; }
+@keyframes scStreakFlameWobble {
+  0%, 100% { transform: rotate(-12deg) scale(1); }
+  50%      { transform: rotate(12deg) scale(1.08); }
+}
+.variant-streak .sc-title {
+  background: linear-gradient(180deg, #fff 0%, #ff6b35 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+/* ═══════ Variant 2: 預測命中 BULLSEYE ═══════ */
+.share-card-v2.variant-predict-win {
+  background:
+    radial-gradient(circle 220px at 50% 38%, rgba(255,200,80,0.35) 0%, transparent 70%),
+    linear-gradient(180deg, #1a1408 0%, #0f0d05 100%) !important;
+}
+.sc-target-hero { position: relative; width: 160px; height: 160px; margin: 6px auto 0; }
+.sc-target-ring { position: absolute; border-radius: 50%; border: 2px solid rgba(255,200,80,0.6); }
+.sc-target-ring-1 {
+  inset: 50px;
+  background: radial-gradient(circle, rgba(255,200,80,0.3) 0%, transparent 70%);
+  box-shadow: 0 0 30px rgba(255,200,80,0.45);
+}
+.sc-target-ring-2 { inset: 30px; opacity: 0.65; }
+.sc-target-ring-3 {
+  inset: 0; opacity: 0.4;
+  animation: scTargetExpand 2.5s ease-out infinite;
+}
+@keyframes scTargetExpand {
+  0%   { transform: scale(0.8); opacity: 0; }
+  50%  { opacity: 0.5; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+.sc-target-bullseye {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64px;
+  filter: drop-shadow(0 0 20px rgba(255,200,80,0.8));
+  z-index: 2;
+}
+.sc-spark {
+  position: absolute;
+  font-size: 22px;
+  color: #ffe082;
+  text-shadow: 0 0 12px rgba(255,224,130,0.95);
+  animation: scSparkTwinkle 1.4s ease-in-out infinite;
+}
+.sc-spark-1 { top: -4px; right: 10px; }
+.sc-spark-2 { bottom: 8px; left: 0; animation-delay: -0.5s; }
+.sc-spark-3 { top: 30px; left: -8px; animation-delay: -1s; }
+@keyframes scSparkTwinkle {
+  0%, 100% { transform: scale(0.6); opacity: 0.4; }
+  50%      { transform: scale(1.2); opacity: 1; }
+}
+.variant-predict-win .sc-title {
+  letter-spacing: 6px;
+  background: linear-gradient(180deg, #fff7d6 0%, #ffc850 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(255,200,80,0.5);
+}
+
+/* ═══════ Variant 3: 少數派 minority ═══════ */
+.share-card-v2.variant-minority {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(167,139,250,0.18) 0%, transparent 70%),
+    linear-gradient(180deg, #1a1138 0%, #0a0820 100%) !important;
+}
+.share-card-v2.variant-minority::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(45deg, transparent 0, transparent 20px, rgba(167,139,250,0.04) 20px, rgba(167,139,250,0.04) 22px);
+  pointer-events: none; z-index: 0;
+}
+.sc-minority-hero { text-align: center; margin: 4px auto 0; position: relative; z-index: 1; }
+.sc-minority-pct {
+  font-size: 72px; font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(180deg, #fff 0%, #a78bfa 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 24px rgba(167,139,250,0.5);
+}
+.sc-minority-pct span { font-size: 36px; vertical-align: top; margin-left: 4px; }
+.sc-minority-figures {
+  display: flex; justify-content: center; gap: 4px;
+  margin: 10px 0 6px;
+  font-size: 18px;
+}
+.sc-figure { opacity: 0.18; filter: grayscale(100%); transition: opacity 0.4s; }
+.sc-figure.on {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(167,139,250,0.7));
+  color: #a78bfa;
+}
+.sc-minority-label {
+  font-size: 11px; letter-spacing: 4px;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+}
+.variant-minority .sc-title {
+  background: linear-gradient(180deg, #fff 0%, #a78bfa 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+/* ═══════ Variant 4: 答對了 quiz-correct ═══════ */
+.share-card-v2.variant-quiz-correct {
+  background:
+    radial-gradient(circle 250px at 50% 35%, rgba(107,208,158,0.35) 0%, transparent 70%),
+    linear-gradient(180deg, #06180f 0%, #03100a 100%) !important;
+}
+.sc-check-hero { position: relative; width: 140px; height: 140px; margin: 8px auto 0; }
+.sc-check-burst-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(107,208,158,0.55); }
+.sc-check-burst-ring-1 {
+  background: radial-gradient(circle, rgba(107,208,158,0.4) 0%, transparent 65%);
+  box-shadow: 0 0 32px rgba(107,208,158,0.5);
+}
+.sc-check-burst-ring-2 {
+  animation: scCheckExpand 2.2s ease-out infinite;
+  border-color: rgba(107,208,158,0.4);
+}
+@keyframes scCheckExpand {
+  0%   { transform: scale(0.85); opacity: 0; }
+  50%  { opacity: 0.7; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+.sc-check-mark {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 96px; font-weight: 900;
+  color: #6bd09e;
+  text-shadow: 0 0 24px rgba(107,208,158,0.8);
+  z-index: 2;
+}
+.variant-quiz-correct .sc-title {
+  background: linear-gradient(180deg, #fff 0%, #6bd09e 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+
 @media (max-width: 480px) {
   .share-card-v2 { padding: 22px 18px; min-height: 420px; }
   .sc-icon-wrap { width: 110px; height: 110px; }
   .sc-title { font-size: 28px; }
   .sc-vs-crest, .sc-vs-blank { width: 52px; height: 52px; }
   .sc-vs-score { font-size: 30px; }
+  .sc-streak-num { font-size: 64px; }
+  .sc-streak-flame { font-size: 44px; }
+  .sc-target-hero { width: 130px; height: 130px; }
+  .sc-target-bullseye { font-size: 50px; }
+  .sc-minority-pct { font-size: 56px; }
+  .sc-check-hero { width: 110px; height: 110px; }
+  .sc-check-mark { font-size: 76px; }
 }
 
 .share-card-actions {
