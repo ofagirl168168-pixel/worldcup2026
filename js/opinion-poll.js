@@ -47,6 +47,9 @@
       new Function(text)();
       _opinionDataDate = today;
       console.log('[opinion] data refreshed for new day:', today);
+      // 跨日後也檢查一次預測題開獎（題庫剛換可能有新加 correctAnswer 的題）
+      // 之前 bug：只在 page load 跑一次，跨日掛網的使用者錯過揭曉通知
+      try { _checkPredictResolutions(); } catch (e) { console.warn('[opinion] post-refresh predict check err', e); }
     } catch (e) {
       console.warn('[opinion] refresh failed', e);
     } finally {
@@ -89,18 +92,43 @@
       localStorage.setItem(claimKey, '1');
       results.push({ opinion: o, won, myVote });
     }
-    // 逐個 toast 通知（排隊避免一次湧出）
-    if (results.length && typeof showToast === 'function') {
-      results.forEach((r, i) => setTimeout(() => {
-        const correctOpt = r.opinion.opts[r.opinion.correctAnswer] || '';
-        if (r.won) {
-          showToast(`🎯 預測命中「${_trim(r.opinion.q, 20)}」+${PREDICT_WIN_XP} XP +1 💎`);
-        } else {
-          showToast(`📣 開獎：「${_trim(r.opinion.q, 20)}」正解是 ${correctOpt}`);
-        }
-      }, i * 2500));
+    // 揭曉通知改用「常駐 banner」（toast 才 3 秒太容易漏看）
+    // 排隊顯示，使用者按 X 才消失；登入時也會記到 localStorage 持久顯示
+    if (results.length) {
+      results.forEach((r, i) => setTimeout(() => _showPredictResultBanner(r), i * 1200));
     }
     return results;
+  }
+
+  /* ---------- 揭曉結果 banner（持久顯示直到關閉，比 toast 更醒目）---------- */
+  function _showPredictResultBanner(r) {
+    const correctOpt = r.opinion.opts[r.opinion.correctAnswer] || '';
+    const myOpt = r.opinion.opts[r.myVote] || '';
+    const won = r.won;
+    const banner = document.createElement('div');
+    banner.className = 'predict-result-banner ' + (won ? 'banner-won' : 'banner-lost');
+    banner.innerHTML = `
+      <div class="prb-icon">${won ? '🎯' : '📣'}</div>
+      <div class="prb-body">
+        <div class="prb-title">${won ? '預測命中！' : '預測揭曉'}</div>
+        <div class="prb-q">${_trim(r.opinion.q, 30)}</div>
+        <div class="prb-detail">
+          <div>你選：${myOpt}</div>
+          <div>正解：${correctOpt}</div>
+        </div>
+        ${won ? `<div class="prb-reward">+${PREDICT_WIN_XP} XP &nbsp;&nbsp; +1 💎</div>` : '<div class="prb-encourage">沒中也沒關係，下次再戰！</div>'}
+      </div>
+      <button class="prb-close" aria-label="關閉">✕</button>
+    `;
+    document.body.appendChild(banner);
+    requestAnimationFrame(() => banner.classList.add('show'));
+    const close = () => {
+      banner.classList.remove('show');
+      setTimeout(() => banner.remove(), 350);
+    };
+    banner.querySelector('.prb-close').addEventListener('click', close);
+    // 30 秒後自動消失（避免使用者離開後留著）
+    setTimeout(() => { if (document.body.contains(banner)) close(); }, 30000);
   }
   function _trim(s, n) { return s && s.length > n ? s.slice(0, n) + '…' : (s || ''); }
 

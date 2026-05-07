@@ -1224,6 +1224,93 @@ img.flag-img {
 .supa-toast.toast-error   { border-color: var(--danger);  background: #2e1a1a; }
 .supa-toast.toast-info    { border-color: var(--info);     background: #1a1f2e; }
 
+/* ========== 預測題揭曉 Banner（比 toast 醒目，不自動消失）========== */
+.predict-result-banner {
+  position: fixed; bottom: 24px; right: 24px;
+  z-index: 9998;
+  display: flex; align-items: flex-start; gap: 12px;
+  background: linear-gradient(135deg, #1e2235 0%, #2a2e45 100%);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+  max-width: 360px;
+  width: calc(100vw - 48px);
+  opacity: 0; transform: translateX(20px) translateY(8px);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(.22,1,.36,1);
+}
+.predict-result-banner.show {
+  opacity: 1; transform: translateX(0) translateY(0);
+}
+.predict-result-banner.banner-won {
+  border-color: rgba(255,200,80,0.6);
+  background: linear-gradient(135deg, #2e2818 0%, #3a3220 100%);
+  box-shadow: 0 12px 40px rgba(255,200,80,0.25);
+}
+.predict-result-banner.banner-lost {
+  border-color: rgba(255,255,255,0.22);
+}
+.prb-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.prb-body {
+  flex: 1 1 auto; min-width: 0;
+}
+.prb-title {
+  font-size: 14px; font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.banner-won .prb-title { color: #ffd28a; }
+.prb-q {
+  font-size: 12px;
+  color: rgba(255,255,255,0.78);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.prb-detail {
+  font-size: 12px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.6;
+  background: rgba(0,0,0,0.25);
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.prb-reward {
+  font-size: 14px; font-weight: 800;
+  color: #ffc850;
+  letter-spacing: 0.04em;
+}
+.prb-encourage {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  font-style: italic;
+}
+.prb-close {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.prb-close:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+@media (max-width: 480px) {
+  .predict-result-banner {
+    bottom: 16px; right: 16px; left: 16px;
+    max-width: none;
+  }
+}
+
 /* ========== Loading Skeleton ========== */
 .skeleton {
   background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
