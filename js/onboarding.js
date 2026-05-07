@@ -127,10 +127,29 @@
         themeColor: '#6bd09e',
         shareText: '🎯 我剛在 Soccer麥迪 完成第一票！每天一題擂台投票、連續打卡升等，一起來戰？',
       });
-      // 投完第一票 5 秒後，再彈個 toast 提示挑戰賽（漸進引導）
-      setTimeout(() => _showChallengeNavHint(), 5500);
+      // 等使用者關掉分享卡才彈挑戰賽提示（不要疊在分享卡上面打架）
+      _waitForShareCardCloseThen(() => _showChallengeNavHint(), 1200);
     }, 3500);
   };
+
+  // 輪詢直到 #share-card-overlay 不存在 → 才執行 cb（再延遲 delayMs 給使用者一點呼吸時間）
+  function _waitForShareCardCloseThen(cb, delayMs) {
+    const POLL = 250;
+    const MAX_WAIT = 60000; // 1 分鐘上限，免得使用者忘記關卻一直 polling
+    let elapsed = 0;
+    const t = setInterval(() => {
+      const open = document.getElementById('share-card-overlay');
+      if (!open) {
+        clearInterval(t);
+        setTimeout(cb, delayMs || 0);
+        return;
+      }
+      elapsed += POLL;
+      if (elapsed >= MAX_WAIT) {
+        clearInterval(t); // 放棄（不要彈，避免幾分鐘後突然冒出來）
+      }
+    }, POLL);
+  }
 
   // ── 引導 2：投完第一票後，提示「挑戰賽」更好玩 ──
   function _showChallengeNavHint() {
