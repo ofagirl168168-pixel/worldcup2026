@@ -219,9 +219,12 @@ function removeEntriesForDate(targetDate) {
 
 // ─── 主流程 ────────────────────────────────────────────────
 async function main() {
-  const candidatesPath = process.argv[2];
+  // 解析參數：第一個非 flag 是 candidates path；--add-only 跳過 removeEntriesForDate
+  const args = process.argv.slice(2);
+  const addOnly = args.includes('--add-only');
+  const candidatesPath = args.find(a => !a.startsWith('--'));
   if (!candidatesPath) {
-    console.error('用法：node scripts/opinion-telegram.js <candidates.json>');
+    console.error('用法：node scripts/opinion-telegram.js <candidates.json> [--add-only]');
     process.exit(1);
   }
   writeLock();
@@ -231,8 +234,9 @@ async function main() {
     process.exit(1);
   }
 
-  // 目標日期（候選題統一用第 1 題的日期作為當日目標）
-  const targetDate = rawCandidates[0].date || '';
+  // 目標日期：候選題的 .date 或 .dates[0]（午後回顧題會用 dates 跨日）
+  const targetDate = rawCandidates[0].date || (Array.isArray(rawCandidates[0].dates) && rawCandidates[0].dates[0]) || '';
+  if (addOnly) console.log(`🔒 add-only 模式：寫入時不會刪除同日既有題目`);
 
   // 載入已在題庫中、日期對應 targetDate 的題目（排最前面；選它就維持不動）
   // 與永恆題庫（翻完候選後繼續顯示）
@@ -241,7 +245,12 @@ async function main() {
   try {
     const { DAILY_OPINIONS } = require(path.join(__dirname, '..', 'js', 'data-opinions.js'));
     if (targetDate) {
-      existing = DAILY_OPINIONS.filter(o => o.date === targetDate).map(o => ({ ...o, _existing: true }));
+      // 比對 .date 或 .dates[] 含 targetDate
+      existing = DAILY_OPINIONS.filter(o => {
+        if (o.date === targetDate) return true;
+        if (Array.isArray(o.dates) && o.dates.includes(targetDate)) return true;
+        return false;
+      }).map(o => ({ ...o, _existing: true }));
     }
     const allEternal = DAILY_OPINIONS.filter(o => !o.date).map(o => ({ ...o, _eternal: true }));
     // 以目標日期當種子洗牌，每天順序都不同但同天內一致
@@ -304,8 +313,10 @@ async function main() {
         } else {
           toWrite = { ...chosen, _existing: undefined };
         }
-        const removed = removeEntriesForDate(targetDate);
-        if (removed) console.log(`🗑️ 已移除 ${removed} 則同日 (${targetDate}) 舊題目`);
+        if (!addOnly) {
+          const removed = removeEntriesForDate(targetDate);
+          if (removed) console.log(`🗑️ 已移除 ${removed} 則同日 (${targetDate}) 舊題目`);
+        }
         console.log(`✅ 你選了：${chosen.q}${chosen._eternal ? `（永恆題 → 指派為 ${targetDate}）` : ''}`);
         const filePath = appendToDataFile(toWrite);
 
@@ -421,8 +432,11 @@ async function main() {
   }).catch(() => {});
   // 先清掉同日殘留 entry（跟 `use` action 一致）— 避免舊題壓在前面被 find() 撿走
   // 雖然 appendToDataFile 是 prepend、新題會在前面，但如果之前的人手動加錯位置殘留就會出包
-  const removed = removeEntriesForDate(targetDate);
-  if (removed) console.log(`🗑️ 已移除 ${removed} 則同日 (${targetDate}) 舊題目`);
+  // add-only 模式（午後回顧題）跳過清理，純粹新增第 2 題
+  if (!addOnly) {
+    const removed = removeEntriesForDate(targetDate);
+    if (removed) console.log(`🗑️ 已移除 ${removed} 則同日 (${targetDate}) 舊題目`);
+  }
   const filePath = appendToDataFile(fallback);
   console.log(`📝 已寫入 ${path.relative(process.cwd(), filePath)}`);
   autoCommitAndPush(targetDate, fallback.q);
