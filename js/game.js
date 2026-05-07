@@ -3096,26 +3096,31 @@ function _refreshDailyTaskUI() {
 
 function showDailyTaskPopup() {
   const popupKey = 'daily_task_popup_' + localDateStr();
-  if (localStorage.getItem(popupKey)) return; // 今天已彈過
+  if (localStorage.getItem(popupKey)) return;
   localStorage.setItem(popupKey, '1');
 
-  // 清理舊 popup keys
   for (let i = localStorage.length - 1; i >= 0; i--) {
     const k = localStorage.key(i);
     if (k && k.startsWith('daily_task_popup_') && k !== popupKey) localStorage.removeItem(k);
   }
 
-  const { total, done, allDone, claimed, tasks } = getDailyTaskProgress();
-
   const overlay = document.createElement('div');
   overlay.id = 'daily-task-popup';
-  overlay.className = 'dtask-popup-overlay';
+  overlay.className = 'dtask-popup-overlay dtask-popup-v2';
   overlay.innerHTML = `
-    <div class="dtask-popup-box">
-      <div class="dtask-popup-header">
-        <span><i class="fas fa-clipboard-check"></i> 今日任務</span>
-        <button class="dtask-popup-close" onclick="document.getElementById('daily-task-popup').remove()">&times;</button>
+    <div class="dtask-popup-box dtask-popup-card">
+      <div class="dtask-bg-glow"></div>
+      <div class="dtask-corner dtask-corner-tl"></div>
+      <div class="dtask-corner dtask-corner-tr"></div>
+      <div class="dtask-corner dtask-corner-bl"></div>
+      <div class="dtask-corner dtask-corner-br"></div>
+      <button class="dtask-popup-close" onclick="document.getElementById('daily-task-popup').remove()">×</button>
+      <div class="dtask-icon-wrap">
+        <div class="dtask-icon-ring"></div>
+        <img src="/assets/personas/a5-libra.svg" alt="" class="dtask-icon-svg">
       </div>
+      <div class="dtask-subtitle">DAILY QUEST</div>
+      <h3 class="dtask-popup-title">今日任務</h3>
       <div class="dtask-popup-sub">完成所有任務可領取每日寶箱 ${DAILY_CHEST_SVG}</div>
       <div id="daily-task-popup-body"></div>
       <button class="dtask-popup-go" onclick="document.getElementById('daily-task-popup').remove();showSection('arena')">
@@ -3144,7 +3149,10 @@ function _renderDailyTaskPopupBody(el) {
       const t = DAILY_TASK_POOL[id];
       if (!t) return '';
       const isDone = tasks[id];
-      const goBtn = !isDone && t.go ? `<button class="dtask-go-btn" onclick="document.getElementById('daily-task-popup')?.remove();${t.go}">去完成</button>` : '';
+      // 點「去完成」→ 關掉 popup → 跑 t.go → 之後彈 spotlight 指引到對應 UI
+      const goBtn = !isDone && t.go
+        ? `<button class="dtask-go-btn" onclick="document.getElementById('daily-task-popup')?.remove();${t.go};window._showTaskSpotlight&&window._showTaskSpotlight('${id}')">去完成</button>`
+        : '';
       return `<div class="dtask-row ${isDone ? 'dtask-done' : ''}">
         <span class="dtask-check">${isDone ? '<i class="fas fa-check-circle" style="color:var(--success)"></i>' : '<i class="far fa-square"></i>'}</span>
         <span class="dtask-icon">${t.icon}</span>
@@ -3157,4 +3165,85 @@ function _renderDailyTaskPopupBody(el) {
         claimed ? `${DAILY_CHEST_SVG} 今日寶箱已領取 ✓` :
         `${DAILY_CHEST_SVG} 全部完成可領取：+${DAILY_TASK_BONUS_XP} XP、+${DAILY_TASK_BONUS_GEM} 💎`}
     </div>`;
+}
+
+// ── 任務 spotlight 對應表：點「去完成」後指引到對應 UI ──
+const _TASK_SPOTLIGHTS = {
+  daily_quiz:        null, // 直接彈擂台 modal 就是引導本身
+  pred_match:        { sel: '#section-schedule .match-card', msg: '點任一場比賽來預測比分' },
+  play_rogue:        null, // 直接開遊戲
+  play_friend_room:  { sel: '.fr-lobby-create', msg: '點這裡開房（或下方加入別人開的房）' },
+  rogue_3000:        null,
+  share_any:         { sel: '#btn-share-daily', msg: '點這裡分享拿任務' },
+  unlock_match:      { sel: '#section-predictions .match-card, #section-predictions .pred-card', msg: '點任一場比賽解鎖 AI 分析' },
+  read_article:      { sel: '#section-focus .focus-main-card, #section-focus .focus-article-card', msg: '點任一篇文章開始閱讀' },
+};
+
+window._showTaskSpotlight = function _showTaskSpotlight(taskId) {
+  const sp = _TASK_SPOTLIGHTS[taskId];
+  if (!sp) return;
+  // 等 800ms 讓畫面切換到目標 section 完成
+  setTimeout(() => {
+    const target = document.querySelector(sp.sel);
+    if (!target) return;
+    try { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+    setTimeout(() => _attachTaskFinger(target, sp.msg), 400);
+  }, 800);
+};
+
+function _attachTaskFinger(target, message) {
+  // 移掉舊的
+  const old = document.getElementById('dtask-finger');
+  if (old) old.remove();
+
+  const wrap = document.createElement('div');
+  wrap.id = 'dtask-finger';
+  wrap.className = 'ob-finger-wrap';
+  document.body.appendChild(wrap);
+
+  let side = null;
+  function _renderInner(s) {
+    if (side === s) return;
+    side = s;
+    if (s === 'above') {
+      wrap.classList.add('ob-finger--above');
+      wrap.classList.remove('ob-finger--below');
+      wrap.innerHTML = `<div class="ob-finger-bubble">${message}</div><div class="ob-finger-emoji">👇</div>`;
+    } else {
+      wrap.classList.add('ob-finger--below');
+      wrap.classList.remove('ob-finger--above');
+      wrap.innerHTML = `<div class="ob-finger-emoji">👆</div><div class="ob-finger-bubble">${message}</div>`;
+    }
+  }
+
+  function reposition() {
+    const rect = target.getBoundingClientRect();
+    const HEADER_PAD = 90;
+    const tentativeH = wrap.offsetHeight || 90;
+    const useAbove = rect.top - tentativeH - 6 >= HEADER_PAD;
+    _renderInner(useAbove ? 'above' : 'below');
+    const wrapW = wrap.offsetWidth;
+    const wrapH = wrap.offsetHeight;
+    let left = rect.left + rect.width / 2 - wrapW / 2;
+    left = Math.max(8, Math.min(window.innerWidth - wrapW - 8, left));
+    const top = useAbove ? rect.top - wrapH - 6 : rect.bottom + 8;
+    wrap.style.left = left + 'px';
+    wrap.style.top = top + 'px';
+  }
+  reposition();
+  requestAnimationFrame(() => wrap.classList.add('show'));
+
+  let done = false;
+  function cleanup() {
+    if (done) return; done = true;
+    wrap.classList.remove('show');
+    setTimeout(() => wrap.remove(), 250);
+    target.removeEventListener('click', cleanup);
+    window.removeEventListener('resize', reposition);
+    window.removeEventListener('scroll', reposition, true);
+  }
+  target.addEventListener('click', cleanup);
+  window.addEventListener('resize', reposition);
+  window.addEventListener('scroll', reposition, true);
+  setTimeout(cleanup, 30000);
 }
