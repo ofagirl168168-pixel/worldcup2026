@@ -2151,6 +2151,143 @@ img.flag-img {
   80%      { transform: translateY(-6px) rotate(-3deg); }
 }
 
+/* ========== 預測 Hub：首頁待預測 + nav 紅點 ========== */
+.nav-predict-badge {
+  position: absolute;
+  top: 2px; right: 2px;
+  min-width: 18px; height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff3b30 0%, #c0392b 100%);
+  color: #fff;
+  font-size: 10px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(255,59,48,0.5);
+  border: 1.5px solid #07091a;
+  animation: navPredictBadgePulse 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes navPredictBadgePulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 2px 8px rgba(255,59,48,0.5); }
+  50%      { transform: scale(1.12); box-shadow: 0 2px 14px rgba(255,59,48,0.85); }
+}
+.home-pending-predict {
+  border-left: 3px solid var(--accent, #f0c040);
+  padding-left: 14px;
+}
+.home-pending-predict .section-header h2 {
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+}
+.pending-predict-streak {
+  font-size: 12px; font-weight: 700;
+  color: rgba(255,255,255,0.78);
+  background: rgba(255,107,53,0.12);
+  border: 1px solid rgba(255,107,53,0.4);
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-left: 4px;
+}
+.pp-streak-flame {
+  display: inline-block;
+  animation: ppFlameWobble 1.2s ease-in-out infinite;
+}
+@keyframes ppFlameWobble {
+  0%, 100% { transform: rotate(-6deg); }
+  50%      { transform: rotate(6deg); }
+}
+.pending-predict-list {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.pp-card {
+  display: flex; flex-direction: column; gap: 10px;
+  background: linear-gradient(135deg, rgba(240,192,64,0.08) 0%, rgba(240,192,64,0.02) 100%);
+  border: 1px solid var(--accent-border, rgba(240,192,64,0.4));
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.pp-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent, #f0c040);
+  box-shadow: 0 8px 24px rgba(240,192,64,0.18);
+}
+.pp-card.urgent {
+  border-color: rgba(255,69,58,0.55);
+  background: linear-gradient(135deg, rgba(255,69,58,0.12) 0%, rgba(255,69,58,0.02) 100%);
+  animation: ppUrgentPulse 1.8s ease-in-out infinite;
+}
+@keyframes ppUrgentPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,69,58,0.4); }
+  50%      { box-shadow: 0 0 22px 3px rgba(255,69,58,0.35); }
+}
+.pp-card.soon { border-color: rgba(255,200,80,0.6); }
+.pp-teams {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 700;
+  flex-wrap: wrap;
+}
+.pp-team-name {
+  color: #fff;
+  flex: 1; min-width: 0;
+  text-align: right;
+}
+.pp-team-name--away { text-align: left; }
+.pp-vs {
+  font-size: 11px;
+  color: var(--accent, #f0c040);
+  font-weight: 800;
+  letter-spacing: 1px;
+  flex: 0 0 auto;
+}
+.pp-crest {
+  width: 28px; height: 28px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+.pp-flag {
+  font-size: 22px;
+  flex: 0 0 auto;
+}
+.pp-crest-blank {
+  width: 28px; height: 28px;
+  display: inline-block;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+}
+.pp-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pp-countdown {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 600;
+}
+.pp-card.urgent .pp-countdown { color: #ff6b6b; font-weight: 800; }
+.pp-card.soon .pp-countdown { color: #ffd28a; font-weight: 700; }
+.pp-go-btn {
+  background: linear-gradient(135deg, var(--accent, #f0c040) 0%, var(--orange, #ff8c42) 100%);
+  color: #07091a;
+  border: 0;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 12px; font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(240,192,64,0.3);
+  transition: transform 0.12s, filter 0.12s;
+}
+.pp-go-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+@media (max-width: 600px) {
+  .pp-teams { font-size: 13px; gap: 6px; }
+  .pp-team-name { font-size: 13px; }
+  .pp-crest, .pp-crest-blank { width: 24px; height: 24px; }
+  .pp-go-btn { padding: 7px 14px; font-size: 11px; }
+}
+
 /* ========== Loading Skeleton ========== */
 .skeleton {
   background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);

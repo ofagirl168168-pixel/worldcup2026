@@ -4112,6 +4112,9 @@ function saveMyPred(matchId) {
   localStorage.setItem(predKey, JSON.stringify(myPreds));
   _updatePredBadge();
   completeDailyTask?.('pred_match');
+  // 預測 hub：更新 nav 紅點 + 首頁 hero（少了一場待預測）
+  try { window.updatePredictNavBadge?.(); } catch (e) {}
+  try { window.renderPredictHomeHero?.(); } catch (e) {}
 
   // 首次預測立即給 +1 XP 參與獎
   if (isNew) {
@@ -4120,6 +4123,30 @@ function saveMyPred(matchId) {
     localStorage.setItem(bonusKey, String(cur + 1));
     updateNavXP?.();
     showToast?.('🎉 參與獎 +1 XP');
+
+    // 預測 streak +1
+    let streakBumped = null;
+    try {
+      streakBumped = window.bumpPredictStreak?.();
+      if (streakBumped && streakBumped.bumped) {
+        const STREAK_BONUS = { 3: 15, 7: 50, 30: 200 };
+        const bonus = STREAK_BONUS[streakBumped.current];
+        if (bonus) {
+          // 加 XP（透過既有 bonus_xp 機制）
+          const cur2 = parseInt(localStorage.getItem(bonusKey)||'0') || 0;
+          localStorage.setItem(bonusKey, String(cur2 + bonus));
+          updateNavXP?.();
+          setTimeout(() => showToast?.(`🔥 預測連勝 ${streakBumped.current} 天！+${bonus} XP`), 1200);
+          // 里程碑分享卡
+          setTimeout(() => window._maybeShowPredictStreakCard?.(streakBumped.current, bonus), 4000);
+        }
+      }
+    } catch (e) {}
+
+    // 預測完成分享卡（一般情況；若同時觸發里程碑就讓里程碑卡出現，這張延後彈或不彈）
+    if (!(streakBumped && streakBumped.bumped && [3,7,30].includes(streakBumped.current))) {
+      setTimeout(() => window.showPredictShareCard?.(matchId, h, a), 2500);
+    }
   }
 
   document.getElementById('my-pred-overlay')?.remove();

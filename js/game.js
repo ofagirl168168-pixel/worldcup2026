@@ -3046,7 +3046,7 @@ function renderDailyTaskCard() {
     const t = DAILY_TASK_POOL[id];
     if (!t) return '';
     const isDone = tasks[id];
-    const goBtn = !isDone && t.go ? `<button class="dtask-go-btn" onclick="event.stopPropagation();${t.go}">去完成</button>` : '';
+    const goBtn = !isDone && t.go ? `<button class="dtask-go-btn" onclick="event.stopPropagation();${t.go};window._showTaskSpotlight&&window._showTaskSpotlight('${id}')">去完成</button>` : '';
     return `<div class="dtask-row ${isDone ? 'dtask-done' : ''}">
       <span class="dtask-check">${isDone ? '<i class="fas fa-check-circle" style="color:var(--success)"></i>' : '<i class="far fa-square"></i>'}</span>
       <span class="dtask-icon">${t.icon}</span>
