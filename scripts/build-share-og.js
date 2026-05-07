@@ -190,6 +190,7 @@ function drawPerson(ctx, cx, cy, h, color, glow) {
 }
 
 // ═══════════════════════ STREAK ═══════════════════════
+// 朋友視角 CTA：你能撐幾天？— 不放「我連勝 N 天」（那是炫耀，不是邀請）
 async function renderStreak(logo) {
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
@@ -199,16 +200,16 @@ async function renderStreak(logo) {
   radialGlow(ctx, '#c0392b', 0.22, W / 2, H, 500);
 
   drawBrand(ctx, '#ff6b35', logo);
-  drawBadge(ctx, 'STREAK MILESTONE', '#ff6b35');
+  drawBadge(ctx, 'STREAK CHALLENGE', '#ff6b35');
 
   // 三朵火焰
   drawFlame(ctx, W / 2 - 230, 305, 150, '#c0392b', '#ffd54f');
   drawFlame(ctx, W / 2,        260, 220, '#e74c3c', '#fff7e0');
   drawFlame(ctx, W / 2 + 230, 305, 150, '#c0392b', '#ffd54f');
 
-  drawTitle(ctx, '連勝挑戰', 480, '#fff7e0', '#ff6b35');
-  drawSubtitle(ctx, '你能撐幾天？跟我比比看誰先斷', 530);
-  drawFooter(ctx, '#ff6b35', '加入麥迪擂台 →');
+  drawTitle(ctx, '你能撐幾天？', 480, '#fff7e0', '#ff6b35');
+  drawSubtitle(ctx, '麥迪擂台 · 每日一題不間斷的意志力較量', 530);
+  drawFooter(ctx, '#ff6b35', '來挑戰連勝 →');
 
   return canvas.toBuffer('image/png');
 }
@@ -222,7 +223,7 @@ async function renderPredictWin(logo) {
   radialGlow(ctx, '#ffc850', 0.4, W / 2, 280, 480);
 
   drawBrand(ctx, '#ffc850', logo);
-  drawBadge(ctx, 'PREDICT · WIN', '#ffc850');
+  drawBadge(ctx, 'PREDICT IT', '#ffc850');
 
   // 牛眼靶心
   const cx = W / 2, cy = 290;
@@ -255,9 +256,9 @@ async function renderPredictWin(logo) {
   drawSpark(ctx, cx + 150, cy + 150, 14, '#ffe082');
   drawSpark(ctx, cx - 170, cy - 140, 12, '#ffe082');
 
-  drawTitle(ctx, '預測命中', 510, '#fff7d6', '#ffc850');
-  drawSubtitle(ctx, '敢來一起預測嗎？看誰眼光毒辣', 558);
-  drawFooter(ctx, '#ffc850', '一起來預測 →');
+  drawTitle(ctx, '你猜得到比分嗎？', 510, '#fff7d6', '#ffc850');
+  drawSubtitle(ctx, '麥迪擂台 · 預測比賽結果見眼光', 558);
+  drawFooter(ctx, '#ffc850', '來比眼光 →');
 
   return canvas.toBuffer('image/png');
 }
@@ -283,28 +284,38 @@ async function renderMinority(logo) {
   ctx.restore();
 
   drawBrand(ctx, '#a78bfa', logo);
-  drawBadge(ctx, 'MINORITY VOICE', '#a78bfa');
+  drawBadge(ctx, 'PICK A SIDE', '#a78bfa');
 
-  // 10 個人形（中央 2 個高亮）
-  const total = 10, gap = 86;
-  const totalW = (total - 1) * gap;
-  const startX = W / 2 - totalW / 2;
-  const py = 290, fSize = 70;
-  const onIdx = [3, 6];
-  for (let i = 0; i < total; i++) {
-    const x = startX + i * gap;
-    const isOn = onIdx.includes(i);
-    drawPerson(ctx, x, py, fSize, isOn ? '#a78bfa' : 'rgba(167,139,250,0.25)', isOn);
+  // 兩邊對峙：左 2 人形（紫色亮）vs 右 7 人形（暗灰）
+  // 中間「VS」拉開兩邊
+  const py = 280, fSize = 72;
+  const leftStartX = 200, rightStartX = 720, gap = 80;
+  // 左邊（少數派 — 你這邊）
+  for (let i = 0; i < 2; i++) {
+    drawPerson(ctx, leftStartX + i * gap, py, fSize, '#a78bfa', true);
   }
+  // 右邊（多數派 — 大眾）
+  for (let i = 0; i < 7; i++) {
+    drawPerson(ctx, rightStartX + i * gap, py, fSize, 'rgba(167,139,250,0.28)', false);
+  }
+  // VS 文字（中央）
+  ctx.font = `bold 56px ${FONT_BOLD}`;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#fff';
+  ctx.shadowColor = '#a78bfa';
+  ctx.shadowBlur = 20;
+  ctx.fillText('VS', 660, 300);
+  ctx.shadowBlur = 0;
 
-  drawTitle(ctx, '我是少數派', 480, '#ffffff', '#a78bfa');
-  drawSubtitle(ctx, '你跟大眾一樣嗎？來投一票看看', 530);
-  drawFooter(ctx, '#a78bfa', '看朋友站哪邊 →');
+  drawTitle(ctx, '你站哪邊？', 480, '#ffffff', '#a78bfa');
+  drawSubtitle(ctx, '麥迪擂台投票 · 多數派 vs 少數派', 530);
+  drawFooter(ctx, '#a78bfa', '來投一票 →');
 
   return canvas.toBuffer('image/png');
 }
 
 // ═══════════════════════ QUIZ-CORRECT ═══════════════════════
+// 朋友視角 CTA：把「✓ 答對了」換成「？你猜得到嗎」— 收到分享的人才會想點進來作答
 async function renderQuizCorrect(logo) {
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
@@ -313,9 +324,9 @@ async function renderQuizCorrect(logo) {
   radialGlow(ctx, '#6bd09e', 0.42, W / 2, 290, 500);
 
   drawBrand(ctx, '#6bd09e', logo);
-  drawBadge(ctx, 'DAILY QUIZ · CORRECT', '#6bd09e');
+  drawBadge(ctx, 'DAILY QUIZ', '#6bd09e');
 
-  // 爆發環
+  // 爆發環（保留 — 強調「行動感」）
   const cx = W / 2, cy = 290;
   ctx.strokeStyle = 'rgba(107,208,158,0.35)';
   ctx.lineWidth = 3;
@@ -330,23 +341,20 @@ async function renderQuizCorrect(logo) {
   ctx.fillStyle = ig;
   ctx.beginPath(); ctx.arc(cx, cy, 110, 0, 2 * Math.PI); ctx.fill();
 
-  // 大勾
-  ctx.strokeStyle = '#7befb0';
-  ctx.lineWidth = 26;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
+  // 大問號（取代原本的勾）
+  ctx.font = `bold 220px ${FONT_BOLD}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#7befb0';
   ctx.shadowColor = '#6bd09e';
   ctx.shadowBlur = 35;
-  ctx.beginPath();
-  ctx.moveTo(cx - 70, cy + 8);
-  ctx.lineTo(cx - 18, cy + 60);
-  ctx.lineTo(cx + 75, cy - 50);
-  ctx.stroke();
+  ctx.fillText('?', cx, cy + 12);
   ctx.shadowBlur = 0;
+  ctx.textBaseline = 'alphabetic';
 
-  drawTitle(ctx, '答對了！', 510, '#ffffff', '#6bd09e');
-  drawSubtitle(ctx, '考考朋友看誰先答對', 558);
-  drawFooter(ctx, '#6bd09e', '考考朋友 →');
+  drawTitle(ctx, '你猜得到嗎？', 510, '#ffffff', '#6bd09e');
+  drawSubtitle(ctx, '麥迪今日一題 · 4 選 1 連對有獎', 558);
+  drawFooter(ctx, '#6bd09e', '來答一題 →');
 
   return canvas.toBuffer('image/png');
 }

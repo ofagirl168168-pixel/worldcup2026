@@ -9,25 +9,27 @@
 //
 // 使用者點預覽進來後，client-side js 會把 ?ref= 抓走，再帶他到首頁。
 
+// og:title / og:desc 一律寫成朋友視角的邀請 — 收到分享的人才會想點進來
+// （原本「我答對了」「我預測命中」是炫耀，對接收方沒誘因）
 const VARIANTS = {
   'streak': {
-    title: '🔥 我在 Soccer麥迪 連勝中！你能撐幾天？',
-    desc: '麥迪擂台每日一題，連續答題挑戰意志力。看朋友能撐幾天不斷。',
+    title: '🔥 你能撐幾天？— 麥迪擂台連勝挑戰',
+    desc: '每日一題，看誰能連續答題不斷檔。意志力大比拼，敢來挑戰嗎？',
     accent: '#ff6b35',
   },
   'predict-win': {
-    title: '🎯 我預測命中了！Soccer麥迪 看誰眼光毒',
-    desc: '麥迪擂台 predict 題猜中比賽結果，命中拿 XP 和寶石。敢來比眼光嗎？',
+    title: '🎯 你猜得到比分嗎？— 麥迪擂台預測比賽',
+    desc: '預測比賽結果見真章，命中拿 XP 與寶石。看誰眼光毒辣，敢來比比看？',
     accent: '#ffc850',
   },
   'minority': {
-    title: '🤔 我跟少數派同隊！你跟大眾一樣嗎？',
-    desc: '麥迪擂台 trending 投票，看你站哪邊 — 多數還是少數？來投一票見真章。',
+    title: '🤔 你站哪邊？— 麥迪擂台投票多數派 vs 少數派',
+    desc: '球迷投票見真章。你跟大眾一樣，還是少數派？來投一票看自己站哪邊。',
     accent: '#a78bfa',
   },
   'quiz-correct': {
-    title: '✅ 我今日一題答對了！考考你的足球直覺',
-    desc: 'Soccer麥迪 今日挑戰每天 4 選 1，連對有獎勵。看誰先猜到正解。',
+    title: '❓ 你猜得到嗎？— 麥迪今日一題',
+    desc: '每天 4 選 1，連對有 XP 獎勵。考考你的足球直覺，敢來答一題嗎？',
     accent: '#6bd09e',
   },
 };
@@ -50,7 +52,7 @@ export async function onRequest(context) {
     return Response.redirect(`${origin}/`, 302);
   }
   const v = VARIANTS[variant];
-  const ogImage = `${origin}/og/s/${variant}.png?v=1`;
+  const ogImage = `${origin}/og/s/${variant}.png?v=2`;
   const canonical = `${origin}/s/${variant}`;
 
   // 拿首頁 base，HTMLRewriter 改 meta（跟 /r/<code> 同 pattern）
