@@ -81,9 +81,15 @@
     return `${m} 分鐘後開賽`;
   }
   function _crestImg(team) {
-    if (team && team.crest) return `<img src="${team.crest}" alt="" class="pp-crest">`;
-    if (team && team.flag) return `<span class="pp-flag">${team.flag}</span>`;
-    return '<span class="pp-crest pp-crest-blank"></span>';
+    if (!team) return '<span class="pp-crest pp-crest-blank"></span>';
+    // EPL/UCL: team.flag 是 URL（'https://crests.football-data.org/64.png'）
+    // 世足: team.flag 是 emoji 國旗（'🇫🇷'），team.crest 也可能存在
+    const v = team.crest || team.flag;
+    if (!v) return '<span class="pp-crest pp-crest-blank"></span>';
+    if (typeof v === 'string' && /^https?:\/\//i.test(v)) {
+      return `<img src="${v}" alt="" class="pp-crest" loading="lazy" referrerpolicy="no-referrer">`;
+    }
+    return `<span class="pp-flag">${v}</span>`;
   }
   function renderPredictHomeHero() {
     const root = document.getElementById('home-pending-predict');
