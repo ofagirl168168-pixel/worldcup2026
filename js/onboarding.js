@@ -538,22 +538,44 @@
     const wrap = document.createElement('div');
     wrap.id = 'ob-finger-pointer';
     wrap.className = 'ob-finger-wrap';
-    // 順序：上方 bubble 文字 → 下方 👇 emoji 指向按鈕
-    wrap.innerHTML = `
-      <div class="ob-finger-bubble">點這裡開房</div>
-      <div class="ob-finger-emoji">👇</div>`;
+    // 動態決定要放上方(用 👇)還是下方(用 👆)，後面 reposition 時填內容
     document.body.appendChild(wrap);
+
+    let currentSide = null; // 'above' | 'below'
+    function _renderWrap(side) {
+      if (currentSide === side) return;
+      currentSide = side;
+      if (side === 'above') {
+        // 在按鈕上方 → emoji 在下，朝下指向按鈕
+        wrap.classList.add('ob-finger--above');
+        wrap.classList.remove('ob-finger--below');
+        wrap.innerHTML = `
+          <div class="ob-finger-bubble">點這裡開房</div>
+          <div class="ob-finger-emoji">👇</div>`;
+      } else {
+        // 在按鈕下方 → emoji 在上，朝上指向按鈕
+        wrap.classList.add('ob-finger--below');
+        wrap.classList.remove('ob-finger--above');
+        wrap.innerHTML = `
+          <div class="ob-finger-emoji">👆</div>
+          <div class="ob-finger-bubble">點這裡開房</div>`;
+      }
+    }
 
     function reposition() {
       const rect = target.getBoundingClientRect();
+      // header 高度約 68px，留 90px 緩衝
+      const HEADER_PAD = 90;
+      // 預估 wrap 高度（先放上方算，若超過 header 再放下方）
+      const tentativeH = wrap.offsetHeight || 90;
+      const aboveTop = rect.top - tentativeH - 6;
+      const useAbove = aboveTop >= HEADER_PAD;
+      _renderWrap(useAbove ? 'above' : 'below');
       const wrapW = wrap.offsetWidth;
       const wrapH = wrap.offsetHeight;
-      // 手指放在按鈕「上方」(emoji 朝下指向按鈕)；超出邊界就修正
       let left = rect.left + rect.width / 2 - wrapW / 2;
       left = Math.max(8, Math.min(window.innerWidth - wrapW - 8, left));
-      let top = rect.top - wrapH - 6;
-      // 螢幕頂端不夠空間（被 header 擋）→ 改放下方
-      if (top < 80) top = rect.bottom + 8;
+      const top = useAbove ? rect.top - wrapH - 6 : rect.bottom + 8;
       wrap.style.left = left + 'px';
       wrap.style.top = top + 'px';
     }
