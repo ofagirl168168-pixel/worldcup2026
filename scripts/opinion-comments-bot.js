@@ -141,7 +141,7 @@ async function softDeleteComment(id) {
 // ─── 麥迪信箱（user_feedback）──────────────────────────────
 async function fetchNewFeedback(sinceIso) {
   const q = new URLSearchParams({
-    select: 'id,category,nickname,contact,content,created_at',
+    select: 'id,category,nickname,content,created_at',
     deleted: 'eq.false',
     created_at: `gt.${sinceIso}`,
     order: 'created_at.asc',
@@ -167,6 +167,26 @@ async function markFeedbackRead(id) {
     body: JSON.stringify({ read_at: new Date().toISOString() }),
   });
 }
+
+async function setFeedbackReply(id, replyText) {
+  const url = `${REST}/user_feedback?id=eq.${encodeURIComponent(id)}`;
+  const now = new Date().toISOString();
+  return await supaFetch(url, {
+    method: 'PATCH',
+    headers: { 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ reply: replyText, replied_at: now, read_at: now }),
+  });
+}
+
+// 預設回覆對應表（key 越短越好，Telegram callback_data 上限 64 byte）
+const PRESET_REPLIES = {
+  ack:  '👍 收到了，謝謝你的回饋！',
+  fix:  '🛠️ 已修復，下次部署後就會生效。',
+  todo: '📋 已加進待辦清單，會排時間做。',
+  good: '💡 很好的點子，會認真考慮！',
+  pass: '❌ 這個暫時不會做，但謝謝你的建議。',
+  thx:  '❤️ 謝謝支持，會繼續努力！',
+};
 
 // ─── 訊息格式 ─────────────────────────────────────────────
 function formatComment(c) {
@@ -206,14 +226,13 @@ function formatFeedback(f) {
   const timeStr = new Date(f.created_at).toLocaleString('zh-TW', {
     timeZone: 'Asia/Taipei', hour12: false,
   });
-  let body =
+  return (
     `📮 *麥迪信箱新訊息*\n\n` +
     `${escapeMd(cat)}\n` +
     `👤 ${escapeMd(nick)}\n` +
-    `🕘 ${escapeMd(timeStr)}\n`;
-  if (f.contact) body += `📞 ${escapeMd(f.contact)}\n`;
-  body += `\n📝 ${escapeMd(f.content)}`;
-  return body;
+    `🕘 ${escapeMd(timeStr)}\n\n` +
+    `📝 ${escapeMd(f.content)}`
+  );
 }
 
 async function sendFeedbackToTelegram(f) {
@@ -222,10 +241,22 @@ async function sendFeedbackToTelegram(f) {
     text: formatFeedback(f),
     parse_mode: 'MarkdownV2',
     reply_markup: {
-      inline_keyboard: [[
-        { text: '✅ 已讀', callback_data: `fbread:${f.id}` },
-        { text: '🗑️ 刪除', callback_data: `fbdel:${f.id}` },
-      ]],
+      inline_keyboard: [
+        [
+          { text: '👍 收到', callback_data: `fbr:ack:${f.id}` },
+          { text: '🛠️ 已修', callback_data: `fbr:fix:${f.id}` },
+          { text: '📋 待辦', callback_data: `fbr:todo:${f.id}` },
+        ],
+        [
+          { text: '💡 採納', callback_data: `fbr:good:${f.id}` },
+          { text: '❌ 不做', callback_data: `fbr:pass:${f.id}` },
+          { text: '❤️ 感謝', callback_data: `fbr:thx:${f.id}` },
+        ],
+        [
+          { text: '✅ 已讀', callback_data: `fbread:${f.id}` },
+          { text: '🗑️ 刪除', callback_data: `fbdel:${f.id}` },
+        ],
+      ],
     },
   });
 }
@@ -234,7 +265,11 @@ async function sendFeedbackToTelegram(f) {
 async function handleCallback(cb) {
   const data = cb.data || '';
   const msg = cb.message;
-  const [action, id] = data.split(':', 2);
+  const parts = data.split(':');
+  const action = parts[0];
+  // fbr:<preset>:<id> — 預設回覆，多一個參數
+  const presetKey = action === 'fbr' ? parts[1] : null;
+  const id = action === 'fbr' ? parts[2] : parts[1];
   if (!id) return;
 
   try {
@@ -269,6 +304,19 @@ async function handleCallback(cb) {
         text: (msg.text || '') + '\n\n✅ 已讀',
       });
       await tg('answerCallbackQuery', { callback_query_id: cb.id, text: '標記已讀' });
+    } else if (action === 'fbr') {
+      const replyText = PRESET_REPLIES[presetKey];
+      if (!replyText) {
+        await tg('answerCallbackQuery', { callback_query_id: cb.id, text: '未知的預設回覆', show_alert: true });
+        return;
+      }
+      await setFeedbackReply(id, replyText);
+      await tg('editMessageText', {
+        chat_id: msg.chat.id,
+        message_id: msg.message_id,
+        text: (msg.text || '') + `\n\n📬 已回覆：${replyText}`,
+      });
+      await tg('answerCallbackQuery', { callback_query_id: cb.id, text: '已回覆' });
     }
   } catch (e) {
     console.error('[callback]', action, id, e.message);

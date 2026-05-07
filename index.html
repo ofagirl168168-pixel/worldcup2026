@@ -50,9 +50,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/base.css?v=4" />
+  <link rel="stylesheet" href="css/components.css?v=4" />
+  <link rel="stylesheet" href="css/animations.css?v=4" />
 </head>
 <body>
 
@@ -652,10 +652,7 @@
             <label for="feedback-content">想說的話 <span class="feedback-len" id="feedback-len">0/500</span></label>
             <textarea id="feedback-content" maxlength="500" rows="6" required placeholder="500 字以內，越具體越好（哪個頁面、哪個按鈕、實際看到什麼）"></textarea>
           </div>
-          <div class="feedback-row">
-            <label for="feedback-contact">聯絡方式（選填，需要回覆才填）</label>
-            <input type="text" id="feedback-contact" maxlength="100" placeholder="email / Telegram / IG，留空就無法回覆" />
-          </div>
+          <p class="feedback-reply-hint">站長回覆會出現在「📂 我的紀錄」分頁，記得回來看看。</p>
           <div class="feedback-actions">
             <button type="button" class="feedback-cancel" onclick="closeFeedbackModal()">取消</button>
             <button type="submit" class="feedback-submit" id="feedback-submit-btn">📨 送出</button>

@@ -56,14 +56,26 @@
       }
       const CAT_ICON = { '建議': '💡', 'Bug': '🐛', '讚美': '❤️', '其他': '💬' };
       list.innerHTML = data.map(f => {
-        const read = f.read_at ? `<span class="fb-read-mark">✓ 已讀 ${_fmtTime(f.read_at)}</span>` : '<span class="fb-pending-mark">⏳ 等待查看</span>';
-        return `<div class="fb-item">
+        let status;
+        if (f.reply) {
+          status = `<span class="fb-replied-mark">📬 站長已回覆 ${_fmtTime(f.replied_at || f.read_at)}</span>`;
+        } else if (f.read_at) {
+          status = `<span class="fb-read-mark">✓ 已讀 ${_fmtTime(f.read_at)}</span>`;
+        } else {
+          status = '<span class="fb-pending-mark">⏳ 等待查看</span>';
+        }
+        const replyBlock = f.reply ? `<div class="fb-item-reply">
+          <div class="fb-reply-label">📬 站長回覆</div>
+          <div class="fb-reply-content">${escapeHtml(f.reply)}</div>
+        </div>` : '';
+        return `<div class="fb-item${f.reply ? ' has-reply' : ''}">
           <div class="fb-item-head">
             <span class="fb-item-cat">${CAT_ICON[f.category] || '💬'} ${escapeHtml(f.category)}</span>
             <span class="fb-item-time">${escapeHtml(_fmtTime(f.created_at))}</span>
           </div>
           <div class="fb-item-content">${escapeHtml(f.content)}</div>
-          <div class="fb-item-status">${read}</div>
+          ${replyBlock}
+          <div class="fb-item-status">${status}</div>
         </div>`;
       }).join('');
     } catch (e) {
@@ -134,7 +146,6 @@
 
     const cat = document.querySelector('.feedback-cat.active')?.dataset.cat || '其他';
     const nick = $('feedback-nick').value.trim() || null;
-    const contact = $('feedback-contact').value.trim() || null;
     const content = $('feedback-content').value.trim();
     if (!content) {
       status.textContent = '⚠️ 內容不能空白';
@@ -164,7 +175,6 @@
       const { error } = await window.DB.from('user_feedback').insert({
         category: cat,
         nickname: nick,
-        contact: contact,
         content: content,
         user_id: userId,
         voter_key: _ensureVoterKey(),
@@ -178,7 +188,6 @@
       // 清空表單
       $('feedback-content').value = '';
       $('feedback-nick').value = '';
-      $('feedback-contact').value = '';
       $('feedback-len').textContent = '0/500';
       // 2.5 秒後關閉
       setTimeout(() => closeFeedbackModal(), 2500);
