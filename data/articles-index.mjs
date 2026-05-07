@@ -52,6 +52,16 @@ export default [
     "shareable": true
   },
   {
+    "id": "11",
+    "tournament": "wc",
+    "title": "麥迪擂台第二週戰報：179 票見證歐冠四強最大驚奇",
+    "summary": "第二週擂台累積 7 題、179 票、38 則留言 — 票數比首週翻一倍多。歐冠四強票投最看好的「拜仁+兵工廠」結果一半夢碎，神留言「登能兒」也意外爆紅。",
+    "date": "2026-05-05",
+    "category": "社群觀察",
+    "readTime": "6分鐘",
+    "shareable": true
+  },
+  {
     "id": "epl-044",
     "tournament": "epl",
     "title": "【賽後回顧】切爾西 1-3 諾丁漢森林：Awoniyi 梅開二度，藍軍六連敗追平英超紀錄",
