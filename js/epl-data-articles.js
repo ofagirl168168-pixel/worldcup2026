@@ -2638,7 +2638,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <p><strong>預測：桑德蘭 0-2 曼聯</strong>——紅魔帶著歐冠資格的底氣穩穩拿下。</p>
 
 <h3>水晶宮 vs 愛華頓｜5/10（日）21:00 台灣時間</h3>
-<p><strong>水晶宮（第15・43分）</strong>Nketiah 賽季報銷、Doucouré 膝傷缺陣，但 Mateta-Sarr-Kamada-Pino 的主力攻擊線尚在。<strong>愛華頓（第10・48分）</strong>已數學上安全，但 Branthwaite 和 Grealish 賽季報銷。</p>
+<p><strong>水晶宮（第15・43分）</strong>Nketiah 賽季報銷、Cheick Doucouré 膝傷缺陣，但 Mateta-Sarr-Kamada-Pino 的主力攻擊線尚在。<strong>愛華頓（第10・48分）</strong>已數學上安全，但 Branthwaite 和 Grealish（曼城外借）賽季報銷。</p>
 <p><strong>預測：水晶宮 1-1 愛華頓</strong></p>
 
 <h3>伯恩利 vs 阿斯頓維拉｜5/10（日）21:00 台灣時間</h3>
