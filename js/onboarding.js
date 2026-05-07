@@ -279,11 +279,12 @@
   // 4 步驟：① 概念介紹（中央卡）② spotlight 開房按鈕 ③ spotlight 房間列表 ④ 結尾說明
   const TUTORIAL_STEPS = [
     {
-      mode: 'centered',
-      icon: 'a10-crown',
+      mode: 'spotlight',
+      target: '#section-friend-room .fr-lobby-title',
       title: '歡迎來到麥迪挑戰賽',
       body: '真實比賽即將開打？開一間「房」邀朋友一起 <b>猜比分</b>，比賽時用 AI 模擬賽事直播決勝負。',
       tip: '💡 4 步驟導覽，30 秒看完就會玩',
+      tooltipSide: 'bottom',
     },
     {
       mode: 'spotlight',
@@ -340,11 +341,13 @@
     const backBtn = root.querySelector('#cts-back');
     const nextBtn = root.querySelector('#cts-next');
 
+    let finishedByGoal = false; // true = 按了最後的「開始玩」（要彈手指指引）
     function close() {
       root.classList.remove('show');
       setTimeout(() => {
         root.remove();
         _flushDeferredDailyTask(); // tutorial 結束才彈每日任務
+        if (finishedByGoal) _showOpenRoomFinger();
       }, 300);
     }
     closeBtn.addEventListener('click', close);
@@ -459,7 +462,7 @@
     backBtn.addEventListener('click', () => { if (cur > 0) { cur--; render(); } });
     nextBtn.addEventListener('click', () => {
       if (cur < TUTORIAL_STEPS.length - 1) { cur++; render(); }
-      else close();
+      else { finishedByGoal = true; close(); }
     });
 
     requestAnimationFrame(() => {
@@ -477,6 +480,51 @@
     });
   }
   window.maybeShowChallengeTutorial = _showChallengeTutorial;
+
+  // ── 引導 4：教學結束 → 動畫手指指向「開房」按鈕 ──
+  function _showOpenRoomFinger() {
+    const target = document.querySelector('.fr-lobby-create');
+    if (!target) return;
+
+    // 已存在就先移掉避免重疊
+    const existing = document.getElementById('ob-finger-pointer');
+    if (existing) existing.remove();
+
+    const wrap = document.createElement('div');
+    wrap.id = 'ob-finger-pointer';
+    wrap.className = 'ob-finger-wrap';
+    wrap.innerHTML = `
+      <div class="ob-finger-bubble">點這裡開房 →</div>
+      <div class="ob-finger-emoji">👆</div>`;
+    document.body.appendChild(wrap);
+
+    function reposition() {
+      const rect = target.getBoundingClientRect();
+      const wrapW = wrap.offsetWidth;
+      const wrapH = wrap.offsetHeight;
+      // 手指放在按鈕下方、置中對齊；超出右邊界就靠右
+      let left = rect.left + rect.width / 2 - wrapW / 2;
+      left = Math.max(8, Math.min(window.innerWidth - wrapW - 8, left));
+      const top = rect.bottom + 8;
+      wrap.style.left = left + 'px';
+      wrap.style.top = top + 'px';
+    }
+    reposition();
+    requestAnimationFrame(() => wrap.classList.add('show'));
+
+    function cleanup() {
+      wrap.classList.remove('show');
+      setTimeout(() => wrap.remove(), 250);
+      target.removeEventListener('click', cleanup);
+      window.removeEventListener('resize', reposition);
+      window.removeEventListener('scroll', reposition, true);
+    }
+    target.addEventListener('click', cleanup);
+    window.addEventListener('resize', reposition);
+    window.addEventListener('scroll', reposition, true);
+    // 60 秒沒按也自動消失
+    setTimeout(cleanup, 60000);
+  }
 
   // 監聽 section 切換到 friend-room → 首次彈 tutorial（延遲 800ms 讓頁面渲染）
   document.addEventListener('click', (e) => {

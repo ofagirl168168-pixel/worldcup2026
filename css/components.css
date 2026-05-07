@@ -2095,6 +2095,47 @@ img.flag-img {
   .cts-card-centered .cts-title { font-size: 22px; }
 }
 
+/* ── 教學結束後動畫手指指向「開房」按鈕 ── */
+.ob-finger-wrap {
+  position: fixed;
+  z-index: 10262;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(.22,1,.36,1);
+}
+.ob-finger-wrap.show { opacity: 1; transform: translateY(0); }
+.ob-finger-bubble {
+  background: linear-gradient(135deg, #ffc850 0%, #ff9a3c 100%);
+  color: #0a0d1f;
+  font-size: 12px; font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(255,200,80,0.4);
+  white-space: nowrap;
+  animation: obFingerBubblePulse 2s ease-in-out infinite;
+}
+@keyframes obFingerBubblePulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+.ob-finger-emoji {
+  font-size: 36px;
+  filter: drop-shadow(0 4px 10px rgba(255,200,80,0.55));
+  animation: obFingerBounce 1s cubic-bezier(.34,1.56,.64,1) infinite;
+  transform-origin: center top;
+}
+@keyframes obFingerBounce {
+  0%, 100% { transform: translateY(0) rotate(-8deg); }
+  30%      { transform: translateY(-12px) rotate(0deg); }
+  60%      { transform: translateY(0) rotate(8deg); }
+  80%      { transform: translateY(-6px) rotate(-4deg); }
+}
+
 /* ========== Loading Skeleton ========== */
 .skeleton {
   background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
