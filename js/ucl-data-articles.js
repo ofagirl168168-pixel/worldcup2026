@@ -1066,3 +1066,4 @@ Camavinga 紅牌成為轉折點。第 89 分鐘 Luis Díaz 突入禁區冷靜推
 
 // 導出
 if (typeof window !== 'undefined') window.UCL_ARTICLES = UCL_ARTICLES;
+
