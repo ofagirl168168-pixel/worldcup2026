@@ -77,17 +77,31 @@
   }
 
   // ── 啟動 ──
+  // 跟「每日麥迪擂台彈窗」打架的問題：以前 init 在 3 秒後直接彈引導，
+  // 但 daily popup 可能更晚才開（auto-refresh / 資料載入完才開）→ 兩個 overlay 疊在一起。
+  // 修法：擂台彈窗如果在最初 8 秒內出現，當作「使用者已被引導到擂台」→ 跳過 onboarding。
   function init() {
     if (!isFirstTimeVisitor()) return;
-    // 等 3 秒讓使用者先看到首頁，再彈引導
-    setTimeout(() => {
-      // 二次檢查：如果擂台彈窗已經自己彈起來了（每日彈窗），不要重疊
+    // 等候 8 秒看擂台彈窗會不會自己跳；途中任何時點偵測到 #opinion-overlay → markVisited 直接跳過
+    let elapsed = 0;
+    const POLL_MS = 250;
+    const MAX_WAIT_MS = 8000;
+    const timer = setInterval(() => {
+      // 1. 已經跳了擂台彈窗 → 視同已引導，永遠不再彈 onboarding
       if (document.getElementById('opinion-overlay')) {
-        markVisited(); // 算他看過了
+        clearInterval(timer);
+        markVisited();
         return;
       }
-      showWelcomeArrow();
-    }, 3000);
+      // 2. 過 8 秒還沒跳擂台 → 自己彈引導
+      elapsed += POLL_MS;
+      if (elapsed >= MAX_WAIT_MS) {
+        clearInterval(timer);
+        // 最終還要再確認一次（race condition 保險）
+        if (document.getElementById('opinion-overlay')) { markVisited(); return; }
+        showWelcomeArrow();
+      }
+    }, POLL_MS);
   }
 
   if (document.readyState === 'loading') {
