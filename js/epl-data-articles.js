@@ -2571,7 +2571,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>曼城近況：Doku 救命但問題浮現</h3>
 
-<p>愛華頓一戰暴露了曼城的兩大隱患：<strong>後防鬆動</strong>和<strong>中場缺乏 Rodri 的節奏控制</strong>。Gvardiol 賽季報銷、Dias 缺陣，中後衛組合只剩 Akanji 和 Stones（剛回歸），Marc Guehi 的低級失誤更是直接送了愛華頓一球。Jérémy Doku 兩度建功是唯一的亮點——包括補時第 97 分鐘的絕平進球。</p>
+<p>愛華頓一戰暴露了曼城的兩大隱患：<strong>後防鬆動</strong>和<strong>中場缺乏 Rodri 的節奏控制</strong>。Gvardiol 脛骨骨折長期缺陣（本季復出存疑）、Dias 缺陣，中後衛組合只剩 Akanji 和 Stones（剛回歸），Marc Guehi 的低級失誤更是直接送了愛華頓一球。Jérémy Doku 兩度建功是唯一的亮點——包括補時第 97 分鐘的絕平進球。</p>
 
 <p>Haaland 本季英超已轟進 25 球，是金靴獎的有力爭奪者。但若 Rodri 無法復出，曼城中場的防守屏障和推進能力都會打折扣。</p>
 
@@ -2590,11 +2590,11 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px">曼城</td>
-<td style="padding:8px">Rodri（腹股溝，待評估）、Gvardiol（脛骨骨折，賽季報銷）、Dias（腳踝，五月中旬目標）</td>
+<td style="padding:8px">Rodri（腹股溝，待評估）、Gvardiol（脛骨骨折，本季復出存疑）、Dias（腳踝，五月中旬目標）</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px">布倫特福德</td>
-<td style="padding:8px">Jordan Henderson（傷缺）、Vitaly Janelt（傷缺）、Rico Henry（長期傷缺）、Fábio Carvalho（傷缺）</td>
+<td style="padding:8px">Jordan Henderson（傷缺）、Vitaly Janelt（傷缺）、Rico Henry（長期傷缺）、Fábio Carvalho（ACL，賽季報銷）</td>
 </tr>
 </table>
 
