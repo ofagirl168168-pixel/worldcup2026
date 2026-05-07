@@ -508,19 +508,22 @@
     const wrap = document.createElement('div');
     wrap.id = 'ob-finger-pointer';
     wrap.className = 'ob-finger-wrap';
+    // 順序：上方 bubble 文字 → 下方 👇 emoji 指向按鈕
     wrap.innerHTML = `
-      <div class="ob-finger-bubble">點這裡開房 →</div>
-      <div class="ob-finger-emoji">👆</div>`;
+      <div class="ob-finger-bubble">點這裡開房</div>
+      <div class="ob-finger-emoji">👇</div>`;
     document.body.appendChild(wrap);
 
     function reposition() {
       const rect = target.getBoundingClientRect();
       const wrapW = wrap.offsetWidth;
       const wrapH = wrap.offsetHeight;
-      // 手指放在按鈕下方、置中對齊；超出右邊界就靠右
+      // 手指放在按鈕「上方」(emoji 朝下指向按鈕)；超出邊界就修正
       let left = rect.left + rect.width / 2 - wrapW / 2;
       left = Math.max(8, Math.min(window.innerWidth - wrapW - 8, left));
-      const top = rect.bottom + 8;
+      let top = rect.top - wrapH - 6;
+      // 螢幕頂端不夠空間（被 header 擋）→ 改放下方
+      if (top < 80) top = rect.bottom + 8;
       wrap.style.left = left + 'px';
       wrap.style.top = top + 'px';
     }
