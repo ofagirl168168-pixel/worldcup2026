@@ -349,8 +349,13 @@
       root.classList.remove('show');
       setTimeout(() => {
         root.remove();
-        _flushDeferredDailyTask(); // tutorial 結束才彈每日任務
-        if (finishedByGoal) _showOpenRoomFinger();
+        if (finishedByGoal) {
+          // 完整看完教學 → 接手指指引；每日任務再延後到使用者按開房或 60 秒後
+          _showOpenRoomFinger();
+        } else {
+          // 中途略過 → 直接補彈每日任務
+          _flushDeferredDailyTask();
+        }
       }, 300);
     }
     closeBtn.addEventListener('click', close);
@@ -487,7 +492,14 @@
   // ── 引導 4：教學結束 → 動畫手指指向「開房」按鈕 ──
   function _showOpenRoomFinger() {
     const target = document.querySelector('.fr-lobby-create');
-    if (!target) return;
+    if (!target) {
+      // 沒找到開房按鈕（不該發生，但保險）→ 直接 flush 不卡死
+      _flushDeferredDailyTask();
+      return;
+    }
+
+    // 確保 daily task popup 仍在 deferred 狀態 — finger 期間不要彈
+    window.__deferDailyTaskForChallenge = true;
 
     // 已存在就先移掉避免重疊
     const existing = document.getElementById('ob-finger-pointer');
@@ -515,12 +527,17 @@
     reposition();
     requestAnimationFrame(() => wrap.classList.add('show'));
 
+    let done = false;
     function cleanup() {
+      if (done) return;
+      done = true;
       wrap.classList.remove('show');
       setTimeout(() => wrap.remove(), 250);
       target.removeEventListener('click', cleanup);
       window.removeEventListener('resize', reposition);
       window.removeEventListener('scroll', reposition, true);
+      // 手指指引結束才補彈每日任務
+      _flushDeferredDailyTask();
     }
     target.addEventListener('click', cleanup);
     window.addEventListener('resize', reposition);
