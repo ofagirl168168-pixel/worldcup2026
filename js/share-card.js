@@ -22,6 +22,40 @@
     psychic:   'a6-psychic-waves',   // 通用 → 預知
   };
 
+  // ── Variant 對應的客製 CTA / 提示 / 分享連結路徑（站內外文案差異化關鍵）
+  // sharePath 對應 functions/s/<variant>.js → 該路徑回首頁但改寫 og:image / og:title
+  // 所以 LINE/TG 預覽會看到該 variant 專屬縮圖（og/s/<variant>.png）
+  const VARIANT_CFG = {
+    'streak': {
+      cta: '挑戰我的連勝紀錄 →',
+      hint: '炫耀給朋友看，對方加入雙方各拿 +5 💎',
+      btnLineLabel: '🔥 LINE 炫耀',
+      btnTgLabel: '✈️ Telegram 戰書',
+      sharePath: '/s/streak',
+    },
+    'predict-win': {
+      cta: '比比看誰眼光毒辣 →',
+      hint: '邀朋友比預測眼光，雙方各拿 +5 💎',
+      btnLineLabel: '🎯 LINE 比眼光',
+      btnTgLabel: '✈️ Telegram 戰帖',
+      sharePath: '/s/predict-win',
+    },
+    'minority': {
+      cta: '看朋友站哪邊 →',
+      hint: '看朋友是多數還是少數派，加入雙方拿 +5 💎',
+      btnLineLabel: '🤔 LINE 投票戰',
+      btnTgLabel: '✈️ Telegram',
+      sharePath: '/s/minority',
+    },
+    'quiz-correct': {
+      cta: '考考朋友答不答得出來 →',
+      hint: '看朋友答不答得出今日一題，加入雙方拿 +5 💎',
+      btnLineLabel: '✅ LINE 考朋友',
+      btnTgLabel: '✈️ Telegram',
+      sharePath: '/s/quiz-correct',
+    },
+  };
+
   // ── URL ?ref → localStorage（首次造訪生效）
   (function captureRef() {
     try {
@@ -88,7 +122,11 @@
     if (document.getElementById('share-card-overlay')) return;
 
     const voterKey = getVoterKey();
-    const shareUrl = (opts.shareUrlBase || location.origin) + '?ref=' + encodeURIComponent(voterKey);
+    const cfg = VARIANT_CFG[opts.variant] || {};
+    // 有對應 variant → 用 /s/<variant>?ref=...（社群預覽會看到客製 OG）
+    // 沒有 → fallback 到首頁 ?ref=...（通用 OG）
+    const sharePath = cfg.sharePath || '';
+    const shareUrl = (opts.shareUrlBase || location.origin) + sharePath + '?ref=' + encodeURIComponent(voterKey);
     const themeColor = opts.themeColor || '#f0c040';
     const iconFile = EVENT_ICONS[opts.icon] || EVENT_ICONS.psychic;
     const iconUrl = `/assets/personas/${iconFile}.svg`;
@@ -130,16 +168,16 @@
             <div class="sc-divider"></div>
             <div class="sc-footer-row">
               <div class="sc-url">soccermaddy · 麥迪擂台</div>
-              <div class="sc-cta">→ 加入挑戰</div>
+              <div class="sc-cta">${cfg.cta || '→ 加入挑戰'}</div>
             </div>
           </div>
         </div>
         <div class="share-card-arrow">↓</div>
         <div class="share-card-actions">
-          <div class="share-card-hint">分享後對方加入，雙方各拿 +5 💎</div>
+          <div class="share-card-hint">${cfg.hint || '分享後對方加入，雙方各拿 +5 💎'}</div>
           <div class="share-card-btns">
-            <button class="sc-btn sc-btn-line" data-action="line">📲 LINE 分享</button>
-            <button class="sc-btn sc-btn-tg" data-action="tg">✈️ Telegram</button>
+            <button class="sc-btn sc-btn-line" data-action="line">${cfg.btnLineLabel || '📲 LINE 分享'}</button>
+            <button class="sc-btn sc-btn-tg" data-action="tg">${cfg.btnTgLabel || '✈️ Telegram'}</button>
             <button class="sc-btn sc-btn-copy" data-action="copy">🔗 複製連結</button>
             <button class="sc-btn sc-btn-png" data-action="png">🖼️ 存成圖片</button>
           </div>
