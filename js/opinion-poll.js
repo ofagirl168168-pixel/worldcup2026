@@ -129,6 +129,18 @@
     banner.querySelector('.prb-close').addEventListener('click', close);
     // 30 秒後自動消失（避免使用者離開後留著）
     setTimeout(() => { if (document.body.contains(banner)) close(); }, 30000);
+
+    // 🎯 預測命中 → 觸發分享卡（5 秒後，讓使用者先看到 banner）
+    if (won && typeof showShareCard === 'function') {
+      setTimeout(() => showShareCard({
+        eventKey: 'predict-win-' + r.opinion.id,
+        title: '🎯 預測命中！',
+        subtitle: 'MADDY ARENA · PREDICT WIN',
+        bodyHtml: `<div style="font-size:13px;line-height:1.5">${_trim(r.opinion.q, 36)}</div><div style="margin-top:8px"><b>${myOpt}</b></div><div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:6px">+${PREDICT_WIN_XP} XP &nbsp;+1 💎</div>`,
+        themeColor: '#ffc850',
+        shareText: `🎯 我預測中了「${_trim(r.opinion.q, 24)}」！你也來 Soccer麥迪 試試運氣？`,
+      }), 5000);
+    }
   }
   function _trim(s, n) { return s && s.length > n ? s.slice(0, n) + '…' : (s || ''); }
 
@@ -367,8 +379,26 @@
         const bonus = STREAK_BONUS[bumped.current];
         _addOpinionXP(bonus);
         try { if (typeof showToast === 'function') setTimeout(() => showToast(`🔥 連勝 ${bumped.current} 天里程碑！+${bonus} XP`), 800); } catch (e) {}
+        // 🎉 連勝里程碑 → 觸發分享卡（延遲到 toast 之後 4 秒、避免擋住投票結果動畫）
+        try {
+          if (typeof showShareCard === 'function') {
+            setTimeout(() => showShareCard({
+              eventKey: 'streak-' + bumped.current,
+              title: `🔥 連勝 ${bumped.current} 天！`,
+              subtitle: 'MADDY ARENA · STREAK MILESTONE',
+              bodyHtml: `<div>我在麥迪擂台連續答題 <b>${bumped.current}</b> 天</div><div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:6px">+${bonus} XP 里程碑入袋</div>`,
+              themeColor: '#ff6b35',
+              shareText: `🔥 我在 Soccer麥迪 連勝 ${bumped.current} 天！每天一題擂台投票、累積等級，你敢挑戰嗎？`,
+            }), 4000);
+          }
+        } catch (e) {}
       }
     }
+
+    // 被邀請者首次投票 → 兌現雙方推薦獎勵
+    try { if (typeof claimReferralIfPending === 'function') claimReferralIfPending(); } catch (e) {}
+    // 新使用者首次投票 → 引導分享給朋友
+    try { if (typeof maybeShowFirstVoteShare === 'function') maybeShowFirstVoteShare(opinion); } catch (e) {}
 
     // 送到 Supabase（失敗不擋 UI）
     _insertVote(opinion.id, chosenIdx);
@@ -518,6 +548,22 @@
     // 找少數派（至少有 2 人投票才判斷，避免首票就被叫少數派）
     const maxVotes = Math.max(...votes);
     const isMinority = totalVotes >= 2 && votes[chosenIdx] < maxVotes;
+
+    // 🔥 trending 少數派 + 大眾分裂 → 觸發分享卡（只對 trending；predict 走預測命中那條）
+    // 條件：當下投的(剛投票)、是少數派、總票數 >= 5、是 trending 題
+    const isFreshVote = !!overlay.dataset.streakBump; // _handleVote 設過 → 剛投完
+    if (isFreshVote && isMinority && totalVotes >= 5 && opinion.type === 'trending' && typeof showShareCard === 'function') {
+      const myPct = Math.round(votes[chosenIdx] / totalVotes * 100);
+      const myOpt = (opinion.opts[chosenIdx] || '').slice(0, 30);
+      setTimeout(() => showShareCard({
+        eventKey: 'minority-' + opinion.id,
+        title: '🤔 我是少數派',
+        subtitle: 'MADDY ARENA · MINORITY VOICE',
+        bodyHtml: `<div style="font-size:13px">${_trim(opinion.q, 36)}</div><div style="margin-top:8px">我選 <b>${myOpt}</b></div><div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:6px">只有 ${myPct}% 的人跟我一樣</div>`,
+        themeColor: '#a78bfa',
+        shareText: `🤔 麥迪擂台「${_trim(opinion.q, 22)}」我跟 ${myPct}% 少數派同陣線。你怎麼看？`,
+      }), 5500);
+    }
 
     // 連續天數：若剛投完票（_handleVote 寫入 dataset），用 bumped 後狀態；否則直接讀
     let streak;

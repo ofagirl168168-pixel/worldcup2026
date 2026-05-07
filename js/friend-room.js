@@ -716,6 +716,7 @@
   function _showInviteResult(roomCode, isPublic) {
     const url = `${location.origin}/r/${roomCode}`;
     if (navigator.clipboard) navigator.clipboard.writeText(url).catch(() => {});
+    const shareText = `🏆 開了挑戰賽房 #${roomCode}！來戰！誰猜比分最準。`;
 
     const overlay = document.createElement('div');
     overlay.className = 'fr-modal-overlay';
@@ -725,7 +726,12 @@
         <div class="fr-invite-icon">${isPublic ? '🎉' : '🔒'}</div>
         <h3 class="fr-modal-title">${isPublic ? '公開房' : '私人房'}建立成功</h3>
         <div class="fr-invite-code">#${roomCode}</div>
-        <p class="fr-modal-sub">邀請連結已複製到剪貼簿</p>
+        <p class="fr-modal-sub">邀請連結已複製，立刻分享拉朋友來戰：</p>
+        <div class="fr-share-grid">
+          <button type="button" class="fr-share-btn fr-share-line" id="fr-share-line">📲 LINE</button>
+          <button type="button" class="fr-share-btn fr-share-tg" id="fr-share-tg">✈️ Telegram</button>
+          <button type="button" class="fr-share-btn fr-share-copy" id="fr-share-copy">🔗 再複製一次</button>
+        </div>
         <div class="fr-invite-link">${url}</div>
         <div class="fr-form-actions">
           <button type="button" class="fr-btn fr-btn--submit" id="fr-invite-ok">進入房間</button>
@@ -738,7 +744,6 @@
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 250);
     };
-    // 按「進入房間」/ X / 點外面 → 關 invite modal 後自動 joinRoom 進房（房主停在房內看倒數、聊天，不會被丟回大廳）
     const closeAndEnter = () => {
       close();
       setTimeout(() => {
@@ -748,6 +753,22 @@
     overlay.addEventListener('click', e => { if (e.target === overlay) closeAndEnter(); });
     overlay.querySelector('.fr-modal-close').addEventListener('click', closeAndEnter);
     overlay.querySelector('#fr-invite-ok').addEventListener('click', closeAndEnter);
+    overlay.querySelector('#fr-share-line').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const t = encodeURIComponent(`${shareText} ${url}`);
+      window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}&text=${t}`, '_blank', 'noopener');
+    });
+    overlay.querySelector('#fr-share-tg').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`, '_blank', 'noopener');
+    });
+    overlay.querySelector('#fr-share-copy').addEventListener('click', async (ev) => {
+      ev.stopPropagation();
+      try {
+        await navigator.clipboard.writeText(`${shareText} ${url}`);
+        if (typeof showToast === 'function') showToast('🔗 連結已複製');
+      } catch (e) {}
+    });
   }
 
   // ── 進房間 + 猜比分 ─────────────────────────────────────
