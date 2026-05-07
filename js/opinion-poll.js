@@ -130,13 +130,15 @@
     // 30 秒後自動消失（避免使用者離開後留著）
     setTimeout(() => { if (document.body.contains(banner)) close(); }, 30000);
 
-    // 🎯 預測命中 → 觸發分享卡（5 秒後，讓使用者先看到 banner）
+    // 🎯 預測命中 → 觸發分享卡
     if (won && typeof showShareCard === 'function') {
       setTimeout(() => showShareCard({
         eventKey: 'predict-win-' + r.opinion.id,
-        title: '🎯 預測命中！',
-        subtitle: 'MADDY ARENA · PREDICT WIN',
-        bodyHtml: `<div style="font-size:13px;line-height:1.5">${_trim(r.opinion.q, 36)}</div><div style="margin-top:8px"><b>${myOpt}</b></div><div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:6px">+${PREDICT_WIN_XP} XP &nbsp;+1 💎</div>`,
+        icon: 'predict',
+        title: '預測命中',
+        subtitle: 'PREDICT WIN',
+        bodyText: `${_trim(r.opinion.q, 36)}<br/>我選 <b>${myOpt}</b>`,
+        reward: `+${PREDICT_WIN_XP} XP　+1 💎`,
         themeColor: '#ffc850',
         shareText: `🎯 我預測中了「${_trim(r.opinion.q, 24)}」！你也來 Soccer麥迪 試試運氣？`,
       }), 5000);
@@ -379,16 +381,19 @@
         const bonus = STREAK_BONUS[bumped.current];
         _addOpinionXP(bonus);
         try { if (typeof showToast === 'function') setTimeout(() => showToast(`🔥 連勝 ${bumped.current} 天里程碑！+${bonus} XP`), 800); } catch (e) {}
-        // 🎉 連勝里程碑 → 觸發分享卡（延遲到 toast 之後 4 秒、避免擋住投票結果動畫）
+        // 🎉 連勝里程碑 → 觸發分享卡
         try {
           if (typeof showShareCard === 'function') {
             setTimeout(() => showShareCard({
               eventKey: 'streak-' + bumped.current,
-              title: `🔥 連勝 ${bumped.current} 天！`,
-              subtitle: 'MADDY ARENA · STREAK MILESTONE',
-              bodyHtml: `<div>我在麥迪擂台連續答題 <b>${bumped.current}</b> 天</div><div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:6px">+${bonus} XP 里程碑入袋</div>`,
+              icon: 'streak',
+              badge: bumped.current,
+              title: `連勝 ${bumped.current} 天`,
+              subtitle: 'STREAK MILESTONE',
+              bodyText: `麥迪擂台連續答題 <b>${bumped.current}</b> 天<br/>每日不間斷的決策訓練`,
+              reward: `+${bonus} XP`,
               themeColor: '#ff6b35',
-              shareText: `🔥 我在 Soccer麥迪 連勝 ${bumped.current} 天！每天一題擂台投票、累積等級，你敢挑戰嗎？`,
+              shareText: `🔥 我在 Soccer麥迪 連勝 ${bumped.current} 天！每天一題擂台投票，你敢挑戰嗎？`,
             }), 4000);
           }
         } catch (e) {}
@@ -557,9 +562,12 @@
       const myOpt = (opinion.opts[chosenIdx] || '').slice(0, 30);
       setTimeout(() => showShareCard({
         eventKey: 'minority-' + opinion.id,
-        title: '🤔 我是少數派',
-        subtitle: 'MADDY ARENA · MINORITY VOICE',
-        bodyHtml: `<div style="font-size:13px">${_trim(opinion.q, 36)}</div><div style="margin-top:8px">我選 <b>${myOpt}</b></div><div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:6px">只有 ${myPct}% 的人跟我一樣</div>`,
+        icon: 'minority',
+        badge: myPct + '%',
+        title: '我是少數派',
+        subtitle: 'MINORITY VOICE',
+        bodyText: `${_trim(opinion.q, 36)}<br/>我選 <b>${myOpt}</b>`,
+        reward: `只有 ${myPct}% 的人跟我同陣線`,
         themeColor: '#a78bfa',
         shareText: `🤔 麥迪擂台「${_trim(opinion.q, 22)}」我跟 ${myPct}% 少數派同陣線。你怎麼看？`,
       }), 5500);
