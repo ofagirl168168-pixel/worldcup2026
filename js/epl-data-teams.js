@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-05-07 日更）
+   資料截止：2025/26 賽季（2026-05-07 午後更新）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -786,11 +786,11 @@ window.EPL_MATCHES = [
   // 布萊頓 vs 狼隊 | 05/09 22:00 台灣時間 (05/09 15:00 BST)
   {id:'EPL-MW36-BHA-WOL', matchday:36, date:'2026-05-09', time:'22:00', home:'BHA', away:'WOL', stage:'league', status:'upcoming'},
 
-  // 伯恩利 vs 阿斯頓維拉 | 05/09 22:00 台灣時間
-  {id:'EPL-MW36-BUR-AVL', matchday:36, date:'2026-05-09', time:'22:00', home:'BUR', away:'AVL', stage:'league', status:'upcoming'},
+  // 伯恩利 vs 阿斯頓維拉 | 05/10 21:00 台灣時間 (05/10 14:00 BST，因歐霸延賽)
+  {id:'EPL-MW36-BUR-AVL', matchday:36, date:'2026-05-10', time:'21:00', home:'BUR', away:'AVL', stage:'league', status:'upcoming'},
 
-  // 水晶宮 vs 愛華頓 | 05/09 22:00 台灣時間
-  {id:'EPL-MW36-CRY-EVE', matchday:36, date:'2026-05-09', time:'22:00', home:'CRY', away:'EVE', stage:'league', status:'upcoming'},
+  // 水晶宮 vs 愛華頓 | 05/10 21:00 台灣時間 (05/10 14:00 BST，因歐會盃延賽)
+  {id:'EPL-MW36-CRY-EVE', matchday:36, date:'2026-05-10', time:'21:00', home:'CRY', away:'EVE', stage:'league', status:'upcoming'},
 
   // 富勒姆 vs 伯恩茅斯 | 05/09 22:00 台灣時間
   {id:'EPL-MW36-FUL-BOU', matchday:36, date:'2026-05-09', time:'22:00', home:'FUL', away:'BOU', stage:'league', status:'upcoming'},
