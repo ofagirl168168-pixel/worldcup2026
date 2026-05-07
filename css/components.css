@@ -1329,6 +1329,30 @@ img.flag-img {
   box-shadow: 0 8px 24px rgba(255,200,80,0.35);
   background: linear-gradient(135deg, #3a2e1d 0%, #2a1f12 100%);
 }
+/* 紅點通知：站長回覆後 3 個入口都顯示 */
+.btn-feedback-float.has-unread-reply,
+.feedback-btn.has-unread-reply,
+.user-dropdown button.has-unread-reply {
+  position: relative;
+}
+.btn-feedback-float.has-unread-reply::after,
+.feedback-btn.has-unread-reply::after,
+.user-dropdown button.has-unread-reply::after {
+  content: '';
+  position: absolute;
+  top: -3px; right: -3px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #ff3b30;
+  border: 2px solid #1a1d2e;
+  box-shadow: 0 0 8px rgba(255,59,48,0.7);
+  animation: feedbackUnreadPulse 1.6s ease-in-out infinite;
+  z-index: 1;
+}
+@keyframes feedbackUnreadPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.25); opacity: 0.85; }
+}
 @media (max-width: 768px) {
   .btn-feedback-float {
     bottom: 86px; left: 24px;

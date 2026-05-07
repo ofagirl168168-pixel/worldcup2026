@@ -9,6 +9,7 @@
 
   const STORAGE_LAST_SUBMIT = 'feedback_last_submit';
   const STORAGE_VOTER_KEY = 'opinion_voter_key'; // 共用 opinion-poll 的瀏覽器唯一碼
+  const STORAGE_LAST_SEEN_REPLY = 'feedback_last_seen_reply_at'; // 已看到的最新回覆時間
   const RATE_LIMIT_MS = 30 * 1000; // 30 秒一次（防 spam）
 
   function $(id) { return document.getElementById(id); }
@@ -36,6 +37,55 @@
       return new Date(iso).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', hour12: false }).replace(/\//g, '-');
     } catch (e) { return iso; }
   }
+
+  // ── 紅點通知：檢查是否有未看過的站長回覆 ──
+  async function _checkUnreadReplies() {
+    if (!window.DB) return false;
+    const vkey = localStorage.getItem(STORAGE_VOTER_KEY);
+    if (!vkey) return false; // 完全沒互動過 → 不可能有回覆
+    try {
+      const { data, error } = await window.DB.rpc('get_my_feedback', { vkey });
+      if (error) return false;
+      const lastSeen = localStorage.getItem(STORAGE_LAST_SEEN_REPLY) || '';
+      const newest = (data || []).reduce((max, f) => {
+        if (!f.replied_at) return max;
+        return (!max || f.replied_at > max) ? f.replied_at : max;
+      }, null);
+      const hasUnread = newest && newest > lastSeen;
+      _toggleUnreadDot(!!hasUnread);
+      return hasUnread;
+    } catch (e) {
+      console.warn('[feedback] check unread failed', e);
+      return false;
+    }
+  }
+
+  function _toggleUnreadDot(on) {
+    const targets = [
+      document.getElementById('btn-feedback-float'),
+      document.querySelector('.feedback-btn'),                                            // footer
+      document.querySelector('#user-dropdown button[onclick*="openFeedbackModal"]'),     // user menu entry
+    ].filter(Boolean);
+    targets.forEach(el => el.classList.toggle('has-unread-reply', !!on));
+  }
+
+  // 將「目前所有回覆」標記為已看過 → 清紅點
+  async function _markAllRepliesSeen() {
+    if (!window.DB) return;
+    const vkey = localStorage.getItem(STORAGE_VOTER_KEY);
+    if (!vkey) return;
+    try {
+      const { data } = await window.DB.rpc('get_my_feedback', { vkey });
+      const newest = (data || []).reduce((max, f) => {
+        if (!f.replied_at) return max;
+        return (!max || f.replied_at > max) ? f.replied_at : max;
+      }, null);
+      if (newest) localStorage.setItem(STORAGE_LAST_SEEN_REPLY, newest);
+      _toggleUnreadDot(false);
+    } catch (e) { /* 失敗不影響 */ }
+  }
+
+  window.feedbackCheckUnread = _checkUnreadReplies;
 
   // ── 我的紀錄 — 透過 RPC 抓 voter_key 對應的回饋 ──
   async function loadMyFeedback() {
@@ -117,8 +167,24 @@
     document.querySelectorAll('.feedback-tab-pane').forEach(p => {
       p.style.display = p.dataset.pane === target ? '' : 'none';
     });
-    if (target === 'mine') loadMyFeedback();
+    if (target === 'mine') {
+      loadMyFeedback();
+      _markAllRepliesSeen(); // 看過 = 清紅點
+    }
   });
+
+  // 頁面載入後檢查是否有未看過的站長回覆（show 紅點）
+  // 延遲 2.5 秒等 supabase-client 初始化完成
+  function _scheduleUnreadCheck() {
+    setTimeout(_checkUnreadReplies, 2500);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _scheduleUnreadCheck);
+  } else {
+    _scheduleUnreadCheck();
+  }
+  // 每 2 分鐘再檢一次（站長剛回完使用者馬上看到紅點）
+  setInterval(_checkUnreadReplies, 2 * 60 * 1000);
 
   // 字數計算
   document.addEventListener('input', (e) => {
