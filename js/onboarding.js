@@ -127,26 +127,37 @@
         themeColor: '#6bd09e',
         shareText: '🎯 我剛在 Soccer麥迪 完成第一票！每天一題擂台投票、連續打卡升等，一起來戰？',
       });
-      // 等使用者關掉分享卡才彈挑戰賽提示（不要疊在分享卡上面打架）
-      _waitForShareCardCloseThen(() => _showChallengeNavHint(), 1200);
+      // 等使用者關掉所有 overlay（分享卡 + 擂台彈窗）才彈挑戰賽提示，
+      // 不然會疊在還沒關的擂台/分享卡上面打架
+      _waitForAllOverlaysClosedThen(() => _showChallengeNavHint(), 1200);
     }, 3500);
   };
 
-  // 輪詢直到 #share-card-overlay 不存在 → 才執行 cb（再延遲 delayMs 給使用者一點呼吸時間）
-  function _waitForShareCardCloseThen(cb, delayMs) {
-    const POLL = 250;
-    const MAX_WAIT = 60000; // 1 分鐘上限，免得使用者忘記關卻一直 polling
+  // 輪詢直到分享卡 + 擂台彈窗 + 任何 modal-like overlay 都關掉 → 才執行 cb
+  function _waitForAllOverlaysClosedThen(cb, delayMs) {
+    const POLL = 300;
+    const MAX_WAIT = 5 * 60 * 1000; // 5 分鐘上限
+    const SELECTORS = [
+      '#share-card-overlay',
+      '#opinion-overlay',
+      '.opinion-overlay.open',
+      '.feedback-modal-overlay.open',
+      '.fr-modal-overlay.open',
+      '.pq-overlay.open',
+    ];
+    function anyOpen() {
+      return SELECTORS.some(s => document.querySelector(s));
+    }
     let elapsed = 0;
     const t = setInterval(() => {
-      const open = document.getElementById('share-card-overlay');
-      if (!open) {
+      if (!anyOpen()) {
         clearInterval(t);
         setTimeout(cb, delayMs || 0);
         return;
       }
       elapsed += POLL;
       if (elapsed >= MAX_WAIT) {
-        clearInterval(t); // 放棄（不要彈，避免幾分鐘後突然冒出來）
+        clearInterval(t); // 放棄
       }
     }, POLL);
   }
