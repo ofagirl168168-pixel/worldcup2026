@@ -56,7 +56,10 @@
     document.body.appendChild(overlay);
     document.body.appendChild(arrow);
     document.body.appendChild(tooltip);
-    requestAnimationFrame(() => overlay.classList.add('show'));
+    requestAnimationFrame(() => {
+      overlay.classList.add('show');
+      tooltip.classList.add('show'); // 之前漏了，導致 ob-tooltip 全域 opacity:0 把卡片吃掉
+    });
 
     function close() {
       overlay.classList.remove('show');
