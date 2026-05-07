@@ -427,6 +427,9 @@ window.addEventListener('load', () => {
     _safe(() => showOpinionPoll(() => {
       if (isArticleLanding) {
         window.__pendingDailyTaskAfterArticle = true;
+      } else if (window.__deferDailyTaskForChallenge) {
+        // 首次投票流程進行中：分享卡 + 挑戰賽指引 → 都結束才彈每日任務
+        window.__pendingDailyTaskAfterChallenge = true;
       } else {
         _safe(() => showDailyTaskPopup(), 'showDailyTaskPopup');
       }

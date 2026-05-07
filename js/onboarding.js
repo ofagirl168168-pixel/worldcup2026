@@ -115,6 +115,8 @@
     if (localStorage.getItem(STORAGE_FIRST_VOTE_DONE)) return;
     localStorage.setItem(STORAGE_FIRST_VOTE_DONE, '1');
     markVisited();
+    // 通知 data-fix：先別彈每日任務彈窗，等挑戰賽指引看完再彈
+    window.__deferDailyTaskForChallenge = true;
     if (typeof showShareCard !== 'function') return;
     setTimeout(() => {
       showShareCard({
@@ -132,6 +134,18 @@
       _waitForAllOverlaysClosedThen(() => _showChallengeNavHint(), 1200);
     }, 3500);
   };
+
+  // 解除每日任務彈窗的延遲鎖定 → 補彈
+  function _flushDeferredDailyTask() {
+    window.__deferDailyTaskForChallenge = false;
+    if (window.__pendingDailyTaskAfterChallenge && typeof window.showDailyTaskPopup === 'function') {
+      window.__pendingDailyTaskAfterChallenge = false;
+      // 給使用者 600ms 換氣再彈
+      setTimeout(() => {
+        try { window.showDailyTaskPopup(); } catch (e) {}
+      }, 600);
+    }
+  }
 
   // 輪詢直到分享卡 + 擂台彈窗 + 任何 modal-like overlay 都關掉 → 才執行 cb
   function _waitForAllOverlaysClosedThen(cb, delayMs) {
@@ -214,28 +228,29 @@
       tooltip.classList.add('show');
     });
 
-    function close() {
+    function close(opts) {
       dimmer.classList.remove('show');
       tooltip.classList.remove('show');
       navBtn.classList.remove('ob-nav-highlight');
       setTimeout(() => {
         dimmer.remove();
         tooltip.remove();
+        // 沒進挑戰賽（直接略過 / 點黑幕關）→ 立刻補彈每日任務
+        // 進了挑戰賽（看看怎麼玩 / 點 nav）→ 等 spotlight tutorial 結束後才補彈
+        if (opts && opts.flushNow) _flushDeferredDailyTask();
       }, 280);
     }
-    document.getElementById('ob-skip-challenge').addEventListener('click', close);
+    document.getElementById('ob-skip-challenge').addEventListener('click', () => close({ flushNow: true }));
     document.getElementById('ob-go-challenge').addEventListener('click', () => {
-      close();
+      close(); // 不立即 flush — 等 spotlight tutorial 結束
       try {
         if (typeof showSection === 'function') showSection('friend-room');
         else if (navBtn) navBtn.click();
       } catch (e) {}
     });
-    // 點 dim 也關
-    dimmer.addEventListener('click', close);
-    // 點 nav 按鈕直接進挑戰賽（也算「看看怎麼玩」）
+    dimmer.addEventListener('click', () => close({ flushNow: true }));
     const onNavClick = () => {
-      close();
+      close(); // 不立即 flush — 等 spotlight tutorial 結束
       navBtn.removeEventListener('click', onNavClick);
     };
     navBtn.addEventListener('click', onNavClick);
@@ -327,7 +342,10 @@
 
     function close() {
       root.classList.remove('show');
-      setTimeout(() => root.remove(), 300);
+      setTimeout(() => {
+        root.remove();
+        _flushDeferredDailyTask(); // tutorial 結束才彈每日任務
+      }, 300);
     }
     closeBtn.addEventListener('click', close);
     spotlight.addEventListener('click', close);
