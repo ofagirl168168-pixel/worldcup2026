@@ -252,10 +252,6 @@ async function sendFeedbackToTelegram(f) {
           { text: '❌ 不做', callback_data: `fbr:pass:${f.id}` },
           { text: '❤️ 感謝', callback_data: `fbr:thx:${f.id}` },
         ],
-        [
-          { text: '✅ 已讀', callback_data: `fbread:${f.id}` },
-          { text: '🗑️ 刪除', callback_data: `fbdel:${f.id}` },
-        ],
       ],
     },
   });

@@ -72,6 +72,41 @@ if (!TOKEN || !CHAT_ID) {
 
 const API = `https://api.telegram.org/bot${TOKEN}`;
 
+// Supabase（用來在 callback 直通時更新 user_feedback / opinion_comments）
+const SUPA_URL = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPA_REST = SUPA_URL ? `${SUPA_URL}/rest/v1` : null;
+
+// 預設回覆對應表（跟 opinion-comments-bot.js 同步）
+const PRESET_REPLIES = {
+  ack:  '👍 收到了，謝謝你的回饋！',
+  fix:  '🛠️ 已修復，下次部署後就會生效。',
+  todo: '📋 已加進待辦清單，會排時間做。',
+  good: '💡 很好的點子，會認真考慮！',
+  pass: '❌ 這個暫時不會做，但謝謝你的建議。',
+  thx:  '❤️ 謝謝支持，會繼續努力！',
+};
+
+async function supaPatch(table, id, body) {
+  if (!SUPA_REST || !SERVICE_KEY) {
+    throw new Error('SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set');
+  }
+  const res = await fetch(`${SUPA_REST}/${table}?id=eq.${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: `Bearer ${SERVICE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`Supabase PATCH ${res.status}: ${t}`);
+  }
+}
+
 // 鎖檔：跟 opinion-comments-bot.js 共用同一個 MADDY bot token，
 // 同時 polling 會互搶 callback。本腳本啟動時寫 lock，
 // comments-bot 偵測到 lock 就暫停自己的 polling，退出前清掉。
@@ -293,11 +328,63 @@ async function main() {
       if (!u.callback_query) continue;
 
       const cb = u.callback_query;
-      const [action, idxStr] = (cb.data || '').split(':');
+      const dataStr = cb.data || '';
+      const parts = dataStr.split(':');
+      const action = parts[0];
+      const idxStr = parts[1];
       const idx = parseInt(idxStr);
 
       // 回應 callback 避免轉圈
       await tg('answerCallbackQuery', { callback_query_id: cb.id }).catch(() => {});
+
+      // ─── 跨 bot callback 直通：fbr / del / keep ───
+      // 共用 MADDY token 期間，opinion-comments-bot.js 暫停 polling，
+      // 它的 callback 都到我這 → 由我代為更新 Supabase + 編輯訊息
+      if (action === 'fbr') {
+        const presetKey = parts[1];
+        const fbId = parts[2];
+        const replyText = PRESET_REPLIES[presetKey];
+        if (!replyText || !fbId) {
+          console.warn(`⚠️ 未知的 fbr callback: ${dataStr}`);
+          continue;
+        }
+        try {
+          const now = new Date().toISOString();
+          await supaPatch('user_feedback', fbId, { reply: replyText, replied_at: now, read_at: now });
+          await tg('editMessageText', {
+            chat_id: cb.message.chat.id,
+            message_id: cb.message.message_id,
+            text: (cb.message.text || '') + `\n\n📬 已回覆：${replyText}`,
+          }).catch(() => {});
+          console.log(`📬 已代回覆 feedback ${fbId}: ${replyText}`);
+        } catch (e) {
+          console.error(`❌ 代回覆 feedback 失敗 ${fbId}:`, e.message);
+        }
+        continue;
+      }
+      if (action === 'del') {
+        // 擂台留言軟刪除
+        try {
+          await supaPatch('opinion_comments', idxStr /* 第二段是 id */, { deleted: true });
+          await tg('editMessageText', {
+            chat_id: cb.message.chat.id,
+            message_id: cb.message.message_id,
+            text: (cb.message.text || '') + '\n\n🗑️ 已刪除',
+          }).catch(() => {});
+          console.log(`🗑️ 已代刪除 opinion_comment ${idxStr}`);
+        } catch (e) {
+          console.error(`❌ 代刪 opinion_comment 失敗 ${idxStr}:`, e.message);
+        }
+        continue;
+      }
+      if (action === 'keep') {
+        await tg('editMessageText', {
+          chat_id: cb.message.chat.id,
+          message_id: cb.message.message_id,
+          text: (cb.message.text || '') + '\n\n✅ 已保留',
+        }).catch(() => {});
+        continue;
+      }
 
       if (action === 'use') {
         const chosen = candidates[idx];
