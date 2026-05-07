@@ -244,8 +244,11 @@
     document.getElementById('ob-go-challenge').addEventListener('click', () => {
       close(); // 不立即 flush — 等 spotlight tutorial 結束
       try {
-        if (typeof showSection === 'function') showSection('friend-room');
-        else if (navBtn) navBtn.click();
+        // 直接模擬點 nav 按鈕：會觸發 friend-room.js 的 click listener（loadLobby + 訂閱 realtime）
+        // 也會觸發我們自己的 click listener（彈 spotlight tutorial）
+        // 之前用 showSection() 跳過了所有 click listener → lobby 卡載入、tutorial 不彈
+        if (navBtn) navBtn.click();
+        else if (typeof showSection === 'function') showSection('friend-room');
       } catch (e) {}
     });
     dimmer.addEventListener('click', () => close({ flushNow: true }));
