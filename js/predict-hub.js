@@ -252,12 +252,29 @@
     const awayName = at.nameCN || at.name || m.away;
     const winText = h > a ? `押 ${homeName} 贏` : a > h ? `押 ${awayName} 贏` : '押平手';
 
+    // 隊徽 + 比分大字（取代預設的 SVG icon）
+    const _crest = team => {
+      const v = team.crest || team.flag;
+      if (!v) return '<span class="sc-vs-blank"></span>';
+      if (typeof v === 'string' && /^https?:\/\//i.test(v)) {
+        return `<img src="${v}" alt="" class="sc-vs-crest">`;
+      }
+      return `<span class="sc-vs-flag">${v}</span>`;
+    };
+    const imagesHtml = `
+      <div class="sc-vs-block">
+        <div class="sc-vs-side">${_crest(ht)}<div class="sc-vs-team">${homeName}</div></div>
+        <div class="sc-vs-score"><span class="sc-vs-h">${h}</span><span class="sc-vs-dash">-</span><span class="sc-vs-a">${a}</span></div>
+        <div class="sc-vs-side">${_crest(at)}<div class="sc-vs-team">${awayName}</div></div>
+      </div>`;
+
     showShareCard({
       eventKey: 'predict-' + matchId,
       icon: 'predict',
-      title: `${h} - ${a}`,
+      imagesHtml,
+      title: '我的預測',
       subtitle: 'MY PREDICTION',
-      bodyText: `${homeName} <b>vs</b> ${awayName}<br/>${winText}`,
+      bodyText: winText,
       themeColor: '#42a5f5',
       shareText: `🎯 我預測 ${homeName} ${h}-${a} ${awayName}！你猜呢？來 Soccer麥迪 較量比分準度。`,
     });

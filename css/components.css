@@ -1815,10 +1815,96 @@ img.flag-img {
 }
 .sc-url { color: var(--theme, #f0c040); font-weight: 700; letter-spacing: 0.5px; }
 .sc-cta { color: rgba(255,255,255,0.7); }
+
+/* 預覽提示：卡片上方 label + 卡片右上角 PREVIEW 浮水印 + 下方箭頭 */
+.share-card-preview-label {
+  text-align: center;
+  font-size: 12px; font-weight: 700;
+  color: rgba(255,200,80,0.9);
+  background: rgba(255,200,80,0.08);
+  border: 1px dashed rgba(255,200,80,0.45);
+  padding: 8px 14px;
+  border-radius: 999px;
+  margin: 0 auto;
+}
+.sc-preview-tag {
+  position: absolute;
+  top: 12px; right: 16px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.22);
+  color: rgba(255,255,255,0.55);
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 2px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  z-index: 2;
+  pointer-events: none;
+}
+.share-card-arrow {
+  text-align: center;
+  font-size: 22px;
+  color: rgba(255,200,80,0.6);
+  font-weight: 900;
+  margin: -2px 0;
+  animation: scArrowBounce 1.4s ease-in-out infinite;
+}
+@keyframes scArrowBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50%      { transform: translateY(4px); opacity: 1; }
+}
+
+/* imagesHtml：對戰版（隊徽 + 比分大字）取代 SVG icon */
+.sc-images {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 4px auto 6px;
+}
+.sc-vs-block {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+}
+.sc-vs-side {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px;
+}
+.sc-vs-crest {
+  width: 64px; height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 14px color-mix(in srgb, var(--theme, #f0c040) 50%, transparent));
+}
+.sc-vs-flag { font-size: 56px; line-height: 1; }
+.sc-vs-blank {
+  width: 64px; height: 64px;
+  display: inline-block;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+.sc-vs-team {
+  font-size: 12px; font-weight: 800;
+  color: rgba(255,255,255,0.92);
+  text-align: center;
+}
+.sc-vs-score {
+  display: flex; align-items: baseline; gap: 4px;
+  font-size: 36px; font-weight: 900;
+  background: linear-gradient(180deg, #fff 0%, var(--theme, #f0c040) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 20px color-mix(in srgb, var(--theme, #f0c040) 30%, transparent);
+}
+.sc-vs-dash { font-size: 24px; opacity: 0.5; }
+
 @media (max-width: 480px) {
   .share-card-v2 { padding: 22px 18px; min-height: 420px; }
   .sc-icon-wrap { width: 110px; height: 110px; }
   .sc-title { font-size: 28px; }
+  .sc-vs-crest, .sc-vs-blank { width: 52px; height: 52px; }
+  .sc-vs-score { font-size: 30px; }
 }
 
 .share-card-actions {

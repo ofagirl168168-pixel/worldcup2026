@@ -98,8 +98,10 @@
     overlay.className = 'share-card-overlay';
     overlay.innerHTML = `
       <div class="share-card-wrap">
+        <div class="share-card-preview-label">📤 預覽 · 下方按鈕分享的就是這張卡</div>
         <button class="share-card-close" aria-label="關閉">×</button>
         <div class="share-card share-card-v2" id="share-card-canvas" style="--theme:${themeColor}">
+          <div class="sc-preview-tag">PREVIEW</div>
           <div class="sc-bg-glow"></div>
           <div class="sc-bg-rays"></div>
           <div class="sc-corner sc-corner-tl"></div>
@@ -113,11 +115,12 @@
               <div class="sc-brand-sub">${opts.subtitle || 'MADDY ARENA'}</div>
             </div>
           </div>
+          ${opts.imagesHtml ? `<div class="sc-images">${opts.imagesHtml}</div>` : `
           <div class="sc-icon-wrap">
             <div class="sc-icon-ring"></div>
             <img src="${iconUrl}" alt="" class="sc-icon">
             ${opts.badge ? `<div class="sc-icon-badge">${opts.badge}</div>` : ''}
-          </div>
+          </div>`}
           <div class="sc-title">${opts.title || ''}</div>
           ${opts.bodyText ? `<div class="sc-body">${opts.bodyText}</div>` : ''}
           ${opts.reward ? `<div class="sc-reward">${opts.reward}</div>` : ''}
@@ -129,8 +132,9 @@
             </div>
           </div>
         </div>
+        <div class="share-card-arrow">↓</div>
         <div class="share-card-actions">
-          <div class="share-card-hint">📲 分享給朋友 · 對方加入後雙方各拿 +5 💎</div>
+          <div class="share-card-hint">分享後對方加入，雙方各拿 +5 💎</div>
           <div class="share-card-btns">
             <button class="sc-btn sc-btn-line" data-action="line">📲 LINE 分享</button>
             <button class="sc-btn sc-btn-tg" data-action="tg">✈️ Telegram</button>
@@ -172,6 +176,9 @@
         if (typeof showToast === 'function') showToast('⚠️ 存圖元件未載入');
         return;
       }
+      // 截圖前先把 PREVIEW 浮水印隱藏，存完再恢復
+      const tag = card.querySelector('.sc-preview-tag');
+      if (tag) tag.style.display = 'none';
       try {
         const canvas = await html2canvas(card, { backgroundColor: null, scale: 2, useCORS: true });
         const a = document.createElement('a');
@@ -180,6 +187,8 @@
         a.click();
       } catch (e) {
         if (typeof showToast === 'function') showToast('⚠️ 存圖失敗：' + e.message);
+      } finally {
+        if (tag) tag.style.display = '';
       }
     });
 
