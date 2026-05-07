@@ -1913,7 +1913,32 @@ img.flag-img {
 .ob-btn-skip { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.65); }
 
 /* 挑戰賽 nav tooltip 上箭頭（指向 nav-btn）*/
-.ob-tooltip-challenge { box-shadow: 0 12px 36px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,200,80,0.45) inset; }
+.ob-tooltip-challenge {
+  box-shadow: 0 12px 36px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,200,80,0.45) inset, 0 0 40px rgba(255,200,80,0.25);
+  z-index: 10260;
+}
+/* tooltip 出現時的半透明遮罩，襯托更醒目 */
+.ob-dimmer {
+  position: fixed; inset: 0;
+  z-index: 10255;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(2px);
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: auto;
+}
+.ob-dimmer.show { opacity: 1; }
+/* 被引導的 nav 按鈕加金色脈動 */
+.nav-btn.ob-nav-highlight {
+  position: relative;
+  z-index: 10261;
+  box-shadow: 0 0 0 3px #ffc850, 0 0 24px rgba(255,200,80,0.6);
+  border-radius: 8px;
+  animation: obNavPulse 1.2s ease-in-out infinite;
+}
+@keyframes obNavPulse {
+  0%, 100% { box-shadow: 0 0 0 3px #ffc850, 0 0 24px rgba(255,200,80,0.6); }
+  50%      { box-shadow: 0 0 0 4px #ffc850, 0 0 36px rgba(255,200,80,0.9); }
+}
 .ob-tooltip-arrow-up {
   position: absolute;
   top: -8px; left: 140px;

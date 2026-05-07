@@ -144,6 +144,9 @@
       '.feedback-modal-overlay.open',
       '.fr-modal-overlay.open',
       '.pq-overlay.open',
+      '.dtask-popup-overlay',  // 每日任務彈窗
+      '.modal-overlay.open',   // 通用彈窗
+      '.predict-result-banner',// 預測揭曉 banner
     ];
     function anyOpen() {
       return SELECTORS.some(s => document.querySelector(s));
@@ -165,16 +168,31 @@
   // ── 引導 2：投完第一票後，提示「挑戰賽」更好玩 ──
   function _showChallengeNavHint() {
     if (localStorage.getItem(STORAGE_CHALLENGE_HINT_SHOWN)) return;
+    // 再次檢查當下是否有 overlay（race condition 保險）— 有就再 polling 等
+    const SELECTORS = [
+      '#share-card-overlay', '#opinion-overlay',
+      '.opinion-overlay.open', '.feedback-modal-overlay.open',
+      '.fr-modal-overlay.open', '.pq-overlay.open',
+      '.dtask-popup-overlay', '.modal-overlay.open',
+      '.predict-result-banner',
+    ];
+    if (SELECTORS.some(s => document.querySelector(s))) {
+      _waitForAllOverlaysClosedThen(_showChallengeNavHint, 1200);
+      return;
+    }
     localStorage.setItem(STORAGE_CHALLENGE_HINT_SHOWN, '1');
-    // 找 nav 中的「挑戰賽」按鈕（桌機 main-nav 或手機 mobile-nav）
     const navBtn = document.querySelector('.nav-btn[data-section="friend-room"]');
     if (!navBtn) return;
     const rect = navBtn.getBoundingClientRect();
     if (rect.width === 0) return;
 
+    // dim background 讓 tooltip 更醒目
+    const dimmer = document.createElement('div');
+    dimmer.className = 'ob-dimmer';
+    document.body.appendChild(dimmer);
+
     const tooltip = document.createElement('div');
     tooltip.className = 'ob-tooltip ob-tooltip-challenge';
-    // 放在 nav 下方
     const left = Math.min(window.innerWidth - 296, Math.max(16, rect.left + rect.width / 2 - 140));
     tooltip.style.left = left + 'px';
     tooltip.style.top = (rect.bottom + 14) + 'px';
@@ -187,11 +205,23 @@
       </div>
       <div class="ob-tooltip-arrow ob-tooltip-arrow-up"></div>`;
     document.body.appendChild(tooltip);
-    requestAnimationFrame(() => tooltip.classList.add('show'));
+
+    // 高亮 nav 按鈕（脈動光暈）
+    navBtn.classList.add('ob-nav-highlight');
+
+    requestAnimationFrame(() => {
+      dimmer.classList.add('show');
+      tooltip.classList.add('show');
+    });
 
     function close() {
+      dimmer.classList.remove('show');
       tooltip.classList.remove('show');
-      setTimeout(() => tooltip.remove(), 250);
+      navBtn.classList.remove('ob-nav-highlight');
+      setTimeout(() => {
+        dimmer.remove();
+        tooltip.remove();
+      }, 280);
     }
     document.getElementById('ob-skip-challenge').addEventListener('click', close);
     document.getElementById('ob-go-challenge').addEventListener('click', () => {
@@ -201,8 +231,33 @@
         else if (navBtn) navBtn.click();
       } catch (e) {}
     });
-    // 12 秒自動消失
-    setTimeout(close, 12000);
+    // 點 dim 也關
+    dimmer.addEventListener('click', close);
+    // 點 nav 按鈕直接進挑戰賽（也算「看看怎麼玩」）
+    const onNavClick = () => {
+      close();
+      navBtn.removeEventListener('click', onNavClick);
+    };
+    navBtn.addEventListener('click', onNavClick);
+
+    // 不再 12 秒自動消失 — 由使用者按按鈕關掉
+    // 但若中途有其他 overlay 跳出來（每日任務、預測結算彈窗等），先 hide tooltip 等它關掉再 re-show
+    let hidden = false;
+    const watchdog = setInterval(() => {
+      const open = SELECTORS.some(s => document.querySelector(s));
+      if (open && !hidden) {
+        hidden = true;
+        tooltip.style.opacity = '0';
+        tooltip.style.pointerEvents = 'none';
+        dimmer.style.opacity = '0';
+      } else if (!open && hidden) {
+        hidden = false;
+        tooltip.style.opacity = '';
+        tooltip.style.pointerEvents = '';
+        dimmer.style.opacity = '';
+      }
+      if (!document.body.contains(tooltip)) clearInterval(watchdog);
+    }, 400);
   }
 
   // ── 引導 3：到達挑戰賽頁面 → 4 步驟導覽 ──
