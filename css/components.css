@@ -1311,6 +1311,170 @@ img.flag-img {
   }
 }
 
+/* ========== 麥迪信箱（使用者回饋）========== */
+.footer-feedback {
+  margin-top: 14px;
+  display: flex; justify-content: center;
+}
+.feedback-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.85);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.feedback-btn:hover {
+  background: rgba(255,200,80,0.12);
+  border-color: rgba(255,200,80,0.45);
+  color: #ffd28a;
+}
+.feedback-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(4px);
+  z-index: 10100;
+  display: none; align-items: center; justify-content: center;
+  padding: 16px;
+  opacity: 0; transition: opacity 0.25s ease;
+}
+.feedback-modal-overlay.open { opacity: 1; }
+.feedback-modal-box {
+  background: #1a1d2e;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  width: 100%; max-width: 520px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+  transform: translateY(20px); opacity: 0;
+  transition: transform 0.3s cubic-bezier(.22,1,.36,1), opacity 0.3s ease;
+}
+.feedback-modal-overlay.open .feedback-modal-box {
+  transform: translateY(0); opacity: 1;
+}
+.feedback-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.feedback-modal-header h2 {
+  margin: 0;
+  font-size: 18px; font-weight: 800;
+  color: #ffd28a;
+}
+.feedback-modal-close {
+  background: transparent; border: none;
+  color: rgba(255,255,255,0.55);
+  font-size: 24px; cursor: pointer;
+  padding: 4px 12px; border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+}
+.feedback-modal-close:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+.feedback-modal-body {
+  padding: 18px 22px 22px;
+}
+.feedback-intro {
+  color: rgba(255,255,255,0.7);
+  font-size: 13px; line-height: 1.6;
+  margin: 0 0 18px;
+}
+.feedback-row {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 14px;
+}
+.feedback-row label {
+  font-size: 12px; font-weight: 700;
+  color: rgba(255,255,255,0.78);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.feedback-len {
+  font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.5);
+}
+.feedback-row input,
+.feedback-row textarea {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #fff;
+  padding: 10px 12px;
+  font: inherit; font-size: 14px;
+  resize: vertical;
+  transition: border-color 0.15s;
+}
+.feedback-row input:focus,
+.feedback-row textarea:focus {
+  outline: none;
+  border-color: rgba(255,200,80,0.55);
+}
+.feedback-cats {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.feedback-cat {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.72);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.feedback-cat:hover {
+  border-color: rgba(255,255,255,0.32);
+  color: #fff;
+}
+.feedback-cat.active {
+  background: rgba(255,200,80,0.18);
+  border-color: rgba(255,200,80,0.55);
+  color: #ffd28a;
+}
+.feedback-actions {
+  display: flex; gap: 10px; justify-content: flex-end;
+  margin-top: 18px;
+}
+.feedback-cancel,
+.feedback-submit {
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+.feedback-cancel {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.78);
+}
+.feedback-cancel:hover {
+  background: rgba(255,255,255,0.1);
+}
+.feedback-submit {
+  background: linear-gradient(135deg, #ffc850 0%, #ff9a3c 100%);
+  color: #1a1d2e;
+}
+.feedback-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255,200,80,0.35);
+}
+.feedback-submit:disabled {
+  opacity: 0.55; cursor: default;
+}
+.feedback-status {
+  margin-top: 12px;
+  font-size: 13px;
+  text-align: center;
+  min-height: 18px;
+}
+.feedback-status.ok { color: #6bd09e; }
+.feedback-status.err { color: #ff8888; }
+
 /* ========== Loading Skeleton ========== */
 .skeleton {
   background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);

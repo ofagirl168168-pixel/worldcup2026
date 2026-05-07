@@ -53,6 +53,7 @@ if (!SUPA_URL || !SERVICE_KEY) {
 const API = `https://api.telegram.org/bot${TOKEN}`;
 const REST = `${SUPA_URL}/rest/v1`;
 const CURSOR_PATH = path.join(__dirname, '.comments-cursor');
+const FEEDBACK_CURSOR_PATH = path.join(__dirname, '.feedback-cursor');
 const POLL_INTERVAL_MS = 15000;
 const TELEGRAM_POLL_TIMEOUT = 30; // seconds
 // 共用 MADDY bot token 的 opinion-telegram.js 啟動時寫這個 lock；
@@ -71,6 +72,17 @@ function readCursor() {
 }
 function writeCursor(ts) {
   try { fs.writeFileSync(CURSOR_PATH, ts, 'utf8'); } catch (e) {}
+}
+
+function readFeedbackCursor() {
+  try {
+    const raw = fs.readFileSync(FEEDBACK_CURSOR_PATH, 'utf8').trim();
+    if (raw) return raw;
+  } catch (e) {}
+  return new Date().toISOString();
+}
+function writeFeedbackCursor(ts) {
+  try { fs.writeFileSync(FEEDBACK_CURSOR_PATH, ts, 'utf8'); } catch (e) {}
 }
 
 // ─── Telegram API ─────────────────────────────────────────
@@ -126,6 +138,36 @@ async function softDeleteComment(id) {
   });
 }
 
+// ─── 麥迪信箱（user_feedback）──────────────────────────────
+async function fetchNewFeedback(sinceIso) {
+  const q = new URLSearchParams({
+    select: 'id,category,nickname,contact,content,created_at',
+    deleted: 'eq.false',
+    created_at: `gt.${sinceIso}`,
+    order: 'created_at.asc',
+    limit: '20',
+  });
+  return await supaFetch(`${REST}/user_feedback?${q}`);
+}
+
+async function softDeleteFeedback(id) {
+  const url = `${REST}/user_feedback?id=eq.${encodeURIComponent(id)}`;
+  return await supaFetch(url, {
+    method: 'PATCH',
+    headers: { 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ deleted: true }),
+  });
+}
+
+async function markFeedbackRead(id) {
+  const url = `${REST}/user_feedback?id=eq.${encodeURIComponent(id)}`;
+  return await supaFetch(url, {
+    method: 'PATCH',
+    headers: { 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ read_at: new Date().toISOString() }),
+  });
+}
+
 // ─── 訊息格式 ─────────────────────────────────────────────
 function formatComment(c) {
   const nick = c.nickname || '匿名觀眾';
@@ -156,6 +198,38 @@ async function sendCommentToTelegram(c) {
   });
 }
 
+// ─── 麥迪信箱訊息格式 ──────────────────────────────────────
+const CAT_EMOJI = { '建議': '💡', 'Bug': '🐛', '讚美': '❤️', '其他': '💬' };
+function formatFeedback(f) {
+  const nick = f.nickname || '匿名觀眾';
+  const cat = `${CAT_EMOJI[f.category] || '💬'} ${f.category}`;
+  const timeStr = new Date(f.created_at).toLocaleString('zh-TW', {
+    timeZone: 'Asia/Taipei', hour12: false,
+  });
+  let body =
+    `📮 *麥迪信箱新訊息*\n\n` +
+    `${escapeMd(cat)}\n` +
+    `👤 ${escapeMd(nick)}\n` +
+    `🕘 ${escapeMd(timeStr)}\n`;
+  if (f.contact) body += `📞 ${escapeMd(f.contact)}\n`;
+  body += `\n📝 ${escapeMd(f.content)}`;
+  return body;
+}
+
+async function sendFeedbackToTelegram(f) {
+  return await tg('sendMessage', {
+    chat_id: CHAT_ID,
+    text: formatFeedback(f),
+    parse_mode: 'MarkdownV2',
+    reply_markup: {
+      inline_keyboard: [[
+        { text: '✅ 已讀', callback_data: `fbread:${f.id}` },
+        { text: '🗑️ 刪除', callback_data: `fbdel:${f.id}` },
+      ]],
+    },
+  });
+}
+
 // ─── 處理 callback_query ──────────────────────────────────
 async function handleCallback(cb) {
   const data = cb.data || '';
@@ -179,6 +253,22 @@ async function handleCallback(cb) {
         text: (msg.text || '') + '\n\n✅ 已保留',
       });
       await tg('answerCallbackQuery', { callback_query_id: cb.id, text: '已保留' });
+    } else if (action === 'fbdel') {
+      await softDeleteFeedback(id);
+      await tg('editMessageText', {
+        chat_id: msg.chat.id,
+        message_id: msg.message_id,
+        text: (msg.text || '') + '\n\n🗑️ 已刪除',
+      });
+      await tg('answerCallbackQuery', { callback_query_id: cb.id, text: '已刪除' });
+    } else if (action === 'fbread') {
+      await markFeedbackRead(id);
+      await tg('editMessageText', {
+        chat_id: msg.chat.id,
+        message_id: msg.message_id,
+        text: (msg.text || '') + '\n\n✅ 已讀',
+      });
+      await tg('answerCallbackQuery', { callback_query_id: cb.id, text: '標記已讀' });
     }
   } catch (e) {
     console.error('[callback]', action, id, e.message);
@@ -212,6 +302,31 @@ async function commentPollLoop() {
       }
     } catch (e) {
       console.error('❌ 抓留言失敗:', e.message);
+    }
+    await sleep(POLL_INTERVAL_MS);
+  }
+}
+
+async function feedbackPollLoop() {
+  let cursor = readFeedbackCursor();
+  console.log(`📮 從 ${cursor} 開始監聽麥迪信箱`);
+  while (true) {
+    try {
+      const rows = await fetchNewFeedback(cursor);
+      if (rows && rows.length) {
+        for (const f of rows) {
+          try {
+            await sendFeedbackToTelegram(f);
+            console.log(`📮 推送回饋 ${f.id}（${f.category} / ${f.nickname || '匿名'}）`);
+          } catch (e) {
+            console.error(`❌ 推送回饋失敗 ${f.id}:`, e.message);
+          }
+          if (f.created_at > cursor) cursor = f.created_at;
+        }
+        writeFeedbackCursor(cursor);
+      }
+    } catch (e) {
+      console.error('❌ 抓回饋失敗:', e.message);
     }
     await sleep(POLL_INTERVAL_MS);
   }
@@ -260,13 +375,13 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
     // 啟動提示
     await tg('sendMessage', {
       chat_id: CHAT_ID,
-      text: '🤖 麥迪擂台留言審核機器人已啟動\n有新留言會在這裡通知，按 🗑️ 即可刪除。',
+      text: '🤖 麥迪擂台留言審核機器人已啟動\n有新留言 / 麥迪信箱 新訊息都會在這裡通知。',
     });
   } catch (e) {
     console.warn('⚠️ 啟動訊息發送失敗:', e.message);
   }
-  // 兩個 loop 同時跑
-  await Promise.all([commentPollLoop(), telegramPollLoop()]);
+  // 三個 loop 同時跑：擂台留言 + 麥迪信箱回饋 + telegram callback 處理
+  await Promise.all([commentPollLoop(), feedbackPollLoop(), telegramPollLoop()]);
 })().catch(err => {
   console.error('💥 Fatal:', err);
   process.exit(1);

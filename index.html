@@ -610,8 +610,52 @@
         <span>2026年6月11日 — 7月19日</span>
         <span>所有時間以台灣時間（UTC+8）顯示</span>
       </div>
+      <div class="footer-feedback">
+        <button class="feedback-btn" onclick="openFeedbackModal()">📮 麥迪信箱 · 留言給我</button>
+      </div>
     </div>
   </footer>
+
+  <!-- 麥迪信箱 Modal -->
+  <div id="feedback-modal" class="feedback-modal-overlay" style="display:none" onclick="if(event.target===this)closeFeedbackModal()">
+    <div class="feedback-modal-box">
+      <div class="feedback-modal-header">
+        <h2>📮 麥迪信箱</h2>
+        <button class="feedback-modal-close" onclick="closeFeedbackModal()">&times;</button>
+      </div>
+      <div class="feedback-modal-body">
+        <p class="feedback-intro">有什麼建議、bug 回報、想說的話，直接寫給我吧 — 站長本人會看。</p>
+        <form id="feedback-form" onsubmit="submitFeedback(event)">
+          <div class="feedback-row">
+            <label>類型</label>
+            <div class="feedback-cats">
+              <button type="button" class="feedback-cat active" data-cat="建議">💡 建議</button>
+              <button type="button" class="feedback-cat" data-cat="Bug">🐛 Bug</button>
+              <button type="button" class="feedback-cat" data-cat="讚美">❤️ 讚美</button>
+              <button type="button" class="feedback-cat" data-cat="其他">💬 其他</button>
+            </div>
+          </div>
+          <div class="feedback-row">
+            <label for="feedback-nick">暱稱（選填）</label>
+            <input type="text" id="feedback-nick" maxlength="20" placeholder="留空 = 匿名" />
+          </div>
+          <div class="feedback-row">
+            <label for="feedback-content">想說的話 <span class="feedback-len" id="feedback-len">0/500</span></label>
+            <textarea id="feedback-content" maxlength="500" rows="6" required placeholder="500 字以內，越具體越好（哪個頁面、哪個按鈕、實際看到什麼）"></textarea>
+          </div>
+          <div class="feedback-row">
+            <label for="feedback-contact">聯絡方式（選填，需要回覆才填）</label>
+            <input type="text" id="feedback-contact" maxlength="100" placeholder="email / Telegram / IG，留空就無法回覆" />
+          </div>
+          <div class="feedback-actions">
+            <button type="button" class="feedback-cancel" onclick="closeFeedbackModal()">取消</button>
+            <button type="submit" class="feedback-submit" id="feedback-submit-btn">📨 送出</button>
+          </div>
+          <div class="feedback-status" id="feedback-status"></div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- 我的預測記錄 Modal -->
   <div id="pred-history-modal" class="pred-modal-overlay" style="display:none" onclick="if(event.target===this)closePredModal()">
@@ -658,6 +702,7 @@
   <script src="js/auto-refresh.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/gems.js"></script>
+  <script src="js/feedback-modal.js"></script>
   <!-- 歐冠即時比分載入器（從 football-data.org 自動同步） -->
   <script src="js/ucl-live-loader.js"></script>
   <!-- 英超即時比分載入器 -->
