@@ -122,7 +122,13 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
+  /* sticky footer 模式：main 撐滿剩餘空間，footer 永遠跟在 main 末端
+     之前 .page-section 用 min-height:100vh 導致短頁面下方有大空白，使用者誤以為頁尾就是這、不再往下滑 → 看不到 footer */
+  display: flex;
+  flex-direction: column;
 }
+#main-content { flex: 1 0 auto; }
+.main-footer { flex-shrink: 0; }
 a { color: inherit; text-decoration: none; }
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 img { max-width: 100%; display: block; }
@@ -257,7 +263,9 @@ ul { list-style: none; }
 
 /* ---------- 主內容區 ---------- */
 #main-content { padding-top: var(--header-h); position: relative; z-index: 1; }
-.page-section { display: none; min-height: 100vh; }
+/* min-height 拿掉，改用 sticky footer pattern（body flex column + main flex:1）
+   原本 min-height:100vh 在短頁面留下大空白，使用者以為頁尾就是這，看不到 footer */
+.page-section { display: none; }
 .page-section.active { display: block; animation: pageFadeIn 0.35s ease; }
 @keyframes pageFadeIn {
   from { opacity: 0; transform: translateY(10px); }

@@ -1312,6 +1312,30 @@ img.flag-img {
 }
 
 /* ========== 麥迪信箱（使用者回饋）========== */
+/* 浮動入口按鈕（icon-only），所有訪客皆可見 */
+.btn-feedback-float {
+  position: fixed; bottom: 24px; left: 200px; z-index: 900;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(255,200,80,0.4);
+  background: linear-gradient(135deg, #2a2e45 0%, #1a1d2e 100%);
+  color: #ffd28a;
+  font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08) inset;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.btn-feedback-float:hover {
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 8px 24px rgba(255,200,80,0.35);
+  background: linear-gradient(135deg, #3a2e1d 0%, #2a1f12 100%);
+}
+@media (max-width: 768px) {
+  .btn-feedback-float {
+    bottom: 86px; left: 24px;
+    width: 40px; height: 40px;
+    font-size: 18px;
+  }
+}
 .footer-feedback {
   margin-top: 14px;
   display: flex; justify-content: center;

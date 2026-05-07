@@ -191,6 +191,10 @@
             <i class="fas fa-medal"></i> 我的成就
           </button>
           <hr style="border-color:rgba(255,255,255,0.08);margin:4px 0">
+          <button onclick="openFeedbackModal();event.stopPropagation()">
+            <i class="fas fa-envelope"></i> 麥迪信箱
+          </button>
+          <hr style="border-color:rgba(255,255,255,0.08);margin:4px 0">
           <button onclick="logout();event.stopPropagation()" style="color:var(--danger)">
             <i class="fas fa-sign-out-alt"></i> 登出
           </button>
@@ -730,6 +734,13 @@
     <span class="btn-arena-float-ring"></span>
     <span class="btn-arena-float-icon">⚔️</span>
     <span class="btn-arena-float-label">麥迪擂台</span>
+  </button>
+  <!-- 麥迪信箱浮動入口（小圖示按鈕，所有訪客皆可見） -->
+  <button id="btn-feedback-float" class="btn-feedback-float"
+    onclick="openFeedbackModal()"
+    aria-label="麥迪信箱 留言給站長"
+    title="麥迪信箱 · 留言給站長">
+    📮
   </button>
 
   <script src="js/fx.js" defer></script>
