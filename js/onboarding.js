@@ -147,18 +147,20 @@
     }
   }
 
-  // 等到使用者離開所有挑戰賽流程（任何 .fr-modal-overlay 都關掉、且持續 2 秒沒新 modal）才 flush
-  // 用於：使用者按了開房 → 開房 modal → 建房 → 邀請 modal → 房間 modal... 都關完才彈每日任務
+  // 等到使用者離開所有挑戰賽流程（任何 .fr-modal-overlay 或 .fr-room-overlay 都關掉、
+  // 且持續 2 秒沒新 modal）才 flush。
+  // 涵蓋：開房 modal → 邀請成功 modal → 房間 view（fr-room-overlay）→ 看回放 modal → 大廳
   function _flushWhenChallengeFlowExits() {
     if (_chFlowWatcher) clearInterval(_chFlowWatcher);
     let stableSince = null;
     const STABLE_MS = 2000;
-    const MAX_WAIT = 10 * 60 * 1000;
+    const MAX_WAIT = 30 * 60 * 1000; // 30 分鐘上限（房間 view 可能停很久看模擬賽）
     let totalElapsed = 0;
     const POLL = 300;
+    const SELECTORS = '.fr-modal-overlay, .fr-room-overlay';
     _chFlowWatcher = setInterval(() => {
-      const modalOpen = document.querySelector('.fr-modal-overlay');
-      if (modalOpen) {
+      const open = document.querySelector(SELECTORS);
+      if (open) {
         stableSince = null;
       } else {
         if (stableSince === null) stableSince = Date.now();
@@ -186,11 +188,12 @@
       '#opinion-overlay',
       '.opinion-overlay.open',
       '.feedback-modal-overlay.open',
-      '.fr-modal-overlay.open',
+      '.fr-modal-overlay',         // 挑戰賽建房/邀請/看回放 modal
+      '.fr-room-overlay',          // 挑戰賽房間 view
       '.pq-overlay.open',
-      '.dtask-popup-overlay',  // 每日任務彈窗
-      '.modal-overlay.open',   // 通用彈窗
-      '.predict-result-banner',// 預測揭曉 banner
+      '.dtask-popup-overlay',      // 每日任務彈窗
+      '.modal-overlay.open',       // 通用彈窗
+      '.predict-result-banner',    // 預測揭曉 banner
     ];
     function anyOpen() {
       return SELECTORS.some(s => document.querySelector(s));

@@ -721,20 +721,29 @@
     const overlay = document.createElement('div');
     overlay.className = 'fr-modal-overlay';
     overlay.innerHTML = `
-      <div class="fr-modal fr-modal--narrow" role="dialog">
+      <div class="fr-modal fr-modal--narrow fr-invite-card" role="dialog" style="--theme:${isPublic ? '#ffc850' : '#a78bfa'}">
+        <div class="fr-invite-bg-glow"></div>
+        <div class="fr-invite-corner fr-invite-corner-tl"></div>
+        <div class="fr-invite-corner fr-invite-corner-tr"></div>
+        <div class="fr-invite-corner fr-invite-corner-bl"></div>
+        <div class="fr-invite-corner fr-invite-corner-br"></div>
         <button class="fr-modal-close" type="button">&times;</button>
-        <div class="fr-invite-icon">${isPublic ? '🎉' : '🔒'}</div>
-        <h3 class="fr-modal-title">${isPublic ? '公開房' : '私人房'}建立成功</h3>
+        <div class="fr-invite-icon-wrap">
+          <div class="fr-invite-icon-ring"></div>
+          <img src="/assets/personas/${isPublic ? 'a10-crown' : 'a2-hidden'}.svg" alt="" class="fr-invite-icon-svg">
+        </div>
+        <div class="fr-invite-subtitle">${isPublic ? 'PUBLIC ROOM' : 'PRIVATE ROOM'}</div>
+        <h3 class="fr-modal-title fr-invite-title">${isPublic ? '公開房' : '私人房'}建立成功</h3>
         <div class="fr-invite-code">#${roomCode}</div>
-        <p class="fr-modal-sub">邀請連結已複製，立刻分享拉朋友來戰：</p>
+        <p class="fr-modal-sub">邀請連結已複製，立刻分享拉朋友來戰</p>
         <div class="fr-share-grid">
           <button type="button" class="fr-share-btn fr-share-line" id="fr-share-line">📲 LINE</button>
           <button type="button" class="fr-share-btn fr-share-tg" id="fr-share-tg">✈️ Telegram</button>
-          <button type="button" class="fr-share-btn fr-share-copy" id="fr-share-copy">🔗 再複製一次</button>
+          <button type="button" class="fr-share-btn fr-share-copy" id="fr-share-copy">🔗 再複製</button>
         </div>
         <div class="fr-invite-link">${url}</div>
         <div class="fr-form-actions">
-          <button type="button" class="fr-btn fr-btn--submit" id="fr-invite-ok">進入房間</button>
+          <button type="button" class="fr-btn fr-btn--submit" id="fr-invite-ok">進入房間 →</button>
         </div>
       </div>
     `;
