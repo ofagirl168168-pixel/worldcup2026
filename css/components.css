@@ -2281,15 +2281,15 @@ img.flag-img {
   border-radius: 50%;
 }
 .pp-meta {
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding-top: 8px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px;
+  padding-top: 10px;
   border-top: 1px dashed rgba(255,255,255,0.08);
 }
 .pp-time {
-  display: flex; flex-direction: column; gap: 2px;
+  display: flex; flex-direction: row; gap: 14px; align-items: center;
   font-size: 12px;
+  flex-wrap: wrap; justify-content: center;
 }
 .pp-kickoff {
   color: rgba(255,255,255,0.85);
