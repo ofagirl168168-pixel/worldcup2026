@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-05-01 日更）
+   資料截止：2025/26 賽季（2026-05-07 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -24,11 +24,10 @@ const EPL_TEAMS = {
     recentForm:['W','W','L','L','W'],
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
     injuries:[
-      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題，已恢復訓練，Arteta 確認可出場',returnDate:'可出場'},
-      {name:'Kai Havertz',pos:'前鋒',status:'肌肉傷勢（vs NEW 4/25），缺席馬競首回合，vs FUL（5/2）出場存疑',returnDate:'歐冠次回合（5/6）目標復出'},
-      {name:'Eberechi Eze',pos:'攻擊中場',status:'小不適已恢復，Arteta 確認可出場',returnDate:'可出場'},
-      {name:'Jurrien Timber',pos:'後衛',status:'腹股溝傷（3/14 起缺陣），確認缺席馬競首回合',returnDate:'賽季末評估'},
-      {name:'Riccardo Calafiori',pos:'左後衛',status:'Arteta 確認可出場',returnDate:'可出場'},
+      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題已復出，vs FUL（5/2）先發進球',returnDate:'可出場'},
+      {name:'Martin Ødegaard',pos:'攻擊中場',status:'膝傷（缺席 vs FUL 5/2），歐冠次回合替補上陣',returnDate:'需評估'},
+      {name:'Kai Havertz',pos:'前鋒',status:'肌肉傷勢（vs NEW 4/25），歐冠次回合（5/5）復出先發',returnDate:'可出場'},
+      {name:'Jurrien Timber',pos:'後衛',status:'腹股溝傷（3/14 起缺陣），賽季末評估',returnDate:'賽季末'},
       {name:'Mikel Merino',pos:'中場',status:'已脫護具但本季不預期回歸',returnDate:'賽季報銷'},
       {name:'Noni Madueke',pos:'右翼',status:'膝傷（歐冠八強次回合退場）',returnDate:'評估中'}
     ]
@@ -50,7 +49,7 @@ const EPL_TEAMS = {
     recentForm:['L','W','W','W','L'],
     history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍',
     injuries:[
-      {name:'Mohamed Salah',pos:'右翼',status:'左腿後肌撕裂（vs CRY 4/25），利物浦確認賽季結束前可復出',returnDate:'五月中旬（世界盃可趕上）'},
+      {name:'Mohamed Salah',pos:'右翼',status:'確認僅輕微肌肉問題，賽季結束前可復出',returnDate:'五月中旬'},
       {name:'Hugo Ekitike',pos:'前鋒',status:'阿基里斯腱斷裂（vs PSG受傷）',returnDate:'賽季報銷＋世界盃缺席'},
       {name:'Alisson',pos:'門將',status:'肌肉拉傷（缺席一個月），有機會回歸',returnDate:'評估中'},
       {name:'Mamardashvili',pos:'門將',status:'傷缺數週',returnDate:'評估中'},
@@ -77,10 +76,9 @@ const EPL_TEAMS = {
     history:'9次英格蘭頂級聯賽冠軍，2022/23三冠王',
     injuries:[
       {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末可望回歸'},
-      {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢',returnDate:'四月底（本月報銷）'},
+      {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢，預計五月中旬回歸',returnDate:'5/19 vs BOU 目標'},
       {name:'John Stones',pos:'中後衛',status:'已回歸訓練，可出場',returnDate:'已歸隊'},
-      {name:'Nico O\'Reilly',pos:'中場',status:'腿後肌傷（vs Chelsea下半場受傷）',returnDate:'評估中，已輕度訓練'},
-      {name:'Rodri',pos:'防守中場',status:'腹股溝傷（足總盃半決賽未冒險上陣）',returnDate:'下場聯賽（5/4 vs 艾弗頓）目標復出'}
+      {name:'Rodri',pos:'防守中場',status:'腹股溝傷，Guardiola 稱好轉中但仍未隨隊訓練',returnDate:'MW36 待評估'}
     ]
   },
   'CHE': {
@@ -246,7 +244,7 @@ const EPL_TEAMS = {
   },
   'BRE': {
     name:'Brentford', nameCN:'布倫特福德', flag:'https://crests.football-data.org/402.png',
-    league:'Premier League', eplRank:9, coach:'Keith Andrews', formation:'4-3-3',
+    league:'Premier League', eplRank:7, coach:'Keith Andrews', formation:'4-3-3',
     keyPlayers:[
       {name:'Igor Thiago',pos:'前鋒',club:'布倫特福德'},
       {name:'Kevin Schade',pos:'翼鋒',club:'布倫特福德'},

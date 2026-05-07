@@ -12,6 +12,16 @@ export default [
     "shareable": true
   },
   {
+    "id": "epl-048",
+    "tournament": "epl",
+    "title": "【賽前分析】曼城 vs 布倫特福德：少 Rodri 的冠軍追擊戰，Guardiola 不容再失分",
+    "summary": "第36輪焦點戰——曼城主場迎戰布倫特福德。落後兵工廠5分的曼城已無退路，但 Rodri 腹股溝傷勢仍是未知數。布倫特福德上輪 3-0 大勝西漢姆，士氣正旺。伊蒂哈德球場的追冠之夜，誰能笑到最後？",
+    "date": "2026-05-07",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "ucl-023",
     "tournament": "ucl",
     "title": "【四強戰報】拜仁 1-1 PSG：Dembélé 閃擊定調！衛冕冠軍總比分 6-5 再闖決賽",

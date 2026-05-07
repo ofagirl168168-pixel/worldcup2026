@@ -2536,6 +2536,84 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 </table>`,
     tags: ['賽前分析', '西漢姆', '兵工廠', '保級', '冠軍爭奪', '第36輪', 'Gyökeres', 'Saka', 'Arteta', 'Nuno']
   }
+  ,{
+    id: 'epl-048',
+    title: '【賽前分析】曼城 vs 布倫特福德：少 Rodri 的冠軍追擊戰，Guardiola 不容再失分',
+    date: '2026-05-07',
+    category: '賽前深度分析',
+    summary: '第36輪焦點戰——曼城主場迎戰布倫特福德。落後兵工廠5分的曼城已無退路，但 Rodri 腹股溝傷勢仍是未知數。布倫特福德上輪 3-0 大勝西漢姆，士氣正旺。伊蒂哈德球場的追冠之夜，誰能笑到最後？',
+    content: `<h2>曼城 vs 布倫特福德｜英超第36輪・5/10（日）00:30 台灣時間・伊蒂哈德球場</h2>
+
+<h3>聯賽形勢</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:2px solid rgba(255,255,255,0.3)">
+<td style="padding:8px"><strong>球隊</strong></td>
+<td style="padding:8px"><strong>已賽</strong></td>
+<td style="padding:8px"><strong>積分</strong></td>
+<td style="padding:8px"><strong>形勢</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">兵工廠</td>
+<td style="padding:8px">35</td>
+<td style="padding:8px">76</td>
+<td style="padding:8px">榜首，掌握主動權</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">曼城</td>
+<td style="padding:8px">34</td>
+<td style="padding:8px">71</td>
+<td style="padding:8px">少賽一場，落後 5 分</td>
+</tr>
+</table>
+
+<p>曼城在上輪客場 3-3 被愛華頓逼平後，追冠形勢更加嚴峻。儘管手上仍有一場補賽，但數學上必須全勝、同時祈禱兵工廠犯錯，才有機會翻盤。Guardiola 不會放過任何 3 分的機會——特別是在自己的主場。</p>
+
+<h3>曼城近況：Doku 救命但問題浮現</h3>
+
+<p>愛華頓一戰暴露了曼城的兩大隱患：<strong>後防鬆動</strong>和<strong>中場缺乏 Rodri 的節奏控制</strong>。Gvardiol 賽季報銷、Dias 缺陣，中後衛組合只剩 Akanji 和 Stones（剛回歸），Marc Guehi 的低級失誤更是直接送了愛華頓一球。Jérémy Doku 兩度建功是唯一的亮點——包括補時第 97 分鐘的絕平進球。</p>
+
+<p>Haaland 本季英超已轟進 25 球，是金靴獎的有力爭奪者。但若 Rodri 無法復出，曼城中場的防守屏障和推進能力都會打折扣。</p>
+
+<h3>布倫特福德近況：3-0 大勝找回信心</h3>
+
+<p>布倫特福德在經歷六場不勝的低潮後，上輪 3-0 客場痛宰西漢姆，Keith Andrews 的球隊總算喘了口氣。目前積 51 分排名第 7，歐霸席位仍在射程範圍內。Igor Thiago 是球隊的進攻核心，Kevin Schade 的邊路突破也是重要武器。</p>
+
+<p>不過，布倫特福德做客伊蒂哈德的戰績慘淡——過去 10 次英超交手，蜜蜂軍團僅贏過 2 場，且從未在曼城主場取勝。</p>
+
+<h3>傷兵與陣容</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:2px solid rgba(255,255,255,0.3)">
+<td style="padding:8px"><strong>球隊</strong></td>
+<td style="padding:8px"><strong>傷兵/缺陣</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">曼城</td>
+<td style="padding:8px">Rodri（腹股溝，待評估）、Gvardiol（脛骨骨折，賽季報銷）、Dias（腳踝，五月中旬目標）</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">布倫特福德</td>
+<td style="padding:8px">Jordan Henderson（傷缺）、Vitaly Janelt（傷缺）、Rico Henry（長期傷缺）、Fábio Carvalho（傷缺）</td>
+</tr>
+</table>
+
+<h3>關鍵對決</h3>
+
+<p><strong>Haaland vs Nathan Collins</strong>：挪威人的身體對抗和門前嗅覺 vs 愛爾蘭中衛的硬朗防守。Collins 是布倫特福德本季最穩定的後防球員，但面對 Haaland 的空中和地面雙重威脅，壓力會是完全不同級別的。</p>
+
+<p><strong>Doku / Foden vs 布倫特福德邊路</strong>：曼城近期依賴邊路推進創造機會，Doku 的狀態火熱，而 Foden 在中路和邊路的靈活切換是 Guardiola 體系的重要環節。</p>
+
+<h3>本站預測</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr>
+<td style="padding:8px"><strong>預測比分</strong></td>
+<td style="padding:8px">曼城 3-1 布倫特福德。追冠壓力下的曼城不會在主場犯同樣的錯誤，Haaland 和 Doku 聯手應可撕開布倫特福德的防線。但蜜蜂軍團不會空手而歸，Igor Thiago 有能力把握一次機會。</td>
+</tr>
+</table>`,
+    tags: ['賽前分析', '曼城', '布倫特福德', '爭冠', '第36輪', 'Haaland', 'Doku', 'Rodri', 'Igor Thiago', 'Guardiola']
+  }
 ];
 
 window.EPL_ARTICLES = EPL_ARTICLES;
