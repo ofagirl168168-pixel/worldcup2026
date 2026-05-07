@@ -8,9 +8,69 @@
   'use strict';
 
   const STORAGE_LAST_SUBMIT = 'feedback_last_submit';
+  const STORAGE_VOTER_KEY = 'opinion_voter_key'; // 共用 opinion-poll 的瀏覽器唯一碼
   const RATE_LIMIT_MS = 30 * 1000; // 30 秒一次（防 spam）
 
   function $(id) { return document.getElementById(id); }
+
+  // 取得（或生成）瀏覽器唯一 voter_key — 用來綁回饋紀錄、讓使用者只看到自己寄過的
+  function _ensureVoterKey() {
+    let k = localStorage.getItem(STORAGE_VOTER_KEY);
+    if (!k) {
+      k = 'v_' + Math.random().toString(36).slice(2, 10)
+            + Math.random().toString(36).slice(2, 10)
+            + Date.now().toString(36);
+      localStorage.setItem(STORAGE_VOTER_KEY, k);
+    }
+    return k;
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function _fmtTime(iso) {
+    try {
+      return new Date(iso).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', hour12: false }).replace(/\//g, '-');
+    } catch (e) { return iso; }
+  }
+
+  // ── 我的紀錄 — 透過 RPC 抓 voter_key 對應的回饋 ──
+  async function loadMyFeedback() {
+    const list = $('feedback-my-list');
+    if (!list) return;
+    if (!window.DB) {
+      list.innerHTML = '<div class="feedback-empty">⚠️ 未連線，無法載入</div>';
+      return;
+    }
+    list.innerHTML = '<div class="feedback-empty">載入中…</div>';
+    const vkey = _ensureVoterKey();
+    try {
+      const { data, error } = await window.DB.rpc('get_my_feedback', { vkey });
+      if (error) throw error;
+      if (!data || !data.length) {
+        list.innerHTML = '<div class="feedback-empty">還沒寄過任何訊息</div>';
+        return;
+      }
+      const CAT_ICON = { '建議': '💡', 'Bug': '🐛', '讚美': '❤️', '其他': '💬' };
+      list.innerHTML = data.map(f => {
+        const read = f.read_at ? `<span class="fb-read-mark">✓ 已讀 ${_fmtTime(f.read_at)}</span>` : '<span class="fb-pending-mark">⏳ 等待查看</span>';
+        return `<div class="fb-item">
+          <div class="fb-item-head">
+            <span class="fb-item-cat">${CAT_ICON[f.category] || '💬'} ${escapeHtml(f.category)}</span>
+            <span class="fb-item-time">${escapeHtml(_fmtTime(f.created_at))}</span>
+          </div>
+          <div class="fb-item-content">${escapeHtml(f.content)}</div>
+          <div class="fb-item-status">${read}</div>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      console.warn('[feedback] load my feedback failed', e);
+      list.innerHTML = '<div class="feedback-empty err">❌ 載入失敗：' + escapeHtml(e.message || '未知錯誤') + '</div>';
+    }
+  }
 
   window.openFeedbackModal = function openFeedbackModal() {
     const m = $('feedback-modal');
@@ -34,6 +94,18 @@
     if (!btn) return;
     document.querySelectorAll('.feedback-cat').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+  });
+
+  // 寫信 / 我的紀錄 tab 切換
+  document.addEventListener('click', (e) => {
+    const tab = e.target.closest('.feedback-tab');
+    if (!tab) return;
+    const target = tab.dataset.tab;
+    document.querySelectorAll('.feedback-tab').forEach(b => b.classList.toggle('active', b === tab));
+    document.querySelectorAll('.feedback-tab-pane').forEach(p => {
+      p.style.display = p.dataset.pane === target ? '' : 'none';
+    });
+    if (target === 'mine') loadMyFeedback();
   });
 
   // 字數計算
@@ -95,6 +167,7 @@
         contact: contact,
         content: content,
         user_id: userId,
+        voter_key: _ensureVoterKey(),
         user_agent: (navigator.userAgent || '').slice(0, 200),
       });
       if (error) throw error;

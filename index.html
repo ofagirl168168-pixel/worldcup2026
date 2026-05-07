@@ -624,7 +624,12 @@
         <button class="feedback-modal-close" onclick="closeFeedbackModal()">&times;</button>
       </div>
       <div class="feedback-modal-body">
-        <p class="feedback-intro">有什麼建議、bug 回報、想說的話，直接寫給我吧 — 站長本人會看。</p>
+        <div class="feedback-tabs">
+          <button class="feedback-tab active" data-tab="write">✏️ 寫信</button>
+          <button class="feedback-tab" data-tab="mine">📂 我的紀錄</button>
+        </div>
+        <div class="feedback-tab-pane" data-pane="write">
+        <p class="feedback-intro">有什麼建議、bug 回報、想說的話，直接寫給我吧 — 站長本人會看。<br><span class="feedback-privacy">🔒 只有你自己看得到記錄；其他使用者完全看不到別人寫了什麼。</span></p>
         <form id="feedback-form" onsubmit="submitFeedback(event)">
           <div class="feedback-row">
             <label>類型</label>
@@ -653,6 +658,13 @@
           </div>
           <div class="feedback-status" id="feedback-status"></div>
         </form>
+        </div>
+        <div class="feedback-tab-pane" data-pane="mine" style="display:none">
+          <p class="feedback-intro">📂 你過去寄出的訊息（最近 50 則）— 只有你自己看得到。</p>
+          <div id="feedback-my-list" class="feedback-my-list">
+            <div class="feedback-empty">載入中…</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
