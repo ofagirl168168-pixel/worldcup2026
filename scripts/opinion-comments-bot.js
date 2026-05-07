@@ -355,8 +355,42 @@ async function commentPollLoop() {
   }
 }
 
-async function feedbackPollLoop() {
-  let cursor = readFeedbackCursor();
+// 啟動時先把所有未讀（read_at IS NULL && deleted=false）的回饋推一次
+// 修「重啟前提交的回饋永遠錯過」的問題
+async function catchupFeedbackOnStartup() {
+  try {
+    const q = new URLSearchParams({
+      select: 'id,category,nickname,content,created_at',
+      deleted: 'eq.false',
+      read_at: 'is.null',
+      order: 'created_at.asc',
+      limit: '20',
+    });
+    const rows = await supaFetch(`${REST}/user_feedback?${q}`);
+    if (!rows || !rows.length) {
+      console.log('📮 啟動補抓：沒有未讀回饋');
+      return null;
+    }
+    console.log(`📮 啟動補抓：發現 ${rows.length} 則未讀回饋，推送中...`);
+    let lastTs = null;
+    for (const f of rows) {
+      try {
+        await sendFeedbackToTelegram(f);
+        console.log(`📮 補推回饋 ${f.id}（${f.category} / ${f.nickname || '匿名'}）`);
+        lastTs = f.created_at;
+      } catch (e) {
+        console.error(`❌ 補推失敗 ${f.id}:`, e.message);
+      }
+    }
+    return lastTs;
+  } catch (e) {
+    console.error('❌ 啟動補抓失敗:', e.message);
+    return null;
+  }
+}
+
+async function feedbackPollLoop(initialCursor) {
+  let cursor = initialCursor || readFeedbackCursor();
   console.log(`📮 從 ${cursor} 開始監聽麥迪信箱`);
   while (true) {
     try {
@@ -428,6 +462,9 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
   } catch (e) {
     console.warn('⚠️ 啟動訊息發送失敗:', e.message);
   }
+  // 啟動補抓未讀回饋（重啟前提交的也能撈到）
+  const catchupTs = await catchupFeedbackOnStartup();
+  if (catchupTs) writeFeedbackCursor(catchupTs);
   // 三個 loop 同時跑：擂台留言 + 麥迪信箱回饋 + telegram callback 處理
   await Promise.all([commentPollLoop(), feedbackPollLoop(), telegramPollLoop()]);
 })().catch(err => {

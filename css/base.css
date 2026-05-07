@@ -415,9 +415,12 @@ ul { list-style: none; }
 
 /* ---------- 頁腳 ---------- */
 .main-footer {
-  border-top: 1px solid var(--border);
-  background: rgba(0,0,0,0.3);
-  padding: 32px 24px;
+  border-top: 2px solid var(--accent-border);
+  background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%);
+  /* padding-bottom 加大：避免左下/右下浮動按鈕(bottom:24px)蓋住 footer 底部內容 */
+  padding: 32px 24px 100px;
+  position: relative;
+  z-index: 2;
 }
 .footer-inner {
   max-width: 1400px; margin: 0 auto;
