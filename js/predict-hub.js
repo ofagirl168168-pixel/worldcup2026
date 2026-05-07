@@ -76,9 +76,22 @@
     if (ms <= 0) return '即將開賽';
     const h = Math.floor(ms / 3600000);
     const m = Math.floor((ms % 3600000) / 60000);
-    if (h > 24) return `${Math.floor(h / 24)} 天後開賽`;
-    if (h > 0) return `${h} 小時 ${m} 分後開賽`;
-    return `${m} 分鐘後開賽`;
+    if (h > 24) return `${Math.floor(h / 24)} 天後`;
+    if (h > 0) return `${h} 小時 ${m} 分後`;
+    return `${m} 分鐘後`;
+  }
+  // 把 kickoff 時間轉成「5/9 (五) 22:30」格式
+  const _DOW = ['日','一','二','三','四','五','六'];
+  function _fmtKickoff(ms) {
+    if (!ms) return '';
+    const d = new Date(ms);
+    // 轉成台灣時區
+    const tw = new Date(d.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+    const mo = tw.getMonth() + 1;
+    const dd = tw.getDate();
+    const hh = String(tw.getHours()).padStart(2, '0');
+    const mm = String(tw.getMinutes()).padStart(2, '0');
+    return `${mo}/${dd} (${_DOW[tw.getDay()]}) ${hh}:${mm}`;
   }
   function _crestImg(team) {
     if (!team) return '<span class="pp-crest pp-crest-blank"></span>';
@@ -103,13 +116,15 @@
     root.style.display = '';
     if (badge) badge.textContent = `${pending.length} 場`;
 
-    // streak 顯示
+    // streak 顯示（沒 streak 整個 chip 隱藏，避免空殼紅圈）
     const streak = getPredictStreak();
     if (streakEl) {
       if (streak.current > 0) {
         streakEl.innerHTML = `<span class="pp-streak-flame" title="沒比賽的日子不算斷 streak">🔥</span> 連續 <b>${streak.current}</b> 天`;
+        streakEl.style.display = '';
       } else {
         streakEl.innerHTML = '';
+        streakEl.style.display = 'none';
       }
     }
 
@@ -125,14 +140,21 @@
       const awayName = at.nameCN || at.name || m.away;
       return `<div class="pp-card ${urgency}" onclick="openPredModal('${m.id}')">
         <div class="pp-teams">
-          ${_crestImg(ht)}
-          <span class="pp-team-name">${homeName}</span>
+          <div class="pp-team pp-team--home">
+            ${_crestImg(ht)}
+            <span class="pp-team-name">${homeName}</span>
+          </div>
           <span class="pp-vs">VS</span>
-          <span class="pp-team-name pp-team-name--away">${awayName}</span>
-          ${_crestImg(at)}
+          <div class="pp-team pp-team--away">
+            <span class="pp-team-name">${awayName}</span>
+            ${_crestImg(at)}
+          </div>
         </div>
         <div class="pp-meta">
-          <span class="pp-countdown">⏰ ${_fmtCountdown(msLeft)}</span>
+          <div class="pp-time">
+            <span class="pp-kickoff">📅 ${_fmtKickoff(ko)}</span>
+            <span class="pp-countdown">⏰ ${_fmtCountdown(msLeft)}</span>
+          </div>
           <button class="pp-go-btn" onclick="event.stopPropagation();openPredModal('${m.id}')">預測比分 →</button>
         </div>
       </div>`;
