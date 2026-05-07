@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-049",
+    "tournament": "epl",
+    "title": "【賽前分析】第36輪其餘場次：熱刺保級生死戰、森林5連勝能否延續、升班馬挑戰歐冠隊",
+    "summary": "第36輪剩餘7場速覽：熱刺主場迎里茲聯是保級關鍵戰，森林5連勝挑戰紐卡索，桑德蘭主場面對歐冠資格確認的曼聯。已降級的伯恩利和狼隊各自迎戰維拉與布萊頓。",
+    "date": "2026-05-08",
+    "category": "賽前分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-047",
     "tournament": "epl",
     "title": "【賽前分析】西漢姆 vs 兵工廠：保級生死戰遇上歐冠決賽隊，倫敦德比火藥味十足",
@@ -179,7 +189,7 @@ export default [
     "date": "2026-04-30",
     "category": "賽後回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-019",
