@@ -101,7 +101,7 @@
     const streak = getPredictStreak();
     if (streakEl) {
       if (streak.current > 0) {
-        streakEl.innerHTML = `<span class="pp-streak-flame">🔥</span> 連續 <b>${streak.current}</b> 天`;
+        streakEl.innerHTML = `<span class="pp-streak-flame" title="沒比賽的日子不算斷 streak">🔥</span> 連續 <b>${streak.current}</b> 天`;
       } else {
         streakEl.innerHTML = '';
       }
@@ -149,23 +149,65 @@
   }
   window.getPredictStreak = getPredictStreak;
 
-  function bumpPredictStreak() {
-    const today = (typeof localDateStr === 'function') ? localDateStr() : new Date().toISOString().slice(0, 10);
-    const s = getPredictStreak();
-    if (s.lastDate === today) return { ...s, bumped: false };
-    const d = new Date(today + 'T00:00:00');
-    d.setDate(d.getDate() - 1);
-    const yesterday = d.getFullYear() + '-' +
+  // 某個日期是否「有真正可預測的比賽」（任一賽事任何一場都算）
+  // 用全部三個賽事池一起查（使用者可能某天只有歐冠、某天只有英超）
+  function _hadMatchesOnDate(dateStr) {
+    const pools = [
+      window.EPL_MATCHES || [],
+      window.UCL_MATCHES || [],
+      (typeof SCHEDULE !== 'undefined') ? SCHEDULE : [],
+    ];
+    for (const matches of pools) {
+      for (const m of matches) {
+        if (!m.home || !m.away || m.home === 'TBD' || m.away === 'TBD') continue;
+        const md = m.date || m.twDate;
+        if (md === dateStr) return true;
+      }
+    }
+    return false;
+  }
+  function _yyyymmdd(d) {
+    return d.getFullYear() + '-' +
       String(d.getMonth() + 1).padStart(2, '0') + '-' +
       String(d.getDate()).padStart(2, '0');
+  }
+
+  // 預測 streak bump（沒比賽的日子自動跳過、不算斷）
+  function bumpPredictStreak() {
+    const today = (typeof localDateStr === 'function') ? localDateStr() : _yyyymmdd(new Date());
+    const s = getPredictStreak();
+    if (s.lastDate === today) return { ...s, bumped: false };
+
+    // 第一次預測 → current = 1
+    if (!s.lastDate) {
+      const next = { current: 1, longest: 1, lastDate: today };
+      localStorage.setItem(STORAGE_PREDICT_STREAK, JSON.stringify(next));
+      return { ...next, bumped: true, prevCurrent: 0 };
+    }
+
+    // 從昨天往回掃到 lastDate，途中如果遇到「有比賽但沒預測」→ streak 斷掉
+    // 沒比賽的日子直接跳過（不算斷）
+    const cursor = new Date(today + 'T00:00:00');
+    cursor.setDate(cursor.getDate() - 1);
+    let broken = false;
+    let walks = 0;
+    while (walks < 60) { // 最多回看 60 天，避免極端情境卡死
+      const cs = _yyyymmdd(cursor);
+      if (cs === s.lastDate) break;
+      if (_hadMatchesOnDate(cs)) { broken = true; break; }
+      cursor.setDate(cursor.getDate() - 1);
+      walks++;
+    }
+    if (walks >= 60) broken = true;
+
     const next = {
-      current: s.lastDate === yesterday ? s.current + 1 : 1,
+      current: broken ? 1 : s.current + 1,
       longest: 0,
       lastDate: today,
     };
     next.longest = Math.max(s.longest, next.current);
     localStorage.setItem(STORAGE_PREDICT_STREAK, JSON.stringify(next));
-    return { ...next, bumped: true, prevCurrent: s.current };
+    return { ...next, bumped: true, prevCurrent: s.current, brokenByMissedDay: broken };
   }
   window.bumpPredictStreak = bumpPredictStreak;
 
