@@ -147,6 +147,36 @@
     }
   }
 
+  // 等到使用者離開所有挑戰賽流程（任何 .fr-modal-overlay 都關掉、且持續 2 秒沒新 modal）才 flush
+  // 用於：使用者按了開房 → 開房 modal → 建房 → 邀請 modal → 房間 modal... 都關完才彈每日任務
+  function _flushWhenChallengeFlowExits() {
+    if (_chFlowWatcher) clearInterval(_chFlowWatcher);
+    let stableSince = null;
+    const STABLE_MS = 2000;
+    const MAX_WAIT = 10 * 60 * 1000;
+    let totalElapsed = 0;
+    const POLL = 300;
+    _chFlowWatcher = setInterval(() => {
+      const modalOpen = document.querySelector('.fr-modal-overlay');
+      if (modalOpen) {
+        stableSince = null;
+      } else {
+        if (stableSince === null) stableSince = Date.now();
+        else if (Date.now() - stableSince >= STABLE_MS) {
+          clearInterval(_chFlowWatcher); _chFlowWatcher = null;
+          _flushDeferredDailyTask();
+          return;
+        }
+      }
+      totalElapsed += POLL;
+      if (totalElapsed >= MAX_WAIT) {
+        clearInterval(_chFlowWatcher); _chFlowWatcher = null;
+        _flushDeferredDailyTask();
+      }
+    }, POLL);
+  }
+  let _chFlowWatcher = null;
+
   // 輪詢直到分享卡 + 擂台彈窗 + 任何 modal-like overlay 都關掉 → 才執行 cb
   function _waitForAllOverlaysClosedThen(cb, delayMs) {
     const POLL = 300;
@@ -531,22 +561,29 @@
     requestAnimationFrame(() => wrap.classList.add('show'));
 
     let done = false;
-    function cleanup() {
+    let clickedTarget = false;
+    function cleanup(byClick) {
       if (done) return;
       done = true;
       wrap.classList.remove('show');
       setTimeout(() => wrap.remove(), 250);
-      target.removeEventListener('click', cleanup);
+      target.removeEventListener('click', onTargetClick);
       window.removeEventListener('resize', reposition);
       window.removeEventListener('scroll', reposition, true);
-      // 手指指引結束才補彈每日任務
-      _flushDeferredDailyTask();
+      if (byClick) {
+        // 使用者按了開房 → 等他走完整個挑戰賽流程（建房/邀請/房間 modal）才彈每日任務
+        _flushWhenChallengeFlowExits();
+      } else {
+        // 60 秒沒按 → 直接補彈
+        _flushDeferredDailyTask();
+      }
     }
-    target.addEventListener('click', cleanup);
+    function onTargetClick() { clickedTarget = true; cleanup(true); }
+    target.addEventListener('click', onTargetClick);
     window.addEventListener('resize', reposition);
     window.addEventListener('scroll', reposition, true);
-    // 60 秒沒按也自動消失
-    setTimeout(cleanup, 60000);
+    // 60 秒沒按也自動消失（這條 timeout 走 cleanup(false) → 直接 flush）
+    setTimeout(() => cleanup(false), 60000);
   }
 
   // 監聽 section 切換到 friend-room → 首次彈 tutorial（延遲 800ms 讓頁面渲染）
