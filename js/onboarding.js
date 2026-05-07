@@ -260,86 +260,210 @@
     }, 400);
   }
 
-  // ── 引導 3：到達挑戰賽頁面 → 4 步驟導覽 ──
+  // ── 引導 3：到達挑戰賽頁面 → spotlight 頁面內引導 ──
+  // 4 步驟：① 概念介紹（中央卡）② spotlight 開房按鈕 ③ spotlight 房間列表 ④ 結尾說明
+  const TUTORIAL_STEPS = [
+    {
+      mode: 'centered',
+      icon: 'a10-crown',
+      title: '歡迎來到麥迪挑戰賽',
+      body: '真實比賽即將開打？開一間「房」邀朋友一起 <b>猜比分</b>，比賽時用 AI 模擬賽事直播決勝負。',
+      tip: '💡 4 步驟導覽，30 秒看完就會玩',
+    },
+    {
+      mode: 'spotlight',
+      target: '.fr-lobby-create',
+      title: '點這裡開自己的房',
+      body: '選一場比賽 → 設下注 XP → 選公開房 / 私人房 → 完成。系統會自動複製邀請連結。',
+      tip: '💡 公開房任何人都能進；私人房只有拿到連結的人能進',
+      tooltipSide: 'bottom',
+    },
+    {
+      mode: 'spotlight',
+      target: '#fr-lobby-list',
+      title: '或從這裡加入別人開的房',
+      body: '大廳已排好「本週開放中」的房間，包含 <b>系統官方房</b>（每場真實比賽自動建立）跟其他玩家的公開房。',
+      tip: '💡 點「加入」直接猜比分，比開房還快',
+      tooltipSide: 'top',
+    },
+    {
+      mode: 'centered',
+      icon: 'a4-magnifying-glass',
+      title: '開賽 → AI 直播決勝負',
+      body: '開賽時間到，所有人的猜分鎖定。<b>AI 跑模擬賽直播</b>，全房同步看哪邊先進球。<b>誰最接近真實比分誰贏</b>，獨享所有 XP 池。',
+      tip: '💡 結束後分享戰績到 LINE，拉朋友來下一局',
+    },
+  ];
+
   function _showChallengeTutorial() {
     if (localStorage.getItem(STORAGE_CHALLENGE_TUTORIAL)) return;
     localStorage.setItem(STORAGE_CHALLENGE_TUTORIAL, '1');
 
-    const overlay = document.createElement('div');
-    overlay.className = 'ct-overlay';
-    overlay.innerHTML = `
-      <div class="ct-card">
-        <button class="ct-close">×</button>
-        <div class="ct-icon"><img src="/assets/personas/a10-crown.svg" alt=""></div>
-        <div class="ct-step" id="ct-step-1">
-          <div class="ct-step-num">STEP 1 / 4</div>
-          <h3>歡迎來到麥迪挑戰賽</h3>
-          <p>真實比賽即將開打？開一間「房」邀朋友一起 <b>猜比分</b>，比賽用 AI 模擬賽事直播決勝負。</p>
-          <div class="ct-actions">
-            <button class="ct-btn-primary" data-next>下一步 →</button>
-            <button class="ct-btn-skip" data-close>略過</button>
-          </div>
+    const root = document.createElement('div');
+    root.className = 'cts-root';
+    root.innerHTML = `
+      <div class="cts-spotlight" id="cts-spotlight"></div>
+      <div class="cts-card" id="cts-card">
+        <button class="cts-close" aria-label="關閉">×</button>
+        <div class="cts-step-num" id="cts-num"></div>
+        <div class="cts-icon-wrap" id="cts-icon-wrap"></div>
+        <h3 class="cts-title" id="cts-title"></h3>
+        <p class="cts-body" id="cts-body"></p>
+        <p class="cts-tip" id="cts-tip"></p>
+        <div class="cts-actions">
+          <button class="cts-btn-back" id="cts-back">← 上一步</button>
+          <button class="cts-btn-primary" id="cts-next">下一步 →</button>
         </div>
-        <div class="ct-step" id="ct-step-2" style="display:none">
-          <div class="ct-step-num">STEP 2 / 4</div>
-          <h3>怎麼開房？</h3>
-          <p>右上角「<b>＋ 開房</b>」按鈕 → 選比賽 → 設下注 (XP) → 公開房 / 私人房自選。</p>
-          <p class="ct-tip">💡 公開房任何人都能進；私人房只有拿到連結的人能進。</p>
-          <div class="ct-actions">
-            <button class="ct-btn-back" data-prev>← 上一步</button>
-            <button class="ct-btn-primary" data-next>下一步 →</button>
-          </div>
-        </div>
-        <div class="ct-step" id="ct-step-3" style="display:none">
-          <div class="ct-step-num">STEP 3 / 4</div>
-          <h3>邀請朋友</h3>
-          <p>建房後系統自動複製邀請連結，並提供 <b>📲 LINE / ✈️ Telegram</b> 一鍵分享按鈕。朋友點連結直接進房。</p>
-          <p class="ct-tip">💡 朋友透過你的連結首次完成擂台投票，雙方各拿 <b>+5 💎</b>。</p>
-          <div class="ct-actions">
-            <button class="ct-btn-back" data-prev>← 上一步</button>
-            <button class="ct-btn-primary" data-next>下一步 →</button>
-          </div>
-        </div>
-        <div class="ct-step" id="ct-step-4" style="display:none">
-          <div class="ct-step-num">STEP 4 / 4</div>
-          <h3>開賽 → 直播決勝負</h3>
-          <p>開賽時間到，所有人的猜分都鎖定。AI 跑模擬賽直播，全房同步看哪邊先進球。<b>誰最接近真實比分誰贏</b>，獨享所有 XP 池。</p>
-          <p class="ct-tip">💡 找不到合適比賽？大廳已自動排好「<b>本週開放中</b>」的官方房，直接點「加入」就行。</p>
-          <div class="ct-actions">
-            <button class="ct-btn-back" data-prev>← 上一步</button>
-            <button class="ct-btn-primary ct-btn-finish" data-close>🚀 開始玩</button>
-          </div>
-        </div>
+        <div class="cts-progress" id="cts-progress"></div>
       </div>`;
-    document.body.appendChild(overlay);
-    requestAnimationFrame(() => overlay.classList.add('show'));
+    document.body.appendChild(root);
 
-    let cur = 1;
-    function show(n) {
-      cur = n;
-      overlay.querySelectorAll('.ct-step').forEach((el, i) => {
-        el.style.display = (i + 1 === n) ? '' : 'none';
+    let cur = 0;
+    const spotlight = root.querySelector('#cts-spotlight');
+    const card = root.querySelector('#cts-card');
+    const closeBtn = root.querySelector('.cts-close');
+    const backBtn = root.querySelector('#cts-back');
+    const nextBtn = root.querySelector('#cts-next');
+
+    function close() {
+      root.classList.remove('show');
+      setTimeout(() => root.remove(), 300);
+    }
+    closeBtn.addEventListener('click', close);
+    spotlight.addEventListener('click', close);
+
+    function render() {
+      const step = TUTORIAL_STEPS[cur];
+      const total = TUTORIAL_STEPS.length;
+
+      // 步驟編號
+      root.querySelector('#cts-num').textContent = `STEP ${cur + 1} / ${total}`;
+
+      // icon
+      const iconWrap = root.querySelector('#cts-icon-wrap');
+      iconWrap.innerHTML = step.icon ? `<img src="/assets/personas/${step.icon}.svg" alt="">` : '';
+      iconWrap.style.display = step.icon ? '' : 'none';
+
+      // 文案
+      root.querySelector('#cts-title').innerHTML = step.title;
+      root.querySelector('#cts-body').innerHTML = step.body;
+      const tipEl = root.querySelector('#cts-tip');
+      if (step.tip) { tipEl.innerHTML = step.tip; tipEl.style.display = ''; }
+      else { tipEl.style.display = 'none'; }
+
+      // 進度點
+      root.querySelector('#cts-progress').innerHTML =
+        TUTORIAL_STEPS.map((_, i) => `<span class="cts-dot${i === cur ? ' on' : ''}"></span>`).join('');
+
+      // 按鈕
+      backBtn.style.visibility = cur === 0 ? 'hidden' : '';
+      nextBtn.textContent = cur === total - 1 ? '🚀 開始玩' : '下一步 →';
+
+      // mode：spotlight 圈出元素 + 把 card 放在元素旁邊
+      if (step.mode === 'spotlight' && step.target) {
+        const el = document.querySelector(step.target);
+        if (el) {
+          // scroll 到可視區
+          try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+          // 等 scroll 結束再定位（350ms）
+          setTimeout(() => _positionSpotlight(el, step.tooltipSide || 'bottom'), 380);
+        } else {
+          _positionCardCenter();
+        }
+      } else {
+        _positionCardCenter();
+      }
+    }
+
+    function _positionSpotlight(el, side) {
+      const rect = el.getBoundingClientRect();
+      const pad = 12;
+      const sx = rect.left - pad;
+      const sy = rect.top - pad;
+      const sw = rect.width + pad * 2;
+      const sh = rect.height + pad * 2;
+
+      // spotlight：用大 box-shadow 創造「中間透明、外圍半透明黑」的洞
+      Object.assign(spotlight.style, {
+        left: sx + 'px',
+        top: sy + 'px',
+        width: sw + 'px',
+        height: sh + 'px',
+        opacity: '1',
+        display: 'block',
+      });
+
+      // 卡片放在元素附近
+      card.classList.add('cts-card-floating');
+      card.classList.remove('cts-card-centered');
+      const cardW = Math.min(360, window.innerWidth - 32);
+      let cardLeft, cardTop;
+      if (side === 'top') {
+        cardLeft = Math.max(16, Math.min(window.innerWidth - cardW - 16, sx + sw / 2 - cardW / 2));
+        cardTop = Math.max(16, sy - 16 - card.offsetHeight);
+        if (cardTop < 16) {
+          // 上面放不下 → 改放下面
+          cardTop = sy + sh + 16;
+        }
+      } else {
+        cardLeft = Math.max(16, Math.min(window.innerWidth - cardW - 16, sx + sw / 2 - cardW / 2));
+        cardTop = sy + sh + 16;
+        if (cardTop + card.offsetHeight > window.innerHeight - 16) {
+          cardTop = Math.max(16, sy - 16 - card.offsetHeight);
+        }
+      }
+      Object.assign(card.style, {
+        left: cardLeft + 'px',
+        top: cardTop + 'px',
+        right: 'auto',
+        bottom: 'auto',
+        transform: 'none',
       });
     }
-    function close() {
-      overlay.classList.remove('show');
-      setTimeout(() => overlay.remove(), 280);
+
+    function _positionCardCenter() {
+      // 中央模式：spotlight 全螢幕黑、card 置中
+      Object.assign(spotlight.style, {
+        left: '0', top: '0',
+        width: '100vw', height: '100vh',
+        opacity: '1',
+        display: 'block',
+      });
+      card.classList.add('cts-card-centered');
+      card.classList.remove('cts-card-floating');
+      Object.assign(card.style, {
+        left: '50%', top: '50%',
+        right: 'auto', bottom: 'auto',
+        transform: 'translate(-50%, -50%)',
+      });
     }
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) close();
-      const t = e.target.closest('[data-next], [data-prev], [data-close], .ct-close');
-      if (!t) return;
-      if (t.matches('[data-next]')) show(cur + 1);
-      else if (t.matches('[data-prev]')) show(cur - 1);
+
+    backBtn.addEventListener('click', () => { if (cur > 0) { cur--; render(); } });
+    nextBtn.addEventListener('click', () => {
+      if (cur < TUTORIAL_STEPS.length - 1) { cur++; render(); }
       else close();
+    });
+
+    requestAnimationFrame(() => {
+      root.classList.add('show');
+      render();
+    });
+
+    // window resize → 重新定位
+    const onResize = () => render();
+    window.addEventListener('resize', onResize);
+    root.addEventListener('transitionend', () => {
+      if (!document.body.contains(root)) {
+        window.removeEventListener('resize', onResize);
+      }
     });
   }
   window.maybeShowChallengeTutorial = _showChallengeTutorial;
 
-  // 監聽 section 切換到 friend-room → 首次彈 tutorial
+  // 監聽 section 切換到 friend-room → 首次彈 tutorial（延遲 800ms 讓頁面渲染）
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-section="friend-room"]');
     if (!btn) return;
-    setTimeout(() => _showChallengeTutorial(), 600);
+    setTimeout(() => _showChallengeTutorial(), 800);
   });
 })();
