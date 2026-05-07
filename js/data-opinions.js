@@ -14,6 +14,11 @@ const DAILY_OPINIONS = [
 
   // ── 本週時事 ─────────────────────────────────────────
 
+  { id:'op-20260507-b', dates:['2026-05-07','2026-05-08'], type:'trending',
+    q:"拜仁 1-1 PSG 出局！Neves 那次手球沒判點球，拜仁 CEO 公開質疑裁判經驗，你怎麼看？",
+    opts:["規則內合理，是 Marquinhos 自家解圍踢出才碰到 Neves，沒有故意手球 ⚖️","應該判點球！拜仁本場至少兩次手球都被吃掉 🔴","拜仁球迷別再吵了，PSG 整場創造機會更多本來就該晉級 🔵","真正問題是 UEFA 派一個只執法 15 場歐冠的菜鳥裁判 — 制度問題 📺"],
+    context:"拜仁主場 1-1 戰平 PSG，總比分 5-6 出局無緣決賽。Dembélé 開賽 2 分鐘進球、Kane 第 94 分鐘扳平。但 Bayern 上下對葡萄牙裁判 João Pinheiro 非常憤怒：(1) Marquinhos 解圍誤打中隊友 João Neves 伸開的手，VAR 沒判點球；(2) 上半場 Konrad Laimer 被吹手球但慢動作顯示其實是 Nuno Mendes 的手，Mendes 反而逃過第二張黃牌；(3) Kane 第 23 分鐘的反擊也被吹越位。Kompany 賽後公開不滿，拜仁 CEO Dreesen 直言「派一個只有 15 場歐冠經驗的裁判執法這種比賽，至少令人驚訝」。前德甲裁判 Manuel Gräfe 也認為 Neves 那球該判點球。" },
+
   { id:'op-20260508-a', date:'2026-05-08', type:'trending',
     q:"歐冠決賽對陣確定！PSG vs 兵工廠，衛冕冠軍對決 20 年首次殺入決賽的槍手，你看好誰？",
     opts:["兵工廠奪冠！Arteta 帶隊創造歷史 🔴","PSG 成功衛冕！Dembélé + Kvaratskhelia 太強 🔵","120 分鐘分不出勝負，PK 大戰定生死 ⚡","看好 PSG 但希望兵工廠贏，中立球迷支持弱者 🤞"],
