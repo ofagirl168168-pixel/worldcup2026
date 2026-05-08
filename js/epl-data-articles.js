@@ -2629,7 +2629,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p>Roberto De Zerbi 在賽季中段接手熱刺以來，球隊雖未脫胎換骨，但<strong>戰術紀律明顯回升</strong>。本季熱刺已三度換帥，上輪客場 2-1 維拉的勝利是他上任以來最關鍵一勝——Gallagher 25 碼遠射 + Richarlison 頭槌讓熱刺半場 2-0 領先，雖然 Buendía 補時扳回一城，但守住了這 3 分讓熱刺暫時擺脫降級區。</p>
 
-<p>De Zerbi 的進攻控球風格在熱刺現有陣容上其實相性不算完美，但他用<strong>邊路速度 + 高位壓迫</strong>勉強組裝出可用體系。Micky van de Ven 的中後衛速度（本賽季最快回追紀錄達 37.4 km/h）是抵禦反擊的關鍵保險；中場由 Pape Matar Sarr 跟 Yves Bissouma 撐起轉換空間。</p>
+<p>De Zerbi 的進攻控球風格在熱刺現有陣容上其實相性不算完美，但他用<strong>邊路速度 + 高位壓迫</strong>勉強組裝出可用體系。Micky van de Ven 的中後衛速度（本賽季最快回追紀錄達 37.38 km/h，英超官方紀錄）是抵禦反擊的關鍵保險；中場由 Pape Matar Sarr 跟 Yves Bissouma 撐起轉換空間。</p>
 
 <h2>熱刺傷兵地獄：9 名一線球員缺陣</h2>
 
@@ -2640,11 +2640,11 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
   <li><strong>Dominic Solanke（前鋒）</strong>—— 多方報導賽季報銷，De Zerbi 僅表示「尚不確定」，本場幾乎確定缺陣。失去他等於失去禁區終結點</li>
   <li><strong>Cristian Romero（中後衛）</strong>—— 4 月膝傷後沒回到陣中</li>
   <li><strong>Mohammed Kudus（攻擊中場）</strong>—— 缺陣中</li>
-  <li><strong>Xavi Simons（中場）</strong>—— 缺陣中</li>
+  <li><strong>Xavi Simons（中場）</strong>—— 對 Wolves 拉斷 ACL 賽季報銷，連世界盃都受影響</li>
   <li>另有 4 名一線球員傷停，總計 De Zerbi 缺 9 名一隊主力</li>
 </ul>
 
-<p>替補席上能補位的 Richarlison（本季英超 10 球 30 場）目前是熱刺最關鍵的攻擊輸出，本場八成會頂上中鋒位置。James Maddison 雖在陣，但本季狀態起伏，是否能扛起 10 號責任成最大未知數。</p>
+<p>替補席上能補位的 Richarlison（本季英超 10 球 27 場）目前是熱刺最關鍵的攻擊輸出，本場八成會頂上中鋒位置。James Maddison 雖在陣，但本季狀態起伏，是否能扛起 10 號責任成最大未知數。</p>
 
 <h2>里茲聯：6 連不敗的逆襲</h2>
 
@@ -2652,12 +2652,11 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <ul>
   <li>近 6 場英超不敗</li>
-  <li>近 22 場英超只輸 4 場</li>
-  <li>4 月 13 日客場 2-1 擊敗曼聯——里茲<strong>45 年來首度在 Old Trafford 拿下英超勝利</strong></li>
+  <li>4 月 13 日客場 2-1 擊敗曼聯——里茲<strong>45 年來首度在 Old Trafford 拿下頂級聯賽勝利</strong>（上次贏球是 1981 年）</li>
   <li>上週五主場 3-1 大勝伯恩利：Anton Stach 開場 8 分鐘世界波遠射、Noah Okafor 與 Dominic Calvert-Lewin 下半場 4 分鐘內連入兩球殺死比賽</li>
 </ul>
 
-<p><strong>Dominic Calvert-Lewin</strong>（前 Everton 中鋒，本季加盟里茲）已在英超 32 場攻入 12 球，是 Farke 體系裡的支點型前鋒。Anton Stach 跟 Noah Okafor 提供二線火力，而本季加盟的瑞士天才 Willy Gnonto 則是邊路爆破點。</p>
+<p><strong>Dominic Calvert-Lewin</strong>（前 Everton 中鋒，本季加盟里茲）已在英超 31 場攻入 12 球，是 Farke 體系裡的支點型前鋒。Anton Stach 跟 Noah Okafor 提供二線火力，而本季加盟的瑞士天才 Willy Gnonto 則是邊路爆破點。</p>
 
 <p>Farke 的里茲打法相對務實——4-2-3-1 雙後腰護中場、邊路靠速度衝擊。本場無關重要積分，預期里茲會打得開放，但仍會留意防反。</p>
 
@@ -2680,7 +2679,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <ul>
   <li><strong>Richarlison 能否頂住中鋒</strong>：失去 Solanke 後他是熱刺禁區唯一終結點</li>
   <li><strong>Calvert-Lewin 對前東家心情</strong>：他從 2016-2025 在 Everton，沒在熱刺踢過，但作為英超老中鋒對北倫敦戰場應該不陌生</li>
-  <li><strong>Brandon Austin 的英超首秀（如果 Vicario 真不能上）</strong>：23 歲後備門將首次擔綱保級戰，壓力指標</li>
+  <li><strong>Brandon Austin 的英超首秀（如果 Vicario 真不能上）</strong>：27 歲後備門將首次擔綱保級戰，壓力指標</li>
   <li><strong>De Zerbi 的板凳</strong>：9 個傷兵下他能輪換的選項極少，60 分鐘後體能掉下來時誰能補位</li>
 </ul>
 
@@ -2710,7 +2709,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p>Pereira 的森林打法走<strong>4-2-3-1 紀律性反擊</strong>：後場雙後腰穩固、中場由 Morgan Gibbs-White 組織創造、邊路靠 Callum Hudson-Odoi 等人衝擊，禁區由<strong>老將 Chris Wood 撐起終結點</strong>。Wood 本季雖年屆 34，但在 Pereira 體系下進球效率極高，是森林近期火力爆發的核心。</p>
 
-<p>4/25 客場 5-0 屠殺桑德蘭那場是 Pereira 體系成熟的標誌——21 分鐘內灌進 4 球（17'-37'），Chris Wood、Morgan Gibbs-White、Igor Jesus 聯袂建功，整支球隊像是換了個靈魂。5/4 客場 3-1 切爾西那場則是延續勢頭，Awoniyi 開場 2 分鐘破門 + Igor Jesus 罰入十二碼，把藍軍打到英超時代最長 6 連敗。</p>
+<p>4/24 客場 5-0 屠殺桑德蘭那場是 Pereira 體系成熟的標誌——20 分鐘內灌進 4 球（17'-37'），Chris Wood、Morgan Gibbs-White、Igor Jesus 聯袂建功，整支球隊像是換了個靈魂。5/4 客場 3-1 切爾西那場則是延續勢頭，Awoniyi 開場 2 分鐘破門 + Igor Jesus 罰入十二碼，把藍軍打到<strong>切爾西自 1993 年以來最長的英超 6 連敗</strong>。</p>
 
 <h2>紐卡索：Howe 危機與火力下滑</h2>
 
