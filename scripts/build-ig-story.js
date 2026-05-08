@@ -261,8 +261,8 @@ async function renderStory(article, logo) {
     });
   }
 
-  // ── 底部 CTA 區（連結貼紙位置 + URL 印在圖上）
-  const ctaY = H - 320;
+  // ── 底部 CTA 區（移除 emoji 避免字型問題；移除誤導的 URL）
+  const ctaY = H - 340;
   // 上方分隔線
   ctx.strokeStyle = hexA(theme.accent, 0.4);
   ctx.lineWidth = 2;
@@ -271,21 +271,36 @@ async function renderStory(article, logo) {
   ctx.lineTo(W - 140, ctaY);
   ctx.stroke();
 
-  // 「點連結貼紙看全文」（指引限動觀眾用 IG 內建 link sticker）
-  ctx.font = `bold 38px ${FONT_BOLD}`;
+  // 用 canvas 路徑畫一個向上箭頭（取代 👆 emoji，繞開字型問題）
+  const arrowCx = W / 2;
+  const arrowY = ctaY + 50;
+  ctx.fillStyle = theme.accent;
+  ctx.beginPath();
+  ctx.moveTo(arrowCx, arrowY - 15);          // 頂點
+  ctx.lineTo(arrowCx + 18, arrowY + 5);      // 右下
+  ctx.lineTo(arrowCx + 8, arrowY + 5);       // 右肩
+  ctx.lineTo(arrowCx + 8, arrowY + 25);      // 右下角
+  ctx.lineTo(arrowCx - 8, arrowY + 25);      // 左下角
+  ctx.lineTo(arrowCx - 8, arrowY + 5);       // 左肩
+  ctx.lineTo(arrowCx - 18, arrowY + 5);      // 左下
+  ctx.closePath();
+  ctx.fill();
+
+  // 主 CTA：點連結貼紙（這個 IG 觀眾要自己手動加，但說明清楚比較有點擊動機）
+  ctx.font = `bold 40px ${FONT_BOLD}`;
   ctx.fillStyle = theme.accent;
   ctx.textAlign = 'center';
-  ctx.fillText('👆 點上方連結看完整分析', W / 2, ctaY + 60);
+  ctx.fillText('點上方連結看完整分析', W / 2, ctaY + 110);
 
-  // 副標：直接顯示 URL 給沒看到貼紙的觀眾
-  ctx.font = `400 26px ${FONT}`;
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ctx.fillText(`或前往 soccermaddy.pages.dev`, W / 2, ctaY + 110);
+  // 副標：IG 帳號（讓觀眾知道是哪個帳號）
+  ctx.font = `bold 30px ${FONT_BOLD}`;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('@168good236', W / 2, ctaY + 165);
 
-  // 底部品牌浮水印（IG reply bar 之上）
-  ctx.font = `bold 32px ${FONT_BOLD}`;
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.fillText('@168good236', W / 2, H - 160);
+  // 副副標：站內品牌（更小灰字）
+  ctx.font = `400 24px ${FONT}`;
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillText('Soccer麥迪 · 麥迪擂台', W / 2, ctaY + 205);
 
   return canvas.toBuffer('image/png');
 }
