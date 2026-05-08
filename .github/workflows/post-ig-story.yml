@@ -58,7 +58,7 @@ jobs:
           echo "等 Cloudflare 把新檔案 deploy 上去（約 60-120 秒）..."
           sleep 90
 
-      - name: Post IG stories
+      - name: Post IG stories（週末/國定假日才會發；平日會自動跳過）
         env:
           IG_BUSINESS_ACCOUNT_ID: ${{ secrets.IG_BUSINESS_ACCOUNT_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
@@ -66,11 +66,18 @@ jobs:
           SITE_URL: https://worldcup2026-9u0.pages.dev
         run: node scripts/post-ig-story.js
 
+      - name: Post to Telegram channel（每天都發、電子報模式）
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.CLAUDE330_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TG_NEWSLETTER_CHANNEL_ID }}
+          SITE_URL: https://worldcup2026-9u0.pages.dev
+        run: node scripts/post-telegram-channel.js
+
       - name: Commit posted state
         if: always()  # 即使前一步部分失敗也要 commit 已成功的部分
         run: |
           git pull --rebase || true
-          git add og/ig-story/.posted-state.json || true
+          git add og/ig-story/.posted-state.json og/ig-story/.tg-channel-state.json || true
           if git diff --staged --quiet; then
             echo "state 沒變"
           else

@@ -44,6 +44,35 @@ const POLL_INTERVAL = 3000;    // 等 container ready 的 poll 間隔
 const POLL_MAX = 20;            // 最多等 20*3=60s
 
 const DRY_RUN = process.argv.includes('--dry');
+const FORCE_POST = process.argv.includes('--force');  // 強制發（測試用，繞過平日跳過）
+
+// 台灣時區當天日期 + 星期
+function getTaipeiToday() {
+  const fmtYMD = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const fmtWD = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Taipei', weekday: 'long' });
+  return { ymd: fmtYMD.format(new Date()), weekday: fmtWD.format(new Date()) };
+}
+
+// 是否是「自動發 IG」的日子（週六/日 + 國定假日）
+function isAutoPostDay() {
+  if (FORCE_POST) return { auto: true, reason: '--force 強制發' };
+  const { ymd, weekday } = getTaipeiToday();
+  if (weekday === 'Saturday' || weekday === 'Sunday') {
+    return { auto: true, reason: `週末（${weekday}）` };
+  }
+  // 載入國定假日
+  try {
+    const holFile = path.join(ROOT, 'data', 'tw-holidays.json');
+    if (fs.existsSync(holFile)) {
+      const hols = JSON.parse(fs.readFileSync(holFile, 'utf8'));
+      const year = ymd.slice(0, 4);
+      const list = (hols.holidays && hols.holidays[year]) || [];
+      const match = list.find(h => h.date === ymd);
+      if (match) return { auto: true, reason: `國定假日：${match.name}` };
+    }
+  } catch (e) { /* fall through */ }
+  return { auto: false, reason: `平日（${weekday}）— 跳過 IG 自動發、改由你手動發 + 加 link sticker` };
+}
 
 function log(...args) { console.log('[ig-story]', ...args); }
 function err(...args) { console.error('[ig-story]', ...args); }
@@ -188,6 +217,15 @@ async function checkTokenExpiry() {
 }
 
 (async () => {
+  // 平日跳過 IG 自動發（觀眾要在 IG 上看到 link sticker，但 API 不支援自動加 → 平日由人工發）
+  const dayCheck = isAutoPostDay();
+  if (!dayCheck.auto) {
+    log(`⏭️ ${dayCheck.reason}`);
+    log('（TG 頻道仍會收到通知，IG 限動圖已自動產出在 og/ig-story/，請開 IG App 手動上傳並加 link sticker）');
+    return;
+  }
+  log(`✅ ${dayCheck.reason} → 自動發 IG 限動`);
+
   if (!IG_USER_ID || !IG_TOKEN) {
     err('缺 IG_BUSINESS_ACCOUNT_ID 或 IG_ACCESS_TOKEN 環境變數');
     process.exit(1);

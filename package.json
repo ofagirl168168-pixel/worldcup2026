@@ -13,6 +13,7 @@
     "build:share-og": "node scripts/build-share-og.js",
     "build:ig-story": "node scripts/build-ig-story.js",
     "post:ig-story": "node scripts/post-ig-story.js",
+    "post:tg-channel": "node scripts/post-telegram-channel.js",
     "build:matches-index": "node scripts/build-matches-index.js"
   },
   "dependencies": {
