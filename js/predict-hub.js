@@ -260,6 +260,89 @@
   }
   window.maybeShowPredictSpotlight = maybeShowPredictSpotlight;
 
+  // ── A4: 3 小時內即將開賽 → 頂部 sticky banner（可關閉）──
+  const STORAGE_IMMINENT_DISMISSED = 'predict_imminent_dismissed_v1';
+  function _getDismissed() {
+    try { return new Set(JSON.parse(localStorage.getItem(STORAGE_IMMINENT_DISMISSED) || '[]')); }
+    catch { return new Set(); }
+  }
+  function _saveDismissed(set) {
+    // 清掉已開賽超過 6 小時的舊紀錄，避免 localStorage 一直長
+    const matches = _getCurrentMatches();
+    const valid = new Set(matches.filter(m => _kickoffMs(m) > Date.now() - 6 * 3600000).map(m => m.id));
+    const cleaned = Array.from(set).filter(id => valid.has(id));
+    try { localStorage.setItem(STORAGE_IMMINENT_DISMISSED, JSON.stringify(cleaned)); } catch (e) {}
+  }
+  function _getImminentMatch() {
+    const pending = getPendingPredicts(3); // 3 小時內
+    const now = Date.now();
+    const dismissed = _getDismissed();
+    return pending.find(m => {
+      const ko = _kickoffMs(m);
+      const msLeft = ko - now;
+      if (msLeft <= 0 || msLeft > 3 * 3600000) return false;
+      return !dismissed.has(m.id);
+    }) || null;
+  }
+  function renderImminentBanner() {
+    const m = _getImminentMatch();
+    let banner = document.getElementById('predict-imminent-banner');
+    const removeBanner = () => {
+      if (!banner) return;
+      banner.classList.remove('show');
+      document.body.classList.remove('has-imminent-banner');
+      setTimeout(() => banner && banner.remove(), 280);
+    };
+    if (!m) { removeBanner(); return; }
+
+    const teams = _getCurrentTeams();
+    const ht = teams[m.home] || {};
+    const at = teams[m.away] || {};
+    const homeName = ht.nameCN || ht.name || m.home;
+    const awayName = at.nameCN || at.name || m.away;
+    const ko = _kickoffMs(m);
+    const msLeft = ko - Date.now();
+    const cdText = _fmtCountdown(msLeft);
+    const isUrgent = msLeft < 30 * 60000;
+    const isVeryUrgent = msLeft < 10 * 60000;
+
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'predict-imminent-banner';
+      banner.className = 'predict-imminent-banner';
+      document.body.appendChild(banner);
+      requestAnimationFrame(() => {
+        banner.classList.add('show');
+        document.body.classList.add('has-imminent-banner');
+      });
+    }
+    banner.classList.toggle('urgent', isUrgent);
+    banner.classList.toggle('very-urgent', isVeryUrgent);
+    banner.innerHTML = `
+      <div class="pib-content">
+        <span class="pib-icon">${isVeryUrgent ? '🔥' : isUrgent ? '⚡' : '⏰'}</span>
+        <span class="pib-text">
+          <b>${homeName}</b> vs <b>${awayName}</b>
+          <span class="pib-time">· ${_fmtKickoff(ko)} 開賽</span>
+          <span class="pib-countdown">剩 ${cdText}</span>
+        </span>
+        <span class="pib-cta">立即預測 →</span>
+      </div>
+      <button class="pib-close" aria-label="關閉">×</button>`;
+
+    banner.querySelector('.pib-content').addEventListener('click', () => {
+      try { window.openPredModal(m.id); } catch (e) {}
+    });
+    banner.querySelector('.pib-close').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dismissed = _getDismissed();
+      dismissed.add(m.id);
+      _saveDismissed(dismissed);
+      renderImminentBanner();
+    });
+  }
+  window.renderImminentBanner = renderImminentBanner;
+
   // ── B: 預測 streak（連續 N 天至少預測 1 場）──
   function getPredictStreak() {
     try {
@@ -409,10 +492,13 @@
         renderPredictHomeHero();
       }, 400);
     });
+    // 即將開賽 banner（首次跑 + 每分鐘刷新倒數）
+    renderImminentBanner();
     // 每分鐘刷新（倒數時間 + 進入 24h 內的場次也要排進來）
     setInterval(() => {
       updatePredictNavBadge();
       renderPredictHomeHero();
+      renderImminentBanner();
     }, 60 * 1000);
     // 每天首次造訪 → spotlight 提醒（5 秒後彈，等其他引導/分享卡跑完）
     setTimeout(maybeShowPredictSpotlight, 5000);

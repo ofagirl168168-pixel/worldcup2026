@@ -7588,3 +7588,111 @@ body.opinion-open .btn-arena-float { display: none; }
   .ps-title b { font-size: 22px; }
   .ps-go-first { font-size: 14px; padding: 12px; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   PREDICT IMMINENT BANNER — 3 小時內開賽 sticky top 提醒
+   ═══════════════════════════════════════════════════════════ */
+.predict-imminent-banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9990;
+  background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(-110%);
+  transition: transform 0.32s cubic-bezier(.2, .9, .3, 1.1);
+}
+.predict-imminent-banner.show { transform: translateY(0); }
+.predict-imminent-banner.urgent {
+  background: linear-gradient(90deg, #ef6c00 0%, #ff9800 100%);
+}
+.predict-imminent-banner.very-urgent {
+  background: linear-gradient(90deg, #c62828 0%, #f44336 100%);
+  animation: pibPulse 2s ease-in-out infinite;
+}
+@keyframes pibPulse {
+  0%, 100% { box-shadow: 0 2px 12px rgba(244, 67, 54, 0.4); }
+  50%      { box-shadow: 0 2px 24px rgba(244, 67, 54, 0.7); }
+}
+.pib-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  transition: opacity 0.15s ease;
+}
+.pib-content:hover { opacity: 0.85; }
+.pib-icon { font-size: 18px; flex-shrink: 0; }
+.pib-text {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pib-time {
+  margin-left: 6px;
+  opacity: 0.85;
+  font-weight: 500;
+}
+.pib-countdown {
+  margin-left: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.pib-cta {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.pib-close {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 22px;
+  line-height: 1;
+  padding: 4px 10px;
+  margin-left: 6px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.pib-close:hover { color: #fff; }
+
+/* 顯示 banner 時把 body 整體往下推（避開原本 header） */
+body.has-imminent-banner { padding-top: 44px; transition: padding-top 0.32s; }
+body.has-imminent-banner header,
+body.has-imminent-banner .header,
+body.has-imminent-banner .top-header {
+  /* 若你的 header 是 sticky 也跟著推下 */
+  top: 44px !important;
+}
+
+@media (max-width: 600px) {
+  .predict-imminent-banner { font-size: 12px; padding: 7px 10px; gap: 6px; }
+  .pib-icon { font-size: 16px; }
+  .pib-time { display: none; }    /* 手機版省空間，倒數比開賽時間重要 */
+  .pib-cta { padding: 3px 8px; font-size: 11px; }
+  .pib-countdown { font-size: 11px; padding: 2px 6px; }
+  body.has-imminent-banner { padding-top: 38px; }
+  body.has-imminent-banner header,
+  body.has-imminent-banner .header,
+  body.has-imminent-banner .top-header { top: 38px !important; }
+}
