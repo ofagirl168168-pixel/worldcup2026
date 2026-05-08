@@ -11,6 +11,8 @@
     "build:official-rooms": "node scripts/build-official-rooms.js",
     "build:room-og": "node scripts/build-room-og.js",
     "build:share-og": "node scripts/build-share-og.js",
+    "build:ig-story": "node scripts/build-ig-story.js",
+    "post:ig-story": "node scripts/post-ig-story.js",
     "build:matches-index": "node scripts/build-matches-index.js"
   },
   "dependencies": {

@@ -1,0 +1,79 @@
+name: 自動發 IG 限動
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/articles-index.mjs'
+      - 'js/data-articles.js'
+      - 'js/epl-data-articles.js'
+      - 'js/ucl-data-articles.js'
+  workflow_dispatch:  # 手動觸發備援
+
+# 同時間只跑一個 — 避免兩次推送觸發兩個 job 重複發
+concurrency:
+  group: ig-story
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # 要 commit 限動圖 + state 檔回 repo
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          # 只裝 build:ig-story 需要的（@napi-rs/canvas + 字型）
+          npm install
+          # Linux 環境裝 Noto Sans CJK 字型才能畫中文
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk
+
+      - name: Build IG story images for new articles
+        run: node scripts/build-ig-story.js
+
+      - name: Commit any new IG story images
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add og/ig-story/*.png || true
+          if git diff --staged --quiet; then
+            echo "沒新限動圖，跳過 commit"
+          else
+            git commit -m "chore(ig-story): generate story images for new articles"
+            git push
+          fi
+
+      - name: Wait for Cloudflare Pages to deploy new images
+        run: |
+          echo "等 Cloudflare 把新檔案 deploy 上去（約 60-120 秒）..."
+          sleep 90
+
+      - name: Post IG stories
+        env:
+          IG_BUSINESS_ACCOUNT_ID: ${{ secrets.IG_BUSINESS_ACCOUNT_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_PAGE_ID: ${{ secrets.IG_PAGE_ID }}
+          SITE_URL: https://worldcup2026-9u0.pages.dev
+        run: node scripts/post-ig-story.js
+
+      - name: Commit posted state
+        if: always()  # 即使前一步部分失敗也要 commit 已成功的部分
+        run: |
+          git pull --rebase || true
+          git add og/ig-story/.posted-state.json || true
+          if git diff --staged --quiet; then
+            echo "state 沒變"
+          else
+            git commit -m "chore(ig-story): update posted state"
+            git push
+          fi
