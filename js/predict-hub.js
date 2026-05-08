@@ -104,20 +104,18 @@
     }
     return `<span class="pp-flag">${v}</span>`;
   }
-  function renderPredictHomeHero() {
-    const root = document.getElementById('home-pending-predict');
-    const list = document.getElementById('pending-predict-list');
-    const badge = document.getElementById('pending-predict-count');
-    const streakEl = document.getElementById('pending-predict-streak');
+  // 通用 render 函式（給多個位置共用 — 首頁、AI 預測頁等）
+  function _renderPendingSection(rootId, listId, badgeId, streakId, pending, teams, streak) {
+    const root = document.getElementById(rootId);
+    const list = document.getElementById(listId);
     if (!root || !list) return;
-
-    const pending = getPendingPredicts();
     if (!pending.length) { root.style.display = 'none'; return; }
     root.style.display = '';
+
+    const badge = document.getElementById(badgeId);
     if (badge) badge.textContent = `${pending.length} 場`;
 
-    // streak 顯示（沒 streak 整個 chip 隱藏，避免空殼紅圈）
-    const streak = getPredictStreak();
+    const streakEl = document.getElementById(streakId);
     if (streakEl) {
       if (streak.current > 0) {
         streakEl.innerHTML = `<span class="pp-streak-flame" title="沒比賽的日子不算斷 streak">🔥</span> 連續 <b>${streak.current}</b> 天`;
@@ -128,7 +126,6 @@
       }
     }
 
-    const teams = _getCurrentTeams();
     const now = Date.now();
     list.innerHTML = pending.map(m => {
       const ht = teams[m.home] || {};
@@ -160,7 +157,108 @@
       </div>`;
     }).join('');
   }
+
+  function renderPredictHomeHero() {
+    const pending = getPendingPredicts();
+    const teams = _getCurrentTeams();
+    const streak = getPredictStreak();
+    // 首頁
+    _renderPendingSection('home-pending-predict', 'pending-predict-list', 'pending-predict-count', 'pending-predict-streak', pending, teams, streak);
+    // AI 預測頁（含英超/歐冠/世足，依當前 Tournament 切換）
+    _renderPendingSection('predictions-pending-predict', 'predictions-pending-predict-list', 'predictions-pending-predict-count', 'predictions-pending-predict-streak', pending, teams, streak);
+  }
   window.renderPredictHomeHero = renderPredictHomeHero;
+
+  // ── A3: 每天首次造訪 → 跳 spotlight 通知有比賽可預測 ──
+  // 比首頁 section 更醒目（黑幕 + 中央彈窗），但每天最多一次
+  const STORAGE_SPOTLIGHT_PREFIX = 'predict_spotlight_';
+  function _localDateStrTw() {
+    const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei' });
+    return fmt.format(new Date());
+  }
+  function maybeShowPredictSpotlight() {
+    const today = _localDateStrTw();
+    const key = STORAGE_SPOTLIGHT_PREFIX + today;
+    if (localStorage.getItem(key)) return;
+    // 等其他 overlay/引導跑完才彈，避免疊在一起
+    const overlaySels = ['#share-card-overlay', '#opinion-overlay', '.cts-root', '.ob-overlay.show', '.predict-result-banner', '#predict-spotlight-overlay'];
+    if (overlaySels.some(s => document.querySelector(s))) {
+      setTimeout(maybeShowPredictSpotlight, 2000);
+      return;
+    }
+    const pending = getPendingPredicts(48);
+    if (!pending.length) return;
+    showPredictSpotlight(pending);
+    localStorage.setItem(key, '1');
+  }
+  function showPredictSpotlight(pending) {
+    const teams = _getCurrentTeams();
+    const top = pending.slice(0, 3);
+    const top0 = top[0];
+    const top0Home = (teams[top0.home] || {}).nameCN || top0.home;
+    const top0Away = (teams[top0.away] || {}).nameCN || top0.away;
+
+    const itemsHtml = top.map(m => {
+      const ht = teams[m.home] || {};
+      const at = teams[m.away] || {};
+      const ko = _kickoffMs(m);
+      const msLeft = ko - Date.now();
+      const homeName = ht.nameCN || ht.name || m.home;
+      const awayName = at.nameCN || at.name || m.away;
+      const urgency = msLeft < 2 * 3600000 ? 'urgent' : '';
+      return `<div class="ps-item ${urgency}" data-mid="${m.id}">
+        <div class="ps-item-teams">
+          ${_crestImg(ht)}
+          <span class="ps-item-name">${homeName}</span>
+          <span class="ps-item-vs">VS</span>
+          <span class="ps-item-name">${awayName}</span>
+          ${_crestImg(at)}
+        </div>
+        <div class="ps-item-meta">
+          <span class="ps-item-time">📅 ${_fmtKickoff(ko)}</span>
+          <span class="ps-item-countdown">⏰ ${_fmtCountdown(msLeft)}</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    const overlay = document.createElement('div');
+    overlay.id = 'predict-spotlight-overlay';
+    overlay.className = 'predict-spotlight-overlay';
+    overlay.innerHTML = `
+      <div class="predict-spotlight-card">
+        <button class="ps-close" aria-label="關閉">×</button>
+        <div class="ps-icon">🎯</div>
+        <h2 class="ps-title">你還有 <b>${pending.length}</b> 場比賽可以預測</h2>
+        <p class="ps-subtitle">以下比賽 48 小時內開賽 — 預測命中拿 <b>+20 XP</b> 跟 <b>1 💎</b></p>
+        <div class="ps-list">${itemsHtml}</div>
+        <button class="ps-go-first" data-mid="${top0.id}">
+          🎯 預測第一場：${top0Home} vs ${top0Away} →
+        </button>
+        <button class="ps-skip">稍後再看</button>
+        <p class="ps-tip">每天首次造訪才會彈一次，不會打擾你</p>
+      </div>`;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    function close() {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 250);
+    }
+    function goPredict(mid) {
+      close();
+      // 等彈窗淡出再開預測 modal，避免 z-index 打架
+      setTimeout(() => { try { window.openPredModal(mid); } catch (e) {} }, 280);
+    }
+    overlay.querySelector('.ps-close').addEventListener('click', close);
+    overlay.querySelector('.ps-skip').addEventListener('click', close);
+    overlay.querySelector('.ps-go-first').addEventListener('click', () => goPredict(top0.id));
+    overlay.querySelectorAll('.ps-item').forEach(el => {
+      el.addEventListener('click', () => goPredict(el.dataset.mid));
+    });
+    // 點黑幕關閉
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  }
+  window.maybeShowPredictSpotlight = maybeShowPredictSpotlight;
 
   // ── B: 預測 streak（連續 N 天至少預測 1 場）──
   function getPredictStreak() {
@@ -316,6 +414,8 @@
       updatePredictNavBadge();
       renderPredictHomeHero();
     }, 60 * 1000);
+    // 每天首次造訪 → spotlight 提醒（5 秒後彈，等其他引導/分享卡跑完）
+    setTimeout(maybeShowPredictSpotlight, 5000);
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => setTimeout(_init, 1500));
