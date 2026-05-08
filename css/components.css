@@ -5724,6 +5724,27 @@ body.opinion-open .btn-arena-float { display: none; }
   font-size: 14px; font-weight: 700;
   white-space: nowrap;
 }
+.fr-lobby-header-actions {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+}
+.fr-lobby-replay-tutorial {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,215,0,0.25);
+  color: #ffd700;
+  padding: 8px 14px; border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.fr-lobby-replay-tutorial:hover {
+  background: rgba(255,215,0,0.12);
+  border-color: rgba(255,215,0,0.5);
+}
+.fr-lobby-replay-tutorial i { margin-right: 4px; opacity: 0.8; }
+@media (max-width: 480px) {
+  .fr-lobby-replay-tutorial { font-size: 12px; padding: 7px 10px; }
+}
 
 /* Filter bar */
 .fr-lobby-filter {

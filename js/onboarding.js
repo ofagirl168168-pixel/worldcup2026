@@ -351,9 +351,12 @@
     },
   ];
 
-  function _showChallengeTutorial() {
-    if (localStorage.getItem(STORAGE_CHALLENGE_TUTORIAL)) return;
-    localStorage.setItem(STORAGE_CHALLENGE_TUTORIAL, '1');
+  function _showChallengeTutorial(opts) {
+    opts = opts || {};
+    // force=true 由「重看引導」按鈕觸發，繞過已看過的 flag
+    if (!opts.force && localStorage.getItem(STORAGE_CHALLENGE_TUTORIAL)) return;
+    // ⚠️ 之前是「一打開就標記完成」，導致使用者只要不小心點黑幕就再也看不到
+    // 改成「真的看完才算完成」：flag 在 close() 內依關閉方式判斷是否寫入
 
     const root = document.createElement('div');
     root.className = 'cts-root';
@@ -381,8 +384,14 @@
     const backBtn = root.querySelector('#cts-back');
     const nextBtn = root.querySelector('#cts-next');
 
-    let finishedByGoal = false; // true = 按了最後的「開始玩」（要彈手指指引）
+    let finishedByGoal = false;     // true = 按了最後的「開始玩」（要彈手指指引）
+    let dismissedExplicitly = false; // true = 主動按 X 或黑幕關掉（也算明確完成、不再重彈）
     function close() {
+      // 只有「明確完成」（看完最後步驟 OR 主動關閉）才 mark done。
+      // 純粹刷頁、切 tab、ESC、頁面 navigate 走（這些不會走 close）→ 下次還會出現。
+      if (finishedByGoal || dismissedExplicitly) {
+        try { localStorage.setItem(STORAGE_CHALLENGE_TUTORIAL, '1'); } catch (e) {}
+      }
       root.classList.remove('show');
       setTimeout(() => {
         root.remove();
@@ -395,8 +404,8 @@
         }
       }, 300);
     }
-    closeBtn.addEventListener('click', close);
-    spotlight.addEventListener('click', close);
+    closeBtn.addEventListener('click', () => { dismissedExplicitly = true; close(); });
+    spotlight.addEventListener('click', () => { dismissedExplicitly = true; close(); });
 
     function render() {
       const step = TUTORIAL_STEPS[cur];
@@ -525,6 +534,11 @@
     });
   }
   window.maybeShowChallengeTutorial = _showChallengeTutorial;
+  // 「重看引導」按鈕用 — 強制重彈（不論 flag）
+  window.replayChallengeTutorial = function () {
+    try { localStorage.removeItem(STORAGE_CHALLENGE_TUTORIAL); } catch (e) {}
+    _showChallengeTutorial({ force: true });
+  };
 
   // ── 引導 4：教學結束 → 動畫手指指向「開房」按鈕 ──
   function _showOpenRoomFinger() {

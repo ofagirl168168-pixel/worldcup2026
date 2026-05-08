@@ -51,7 +51,7 @@
 
   <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="css/base.css?v=4" />
-  <link rel="stylesheet" href="css/components.css?v=5" />
+  <link rel="stylesheet" href="css/components.css?v=6" />
   <link rel="stylesheet" href="css/animations.css?v=4" />
 </head>
 <body>
@@ -572,9 +572,14 @@
             <h2><i class="fas fa-trophy"></i> 麥迪挑戰賽</h2>
             <p class="fr-lobby-sub">跟朋友猜比分、看模擬賽直播決勝負</p>
           </div>
-          <button class="btn-primary fr-lobby-create" onclick="FriendRoom.openCreateModal()">
-            <i class="fas fa-plus"></i> 開房
-          </button>
+          <div class="fr-lobby-header-actions">
+            <button class="fr-lobby-replay-tutorial" onclick="window.replayChallengeTutorial && window.replayChallengeTutorial()" title="重看引導">
+              <i class="fas fa-circle-question"></i> 重看引導
+            </button>
+            <button class="btn-primary fr-lobby-create" onclick="FriendRoom.openCreateModal()">
+              <i class="fas fa-plus"></i> 開房
+            </button>
+          </div>
         </div>
 
         <div class="fr-lobby-filter">
