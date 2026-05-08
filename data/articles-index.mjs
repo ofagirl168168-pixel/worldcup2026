@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "12",
+    "tournament": "wc",
+    "title": "倒數33天：48 隊新制完整圖解 — 12 組怎麼分？32 強晉級規則一次搞懂",
+    "summary": "2026 世界盃首次擴軍到 48 隊、104 場比賽、橫跨美加墨 16 城。新增的「32 強」是什麼？8 個最佳第三名怎麼比？這篇把整套賽制拆給你看。",
+    "date": "2026-05-08",
+    "category": "規則解析",
+    "readTime": "8分鐘",
+    "shareable": true
+  },
+  {
     "id": "epl-049",
     "tournament": "epl",
     "title": "【賽前分析】第36輪其餘場次：熱刺保級生死戰、森林5連勝能否延續、升班馬挑戰歐冠隊",
