@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-05-07 午後更新）
+   資料截止：2025/26 賽季（2026-05-09 早上更新）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -98,9 +98,11 @@ const EPL_TEAMS = {
     recentForm:['L','L','L','L','L'],
     history:'6次英格蘭頂級聯賽冠軍，2次歐冠冠軍',
     injuries:[
-      {name:'Reece James',pos:'右後衛',status:'腿後肌傷',returnDate:'五月初'},
-      {name:'Cole Palmer',pos:'攻擊中場/右翼',status:'腿後腱緊繃（缺席 vs 布萊頓）',returnDate:'短期內'},
-      {name:'Levi Colwill',pos:'中後衛',status:'長期傷缺',returnDate:'未定'},
+      {name:'Reece James',pos:'右後衛',status:'已回歸訓練，本週全程參與',returnDate:'可出場'},
+      {name:'Levi Colwill',pos:'中後衛',status:'已回歸大名單，本週全程訓練',returnDate:'可出場'},
+      {name:'Pedro Neto',pos:'翼鋒',status:'帶傷上陣，不太可能出場',returnDate:'評估中'},
+      {name:'Alejandro Garnacho',pos:'翼鋒',status:'帶傷上陣，不太可能出場',returnDate:'評估中'},
+      {name:'Robert Sánchez',pos:'門將',status:'傷缺',returnDate:'不可出場'},
       {name:'Estevao',pos:'翼鋒',status:'嚴重腿後肌傷（vs 曼聯退場），可能需手術',returnDate:'賽季報銷，世界盃存疑'},
       {name:'Filip Jorgensen',pos:'門將',status:'傷勢反覆',returnDate:'賽季報銷'},
       {name:'Jamie Gittens',pos:'翼鋒',status:'傷勢反覆',returnDate:'賽季報銷'}
@@ -123,6 +125,7 @@ const EPL_TEAMS = {
     recentForm:['D','L','W','W','W'],
     history:'20次英格蘭頂級聯賽冠軍，3次歐冠冠軍，英格蘭最成功俱樂部',
     injuries:[
+      {name:'Benjamin Šeško',pos:'前鋒',status:'脛骨問題持續管理中（vs LIV 5/3 後加劇）',returnDate:'帶傷出賽'},
       {name:'Patrick Dorgu',pos:'翼衛',status:'肌肉傷復健中，恢復進度中',returnDate:'賽季末'},
       {name:'Lisandro Martínez',pos:'中後衛',status:'MW35 停賽期滿，已可出場',returnDate:'已解禁'},
       {name:'Matheus Cunha',pos:'翼鋒',status:'已復出（vs LIV 5/3 先發進球）',returnDate:'已復出'}
@@ -144,7 +147,7 @@ const EPL_TEAMS = {
     recentForm:['L','L','D','W','W'],
     history:'2次英格蘭頂級聯賽冠軍，2019歐冠亞軍',
     injuries:[
-      {name:'Dominic Solanke',pos:'前鋒',status:'肌肉傷（vs WOL 4/25），De Zerbi 稱不嚴重',returnDate:'評估中'},
+      {name:'Dominic Solanke',pos:'前鋒',status:'肌肉傷（vs WOL 4/25），改善中但出場仍存疑',returnDate:'評估中'},
       {name:'Xavi Simons',pos:'攻擊中場',status:'右膝前十字韌帶斷裂（vs WOL 4/25），需手術',returnDate:'賽季報銷＋世界盃報銷'},
       {name:'James Maddison',pos:'攻擊中場',status:'前十字韌帶傷（恢復中）',returnDate:'賽季報銷'},
       {name:'Cristian Romero',pos:'中後衛',status:'膝傷',returnDate:'賽季報銷（世界盃存疑）'},

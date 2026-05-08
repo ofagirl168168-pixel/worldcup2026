@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "13",
+    "tournament": "wc",
+    "title": "倒數32天：Mbappé 的矛盾之路 — 本季41球卻被3300萬人「請走」，他能帶法國重返巔峰嗎？",
+    "summary": "皇馬射手王、#MbappeOut 連署主角、世界盃衛冕亞軍核心 — Kylian Mbappé 在爭議中迎來第三屆世界盃。I 組（法國、塞內加爾、挪威、伊拉克）看似輕鬆，但場外風暴才是最大敵人。",
+    "date": "2026-05-09",
+    "category": "球星聚焦",
+    "readTime": "8分鐘",
+    "shareable": true
+  },
+  {
     "id": "12",
     "tournament": "wc",
     "title": "倒數33天：48 隊新制完整圖解 — 12 組怎麼分？32 強晉級規則一次搞懂",
