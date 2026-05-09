@@ -3677,6 +3677,7 @@ function openArticle(id) {
       <span><i class="fas fa-clock"></i> ${a.readTime}</span>
     </div>
     <div class="article-modal-body">${a.body}</div>
+    ${(typeof window.buildTgChannelArticleCTA === 'function' ? window.buildTgChannelArticleCTA() : '')}
     ${_renderShareBar(a.id, a.title)}`;
   document.getElementById('article-modal-overlay').classList.add('open');
 }
@@ -3702,6 +3703,7 @@ function openUCLArticle(id) {
     <div class="article-modal-title">${a.title}</div>
     <div class="article-modal-meta"><span><i class="fas fa-calendar"></i> ${a.date}</span></div>
     <div class="article-modal-body">${bodyHtml}</div>
+    ${(typeof window.buildTgChannelArticleCTA === 'function' ? window.buildTgChannelArticleCTA() : '')}
     ${_renderShareBar(a.id, a.title)}`;
   document.getElementById('article-modal-overlay').classList.add('open');
 }
