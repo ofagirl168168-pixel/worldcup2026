@@ -39,7 +39,8 @@ const IG_TOKEN = process.env.IG_ACCESS_TOKEN;
 const SITE_URL = (process.env.SITE_URL || 'https://worldcup2026-9u0.pages.dev').replace(/\/$/, '');
 
 const FRESHNESS_DAYS = 7;     // 只發最近 7 天內的文章
-const MAX_PER_RUN = 3;         // 一次最多發幾篇（避免被 IG 限速）
+const MAX_PER_RUN = 2;         // 一次最多發幾篇（避免被 IG 限速 + 降低重複壓力）
+const MIN_GAP_SINCE_LAST_POST_MIN = 5;  // 距上次成功發布 < 5 分 → 跳過此次（同 commit 連環觸發保護）
 const POLL_INTERVAL = 3000;    // 等 container ready 的 poll 間隔
 const POLL_MAX = 20;            // 最多等 20*3=60s
 
@@ -247,6 +248,20 @@ async function checkTokenExpiry() {
   const articles = await loadArticles();
   const state = await loadState();
   const postedIds = new Set(state.posted.map(p => p.id));
+
+  // 防止「短時間連環觸發」造成重複發布（race condition 保護）
+  // 例：日更跑了 fact-check 修正 → 多次 commit → 多次 workflow 觸發 →
+  //     如果上次 push state 失敗，新 run 不知道，會再 post 一次
+  if (state.posted.length > 0) {
+    const lastPost = state.posted[state.posted.length - 1];
+    if (lastPost.postedAt) {
+      const minsSinceLast = (Date.now() - new Date(lastPost.postedAt).getTime()) / 60000;
+      if (minsSinceLast < MIN_GAP_SINCE_LAST_POST_MIN) {
+        log(`⏸️ 距上次發布 ${minsSinceLast.toFixed(1)} 分鐘 < ${MIN_GAP_SINCE_LAST_POST_MIN} 分鐘 → 跳過（race protection）`);
+        return;
+      }
+    }
+  }
 
   const candidates = articles
     .filter(a => a.shareable !== false)

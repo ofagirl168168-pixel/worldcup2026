@@ -73,14 +73,24 @@ jobs:
           SITE_URL: https://worldcup2026-9u0.pages.dev
         run: node scripts/post-telegram-channel.js
 
-      - name: Commit posted state
-        if: always()  # 即使前一步部分失敗也要 commit 已成功的部分
+      - name: Commit posted state (with retry to prevent state loss → duplicates)
+        if: always()
         run: |
-          git pull --rebase || true
-          git add og/ig-story/.posted-state.json og/ig-story/.tg-channel-state.json || true
-          if git diff --staged --quiet; then
-            echo "state 沒變"
-          else
-            git commit -m "chore(ig-story): update posted state"
-            git push
-          fi
+          set +e   # 不要因為單次 push 失敗就中止 — 內建重試
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase --autostash || true
+            git add og/ig-story/.posted-state.json og/ig-story/.tg-channel-state.json 2>/dev/null || true
+            if git diff --staged --quiet; then
+              echo "state 沒變，跳過"
+              exit 0
+            fi
+            git commit -m "chore(ig-story): update posted state" || true
+            if git push; then
+              echo "✓ state pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "⚠️ push attempt $attempt failed，等 $((attempt*5)) 秒重試"
+            sleep $((attempt*5))
+          done
+          echo "❌ 5 次 push 都失敗 — state 沒同步到 origin，下次 workflow 可能會重發"
+          exit 1
