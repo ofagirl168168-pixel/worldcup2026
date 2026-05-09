@@ -14,6 +14,9 @@
     "build:ig-story": "node scripts/build-ig-story.js",
     "post:ig-story": "node scripts/post-ig-story.js",
     "post:tg-channel": "node scripts/post-telegram-channel.js",
+    "push:tg-prematch": "node scripts/push-pre-match-alert.js",
+    "push:tg-arena": "node scripts/push-arena-topic.js",
+    "push:tg-summary": "node scripts/push-daily-summary.js",
     "build:matches-index": "node scripts/build-matches-index.js"
   },
   "dependencies": {

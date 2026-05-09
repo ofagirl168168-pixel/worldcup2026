@@ -1,0 +1,43 @@
+name: TG 每日擂台題推送
+
+on:
+  schedule:
+    # 16:30 UTC = 00:30 隔天 TW（新題目剛上線時推）
+    - cron: '30 16 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: tg-arena
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Push today's arena topic to TG
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.CLAUDE330_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TG_NEWSLETTER_CHANNEL_ID }}
+          SITE_URL: https://worldcup2026-9u0.pages.dev
+        run: node scripts/push-arena-topic.js
+
+      - name: Commit state if changed
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git pull --rebase || true
+          git add og/.tg-arena-state.json || true
+          if git diff --staged --quiet; then
+            echo "no state change"
+          else
+            git commit -m "chore(tg-arena): update state"
+            git push
+          fi

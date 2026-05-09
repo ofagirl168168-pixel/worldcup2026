@@ -1,0 +1,42 @@
+name: TG 賽前 1 小時提醒
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # 每 30 分鐘跑一次
+  workflow_dispatch:
+
+concurrency:
+  group: tg-prematch
+  cancel-in-progress: false
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Send pre-match alerts to TG
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.CLAUDE330_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TG_NEWSLETTER_CHANNEL_ID }}
+          SITE_URL: https://worldcup2026-9u0.pages.dev
+        run: node scripts/push-pre-match-alert.js
+
+      - name: Commit state if changed
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git pull --rebase || true
+          git add og/.tg-prematch-state.json || true
+          if git diff --staged --quiet; then
+            echo "no state change"
+          else
+            git commit -m "chore(tg-prematch): update state"
+            git push
+          fi

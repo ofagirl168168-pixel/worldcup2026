@@ -1,0 +1,43 @@
+name: TG 早安日報推送
+
+on:
+  schedule:
+    # 00:00 UTC = 08:00 TW
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: tg-summary
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Push daily summary to TG
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.CLAUDE330_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TG_NEWSLETTER_CHANNEL_ID }}
+          SITE_URL: https://worldcup2026-9u0.pages.dev
+        run: node scripts/push-daily-summary.js
+
+      - name: Commit state if changed
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git pull --rebase || true
+          git add og/.tg-summary-state.json || true
+          if git diff --staged --quiet; then
+            echo "no state change"
+          else
+            git commit -m "chore(tg-summary): update state"
+            git push
+          fi
