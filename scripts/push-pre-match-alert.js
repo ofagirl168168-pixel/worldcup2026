@@ -13,13 +13,19 @@
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const igRender = require('./_ig-story-render.js');
 
 const ROOT = path.join(__dirname, '..');
 const STATE_FILE = path.join(ROOT, 'og', '.tg-prematch-state.json');
+const IG_DIR = path.join(ROOT, 'og', 'ig-story-prematch');
 
 const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TG_CHANNEL = process.env.TELEGRAM_CHANNEL_ID;
+const IG_USER_ID = process.env.IG_BUSINESS_ACCOUNT_ID;
+const IG_TOKEN = process.env.IG_ACCESS_TOKEN;
 const SITE_URL = (process.env.SITE_URL || 'https://worldcup2026-9u0.pages.dev').replace(/\/$/, '');
+
+const POST_IG = process.argv.includes('--post-ig');
 
 function loadJs(file) {
   const sandbox = { window: {}, console: { log: () => {}, warn: () => {}, error: () => {} } };
@@ -90,6 +96,38 @@ function buildMessage(m, teams, league) {
 #${tournament} #賽前提醒`;
 }
 
+async function postIgPhase(state) {
+  if (!IG_USER_ID || !IG_TOKEN) {
+    console.log('缺 IG token，跳過 --post-ig 階段');
+    return;
+  }
+  // 找出有圖、未發 IG 的 entry
+  const todo = state.alerted.filter(e => e.image_saved && !e.ig_media_id);
+  console.log(`--post-ig: 待發 IG 限動 ${todo.length} 篇`);
+  for (const e of todo) {
+    try {
+      const imageUrl = `${SITE_URL}/og/ig-story-prematch/${e.id}.png?v=${Date.now()}`;
+      console.log(`  ${e.id}: 等 ${imageUrl} deploy...`);
+      // 簡單重試 6 次（每次 5 秒）
+      let ok = false;
+      for (let i = 0; i < 6; i++) {
+        const r = await fetch(imageUrl, { method: 'HEAD' });
+        if (r.ok && (r.headers.get('content-type') || '').startsWith('image/')) { ok = true; break; }
+        await new Promise(rs => setTimeout(rs, 5000));
+      }
+      if (!ok) { console.error(`  ${e.id}: 圖未 deploy 跳過`); continue; }
+      const igMediaId = await igRender.postStoryViaApi({ imageUrl, igUserId: IG_USER_ID, igToken: IG_TOKEN });
+      e.ig_media_id = igMediaId;
+      e.ig_posted_at = new Date().toISOString();
+      saveState(state);
+      console.log(`  ✓ ${e.id} → ig_media_id=${igMediaId}`);
+      await new Promise(rs => setTimeout(rs, 3000));
+    } catch (err) {
+      console.error(`  ✗ ${e.id}: ${err.message}`);
+    }
+  }
+}
+
 (async () => {
   if (!TG_TOKEN || !TG_CHANNEL) {
     console.error('缺 TELEGRAM_BOT_TOKEN 或 TELEGRAM_CHANNEL_ID');
@@ -97,6 +135,13 @@ function buildMessage(m, teams, league) {
   }
 
   const state = loadState();
+
+  // --post-ig 模式：只跑 IG 上傳，不再 TG
+  if (POST_IG) {
+    await postIgPhase(state);
+    return;
+  }
+
   const alertedIds = new Set(state.alerted.map(e => e.id));
 
   const eplWin = loadJs('js/epl-data-teams.js');
@@ -135,15 +180,37 @@ function buildMessage(m, teams, league) {
     try {
       const text = buildMessage(c.m, c.teams, c.league);
       const result = await sendTG(text);
-      if (result.ok) {
-        state.alerted.push({ id: c.m.id, ko: kickoffMs(c.m), at: now });
-        saveState(state);
-        sent++;
-        console.log(`✓ alerted ${c.m.id}`);
-        if (sent < candidates.length) await new Promise(r => setTimeout(r, 2000));
-      } else {
-        console.error(`✗ ${c.m.id}:`, JSON.stringify(result));
+      if (!result.ok) {
+        console.error(`✗ ${c.m.id} TG:`, JSON.stringify(result));
+        continue;
       }
+
+      const entry = { id: c.m.id, ko: kickoffMs(c.m), at: now };
+
+      // 同時產 IG 限動圖（IG 上傳留到 --post-ig 階段，因為要等 Cloudflare deploy）
+      if (IG_USER_ID && IG_TOKEN) {
+        try {
+          const ht = c.teams[c.m.home] || {};
+          const at = c.teams[c.m.away] || {};
+          const buf = await igRender.renderPrematch({
+            home: ht.nameCN || ht.name || c.m.home,
+            away: at.nameCN || at.name || c.m.away,
+            kickoffMs: kickoffMs(c.m),
+            league: c.league,
+          });
+          fs.mkdirSync(IG_DIR, { recursive: true });
+          fs.writeFileSync(path.join(IG_DIR, `${c.m.id}.png`), buf);
+          entry.image_saved = true;
+        } catch (e) {
+          console.error(`  ${c.m.id} IG image gen 失敗：${e.message}`);
+        }
+      }
+
+      state.alerted.push(entry);
+      saveState(state);
+      sent++;
+      console.log(`✓ alerted ${c.m.id}${entry.image_saved ? ' + IG image' : ''}`);
+      if (sent < candidates.length) await new Promise(r => setTimeout(r, 2000));
     } catch (e) {
       console.error(`✗ ${c.m.id}:`, e.message);
     }

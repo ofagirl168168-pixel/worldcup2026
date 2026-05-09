@@ -8,13 +8,19 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 const url = require('url');
+const igRender = require('./_ig-story-render.js');
 
 const ROOT = path.join(__dirname, '..');
 const STATE_FILE = path.join(ROOT, 'og', '.tg-summary-state.json');
+const IG_DIR = path.join(ROOT, 'og', 'ig-story-summary');
 
 const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TG_CHANNEL = process.env.TELEGRAM_CHANNEL_ID;
+const IG_USER_ID = process.env.IG_BUSINESS_ACCOUNT_ID;
+const IG_TOKEN = process.env.IG_ACCESS_TOKEN;
 const SITE_URL = (process.env.SITE_URL || 'https://worldcup2026-9u0.pages.dev').replace(/\/$/, '');
+
+const POST_IG = process.argv.includes('--post-ig');
 
 function tdate() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei' }).format(new Date());
@@ -64,6 +70,28 @@ function escapeHtml(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+async function postIgPhase(state) {
+  if (!IG_USER_ID || !IG_TOKEN) { console.log('缺 IG token，跳過'); return; }
+  if (!state.image_saved || state.ig_media_id) { console.log('沒待發 IG 圖'); return; }
+  const today = tdate();
+  const imageUrl = `${SITE_URL}/og/ig-story-summary/${today}.png?v=${Date.now()}`;
+  console.log(`等 ${imageUrl} deploy...`);
+  let ok = false;
+  for (let i = 0; i < 6; i++) {
+    const r = await fetch(imageUrl, { method: 'HEAD' });
+    if (r.ok && (r.headers.get('content-type') || '').startsWith('image/')) { ok = true; break; }
+    await new Promise(rs => setTimeout(rs, 5000));
+  }
+  if (!ok) { console.error('圖未 deploy'); return; }
+  try {
+    const igMediaId = await igRender.postStoryViaApi({ imageUrl, igUserId: IG_USER_ID, igToken: IG_TOKEN });
+    state.ig_media_id = igMediaId;
+    state.ig_posted_at = new Date().toISOString();
+    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+    console.log(`✓ IG ig_media_id=${igMediaId}`);
+  } catch (e) { console.error('IG 發布失敗：', e.message); }
+}
+
 (async () => {
   if (!TG_TOKEN || !TG_CHANNEL) { console.error('缺 env'); process.exit(1); }
 
@@ -72,6 +100,12 @@ function escapeHtml(s) {
   if (fs.existsSync(STATE_FILE)) {
     try { state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')); } catch {}
   }
+
+  if (POST_IG) {
+    if (state.date === today) await postIgPhase(state);
+    return;
+  }
+
   if (state.date === today) { console.log('Already sent today'); return; }
 
   // ── 今日比賽 ──
@@ -138,18 +172,43 @@ function escapeHtml(s) {
   const text = sections.join('\n\n');
 
   const result = await sendTG(text);
-  if (result.ok) {
-    fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
-    fs.writeFileSync(STATE_FILE, JSON.stringify({
-      date: today,
-      sent: true,
-      msg_id: result.result.message_id,
-      matches: matchLines.length,
-      articles: articleLines.length,
-    }, null, 2));
-    console.log('✓ Pushed daily summary');
-  } else {
-    console.error('✗', JSON.stringify(result));
+  if (!result.ok) {
+    console.error('✗ TG:', JSON.stringify(result));
     process.exit(1);
   }
+
+  const stateOut = {
+    date: today,
+    sent: true,
+    msg_id: result.result.message_id,
+    matches: matchLines.length,
+    articles: articleLines.length,
+  };
+
+  // 同時產 IG 限動圖
+  if (IG_USER_ID && IG_TOKEN) {
+    try {
+      const matchesForIg = [
+        ...eplMatches.map(m => ({ time: m.time, home: (eplTeams[m.home] || {}).nameCN || m.home, away: (eplTeams[m.away] || {}).nameCN || m.away })),
+        ...uclMatches.map(m => ({ time: m.time, home: (uclTeams[m.home] || {}).nameCN || m.home, away: (uclTeams[m.away] || {}).nameCN || m.away })),
+      ].sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+      const articleTitles = recent.map(a => String(a.title || '').replace(/^【[^】]*】\s*/, ''));
+      const buf = await igRender.renderSummary({
+        date: today, weekday: tweekdayCN(),
+        matches: matchesForIg,
+        articles: articleTitles,
+        opinionQ: todayOps[0] ? todayOps[0].q : '',
+      });
+      fs.mkdirSync(IG_DIR, { recursive: true });
+      fs.writeFileSync(path.join(IG_DIR, `${today}.png`), buf);
+      stateOut.image_saved = true;
+      console.log('✓ IG image generated');
+    } catch (e) {
+      console.error('IG image gen 失敗：', e.message);
+    }
+  }
+
+  fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
+  fs.writeFileSync(STATE_FILE, JSON.stringify(stateOut, null, 2));
+  console.log('✓ Pushed daily summary');
 })().catch(e => { console.error(e); process.exit(1); });
