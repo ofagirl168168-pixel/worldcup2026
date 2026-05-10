@@ -2802,8 +2802,8 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <td style="padding:8px"><strong>Arteta 半場戰術調整</strong> — 上半場 Rice 被安排在右後衛實驗失敗，中場被 Soucek 壓制。半場後 Rice 回歸中場，兵工廠重新掌控節奏</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
-<td style="padding:8px">75' 🧤</td>
-<td style="padding:8px"><strong>Raya 神撲 Castellanos 頭鎚</strong> — Taty Castellanos 禁區內魚躍頭鎚攻門，Raya 全力飛撲將球擋出，保住清白之身</td>
+<td style="padding:8px">78' 🧤</td>
+<td style="padding:8px"><strong>Raya 關鍵撲救</strong> — 西漢姆反擊製造威脅射門，Raya 全力飛撲將球擋出，保住清白之身</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px">83' ⚽</td>
