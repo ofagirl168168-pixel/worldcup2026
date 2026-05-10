@@ -2,6 +2,26 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "14",
+    "tournament": "wc",
+    "title": "麥迪擂台第三週戰報：148 票聚焦歐冠決賽與英超保級白熱化",
+    "summary": "第三週擂台累積 6 題、148 票、52 則留言。歐冠半決賽次回合燃爆全場，PSG vs 兵工廠決賽對陣確定後的預測題「分裂指數 92」創下新高。",
+    "date": "2026-05-11",
+    "category": "社群觀察",
+    "readTime": "5分鐘",
+    "shareable": true
+  },
+  {
+    "id": "epl-052",
+    "tournament": "epl",
+    "title": "【賽後回顧】西漢姆 0-1 兵工廠：Trossard 83 分鐘絕殺，VAR 否決 Wilson 補時扳平",
+    "summary": "Trossard 第 83 分鐘接 Ødegaard 做球勁射破網，兵工廠客場 1-0 擊敗西漢姆，領先榜首 5 分。補時 Wilson 扳平球因 Pablo 犯規門將 Raya 被 VAR 取消，西漢姆保級形勢更加嚴峻。",
+    "date": "2026-05-11",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "13",
     "tournament": "wc",
     "title": "倒數32天：Mbappé 的矛盾之路 — 本季43球卻被4000萬人「請走」，他能帶法國重返巔峰嗎？",
@@ -179,7 +199,7 @@ export default [
     "date": "2026-05-03",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-038",
@@ -189,7 +209,7 @@ export default [
     "date": "2026-05-03",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-039",
@@ -199,7 +219,7 @@ export default [
     "date": "2026-05-03",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-040",
@@ -209,7 +229,7 @@ export default [
     "date": "2026-05-03",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-036",

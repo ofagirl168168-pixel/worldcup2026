@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-05-10 下午更新）
+   資料截止：2025/26 賽季（2026-05-11 早安更新）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -794,10 +794,14 @@ window.EPL_MATCHES = [
    goals:[{team:'BHA',player:'Hinshelwood',minute:1},{team:'BHA',player:'Dunk',minute:5},{team:'BHA',player:'Minteh',minute:86}]},
 
   // 伯恩利 vs 阿斯頓維拉 | 05/10 21:00 台灣時間 (05/10 14:00 BST，因歐霸延賽)
-  {id:'EPL-MW36-BUR-AVL', matchday:36, date:'2026-05-10', time:'21:00', home:'BUR', away:'AVL', stage:'league', status:'upcoming'},
+  {id:'EPL-MW36-BUR-AVL', matchday:36, date:'2026-05-10', time:'21:00', home:'BUR', away:'AVL', stage:'league',
+   status:'finished', score:{h:2,a:2}, halfTime:{h:1,a:1},
+   goals:[{team:'BUR',player:'Jaidon Anthony',minute:8},{team:'AVL',player:'Barkley',minute:42},{team:'AVL',player:'Watkins',minute:56},{team:'BUR',player:'Flemming',minute:58}]},
 
   // 水晶宮 vs 愛華頓 | 05/10 21:00 台灣時間 (05/10 14:00 BST，因歐會盃延賽)
-  {id:'EPL-MW36-CRY-EVE', matchday:36, date:'2026-05-10', time:'21:00', home:'CRY', away:'EVE', stage:'league', status:'upcoming'},
+  {id:'EPL-MW36-CRY-EVE', matchday:36, date:'2026-05-10', time:'21:00', home:'CRY', away:'EVE', stage:'league',
+   status:'finished', score:{h:2,a:2}, halfTime:{h:1,a:1},
+   goals:[{team:'EVE',player:'Tarkowski',minute:6},{team:'CRY',player:'Sarr',minute:34},{team:'EVE',player:'Beto',minute:47},{team:'CRY',player:'Mateta',minute:77}]},
 
   // 富勒姆 vs 伯恩茅斯 | 05/09 22:00 台灣時間
   {id:'EPL-MW36-FUL-BOU', matchday:36, date:'2026-05-09', time:'22:00', home:'FUL', away:'BOU', stage:'league',
@@ -815,13 +819,53 @@ window.EPL_MATCHES = [
    goals:[{team:'MCI',player:'Doku',minute:60},{team:'MCI',player:'Haaland',minute:75},{team:'MCI',player:'Marmoush',minute:90}]},
 
   // 諾丁漢森林 vs 紐卡索 | 05/10 21:00 台灣時間 (05/10 14:00 BST)
-  {id:'EPL-MW36-NFO-NEW', matchday:36, date:'2026-05-10', time:'21:00', home:'NFO', away:'NEW', stage:'league', status:'upcoming'},
+  {id:'EPL-MW36-NFO-NEW', matchday:36, date:'2026-05-10', time:'21:00', home:'NFO', away:'NEW', stage:'league',
+   status:'finished', score:{h:1,a:1}, halfTime:{h:0,a:0},
+   goals:[{team:'NEW',player:'Harvey Barnes',minute:74},{team:'NFO',player:'Elliot Anderson',minute:88}]},
 
   // 西漢姆 vs 兵工廠 | 05/10 23:30 台灣時間 (05/10 16:30 BST)
-  {id:'EPL-MW36-WHU-ARS', matchday:36, date:'2026-05-10', time:'23:30', home:'WHU', away:'ARS', stage:'league', status:'upcoming'},
+  {id:'EPL-MW36-WHU-ARS', matchday:36, date:'2026-05-10', time:'23:30', home:'WHU', away:'ARS', stage:'league',
+   status:'finished', score:{h:0,a:1}, halfTime:{h:0,a:0},
+   goals:[{team:'ARS',player:'Trossard',minute:83}]},
 
   // 熱刺 vs 里茲聯 | 05/11 23:00 台灣時間 (05/11 16:00 BST)
   {id:'EPL-MW36-TOT-LEE', matchday:36, date:'2026-05-11', time:'23:00', home:'TOT', away:'LEE', stage:'league', status:'upcoming'},
+
+  // ===== 補賽 (因聯賽盃決賽延期) =====
+  // 曼城 vs 水晶宮 | 05/14 03:00 台灣時間 (05/13 20:00 BST)
+  {id:'EPL-RSC-MCI-CRY', matchday:0, date:'2026-05-14', time:'03:00', home:'MCI', away:'CRY', stage:'league', status:'upcoming'},
+
+  // ===== 第 37 輪 (2026-05-15 ~ 05-20 台灣時間) =====
+
+  // 阿斯頓維拉 vs 利物浦 | 05/16 03:00 台灣時間 (05/15 20:00 BST)
+  {id:'EPL-MW37-AVL-LIV', matchday:37, date:'2026-05-16', time:'03:00', home:'AVL', away:'LIV', stage:'league', status:'upcoming'},
+
+  // 曼聯 vs 諾丁漢森林 | 05/17 19:30 台灣時間 (05/17 12:30 BST)
+  {id:'EPL-MW37-MUN-NFO', matchday:37, date:'2026-05-17', time:'19:30', home:'MUN', away:'NFO', stage:'league', status:'upcoming'},
+
+  // 布倫特福德 vs 水晶宮 | 05/17 22:00 台灣時間 (05/17 15:00 BST)
+  {id:'EPL-MW37-BRE-CRY', matchday:37, date:'2026-05-17', time:'22:00', home:'BRE', away:'CRY', stage:'league', status:'upcoming'},
+
+  // 愛華頓 vs 桑德蘭 | 05/17 22:00 台灣時間 (05/17 15:00 BST)
+  {id:'EPL-MW37-EVE-SUN', matchday:37, date:'2026-05-17', time:'22:00', home:'EVE', away:'SUN', stage:'league', status:'upcoming'},
+
+  // 里茲聯 vs 布萊頓 | 05/17 22:00 台灣時間 (05/17 15:00 BST)
+  {id:'EPL-MW37-LEE-BHA', matchday:37, date:'2026-05-17', time:'22:00', home:'LEE', away:'BHA', stage:'league', status:'upcoming'},
+
+  // 狼隊 vs 富勒姆 | 05/17 22:00 台灣時間 (05/17 15:00 BST)
+  {id:'EPL-MW37-WOL-FUL', matchday:37, date:'2026-05-17', time:'22:00', home:'WOL', away:'FUL', stage:'league', status:'upcoming'},
+
+  // 紐卡索 vs 西漢姆 | 05/18 00:30 台灣時間 (05/17 17:30 BST)
+  {id:'EPL-MW37-NEW-WHU', matchday:37, date:'2026-05-18', time:'00:30', home:'NEW', away:'WHU', stage:'league', status:'upcoming'},
+
+  // 兵工廠 vs 伯恩利 | 05/19 03:00 台灣時間 (05/18 20:00 BST)
+  {id:'EPL-MW37-ARS-BUR', matchday:37, date:'2026-05-19', time:'03:00', home:'ARS', away:'BUR', stage:'league', status:'upcoming'},
+
+  // 伯恩茅斯 vs 曼城 | 05/20 02:30 台灣時間 (05/19 19:30 BST，因足總盃決賽延期)
+  {id:'EPL-MW37-BOU-MCI', matchday:37, date:'2026-05-20', time:'02:30', home:'BOU', away:'MCI', stage:'league', status:'upcoming'},
+
+  // 切爾西 vs 熱刺 | 05/20 03:15 台灣時間 (05/19 20:15 BST，因足總盃決賽延期)
+  {id:'EPL-MW37-CHE-TOT', matchday:37, date:'2026-05-20', time:'03:15', home:'CHE', away:'TOT', stage:'league', status:'upcoming'},
 
 ];
 

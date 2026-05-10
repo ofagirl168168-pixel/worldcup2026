@@ -2785,6 +2785,85 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <p><strong>布萊頓（第7・50分）</strong>穩居中上游。<strong>狼隊（第19・18分）</strong>已確定降級，本季僅3勝。</p>
 <p><strong>預測：布萊頓 3-0 狼隊</strong>——實力差距懸殊。</p>`,
     tags: ['賽前分析', '熱刺', '里茲聯', '森林', '紐卡索', '桑德蘭', '曼聯', '保級', '第36輪']
+  },
+  {
+    id: 'epl-052',
+    title: '【賽後回顧】西漢姆 0-1 兵工廠：Trossard 83 分鐘絕殺，VAR 否決 Wilson 補時扳平',
+    date: '2026-05-11',
+    category: '賽後深度回顧',
+    summary: 'Trossard 第 83 分鐘接 Ødegaard 做球勁射破網，兵工廠客場 1-0 擊敗西漢姆，領先榜首 5 分。補時 Wilson 扳平球因 Pablo 犯規門將 Raya 被 VAR 取消，西漢姆保級形勢更加嚴峻。',
+    content: `<h2>西漢姆 0-1 兵工廠｜第36輪・倫敦體育場</h2>
+
+<h3>關鍵時刻</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">45' 🔄</td>
+<td style="padding:8px"><strong>Arteta 半場戰術調整</strong> — 上半場 Rice 被安排在右後衛實驗失敗，中場被 Soucek 壓制。半場後 Rice 回歸中場，兵工廠重新掌控節奏</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">75' 🧤</td>
+<td style="padding:8px"><strong>Raya 神撲 Castellanos 頭鎚</strong> — Taty Castellanos 禁區內魚躍頭鎚攻門，Raya 全力飛撲將球擋出，保住清白之身</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">83' ⚽</td>
+<td style="padding:8px"><strong>Trossard 破門！（0-1）</strong> — Ødegaard 帶球殺入禁區後回敲，Trossard 接應後一腳勁射直竄球門死角，兵工廠打破僵局</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">90+5' ❌</td>
+<td style="padding:8px"><strong>Wilson 進球被 VAR 取消</strong> — Callum Wilson 補時推射入網，全場一度沸騰。但經漫長 VAR 審查確認 Pablo 在進球過程中犯規推倒 Raya，進球無效</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-0 ∣ 終場 0-1</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>上半場：Rice 客串右後衛的失敗實驗</h4>
+
+<p>Arteta 大膽將 Declan Rice 安排在右後衛位置，試圖在後場多一位持球者來突破西漢姆的低位防守。但這個部署適得其反——兵工廠中場失去了 Rice 的覆蓋與推進能力，Soucek 和 Mateus Fernandes 趁勢在中場搶到控制權。上半場兵工廠雖然 63.7% 控球，卻幾乎沒有製造有效威脅。</p>
+
+<h4>下半場：換人改變局勢</h4>
+
+<p>半場後 Arteta 撥亂反正，Rice 回歸中場本位，隨後 Ødegaard 和 Havertz 替補上陣。兵工廠的進攻立刻找到節奏，尤其 Ødegaard 上場後的傳切配合讓西漢姆後防疲於奔命。第 83 分鐘 Ødegaard 帶球突入禁區後冷靜回做，Trossard 迎球怒射破網，全場爆發。</p>
+
+<h4>補時 VAR 戲碼</h4>
+
+<p>西漢姆在補時第 5 分鐘由 Wilson 推射入網，倫敦體育場一度陷入瘋狂。但 VAR 介入後確認 Pablo 在爭搶中犯規推倒門將 Raya，進球被取消。這個判決引發西漢姆球迷強烈不滿，但回放顯示 Pablo 確實有推擠動作在先。</p>
+
+<h3>數據速覽</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;text-align:center">
+<tr style="border-bottom:2px solid var(--accent)">
+<th style="padding:8px;text-align:left">數據</th>
+<th style="padding:8px">西漢姆</th>
+<th style="padding:8px">兵工廠</th>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">控球率</td><td>36.3%</td><td>63.7%</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">射門（射正）</td><td>9（3）</td><td>15（4）</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">撲救</td><td>3（Hermansen）</td><td>3（Raya）</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+<td style="padding:6px 8px;text-align:left">角球</td><td>4</td><td>3</td>
+</tr>
+<tr>
+<td style="padding:6px 8px;text-align:left">黃牌</td><td>3</td><td>4</td>
+</tr>
+</table>
+
+<h3>爭冠與保級形勢</h3>
+
+<ul>
+<li><strong>兵工廠</strong>：第36輪結束後領先第二名 5 分、剩餘 2 場聯賽，奪冠在望。這將是兵工廠自 2003/04 賽季以來首座聯賽冠軍。但 Ben White 受傷離場令人擔憂——5/30 歐冠決賽對巴黎聖日耳曼迫在眉睫。</li>
+<li><strong>西漢姆</strong>：保級形勢告急。剩餘 2 場必須搶分。Nuno 的球隊防守表現不差，但進攻端持續乏力是致命傷。</li>
+</ul>`,
+    tags: ['賽後回顧', '西漢姆', '兵工廠', 'Trossard', 'Rice', 'VAR', 'Ødegaard', '保級', '爭冠', '第36輪']
   }
 ];
 
