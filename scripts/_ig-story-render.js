@@ -132,8 +132,11 @@ async function _drawHeader(ctx, theme, customBadge) {
   ctx.fillText(labelText, labelX + 20, brandY + 56);
 }
 
+// 這 3 種類型都是「全自動發」 — 不會有人工 link sticker，
+// 所以拿掉「↑ 點上方連結」誤導文案，直接用大字 CTA + IG 帳號
 function _drawFooter(ctx, theme, ctaText) {
-  const ctaY = H - 340;
+  const ctaY = H - 320;
+  // 分隔線
   ctx.strokeStyle = _hexA(theme.accent, 0.4);
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -141,29 +144,24 @@ function _drawFooter(ctx, theme, ctaText) {
   ctx.lineTo(W - 140, ctaY);
   ctx.stroke();
 
-  // 上箭頭
-  const cx = W / 2, ay = ctaY + 50;
-  ctx.fillStyle = theme.accent;
-  ctx.beginPath();
-  ctx.moveTo(cx, ay - 15);
-  ctx.lineTo(cx + 18, ay + 5); ctx.lineTo(cx + 8, ay + 5);
-  ctx.lineTo(cx + 8, ay + 25); ctx.lineTo(cx - 8, ay + 25);
-  ctx.lineTo(cx - 8, ay + 5); ctx.lineTo(cx - 18, ay + 5);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.font = `bold 40px ${FONT_BOLD}`;
+  // 主 CTA（大字、主題色）
+  ctx.font = `bold 46px ${FONT_BOLD}`;
   ctx.fillStyle = theme.accent;
   ctx.textAlign = 'center';
-  ctx.fillText(ctaText, W / 2, ctaY + 110);
+  ctx.shadowColor = _hexA(theme.accent, 0.5);
+  ctx.shadowBlur = 18;
+  ctx.fillText(ctaText, W / 2, ctaY + 80);
+  ctx.shadowBlur = 0;
 
-  ctx.font = `bold 30px ${FONT_BOLD}`;
+  // IG 帳號（白色稍小，作為導引到 bio link）
+  ctx.font = `bold 36px ${FONT_BOLD}`;
   ctx.fillStyle = '#ffffff';
-  ctx.fillText('@168good236', W / 2, ctaY + 165);
+  ctx.fillText('@168good236', W / 2, ctaY + 155);
 
-  ctx.font = `400 24px ${FONT}`;
+  // 主頁簡介有連結 提示（小字、灰）
+  ctx.font = `400 26px ${FONT}`;
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
-  ctx.fillText('Soccer麥迪 · 麥迪擂台', W / 2, ctaY + 205);
+  ctx.fillText('主頁簡介點連結進站', W / 2, ctaY + 200);
 }
 
 // ═══════════════════════ PREMATCH ═══════════════════════
