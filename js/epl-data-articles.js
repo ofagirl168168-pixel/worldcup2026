@@ -2798,8 +2798,8 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
-<td style="padding:8px;width:60px;white-space:nowrap">45' 🔄</td>
-<td style="padding:8px"><strong>Arteta 半場戰術調整</strong> — 上半場 Rice 被安排在右後衛實驗失敗，中場被 Soucek 壓制。半場後 Rice 回歸中場，兵工廠重新掌控節奏</td>
+<td style="padding:8px;width:60px;white-space:nowrap">28' 🤕</td>
+<td style="padding:8px"><strong>Ben White 傷退</strong> — White 在一次攔截中膝蓋受傷離場，Arteta 被迫將 Rice 移到右後衛應急，中場控制力大減、被 Soucek 壓制</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px">78' 🧤</td>
@@ -2820,9 +2820,9 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>比賽回顧</h3>
 
-<h4>上半場：Rice 客串右後衛的失敗實驗</h4>
+<h4>上半場：White 傷退打亂部署</h4>
 
-<p>Arteta 大膽將 Declan Rice 安排在右後衛位置，試圖在後場多一位持球者來突破西漢姆的低位防守。但這個部署適得其反——兵工廠中場失去了 Rice 的覆蓋與推進能力，Soucek 和 Mateus Fernandes 趁勢在中場搶到控制權。上半場兵工廠雖然 63.7% 控球，卻幾乎沒有製造有效威脅。</p>
+<p>第 28 分鐘 Ben White 在攔截 Summerville 時膝蓋受傷離場，Arteta 被迫將 Declan Rice 移到右後衛應急。兵工廠中場因此失去 Rice 的覆蓋與推進能力，Soucek 和 Mateus Fernandes 趁勢在中場搶到控制權。上半場兵工廠雖然 63.7% 控球，卻幾乎沒有製造有效威脅。</p>
 
 <h4>下半場：換人改變局勢</h4>
 
