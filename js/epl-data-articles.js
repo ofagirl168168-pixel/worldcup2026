@@ -3029,6 +3029,110 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p>Carrick 的曼聯在確保歐冠席位後明顯收力。領先利物浦 6 分、剩 2 場，第三名幾乎到手。桑德蘭升班馬本季保級無虞但也無法再進一步。</p>`,
     tags: ['賽後回顧', '森林', '紐卡索', '布萊頓', '狼隊', '伯恩利', '維拉', '水晶宮', '愛華頓', '富勒姆', '伯恩茅斯', '桑德蘭', '曼聯', 'Anderson', 'Hinshelwood', '保級', '第36輪']
+  },
+  {
+    id: 'epl-057',
+    title: '【賽前分析】曼城 vs 水晶宮：補賽=決命局，Guardiola 贏了就暫登榜首',
+    date: '2026-05-12',
+    category: '賽前深度分析',
+    summary: '英超補賽——曼城主場迎戰水晶宮，這是 Guardiola 手中的「遊戲外掛」：贏球就以 80 分暫時超越兵工廠（79 分）登上榜首，輸球則冠軍夢幾乎破滅。Rodri 傷癒歸隊成關鍵，水晶宮帶著歐會盃決賽的信心來訪。',
+    content: `<h2>曼城 vs 水晶宮｜英超補賽・05/14（三）03:00 台灣時間・伊蒂哈德球場</h2>
+
+<p>這場補賽的意義超越三分——它決定英超冠軍歸屬的走向。</p>
+
+<h3>為什麼這場補賽如此關鍵？</h3>
+
+<p>因聯賽盃決賽延期的這場比賽，讓曼城手握「額外一場」的籌碼。目前積分榜：</p>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">排名</th><th style="padding:8px">球隊</th><th style="padding:8px">賽</th><th style="padding:8px">積分</th><th style="padding:8px">剩餘場次</th></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">1</td><td style="padding:8px">兵工廠</td><td style="padding:8px">36</td><td style="padding:8px">79</td><td style="padding:8px">2（伯恩利主、最後一輪）</td></tr>
+<tr><td style="padding:8px">2</td><td style="padding:8px">曼城</td><td style="padding:8px">36</td><td style="padding:8px">77</td><td style="padding:8px">3（水晶宮主、伯恩茅斯客、最後一輪）</td></tr>
+</table>
+
+<p><b>曼城贏球 → 80 分暫登榜首</b>，給兵工廠施加巨大心理壓力。<b>曼城平局或輸球</b> → 兵工廠只要在最後 2 輪拿到 1-2 分就封王。這是 Guardiola 本季最重要的 90 分鐘。</p>
+
+<h3>曼城：伊蒂哈德堡壘 + Rodri 回歸？</h3>
+
+<p>曼城的主場戰績本季幾乎無可挑剔——<b>八月至今主場僅 1 敗</b>，後 16 場主場拿下 13 勝，伊蒂哈德已成為英超最難攻克的堡壘。上輪 3-0 輕取布倫特福德，<b>Doku、Haaland、Marmoush</b> 各入一球，攻擊線狀態火熱。</p>
+
+<p>最大的利好是 <b>Rodri</b> 的傷勢恢復。這位西班牙中場因腹股溝傷勢缺席了過去 4 場比賽，但已重返部分訓練。如果 Rodri 能出場哪怕替補上陣，曼城的中場控制力將提升一個檔次。此外，<b>Gvardiol</b> 從脛骨骨折中復出，可能進入大名單。<b>Khusanov</b> 的傷勢不嚴重，預計可出戰。</p>
+
+<p><b>核心球員</b>：Haaland、Doku、Marmoush 領銜攻擊線，Bernardo Silva 和 Kovačić 坐鎮中場，Rodri 若復出更添控制力。Rico Lewis 和 Akanji 組成後防骨幹。</p>
+
+<h3>水晶宮：歐會盃決賽隊的雙重挑戰</h3>
+
+<p>Glasner 的水晶宮正經歷夢幻又疲憊的賽季——他們殺入了<b>歐洲協會聯賽決賽</b>（5/27 對佛倫提那），但英超近 4 場未勝，聯賽排名第 15 已安全但無法再進一步。</p>
+
+<p>上輪主場 2-2 被愛華頓追平暴露了水晶宮的問題：領先時無法守住比分、下半場體能下降。<b>Nketiah 賽季報銷、Doucouré 膝傷缺陣</b>是長期傷兵，但攻擊三叉戟 <b>Mateta-Sarr-Pino</b> 仍是英超中下游最具威脅的鋒線之一。</p>
+
+<p>水晶宮的心理狀態值得關注：他們可能會選擇「保存體力備戰歐會盃決賽」，也可能「帶著決賽信心放手一搏」。Glasner 的選擇將決定這場比賽的基調。</p>
+
+<h3>戰術焦點</h3>
+
+<p><b>曼城的壓迫 vs 水晶宮的反擊</b>：曼城本季在伊蒂哈德的控球率平均 68%，水晶宮則是英超反擊效率前五的球隊。Sarr 的速度和 Mateta 的禁區存在感，能在曼城高位壓迫時找到身後空間。</p>
+
+<p><b>Haaland 的空中優勢</b>：水晶宮的中衛組合（Guéhi + Lacroix）高空能力不差，但面對狀態火熱的 Haaland（上輪頭球建功），定位球會是曼城的重要得分手段。</p>
+
+<h3>麥迪預測</h3>
+
+<p><b>曼城 3-1 水晶宮</b>。伊蒂哈德的氛圍加上冠軍壓力的驅動力，曼城不會給水晶宮任何喘息空間。Haaland 和 Doku 有望建功。但水晶宮不會空手而歸——Mateta 或 Sarr 有機會在反擊中找到一球。Guardiola 暫登榜首，把壓力丟回給 Arteta。</p>`,
+    tags: ['賽前分析', '曼城', '水晶宮', 'Haaland', 'Guardiola', 'Rodri', 'Mateta', '爭冠', '補賽']
+  },
+  {
+    id: 'epl-056',
+    title: '【賽後回顧】熱刺 1-1 里茲聯：Tel 世界波開局卻送點，Kinsky 神撲救回一分',
+    date: '2026-05-12',
+    category: '賽後深度回顧',
+    summary: '第36輪保級生死戰——Mathys Tel 第50分鐘禁區外世界波破門，卻在第74分鐘因危險動作踢中 Ampadu 送點，Calvert-Lewin 操刀扳平。補時 Kinsky 撲出 Longstaff 必進球化解危機，熱刺 38 分領先降級區 2 分、剩 2 輪。',
+    content: `<h2>熱刺 1-1 里茲聯｜第36輪・05/12 03:00 台灣時間・熱刺球場</h2>
+
+<p>這場保級生死戰沒有辜負賽前的緊張氛圍——一記世界波、一個爭議點球、一次賽季最佳撲救，所有劇情在補時 13 分鐘裡達到高潮。</p>
+
+<h3>上半場：緊繃到窒息</h3>
+
+<p>De Zerbi 排出最強可用陣容：Kinsky 把守球門（Vicario 仍然缺陣）、Van de Ven 搭檔 Danso 組成中衛、Palhinha 和 Bentancur 雙後腰。進攻端以 Kolo Muani、Richarlison、Mathys Tel 三叉戟出擊——<strong>Solanke 幾乎確定賽季報銷</strong>的消息在賽前已被多方證實。</p>
+
+<p>Farke 的里茲則以穩固的陣型應戰，Ampadu 領銜中場、Tanaka 和 Stach 提供覆蓋、Calvert-Lewin 頂在最前。里茲帶著 6 場不敗的氣勢來訪，沒有任何壓力。</p>
+
+<p>上半場兩隊踢得小心翼翼，熱刺控球 56% 但很難找到突破口。里茲的 low block 讓 De Zerbi 的傳控體系失靈——Porro 和 Udogie 的邊路傳中找不到人、Richarlison 拿球後轉身空間被壓縮。0-0 進入中場休息，熱刺球場氣氛已經開始焦躁。</p>
+
+<h3>Tel：50 分鐘世界波，74 分鐘從英雄到罪人</h3>
+
+<p>下半場開局僅 5 分鐘，<strong>Mathys Tel</strong> 接到角球後方的回傳，在禁區外約 25 碼處右腳一記弧線球，皮球劃過 Darlow 的指尖鑽入球門右上角——<strong>世界波</strong>。熱刺球場瞬間沸騰，De Zerbi 在場邊揮拳慶祝。這是 Tel 加盟後第 4 球，也是最關鍵的一球。</p>
+
+<p>但 Tel 的夜晚在第 74 分鐘急轉直下。他在禁區內嘗試一記倒掛金鉤清球，高抬的右腳踢中了正在爭頂的 <strong>Ethan Ampadu</strong> 頭部。主裁判最初沒有吹罰，但 <strong>VAR 介入審查後判定點球</strong>——Tel 的動作被認定為危險動作。</p>
+
+<p><strong>Calvert-Lewin</strong> 操刀主射，冷靜將球推入右下角，Kinsky 猜對方向但鞭長莫及。1-1。</p>
+
+<h3>補時 13 分鐘：Kinsky 的賽季最佳撲救</h3>
+
+<p>比賽進入漫長的補時——裁判給出 <strong>13 分鐘</strong>。里茲嗅到血腥味，開始大舉壓上。第 90+8 分鐘，替補上陣的 <strong>Sean Longstaff</strong> 在禁區頂接到 Daniel James 的橫傳，一腳抽射直奔球門左上角——所有人都以為進了。</p>
+
+<p>但 <strong>Kinsky</strong> 飛身撲出，單掌將球拍到橫樑上彈出！這記撲救被 Sky Sports 賽後評為「<strong>賽季最佳撲救候選</strong>」。如果沒有這一撲，熱刺今晚就輸了，保級形勢將陷入絕境。</p>
+
+<h3>保級形勢：2 分的生命線</h3>
+
+<p>平局讓熱刺拿到 <strong>38 分</strong>，領先第 18 名西漢姆 <strong>2 分</strong>。但西漢姆已完成 36 輪，熱刺也踢完 36 場——雙方都只剩最後 2 輪。</p>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">排名</th><th style="padding:8px">球隊</th><th style="padding:8px">賽</th><th style="padding:8px">積分</th><th style="padding:8px">剩餘賽程</th></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">17</td><td style="padding:8px">熱刺</td><td style="padding:8px">36</td><td style="padding:8px">38</td><td style="padding:8px">切爾西（客）、？</td></tr>
+<tr><td style="padding:8px;background:#ffcccc">18</td><td style="padding:8px;background:#ffcccc">西漢姆</td><td style="padding:8px;background:#ffcccc">36</td><td style="padding:8px;background:#ffcccc">36</td><td style="padding:8px;background:#ffcccc">紐卡索（客）、里茲聯（主）</td></tr>
+<tr><td style="padding:8px;background:#ff9999">19</td><td style="padding:8px;background:#ff9999">狼隊</td><td style="padding:8px;background:#ff9999">36</td><td style="padding:8px;background:#ff9999">已降級</td><td style="padding:8px;background:#ff9999">—</td></tr>
+<tr><td style="padding:8px;background:#ff9999">20</td><td style="padding:8px;background:#ff9999">伯恩利</td><td style="padding:8px;background:#ff9999">36</td><td style="padding:8px;background:#ff9999">已降級</td><td style="padding:8px;background:#ff9999">—</td></tr>
+</table>
+
+<p>熱刺最後兩場：客場打切爾西（MW37）、最後一輪待確認。切爾西客場從來都不好打，但 De Zerbi 上任以來球隊的戰術紀律明顯提升。西漢姆則要面對客場打紐卡索和主場打里茲聯——兩場都極具挑戰。</p>
+
+<p><strong>關鍵數字</strong>：如果熱刺最後 2 場拿到 1 分，西漢姆就算全贏也只能追平 38 分、淨勝球差距極可能不利。換言之，<strong>熱刺只要再拿 1 分就幾乎確定保級</strong>。</p>
+
+<h3>賽後反應</h3>
+
+<p>De Zerbi 賽後表示：「一分不夠，但比零分好。Tel 的進球是世界級的，但他必須學會在禁區內不做那種危險動作。Kinsky 救了我們——他的撲救讓我們還活著。」</p>
+
+<p>Farke 則說：「我們帶走一分是公平的結果，但 Longstaff 那球本應進的。里茲今天證明了我們不怕任何對手。」</p>`,
+    tags: ['賽後回顧', '熱刺', '里茲聯', 'Tel', 'Calvert-Lewin', 'Kinsky', 'De Zerbi', 'Farke', 'VAR', '保級', '第36輪']
   }
 ];
 

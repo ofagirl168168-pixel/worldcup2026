@@ -1,5 +1,100 @@
 const ARTICLES = [
   {
+    id:15, cat:'小組分析', date:'2026-05-12', readTime:'8分鐘',
+    title:'倒數30天：F組前瞻——荷蘭追夢、日本巨殺、Gyökeres 帶瑞典重返世界盃',
+    desc:'F組是本屆最均衡的死亡組：荷蘭追逐隊史首冠、日本連斬英德後氣勢如虹、瑞典坐擁Gyökeres+Isak頂級鋒線、突尼西亞三連屆不甘陪襯。四隊實力接近，任何排名組合都不意外。',
+    body:`<h3>F組：本屆最均衡的「隱形死亡組」</h3>
+
+<p>距離 2026 世界盃開幕僅剩 <b>30 天</b>。當所有人的目光聚焦在 C 組（巴西、摩洛哥）和 L 組（英格蘭、克羅埃西亞）的死亡組劇本時，<b>F 組</b>悄悄成為本屆最令人難以預測的小組——四支球隊都有實力擊敗彼此，沒有絕對魚腩，也沒有穩拿出線權的霸主。</p>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">球隊</th><th style="padding:8px">FIFA 排名</th><th style="padding:8px">關鍵球員</th><th style="padding:8px">核心看點</th></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">🇳🇱 荷蘭</td><td style="padding:8px">第 3</td><td style="padding:8px">Van Dijk、Gakpo、Reijnders</td><td style="padding:8px">三屆亞軍追首冠，Xavi Simons ACL 報銷是最大打擊</td></tr>
+<tr><td style="padding:8px">🇯🇵 日本</td><td style="padding:8px">第 15</td><td style="padding:8px">久保建英、三笘薫、遠藤航</td><td style="padding:8px">亞洲最強軍團，2022 連殺德西後已非黑馬</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">🇸🇪 瑞典</td><td style="padding:8px">第 20</td><td style="padding:8px">Gyökeres、Isak、Elanga</td><td style="padding:8px">Potter 帶隊、雙神鋒壓陣，闊別 28 年重返世界盃</td></tr>
+<tr><td style="padding:8px">🇹🇳 突尼西亞</td><td style="padding:8px">第 40</td><td style="padding:8px">Khazri、Msakni</td><td style="padding:8px">三連屆但從未突破小組賽，2022 曾擊敗法國</td></tr>
+</table>
+
+<h3>🇳🇱 荷蘭：三屆亞軍的無冠魔咒</h3>
+
+<p>荷蘭足球是世界盃永遠的悲劇英雄。1974、1978、2010 三度殺入決賽卻三度空手而歸，這一次，Koeman 的橙衣軍團帶著「最完整的一代」再度出征。</p>
+
+<p>資格賽 8 場不敗（6 勝 2 平）展現了穩定性，但 <b>Xavi Simons 在熱刺遭遇 ACL 斷裂確定缺席世界盃</b>，是對荷蘭創造力的沉重打擊。這位 23 歲的中場核心是 Koeman 戰術體系的十號位首選，他的缺席意味著 Reijnders 或 Frenkie de Jong 需要填補攻擊組織的空白。</p>
+
+<p><b>預計先發陣容（4-2-3-1）</b></p>
+<ul>
+<li><b>門將</b>：Verbruggen（布萊頓）</li>
+<li><b>後衛</b>：Dumfries（國際米蘭）、Van Dijk（利物浦）、De Vrij（國際米蘭）、Aké（曼城）</li>
+<li><b>中場</b>：De Jong（巴塞隆納）、Reijnders（曼城）</li>
+<li><b>攻擊</b>：Malen（多特蒙德）、Koopmeiners（尤文圖斯）、Gakpo（利物浦）</li>
+<li><b>前鋒</b>：Brobbey（阿賈克斯）</li>
+</ul>
+
+<p>好消息是 <b>Van Dijk</b> 狀態火熱——利物浦本季英超的穩固防守有很大一部分功勞歸於這位 34 歲的隊長。<b>Cody Gakpo</b> 在利物浦的靈活跑位和進球能力，加上 Reijnders 在曼城練就的壓迫式中場踢法，讓荷蘭在中前場依然有足夠火力。</p>
+
+<h3>🇯🇵 日本：不再是黑馬的「巨人殺手」</h3>
+
+<p>2022 卡達世界盃小組賽連續擊敗德國和西班牙的劇本，讓全世界重新認識日本足球。但那還只是序曲——<b>2026 年 3 月，日本在溫布利 1-0 擊敗英格蘭</b>，成為史上第一支在溫布利贏球的亞洲國家隊。</p>
+
+<p>森保一（Hajime Moriyasu）的球隊擁有歐洲頂級聯賽史上最強的日本球員群：</p>
+<ul>
+<li><b>久保建英</b>（皇家社會）：右路突破 + 進球，西甲本季貢獻雙位數進球助攻</li>
+<li><b>三笘薫</b>（布萊頓）：左路盤帶魔術師，英超最恐怖的 1v1 選手之一</li>
+<li><b>遠藤航</b>（利物浦）：中場掃蕩機器，但本季傷勢反覆，健康狀態是最大問號</li>
+<li><b>鎌田大地</b>（水晶宮）：攻擊中場新選項，歐會盃表現搶眼</li>
+</ul>
+
+<p>日本的壓迫體系在亞洲是頂級的，但世界盃的考驗不同——48 隊新制下最多需踢 8 場，體能管理是關鍵。2022 年日本在 16 強 PK 大戰敗給克羅埃西亞的心理陰影是否已經克服？F 組首戰就碰荷蘭，開局之戰的結果可能決定整個小組的走勢。</p>
+
+<h3>🇸🇪 瑞典：Gyökeres + Isak 的雙神鋒時代</h3>
+
+<p>瑞典闊別 <b>8 年</b>重返世界盃（上次是 2018 俄羅斯，2022 卡達未晉級），而且是以最戲劇化的方式——<b>Gyökeres 第 88 分鐘絕殺波蘭</b>，替 Graham Potter 的球隊搶到最後一張入場券。</p>
+
+<p>Potter 從切爾西被解雇後轉戰國際賽場，帶來了英超的高強度壓迫體系。而他手上的牌非常好：</p>
+<ul>
+<li><b>Viktor Gyökeres</b>（兵工廠）：本季英超 + 歐冠合計進球數位居前列，兵工廠的絕對主力前鋒</li>
+<li><b>Alexander Isak</b>（利物浦）：轉會利物浦後持續高產，速度和終結力都是世界級</li>
+<li><b>Anthony Elanga</b>（紐卡索）：資格賽附加賽進球功臣，右路速度飛快</li>
+<li><b>Lucas Bergvall</b>（熱刺）：年僅 20 歲的中場指揮官，英超經驗正在快速累積</li>
+</ul>
+
+<p><b>Gyökeres + Isak</b> 是本屆世界盃最恐怖的鋒線搭檔之一——兩人合計身價超過 2 億歐元，本季聯賽合計進球突破 40 大關。如果 Potter 能讓兩人同時上場並找到化學反應，瑞典有能力擊敗任何對手。</p>
+
+<p>隱憂是 Gyökeres 近期有肌肉問題缺席了部分國家隊集訓，能否在世界盃前恢復到 100% 是關鍵。</p>
+
+<h3>🇹🇳 突尼西亞：三連屆的驕傲與瓶頸</h3>
+
+<p>突尼西亞連續三屆出席世界盃（2018、2022、2026），是北非足球的穩定代表。2022 年小組賽 <b>1-0 擊敗法國</b>是他們的高光時刻——儘管法國當時已確定出線而進行大輪換，但突尼西亞展現出的戰術紀律和防守韌性是真實的。</p>
+
+<p>問題在於<b>持續性</b>：突尼西亞從未在世界盃小組賽中晉級。三場比賽的容錯率太低，他們往往在打出一場好球後，接下來就因為進攻火力不足而功虧一簣。F 組的對手實力普遍高於 2022 年的 D 組（法國、丹麥、澳洲），突尼西亞要突圍難度更大。</p>
+
+<h3>賽程與關鍵戰</h3>
+
+<p>F 組比賽橫跨美國與墨西哥：</p>
+<ul>
+<li><b>6/14（六）</b>：荷蘭 vs 日本（阿靈頓 AT&T Stadium）、瑞典 vs 突尼西亞（蒙特雷 Estadio BBVA）</li>
+<li><b>6/20（五）</b>：荷蘭 vs 瑞典（休士頓 NRG Stadium）、突尼西亞 vs 日本（蒙特雷 Estadio BBVA）</li>
+<li><b>6/25（三）</b>：日本 vs 瑞典（阿靈頓 AT&T Stadium）、突尼西亞 vs 荷蘭（堪薩斯城 Arrowhead Stadium）</li>
+</ul>
+
+<p><b>首輪荷蘭 vs 日本</b>是整個 F 組的定調之戰。2022 年日本曾在小組賽擊敗德國和西班牙這兩支歐洲頂級球隊——如果他們能在阿靈頓複製奇蹟，整個 F 組的出線形勢就會大洗牌。而<b>末輪日本 vs 瑞典</b>很可能成為事實上的「出線生死戰」——兩支球隊都在爭奪第二甚至最佳第三的名額。</p>
+
+<h3>麥迪預測</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">排名</th><th style="padding:8px">球隊</th><th style="padding:8px">預測積分</th><th style="padding:8px">分析</th></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">1</td><td style="padding:8px">🇳🇱 荷蘭</td><td style="padding:8px">7</td><td style="padding:8px">整體實力最強，但首戰對日本可能丟分。Xavi Simons 缺席削弱創造力，小組頭名不穩</td></tr>
+<tr><td style="padding:8px">2</td><td style="padding:8px">🇯🇵 日本</td><td style="padding:8px">5</td><td style="padding:8px">壓迫體系成熟、歐洲球員比例史上最高。與瑞典的末輪對決是關鍵</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">3</td><td style="padding:8px">🇸🇪 瑞典</td><td style="padding:8px">4</td><td style="padding:8px">Gyökeres + Isak 火力足以贏任何對手，但整體防守穩定性是問號。最佳第三名候選</td></tr>
+<tr><td style="padding:8px">4</td><td style="padding:8px">🇹🇳 突尼西亞</td><td style="padding:8px">1</td><td style="padding:8px">防守韌性有餘、進攻火力不足。要突圍需要奇蹟</td></tr>
+</table>
+
+<p>48 隊新制下，<b>F 組第三名拿到 4 分就幾乎篤定以最佳第三名晉級</b>。這意味著瑞典即使只拿到 1 勝 1 平（4 分），也有很高機率進入 32 強。F 組的殘酷之處在於：三支強隊都有出線實力，但只有兩個直接晉級名額——必有一隊要賭最佳第三名的命運。</p>
+
+<p>台灣球迷特別關注的<b>日本</b>：久保建英和三笘薫的雙翼是 F 組最具觀賞性的攻擊組合之一。如果遠藤航能健康出賽，日本的中場壓迫 + 兩翼突破的戰術體系，足以在首戰就給荷蘭製造巨大麻煩。6/14 的荷蘭 vs 日本，會是整個小組賽階段最值得熬夜看的比賽之一。</p>`,
+    tags:['小組分析','F組','荷蘭','日本','瑞典','突尼西亞','世界盃','Van Dijk','久保建英','Gyökeres','Isak','三笘薫']
+  },
+  {
     id:14, cat:'社群觀察', date:'2026-05-11', readTime:'5分鐘',
     tournament:'all',
     title:'麥迪擂台第三週戰報：148 票聚焦歐冠決賽與英超保級白熱化',

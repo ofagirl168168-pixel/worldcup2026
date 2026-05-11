@@ -829,7 +829,9 @@ window.EPL_MATCHES = [
    goals:[{team:'ARS',player:'Trossard',minute:83}]},
 
   // 熱刺 vs 里茲聯 | 05/12 03:00 台灣時間 (05/11 20:00 BST)
-  {id:'EPL-MW36-TOT-LEE', matchday:36, date:'2026-05-12', time:'03:00', home:'TOT', away:'LEE', stage:'league', status:'upcoming'},
+  {id:'EPL-MW36-TOT-LEE', matchday:36, date:'2026-05-12', time:'03:00', home:'TOT', away:'LEE', stage:'league',
+   status:'finished', score:{h:1,a:1}, halfTime:{h:0,a:0},
+   goals:[{team:'TOT',player:'Mathys Tel',minute:50},{team:'LEE',player:'Calvert-Lewin',minute:74,type:'pen'}]},
 
   // ===== 補賽 (因聯賽盃決賽延期) =====
   // 曼城 vs 水晶宮 | 05/14 03:00 台灣時間 (05/13 20:00 BST)

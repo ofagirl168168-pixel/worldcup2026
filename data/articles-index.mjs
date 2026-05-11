@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "15",
+    "tournament": "wc",
+    "title": "倒數30天：F組前瞻——荷蘭追夢、日本巨殺、Gyökeres 帶瑞典重返世界盃",
+    "summary": "F組是本屆最均衡的死亡組：荷蘭追逐隊史首冠、日本連斬英德後氣勢如虹、瑞典坐擁Gyökeres+Isak頂級鋒線、突尼西亞三連屆不甘陪襯。四隊實力接近，任何排名組合都不意外。",
+    "date": "2026-05-12",
+    "category": "小組分析",
+    "readTime": "8分鐘",
+    "shareable": true
+  },
+  {
     "id": "epl-053",
     "tournament": "epl",
     "title": "【賽後回顧】利物浦 1-1 切爾西：Gravenberch 世界波遇上 Enzo 鬼線任意球，安菲爾德悶局收場",
@@ -26,6 +36,26 @@ export default [
     "tournament": "epl",
     "title": "【賽後回顧】第36輪戰報合集：Anderson 舊主復仇保安全、布萊頓 35 秒閃擊、雙紅牌西倫敦德比",
     "summary": "第36輪其餘六場賽後回顧：諾丁漢森林 1-1 紐卡索（Anderson 88 分鐘扳平確保保級）、布萊頓 3-0 狼隊（Hinshelwood 35 秒破門創隊史紀錄）、伯恩利 2-2 維拉、水晶宮 2-2 愛華頓、富勒姆 0-1 伯恩茅斯（雙紅牌）、桑德蘭 0-0 曼聯。",
+    "date": "2026-05-12",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-057",
+    "tournament": "epl",
+    "title": "【賽前分析】曼城 vs 水晶宮：補賽=決命局，Guardiola 贏了就暫登榜首",
+    "summary": "英超補賽——曼城主場迎戰水晶宮，這是 Guardiola 手中的「遊戲外掛」：贏球就以 80 分暫時超越兵工廠（79 分）登上榜首，輸球則冠軍夢幾乎破滅。Rodri 傷癒歸隊成關鍵，水晶宮帶著歐會盃決賽的信心來訪。",
+    "date": "2026-05-12",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-056",
+    "tournament": "epl",
+    "title": "【賽後回顧】熱刺 1-1 里茲聯：Tel 世界波開局卻送點，Kinsky 神撲救回一分",
+    "summary": "第36輪保級生死戰——Mathys Tel 第50分鐘禁區外世界波破門，卻在第74分鐘因危險動作踢中 Ampadu 送點，Calvert-Lewin 操刀扳平。補時 Kinsky 撲出 Longstaff 必進球化解危機，熱刺 38 分領先降級區 2 分、剩 2 輪。",
     "date": "2026-05-12",
     "category": "賽後深度回顧",
     "readTime": null,
