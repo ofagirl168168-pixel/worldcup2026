@@ -226,8 +226,12 @@ function appendToDataFile(candidate) {
   // 找該區塊的第一個題目後方
   const blockStart = src.indexOf('\n', markerIdx);
   // 在標記下一行直接插入新題目（變成最新的時事題在最上面）
+  // 支援兩種格式：date:'YYYY-MM-DD' 單日 OR dates:[...] 跨日（午後熱點題用）
+  const dateField = (candidate.dates && Array.isArray(candidate.dates))
+    ? `dates:${JSON.stringify(candidate.dates)}`
+    : `date:'${candidate.date || ''}'`;
   const entry =
-    `\n  { id:'${candidate.id}', date:'${candidate.date || ''}', type:'${candidate.type}',\n` +
+    `\n  { id:'${candidate.id}', ${dateField}, type:'${candidate.type}',\n` +
     `    q:${JSON.stringify(candidate.q)},\n` +
     `    opts:${JSON.stringify(candidate.opts)},\n` +
     `    context:${JSON.stringify(candidate.context || '')} },\n`;
@@ -400,11 +404,17 @@ async function main() {
         } else {
           toWrite = { ...chosen, _existing: undefined };
         }
-        let removed = 0;  // 提到區塊外，下方 line 442 suffix 訊息會用到
+        let removed = 0;  // 提到區塊外，下方 suffix 訊息會用到
         if (!addOnly) {
           removed = removeEntriesForDate(targetDate);
           if (removed) console.log(`🗑️ 已移除 ${removed} 則同日 (${targetDate}) 舊題目`);
         }
+        // 判斷是「現在已上線」還是「未來顯示」
+        // 午後熱點題 dates 含今天 → 現在就上線；早上明日題只含明天 → 將顯示
+        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+        const isLiveNow = Array.isArray(toWrite.dates)
+          ? toWrite.dates.includes(today)
+          : (toWrite.date === today);
         console.log(`✅ 你選了：${chosen.q}${chosen._eternal ? `（永恆題 → 指派為 ${targetDate}）` : ''}`);
         const filePath = appendToDataFile(toWrite);
 
@@ -439,7 +449,9 @@ async function main() {
           }).catch(() => {});
         }
         const suffix =
-          `\n\n✅ *已確認，${escapeMd(targetDate)} 將顯示此題*` +
+          (isLiveNow
+            ? `\n\n✅ *已確認，現在就上線*（網站重整即可看到）`
+            : `\n\n✅ *已確認，${escapeMd(targetDate)} 將顯示此題*`) +
           (removed > 1 ? `\n🗑️ 已整併同日 ${removed} 則舊題目` : '');
         await tg('editMessageText', {
           chat_id: CHAT_ID,
