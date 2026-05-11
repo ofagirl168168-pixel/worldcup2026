@@ -2,6 +2,36 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-053",
+    "tournament": "epl",
+    "title": "【賽後回顧】利物浦 1-1 切爾西：Gravenberch 世界波遇上 Enzo 鬼線任意球，安菲爾德悶局收場",
+    "summary": "Gravenberch 禁區外弧線球破網先馳得點，Enzo Fernández 任意球貼地穿越人牆扳平。雙方下半場各有進球被 VAR 取消，Van Dijk、Szoboszlai 先後中框架。利物浦歐冠席位仍未鎖定，切爾西止住英超六連敗。",
+    "date": "2026-05-12",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-054",
+    "tournament": "epl",
+    "title": "【賽後回顧】曼城 3-0 布倫特福德：Doku 世界波領銜，Haaland + Marmoush 下半場連環轟，積分差縮至 2 分",
+    "summary": "Doku 第 60 分鐘精彩弧線球打破僵局，Haaland 背身腳後跟推射鎖定勝局，Marmoush 補時再下一城。曼城下半場三球橫掃布倫特福德，與榜首兵工廠的差距縮小至 2 分。",
+    "date": "2026-05-12",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-055",
+    "tournament": "epl",
+    "title": "【賽後回顧】第36輪戰報合集：Anderson 舊主復仇保安全、布萊頓 35 秒閃擊、雙紅牌西倫敦德比",
+    "summary": "第36輪其餘六場賽後回顧：諾丁漢森林 1-1 紐卡索（Anderson 88 分鐘扳平確保保級）、布萊頓 3-0 狼隊（Hinshelwood 35 秒破門創隊史紀錄）、伯恩利 2-2 維拉、水晶宮 2-2 愛華頓、富勒姆 0-1 伯恩茅斯（雙紅牌）、桑德蘭 0-0 曼聯。",
+    "date": "2026-05-12",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "14",
     "tournament": "wc",
     "title": "麥迪擂台第三週戰報：148 票聚焦歐冠決賽與英超保級白熱化",
@@ -159,7 +189,7 @@ export default [
     "date": "2026-05-04",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-042",
@@ -169,7 +199,7 @@ export default [
     "date": "2026-05-04",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-043",
@@ -179,7 +209,7 @@ export default [
     "date": "2026-05-04",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-021",
@@ -189,7 +219,7 @@ export default [
     "date": "2026-05-04",
     "category": "賽前深度分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-037",

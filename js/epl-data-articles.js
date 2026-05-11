@@ -2864,6 +2864,171 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <li><strong>西漢姆</strong>：保級形勢告急。剩餘 2 場必須搶分。Nuno 的球隊防守表現不差，但進攻端持續乏力是致命傷。</li>
 </ul>`,
     tags: ['賽後回顧', '西漢姆', '兵工廠', 'Trossard', 'Rice', 'VAR', 'Ødegaard', '保級', '爭冠', '第36輪']
+  },
+  {
+    id: 'epl-053',
+    title: '【賽後回顧】利物浦 1-1 切爾西：Gravenberch 世界波遇上 Enzo 鬼線任意球，安菲爾德悶局收場',
+    date: '2026-05-12',
+    category: '賽後深度回顧',
+    summary: 'Gravenberch 禁區外弧線球破網先馳得點，Enzo Fernández 任意球貼地穿越人牆扳平。雙方下半場各有進球被 VAR 取消，Van Dijk、Szoboszlai 先後中框架。利物浦歐冠席位仍未鎖定，切爾西止住英超六連敗。',
+    content: `<h2>利物浦 1-1 切爾西｜第36輪・安菲爾德</h2>
+
+<h3>關鍵時刻</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">6' ⚽</td>
+<td style="padding:8px"><strong>Gravenberch 破門！（1-0）</strong> — Gravenberch 在禁區邊緣接應隊友回傳，一腳弧線球直竄球門右上死角，門將 Sánchez 鞭長莫及。這是他唯一一次射門就直接得分。</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">35' ⚽</td>
+<td style="padding:8px"><strong>Enzo Fernández 扳平！（1-1）</strong> — 禁區外任意球，Enzo 低射貼地穿越人牆間隙，皮球鑽入遠柱球門內側，Kelleher 判斷正確但鞭長莫及。</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">55' 🚫</td>
+<td style="padding:8px"><strong>VAR 取消利物浦進球</strong> — Szoboszlai 頭槌入網但被判越位在先</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">72' 🚫</td>
+<td style="padding:8px"><strong>VAR 取消切爾西進球</strong> — Nkunku 近距離補射入網同樣因越位無效</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">80' 💥</td>
+<td style="padding:8px"><strong>Van Dijk 中柱</strong> — 角球二次進攻，Van Dijk 頭槌轟中右門柱彈出</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 1-1 ∣ 終場 1-1</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>上半場：兩記世界波定調</h4>
+
+<p>開局僅 6 分鐘 Gravenberch 就以一記精彩的弧線球打開比分，皮球從禁區邊緣劃出完美弧線飛入死角。切爾西並未慌亂，第 35 分鐘 Enzo Fernández 獲得禁區外任意球機會，他的低射巧妙穿越人牆縫隙，貼地滾入遠角，將比分追平。上半場雙方攻守節奏快速，但在兩球之後缺乏致命威脅。</p>
+
+<h4>下半場：VAR 主導劇情</h4>
+
+<p>下半場雙方都有進球被 VAR 推翻——Szoboszlai 和 Nkunku 先後因越位被判無效。利物浦加大攻勢，Van Dijk 頭槌中柱、Szoboszlai 遠射擦柱而出，但始終無法再次攻破 Sánchez 的大門。切爾西後防在 Reece James 回歸後表現穩固，成功守住一分。</p>
+
+<h3>形勢影響</h3>
+
+<ul>
+<li><strong>利物浦</strong>：第 4 名積 59 分，歐冠席位仍未鎖定，剩餘 2 場需繼續搶分。傷兵問題嚴重——Ekitike 賽季報銷、Salah 仍未歸隊。</li>
+<li><strong>切爾西</strong>：第 9 名積 49 分，終於止住英超六連敗的頹勢。Reece James 傷癒復出穩定了後防。賽季目標已轉向歐霸盃。</li>
+</ul>`,
+    tags: ['賽後回顧', '利物浦', '切爾西', 'Gravenberch', 'Enzo Fernández', 'VAR', '安菲爾德', '第36輪']
+  },
+  {
+    id: 'epl-054',
+    title: '【賽後回顧】曼城 3-0 布倫特福德：Doku 世界波領銜，Haaland + Marmoush 下半場連環轟，積分差縮至 2 分',
+    date: '2026-05-12',
+    category: '賽後深度回顧',
+    summary: 'Doku 第 60 分鐘精彩弧線球打破僵局，Haaland 背身腳後跟推射鎖定勝局，Marmoush 補時再下一城。曼城下半場三球橫掃布倫特福德，與榜首兵工廠的差距縮小至 2 分。',
+    content: `<h2>曼城 3-0 布倫特福德｜第36輪・伊蒂哈德球場</h2>
+
+<h3>關鍵時刻</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">60' ⚽</td>
+<td style="padding:8px"><strong>Doku 破門！（1-0）</strong> — 短角球戰術，Doku 左路接回傳後切入，一腳弧線球劃向遠角直竄網窩，精彩絕倫。</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">75' ⚽</td>
+<td style="padding:8px"><strong>Haaland 擴大比分！（2-0）</strong> — Semenyo 右路傳中，Haaland 第一次射門被擋，隨即腳後跟背身推射補中，近距離破門。</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">90+2' ⚽</td>
+<td style="padding:8px"><strong>Marmoush 鎖定勝局！（3-0）</strong> — Haaland 反擊中直塞右路，Marmoush 禁區內低射遠角入網。</td>
+</tr>
+<tr>
+<td colspan="2" style="padding:10px 8px;text-align:center;font-weight:bold;color:var(--accent)">半場 0-0 ∣ 終場 3-0</td>
+</tr>
+</table>
+
+<h3>比賽回顧</h3>
+
+<h4>上半場：布倫特福德硬抗</h4>
+
+<p>布倫特福德上半場展現出強硬的競爭力，中場壓迫讓曼城難以找到慣常的傳切節奏。Guardiola 的球隊控球率雖高，但缺乏致命最後一傳。半場 0-0 的比分真實反映了布倫特福德的出色防守紀律。</p>
+
+<h4>下半場：三球連爆</h4>
+
+<p>第 60 分鐘 Doku 的世界波打破僵局後，曼城像開了閘門。Haaland 第 75 分鐘的腳後跟推射展現頂級射手的靈感——他的第一腳射門被擋後，立刻用腳後跟將球送入網窩。補時 Marmoush 的入球則是 Haaland 無私助攻的完美結尾。曼城下半場三球零封，淨勝球提升至 +40，直逼兵工廠的 +42。</p>
+
+<h3>爭冠形勢</h3>
+
+<ul>
+<li><strong>曼城</strong>：積分追至僅落後兵工廠 2 分（兵工廠稍後 1-0 勝西漢姆再次拉開至 5 分），淨勝球差距僅剩 2 球。Guardiola 的球隊在缺少 Rodri 的情況下依然保持爭冠競爭力。</li>
+<li><strong>布倫特福德</strong>：上半場表現值得肯定，但下半場體能下滑後被曼城懲罰。球隊本季中游位置穩固。</li>
+</ul>`,
+    tags: ['賽後回顧', '曼城', '布倫特福德', 'Doku', 'Haaland', 'Marmoush', 'Guardiola', '爭冠', '第36輪']
+  },
+  {
+    id: 'epl-055',
+    title: '【賽後回顧】第36輪戰報合集：Anderson 舊主復仇保安全、布萊頓 35 秒閃擊、雙紅牌西倫敦德比',
+    date: '2026-05-12',
+    category: '賽後深度回顧',
+    summary: '第36輪其餘六場賽後回顧：諾丁漢森林 1-1 紐卡索（Anderson 88 分鐘扳平確保保級）、布萊頓 3-0 狼隊（Hinshelwood 35 秒破門創隊史紀錄）、伯恩利 2-2 維拉、水晶宮 2-2 愛華頓、富勒姆 0-1 伯恩茅斯（雙紅牌）、桑德蘭 0-0 曼聯。',
+    content: `<h2>第36輪其餘六場賽後回顧</h2>
+
+<h3>諾丁漢森林 1-1 紐卡索｜05/10 21:00</h3>
+
+<p><strong>進球：</strong>Harvey Barnes 74'（紐卡索）、Elliot Anderson 88'（森林）</p>
+
+<p>紐卡索客場一度取得領先——Harvey Barnes 第 74 分鐘的入球看似要為喜鵲拿下三分。但 Elliot Anderson 第 88 分鐘接 McAtee 妙傳後禁區內近角射入，戲劇性扳平比分。</p>
+
+<p>Anderson 面對舊主紐卡索進球別具意義——他 2024 年夏天因 PSR 規定被迫以 3,500 萬鎊離隊，此前從未在紐卡索一隊取得正式進球。這記扳平球加上稍後西漢姆 0-1 負兵工廠，<strong>確認森林英超保級成功</strong>，Pereira 麾下的森林領先降級區 7 分、剩 2 輪。紐卡索則延續近期吹領先保不住的毛病。</p>
+
+<hr>
+
+<h3>布萊頓 3-0 狼隊｜05/09 22:00</h3>
+
+<p><strong>進球：</strong>Hinshelwood 1'、Dunk 5'、Minteh 86'</p>
+
+<p>布萊頓用 5 分鐘就殺死比賽——<strong>Hinshelwood 開賽僅 35 秒頭槌破門</strong>，接 De Cuyper 左路傳中頂入右上角，創下布萊頓英超史上最快進球紀錄（超越 Mac Allister 2022 年的 49 秒）。第 5 分鐘 Dunk 再從 De Cuyper 角球中頭槌建功，隊長攻入本季首球。</p>
+
+<p>下半場狼隊毫無威脅，Minteh 第 86 分鐘禁區內搶到散球補射鎖定 3-0。布萊頓升至第 7，歐戰資格競爭白熱化。狼隊繼續墊底，降級命運早已註定。</p>
+
+<hr>
+
+<h3>伯恩利 2-2 阿斯頓維拉｜05/10 21:00</h3>
+
+<p><strong>進球：</strong>Jaidon Anthony 8'（伯恩利）、Barkley 42'（維拉）、Watkins 56'（維拉）、Flemming 58'（伯恩利）</p>
+
+<p>已降級的伯恩利展現鬥志，兩度扳平。Jaidon Anthony 第 8 分鐘把握 Ugochukwu 遠射被 Emi Martinez 撲出的二次機會率先破門。Barkley 頭槌扳平後，Watkins 下半場接 Martinez 長傳單刀破門讓維拉反超。但僅僅 2 分鐘後 Flemming 就在反搶成功後冷靜射入扳平。</p>
+
+<p>維拉本場失分對歐冠席位爭奪產生直接影響——他們在第五名的位置上受到利物浦的壓迫。</p>
+
+<hr>
+
+<h3>水晶宮 2-2 愛華頓｜05/10 21:00</h3>
+
+<p><strong>進球：</strong>Tarkowski 6'（愛華頓）、Sarr 34'（水晶宮）、Beto 47'（愛華頓）、Mateta 77'（水晶宮）</p>
+
+<p>愛華頓兩度領先但兩度被追平。Tarkowski 第 6 分鐘角球後門頂入先開紀錄；Sarr 利用 Michael Keane 防守失誤扳平。下半場開場 Beto 一條龍突破——控下 Tarkowski 長傳後過掉 Lacroix、穿襠 Henderson 射入，精彩絕倫。但替補上陣的 Mateta 第 77 分鐘在禁區內獲得太多空間，接 Mitchell 傳中猛力射入。</p>
+
+<p>水晶宮在剛打入歐會盃決賽後士氣高昂，兩度追平展現韌性。愛華頓的歐戰夢想則因連續丟分受挫。</p>
+
+<hr>
+
+<h3>富勒姆 0-1 伯恩茅斯｜05/09 22:00</h3>
+
+<p><strong>進球：</strong>Rayan 53'（伯恩茅斯）</p>
+
+<p>這場西倫敦鄰居德比因兩張紅牌而劇情大變。伯恩茅斯的 <strong>Ryan Christie</strong> 上半場末段因魯莽犯規 Castagne 被 VAR 確認直紅罰下；但僅 10 分鐘後富勒姆中衛 <strong>Joachim Andersen</strong> 同樣因雙腳飛鏟 Truffert 被直紅罰下，雙方回到 10 對 10。</p>
+
+<p>第 53 分鐘巴西翼鋒 <strong>Rayan</strong> 在 25 碼外一腳遠射破門，攻入加盟以來第 5 球。伯恩茅斯英超 <strong>16 場不敗</strong>紀錄持續延伸，歐戰席位在望。Iraola 即將離任（Marco Rose 已確認接手），但球隊狀態依然火熱。</p>
+
+<hr>
+
+<h3>桑德蘭 0-0 曼聯｜05/09 22:00</h3>
+
+<p>光明球場的悶戰。桑德蘭上半場更有威脅——Talbi 和 Sadiki 各有機會，但門前欠缺臨門一腳。曼聯下半場稍有改善，Brobbey 頭球被 Roefs 撲出、Geertruida 遠射中柱。補時 Matheus Cunha 射門被撲，但這已是曼聯全場<strong>唯一射正</strong>。</p>
+
+<p>Carrick 的曼聯在確保歐冠席位後明顯收力。領先利物浦 6 分、剩 2 場，第三名幾乎到手。桑德蘭升班馬本季保級無虞但也無法再進一步。</p>`,
+    tags: ['賽後回顧', '森林', '紐卡索', '布萊頓', '狼隊', '伯恩利', '維拉', '水晶宮', '愛華頓', '富勒姆', '伯恩茅斯', '桑德蘭', '曼聯', 'Anderson', 'Hinshelwood', '保級', '第36輪']
   }
 ];
 
