@@ -9,10 +9,10 @@ const ARTICLES = [
 
 <table style="width:100%;border-collapse:collapse;margin:12px 0">
 <tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">球隊</th><th style="padding:8px">FIFA 排名</th><th style="padding:8px">關鍵球員</th><th style="padding:8px">核心看點</th></tr>
-<tr style="background:#f8f8f8"><td style="padding:8px">🇳🇱 荷蘭</td><td style="padding:8px">第 3</td><td style="padding:8px">Van Dijk、Gakpo、Reijnders</td><td style="padding:8px">三屆亞軍追首冠，Xavi Simons ACL 報銷是最大打擊</td></tr>
-<tr><td style="padding:8px">🇯🇵 日本</td><td style="padding:8px">第 15</td><td style="padding:8px">久保建英、三笘薫、遠藤航</td><td style="padding:8px">亞洲最強軍團，2022 連殺德西後已非黑馬</td></tr>
-<tr style="background:#f8f8f8"><td style="padding:8px">🇸🇪 瑞典</td><td style="padding:8px">第 20</td><td style="padding:8px">Gyökeres、Isak、Elanga</td><td style="padding:8px">Potter 帶隊、雙神鋒壓陣，闊別 28 年重返世界盃</td></tr>
-<tr><td style="padding:8px">🇹🇳 突尼西亞</td><td style="padding:8px">第 40</td><td style="padding:8px">Khazri、Msakni</td><td style="padding:8px">三連屆但從未突破小組賽，2022 曾擊敗法國</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">🇳🇱 荷蘭</td><td style="padding:8px">第 7</td><td style="padding:8px">Van Dijk、Gakpo、Reijnders</td><td style="padding:8px">三屆亞軍追首冠，Xavi Simons ACL 報銷是最大打擊</td></tr>
+<tr><td style="padding:8px">🇯🇵 日本</td><td style="padding:8px">第 18</td><td style="padding:8px">久保建英、三笘薫、遠藤航</td><td style="padding:8px">亞洲最強軍團，2022 連殺德西後已非黑馬</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">🇸🇪 瑞典</td><td style="padding:8px">第 38</td><td style="padding:8px">Gyökeres、Isak、Elanga</td><td style="padding:8px">Potter 帶隊、雙神鋒壓陣，闊別 8 年重返世界盃</td></tr>
+<tr><td style="padding:8px">🇹🇳 突尼西亞</td><td style="padding:8px">第 44</td><td style="padding:8px">Khazri、Msakni</td><td style="padding:8px">三連屆但從未突破小組賽，2022 曾擊敗法國</td></tr>
 </table>
 
 <h3>🇳🇱 荷蘭：三屆亞軍的無冠魔咒</h3>
@@ -58,7 +58,7 @@ const ARTICLES = [
 <li><b>Lucas Bergvall</b>（熱刺）：年僅 20 歲的中場指揮官，英超經驗正在快速累積</li>
 </ul>
 
-<p><b>Gyökeres + Isak</b> 是本屆世界盃最恐怖的鋒線搭檔之一——兩人合計身價超過 2 億歐元，本季聯賽合計進球突破 40 大關。如果 Potter 能讓兩人同時上場並找到化學反應，瑞典有能力擊敗任何對手。</p>
+<p><b>Gyökeres + Isak</b> 是本屆世界盃最恐怖的鋒線搭檔之一——兩人合計轉會費超過 2 億歐元，本季各項賽事合計進球超過 20 球。如果 Potter 能讓兩人同時上場並找到化學反應，瑞典有能力擊敗任何對手。</p>
 
 <p>隱憂是 Gyökeres 近期有肌肉問題缺席了部分國家隊集訓，能否在世界盃前恢復到 100% 是關鍵。</p>
 
