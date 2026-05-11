@@ -44,48 +44,72 @@ def main() -> None:
     print("IG instagrapi 一次性登入工具")
     print("=" * 60)
     print()
-
-    username = input("IG username [168good236]: ").strip() or "168good236"
-    password = getpass("IG password (輸入時不顯示): ").strip()
-    if not password:
-        print("❌ 密碼空白，中止")
-        sys.exit(1)
+    print("選擇登入方式：")
+    print("  [1] sessionid cookie（推薦 — 從瀏覽器拿、繞過 API 風控）")
+    print("  [2] 帳號密碼（容易被 IG API 層擋）")
+    mode = input("選 [1]: ").strip() or "1"
+    print()
 
     cl = Client()
-    # 模擬 iPhone 不容易被擋
-    cl.set_device({
-        "app_version": "269.0.0.18.75",
-        "android_version": 26,
-        "android_release": "8.0.0",
-        "dpi": "480dpi",
-        "resolution": "1080x1920",
-        "manufacturer": "Apple",
-        "device": "iPhone13,3",
-        "model": "iPhone 12 Pro",
-        "cpu": "iPhone13,3",
-        "version_code": "314665256",
-    })
-    cl.set_user_agent("Instagram 269.0.0.18.75 Android (26/8.0.0; 480dpi; 1080x1920; Apple; iPhone 12 Pro; iPhone13,3; iPhone13,3; en_US; 314665256)")
+    # 用 instagrapi 內建的一致裝置指紋（Samsung Android），避免自訂組合矛盾
 
-    print(f"\n→ 嘗試登入 {username}…")
-    try:
-        cl.login(username, password)
-        print("✓ 登入成功（一次過）")
-    except TwoFactorRequired:
-        code = input("📱 IG 要 2FA 驗證碼（檢查 Authenticator App / 簡訊）：").strip()
-        cl.login(username, password, verification_code=code)
-        print("✓ 2FA 通過")
-    except ChallengeRequired as e:
-        print(f"⚠️  IG 要求驗證身分：{e}")
-        print("  → 開 IG App 看通知 / Email / 簡訊")
-        print("  → 按下「是、是我」確認後再重跑此腳本")
-        sys.exit(2)
-    except BadPassword:
-        print("❌ 密碼錯誤")
-        sys.exit(1)
-    except Exception as e:
-        print(f"❌ 登入失敗：{type(e).__name__}: {e}")
-        sys.exit(1)
+    if mode == "2":
+        # ── 路徑 B：帳密登入（容易被 IG API 擋）──
+        username = input("IG username [168good236]: ").strip() or "168good236"
+        password = getpass("IG password (輸入時不顯示): ").strip()
+        if not password:
+            print("❌ 密碼空白，中止")
+            sys.exit(1)
+        print(f"\n→ 嘗試登入 {username}…")
+        try:
+            cl.login(username, password)
+            print("✓ 登入成功（一次過）")
+        except TwoFactorRequired:
+            code = input("📱 IG 要 2FA 驗證碼（檢查 Authenticator App / 簡訊）：").strip()
+            cl.login(username, password, verification_code=code)
+            print("✓ 2FA 通過")
+        except ChallengeRequired as e:
+            print(f"⚠️  IG 要求驗證身分：{e}")
+            print("  → 開 IG App 看通知 / Email / 簡訊")
+            print("  → 按下「是、是我」確認後再重跑此腳本")
+            sys.exit(2)
+        except BadPassword:
+            print("❌ 密碼錯誤（或被 IG API 風控擋）— 改用方式 [1] sessionid")
+            sys.exit(1)
+        except Exception as e:
+            print(f"❌ 登入失敗：{type(e).__name__}: {e}")
+            sys.exit(1)
+    else:
+        # ── 路徑 A：sessionid cookie 登入（推薦）──
+        print("從瀏覽器拿 sessionid：")
+        print("  1. 確認 instagram.com 已用 168good236 登入（你剛剛已做）")
+        print("  2. 按 F12 → 上方頁籤 'Application'（Edge）或 '應用程式' / 'Storage'")
+        print("  3. 左邊樹狀展開 Cookies → https://www.instagram.com")
+        print("  4. 找一行 Name 是 'sessionid'，複製 Value 整串")
+        print("     （長像 12345%3AAbcDef...:xxxxxxxxx，包含 % 符號）")
+        print()
+        sessionid = input("貼 sessionid: ").strip().strip('"').strip("'")
+        if not sessionid:
+            print("❌ sessionid 空白，中止")
+            sys.exit(1)
+        # URL 解碼（瀏覽器 cookie value 含 %3A 等編碼字元；instagrapi 要解碼版）
+        import urllib.parse
+        sessionid_decoded = urllib.parse.unquote(sessionid)
+        if sessionid_decoded != sessionid:
+            print(f"(已自動 URL 解碼 sessionid)")
+        print(f"\n→ 用 sessionid 登入…")
+        try:
+            cl.login_by_sessionid(sessionid_decoded)
+            # 驗證 session 真的有效
+            cl.get_timeline_feed()
+            uname = cl.user_info(cl.user_id).username
+            print(f"✓ 用 sessionid 登入成功，帳號 @{uname}")
+        except LoginRequired:
+            print("❌ sessionid 失效 — 重新在瀏覽器登入 instagram.com 拿新 sessionid")
+            sys.exit(1)
+        except Exception as e:
+            print(f"❌ 登入失敗：{type(e).__name__}: {e}")
+            sys.exit(1)
 
     # 存 session
     SESSION_PATH.write_text(

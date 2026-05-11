@@ -101,9 +101,19 @@ async function postIgPhase(state) {
     console.log('缺 IG token，跳過 --post-ig 階段');
     return;
   }
-  // 找出有圖、未發 IG 的 entry
-  const todo = state.alerted.filter(e => e.image_saved && !e.ig_media_id);
-  console.log(`--post-ig: 待發 IG 限動 ${todo.length} 篇`);
+  // 找出有圖、未發 IG、且比賽還沒開賽（避免 token 修好後補貼昨天的過期圖）
+  const now = Date.now();
+  const stale = state.alerted.filter(e => e.image_saved && !e.ig_media_id && e.ko && e.ko <= now);
+  if (stale.length) {
+    console.log(`⏰ ${stale.length} 個過期 entry 已開賽，跳過不補發 IG（避免「昨日比賽今天提醒」bug）`);
+    for (const e of stale) {
+      e.ig_skipped_stale = true;
+      e.ig_skipped_at = new Date(now).toISOString();
+    }
+    saveState(state);
+  }
+  const todo = state.alerted.filter(e => e.image_saved && !e.ig_media_id && e.ko && e.ko > now && !e.ig_skipped_stale);
+  console.log(`--post-ig: 待發 IG 限動 ${todo.length} 篇（已排除過期 ${stale.length} 篇）`);
   for (const e of todo) {
     try {
       const imageUrl = `${SITE_URL}/og/ig-story-prematch/${e.id}.png?v=${Date.now()}`;
