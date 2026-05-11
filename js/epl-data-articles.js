@@ -3032,10 +3032,10 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
   },
   {
     id: 'epl-057',
-    title: '【賽前分析】曼城 vs 水晶宮：補賽=決命局，Guardiola 贏了就暫登榜首',
+    title: '【賽前分析】曼城 vs 水晶宮：補賽追分戰，Guardiola 贏了差距縮至 2 分',
     date: '2026-05-12',
     category: '賽前深度分析',
-    summary: '英超補賽——曼城主場迎戰水晶宮，這是 Guardiola 手中的「遊戲外掛」：贏球就以 80 分暫時超越兵工廠（79 分）登上榜首，輸球則冠軍夢幾乎破滅。Rodri 傷癒歸隊成關鍵，水晶宮帶著歐會盃決賽的信心來訪。',
+    summary: '英超補賽——曼城（74 分）主場迎戰水晶宮，贏球可追至 77 分、與兵工廠（79 分）只差 2 分且多一場在手。輸球則冠軍夢幾乎破滅。Rodri 傷癒歸隊成關鍵，水晶宮帶著歐會盃決賽的信心來訪。',
     content: `<h2>曼城 vs 水晶宮｜英超補賽・05/14（三）03:00 台灣時間・伊蒂哈德球場</h2>
 
 <p>這場補賽的意義超越三分——它決定英超冠軍歸屬的走向。</p>
@@ -3047,10 +3047,10 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <table style="width:100%;border-collapse:collapse;margin:12px 0">
 <tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">排名</th><th style="padding:8px">球隊</th><th style="padding:8px">賽</th><th style="padding:8px">積分</th><th style="padding:8px">剩餘場次</th></tr>
 <tr style="background:#f8f8f8"><td style="padding:8px">1</td><td style="padding:8px">兵工廠</td><td style="padding:8px">36</td><td style="padding:8px">79</td><td style="padding:8px">2（伯恩利主、最後一輪）</td></tr>
-<tr><td style="padding:8px">2</td><td style="padding:8px">曼城</td><td style="padding:8px">36</td><td style="padding:8px">77</td><td style="padding:8px">3（水晶宮主、伯恩茅斯客、最後一輪）</td></tr>
+<tr><td style="padding:8px">2</td><td style="padding:8px">曼城</td><td style="padding:8px">36</td><td style="padding:8px">74</td><td style="padding:8px">3（水晶宮主、伯恩茅斯客、最後一輪）</td></tr>
 </table>
 
-<p><b>曼城贏球 → 80 分暫登榜首</b>，給兵工廠施加巨大心理壓力。<b>曼城平局或輸球</b> → 兵工廠只要在最後 2 輪拿到 1-2 分就封王。這是 Guardiola 本季最重要的 90 分鐘。</p>
+<p><b>曼城贏球 → 77 分、與兵工廠只差 2 分且多一場在手</b>，冠軍懸念延續到最後一輪。<b>曼城平局或輸球</b> → 兵工廠只要在最後 2 輪拿到 1-2 分就封王。這是 Guardiola 本季最重要的 90 分鐘。</p>
 
 <h3>曼城：伊蒂哈德堡壘 + Rodri 回歸？</h3>
 
@@ -3062,7 +3062,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>水晶宮：歐會盃決賽隊的雙重挑戰</h3>
 
-<p>Glasner 的水晶宮正經歷夢幻又疲憊的賽季——他們殺入了<b>歐洲協會聯賽決賽</b>（5/27 對佛倫提那），但英超近 4 場未勝，聯賽排名第 15 已安全但無法再進一步。</p>
+<p>Glasner 的水晶宮正經歷夢幻又疲憊的賽季——他們殺入了<b>歐洲協會聯賽決賽</b>（5/27 對拉佑瓦萊卡諾），但英超近 4 場未勝，聯賽排名第 15 已安全但無法再進一步。</p>
 
 <p>上輪主場 2-2 被愛華頓追平暴露了水晶宮的問題：領先時無法守住比分、下半場體能下降。<b>Nketiah 賽季報銷、Doucouré 膝傷缺陣</b>是長期傷兵，但攻擊三叉戟 <b>Mateta-Sarr-Pino</b> 仍是英超中下游最具威脅的鋒線之一。</p>
 
@@ -3076,7 +3076,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>麥迪預測</h3>
 
-<p><b>曼城 3-1 水晶宮</b>。伊蒂哈德的氛圍加上冠軍壓力的驅動力，曼城不會給水晶宮任何喘息空間。Haaland 和 Doku 有望建功。但水晶宮不會空手而歸——Mateta 或 Sarr 有機會在反擊中找到一球。Guardiola 暫登榜首，把壓力丟回給 Arteta。</p>`,
+<p><b>曼城 3-1 水晶宮</b>。伊蒂哈德的氛圍加上冠軍壓力的驅動力，曼城不會給水晶宮任何喘息空間。Haaland 和 Doku 有望建功。但水晶宮不會空手而歸——Mateta 或 Sarr 有機會在反擊中找到一球。Guardiola 追至只差 2 分，把壓力丟回給 Arteta。</p>`,
     tags: ['賽前分析', '曼城', '水晶宮', 'Haaland', 'Guardiola', 'Rodri', 'Mateta', '爭冠', '補賽']
   },
   {
