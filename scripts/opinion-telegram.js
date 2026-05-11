@@ -226,12 +226,20 @@ function appendToDataFile(candidate) {
   // 找該區塊的第一個題目後方
   const blockStart = src.indexOf('\n', markerIdx);
   // 在標記下一行直接插入新題目（變成最新的時事題在最上面）
-  // 支援兩種格式：date:'YYYY-MM-DD' 單日 OR dates:[...] 跨日（午後熱點題用）
-  const dateField = (candidate.dates && Array.isArray(candidate.dates))
-    ? `dates:${JSON.stringify(candidate.dates)}`
-    : `date:'${candidate.date || ''}'`;
+  // 時間欄位 3 選 1（依優先序）：
+  //   1. expiresAt 真 24h（午後熱點題用，過 24h 自動消失）
+  //   2. dates 陣列（跨日題，舊格式相容）
+  //   3. date 單日（早上明日主題用）
+  let timeField;
+  if (candidate.expiresAt) {
+    timeField = `expiresAt:'${candidate.expiresAt}'`;
+  } else if (Array.isArray(candidate.dates)) {
+    timeField = `dates:${JSON.stringify(candidate.dates)}`;
+  } else {
+    timeField = `date:'${candidate.date || ''}'`;
+  }
   const entry =
-    `\n  { id:'${candidate.id}', ${dateField}, type:'${candidate.type}',\n` +
+    `\n  { id:'${candidate.id}', ${timeField}, type:'${candidate.type}',\n` +
     `    q:${JSON.stringify(candidate.q)},\n` +
     `    opts:${JSON.stringify(candidate.opts)},\n` +
     `    context:${JSON.stringify(candidate.context || '')} },\n`;
@@ -404,17 +412,29 @@ async function main() {
         } else {
           toWrite = { ...chosen, _existing: undefined };
         }
+        // addOnly 模式（午後熱點題）→ 自動加 expiresAt 為 24h 後（剛好 24 小時就消失）
+        // 同時移除 date/dates 避免被舊邏輯誤判
+        if (addOnly && !toWrite.expiresAt) {
+          toWrite.expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+          delete toWrite.date;
+          delete toWrite.dates;
+        }
         let removed = 0;  // 提到區塊外，下方 suffix 訊息會用到
         if (!addOnly) {
           removed = removeEntriesForDate(targetDate);
           if (removed) console.log(`🗑️ 已移除 ${removed} 則同日 (${targetDate}) 舊題目`);
         }
         // 判斷是「現在已上線」還是「未來顯示」
-        // 午後熱點題 dates 含今天 → 現在就上線；早上明日題只含明天 → 將顯示
+        // - 有 expiresAt (午後熱點題 24h 計時) → 現在就上線
+        // - dates 含今天 → 現在就上線
+        // - date === 今天 → 現在就上線
+        // - 其他（date === 明天）→ 將顯示
         const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
-        const isLiveNow = Array.isArray(toWrite.dates)
-          ? toWrite.dates.includes(today)
-          : (toWrite.date === today);
+        const isLiveNow = toWrite.expiresAt
+          ? true
+          : Array.isArray(toWrite.dates)
+            ? toWrite.dates.includes(today)
+            : (toWrite.date === today);
         console.log(`✅ 你選了：${chosen.q}${chosen._eternal ? `（永恆題 → 指派為 ${targetDate}）` : ''}`);
         const filePath = appendToDataFile(toWrite);
 
