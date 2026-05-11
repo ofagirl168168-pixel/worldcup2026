@@ -3091,7 +3091,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>上半場：緊繃到窒息</h3>
 
-<p>De Zerbi 排出最強可用陣容：Kinsky 把守球門（Vicario 仍然缺陣）、Van de Ven 搭檔 Danso 組成中衛、Palhinha 和 Bentancur 雙後腰。進攻端以 Kolo Muani、Richarlison、Mathys Tel 三叉戟出擊——<strong>Solanke 幾乎確定賽季報銷</strong>的消息在賽前已被多方證實。</p>
+<p>De Zerbi 排出最強可用陣容：Kinsky 把守球門（Vicario 仍然缺陣）、Van de Ven 搭檔 Danso 組成中衛、Palhinha 和 Bentancur 雙後腰。進攻端以 Kolo Muani、Richarlison、Mathys Tel 三叉戟出擊——<strong>Solanke 因 Grade 2 腿後肌傷持續缺陣</strong>，賽季報銷機率極高但 GW37 復出未被完全排除。</p>
 
 <p>Farke 的里茲則以穩固的陣型應戰，Ampadu 領銜中場、Tanaka 和 Stach 提供覆蓋、Calvert-Lewin 頂在最前。里茲帶著 6 場不敗的氣勢來訪，沒有任何壓力。</p>
 

@@ -26,8 +26,8 @@ const ARTICLES = [
 <li><b>門將</b>：Verbruggen（布萊頓）</li>
 <li><b>後衛</b>：Dumfries（國際米蘭）、Van Dijk（利物浦）、De Vrij（國際米蘭）、Aké（曼城）</li>
 <li><b>中場</b>：De Jong（巴塞隆納）、Reijnders（曼城）</li>
-<li><b>攻擊</b>：Malen（多特蒙德）、Koopmeiners（尤文圖斯）、Gakpo（利物浦）</li>
-<li><b>前鋒</b>：Brobbey（阿賈克斯）</li>
+<li><b>攻擊</b>：Malen（羅馬）、Koopmeiners（尤文圖斯）、Gakpo（利物浦）</li>
+<li><b>前鋒</b>：Brobbey（桑德蘭）</li>
 </ul>
 
 <p>好消息是 <b>Van Dijk</b> 狀態火熱——利物浦本季英超的穩固防守有很大一部分功勞歸於這位 34 歲的隊長。<b>Cody Gakpo</b> 在利物浦的靈活跑位和進球能力，加上 Reijnders 在曼城練就的壓迫式中場踢法，讓荷蘭在中前場依然有足夠火力。</p>
