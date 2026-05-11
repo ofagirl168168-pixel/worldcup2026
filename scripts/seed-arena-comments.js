@@ -85,22 +85,13 @@ function shuffle(arr) {
     process.exit(1);
   }
 
-  // 時間分佈：起點 = opinion_date 00:00 TW（題目當日午夜上線），終點 = now-5min
+  // 時間分佈：起點 = NOW（剛上線立刻有第 1 則）；終點 = NOW + 12h（drip 慢慢出現）
+  // 網站 query 加 `created_at <= now()` 過濾 → 留言隨時間自然 drip
+  // 已過 created_at 的留言可見、未到的不可見
   const now = Date.now();
-  const dateMatch = /^op-(\d{4})(\d{2})(\d{2})-/.exec(opinionId);
-  let earliest;
-  if (dateMatch) {
-    const ymd = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
-    earliest = new Date(`${ymd}T00:00:00+08:00`).getTime();
-  } else {
-    earliest = now - 12 * 3600 * 1000; // 沒帶日期就用 12h 前 fallback
-  }
-  const latest = now - 5 * 60 * 1000;
-  if (earliest >= latest) {
-    console.error(`opinion ${opinionId} 還沒上線（題目日期在未來）— 等到題目當天 00:00 後再跑 seed`);
-    process.exit(1);
-  }
-  const slotMs = (latest - earliest) / all.length;
+  const earliest = now + 60 * 1000;                  // 1 分鐘後第 1 則就可見
+  const latest   = now + 12 * 3600 * 1000;           // 12h 之後最後一則
+  const slotMs   = (latest - earliest) / all.length;
 
   const ordered = shuffle(all); // 打亂順序避免某 side 集中在同時段
   const rows = ordered.map((c, i) => {
@@ -113,6 +104,7 @@ function shuffle(arr) {
       nickname: randomNick(),
       content: c.content,
       created_at: ts.toISOString(),
+      source: 'bot',  // 區分機器人 vs 真人留言 — opinion-comments-bot.js 用此過濾不推 TG
     };
   });
 

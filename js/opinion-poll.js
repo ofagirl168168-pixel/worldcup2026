@@ -1387,13 +1387,15 @@
       if (e.key === 'Enter' && !e.isComposing && !submitBtn.disabled) submitBtn.click();
     });
 
-    // 載入現有留言
+    // 載入現有留言（過濾未來時間：drip 用，到時間才出現）
     try {
+      const nowIso = new Date().toISOString();
       const { data, error } = await window.DB
         .from('opinion_comments')
         .select('id,opinion_id,side,nickname,content,likes,created_at')
         .eq('opinion_id', opinion.id)
         .eq('deleted', false)
+        .lte('created_at', nowIso)
         .order('created_at', { ascending: false })
         .limit(50);
       if (error) throw error;
@@ -1424,8 +1426,18 @@
           (payload) => {
             const row = payload.new;
             if (!row || row.deleted) return;
-            _renderComment(listEl, row, opinion, chosenIdx, { prepend: true, dedupe: true });
-            _bumpCount(countEl, +1);
+            // drip 機制：未來時間的留言當下不渲染，延遲到 created_at 才出現
+            const visibleAt = new Date(row.created_at).getTime();
+            const delay = visibleAt - Date.now();
+            const render = () => {
+              _renderComment(listEl, row, opinion, chosenIdx, { prepend: true, dedupe: true });
+              _bumpCount(countEl, +1);
+            };
+            if (delay > 0 && delay < 24 * 3600 * 1000) {
+              setTimeout(render, delay);
+            } else {
+              render();
+            }
           })
         .on('postgres_changes',
           { event: 'UPDATE', schema: 'public', table: 'opinion_comments', filter: `opinion_id=eq.${opinion.id}` },

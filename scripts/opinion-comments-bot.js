@@ -120,8 +120,9 @@ async function supaFetch(url, opts) {
 
 async function fetchNewComments(sinceIso) {
   const q = new URLSearchParams({
-    select: 'id,opinion_id,side,nickname,content,likes,created_at,deleted',
+    select: 'id,opinion_id,side,nickname,content,likes,created_at,deleted,source',
     deleted: 'eq.false',
+    source: 'eq.user',  // 只推真人留言 — 機器人 seed 留言（source='bot'）不通知
     created_at: `gt.${sinceIso}`,
     order: 'created_at.asc',
     limit: '50',
