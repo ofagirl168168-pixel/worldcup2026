@@ -400,8 +400,9 @@ async function main() {
         } else {
           toWrite = { ...chosen, _existing: undefined };
         }
+        let removed = 0;  // 提到區塊外，下方 line 442 suffix 訊息會用到
         if (!addOnly) {
-          const removed = removeEntriesForDate(targetDate);
+          removed = removeEntriesForDate(targetDate);
           if (removed) console.log(`🗑️ 已移除 ${removed} 則同日 (${targetDate}) 舊題目`);
         }
         console.log(`✅ 你選了：${chosen.q}${chosen._eternal ? `（永恆題 → 指派為 ${targetDate}）` : ''}`);
