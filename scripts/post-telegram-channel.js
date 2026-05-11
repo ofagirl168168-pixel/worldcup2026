@@ -33,7 +33,13 @@ const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TG_CHANNEL = process.env.TELEGRAM_CHANNEL_ID;
 const SITE_URL = (process.env.SITE_URL || 'https://worldcup2026-9u0.pages.dev').replace(/\/$/, '');
 
-const FRESHNESS_DAYS = 7;
+// 只推今天 + 昨天的文章（往前不補老的）
+function _validDateSet() {
+  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei' });
+  const today = fmt.format(new Date());
+  const yesterday = fmt.format(new Date(Date.now() - 86400000));
+  return new Set([today, yesterday]);
+}
 const MAX_PER_RUN = 5;
 const DELAY_BETWEEN_POSTS = 3000;
 
@@ -61,8 +67,7 @@ async function loadArticles() {
 }
 
 function isFresh(a) {
-  const t = new Date(a.date).getTime();
-  return isFinite(t) && (Date.now() - t) < FRESHNESS_DAYS * 86400000;
+  return _validDateSet().has(a.date);
 }
 
 // 依分類 + 賽事產 hashtags

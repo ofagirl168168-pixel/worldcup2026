@@ -38,7 +38,13 @@ const IG_USER_ID = process.env.IG_BUSINESS_ACCOUNT_ID;
 const IG_TOKEN = process.env.IG_ACCESS_TOKEN;
 const SITE_URL = (process.env.SITE_URL || 'https://worldcup2026-9u0.pages.dev').replace(/\/$/, '');
 
-const FRESHNESS_DAYS = 7;     // 只發最近 7 天內的文章
+// 只發今天 + 昨天的文章（往前不補老的）— 改自原本 FRESHNESS_DAYS=7
+function _validDateSet() {
+  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei' });
+  const today = fmt.format(new Date());
+  const yesterday = fmt.format(new Date(Date.now() - 86400000));
+  return new Set([today, yesterday]);
+}
 const MAX_PER_RUN = 3;         // 一次最多發幾篇（避免被 IG 限速）
 const MIN_GAP_SINCE_LAST_POST_MIN = 5;  // 距上次成功發布 < 5 分 → 跳過此次（同 commit 連環觸發保護）
 const POLL_INTERVAL = 3000;    // 等 container ready 的 poll 間隔
@@ -104,9 +110,8 @@ async function loadArticles() {
 }
 
 function isFresh(article) {
-  const t = new Date(article.date).getTime();
-  if (!isFinite(t)) return false;
-  return (Date.now() - t) < FRESHNESS_DAYS * 86400000;
+  const valid = _validDateSet();
+  return valid.has(article.date);
 }
 
 async function checkUrlReachable(targetUrl, retries = 6) {
