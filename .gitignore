@@ -23,3 +23,6 @@ scripts/.comments-cursor
 
 # opinion-telegram 執行時互斥鎖（內含 PID，comments-bot 用它來讓開 /getUpdates）
 scripts/.opinion-telegram.lock
+
+# IG instagrapi session — 本機限定，絕對不能 commit
+scripts/.ig-session.json
