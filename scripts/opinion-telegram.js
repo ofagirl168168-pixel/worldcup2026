@@ -54,6 +54,19 @@ function autoCommitAndPush(targetDate, chosenQ) {
   }
 }
 
+// 觸發 GH Action 立即推送（午後熱點題不能等 00:30 cron）
+function triggerArenaPushWorkflow() {
+  try {
+    execFileSync('gh', ['workflow', 'run', 'tg-arena-topic.yml'], {
+      cwd: REPO_ROOT, stdio: 'inherit',
+    });
+    console.log('⚡ 已觸發 tg-arena-topic workflow → TG/IG 將立即推送');
+  } catch (err) {
+    console.error('⚠️ 觸發 workflow 失敗（可能 gh CLI 未安裝/登入）:', err.message);
+    console.error('   → 此次午後熱點題的 TG/IG 推送會延到明天 00:30 cron 補發');
+  }
+}
+
 // ─── 讀 .env.local ──────────────────────────────────────────
 const envPath = path.join(__dirname, '.env.local');
 if (fs.existsSync(envPath)) {
@@ -481,7 +494,17 @@ async function main() {
         }).catch(() => {});
         console.log(`📝 已寫入 ${path.relative(process.cwd(), filePath)}`);
         autoCommitAndPush(targetDate, chosen.q);
-        process.exit(0);
+        // 午後熱點題（addOnly + isLiveNow）→ 觸發 workflow 立即推 TG/IG，不能等 00:30 cron
+        if (addOnly && isLiveNow) {
+          // 給 GitHub 一點時間吸收 push 後的 ref（避免 workflow 跑舊 commit）
+          setTimeout(() => {
+            triggerArenaPushWorkflow();
+            process.exit(0);
+          }, 3000);
+        } else {
+          process.exit(0);
+        }
+        return;
       }
 
       if (action === 'next') {

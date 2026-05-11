@@ -207,6 +207,8 @@ async function postIgPhase(state) {
             away: at.nameCN || at.name || c.m.away,
             kickoffMs: kickoffMs(c.m),
             league: c.league,
+            homeCrest: ht.flag || ht.crest || ht.logo,
+            awayCrest: at.flag || at.crest || at.logo,
           });
           fs.mkdirSync(IG_DIR, { recursive: true });
           fs.writeFileSync(path.join(IG_DIR, `${c.m.id}.png`), buf);

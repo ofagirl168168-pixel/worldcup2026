@@ -4041,38 +4041,47 @@ function initLiveScoreTicker() {
 
 // ── 使用者自訂預測 ────────────────────────────────────────
 function openMyPredInput(matchId, hName, aName) {
-  const myPreds = (() => { try { return JSON.parse(localStorage.getItem('wc26_my_preds'))||{}; } catch { return {}; } })();
-  const mine = myPreds[matchId] || { h:0, a:0 };
+  const predKey = {ucl:'ucl26_my_preds',epl:'epl26_my_preds',wc:'wc26_my_preds'}[_tid()] || 'wc26_my_preds';
+  const myPreds = (() => { try { return JSON.parse(localStorage.getItem(predKey))||{}; } catch { return {}; } })();
+  const mine = myPreds[matchId];
+  // 已有預測 → 用既有比分為初值；無 → null（要使用者主動點才解鎖送出鍵）
+  const pick = mine ? { sh: mine.h, sa: mine.a, over: mine.h > 4 || mine.a > 4 } : null;
+
+  // 預測 modal 自己的狀態（送出時讀這個）
+  window._myPredState = { matchId, pick, hName, aName };
+
+  // 5x5 格子 0-0..4-4
+  const cells = ['<div class="fr-grid-corner"></div>'];
+  for (let a = 0; a <= 4; a++) cells.push(`<div class="fr-grid-head">${a}</div>`);
+  for (let h = 0; h <= 4; h++) {
+    cells.push(`<div class="fr-grid-head fr-grid-head--row">${h}</div>`);
+    for (let a = 0; a <= 4; a++) {
+      const isSel = pick && !pick.over && pick.sh === h && pick.sa === a;
+      cells.push(`<button class="fr-grid-cell ${isSel ? 'fr-grid-cell--sel' : ''}" data-h="${h}" data-a="${a}">${h}-${a}</button>`);
+    }
+  }
+  const overBtnLabel = pick && pick.over
+    ? `自訂：${pick.sh} - ${pick.sa}`
+    : '其他比分（>4，需指定主隊/客隊）';
 
   const overlay = document.createElement('div');
   overlay.id = 'my-pred-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px';
   overlay.innerHTML = `
-    <div style="background:#1a1a2e;border-radius:20px;padding:28px 24px;max-width:320px;width:100%;border:1px solid var(--accent-border)">
-      <div style="font-size:20px;font-weight:900;text-align:center;margin-bottom:6px;color:var(--accent)">🎯 你的預測</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:20px">${hName} vs ${aName}</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px">
-        <div style="text-align:center">
-          <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px">${hName}</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button onclick="adjustMyPred('h',-1)" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:18px;cursor:pointer">−</button>
-            <span id="my-pred-h" style="font-size:36px;font-weight:900;color:#fff;min-width:36px;text-align:center">${mine.h}</span>
-            <button onclick="adjustMyPred('h',1)" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:18px;cursor:pointer">+</button>
-          </div>
-        </div>
-        <div style="font-size:28px;font-weight:900;color:rgba(255,255,255,0.3)">:</div>
-        <div style="text-align:center">
-          <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px">${aName}</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button onclick="adjustMyPred('a',-1)" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:18px;cursor:pointer">−</button>
-            <span id="my-pred-a" style="font-size:36px;font-weight:900;color:#fff;min-width:36px;text-align:center">${mine.a}</span>
-            <button onclick="adjustMyPred('a',1)" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:18px;cursor:pointer">+</button>
-          </div>
-        </div>
+    <div style="background:#1a1a2e;border-radius:20px;padding:24px 20px;max-width:380px;width:100%;border:1px solid var(--accent-border);max-height:90vh;overflow-y:auto">
+      <div style="font-size:20px;font-weight:900;text-align:center;margin-bottom:4px;color:var(--accent)">🎯 你的預測</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.55);text-align:center;margin-bottom:12px">
+        <span style="color:#fff;font-weight:700">${hName}</span>
+        <span style="opacity:0.45;margin:0 6px">vs</span>
+        <span style="color:#fff;font-weight:700">${aName}</span>
       </div>
-      <button class="btn-primary" style="width:100%;margin-bottom:10px" onclick="saveMyPred('${matchId}')">
-        確認預測
-      </button>
+      <div style="font-size:11px;color:rgba(255,255,255,0.45);text-align:center;margin-bottom:10px">
+        ↓ 主隊（直）× 客隊（橫）· 點一格送出
+      </div>
+      <div class="fr-pick-grid" id="my-pred-grid">${cells.join('')}</div>
+      <button class="fr-pick-over-btn" id="my-pred-over" style="margin-bottom:14px">${overBtnLabel}</button>
+      <button class="btn-primary" id="my-pred-submit" style="width:100%;margin-bottom:8px" ${pick ? '' : 'disabled'}
+        onclick="saveMyPred('${matchId}')">確認預測</button>
       <button onclick="document.getElementById('my-pred-overlay').remove()"
         style="width:100%;background:none;border:none;color:rgba(255,255,255,0.3);font-size:13px;cursor:pointer;padding:8px">
         取消
@@ -4080,8 +4089,85 @@ function openMyPredInput(matchId, hName, aName) {
     </div>`;
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   document.body.appendChild(overlay);
+
+  // 點 5x5 格子 → 設 pick + 高亮
+  overlay.querySelectorAll('.fr-grid-cell').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const h = parseInt(btn.dataset.h);
+      const a = parseInt(btn.dataset.a);
+      window._myPredState.pick = { sh: h, sa: a, over: false };
+      overlay.querySelectorAll('.fr-grid-cell').forEach(b => b.classList.remove('fr-grid-cell--sel'));
+      btn.classList.add('fr-grid-cell--sel');
+      const sub = overlay.querySelector('#my-pred-submit');
+      if (sub) sub.disabled = false;
+      const overBtn = overlay.querySelector('#my-pred-over');
+      if (overBtn) overBtn.textContent = '其他比分（>4，需指定主隊/客隊）';
+    });
+  });
+
+  // 「其他比分」按鈕 → 開自訂 modal
+  overlay.querySelector('#my-pred-over').addEventListener('click', () => {
+    _openMyPredCustomScore(overlay, matchId, hName, aName);
+  });
 }
 
+// >4 比分自訂 modal（採用與 friend-room 相同 UI）
+function _openMyPredCustomScore(parentOverlay, matchId, hName, aName) {
+  const cur = window._myPredState && window._myPredState.pick;
+  const initH = cur && cur.over ? cur.sh : 5;
+  const initA = cur && cur.over ? cur.sa : 0;
+
+  const modal = document.createElement('div');
+  modal.className = 'fr-modal-overlay';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10002;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = `
+    <div style="background:#1a1a2e;border-radius:16px;padding:24px 20px;max-width:340px;width:100%;border:1px solid var(--accent-border);position:relative">
+      <button type="button" id="mpc-close" style="position:absolute;top:8px;right:12px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:24px;cursor:pointer">×</button>
+      <h3 style="font-size:18px;font-weight:900;text-align:center;margin:0 0 6px;color:var(--accent)">自訂比分（5 球以上）</h3>
+      <p style="font-size:12px;color:rgba(255,255,255,0.55);text-align:center;margin:0 0 16px">主隊 / 客隊必須完全對才算中</p>
+      <div class="fr-custom-row">
+        <div class="fr-custom-side">
+          <div class="fr-custom-side-label">${hName || '主隊'}</div>
+          <input type="number" id="mpc-h" min="0" max="20" value="${initH}" />
+        </div>
+        <span class="fr-custom-dash">-</span>
+        <div class="fr-custom-side">
+          <div class="fr-custom-side-label">${aName || '客隊'}</div>
+          <input type="number" id="mpc-a" min="0" max="20" value="${initA}" />
+        </div>
+      </div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.45);text-align:center;margin:8px 0 14px">至少一邊要 ≥ 5 才需要走這個</p>
+      <div style="display:flex;gap:10px">
+        <button id="mpc-cancel" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:10px;border-radius:8px;cursor:pointer">取消</button>
+        <button id="mpc-ok" class="btn-primary" style="flex:1;padding:10px">確定</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  const close = () => modal.remove();
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+  modal.querySelector('#mpc-close').addEventListener('click', close);
+  modal.querySelector('#mpc-cancel').addEventListener('click', close);
+  modal.querySelector('#mpc-ok').addEventListener('click', () => {
+    const h = parseInt(modal.querySelector('#mpc-h').value);
+    const a = parseInt(modal.querySelector('#mpc-a').value);
+    if (isNaN(h) || isNaN(a) || h < 0 || a < 0 || h > 20 || a > 20) {
+      alert('比分必須在 0–20 之間'); return;
+    }
+    if (h <= 4 && a <= 4) {
+      alert('5 球以下請直接點上面的格子'); return;
+    }
+    window._myPredState.pick = { sh: h, sa: a, over: true };
+    // 反映回父 modal：清掉 grid 高亮、更新 over 按鈕、解鎖送出鍵
+    parentOverlay.querySelectorAll('.fr-grid-cell').forEach(b => b.classList.remove('fr-grid-cell--sel'));
+    const overBtn = parentOverlay.querySelector('#my-pred-over');
+    if (overBtn) overBtn.textContent = `自訂：${h} - ${a}`;
+    const sub = parentOverlay.querySelector('#my-pred-submit');
+    if (sub) sub.disabled = false;
+    close();
+  });
+}
+
+// 保留舊 fn 以防外部呼叫，但新 UI 不再需要 stepper
 function adjustMyPred(side, delta) {
   const el = document.getElementById(`my-pred-${side}`);
   if (!el) return;
@@ -4102,11 +4188,21 @@ function saveMyPred(matchId) {
     if (started) {
       showToast?.('🔒 比賽已開始，無法修改預測');
       document.getElementById('my-pred-overlay')?.remove();
+      window._myPredState = null;
       return;
     }
   }
-  const h = parseInt(document.getElementById('my-pred-h')?.textContent || 0);
-  const a = parseInt(document.getElementById('my-pred-a')?.textContent || 0);
+  // 新格子 UI：從 window._myPredState 讀；fallback 到舊 stepper DOM（向後相容）
+  let h, a;
+  const st = window._myPredState;
+  if (st && st.matchId === matchId && st.pick) {
+    h = st.pick.sh;
+    a = st.pick.sa;
+  } else {
+    h = parseInt(document.getElementById('my-pred-h')?.textContent || 0);
+    a = parseInt(document.getElementById('my-pred-a')?.textContent || 0);
+  }
+  if (isNaN(h) || isNaN(a)) { showToast?.('⚠️ 請先選比分'); return; }
   const predKey = {ucl:'ucl26_my_preds',epl:'epl26_my_preds',wc:'wc26_my_preds'}[_tid()] || 'wc26_my_preds';
   const myPreds = (() => { try { return JSON.parse(localStorage.getItem(predKey))||{}; } catch { return {}; } })();
   const isNew = !myPreds[matchId];
@@ -4152,6 +4248,7 @@ function saveMyPred(matchId) {
   }
 
   document.getElementById('my-pred-overlay')?.remove();
+  window._myPredState = null;
   openPredModal(matchId);
 }
 

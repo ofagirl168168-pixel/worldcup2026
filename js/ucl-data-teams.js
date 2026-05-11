@@ -133,14 +133,14 @@ const UCL_TEAMS = {
     history:'3次歐冠冠軍，2022/23打入決賽'
   },
   'CHE': {
-    name:'Chelsea', nameCN:'乂爾西', flag:'https://crests.football-data.org/61.png', pot:1, league:'Premier League',
+    name:'Chelsea', nameCN:'切爾西', flag:'https://crests.football-data.org/61.png', pot:1, league:'Premier League',
     uefaCoeff:109, coach:'Liam Rosenior', formation:'4-2-3-1',
     keyPlayers:[
-      {name:'Cole Palmer',pos:'攻擊中場/右翼',club:'乂爾西'},
-      {name:'Enzo Fernández',pos:'中場',club:'乂爾西'},
-      {name:'Moisés Caicedo',pos:'防守中場',club:'乂爾西'},
-      {name:'Reece James',pos:'右後衛',club:'乂爾西'},
-      {name:'Robert Sánchez',pos:'門將',club:'乂爾西'}
+      {name:'Cole Palmer',pos:'攻擊中場/右翼',club:'切爾西'},
+      {name:'Enzo Fernández',pos:'中場',club:'切爾西'},
+      {name:'Moisés Caicedo',pos:'防守中場',club:'切爾西'},
+      {name:'Reece James',pos:'右後衛',club:'切爾西'},
+      {name:'Robert Sánchez',pos:'門將',club:'切爾西'}
     ],
     radar:{attack:84,defense:78,midfield:82,speed:84,experience:70},
     style:'控球推進，年輕化快速足球',

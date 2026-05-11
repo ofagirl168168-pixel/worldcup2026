@@ -1890,14 +1890,20 @@ img.flag-img {
   text-align: center;
 }
 .sc-vs-score {
-  display: flex; align-items: baseline; gap: 4px;
+  display: flex; align-items: center; gap: 14px;
   font-size: 36px; font-weight: 900;
+}
+.sc-vs-h, .sc-vs-a {
   background: linear-gradient(180deg, #fff 0%, var(--theme, #f0c040) 100%);
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 20px color-mix(in srgb, var(--theme, #f0c040) 30%, transparent);
 }
-.sc-vs-dash { font-size: 24px; opacity: 0.5; }
+.sc-vs-dash {
+  font-size: 30px; font-weight: 800;
+  color: rgba(255,255,255,0.85);
+  margin: 0 2px;
+}
 
 /* ═══════ Variant 1: 連勝里程碑 streak ═══════ */
 .share-card-v2.variant-streak {

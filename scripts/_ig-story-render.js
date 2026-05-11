@@ -164,13 +164,53 @@ function _drawFooter(ctx, theme, ctaText) {
   ctx.fillText('主頁簡介點連結進站', W / 2, ctaY + 200);
 }
 
+// 從 URL 載入隊徽（網路失敗回 null，不會中斷渲染）
+async function _loadCrest(url) {
+  if (!url || typeof url !== 'string' || !/^https?:\/\//i.test(url)) return null;
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const buf = Buffer.from(await r.arrayBuffer());
+    return await loadImage(buf);
+  } catch {
+    return null;
+  }
+}
+
+// 以 (cx, cy) 為圓心畫圓形隊徽（含背景光暈），尺寸=size
+function _drawCrest(ctx, img, cx, cy, size, theme) {
+  // 圓形底（用主題色淡色，增加層次 + 隊徽是透明背景時也有依託）
+  ctx.save();
+  ctx.fillStyle = _hexA(theme.accent, 0.18);
+  ctx.beginPath();
+  ctx.arc(cx, cy, size / 2 + 14, 0, 2 * Math.PI);
+  ctx.fill();
+  ctx.strokeStyle = _hexA(theme.accent, 0.5);
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  if (img) {
+    ctx.drawImage(img, cx - size / 2, cy - size / 2, size, size);
+  } else {
+    // 沒抓到圖：畫一個球符號當 placeholder
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = `bold ${Math.round(size * 0.6)}px ${FONT_BOLD}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('⚽', cx, cy);
+  }
+  ctx.restore();
+}
+
 // ═══════════════════════ PREMATCH ═══════════════════════
-async function renderPrematch({ home, away, kickoffMs, league }) {
+async function renderPrematch({ home, away, kickoffMs, league, homeCrest, awayCrest }) {
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
   const theme = THEMES.prematch;
   _fillBg(ctx, theme);
   _radial(ctx, theme.glow, 0.45, W / 2, 700, 800);
+
+  // 平行 load 兩個隊徽，與其他繪製動作不衝突
+  const [homeImg, awayImg] = await Promise.all([_loadCrest(homeCrest), _loadCrest(awayCrest)]);
 
   await _drawHeader(ctx, theme, 'PRE-MATCH ALERT');
 
@@ -187,35 +227,42 @@ async function renderPrematch({ home, away, kickoffMs, league }) {
   ctx.fillText('開賽', W / 2, 620);
   ctx.shadowBlur = 0;
 
-  // VS 對戰（中央大字）
-  const cy = 950;
-  ctx.font = `bold 60px ${FONT_BOLD}`;
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#fff';
-  let homeText = String(home);
-  if (ctx.measureText(homeText).width > W - 160) {
-    while (ctx.measureText(homeText + '…').width > W - 160) homeText = homeText.slice(0, -1);
-    homeText = homeText + '…';
-  }
-  ctx.fillText(homeText, W / 2, cy - 80);
+  // VS 對戰：兩側隊徽 + 中央 VS
+  const cy = 970;
+  const crestSize = 220;
+  const crestY = cy;
+  const homeCx = 260;
+  const awayCx = W - 260;
 
-  // VS
-  ctx.font = `bold 100px ${FONT_BOLD}`;
-  const vsGrad = ctx.createLinearGradient(W / 2 - 80, cy, W / 2 + 80, cy + 80);
+  _drawCrest(ctx, homeImg, homeCx, crestY, crestSize, theme);
+  _drawCrest(ctx, awayImg, awayCx, crestY, crestSize, theme);
+
+  // 中央 VS（用漸層色）
+  ctx.font = `bold 130px ${FONT_BOLD}`;
+  const vsGrad = ctx.createLinearGradient(W / 2 - 80, cy - 60, W / 2 + 80, cy + 60);
   vsGrad.addColorStop(0, '#ff5757');
   vsGrad.addColorStop(1, '#ffd700');
   ctx.fillStyle = vsGrad;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.shadowColor = _hexA(theme.glow, 0.5);
+  ctx.shadowBlur = 25;
   ctx.fillText('VS', W / 2, cy + 30);
+  ctx.shadowBlur = 0;
 
-  // Away
-  ctx.font = `bold 60px ${FONT_BOLD}`;
+  // 隊名（隊徽底下）
+  const nameY = crestY + crestSize / 2 + 78;
+  ctx.font = `bold 38px ${FONT_BOLD}`;
   ctx.fillStyle = '#fff';
-  let awayText = String(away);
-  if (ctx.measureText(awayText).width > W - 160) {
-    while (ctx.measureText(awayText + '…').width > W - 160) awayText = awayText.slice(0, -1);
-    awayText = awayText + '…';
-  }
-  ctx.fillText(awayText, W / 2, cy + 130);
+  ctx.textAlign = 'center';
+  const fitName = (name, maxW) => {
+    let t = String(name || '');
+    if (ctx.measureText(t).width <= maxW) return t;
+    while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+    return t + '…';
+  };
+  ctx.fillText(fitName(home, 380), homeCx, nameY);
+  ctx.fillText(fitName(away, 380), awayCx, nameY);
 
   // 賽事標籤 + 開賽時間
   const tw = new Date(new Date(kickoffMs).toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
@@ -227,7 +274,7 @@ async function renderPrematch({ home, away, kickoffMs, league }) {
   const tournament = ({ epl: '英超', ucl: '歐冠', wc: '世足' })[league] || String(league || '').toUpperCase();
   ctx.font = `500 36px ${FONT}`;
   ctx.fillStyle = 'rgba(255,255,255,0.85)';
-  ctx.fillText(`${tournament} · ${m}/${dd} (${dow}) ${hh}:${mm}`, W / 2, cy + 240);
+  ctx.fillText(`${tournament} · ${m}/${dd} (${dow}) ${hh}:${mm}`, W / 2, nameY + 100);
 
   _drawFooter(ctx, theme, '預測比分拿 +20 XP');
   return canvas.toBuffer('image/png');
