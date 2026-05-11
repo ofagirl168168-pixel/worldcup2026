@@ -3058,7 +3058,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p>最大的利好是 <b>Rodri</b> 的傷勢恢復。這位西班牙中場因腹股溝傷勢缺席了過去 4 場比賽，但已重返部分訓練。如果 Rodri 能出場哪怕替補上陣，曼城的中場控制力將提升一個檔次。此外，<b>Gvardiol</b> 從脛骨骨折中復出，可能進入大名單。<b>Khusanov</b> 的傷勢不嚴重，預計可出戰。</p>
 
-<p><b>核心球員</b>：Haaland、Doku、Marmoush 領銜攻擊線，Bernardo Silva 和 Kovačić 坐鎮中場，Rodri 若復出更添控制力。Rico Lewis 和 Akanji 組成後防骨幹。</p>
+<p><b>核心球員</b>：Haaland、Doku、Marmoush 領銜攻擊線，Bernardo Silva 和 Kovačić 坐鎮中場，Rodri 若復出更添控制力。Rico Lewis、Guéhi 和 Khusanov 組成後防骨幹。</p>
 
 <h3>水晶宮：歐會盃決賽隊的雙重挑戰</h3>
 
@@ -3072,7 +3072,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p><b>曼城的壓迫 vs 水晶宮的反擊</b>：曼城本季在伊蒂哈德的控球率平均 68%，水晶宮則是英超反擊效率前五的球隊。Sarr 的速度和 Mateta 的禁區存在感，能在曼城高位壓迫時找到身後空間。</p>
 
-<p><b>Haaland 的空中優勢</b>：水晶宮的中衛組合（Guéhi + Lacroix）高空能力不差，但面對狀態火熱的 Haaland（上輪頭球建功），定位球會是曼城的重要得分手段。</p>
+<p><b>Haaland 的空中優勢</b>：水晶宮的中衛 Lacroix 高空能力不差，但面對狀態火熱的 Haaland（上輪頭球建功），定位球會是曼城的重要得分手段。</p>
 
 <h3>麥迪預測</h3>
 
