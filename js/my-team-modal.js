@@ -563,13 +563,14 @@
         if (t >= w.stateUntil) {
           if (w.state === 'idle') {
             // 機會觸發特殊動作（每 ≥ cooldown 才 roll）
-            if (t > w.actionCooldown && Math.random() < 0.5) {
+            if (t > w.actionCooldown && Math.random() < 0.6) {
               const action = Math.random() < 0.55 ? 'kick' : 'stretch';
               w.state = action;
               w.row = action === 'kick' ? 4 : 5;
               w.frame = 0; w.frameTick = 0; w.vx = 0; w.vy = 0;
-              w.stateUntil = t + 1400 + Math.random() * 600;
-              w.actionCooldown = t + 8000 + Math.random() * 12000;
+              // 動作維持 5-8 秒
+              w.stateUntil = t + 5000 + Math.random() * 3000;
+              w.actionCooldown = t + 12000 + Math.random() * 15000;
             } else {
               w.state = 'walk';
               w.vx = 0; w.vy = 0;
@@ -578,16 +579,15 @@
             // 隨機 idle
             if (Math.random() < 0.4) {
               w.state = 'idle'; w.vx = 0; w.vy = 0;
-              w.stateUntil = t + 1500 + Math.random() * 3000;
+              w.stateUntil = t + 1500 + Math.random() * 2500;
             } else {
-              w.stateUntil = t + 3000 + Math.random() * 4000;
-              // 重選方向
+              w.stateUntil = t + 4000 + Math.random() * 5000;
               w.vx = 0; w.vy = 0;
             }
           } else {
-            // kick / stretch 結束 → walk
-            w.state = 'walk'; w.vx = 0; w.vy = 0;
-            w.stateUntil = t + 2500 + Math.random() * 3000;
+            // kick / stretch 結束 → 短暫 idle
+            w.state = 'idle'; w.vx = 0; w.vy = 0;
+            w.stateUntil = t + 800 + Math.random() * 1200;
           }
         }
 
@@ -611,9 +611,9 @@
           w.frameTick++;
           if (w.frameTick > 10) { w.frame = (w.frame + 1) % 3; w.frameTick = 0; }
         } else if (w.state === 'kick' || w.state === 'stretch') {
-          // 動作 frame 慢一點（每 14 tick 換 frame）
+          // 動作 frame 放慢（每 28 tick 換 frame、3 frame ≈ 1.4 秒一個 cycle）
           w.frameTick++;
-          if (w.frameTick > 14) { w.frame = (w.frame + 1) % 3; w.frameTick = 0; }
+          if (w.frameTick > 28) { w.frame = (w.frame + 1) % 3; w.frameTick = 0; }
         } else {
           // idle
           w.frame = 1;
