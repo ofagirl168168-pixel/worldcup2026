@@ -1,5 +1,91 @@
 const ARTICLES = [
   {
+    id:16, cat:'小組分析', date:'2026-05-13', readTime:'9分鐘',
+    title:'倒數29天：C組前瞻——巴西傷兵滿營、摩洛哥黑馬再襲、海地52年後重返世界盃',
+    desc:'C組是本屆公認的「死亡之組」：巴西失去 Militão 和 Rodrygo 卻仍是奪冠大熱；摩洛哥2022四強後再進化；蘇格蘭時隔28年回歸；海地書寫歷史。Ancelotti 的國際賽首秀從地獄組開始。',
+    body:`<h3>C組：紙面最強 vs 最危險的挑戰者</h3>
+
+<p>距離 2026 世界盃開幕僅剩 <b>29 天</b>。C 組匯集了衛冕亞軍巴西、2022 四強摩洛哥、闊別 28 年的蘇格蘭、以及 52 年後重返世界盃的海地——這是一個<b>沒有弱旅但充滿變數</b>的死亡之組。</p>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">球隊</th><th style="padding:8px">FIFA 排名</th><th style="padding:8px">關鍵球員</th><th style="padding:8px">核心看點</th></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">🇧🇷 巴西</td><td style="padding:8px">第 5</td><td style="padding:8px">Vinicius Jr、Endrick、Marquinhos</td><td style="padding:8px">Ancelotti 執教首屆世界盃，Militão + Rodrygo 雙傷報銷</td></tr>
+<tr><td style="padding:8px">🇲🇦 摩洛哥</td><td style="padding:8px">第 14</td><td style="padding:8px">Hakimi、Amrabat、Bouaddi</td><td style="padding:8px">2022 四強後陣容升級，Ouahbi 接班 Regragui</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">🏴󠁧󠁢󠁳󠁣󠁴󠁿 蘇格蘭</td><td style="padding:8px">第 32</td><td style="padding:8px">McTominay、Robertson、Adams</td><td style="padding:8px">1998 年後首度參賽，Clarke 的紀律防守是王牌</td></tr>
+<tr><td style="padding:8px">🇭🇹 海地</td><td style="padding:8px">第 67</td><td style="padding:8px">Isidor、Bellegarde、Placide</td><td style="padding:8px">1974 後首度參賽，加勒比海唯一世界盃國家</td></tr>
+</table>
+
+<h3>🇧🇷 巴西：Ancelotti 的夢幻與噩夢</h3>
+
+<p>Carlo Ancelotti 在皇馬帶出兩座歐冠後轉戰國際賽場，接手巴西國家隊是他職業生涯最後一塊拼圖。但命運並不客氣——<b>Eder Militão 大腿股二頭肌手術確定缺席世界盃</b>（4月底 vs 阿拉維斯受傷，恢復期 5 個月），加上 <b>Rodrygo 前十字韌帶 + 半月板撕裂賽季報銷</b>，巴西在右翼和中衛兩個位置痛失核心。</p>
+
+<p><b>Estevao</b>（切爾西）也因腿後肌傷飛回巴西治療，世界盃出賽存疑。不過 Ancelotti 的 55 人初選名單驚喜地包含了 <b>Neymar</b>——這位 34 歲的老將在桑托斯的表現有回春跡象，但能否入選最終 26 人仍是問號。Ancelotti 預計 5 月 18 日在里約「明日博物館」公布最終名單。</p>
+
+<p><b>預計先發陣容（4-2-3-1）</b></p>
+<ul>
+<li><b>門將</b>：Ederson（曼城）</li>
+<li><b>後衛</b>：Danilo（尤文圖斯）、Marquinhos（PSG）、Gabriel（兵工廠）、Wendell（波爾圖）</li>
+<li><b>中場</b>：Bruno Guimarães（紐卡索）、Lucas Paquetá（西漢姆）</li>
+<li><b>攻擊</b>：Raphinha（巴塞隆納）、Endrick（皇馬）、Savinho（曼城）</li>
+<li><b>前鋒</b>：Vinicius Jr（皇馬）</li>
+</ul>
+
+<p>Vinicius Jr 是巴西的絕對核心。2024 金球獎第二名的他本季在皇馬表現依然頂級，但<b>巴西國家隊的 Vinicius 和皇馬的 Vinicius 是兩個人</b>——國際賽 65 場僅 8 球的效率，與俱樂部的火力形成強烈反差。Ancelotti 能否在國家隊複製皇馬的戰術環境，讓 Vinicius 解鎖國際賽模式，將決定巴西的上限。</p>
+
+<h3>🇲🇦 摩洛哥：2022 四強不是終點</h3>
+
+<p>2022 卡達世界盃，摩洛哥震驚全球——小組賽力壓比利時和克羅埃西亞出線，淘汰賽連斬西班牙和葡萄牙殺入四強，成為史上第一支闖入世界盃半決賽的非洲球隊。四年後，他們帶著更強的陣容回來了。</p>
+
+<p>新任主帥 <b>Mohamed Ouahbi</b> 接替 Regragui，延續高強度防守反擊的DNA。55 人初選名單已於 5 月 11 日提交 FIFA，其中最令人興奮的是 <b>18 歲的 Ayyoub Bouaddi</b>（里爾），這位中場新星本季在法甲已展現出超齡的比賽閱讀能力。最終 26 人名單將於 5 月 21 日公布，6 月 2 日前確認。</p>
+
+<p>摩洛哥的備戰計劃非常完整：5/22-25 訓練營 → 5/26 友誼賽 vs 蒲隆地 → 6/2 友誼賽 vs 馬達加斯加（馬拉喀什大球場）→ 飛往美國。<b>開幕戰 6/13 就碰巴西（MetLife Stadium）</b>，這是整個 C 組的定調之戰。</p>
+
+<p>核心武器是 <b>Achraf Hakimi</b>（PSG），這位右後衛的攻守兼備是世界級的；加上 <b>Sofyan Amrabat</b> 在中場的鐵肺覆蓋，以及 <b>Youssef En-Nesyri</b> 在禁區內的高空優勢。2022 年他們證明了防守可以贏得世界盃淘汰賽——2026 年他們有能力再做一次。</p>
+
+<h3>🏴󠁧󠁢󠁳󠁣󠁴󠁿 蘇格蘭：28 年的等待</h3>
+
+<p>蘇格蘭上一次參加世界盃是 1998 年法國世界盃。整整 <b>28 年</b>後，Steve Clarke 帶領這支球隊重返世界最高舞台。</p>
+
+<p>蘇格蘭的王牌是<b>紀律防守</b>——Clarke 的球隊不華麗但極難擊敗。資格賽以歐洲區穩定表現晉級，關鍵球員多在英超效力：<b>Scott McTominay</b>（曼聯 → 那不勒斯，本季在意甲表現亮眼）、<b>Andrew Robertson</b>（利物浦隊長）、<b>John McGinn</b>（阿斯頓維拉隊長）。前鋒線則依靠 <b>Che Adams</b>（拖連奴）和 <b>Lyndon Dykes</b> 的拼搶。</p>
+
+<p>傷兵方面，門將 <b>Craig Gordon</b> 正從肩傷中恢復；後衛 <b>Aaron Hickey</b>（布倫特福德）最近已復出上場 61 分鐘，是重大利好。Clarke 的 55 人初選已提交，最終名單預計 5/22 公布。</p>
+
+<p>蘇格蘭的目標很明確：<b>打海地搶三分</b>，然後面對摩洛哥和巴西時爭取平局或爆冷。在 48 隊新制下，4 分可能就足以以最佳第三名晉級。</p>
+
+<h3>🇭🇹 海地：加勒比海的驕傲</h3>
+
+<p>海地是本屆世界盃最動人的故事之一。1974 年西德世界盃後，他們等了 <b>52 年</b>才重返世界舞台——也是至今<b>唯一參加過世界盃的加勒比海國家</b>。</p>
+
+<p>在法國教練 <b>Sébastien Migné</b> 的帶領下，海地以 10 場資格賽僅 2 敗的成績出線。陣中最亮眼的是桑德蘭前鋒 <b>Wilson Isidor</b>、狼隊中場 <b>Jean-Ricner Bellegarde</b>，以及老將門將 <b>Johny Placide</b>（巴斯蒂亞）。隊中大量球員效力歐美聯賽，僑民力量是海地足球的命脈。</p>
+
+<p>戰術上，Migné 採用 4-2-3-1 或 4-4-2 收縮防守，強調身體素質和直接反擊。他們不太可能擊敗巴西或摩洛哥，但<b>蘇格蘭是可以拼的對手</b>——如果海地能在首戰（6/13 vs 蘇格蘭）爆冷搶分，這個小組的局面就會完全打開。</p>
+
+<h3>賽程與關鍵戰</h3>
+
+<ul>
+<li><b>6/13（五）</b>：巴西 vs 摩洛哥（MetLife Stadium, 紐約）、蘇格蘭 vs 海地（費城 Lincoln Financial Field）</li>
+<li><b>6/19（四）</b>：摩洛哥 vs 蘇格蘭（MetLife Stadium, 紐約）、海地 vs 巴西（費城 Lincoln Financial Field）</li>
+<li><b>6/24（二）</b>：巴西 vs 蘇格蘭（MetLife Stadium, 紐約）、摩洛哥 vs 海地（費城 Lincoln Financial Field）</li>
+</ul>
+
+<p><b>首輪巴西 vs 摩洛哥</b>是整個 C 組的震央。2022 年摩洛哥連續淘汰歐洲強隊的經驗，加上 Ancelotti 國際賽首戰的未知數，讓這場比賽充滿變數。另一邊，<b>蘇格蘭 vs 海地</b>看似差距明顯，但海地的球員並不弱——如果蘇格蘭首戰失誤，他們的世界盃之旅可能在小組賽就結束。</p>
+
+<h3>麥迪預測</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">排名</th><th style="padding:8px">球隊</th><th style="padding:8px">預測積分</th><th style="padding:8px">分析</th></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">1</td><td style="padding:8px">🇧🇷 巴西</td><td style="padding:8px">7</td><td style="padding:8px">傷兵衝擊大但陣容深度仍是世界頂級，Ancelotti 的臨場調度是保障</td></tr>
+<tr><td style="padding:8px">2</td><td style="padding:8px">🇲🇦 摩洛哥</td><td style="padding:8px">6</td><td style="padding:8px">2022 經驗 + 新血注入，防守反擊仍是最難纏的對手。有能力首輪就給巴西下馬威</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">3</td><td style="padding:8px">🏴󠁧󠁢󠁳󠁣󠁴󠁿 蘇格蘭</td><td style="padding:8px">4</td><td style="padding:8px">紀律防守 + 英超經驗豐富的球員群。4 分有機會以最佳第三名晉級</td></tr>
+<tr><td style="padding:8px">4</td><td style="padding:8px">🇭🇹 海地</td><td style="padding:8px">1</td><td style="padding:8px">歷史性參賽就是最大的勝利。但 Isidor 和 Bellegarde 有能力在單場爆冷</td></tr>
+</table>
+
+<p>C 組的懸念集中在<b>第二名的爭奪</b>。巴西即使傷兵滿營，依然擁有全組最強的個人能力——Vinicius Jr + Endrick 的鋒線組合足以碾壓任何防線。但摩洛哥不是好惹的——他們在 2022 年已經證明，世界盃淘汰賽裡，紀律和團結可以擊敗天賦。</p>
+
+<p>如果你只看一場 C 組比賽，就看 <b>6/13 巴西 vs 摩洛哥</b>——這場比賽將決定整個小組的走向，也可能是本屆世界盃小組賽階段最精彩的對決之一。</p>`,
+    tags:['小組分析','C組','巴西','摩洛哥','蘇格蘭','海地','世界盃','Vinicius Jr','Ancelotti','Hakimi','McTominay','Endrick']
+  },
+  {
     id:15, cat:'小組分析', date:'2026-05-12', readTime:'8分鐘',
     title:'倒數30天：F組前瞻——荷蘭追夢、日本巨殺、Gyökeres 帶瑞典重返世界盃',
     desc:'F組是本屆最均衡的死亡組：荷蘭追逐隊史首冠、日本連斬英德後氣勢如虹、瑞典坐擁Gyökeres+Isak頂級鋒線、突尼西亞三連屆不甘陪襯。四隊實力接近，任何排名組合都不意外。',

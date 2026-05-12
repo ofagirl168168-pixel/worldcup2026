@@ -3133,6 +3133,59 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p>Farke 則說：「我們帶走一分是公平的結果，但 Longstaff 那球本應進的。里茲今天證明了我們不怕任何對手。」</p>`,
     tags: ['賽後回顧', '熱刺', '里茲聯', 'Tel', 'Calvert-Lewin', 'Kinsky', 'De Zerbi', 'Farke', 'VAR', '保級', '第36輪']
+  },
+  {
+    id: 'epl-058',
+    title: '【賽前分析】阿斯頓維拉 vs 利物浦：歐冠席位生死戰，Salah 缺陣的紅軍能頂住嗎？',
+    date: '2026-05-13',
+    category: '賽前深度分析',
+    summary: '英超第37輪——阿斯頓維拉（第5・58分）主場迎戰利物浦（第4・60分），歐冠資格爭奪的直接對話。維拉 4 天後要踢歐霸決賽，Emery 會輪換嗎？Salah 腿後肌傷缺陣，Slot 如何填補火力真空？',
+    content: `<h2>阿斯頓維拉 vs 利物浦｜第37輪・05/16（五）03:00 台灣時間・維拉公園球場</h2>
+
+<p>這不只是一場英超比賽——這是兩支球隊爭奪歐冠席位的<b>生死戰</b>，而且雙方各有各的隱憂。</p>
+
+<h3>為什麼這場比賽如此關鍵？</h3>
+
+<p>目前積分榜第 4-5 名的爭奪白熱化：</p>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">排名</th><th style="padding:8px">球隊</th><th style="padding:8px">賽</th><th style="padding:8px">積分</th><th style="padding:8px">剩餘</th></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">4</td><td style="padding:8px">利物浦</td><td style="padding:8px">36</td><td style="padding:8px">60</td><td style="padding:8px">2 場</td></tr>
+<tr><td style="padding:8px">5</td><td style="padding:8px">阿斯頓維拉</td><td style="padding:8px">36</td><td style="padding:8px">58</td><td style="padding:8px">2 場</td></tr>
+</table>
+
+<p>利物浦只領先 2 分。<b>維拉主場贏球就反超利物浦升至第四</b>——而且維拉還有歐霸決賽的加持（5/20 vs 弗賴堡），如果歐霸奪冠也能獲得歐冠席位。但 Emery 不會冒險——歐冠資格靠聯賽拿更踏實。</p>
+
+<h3>阿斯頓維拉：歐霸決賽前的兩難</h3>
+
+<p>Emery 面臨本季最棘手的抉擇：4 天後就是歐霸決賽（5/20 vs 弗賴堡），要不要在這場英超比賽輪換？</p>
+
+<p>維拉近 5 場聯賽只贏了 1 場（1W 1D 3L），表現明顯下滑。上輪客場 2-2 伯恩利——<b>Barkley 和 Watkins</b> 各入一球，但也暴露了防守鬆動的問題。不過，維拉在維拉公園的主場戰績遠好於客場——本季主場勝率接近 60%。</p>
+
+<p>預計陣容會做部分輪換以保存歐霸決賽體力，但 <b>Watkins、Tielemans、Martinez</b> 這些核心仍會先發——因為聯賽積分同樣攸關歐冠。<b>McGinn</b> 和 <b>Rogers</b> 的中場創造力是維拉的生命線，<b>Cash</b> 和 <b>Maatsen</b> 的邊路推進也是關鍵。</p>
+
+<p><b>預計先發</b>：Martinez — Cash, Konsa, Mings, Maatsen — Tielemans, Barkley — Rogers, McGinn, Buendía — Watkins</p>
+
+<h3>利物浦：沒有 Salah 的紅軍</h3>
+
+<p>利物浦最大的問題是<b>傷兵</b>。<b>Mohamed Salah 因腿後肌傷缺陣</b>，這位本季英超射手王的缺席讓利物浦的進攻火力直接打折。此外，<b>Ibrahima Konaté 在上輪 vs 切爾西下半場跛行退場</b>，本場能否出戰需評估。<b>Alisson</b> 自 3 月起就未上場，<b>Conor Bradley</b> 和 <b>Hugo Ekitike</b> 都已賽季報銷。</p>
+
+<p>好消息是 Slot 仍有 <b>Van Dijk</b> 鎮守後防、<b>Gravenberch</b> 和 <b>Mac Allister</b> 的中場組合依然穩健、<b>Gakpo</b> 可能頂替 Salah 出任右翼。但少了 Salah，利物浦在最後三十碼的威脅性大幅降低——本季 Salah 缺陣的比賽，利物浦場均進球數從 2.1 降至 1.2。</p>
+
+<p><b>預計先發</b>：Mamardashvili — Jones, Gomez, Van Dijk, Kerkez — Gravenberch, Mac Allister — Ngumoha, Szoboszlai, Gakpo — Frimpong</p>
+
+<h3>戰術焦點</h3>
+
+<p><b>Emery 的高位壓迫 vs Slot 的控球體系</b>：維拉在主場會採取更積極的逼搶策略，試圖在中場搶斷後快速反擊。利物浦在沒有 Salah 的情況下，可能會更依賴 Szoboszlai 的直塞和 Gakpo 的內切射門來製造機會。</p>
+
+<p><b>Watkins vs Van Dijk</b>：這是全場最值得關注的對位。Watkins 的跑位靈活和回撤接應能力是維拉進攻的核心——他能把 Van Dijk 拉出防線，為 Rogers 和 Buendía 創造插上空間。</p>
+
+<p><b>定位球</b>：兩隊本季在定位球得分上都排名前十。Van Dijk 的頭球威脅 vs Konsa 和 Mings 的空中優勢，角球和任意球可能成為破僵手段。</p>
+
+<h3>麥迪預測</h3>
+
+<p><b>阿斯頓維拉 1-1 利物浦</b>。維拉有主場優勢但心繫歐霸決賽，利物浦缺少 Salah 後進攻效率打折。兩隊在高壓對抗中各入一球後，誰也不願冒險全線壓上——和局是最可能的結果。Watkins 為維拉破門，Gakpo 或 Szoboszlai 扳平。這個結果讓利物浦以 1 分優勢保住第四，但歐冠席位之爭要拖到最後一輪。</p>`,
+    tags: ['賽前分析', '阿斯頓維拉', '利物浦', 'Watkins', 'Salah', 'Emery', 'Slot', '歐冠資格', '第37輪']
   }
 ];
 

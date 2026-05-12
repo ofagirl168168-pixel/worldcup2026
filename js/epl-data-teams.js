@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-05-11 早安更新）
+   資料截止：2025/26 賽季（2026-05-13 早安更新）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -29,6 +29,7 @@ const EPL_TEAMS = {
       {name:'Kai Havertz',pos:'前鋒',status:'肌肉傷勢（vs NEW 4/25），歐冠次回合（5/5）復出先發',returnDate:'可出場'},
       {name:'Jurrien Timber',pos:'後衛',status:'腹股溝傷（3/14 起缺陣），賽季末評估',returnDate:'賽季末'},
       {name:'Mikel Merino',pos:'中場',status:'已脫護具但本季不預期回歸',returnDate:'賽季報銷'},
+      {name:'Ben White',pos:'右後衛',status:'傷勢缺陣中',returnDate:'評估中'},
       {name:'Noni Madueke',pos:'右翼',status:'膝傷（歐冠八強次回合退場）',returnDate:'評估中'}
     ]
   },
@@ -49,12 +50,12 @@ const EPL_TEAMS = {
     recentForm:['L','W','W','W','L'],
     history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍',
     injuries:[
-      {name:'Mohamed Salah',pos:'右翼',status:'確認僅輕微肌肉問題，賽季結束前可復出',returnDate:'五月中旬'},
+      {name:'Mohamed Salah',pos:'右翼',status:'腿後肌傷，仍在恢復中',returnDate:'MW37 待評估'},
+      {name:'Ibrahima Konaté',pos:'中後衛',status:'vs CHE（5/11）下半場跛行退場',returnDate:'5/15 AVL 待評估'},
       {name:'Hugo Ekitike',pos:'前鋒',status:'阿基里斯腱斷裂（vs PSG受傷）',returnDate:'賽季報銷＋世界盃缺席'},
-      {name:'Alisson',pos:'門將',status:'肌肉拉傷（缺席一個月），有機會回歸',returnDate:'評估中'},
-      {name:'Mamardashvili',pos:'門將',status:'傷缺數週',returnDate:'評估中'},
+      {name:'Alisson',pos:'門將',status:'3月起缺陣（肌肉拉傷），有機會回歸',returnDate:'評估中'},
       {name:'Wataru Endo',pos:'中場',status:'足部手術',returnDate:'賽季報銷（目標世界盃）'},
-      {name:'Conor Bradley',pos:'右後衛',status:'膝蓋重傷手術',returnDate:'賽季報銷'},
+      {name:'Conor Bradley',pos:'右後衛',status:'膝蓋重傷手術（1月起）',returnDate:'賽季報銷'},
       {name:'Giovanni Leoni',pos:'後衛',status:'前十字韌帶',returnDate:'賽季報銷'}
     ]
   },
@@ -78,7 +79,7 @@ const EPL_TEAMS = {
       {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末可望回歸'},
       {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢，預計五月中旬回歸',returnDate:'5/19 vs BOU 目標'},
       {name:'John Stones',pos:'中後衛',status:'已回歸訓練，可出場',returnDate:'已歸隊'},
-      {name:'Rodri',pos:'防守中場',status:'腹股溝傷，Guardiola 稱好轉中但仍未隨隊訓練',returnDate:'MW36 待評估'}
+      {name:'Rodri',pos:'防守中場',status:'腹股溝傷恢復中，有望 vs CRY（5/13）替補',returnDate:'補賽待評估'}
     ]
   },
   'CHE': {

@@ -2,6 +2,26 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "16",
+    "tournament": "wc",
+    "title": "倒數29天：C組前瞻——巴西傷兵滿營、摩洛哥黑馬再襲、海地52年後重返世界盃",
+    "summary": "C組是本屆公認的「死亡之組」：巴西失去 Militão 和 Rodrygo 卻仍是奪冠大熱；摩洛哥2022四強後再進化；蘇格蘭時隔28年回歸；海地書寫歷史。Ancelotti 的國際賽首秀從地獄組開始。",
+    "date": "2026-05-13",
+    "category": "小組分析",
+    "readTime": "9分鐘",
+    "shareable": true
+  },
+  {
+    "id": "epl-058",
+    "tournament": "epl",
+    "title": "【賽前分析】阿斯頓維拉 vs 利物浦：歐冠席位生死戰，Salah 缺陣的紅軍能頂住嗎？",
+    "summary": "英超第37輪——阿斯頓維拉（第5・58分）主場迎戰利物浦（第4・60分），歐冠資格爭奪的直接對話。維拉 4 天後要踢歐霸決賽，Emery 會輪換嗎？Salah 腿後肌傷缺陣，Slot 如何填補火力真空？",
+    "date": "2026-05-13",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "15",
     "tournament": "wc",
     "title": "倒數30天：F組前瞻——荷蘭追夢、日本巨殺、Gyökeres 帶瑞典重返世界盃",
@@ -189,7 +209,7 @@ export default [
     "date": "2026-05-05",
     "category": "社群觀察",
     "readTime": "6分鐘",
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-044",
@@ -199,7 +219,7 @@ export default [
     "date": "2026-05-05",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-045",
@@ -209,7 +229,7 @@ export default [
     "date": "2026-05-05",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-041",
