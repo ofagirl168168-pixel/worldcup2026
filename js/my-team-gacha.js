@@ -258,7 +258,7 @@
           ${options.subtitle ? `<div class="mt-gacha-banner-sub">${escapeHtml(options.subtitle)}</div>` : ''}
         </div>
         <div class="mt-gacha-cards-wrap">
-          <div class="mt-gacha-cards" id="mt-gacha-cards"></div>
+          <div class="mt-gacha-cards" id="mt-gacha-cards" data-count="${cards.length}"></div>
         </div>
         <div class="mt-gacha-flip-prompt" id="mt-gacha-flip-prompt" hidden>
           <button class="mt-gacha-flip-btn" id="mt-gacha-flip-btn">
