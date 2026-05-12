@@ -124,7 +124,10 @@ async function main() {
   }
   console.log(`\n✅ ${done} portraits + ${done} sprites generated (${skip} skipped)\n`);
 
-  // 5. 寫 CREDITS
+  // 5. 寫 preview HTML（每次 build 都更新）
+  await writePreviewHTML(cardIds);
+
+  // 6. 寫 CREDITS
   const credits = `# PIPOYA 角色素材
 
 \`img/portraits/\` (32×32 idle 正面) + \`img/sprites/\` (96×128 4-direction walk) 由
@@ -149,6 +152,118 @@ ${allPaths.map(p => '- ' + p.replace(/^resources\/characters\//, '')).join('\n')
   fs.writeFileSync(path.join(outPortraits, 'CREDITS.md'), credits, 'utf-8');
   fs.writeFileSync(path.join(outSprites, 'CREDITS.md'), credits, 'utf-8');
   console.log('✅ Wrote CREDITS.md');
+}
+
+async function writePreviewHTML(cardIds) {
+  // 讀 seed 抓 rarity + name 資訊
+  const seedPath = path.join(__dirname, '..', 'supabase', 'migrations', '20260512000001_seed_player_cards.sql');
+  const sql = fs.readFileSync(seedPath, 'utf-8');
+  const cards = [];
+  const re = /\('([^']+)',\s*'(SSR|SR|R)',\s*'([^']*)',\s*('[^']*'|NULL),\s*'(GK|DEF|MID|FWD)'/g;
+  let m;
+  while ((m = re.exec(sql))) {
+    cards.push({
+      card_id: m[1], rarity: m[2], name: m[3],
+      nickname: m[4].replace(/^'|'$/g, '') || '',
+      position: m[5],
+    });
+  }
+  const grouped = { SSR: [], SR: [], R: [] };
+  for (const c of cards) grouped[c.rarity]?.push(c);
+
+  function cardHTML(c) {
+    return `<div class="card r-${c.rarity}" data-id="${c.card_id}" onclick="toggleSprite(this, '${c.card_id}')">
+      <img class="portrait" src="../img/portraits/${c.card_id}.png" alt="">
+      <img class="sprite" src="../img/sprites/${c.card_id}.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">${c.rarity}</div>
+        <div class="name">${c.name}</div>
+        <div class="sub">${c.position} · ${c.card_id}</div>
+      </div>
+    </div>`;
+  }
+
+  const html = `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>PIPOYA 角色預覽（${cards.length} 張）</title>
+<style>
+  body { background: #0d1224; color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 20px; }
+  h1 { font-size: 20px; margin: 0 0 12px; }
+  .nav { font-size: 13px; color: #f0c040; margin-bottom: 16px; }
+  .nav a { color: #f0c040; margin-right: 12px; }
+  .hint { color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 12px; }
+  section { margin-bottom: 28px; }
+  h2 { font-size: 16px; color: #f0c040; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .card:hover { background: rgba(255,255,255,0.1); border-color: rgba(240,192,64,0.5); transform: translateY(-2px); }
+  .card.r-SSR { border-color: #f0c040; background: linear-gradient(180deg, rgba(240,192,64,0.15), rgba(255,255,255,0.04)); }
+  .card.r-SR { border-color: #9b87f5; background: linear-gradient(180deg, rgba(155,135,245,0.12), rgba(255,255,255,0.04)); }
+  .portrait, .sprite {
+    width: 96px; height: 96px;
+    image-rendering: pixelated;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.3);
+    object-fit: cover;
+    object-position: center 0%;
+  }
+  .sprite {
+    border-radius: 8px;
+    width: 96px; height: 128px;
+    object-fit: contain;
+    background: #2a2440;
+  }
+  .meta { margin-top: 6px; }
+  .rarity { display: inline-block; font-size: 10px; font-weight: 900; padding: 2px 5px; border-radius: 3px; background: rgba(255,255,255,0.15); }
+  .r-SSR .rarity { background: #f0c040; color: #1a1a2e; }
+  .r-SR .rarity { background: #9b87f5; color: #fff; }
+  .name { font-size: 13px; font-weight: 700; margin-top: 4px; }
+  .sub { font-size: 10px; color: rgba(255,255,255,0.55); }
+</style>
+</head>
+<body>
+<h1>🎮 PIPOYA 角色預覽（${cards.length} 張、來源 ${path.basename('.pipoya-civilians.json')}）</h1>
+<div class="nav">
+  <a href="#SSR">SSR (${grouped.SSR.length})</a>
+  <a href="#SR">SR (${grouped.SR.length})</a>
+  <a href="#R">R (${grouped.R.length})</a>
+</div>
+<div class="hint">點擊任一張可切換顯示頭像 / 完整 sprite sheet。若看到奇怪的角色（戰士/法師等漏網之魚），告訴 Claude 該 card_id、可加進黑名單。</div>
+
+<section id="SSR"><h2>SSR — ${grouped.SSR.length} 張</h2><div class="grid">${grouped.SSR.map(cardHTML).join('')}</div></section>
+<section id="SR"><h2>SR — ${grouped.SR.length} 張</h2><div class="grid">${grouped.SR.map(cardHTML).join('')}</div></section>
+<section id="R"><h2>R — ${grouped.R.length} 張</h2><div class="grid">${grouped.R.map(cardHTML).join('')}</div></section>
+
+<script>
+  function toggleSprite(el, cardId) {
+    const p = el.querySelector('.portrait');
+    const s = el.querySelector('.sprite');
+    if (p.style.display === 'none') {
+      p.style.display = '';
+      s.style.display = 'none';
+    } else {
+      p.style.display = 'none';
+      s.style.display = '';
+    }
+  }
+</script>
+</body>
+</html>`;
+  const outPath = path.join(__dirname, '..', 'tools', 'pipoya-preview.html');
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  fs.writeFileSync(outPath, html, 'utf-8');
+  console.log(`📋 Wrote preview to tools/pipoya-preview.html`);
 }
 
 main().catch(err => {

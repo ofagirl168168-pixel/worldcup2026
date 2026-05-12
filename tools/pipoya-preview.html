@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>PIPOYA 角色預覽（230 張）</title>
+<style>
+  body { background: #0d1224; color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 20px; }
+  h1 { font-size: 20px; margin: 0 0 12px; }
+  .nav { font-size: 13px; color: #f0c040; margin-bottom: 16px; }
+  .nav a { color: #f0c040; margin-right: 12px; }
+  .hint { color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 12px; }
+  section { margin-bottom: 28px; }
+  h2 { font-size: 16px; color: #f0c040; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .card:hover { background: rgba(255,255,255,0.1); border-color: rgba(240,192,64,0.5); transform: translateY(-2px); }
+  .card.r-SSR { border-color: #f0c040; background: linear-gradient(180deg, rgba(240,192,64,0.15), rgba(255,255,255,0.04)); }
+  .card.r-SR { border-color: #9b87f5; background: linear-gradient(180deg, rgba(155,135,245,0.12), rgba(255,255,255,0.04)); }
+  .portrait, .sprite {
+    width: 96px; height: 96px;
+    image-rendering: pixelated;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.3);
+    object-fit: cover;
+    object-position: center 0%;
+  }
+  .sprite {
+    border-radius: 8px;
+    width: 96px; height: 128px;
+    object-fit: contain;
+    background: #2a2440;
+  }
+  .meta { margin-top: 6px; }
+  .rarity { display: inline-block; font-size: 10px; font-weight: 900; padding: 2px 5px; border-radius: 3px; background: rgba(255,255,255,0.15); }
+  .r-SSR .rarity { background: #f0c040; color: #1a1a2e; }
+  .r-SR .rarity { background: #9b87f5; color: #fff; }
+  .name { font-size: 13px; font-weight: 700; margin-top: 4px; }
+  .sub { font-size: 10px; color: rgba(255,255,255,0.55); }
+</style>
+</head>
+<body>
+<h1>🎮 PIPOYA 角色預覽（230 張、來源 .pipoya-civilians.json）</h1>
+<div class="nav">
+  <a href="#SSR">SSR (30)</a>
+  <a href="#SR">SR (50)</a>
+  <a href="#R">R (150)</a>
+</div>
+<div class="hint">點擊任一張可切換顯示頭像 / 完整 sprite sheet。若看到奇怪的角色（戰士/法師等漏網之魚），告訴 Claude 該 card_id、可加進黑名單。</div>
+
+<section id="SSR"><h2>SSR — 30 張</h2><div class="grid"><div class="card r-SSR" data-id="ssr-mufeimui-01" onclick="toggleSprite(this, 'ssr-mufeimui-01')">
+      <img class="portrait" src="../img/portraits/ssr-mufeimui-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-mufeimui-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">姆霸菲</div>
+        <div class="sub">FWD · ssr-mufeimui-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-halandeng-01" onclick="toggleSprite(this, 'ssr-halandeng-01')">
+      <img class="portrait" src="../img/portraits/ssr-halandeng-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-halandeng-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">哈藍登</div>
+        <div class="sub">FWD · ssr-halandeng-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-vini-01" onclick="toggleSprite(this, 'ssr-vini-01')">
+      <img class="portrait" src="../img/portraits/ssr-vini-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-vini-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">維尼休士</div>
+        <div class="sub">FWD · ssr-vini-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-salaba-01" onclick="toggleSprite(this, 'ssr-salaba-01')">
+      <img class="portrait" src="../img/portraits/ssr-salaba-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-salaba-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">薩拉霸</div>
+        <div class="sub">FWD · ssr-salaba-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-belling-01" onclick="toggleSprite(this, 'ssr-belling-01')">
+      <img class="portrait" src="../img/portraits/ssr-belling-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-belling-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">貝鈴翰</div>
+        <div class="sub">FWD · ssr-belling-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-meihsi-01" onclick="toggleSprite(this, 'ssr-meihsi-01')">
+      <img class="portrait" src="../img/portraits/ssr-meihsi-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-meihsi-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">梅熹</div>
+        <div class="sub">MID · ssr-meihsi-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-luonadou-01" onclick="toggleSprite(this, 'ssr-luonadou-01')">
+      <img class="portrait" src="../img/portraits/ssr-luonadou-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-luonadou-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">羅納斗</div>
+        <div class="sub">FWD · ssr-luonadou-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-modeli-01" onclick="toggleSprite(this, 'ssr-modeli-01')">
+      <img class="portrait" src="../img/portraits/ssr-modeli-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-modeli-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">莫德利祺</div>
+        <div class="sub">MID · ssr-modeli-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-debulong-01" onclick="toggleSprite(this, 'ssr-debulong-01')">
+      <img class="portrait" src="../img/portraits/ssr-debulong-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-debulong-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">德布琅內</div>
+        <div class="sub">MID · ssr-debulong-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-luodeli-01" onclick="toggleSprite(this, 'ssr-luodeli-01')">
+      <img class="portrait" src="../img/portraits/ssr-luodeli-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-luodeli-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">羅得里</div>
+        <div class="sub">MID · ssr-luodeli-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-chuamning-01" onclick="toggleSprite(this, 'ssr-chuamning-01')">
+      <img class="portrait" src="../img/portraits/ssr-chuamning-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-chuamning-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">楚阿明尼</div>
+        <div class="sub">MID · ssr-chuamning-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-weiladi-01" onclick="toggleSprite(this, 'ssr-weiladi-01')">
+      <img class="portrait" src="../img/portraits/ssr-weiladi-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-weiladi-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">維拉地</div>
+        <div class="sub">MID · ssr-weiladi-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-kasaimi-01" onclick="toggleSprite(this, 'ssr-kasaimi-01')">
+      <img class="portrait" src="../img/portraits/ssr-kasaimi-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-kasaimi-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">卡賽米羅</div>
+        <div class="sub">MID · ssr-kasaimi-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-peideli-01" onclick="toggleSprite(this, 'ssr-peideli-01')">
+      <img class="portrait" src="../img/portraits/ssr-peideli-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-peideli-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">佩德立</div>
+        <div class="sub">MID · ssr-peideli-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-fantaike-01" onclick="toggleSprite(this, 'ssr-fantaike-01')">
+      <img class="portrait" src="../img/portraits/ssr-fantaike-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-fantaike-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">范泰克</div>
+        <div class="sub">DEF · ssr-fantaike-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-lubendiya-01" onclick="toggleSprite(this, 'ssr-lubendiya-01')">
+      <img class="portrait" src="../img/portraits/ssr-lubendiya-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-lubendiya-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">魯本帝亞斯</div>
+        <div class="sub">DEF · ssr-lubendiya-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-salihba-01" onclick="toggleSprite(this, 'ssr-salihba-01')">
+      <img class="portrait" src="../img/portraits/ssr-salihba-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-salihba-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">薩力霸</div>
+        <div class="sub">DEF · ssr-salihba-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-makuino-01" onclick="toggleSprite(this, 'ssr-makuino-01')">
+      <img class="portrait" src="../img/portraits/ssr-makuino-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-makuino-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">馬魁諾</div>
+        <div class="sub">DEF · ssr-makuino-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-haqimi-01" onclick="toggleSprite(this, 'ssr-haqimi-01')">
+      <img class="portrait" src="../img/portraits/ssr-haqimi-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-haqimi-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">哈奇咪</div>
+        <div class="sub">DEF · ssr-haqimi-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-daiweisi-01" onclick="toggleSprite(this, 'ssr-daiweisi-01')">
+      <img class="portrait" src="../img/portraits/ssr-daiweisi-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-daiweisi-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">戴衛斯</div>
+        <div class="sub">DEF · ssr-daiweisi-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-yamaer-01" onclick="toggleSprite(this, 'ssr-yamaer-01')">
+      <img class="portrait" src="../img/portraits/ssr-yamaer-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-yamaer-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">亞瑪兒</div>
+        <div class="sub">FWD · ssr-yamaer-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-alisong-01" onclick="toggleSprite(this, 'ssr-alisong-01')">
+      <img class="portrait" src="../img/portraits/ssr-alisong-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-alisong-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">阿哩松</div>
+        <div class="sub">GK · ssr-alisong-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-nuoyier-01" onclick="toggleSprite(this, 'ssr-nuoyier-01')">
+      <img class="portrait" src="../img/portraits/ssr-nuoyier-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-nuoyier-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">諾依爾</div>
+        <div class="sub">GK · ssr-nuoyier-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-kutuwa-01" onclick="toggleSprite(this, 'ssr-kutuwa-01')">
+      <img class="portrait" src="../img/portraits/ssr-kutuwa-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-kutuwa-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">酷圖瓦</div>
+        <div class="sub">GK · ssr-kutuwa-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-dangna-01" onclick="toggleSprite(this, 'ssr-dangna-01')">
+      <img class="portrait" src="../img/portraits/ssr-dangna-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-dangna-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">噹納魯馬</div>
+        <div class="sub">GK · ssr-dangna-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-laya-01" onclick="toggleSprite(this, 'ssr-laya-01')">
+      <img class="portrait" src="../img/portraits/ssr-laya-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-laya-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">拉壓</div>
+        <div class="sub">GK · ssr-laya-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-neima-01" onclick="toggleSprite(this, 'ssr-neima-01')">
+      <img class="portrait" src="../img/portraits/ssr-neima-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-neima-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">內瑪而</div>
+        <div class="sub">FWD · ssr-neima-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-kaiyin-01" onclick="toggleSprite(this, 'ssr-kaiyin-01')">
+      <img class="portrait" src="../img/portraits/ssr-kaiyin-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-kaiyin-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">凱印</div>
+        <div class="sub">FWD · ssr-kaiyin-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-santo-01" onclick="toggleSprite(this, 'ssr-santo-01')">
+      <img class="portrait" src="../img/portraits/ssr-santo-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-santo-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">三笘 燻</div>
+        <div class="sub">MID · ssr-santo-01</div>
+      </div>
+    </div><div class="card r-SSR" data-id="ssr-jiubao-01" onclick="toggleSprite(this, 'ssr-jiubao-01')">
+      <img class="portrait" src="../img/portraits/ssr-jiubao-01.png" alt="">
+      <img class="sprite" src="../img/sprites/ssr-jiubao-01.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SSR</div>
+        <div class="name">玖保 健映</div>
+        <div class="sub">MID · ssr-jiubao-01</div>
+      </div>
+    </div></div></section>
+<section id="SR"><h2>SR — 50 張</h2><div class="grid"><div class="card r-SR" data-id="sr-gk-001" onclick="toggleSprite(this, 'sr-gk-001')">
+      <img class="portrait" src="../img/portraits/sr-gk-001.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-gk-001.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">迪拉可</div>
+        <div class="sub">GK · sr-gk-001</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-gk-002" onclick="toggleSprite(this, 'sr-gk-002')">
+      <img class="portrait" src="../img/portraits/sr-gk-002.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-gk-002.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">迪亞洛夫</div>
+        <div class="sub">GK · sr-gk-002</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-gk-003" onclick="toggleSprite(this, 'sr-gk-003')">
+      <img class="portrait" src="../img/portraits/sr-gk-003.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-gk-003.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">瓦德可</div>
+        <div class="sub">GK · sr-gk-003</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-gk-004" onclick="toggleSprite(this, 'sr-gk-004')">
+      <img class="portrait" src="../img/portraits/sr-gk-004.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-gk-004.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">艾爾波耶夫</div>
+        <div class="sub">GK · sr-gk-004</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-gk-005" onclick="toggleSprite(this, 'sr-gk-005')">
+      <img class="portrait" src="../img/portraits/sr-gk-005.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-gk-005.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">拉卡遜</div>
+        <div class="sub">GK · sr-gk-005</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-gk-006" onclick="toggleSprite(this, 'sr-gk-006')">
+      <img class="portrait" src="../img/portraits/sr-gk-006.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-gk-006.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">哈西可</div>
+        <div class="sub">GK · sr-gk-006</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-gk-007" onclick="toggleSprite(this, 'sr-gk-007')">
+      <img class="portrait" src="../img/portraits/sr-gk-007.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-gk-007.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">帕倫尼</div>
+        <div class="sub">GK · sr-gk-007</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-gk-008" onclick="toggleSprite(this, 'sr-gk-008')">
+      <img class="portrait" src="../img/portraits/sr-gk-008.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-gk-008.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">法蘭奇</div>
+        <div class="sub">GK · sr-gk-008</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-009" onclick="toggleSprite(this, 'sr-def-009')">
+      <img class="portrait" src="../img/portraits/sr-def-009.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-009.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">貝波遜</div>
+        <div class="sub">DEF · sr-def-009</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-010" onclick="toggleSprite(this, 'sr-def-010')">
+      <img class="portrait" src="../img/portraits/sr-def-010.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-010.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">法波可</div>
+        <div class="sub">DEF · sr-def-010</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-011" onclick="toggleSprite(this, 'sr-def-011')">
+      <img class="portrait" src="../img/portraits/sr-def-011.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-011.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">柯西利</div>
+        <div class="sub">DEF · sr-def-011</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-012" onclick="toggleSprite(this, 'sr-def-012')">
+      <img class="portrait" src="../img/portraits/sr-def-012.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-012.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">拉迪維奇</div>
+        <div class="sub">DEF · sr-def-012</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-013" onclick="toggleSprite(this, 'sr-def-013')">
+      <img class="portrait" src="../img/portraits/sr-def-013.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-013.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">哈蘭利</div>
+        <div class="sub">DEF · sr-def-013</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-014" onclick="toggleSprite(this, 'sr-def-014')">
+      <img class="portrait" src="../img/portraits/sr-def-014.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-014.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">柯奧奇</div>
+        <div class="sub">DEF · sr-def-014</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-015" onclick="toggleSprite(this, 'sr-def-015')">
+      <img class="portrait" src="../img/portraits/sr-def-015.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-015.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">薩安遜</div>
+        <div class="sub">DEF · sr-def-015</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-016" onclick="toggleSprite(this, 'sr-def-016')">
+      <img class="portrait" src="../img/portraits/sr-def-016.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-016.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">弗貝森</div>
+        <div class="sub">DEF · sr-def-016</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-017" onclick="toggleSprite(this, 'sr-def-017')">
+      <img class="portrait" src="../img/portraits/sr-def-017.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-017.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">澤安遜</div>
+        <div class="sub">DEF · sr-def-017</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-018" onclick="toggleSprite(this, 'sr-def-018')">
+      <img class="portrait" src="../img/portraits/sr-def-018.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-018.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">瑞迪克</div>
+        <div class="sub">DEF · sr-def-018</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-019" onclick="toggleSprite(this, 'sr-def-019')">
+      <img class="portrait" src="../img/portraits/sr-def-019.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-019.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">迪卡克</div>
+        <div class="sub">DEF · sr-def-019</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-020" onclick="toggleSprite(this, 'sr-def-020')">
+      <img class="portrait" src="../img/portraits/sr-def-020.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-020.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">法頓遜</div>
+        <div class="sub">DEF · sr-def-020</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-021" onclick="toggleSprite(this, 'sr-def-021')">
+      <img class="portrait" src="../img/portraits/sr-def-021.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-021.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">澤迪登</div>
+        <div class="sub">DEF · sr-def-021</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-022" onclick="toggleSprite(this, 'sr-def-022')">
+      <img class="portrait" src="../img/portraits/sr-def-022.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-022.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">帕蘭克</div>
+        <div class="sub">DEF · sr-def-022</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-def-023" onclick="toggleSprite(this, 'sr-def-023')">
+      <img class="portrait" src="../img/portraits/sr-def-023.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-def-023.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">尼貝茲</div>
+        <div class="sub">DEF · sr-def-023</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-024" onclick="toggleSprite(this, 'sr-mid-024')">
+      <img class="portrait" src="../img/portraits/sr-mid-024.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-024.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">尼亞耶夫</div>
+        <div class="sub">MID · sr-mid-024</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-025" onclick="toggleSprite(this, 'sr-mid-025')">
+      <img class="portrait" src="../img/portraits/sr-mid-025.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-025.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">陶奧奇</div>
+        <div class="sub">MID · sr-mid-025</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-026" onclick="toggleSprite(this, 'sr-mid-026')">
+      <img class="portrait" src="../img/portraits/sr-mid-026.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-026.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">柯蘭奇</div>
+        <div class="sub">MID · sr-mid-026</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-027" onclick="toggleSprite(this, 'sr-mid-027')">
+      <img class="portrait" src="../img/portraits/sr-mid-027.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-027.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">澤安曼</div>
+        <div class="sub">MID · sr-mid-027</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-028" onclick="toggleSprite(this, 'sr-mid-028')">
+      <img class="portrait" src="../img/portraits/sr-mid-028.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-028.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">柏亞曼</div>
+        <div class="sub">MID · sr-mid-028</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-029" onclick="toggleSprite(this, 'sr-mid-029')">
+      <img class="portrait" src="../img/portraits/sr-mid-029.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-029.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">迪克曼</div>
+        <div class="sub">MID · sr-mid-029</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-030" onclick="toggleSprite(this, 'sr-mid-030')">
+      <img class="portrait" src="../img/portraits/sr-mid-030.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-030.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">哈瑞蓋</div>
+        <div class="sub">MID · sr-mid-030</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-031" onclick="toggleSprite(this, 'sr-mid-031')">
+      <img class="portrait" src="../img/portraits/sr-mid-031.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-031.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">迪西茲</div>
+        <div class="sub">MID · sr-mid-031</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-032" onclick="toggleSprite(this, 'sr-mid-032')">
+      <img class="portrait" src="../img/portraits/sr-mid-032.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-032.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">陶卡洛</div>
+        <div class="sub">MID · sr-mid-032</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-033" onclick="toggleSprite(this, 'sr-mid-033')">
+      <img class="portrait" src="../img/portraits/sr-mid-033.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-033.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">法奧曼</div>
+        <div class="sub">MID · sr-mid-033</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-034" onclick="toggleSprite(this, 'sr-mid-034')">
+      <img class="portrait" src="../img/portraits/sr-mid-034.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-034.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">帕貝利</div>
+        <div class="sub">MID · sr-mid-034</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-035" onclick="toggleSprite(this, 'sr-mid-035')">
+      <img class="portrait" src="../img/portraits/sr-mid-035.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-035.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">艾西維奇</div>
+        <div class="sub">MID · sr-mid-035</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-036" onclick="toggleSprite(this, 'sr-mid-036')">
+      <img class="portrait" src="../img/portraits/sr-mid-036.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-036.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">艾奧洛</div>
+        <div class="sub">MID · sr-mid-036</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-037" onclick="toggleSprite(this, 'sr-mid-037')">
+      <img class="portrait" src="../img/portraits/sr-mid-037.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-037.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">拉倫登</div>
+        <div class="sub">MID · sr-mid-037</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-mid-038" onclick="toggleSprite(this, 'sr-mid-038')">
+      <img class="portrait" src="../img/portraits/sr-mid-038.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-mid-038.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">澤德尼克</div>
+        <div class="sub">MID · sr-mid-038</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-039" onclick="toggleSprite(this, 'sr-fwd-039')">
+      <img class="portrait" src="../img/portraits/sr-fwd-039.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-039.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">拉利洛</div>
+        <div class="sub">FWD · sr-fwd-039</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-040" onclick="toggleSprite(this, 'sr-fwd-040')">
+      <img class="portrait" src="../img/portraits/sr-fwd-040.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-040.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">瑟利登</div>
+        <div class="sub">FWD · sr-fwd-040</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-041" onclick="toggleSprite(this, 'sr-fwd-041')">
+      <img class="portrait" src="../img/portraits/sr-fwd-041.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-041.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">伊瑞蓋</div>
+        <div class="sub">FWD · sr-fwd-041</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-042" onclick="toggleSprite(this, 'sr-fwd-042')">
+      <img class="portrait" src="../img/portraits/sr-fwd-042.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-042.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">馬頓森</div>
+        <div class="sub">FWD · sr-fwd-042</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-043" onclick="toggleSprite(this, 'sr-fwd-043')">
+      <img class="portrait" src="../img/portraits/sr-fwd-043.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-043.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">瑟亞可</div>
+        <div class="sub">FWD · sr-fwd-043</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-044" onclick="toggleSprite(this, 'sr-fwd-044')">
+      <img class="portrait" src="../img/portraits/sr-fwd-044.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-044.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">尼利維奇</div>
+        <div class="sub">FWD · sr-fwd-044</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-045" onclick="toggleSprite(this, 'sr-fwd-045')">
+      <img class="portrait" src="../img/portraits/sr-fwd-045.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-045.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">尼頓森</div>
+        <div class="sub">FWD · sr-fwd-045</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-046" onclick="toggleSprite(this, 'sr-fwd-046')">
+      <img class="portrait" src="../img/portraits/sr-fwd-046.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-046.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">戴波尼</div>
+        <div class="sub">FWD · sr-fwd-046</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-047" onclick="toggleSprite(this, 'sr-fwd-047')">
+      <img class="portrait" src="../img/portraits/sr-fwd-047.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-047.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">奎德蓋</div>
+        <div class="sub">FWD · sr-fwd-047</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-048" onclick="toggleSprite(this, 'sr-fwd-048')">
+      <img class="portrait" src="../img/portraits/sr-fwd-048.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-048.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">帕拉尼克</div>
+        <div class="sub">FWD · sr-fwd-048</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-049" onclick="toggleSprite(this, 'sr-fwd-049')">
+      <img class="portrait" src="../img/portraits/sr-fwd-049.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-049.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">瑟西洛夫</div>
+        <div class="sub">FWD · sr-fwd-049</div>
+      </div>
+    </div><div class="card r-SR" data-id="sr-fwd-050" onclick="toggleSprite(this, 'sr-fwd-050')">
+      <img class="portrait" src="../img/portraits/sr-fwd-050.png" alt="">
+      <img class="sprite" src="../img/sprites/sr-fwd-050.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">SR</div>
+        <div class="name">迪頓維奇</div>
+        <div class="sub">FWD · sr-fwd-050</div>
+      </div>
+    </div></div></section>
+<section id="R"><h2>R — 150 張</h2><div class="grid"><div class="card r-R" data-id="r-gk-001" onclick="toggleSprite(this, 'r-gk-001')">
+      <img class="portrait" src="../img/portraits/r-gk-001.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-001.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">貝迪茲</div>
+        <div class="sub">GK · r-gk-001</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-002" onclick="toggleSprite(this, 'r-gk-002')">
+      <img class="portrait" src="../img/portraits/r-gk-002.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-002.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">卡德森</div>
+        <div class="sub">GK · r-gk-002</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-003" onclick="toggleSprite(this, 'r-gk-003')">
+      <img class="portrait" src="../img/portraits/r-gk-003.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-003.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">薩貝尼</div>
+        <div class="sub">GK · r-gk-003</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-004" onclick="toggleSprite(this, 'r-gk-004')">
+      <img class="portrait" src="../img/portraits/r-gk-004.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-004.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">迪蘭耶夫</div>
+        <div class="sub">GK · r-gk-004</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-005" onclick="toggleSprite(this, 'r-gk-005')">
+      <img class="portrait" src="../img/portraits/r-gk-005.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-005.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾爾安耶夫</div>
+        <div class="sub">GK · r-gk-005</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-006" onclick="toggleSprite(this, 'r-gk-006')">
+      <img class="portrait" src="../img/portraits/r-gk-006.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-006.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">薩利斯</div>
+        <div class="sub">GK · r-gk-006</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-007" onclick="toggleSprite(this, 'r-gk-007')">
+      <img class="portrait" src="../img/portraits/r-gk-007.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-007.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瑞西尼</div>
+        <div class="sub">GK · r-gk-007</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-008" onclick="toggleSprite(this, 'r-gk-008')">
+      <img class="portrait" src="../img/portraits/r-gk-008.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-008.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">伊拉尼克</div>
+        <div class="sub">GK · r-gk-008</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-009" onclick="toggleSprite(this, 'r-gk-009')">
+      <img class="portrait" src="../img/portraits/r-gk-009.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-009.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瑟亞森</div>
+        <div class="sub">GK · r-gk-009</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-010" onclick="toggleSprite(this, 'r-gk-010')">
+      <img class="portrait" src="../img/portraits/r-gk-010.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-010.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">柯亞奇</div>
+        <div class="sub">GK · r-gk-010</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-011" onclick="toggleSprite(this, 'r-gk-011')">
+      <img class="portrait" src="../img/portraits/r-gk-011.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-011.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">加迪曼</div>
+        <div class="sub">GK · r-gk-011</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-012" onclick="toggleSprite(this, 'r-gk-012')">
+      <img class="portrait" src="../img/portraits/r-gk-012.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-012.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">凱西可</div>
+        <div class="sub">GK · r-gk-012</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-013" onclick="toggleSprite(this, 'r-gk-013')">
+      <img class="portrait" src="../img/portraits/r-gk-013.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-013.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">馬倫蓋</div>
+        <div class="sub">GK · r-gk-013</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-014" onclick="toggleSprite(this, 'r-gk-014')">
+      <img class="portrait" src="../img/portraits/r-gk-014.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-014.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瓦拉森</div>
+        <div class="sub">GK · r-gk-014</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-015" onclick="toggleSprite(this, 'r-gk-015')">
+      <img class="portrait" src="../img/portraits/r-gk-015.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-015.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">奎迪尼克</div>
+        <div class="sub">GK · r-gk-015</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-016" onclick="toggleSprite(this, 'r-gk-016')">
+      <img class="portrait" src="../img/portraits/r-gk-016.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-016.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">戴德遜</div>
+        <div class="sub">GK · r-gk-016</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-017" onclick="toggleSprite(this, 'r-gk-017')">
+      <img class="portrait" src="../img/portraits/r-gk-017.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-017.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">奎利尼克</div>
+        <div class="sub">GK · r-gk-017</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-018" onclick="toggleSprite(this, 'r-gk-018')">
+      <img class="portrait" src="../img/portraits/r-gk-018.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-018.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">伊波尼克</div>
+        <div class="sub">GK · r-gk-018</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-019" onclick="toggleSprite(this, 'r-gk-019')">
+      <img class="portrait" src="../img/portraits/r-gk-019.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-019.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">帕克維奇</div>
+        <div class="sub">GK · r-gk-019</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-020" onclick="toggleSprite(this, 'r-gk-020')">
+      <img class="portrait" src="../img/portraits/r-gk-020.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-020.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">尼波尼</div>
+        <div class="sub">GK · r-gk-020</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-021" onclick="toggleSprite(this, 'r-gk-021')">
+      <img class="portrait" src="../img/portraits/r-gk-021.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-021.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">拉貝遜</div>
+        <div class="sub">GK · r-gk-021</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-022" onclick="toggleSprite(this, 'r-gk-022')">
+      <img class="portrait" src="../img/portraits/r-gk-022.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-022.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">帕德登</div>
+        <div class="sub">GK · r-gk-022</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-023" onclick="toggleSprite(this, 'r-gk-023')">
+      <img class="portrait" src="../img/portraits/r-gk-023.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-023.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾爾奧茲</div>
+        <div class="sub">GK · r-gk-023</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-024" onclick="toggleSprite(this, 'r-gk-024')">
+      <img class="portrait" src="../img/portraits/r-gk-024.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-024.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">帕貝洛</div>
+        <div class="sub">GK · r-gk-024</div>
+      </div>
+    </div><div class="card r-R" data-id="r-gk-025" onclick="toggleSprite(this, 'r-gk-025')">
+      <img class="portrait" src="../img/portraits/r-gk-025.png" alt="">
+      <img class="sprite" src="../img/sprites/r-gk-025.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">柯德克</div>
+        <div class="sub">GK · r-gk-025</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-026" onclick="toggleSprite(this, 'r-def-026')">
+      <img class="portrait" src="../img/portraits/r-def-026.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-026.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">馬克可</div>
+        <div class="sub">DEF · r-def-026</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-027" onclick="toggleSprite(this, 'r-def-027')">
+      <img class="portrait" src="../img/portraits/r-def-027.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-027.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">尼奧森</div>
+        <div class="sub">DEF · r-def-027</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-028" onclick="toggleSprite(this, 'r-def-028')">
+      <img class="portrait" src="../img/portraits/r-def-028.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-028.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">加利蓋</div>
+        <div class="sub">DEF · r-def-028</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-029" onclick="toggleSprite(this, 'r-def-029')">
+      <img class="portrait" src="../img/portraits/r-def-029.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-029.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾貝斯</div>
+        <div class="sub">DEF · r-def-029</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-030" onclick="toggleSprite(this, 'r-def-030')">
+      <img class="portrait" src="../img/portraits/r-def-030.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-030.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾迪奇</div>
+        <div class="sub">DEF · r-def-030</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-031" onclick="toggleSprite(this, 'r-def-031')">
+      <img class="portrait" src="../img/portraits/r-def-031.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-031.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">馬蘭森</div>
+        <div class="sub">DEF · r-def-031</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-032" onclick="toggleSprite(this, 'r-def-032')">
+      <img class="portrait" src="../img/portraits/r-def-032.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-032.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">薩卡克</div>
+        <div class="sub">DEF · r-def-032</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-033" onclick="toggleSprite(this, 'r-def-033')">
+      <img class="portrait" src="../img/portraits/r-def-033.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-033.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">澤卡洛</div>
+        <div class="sub">DEF · r-def-033</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-034" onclick="toggleSprite(this, 'r-def-034')">
+      <img class="portrait" src="../img/portraits/r-def-034.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-034.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">法貝森</div>
+        <div class="sub">DEF · r-def-034</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-035" onclick="toggleSprite(this, 'r-def-035')">
+      <img class="portrait" src="../img/portraits/r-def-035.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-035.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">卡德森</div>
+        <div class="sub">DEF · r-def-035</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-036" onclick="toggleSprite(this, 'r-def-036')">
+      <img class="portrait" src="../img/portraits/r-def-036.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-036.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">烏卡克</div>
+        <div class="sub">DEF · r-def-036</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-037" onclick="toggleSprite(this, 'r-def-037')">
+      <img class="portrait" src="../img/portraits/r-def-037.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-037.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">哈西奇</div>
+        <div class="sub">DEF · r-def-037</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-038" onclick="toggleSprite(this, 'r-def-038')">
+      <img class="portrait" src="../img/portraits/r-def-038.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-038.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">卡倫耶夫</div>
+        <div class="sub">DEF · r-def-038</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-039" onclick="toggleSprite(this, 'r-def-039')">
+      <img class="portrait" src="../img/portraits/r-def-039.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-039.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">拉德曼</div>
+        <div class="sub">DEF · r-def-039</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-040" onclick="toggleSprite(this, 'r-def-040')">
+      <img class="portrait" src="../img/portraits/r-def-040.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-040.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">馬克尼克</div>
+        <div class="sub">DEF · r-def-040</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-041" onclick="toggleSprite(this, 'r-def-041')">
+      <img class="portrait" src="../img/portraits/r-def-041.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-041.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">馬卡曼</div>
+        <div class="sub">DEF · r-def-041</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-042" onclick="toggleSprite(this, 'r-def-042')">
+      <img class="portrait" src="../img/portraits/r-def-042.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-042.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">陶蘭登</div>
+        <div class="sub">DEF · r-def-042</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-043" onclick="toggleSprite(this, 'r-def-043')">
+      <img class="portrait" src="../img/portraits/r-def-043.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-043.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">凱安耶夫</div>
+        <div class="sub">DEF · r-def-043</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-044" onclick="toggleSprite(this, 'r-def-044')">
+      <img class="portrait" src="../img/portraits/r-def-044.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-044.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">澤安斯</div>
+        <div class="sub">DEF · r-def-044</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-045" onclick="toggleSprite(this, 'r-def-045')">
+      <img class="portrait" src="../img/portraits/r-def-045.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-045.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">加奧茲</div>
+        <div class="sub">DEF · r-def-045</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-046" onclick="toggleSprite(this, 'r-def-046')">
+      <img class="portrait" src="../img/portraits/r-def-046.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-046.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">柯克森</div>
+        <div class="sub">DEF · r-def-046</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-047" onclick="toggleSprite(this, 'r-def-047')">
+      <img class="portrait" src="../img/portraits/r-def-047.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-047.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾波克</div>
+        <div class="sub">DEF · r-def-047</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-048" onclick="toggleSprite(this, 'r-def-048')">
+      <img class="portrait" src="../img/portraits/r-def-048.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-048.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">柯倫斯</div>
+        <div class="sub">DEF · r-def-048</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-049" onclick="toggleSprite(this, 'r-def-049')">
+      <img class="portrait" src="../img/portraits/r-def-049.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-049.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">烏瑞尼克</div>
+        <div class="sub">DEF · r-def-049</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-050" onclick="toggleSprite(this, 'r-def-050')">
+      <img class="portrait" src="../img/portraits/r-def-050.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-050.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瓦亞克</div>
+        <div class="sub">DEF · r-def-050</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-051" onclick="toggleSprite(this, 'r-def-051')">
+      <img class="portrait" src="../img/portraits/r-def-051.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-051.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">伊波奇</div>
+        <div class="sub">DEF · r-def-051</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-052" onclick="toggleSprite(this, 'r-def-052')">
+      <img class="portrait" src="../img/portraits/r-def-052.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-052.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瑞迪尼</div>
+        <div class="sub">DEF · r-def-052</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-053" onclick="toggleSprite(this, 'r-def-053')">
+      <img class="portrait" src="../img/portraits/r-def-053.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-053.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">柏奧尼</div>
+        <div class="sub">DEF · r-def-053</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-054" onclick="toggleSprite(this, 'r-def-054')">
+      <img class="portrait" src="../img/portraits/r-def-054.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-054.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">傑頓森</div>
+        <div class="sub">DEF · r-def-054</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-055" onclick="toggleSprite(this, 'r-def-055')">
+      <img class="portrait" src="../img/portraits/r-def-055.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-055.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">伊拉茲</div>
+        <div class="sub">DEF · r-def-055</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-056" onclick="toggleSprite(this, 'r-def-056')">
+      <img class="portrait" src="../img/portraits/r-def-056.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-056.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瑟德洛夫</div>
+        <div class="sub">DEF · r-def-056</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-057" onclick="toggleSprite(this, 'r-def-057')">
+      <img class="portrait" src="../img/portraits/r-def-057.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-057.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">薩頓蓋</div>
+        <div class="sub">DEF · r-def-057</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-058" onclick="toggleSprite(this, 'r-def-058')">
+      <img class="portrait" src="../img/portraits/r-def-058.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-058.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">帕倫可</div>
+        <div class="sub">DEF · r-def-058</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-059" onclick="toggleSprite(this, 'r-def-059')">
+      <img class="portrait" src="../img/portraits/r-def-059.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-059.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">奇瑞洛</div>
+        <div class="sub">DEF · r-def-059</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-060" onclick="toggleSprite(this, 'r-def-060')">
+      <img class="portrait" src="../img/portraits/r-def-060.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-060.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">貝拉洛夫</div>
+        <div class="sub">DEF · r-def-060</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-061" onclick="toggleSprite(this, 'r-def-061')">
+      <img class="portrait" src="../img/portraits/r-def-061.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-061.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">德蘭利</div>
+        <div class="sub">DEF · r-def-061</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-062" onclick="toggleSprite(this, 'r-def-062')">
+      <img class="portrait" src="../img/portraits/r-def-062.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-062.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">馬波蓋</div>
+        <div class="sub">DEF · r-def-062</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-063" onclick="toggleSprite(this, 'r-def-063')">
+      <img class="portrait" src="../img/portraits/r-def-063.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-063.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">加瑞森</div>
+        <div class="sub">DEF · r-def-063</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-064" onclick="toggleSprite(this, 'r-def-064')">
+      <img class="portrait" src="../img/portraits/r-def-064.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-064.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瓦亞登</div>
+        <div class="sub">DEF · r-def-064</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-065" onclick="toggleSprite(this, 'r-def-065')">
+      <img class="portrait" src="../img/portraits/r-def-065.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-065.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">哈頓洛夫</div>
+        <div class="sub">DEF · r-def-065</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-066" onclick="toggleSprite(this, 'r-def-066')">
+      <img class="portrait" src="../img/portraits/r-def-066.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-066.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾洛森</div>
+        <div class="sub">DEF · r-def-066</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-067" onclick="toggleSprite(this, 'r-def-067')">
+      <img class="portrait" src="../img/portraits/r-def-067.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-067.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">法貝斯</div>
+        <div class="sub">DEF · r-def-067</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-068" onclick="toggleSprite(this, 'r-def-068')">
+      <img class="portrait" src="../img/portraits/r-def-068.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-068.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">德洛奇</div>
+        <div class="sub">DEF · r-def-068</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-069" onclick="toggleSprite(this, 'r-def-069')">
+      <img class="portrait" src="../img/portraits/r-def-069.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-069.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">戴波克</div>
+        <div class="sub">DEF · r-def-069</div>
+      </div>
+    </div><div class="card r-R" data-id="r-def-070" onclick="toggleSprite(this, 'r-def-070')">
+      <img class="portrait" src="../img/portraits/r-def-070.png" alt="">
+      <img class="sprite" src="../img/sprites/r-def-070.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">加亞耶夫</div>
+        <div class="sub">DEF · r-def-070</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-071" onclick="toggleSprite(this, 'r-mid-071')">
+      <img class="portrait" src="../img/portraits/r-mid-071.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-071.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">柏卡可</div>
+        <div class="sub">MID · r-mid-071</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-072" onclick="toggleSprite(this, 'r-mid-072')">
+      <img class="portrait" src="../img/portraits/r-mid-072.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-072.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">法瑞奇</div>
+        <div class="sub">MID · r-mid-072</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-073" onclick="toggleSprite(this, 'r-mid-073')">
+      <img class="portrait" src="../img/portraits/r-mid-073.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-073.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">帕亞曼</div>
+        <div class="sub">MID · r-mid-073</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-074" onclick="toggleSprite(this, 'r-mid-074')">
+      <img class="portrait" src="../img/portraits/r-mid-074.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-074.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">卡貝洛夫</div>
+        <div class="sub">MID · r-mid-074</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-075" onclick="toggleSprite(this, 'r-mid-075')">
+      <img class="portrait" src="../img/portraits/r-mid-075.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-075.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾爾亞利</div>
+        <div class="sub">MID · r-mid-075</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-076" onclick="toggleSprite(this, 'r-mid-076')">
+      <img class="portrait" src="../img/portraits/r-mid-076.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-076.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">奇頓利</div>
+        <div class="sub">MID · r-mid-076</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-077" onclick="toggleSprite(this, 'r-mid-077')">
+      <img class="portrait" src="../img/portraits/r-mid-077.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-077.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">陶波森</div>
+        <div class="sub">MID · r-mid-077</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-078" onclick="toggleSprite(this, 'r-mid-078')">
+      <img class="portrait" src="../img/portraits/r-mid-078.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-078.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">陶瑞可</div>
+        <div class="sub">MID · r-mid-078</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-079" onclick="toggleSprite(this, 'r-mid-079')">
+      <img class="portrait" src="../img/portraits/r-mid-079.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-079.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">德迪克</div>
+        <div class="sub">MID · r-mid-079</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-080" onclick="toggleSprite(this, 'r-mid-080')">
+      <img class="portrait" src="../img/portraits/r-mid-080.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-080.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">傑克曼</div>
+        <div class="sub">MID · r-mid-080</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-081" onclick="toggleSprite(this, 'r-mid-081')">
+      <img class="portrait" src="../img/portraits/r-mid-081.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-081.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">奧克奇</div>
+        <div class="sub">MID · r-mid-081</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-082" onclick="toggleSprite(this, 'r-mid-082')">
+      <img class="portrait" src="../img/portraits/r-mid-082.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-082.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">迪波克</div>
+        <div class="sub">MID · r-mid-082</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-083" onclick="toggleSprite(this, 'r-mid-083')">
+      <img class="portrait" src="../img/portraits/r-mid-083.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-083.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瓦亞蓋</div>
+        <div class="sub">MID · r-mid-083</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-084" onclick="toggleSprite(this, 'r-mid-084')">
+      <img class="portrait" src="../img/portraits/r-mid-084.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-084.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">凱卡曼</div>
+        <div class="sub">MID · r-mid-084</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-085" onclick="toggleSprite(this, 'r-mid-085')">
+      <img class="portrait" src="../img/portraits/r-mid-085.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-085.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瑟拉可</div>
+        <div class="sub">MID · r-mid-085</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-086" onclick="toggleSprite(this, 'r-mid-086')">
+      <img class="portrait" src="../img/portraits/r-mid-086.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-086.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瓦蘭洛</div>
+        <div class="sub">MID · r-mid-086</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-087" onclick="toggleSprite(this, 'r-mid-087')">
+      <img class="portrait" src="../img/portraits/r-mid-087.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-087.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">戴利洛</div>
+        <div class="sub">MID · r-mid-087</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-088" onclick="toggleSprite(this, 'r-mid-088')">
+      <img class="portrait" src="../img/portraits/r-mid-088.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-088.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">卡貝森</div>
+        <div class="sub">MID · r-mid-088</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-089" onclick="toggleSprite(this, 'r-mid-089')">
+      <img class="portrait" src="../img/portraits/r-mid-089.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-089.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">卡蘭登</div>
+        <div class="sub">MID · r-mid-089</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-090" onclick="toggleSprite(this, 'r-mid-090')">
+      <img class="portrait" src="../img/portraits/r-mid-090.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-090.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">傑奧耶夫</div>
+        <div class="sub">MID · r-mid-090</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-091" onclick="toggleSprite(this, 'r-mid-091')">
+      <img class="portrait" src="../img/portraits/r-mid-091.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-091.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">貝奧尼</div>
+        <div class="sub">MID · r-mid-091</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-092" onclick="toggleSprite(this, 'r-mid-092')">
+      <img class="portrait" src="../img/portraits/r-mid-092.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-092.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">奧奧森</div>
+        <div class="sub">MID · r-mid-092</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-093" onclick="toggleSprite(this, 'r-mid-093')">
+      <img class="portrait" src="../img/portraits/r-mid-093.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-093.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">迪卡尼克</div>
+        <div class="sub">MID · r-mid-093</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-094" onclick="toggleSprite(this, 'r-mid-094')">
+      <img class="portrait" src="../img/portraits/r-mid-094.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-094.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">奎迪蓋</div>
+        <div class="sub">MID · r-mid-094</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-095" onclick="toggleSprite(this, 'r-mid-095')">
+      <img class="portrait" src="../img/portraits/r-mid-095.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-095.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">烏利遜</div>
+        <div class="sub">MID · r-mid-095</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-096" onclick="toggleSprite(this, 'r-mid-096')">
+      <img class="portrait" src="../img/portraits/r-mid-096.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-096.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">帕安蓋</div>
+        <div class="sub">MID · r-mid-096</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-097" onclick="toggleSprite(this, 'r-mid-097')">
+      <img class="portrait" src="../img/portraits/r-mid-097.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-097.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">凱洛森</div>
+        <div class="sub">MID · r-mid-097</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-098" onclick="toggleSprite(this, 'r-mid-098')">
+      <img class="portrait" src="../img/portraits/r-mid-098.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-098.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">馬倫遜</div>
+        <div class="sub">MID · r-mid-098</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-099" onclick="toggleSprite(this, 'r-mid-099')">
+      <img class="portrait" src="../img/portraits/r-mid-099.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-099.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾洛可</div>
+        <div class="sub">MID · r-mid-099</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-100" onclick="toggleSprite(this, 'r-mid-100')">
+      <img class="portrait" src="../img/portraits/r-mid-100.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-100.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">哈卡茲</div>
+        <div class="sub">MID · r-mid-100</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-101" onclick="toggleSprite(this, 'r-mid-101')">
+      <img class="portrait" src="../img/portraits/r-mid-101.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-101.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">帕亞茲</div>
+        <div class="sub">MID · r-mid-101</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-102" onclick="toggleSprite(this, 'r-mid-102')">
+      <img class="portrait" src="../img/portraits/r-mid-102.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-102.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾安克</div>
+        <div class="sub">MID · r-mid-102</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-103" onclick="toggleSprite(this, 'r-mid-103')">
+      <img class="portrait" src="../img/portraits/r-mid-103.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-103.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瑟德尼克</div>
+        <div class="sub">MID · r-mid-103</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-104" onclick="toggleSprite(this, 'r-mid-104')">
+      <img class="portrait" src="../img/portraits/r-mid-104.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-104.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">陶亞維奇</div>
+        <div class="sub">MID · r-mid-104</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-105" onclick="toggleSprite(this, 'r-mid-105')">
+      <img class="portrait" src="../img/portraits/r-mid-105.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-105.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">傑安利</div>
+        <div class="sub">MID · r-mid-105</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-106" onclick="toggleSprite(this, 'r-mid-106')">
+      <img class="portrait" src="../img/portraits/r-mid-106.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-106.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">加蘭洛夫</div>
+        <div class="sub">MID · r-mid-106</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-107" onclick="toggleSprite(this, 'r-mid-107')">
+      <img class="portrait" src="../img/portraits/r-mid-107.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-107.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瑞洛奇</div>
+        <div class="sub">MID · r-mid-107</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-108" onclick="toggleSprite(this, 'r-mid-108')">
+      <img class="portrait" src="../img/portraits/r-mid-108.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-108.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">烏德尼克</div>
+        <div class="sub">MID · r-mid-108</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-109" onclick="toggleSprite(this, 'r-mid-109')">
+      <img class="portrait" src="../img/portraits/r-mid-109.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-109.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">澤迪森</div>
+        <div class="sub">MID · r-mid-109</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-110" onclick="toggleSprite(this, 'r-mid-110')">
+      <img class="portrait" src="../img/portraits/r-mid-110.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-110.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">德利斯</div>
+        <div class="sub">MID · r-mid-110</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-111" onclick="toggleSprite(this, 'r-mid-111')">
+      <img class="portrait" src="../img/portraits/r-mid-111.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-111.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">迪卡蓋</div>
+        <div class="sub">MID · r-mid-111</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-112" onclick="toggleSprite(this, 'r-mid-112')">
+      <img class="portrait" src="../img/portraits/r-mid-112.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-112.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">馬倫耶夫</div>
+        <div class="sub">MID · r-mid-112</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-113" onclick="toggleSprite(this, 'r-mid-113')">
+      <img class="portrait" src="../img/portraits/r-mid-113.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-113.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">奇拉維奇</div>
+        <div class="sub">MID · r-mid-113</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-114" onclick="toggleSprite(this, 'r-mid-114')">
+      <img class="portrait" src="../img/portraits/r-mid-114.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-114.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">陶西蓋</div>
+        <div class="sub">MID · r-mid-114</div>
+      </div>
+    </div><div class="card r-R" data-id="r-mid-115" onclick="toggleSprite(this, 'r-mid-115')">
+      <img class="portrait" src="../img/portraits/r-mid-115.png" alt="">
+      <img class="sprite" src="../img/sprites/r-mid-115.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">迪波蓋</div>
+        <div class="sub">MID · r-mid-115</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-116" onclick="toggleSprite(this, 'r-fwd-116')">
+      <img class="portrait" src="../img/portraits/r-fwd-116.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-116.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">柏西可</div>
+        <div class="sub">FWD · r-fwd-116</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-117" onclick="toggleSprite(this, 'r-fwd-117')">
+      <img class="portrait" src="../img/portraits/r-fwd-117.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-117.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">弗利曼</div>
+        <div class="sub">FWD · r-fwd-117</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-118" onclick="toggleSprite(this, 'r-fwd-118')">
+      <img class="portrait" src="../img/portraits/r-fwd-118.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-118.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">迪頓尼</div>
+        <div class="sub">FWD · r-fwd-118</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-119" onclick="toggleSprite(this, 'r-fwd-119')">
+      <img class="portrait" src="../img/portraits/r-fwd-119.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-119.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">帕卡洛夫</div>
+        <div class="sub">FWD · r-fwd-119</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-120" onclick="toggleSprite(this, 'r-fwd-120')">
+      <img class="portrait" src="../img/portraits/r-fwd-120.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-120.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">迪洛尼</div>
+        <div class="sub">FWD · r-fwd-120</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-121" onclick="toggleSprite(this, 'r-fwd-121')">
+      <img class="portrait" src="../img/portraits/r-fwd-121.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-121.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">加倫洛</div>
+        <div class="sub">FWD · r-fwd-121</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-122" onclick="toggleSprite(this, 'r-fwd-122')">
+      <img class="portrait" src="../img/portraits/r-fwd-122.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-122.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">澤波尼克</div>
+        <div class="sub">FWD · r-fwd-122</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-123" onclick="toggleSprite(this, 'r-fwd-123')">
+      <img class="portrait" src="../img/portraits/r-fwd-123.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-123.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">柏倫遜</div>
+        <div class="sub">FWD · r-fwd-123</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-124" onclick="toggleSprite(this, 'r-fwd-124')">
+      <img class="portrait" src="../img/portraits/r-fwd-124.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-124.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瑞拉遜</div>
+        <div class="sub">FWD · r-fwd-124</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-125" onclick="toggleSprite(this, 'r-fwd-125')">
+      <img class="portrait" src="../img/portraits/r-fwd-125.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-125.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">凱洛克</div>
+        <div class="sub">FWD · r-fwd-125</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-126" onclick="toggleSprite(this, 'r-fwd-126')">
+      <img class="portrait" src="../img/portraits/r-fwd-126.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-126.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">傑洛洛夫</div>
+        <div class="sub">FWD · r-fwd-126</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-127" onclick="toggleSprite(this, 'r-fwd-127')">
+      <img class="portrait" src="../img/portraits/r-fwd-127.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-127.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">澤瑞曼</div>
+        <div class="sub">FWD · r-fwd-127</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-128" onclick="toggleSprite(this, 'r-fwd-128')">
+      <img class="portrait" src="../img/portraits/r-fwd-128.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-128.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾迪洛</div>
+        <div class="sub">FWD · r-fwd-128</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-129" onclick="toggleSprite(this, 'r-fwd-129')">
+      <img class="portrait" src="../img/portraits/r-fwd-129.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-129.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾爾貝可</div>
+        <div class="sub">FWD · r-fwd-129</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-130" onclick="toggleSprite(this, 'r-fwd-130')">
+      <img class="portrait" src="../img/portraits/r-fwd-130.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-130.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">奎利曼</div>
+        <div class="sub">FWD · r-fwd-130</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-131" onclick="toggleSprite(this, 'r-fwd-131')">
+      <img class="portrait" src="../img/portraits/r-fwd-131.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-131.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">馬倫利</div>
+        <div class="sub">FWD · r-fwd-131</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-132" onclick="toggleSprite(this, 'r-fwd-132')">
+      <img class="portrait" src="../img/portraits/r-fwd-132.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-132.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">戴克登</div>
+        <div class="sub">FWD · r-fwd-132</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-133" onclick="toggleSprite(this, 'r-fwd-133')">
+      <img class="portrait" src="../img/portraits/r-fwd-133.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-133.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">薩德茲</div>
+        <div class="sub">FWD · r-fwd-133</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-134" onclick="toggleSprite(this, 'r-fwd-134')">
+      <img class="portrait" src="../img/portraits/r-fwd-134.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-134.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">尼迪奇</div>
+        <div class="sub">FWD · r-fwd-134</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-135" onclick="toggleSprite(this, 'r-fwd-135')">
+      <img class="portrait" src="../img/portraits/r-fwd-135.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-135.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瓦頓耶夫</div>
+        <div class="sub">FWD · r-fwd-135</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-136" onclick="toggleSprite(this, 'r-fwd-136')">
+      <img class="portrait" src="../img/portraits/r-fwd-136.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-136.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瓦波蓋</div>
+        <div class="sub">FWD · r-fwd-136</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-137" onclick="toggleSprite(this, 'r-fwd-137')">
+      <img class="portrait" src="../img/portraits/r-fwd-137.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-137.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瓦迪耶夫</div>
+        <div class="sub">FWD · r-fwd-137</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-138" onclick="toggleSprite(this, 'r-fwd-138')">
+      <img class="portrait" src="../img/portraits/r-fwd-138.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-138.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾卡尼</div>
+        <div class="sub">FWD · r-fwd-138</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-139" onclick="toggleSprite(this, 'r-fwd-139')">
+      <img class="portrait" src="../img/portraits/r-fwd-139.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-139.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">弗卡奇</div>
+        <div class="sub">FWD · r-fwd-139</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-140" onclick="toggleSprite(this, 'r-fwd-140')">
+      <img class="portrait" src="../img/portraits/r-fwd-140.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-140.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">艾爾卡克</div>
+        <div class="sub">FWD · r-fwd-140</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-141" onclick="toggleSprite(this, 'r-fwd-141')">
+      <img class="portrait" src="../img/portraits/r-fwd-141.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-141.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">瑞卡森</div>
+        <div class="sub">FWD · r-fwd-141</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-142" onclick="toggleSprite(this, 'r-fwd-142')">
+      <img class="portrait" src="../img/portraits/r-fwd-142.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-142.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">加瑞利</div>
+        <div class="sub">FWD · r-fwd-142</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-143" onclick="toggleSprite(this, 'r-fwd-143')">
+      <img class="portrait" src="../img/portraits/r-fwd-143.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-143.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">凱西登</div>
+        <div class="sub">FWD · r-fwd-143</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-144" onclick="toggleSprite(this, 'r-fwd-144')">
+      <img class="portrait" src="../img/portraits/r-fwd-144.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-144.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">加奧利</div>
+        <div class="sub">FWD · r-fwd-144</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-145" onclick="toggleSprite(this, 'r-fwd-145')">
+      <img class="portrait" src="../img/portraits/r-fwd-145.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-145.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">戴西蓋</div>
+        <div class="sub">FWD · r-fwd-145</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-146" onclick="toggleSprite(this, 'r-fwd-146')">
+      <img class="portrait" src="../img/portraits/r-fwd-146.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-146.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">德安登</div>
+        <div class="sub">FWD · r-fwd-146</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-147" onclick="toggleSprite(this, 'r-fwd-147')">
+      <img class="portrait" src="../img/portraits/r-fwd-147.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-147.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">陶西洛夫</div>
+        <div class="sub">FWD · r-fwd-147</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-148" onclick="toggleSprite(this, 'r-fwd-148')">
+      <img class="portrait" src="../img/portraits/r-fwd-148.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-148.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">奇卡尼克</div>
+        <div class="sub">FWD · r-fwd-148</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-149" onclick="toggleSprite(this, 'r-fwd-149')">
+      <img class="portrait" src="../img/portraits/r-fwd-149.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-149.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">法倫尼克</div>
+        <div class="sub">FWD · r-fwd-149</div>
+      </div>
+    </div><div class="card r-R" data-id="r-fwd-150" onclick="toggleSprite(this, 'r-fwd-150')">
+      <img class="portrait" src="../img/portraits/r-fwd-150.png" alt="">
+      <img class="sprite" src="../img/sprites/r-fwd-150.png" alt="" style="display:none">
+      <div class="meta">
+        <div class="rarity">R</div>
+        <div class="name">烏奧遜</div>
+        <div class="sub">FWD · r-fwd-150</div>
+      </div>
+    </div></div></section>
+
+<script>
+  function toggleSprite(el, cardId) {
+    const p = el.querySelector('.portrait');
+    const s = el.querySelector('.sprite');
+    if (p.style.display === 'none') {
+      p.style.display = '';
+      s.style.display = 'none';
+    } else {
+      p.style.display = 'none';
+      s.style.display = '';
+    }
+  }
+</script>
+</body>
+</html>
