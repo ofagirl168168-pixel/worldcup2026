@@ -189,18 +189,19 @@
 
     // 寬一點才裝得下 slash 揮腿、spellcast 舉手張開的手臂
     const FRAME_W = 48, FRAME_H = 64;
-    const FRAME_COLS = 3, FRAME_ROWS = 6;
+    const FRAME_COLS = 3, FRAME_ROWS = 7;
     // row 順序：0=walk-down, 1=walk-left, 2=walk-right, 3=walk-up,
-    //          4=kick(slash-down), 5=stretch(spellcast-down)
-    // LPC y 行：walk=8/9/10/11、slash=12-15、spellcast=0-3
-    const ROW_TO_LPC_Y = [10*64, 9*64, 11*64, 8*64, 14*64, 2*64];
+    //          4=kick(slash-down), 5=cheer/stretch(spellcast-down), 6=frustration(hurt)
+    // LPC y 行：walk=8/9/10/11、slash=12-15、spellcast=0-3、hurt=20
+    const ROW_TO_LPC_Y = [10*64, 9*64, 11*64, 8*64, 14*64, 2*64, 20*64];
     const ROW_FRAMES = [
-      [1, 4, 7],  // walk-down 3 frames
+      [1, 4, 7],  // walk-down
       [1, 4, 7],
       [1, 4, 7],
       [1, 4, 7],
-      [2, 4, 5],  // kick：slash-down 取揮腿幾 frame
-      [3, 5, 6],  // stretch：spellcast-down 取手抬高幾 frame
+      [2, 4, 5],  // kick：slash-down 揮腿
+      [3, 5, 6],  // cheer：spellcast-down 舉手
+      [1, 3, 5],  // frustration：hurt 蹲下/抱頭幾 frame
     ];
 
     const SX = 8, SY_OFF = 0;  // 寬 8-55、高 0-63 整個 frame、手臂 + 頂部頭髮都裝得下

@@ -2136,13 +2136,10 @@
   image-rendering: pixelated;
 }
 .mt-home-sun {
-  position: absolute; top: 18%; right: 14%;
-  width: 22px; height: 22px;
-  background: #ffd866;
-  border: 2px solid #1a1a2e;
-  box-shadow:
-    0 0 0 3px #ffd866,
-    0 0 0 5px #1a1a2e;
+  position: absolute; top: 14%; right: 14%;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: radial-gradient(circle, #fff7c0 0%, #ffd866 70%, #ffaa33 100%);
+  box-shadow: 0 0 26px rgba(255,200,80,0.75);
 }
 .mt-home-cloud {
   position: absolute;

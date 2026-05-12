@@ -541,7 +541,7 @@
       const injured = (w.player.injured_until && new Date(w.player.injured_until) > now)
         ? '<span class="mt-pitch-injury">🏥</span>' : '';
       const SCALE = w.scale;
-      const SHEET_ROWS = 6;  // walk×4 + kick + stretch
+      const SHEET_ROWS = 7;  // walk×4 + kick + cheer + frustration
       const SHEET_COLS = 3;
       el.innerHTML = `
         <div class="mt-home-shadow"></div>

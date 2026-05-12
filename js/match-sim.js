@@ -32,7 +32,7 @@
   const MATCH_MINUTES = 90;
   const REAL_SECONDS = 60;
   const HT_PAUSE_SEC = 0.8;
-  const GOAL_PAUSE_SEC = 0.8;
+  const GOAL_PAUSE_SEC = 2.6;   // 進球後暫停看慶祝動畫
   const TOTAL_FRAMES = FPS * REAL_SECONDS;
 
   // ── 陣型解析 ────────────────────────────────────────────
@@ -185,20 +185,27 @@
       const cx = p.x * PITCH_W;
       const cy = p.y * PITCH_H;
 
-      // 判斷朝向：先比較 ty 變化（南北），再比較 tx 變化（東西）
-      const dyMov = (p.ty || p.y) - p.y;
-      const dxMov = (p.tx || p.x) - p.x;
-      const movingAmt = Math.abs(dxMov) + Math.abs(dyMov);
-      const moving = movingAmt > 0.0005;
-      // PIPOYA row 順序：0=down, 1=left, 2=right, 3=up
-      let dirRow;
-      if (Math.abs(dyMov) > Math.abs(dxMov)) {
-        dirRow = dyMov > 0 ? 0 : 3;  // y 增 = 往下、y 減 = 往上
+      // 進球慶祝/懊惱：覆寫 row + frame
+      let dirRow, frame;
+      if (state.phase === 'celebrate' && state.pauseFrames > 0) {
+        // 得分隊歡呼 (row 5)、敵隊懊惱 (row 6)
+        dirRow = (p.team === state.flashTeam) ? 5 : 6;
+        // 動作 frame 緩慢 cycle（每 16 tick 換 frame）
+        frame = Math.floor(_renderTick / 16) % 3;
       } else {
-        dirRow = dxMov < 0 ? 1 : 2;  // x 減 = 往左、x 增 = 往右
+        // 判斷朝向：先比較 ty 變化（南北），再比較 tx 變化（東西）
+        const dyMov = (p.ty || p.y) - p.y;
+        const dxMov = (p.tx || p.x) - p.x;
+        const movingAmt = Math.abs(dxMov) + Math.abs(dyMov);
+        const moving = movingAmt > 0.0005;
+        // row 順序：0=down, 1=left, 2=right, 3=up
+        if (Math.abs(dyMov) > Math.abs(dxMov)) {
+          dirRow = dyMov > 0 ? 0 : 3;
+        } else {
+          dirRow = dxMov < 0 ? 1 : 2;
+        }
+        frame = moving ? (Math.floor(_renderTick / 8) % 3) : 1;
       }
-      // 走路 3 frames: 0 左腳 / 1 idle / 2 右腳
-      const frame = moving ? (Math.floor(_renderTick / 8) % 3) : 1;
 
       // possessor 腳下白光圓影
       if (isPos) {
@@ -221,15 +228,15 @@
       ctx.fill();
 
       // 取 sprite sheet 並 drawImage
-      // sheet 可能是 PIPOYA HTMLImageElement，或 LPC 預合成的 { source, frameW, frameH }
+      // sheet 可能是 PIPOYA HTMLImageElement，或 LPC 預合成的 { canvas, frameW, frameH }
       const sheetEntry = state.spriteCache?.get(p.card_id);
       let sheet, frameW, frameH, drawW, drawH;
-      if (sheetEntry && sheetEntry.source) {
-        // LPC：{ source: canvas, frameW: 32, frameH: 40 }
-        sheet = sheetEntry.source;
+      if (sheetEntry && sheetEntry.canvas) {
+        // LPC：{ canvas, frameW, frameH }
+        sheet = sheetEntry.canvas;
         frameW = sheetEntry.frameW; frameH = sheetEntry.frameH;
         drawW = SPRITE_DRAW_W;
-        drawH = Math.round(SPRITE_DRAW_W * (frameH / frameW));  // 保 LPC 比例
+        drawH = Math.round(SPRITE_DRAW_W * (frameH / frameW));
       } else if (sheetEntry && sheetEntry.complete && sheetEntry.naturalWidth > 0) {
         // PIPOYA HTMLImageElement（舊路徑、fallback）
         sheet = sheetEntry;
@@ -390,8 +397,9 @@
       const kit = p.team === 'h' ? homeKit : awayKit;
 
       if (look && window.LpcRenderer) {
-        // 非同步生成 LPC sheet（生成完才會被 render 用到、之前 fallback 色圈）
-        window.LpcRenderer.matchSpriteSheet(look, kit).then(result => {
+        // 改用 walkingFullBody（含腳、有 kick/cheer/frustration row）
+        const gen = window.LpcRenderer.walkingFullBody || window.LpcRenderer.matchSpriteSheet;
+        gen(look, kit).then(result => {
           if (result) _matchSpriteCache.set(p.card_id, result);
         }).catch(e => console.warn('LPC sheet failed for', p.card_id, e));
       } else {
