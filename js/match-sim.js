@@ -70,7 +70,71 @@
   };
 
   // ── 繪製 ────────────────────────────────────────────────
+  // ────────── Phase 2.2 pixel sprite ──────────
+  const _SPRITE_W = 12;
+  const _SPRITE_H = 16;
+  let _renderTick = 0;
+
+  // 預先 render 1 個 2-frame walk cycle sprite（24×16 px：兩 frame 並排）
+  function _makePlayerSprite(jerseyColor) {
+    const cv = document.createElement('canvas');
+    cv.width = _SPRITE_W * 2;
+    cv.height = _SPRITE_H;
+    const cx = cv.getContext('2d');
+    cx.imageSmoothingEnabled = false;
+    const SKIN = '#f4c194', SHORT = '#fff', BOOT = '#1a1a2e';
+
+    for (let f = 0; f < 2; f++) {
+      const ox = f * _SPRITE_W;
+      // 頭 4×4
+      cx.fillStyle = SKIN;
+      cx.fillRect(ox + 4, 0, 4, 4);
+      // 球衣 6×4
+      cx.fillStyle = jerseyColor;
+      cx.fillRect(ox + 3, 4, 6, 4);
+      // 球褲 4×2
+      cx.fillStyle = SHORT;
+      cx.fillRect(ox + 4, 8, 4, 2);
+      // 腿 — 依 frame 走路
+      cx.fillStyle = SKIN;
+      if (f === 0) {
+        cx.fillRect(ox + 4, 10, 1, 4);
+        cx.fillRect(ox + 7, 10, 1, 4);
+        cx.fillStyle = BOOT;
+        cx.fillRect(ox + 4, 14, 1, 1);
+        cx.fillRect(ox + 7, 14, 1, 1);
+      } else {
+        // 左腳抬起 = 短一格、boot 位置上移
+        cx.fillRect(ox + 4, 10, 1, 3);
+        cx.fillRect(ox + 7, 10, 1, 4);
+        cx.fillStyle = BOOT;
+        cx.fillRect(ox + 4, 13, 1, 1);
+        cx.fillRect(ox + 7, 14, 1, 1);
+      }
+    }
+    return cv;
+  }
+  // home/away 球衣色不同 + 守門員特別色（黃 vs 橘）
+  const _SPRITE_CACHE = {
+    h:    null, h_gk: null,
+    a:    null, a_gk: null,
+  };
+  function _getSprite(team, isGK) {
+    const key = team + (isGK ? '_gk' : '');
+    if (!_SPRITE_CACHE[key]) {
+      const colors = {
+        h:    '#2196f3', // 主隊藍
+        h_gk: '#ffeb3b', // 主隊 GK 黃
+        a:    '#e53935', // 客隊紅
+        a_gk: '#ff9800', // 客隊 GK 橘
+      };
+      _SPRITE_CACHE[key] = _makePlayerSprite(colors[key]);
+    }
+    return _SPRITE_CACHE[key];
+  }
+
   function render(ctx, state) {
+    _renderTick++;
     const { players, ball, flashTeam, flashAlpha, possessorIdx } = state;
     const grad = ctx.createLinearGradient(0, 0, 0, PITCH_H);
     grad.addColorStop(0, '#2e7d32');
@@ -110,17 +174,54 @@
       ctx.fillRect(0, 0, PITCH_W, PITCH_H);
     }
 
-    // 球員
+    // 球員 — Phase 2.2 pixel sprite（12×16 chibi，2-frame walk cycle）
+    ctx.imageSmoothingEnabled = false;
     players.forEach((p, i) => {
       const isPos = i === possessorIdx;
-      ctx.fillStyle = p.team === 'h' ? '#2196f3' : '#e53935';
+      const isGK = p.role === 'GK';
+      const sprite = _getSprite(p.team, isGK);
+      // 是否在走（移動距離大才動腳）
+      const movingAmt = Math.abs((p.tx || p.x) - p.x) + Math.abs((p.ty || p.y) - p.y);
+      const moving = movingAmt > 0.0005;
+      const frame = moving ? (Math.floor(_renderTick / 5) % 2) : 0;
+      // 朝向（往右 = 預設、往左 flip）
+      const facingRight = ((p.tx || p.x) - p.x) >= -0.0001;
+      const cx = p.x * PITCH_W;
+      const cy = p.y * PITCH_H;
+      const dx = Math.round(cx - _SPRITE_W / 2);
+      const dy = Math.round(cy - _SPRITE_H / 2);
+
+      // possessor 腳下圓影做提示
+      if (isPos) {
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.beginPath();
+        ctx.ellipse(cx, cy + _SPRITE_H / 2 - 1, 6, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // 一般球員陰影
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.beginPath();
-      const r = p.role === 'GK' ? 4.5 : 4;
-      ctx.arc(p.x * PITCH_W, p.y * PITCH_H, isPos ? r + 1 : r, 0, Math.PI * 2);
+      ctx.ellipse(cx, cy + _SPRITE_H / 2 - 1, 4, 1.5, 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = isPos ? '#fff' : 'rgba(255,255,255,0.7)';
-      ctx.lineWidth = isPos ? 1.3 : 0.8;
-      ctx.stroke();
+
+      if (facingRight) {
+        ctx.drawImage(sprite, frame * _SPRITE_W, 0, _SPRITE_W, _SPRITE_H, dx, dy, _SPRITE_W, _SPRITE_H);
+      } else {
+        ctx.save();
+        ctx.translate(dx + _SPRITE_W, dy);
+        ctx.scale(-1, 1);
+        ctx.drawImage(sprite, frame * _SPRITE_W, 0, _SPRITE_W, _SPRITE_H, 0, 0, _SPRITE_W, _SPRITE_H);
+        ctx.restore();
+      }
+
+      // possessor 加白色光暈邊框（用 1px 偏移 stroke 模擬 outline）
+      if (isPos) {
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(cx, cy, _SPRITE_W * 0.7, 0, Math.PI * 2);
+        ctx.stroke();
+      }
     });
 
     // 球（帶陰影）
@@ -205,6 +306,8 @@
     canvas.style.margin = '8px auto';
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
+    // Phase 2.2：pixel sprite 不平滑（保持銳利）
+    ctx.imageSmoothingEnabled = false;
 
     const hF = buildFormation(parseFormation(home.formation), true);
     const aF = buildFormation(parseFormation(away.formation), false);
