@@ -426,6 +426,19 @@
     // 送到 Supabase（失敗不擋 UI）
     _insertVote(opinion.id, chosenIdx);
 
+    // 我的球隊：擂台投票首投/天 → 免費抽卡（§5.4 + §5.6 即時觸發）
+    try {
+      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+      const lastDate = localStorage.getItem('mt_arena_vote_date_v1');
+      if (lastDate !== today && window.MyTeam && typeof window.MyTeam.triggerInstantGacha === 'function') {
+        localStorage.setItem('mt_arena_vote_date_v1', today);
+        // 延遲 800ms 讓投票結果動畫先跑完
+        setTimeout(() => {
+          window.MyTeam.triggerInstantGacha(1, 'arena_vote').catch(e => console.warn('[mt] instant gacha', e));
+        }, 800);
+      }
+    } catch (e) {}
+
     // 觸發滿版光暈爆發（位置已在 click 時設好，切換為 burst 模式）
     overlay.classList.add('burst-active');
 

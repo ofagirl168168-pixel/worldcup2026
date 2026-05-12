@@ -254,15 +254,83 @@
   }
 
   function renderGachaTab(content) {
-    // Phase 1.6 才實作；先放佔位 + 簡單抽卡按鈕
     const team = window.MyTeam.getCached();
+    if (!team || team === 'not_created') return;
+    const tickets = team.tickets || 0;
+    const pity = team.pity_counter || 0;
+    const pityRemaining = Math.max(0, 30 - pity);
+
     content.innerHTML = `
-      <div class="mt-tab-todo">
-        <div class="mt-tab-todo-icon">🎰</div>
-        <div style="margin-bottom:8px">抽卡 UI 開發中</div>
-        <div style="font-size:11px;opacity:0.6;margin-bottom:16px">你目前有 ${team?.tickets || 0} 張抽券<br>Phase 1.6 會做完整抽卡動畫</div>
+      <div class="mt-gacha-tab">
+        <div class="mt-gacha-banner">
+          <div class="mt-gacha-banner-title">🎰 球員抽卡</div>
+          <div class="mt-gacha-banner-sub">
+            抽券 / 50 寶石 → 隨機獲得 R / SR / SSR 球員<br>
+            重複球員自動 ★+1 加強上限
+          </div>
+          <div class="mt-gacha-rates">
+            <span>R <b>75%</b></span>
+            <span>SR <b>20%</b></span>
+            <span style="color:#f0c040">SSR <b>5%</b></span>
+          </div>
+          <div class="mt-gacha-pity-bar">
+            🎯 保底：再抽 <b>${pityRemaining}</b> 次無 SSR 必出（目前 pity = ${pity}/30）
+          </div>
+        </div>
+
+        <div class="mt-gacha-buttons">
+          <button class="mt-gacha-btn-row" id="mt-gacha-1" ${tickets < 1 ? 'disabled' : ''}>
+            <div class="mt-gacha-btn-info">
+              <div class="mt-gacha-btn-title">🎰 抽 1 抽</div>
+              <div class="mt-gacha-btn-sub">隨機獲得 1 張球員卡</div>
+            </div>
+            <div class="mt-gacha-btn-cost">🎟️ 1</div>
+          </button>
+
+          <button class="mt-gacha-btn-row" id="mt-gacha-10" ${tickets < 10 ? 'disabled' : ''}>
+            <div class="mt-gacha-btn-info">
+              <div class="mt-gacha-btn-title">🎰 10 連抽</div>
+              <div class="mt-gacha-btn-sub">10 張 + 保證至少 1 張 SR 起步</div>
+            </div>
+            <div class="mt-gacha-btn-cost">🎟️ 10</div>
+          </button>
+
+          <button class="mt-gacha-btn-row" id="mt-gacha-gem-1">
+            <div class="mt-gacha-btn-info">
+              <div class="mt-gacha-btn-title">💎 寶石抽（保底用）</div>
+              <div class="mt-gacha-btn-sub">沒抽券時用寶石</div>
+            </div>
+            <div class="mt-gacha-btn-cost">💎 50</div>
+          </button>
+        </div>
       </div>
     `;
+
+    // 1 抽
+    content.querySelector('#mt-gacha-1').addEventListener('click', () => _runGacha(1));
+    // 10 連
+    content.querySelector('#mt-gacha-10').addEventListener('click', () => _runGacha(10));
+    // 寶石抽（暫時跳訊息，Phase 1.7 接 gems.js）
+    content.querySelector('#mt-gacha-gem-1').addEventListener('click', () => {
+      if (typeof showToast === 'function') showToast('💎 寶石抽卡 Phase 1.7 接 gems.js');
+    });
+  }
+
+  async function _runGacha(count) {
+    try {
+      await window.MyTeam.gacha(count, { source: 'gacha-tab' });
+      // 動畫跑完 → 重畫 hub
+      renderHub();
+    } catch (err) {
+      console.error('[my-team] gacha error', err);
+      const msg = String(err.message || err);
+      let friendly = '抽卡失敗：' + msg;
+      if (msg.includes('INSUFFICIENT_TICKETS')) friendly = '⚠️ 抽券不足';
+      else if (msg.includes('NO_TEAM')) friendly = '⚠️ 請先建立球隊';
+      else if (msg.includes('NOT_LOGGED_IN')) friendly = '⚠️ 請先登入';
+      if (typeof showToast === 'function') showToast(friendly);
+      else alert(friendly);
+    }
   }
 
   function renderMatchTab(content) {

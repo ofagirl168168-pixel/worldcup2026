@@ -76,6 +76,19 @@ async function handleUserLoggedIn(isNew) {
   await onFirstAccount?.();
   // 初始化寶石（每日簽到 + 餘額）
   await initGems?.();
+
+  // 我的球隊：每日登入首次 → 1 抽券（§5.4）
+  try {
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+    const lastDate = localStorage.getItem('mt_daily_login_date_v1');
+    if (lastDate !== today && window.MyTeam && typeof window.MyTeam.triggerInstantGacha === 'function') {
+      localStorage.setItem('mt_daily_login_date_v1', today);
+      // 延遲讓登入訊息先跑
+      setTimeout(() => {
+        window.MyTeam.triggerInstantGacha(1, 'daily_login').catch(() => {});
+      }, 2500);
+    }
+  } catch (e) {}
   // unlockedMatchSet 已就緒，重新檢查階層成就
   checkTieredAchievements?.();
 

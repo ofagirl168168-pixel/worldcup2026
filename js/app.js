@@ -4222,6 +4222,25 @@ function saveMyPred(matchId) {
     updateNavXP?.();
     showToast?.('🎉 參與獎 +1 XP');
 
+    // 我的球隊：預測一場 +1 體力（§6.4 即時）+ 累積到 5 場 +2 抽券（§5.4）
+    try {
+      if (window.MyTeam) {
+        // +1 體力（即時）
+        window.MyTeam.awardStamina?.(1, 'predict_match');
+
+        // 累計：今天預測幾場？預測 5 場觸發 §5.6 即時抽 2 連
+        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+        const cntKey = 'mt_predict_count_' + today;
+        const cnt = (parseInt(localStorage.getItem(cntKey) || '0') || 0) + 1;
+        localStorage.setItem(cntKey, String(cnt));
+        if (cnt === 5) {
+          setTimeout(() => {
+            window.MyTeam.triggerInstantGacha?.(2, 'predict_5').catch(() => {});
+          }, 1500);
+        }
+      }
+    } catch (e) {}
+
     // 預測 streak +1
     let streakBumped = null;
     try {

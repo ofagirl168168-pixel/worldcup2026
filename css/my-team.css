@@ -392,6 +392,293 @@
   border-radius: 3px;
 }
 
+/* ───────── 抽卡 tab UI ───────── */
+.mt-gacha-tab {
+  text-align: center;
+  padding: 0 4px;
+}
+.mt-gacha-banner {
+  background: linear-gradient(135deg, #2a1855 0%, #1a1a2e 100%);
+  border: 1px solid rgba(240,192,64,0.2);
+  border-radius: 14px;
+  padding: 24px 16px;
+  margin-bottom: 20px;
+}
+.mt-gacha-banner-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: #f0c040;
+  margin-bottom: 6px;
+}
+.mt-gacha-banner-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.6;
+}
+.mt-gacha-rates {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 14px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+}
+.mt-gacha-rates b { color: #fff; }
+.mt-gacha-pity-bar {
+  margin-top: 14px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+}
+.mt-gacha-pity-bar b { color: #f0c040; }
+
+.mt-gacha-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mt-gacha-btn-row {
+  background: linear-gradient(135deg, #1a1a2e 0%, #2a1855 100%);
+  border: 2px solid rgba(240,192,64,0.3);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mt-gacha-btn-row:hover {
+  background: linear-gradient(135deg, #2a1855 0%, #3a2070 100%);
+  border-color: rgba(240,192,64,0.6);
+  transform: translateY(-1px);
+}
+.mt-gacha-btn-row:disabled,
+.mt-gacha-btn-row[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+.mt-gacha-btn-info { text-align: left; }
+.mt-gacha-btn-title { font-size: 16px; font-weight: 900; color: #fff; }
+.mt-gacha-btn-sub { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+.mt-gacha-btn-cost {
+  background: rgba(240,192,64,0.2);
+  color: #f0c040;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ───────── 抽卡動畫 overlay ───────── */
+.mt-gacha-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0,0,0,0.92), rgba(0,0,0,0.98));
+  z-index: 11000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  overflow: hidden;
+}
+.mt-gacha-overlay.open { opacity: 1; }
+.mt-gacha-overlay[data-peak="SSR"] {
+  background: radial-gradient(circle at center, rgba(60,30,0,0.92), rgba(0,0,0,0.98));
+}
+.mt-gacha-overlay[data-peak="SR"] {
+  background: radial-gradient(circle at center, rgba(35,15,60,0.92), rgba(0,0,0,0.98));
+}
+
+.mt-gacha-stage {
+  width: 100%;
+  max-width: 520px;
+  padding: 20px;
+  text-align: center;
+}
+
+/* loading */
+.mt-gacha-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 0;
+}
+.mt-gacha-spinner {
+  font-size: 80px;
+  animation: mt-spin 1.2s linear infinite;
+}
+@keyframes mt-spin {
+  from { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.15); }
+  to   { transform: rotate(360deg) scale(1); }
+}
+.mt-gacha-spinner-text {
+  font-size: 18px;
+  color: #f0c040;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+/* cards reveal */
+.mt-gacha-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.mt-gacha-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 14px 8px 12px;
+  opacity: 0;
+  transform: scale(0.5) rotateY(180deg);
+  animation: mt-card-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes mt-card-reveal {
+  to { opacity: 1; transform: scale(1) rotateY(0deg); }
+}
+.mt-gacha-card.rarity-SSR {
+  border-color: #f0c040;
+  background: linear-gradient(180deg, rgba(240,192,64,0.18) 0%, rgba(224,112,32,0.08) 100%);
+  box-shadow: 0 0 30px rgba(240,192,64,0.4), inset 0 0 20px rgba(240,192,64,0.15);
+}
+.mt-gacha-card.rarity-SR {
+  border-color: #9b87f5;
+  background: linear-gradient(180deg, rgba(155,135,245,0.15) 0%, rgba(100,80,200,0.06) 100%);
+  box-shadow: 0 0 18px rgba(155,135,245,0.3);
+}
+
+.mt-gacha-card-glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: 0;
+}
+.mt-gacha-card.rarity-SSR .mt-gacha-card-glow {
+  background: conic-gradient(from 0deg, transparent, #f0c040, transparent 40%);
+  filter: blur(8px);
+  opacity: 0.6;
+  animation: mt-rotate-glow 4s linear infinite;
+}
+@keyframes mt-rotate-glow {
+  to { transform: rotate(360deg); }
+}
+
+.mt-gacha-card > *:not(.mt-gacha-card-glow) {
+  position: relative;
+  z-index: 1;
+}
+.mt-gacha-card-rarity-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 5px;
+  letter-spacing: 1px;
+  z-index: 2;
+}
+.mt-gacha-card.rarity-SSR .mt-gacha-card-rarity-badge { background: #f0c040; color: #1a1a2e; }
+.mt-gacha-card.rarity-SR .mt-gacha-card-rarity-badge { background: #9b87f5; color: #fff; }
+.mt-gacha-card.rarity-R .mt-gacha-card-rarity-badge { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); }
+
+.mt-gacha-card-emoji {
+  font-size: 40px;
+  line-height: 1;
+  margin: 4px 0 8px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+.mt-gacha-card-name {
+  font-size: 15px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 1px;
+}
+.mt-gacha-card-nick {
+  font-size: 10px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 4px;
+}
+.mt-gacha-card-pos {
+  font-size: 10px;
+  color: #f0c040;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+.mt-gacha-card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.75);
+}
+.mt-gacha-card-stats b { color: #f0c040; font-weight: 800; }
+.mt-gacha-talent {
+  margin-top: 6px;
+  font-size: 10px;
+  background: rgba(240,192,64,0.15);
+  color: #f0c040;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+.mt-gacha-dup {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #ff8c42;
+}
+.mt-gacha-pity {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ff3030, #ff8030);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+/* actions */
+.mt-gacha-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mt-gacha-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.mt-gacha-btn:hover { transform: translateY(-1px); }
+.mt-gacha-btn-primary {
+  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
+  color: #1a1a2e;
+}
+.mt-gacha-btn-secondary {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
 /* ───────── tab 內各區共用提示 ───────── */
 .mt-tab-todo {
   text-align: center;
