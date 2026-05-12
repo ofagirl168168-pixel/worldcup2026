@@ -399,6 +399,25 @@ function settlePredictions() {
       // 寶石獎勵（透過 ref_id 確保每場只發一次）
       if (exact) awardGem?.('pred_exact', matchId);
       if (goalDiffMatch) awardGem?.('pred_goaldiff', matchId);
+
+      // 我的球隊：預測精準（完全比分對）→ +3 抽券（§5.4）
+      // 用 localStorage flag 確保每場只發一次（同 awardGem 一樣靠 matchId 去重）
+      if (exact) {
+        try {
+          if (window.MyTeamBetaEnabled && window.MyTeamBetaEnabled() && window.MyTeam) {
+            const claimedKey = 'mt_pred_exact_claimed';
+            let claimed = {};
+            try { claimed = JSON.parse(localStorage.getItem(claimedKey) || '{}'); } catch (e) {}
+            if (!claimed[matchId]) {
+              claimed[matchId] = 1;
+              localStorage.setItem(claimedKey, JSON.stringify(claimed));
+              setTimeout(() => {
+                window.MyTeam.triggerInstantGacha?.(3, 'pred_exact').catch(() => {});
+              }, 1500);
+            }
+          }
+        } catch (e) {}
+      }
     }
 
     localStorage.setItem(settledKey, JSON.stringify(settled));

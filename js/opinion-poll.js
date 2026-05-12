@@ -391,6 +391,17 @@
         const bonus = STREAK_BONUS[bumped.current];
         _addOpinionXP(bonus);
         try { if (typeof showToast === 'function') setTimeout(() => showToast(`🔥 連勝 ${bumped.current} 天里程碑！+${bonus} XP`), 800); } catch (e) {}
+
+        // 我的球隊：擂台連 7 天 → +5 抽券（§5.4）
+        if (bumped.current === 7) {
+          try {
+            if (window.MyTeamBetaEnabled && window.MyTeamBetaEnabled() && window.MyTeam) {
+              setTimeout(() => {
+                window.MyTeam.awardTickets?.(5, 'arena_streak_7').catch(() => {});
+              }, 1500);
+            }
+          } catch (e) {}
+        }
         // 🎉 連勝里程碑 → 觸發分享卡
         try {
           if (typeof showShareCard === 'function') {
@@ -438,6 +449,10 @@
           setTimeout(() => {
             window.MyTeam.triggerInstantGacha(1, 'arena_vote').catch(e => console.warn('[mt] instant gacha', e));
           }, 800);
+        }
+        // 任務：每次投票都算一次（不只首投）
+        if (window.MyTeamBetaEnabled?.() && window.MyTeam) {
+          window.MyTeam.trackQuest?.('arena_vote', 1).catch(() => {});
         }
       }
     } catch (e) {}
@@ -1384,6 +1399,26 @@
             localStorage.setItem(cxpKey, '1');
             _addOpinionXP(COMMENT_DAILY_XP);
             if (typeof showToast === 'function') setTimeout(() => showToast(`💬 每日首次留言 +${COMMENT_DAILY_XP} XP`), 500);
+
+            // 我的球隊：擂台留言（每週限 5 次）→ +1 抽券（§5.4）
+            try {
+              if (window.MyTeamBetaEnabled && window.MyTeamBetaEnabled() && window.MyTeam) {
+                const isoWeek = (() => {
+                  const d = new Date();
+                  const onejan = new Date(d.getFullYear(), 0, 1);
+                  const wk = Math.ceil(((d - onejan) / 86400000 + onejan.getDay() + 1) / 7);
+                  return d.getFullYear() + '-W' + String(wk).padStart(2, '0');
+                })();
+                const wkKey = 'mt_arena_comment_' + isoWeek;
+                const wkCnt = parseInt(localStorage.getItem(wkKey) || '0') | 0;
+                if (wkCnt < 5) {
+                  localStorage.setItem(wkKey, String(wkCnt + 1));
+                  setTimeout(() => {
+                    window.MyTeam.triggerInstantGacha?.(1, 'arena_comment').catch(() => {});
+                  }, 1200);
+                }
+              }
+            } catch (e) {}
           }
         } catch (e) {}
         input.value = '';

@@ -345,6 +345,7 @@
     const force = card.forced_ssr ? '<div class="mt-gacha-pity">🎊 保底必中！</div>' : '';
     const stars = ({ R: '★', SR: '★★', SSR: '★★★' })[card.rarity];
 
+    const portraitImgId = `gacha-portrait-${card.card_id}-${Math.random().toString(36).slice(2,8)}`;
     el.innerHTML = `
       <div class="mt-gacha-card3d-inner">
         <div class="mt-gacha-card3d-back">
@@ -358,7 +359,7 @@
             <span class="mt-gacha-front-stars">${stars}</span>
           </div>
           <div class="mt-gacha-front-portrait">
-            <img class="mt-gacha-front-portrait-img"
+            <img id="${portraitImgId}" class="mt-gacha-front-portrait-img"
               src="${_portraitUrlFor(card.card_id, card.rarity)}"
               alt="${escapeHtml(card.name)}" loading="lazy" />
             <span class="mt-gacha-front-portrait-pos">${_emojiFor(card.position)}</span>
@@ -381,6 +382,15 @@
       </div>
       <div class="mt-gacha-particles"></div>
     `;
+
+    // 非同步 render LPC portrait（如果有 look_data）
+    if (card.look_data && window.LpcRenderer) {
+      window.LpcRenderer.portrait(card.look_data).then(url => {
+        const img = document.getElementById(portraitImgId);
+        if (img && url) img.src = url;
+      }).catch(e => console.warn('LPC gacha portrait failed:', e));
+    }
+
     return el;
   }
 

@@ -28,49 +28,88 @@
     };
   }
 
+  // ── 教練 trait → 隊伍 buff（簡化版：只處理屬性 buff、機制 trait 待 sim 內擴展）──
+  function _coachBuff(coachTrait, traitValue) {
+    if (!coachTrait) return null;
+    // 屬性 buff（attack_3 / defense_3 / speed_3 等 + 主流 trait）
+    const ATTR_TRAITS = {
+      tactician:        { midfield: 0.08 },
+      offensive_master: { attack: 0.10 },
+      defensive_master: { defense: 0.08 },
+      speed_coach:      { speed: 0.08 },
+      tiki_taka:        { attack: 0.10, midfield: 0.08 },
+      iron_wall:        { defense: 0.08 },
+      gegen_press:      { speed: 0.05, stamina: 0.10 },
+    };
+    if (ATTR_TRAITS[coachTrait]) return ATTR_TRAITS[coachTrait];
+    if (coachTrait.endsWith('_3') && traitValue && traitValue.attr) {
+      return { [traitValue.attr]: traitValue.pct };
+    }
+    return null;
+  }
+
   // ── 玩家球隊資料 → match-sim 的 home 格式 ──
-  function _buildMyTeamData(team, players) {
-    let starters = players.filter(p => p.in_starting_11);
+  function _buildMyTeamData(team, players, activeCoach) {
+    const now = new Date();
+    const healthy = players.filter(p => !p.injured_until || new Date(p.injured_until) <= now);
+    let starters = healthy.filter(p => p.in_starting_11);
     if (starters.length < 11) {
-      // 補滿 11 人：取剩下最強的
-      const rest = players.filter(p => !p.in_starting_11)
+      const rest = healthy.filter(p => !p.in_starting_11)
         .sort((a, b) => (b.current_attack + b.current_defense) - (a.current_attack + a.current_defense));
       starters = starters.concat(rest.slice(0, 11 - starters.length));
     }
     if (!starters.length) return null;
 
-    // radar = 首發平均
     const avg = (key) => Math.round(starters.reduce((s, p) => s + (p[key] || 0), 0) / starters.length);
+
+    // 套教練 buff（影響 radar 屬性、不改 team_player 真實值）
+    const buff = activeCoach ? _coachBuff(activeCoach.coach?.trait, activeCoach.coach?.trait_value) : null;
+    const applyBuff = (v, k) => buff && buff[k] ? Math.min(99, Math.round(v * (1 + buff[k]))) : v;
+
+    // Kit 顏色從 team 取
+    const kit = {
+      shirtColor: team.kit_shirt_color || 'red',
+      pantsColor: team.kit_pants_color || 'white',
+      shoeColor:  team.kit_shoes_color || 'white',
+    };
+
     return {
       nameCN: team.team_name,
       flag: team.team_crest,
-      // Phase 2.2+ 傳 card_id 給 match-sim、用來 lookup PIPOYA sprite
+      formation: team.formation || '4-3-3',
+      kit,
+      coachName: activeCoach ? activeCoach.coach?.name : null,
       keyPlayers: starters.slice(0, 11).map(p => ({
         name: p.card?.name || '?',
         pos: p.card?.position || 'MID',
         club: team.team_name,
         card_id: p.card?.card_id || p.card_id,
+        look_data: window.LpcRenderer ? window.LpcRenderer.resolveLook(p) : null,
       })),
       radar: {
-        attack:     avg('current_attack'),
-        defense:    avg('current_defense'),
-        midfield:   avg('current_midfield'),
-        speed:      avg('current_speed'),
+        attack:     applyBuff(avg('current_attack'),  'attack'),
+        defense:    applyBuff(avg('current_defense'), 'defense'),
+        midfield:   applyBuff(avg('current_midfield'),'midfield'),
+        speed:      applyBuff(avg('current_speed'),   'speed'),
         experience: Math.min(95, 50 + (team.stadium_level - 1) * 5),
       },
     };
   }
 
-  // 為 AI 對手生成 11 個 fake card_id（依 seed 穩定）
+  // 為 AI 對手生成 11 個 fake card_id + 對應 look_data（依 seed 穩定）
   function _generateAIPlayers(seed) {
-    // 從常見 R/SR 系列 hash 出 11 個
     const r = _rng(seed);
     const out = [];
     const series = ['r-fwd', 'r-mid', 'r-def', 'r-gk', 'sr-fwd', 'sr-mid', 'sr-def'];
+    const gen = window.LPC_SSR_LOOKS && window.LPC_SSR_LOOKS.generateRandomLook;
     for (let i = 0; i < 11; i++) {
       const s = series[Math.floor(r() * series.length)];
       const num = String(1 + Math.floor(r() * 100)).padStart(3, '0');
-      out.push({ name: 'AI Player', pos: 'MID', club: 'AI', card_id: `${s}-${num}` });
+      const card_id = `${s}-${num}`;
+      out.push({
+        name: 'AI Player', pos: 'MID', club: 'AI', card_id,
+        look_data: gen ? gen(seed + i * 31) : null,
+      });
     }
     return out;
   }
@@ -153,19 +192,36 @@
 
   // ── 結算 RPC ──
   async function _finalize(opponent, scoreH, scoreA, isBoss) {
-    const opponentSnapshot = {
-      nameCN: opponent.nameCN, flag: opponent.flag,
-      radar: opponent.radar, isReal: !!opponent._isReal,
-    };
-    const { data, error } = await window.DB.rpc('finalize_match', {
-      p_opponent_data: opponentSnapshot,
-      p_opponent_type: opponent._isReal ? 'ai_real' : 'ai_npc',
-      p_is_boss: !!isBoss,
-      p_score_home: scoreH,
-      p_score_away: scoreA,
-      p_match_log: [],
-    });
-    if (error) throw error;
+    let data;
+    if (opponent._isPvp) {
+      const oppSnap = {
+        nameCN: opponent.nameCN, flag: opponent.flag, radar: opponent.radar,
+        pvp_elo: opponent.pvp_elo, formation: opponent.formation, kit: opponent.kit,
+      };
+      data = await window.MyTeam.finalizePvpMatch(opponent._oppUserId, oppSnap, scoreH, scoreA, []);
+      window.MyTeam?.trackQuest?.('pvp_play', 1).catch(() => {});
+    } else {
+      const opponentSnapshot = {
+        nameCN: opponent.nameCN, flag: opponent.flag,
+        radar: opponent.radar, isReal: !!opponent._isReal,
+      };
+      const res = await window.DB.rpc('finalize_match', {
+        p_opponent_data: opponentSnapshot,
+        p_opponent_type: opponent._isReal ? 'ai_real' : 'ai_npc',
+        p_is_boss: !!isBoss,
+        p_score_home: scoreH, p_score_away: scoreA, p_match_log: [],
+      });
+      if (res.error) throw res.error;
+      data = res.data;
+    }
+    // 任務 + 傷病（兩種 match 都觸發）
+    window.MyTeam?.trackQuest?.('match_play', 1).catch(() => {});
+    window.DB?.rpc('injure_random_player', { p_chance_pct: 8 }).then(res => {
+      const d = res?.data;
+      if (d?.injured && typeof showToast === 'function') {
+        showToast(`🏥 ${d.name} 受傷了！${d.days} 天無法出賽`);
+      }
+    }).catch(() => {});
     return data;
   }
 
@@ -187,7 +243,26 @@
       if (typeof showToast === 'function') showToast('🎰 還沒有球員！先去抽卡');
       return;
     }
-    const homeData = _buildMyTeamData(team, players);
+    const healthyCount = players.filter(p => !p.injured_until || new Date(p.injured_until) <= new Date()).length;
+    if (players.length < 11) {
+      if (typeof showToast === 'function') showToast(`⚠️ 不足 11 人（目前 ${players.length}）— 先抽卡補滿陣容才能比賽`);
+      return;
+    }
+    if (healthyCount < 11) {
+      if (typeof showToast === 'function') showToast(`🏥 健康球員不足 11 人（${healthyCount}/11）— 用「傷病恢復包」治療或等他們康復`);
+      return;
+    }
+
+    // 撈主教練（active_coach_id → user_coach + coach_pool join）
+    let activeCoach = null;
+    if (team.active_coach_id) {
+      const { data: coachData } = await window.DB.from('user_coach')
+        .select('*, coach:coach_pool(*)')
+        .eq('id', team.active_coach_id).maybeSingle();
+      activeCoach = coachData || null;
+    }
+
+    const homeData = _buildMyTeamData(team, players, activeCoach);
     if (!homeData) {
       if (typeof showToast === 'function') showToast('⚠️ 球員資料不足');
       return;
@@ -362,6 +437,19 @@
     const resultIcon = ({W:'🏆',D:'🤝',L:'😢'})[result.result];
     const colorClass = ({W:'win',D:'draw',L:'loss'})[result.result];
 
+    // PvP ELO 顯示
+    let pvpHtml = '';
+    if (ctx.isPvp && result.my_elo_delta != null) {
+      const sign = result.my_elo_delta > 0 ? '+' : '';
+      const cls = result.my_elo_delta > 0 ? 'up' : result.my_elo_delta < 0 ? 'down' : '';
+      pvpHtml = `
+        <div class="mt-post-pvp">
+          <div class="mt-post-pvp-title">⚔️ PvP 排位</div>
+          <div class="mt-post-pvp-elo ${cls}">ELO ${sign}${result.my_elo_delta} → <b>${result.new_my_elo}</b></div>
+        </div>
+      `;
+    }
+
     let seasonHtml = '';
     if (result.season_complete) {
       const tierMsg = result.tier_change === 'up' ? `<div class="mt-post-season-tier up">⬆️ 晉級到 Tier ${result.new_tier}</div>` :
@@ -406,6 +494,7 @@
             <div class="mt-post-reward-label">球迷</div>
           </div>
         </div>
+        ${pvpHtml}
         ${seasonHtml}
         <button class="mt-pre-match-go" id="mt-match-close">確認收下</button>
       </div>
@@ -429,7 +518,62 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  // ── PvP 對戰 ──
+  async function runPvpMatch() {
+    const team = window.MyTeam.getCached();
+    if (!team || team === 'not_created') {
+      if (typeof showToast === 'function') showToast('⚠️ 請先建立球隊');
+      return;
+    }
+    if (team.stamina < 1) {
+      if (typeof showToast === 'function') showToast('⚡ 體力不足');
+      return;
+    }
+
+    const players = await window.MyTeam.fetchPlayers();
+    if (players.length < 11) {
+      if (typeof showToast === 'function') showToast(`⚠️ 不足 11 人（目前 ${players.length}）— 先抽卡補滿`);
+      return;
+    }
+    const healthyCount = players.filter(p => !p.injured_until || new Date(p.injured_until) <= new Date()).length;
+    if (healthyCount < 11) {
+      if (typeof showToast === 'function') showToast(`🏥 健康球員不足 11 人（${healthyCount}/11）`);
+      return;
+    }
+
+    // 主教練
+    let activeCoach = null;
+    if (team.active_coach_id) {
+      const { data: coachData } = await window.DB.from('user_coach')
+        .select('*, coach:coach_pool(*)')
+        .eq('id', team.active_coach_id).maybeSingle();
+      activeCoach = coachData || null;
+    }
+    const homeData = _buildMyTeamData(team, players, activeCoach);
+    if (!homeData) {
+      if (typeof showToast === 'function') showToast('⚠️ 球員資料不足');
+      return;
+    }
+
+    // 找對手（會 throw 如果沒對手 / 額度滿）
+    const opponent = await window.MyTeam.findPvpOpponent();
+    if (!opponent) {
+      if (typeof showToast === 'function') showToast('找不到合適對手');
+      return;
+    }
+
+    // 標記成 PvP（之後結算用 finalize_pvp_match 而非 finalize_match）
+    opponent._isPvp = true;
+    opponent._oppUserId = opponent.user_id;
+
+    _openMatchModal({
+      team, homeData, opponent,
+      tier: null, matchIdx: 0, isBoss: false, isPvp: true,
+    });
+  }
+
   if (window.MyTeam) {
     window.MyTeam.runMatch = runMatch;
+    window.MyTeam.runPvpMatch = runPvpMatch;
   }
 })();

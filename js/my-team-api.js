@@ -190,8 +190,96 @@
     return data;
   }
 
+  async function drawCoach(count) {
+    if (!window.DB) throw new Error('NOT_LOGGED_IN');
+    const { data, error } = await window.DB.rpc('coach_gacha_draw', {
+      p_count: count, p_source: 'manual',
+    });
+    if (error) throw error;
+    await fetch_();
+    return data;
+  }
+
+  async function redeemSSRSelect(cardId) {
+    if (!window.DB) throw new Error('NOT_LOGGED_IN');
+    const { data, error } = await window.DB.rpc('redeem_ssr_select_ticket', { p_card_id: cardId });
+    if (error) throw error;
+    await fetch_();
+    return data;
+  }
+
+  async function findPvpOpponent() {
+    if (!window.DB) throw new Error('NOT_LOGGED_IN');
+    const { data, error } = await window.DB.rpc('find_pvp_opponent');
+    if (error) throw error;
+    return data;
+  }
+
+  async function trackQuest(action, amount = 1) {
+    if (!window.DB || !window.currentUser) return [];
+    try {
+      const { data, error } = await window.DB.rpc('track_quest', { p_action: action, p_amount: amount });
+      if (error) { console.warn('[quest] track error', error); return []; }
+      return data || [];
+    } catch (e) { return []; }
+  }
+  async function claimQuest(questId) {
+    if (!window.DB) throw new Error('NOT_LOGGED_IN');
+    const { data, error } = await window.DB.rpc('claim_quest_reward', { p_quest_id: questId });
+    if (error) throw error;
+    await fetch_();
+    return data;
+  }
+  async function fetchQuests() {
+    if (!window.DB || !window.currentUser) return { templates: [], state: [] };
+    const [{ data: t }, { data: s }] = await Promise.all([
+      window.DB.from('quest_template').select('*').order('display_order'),
+      window.DB.from('user_quest_state').select('*'),
+    ]);
+    return { templates: t || [], state: s || [] };
+  }
+  async function buyShopItem(itemId, count = 1) {
+    if (!window.DB) throw new Error('NOT_LOGGED_IN');
+    const { data, error } = await window.DB.rpc('buy_shop_item', { p_item_id: itemId, p_count: count });
+    if (error) throw error;
+    await fetch_();
+    return data;
+  }
+  async function useItem(itemId, targetPlayerId) {
+    if (!window.DB) throw new Error('NOT_LOGGED_IN');
+    const { data, error } = await window.DB.rpc('use_item', { p_item_id: itemId, p_target_player_id: targetPlayerId || null });
+    if (error) throw error;
+    return data;
+  }
+  async function fetchShopAndInventory() {
+    if (!window.DB || !window.currentUser) return { items: [], inventory: [] };
+    const [{ data: items }, { data: inv }] = await Promise.all([
+      window.DB.from('item_template').select('*').order('display_order'),
+      window.DB.from('user_inventory').select('*'),
+    ]);
+    return { items: items || [], inventory: inv || [] };
+  }
+
+  async function finalizePvpMatch(opponentId, opponentSnapshot, scoreH, scoreA, matchLog) {
+    if (!window.DB) throw new Error('NOT_LOGGED_IN');
+    const { data, error } = await window.DB.rpc('finalize_pvp_match', {
+      p_opponent_id: opponentId,
+      p_opponent_snapshot: opponentSnapshot,
+      p_score_home: scoreH,
+      p_score_away: scoreA,
+      p_match_log: matchLog || [],
+    });
+    if (error) throw error;
+    await fetch_();
+    return data;
+  }
+
+  // 別名 refresh = fetch_（modal 用）
+  const refresh = fetch_;
+
   window.MyTeam = {
     fetch: fetch_,
+    refresh,
     create,
     fetchPlayers,
     fetchCardPool,
@@ -200,6 +288,16 @@
     awardGems,
     awardSSRSelectTicket,
     trainPlayer,
+    drawCoach,
+    redeemSSRSelect,
+    findPvpOpponent,
+    finalizePvpMatch,
+    trackQuest,
+    claimQuest,
+    fetchQuests,
+    buyShopItem,
+    useItem,
+    fetchShopAndInventory,
     getCached,
     clearCache,
   };

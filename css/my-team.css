@@ -334,13 +334,82 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
+  background: rgba(255,255,255,0.05);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28px;
   flex-shrink: 0;
+  overflow: hidden;
 }
+.mt-hub-team-crest svg { width: 100%; height: 100%; }
+
+/* ── 設定 / Kit / Crest picker ── */
+.mt-settings-tab { padding: 12px; }
+.mt-settings-section { margin-bottom: 20px; }
+.mt-settings-title { font-size: 13px; font-weight: 700; color: #f0c040; margin-bottom: 8px; }
+.mt-settings-swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.mt-settings-swatch {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  cursor: pointer; transition: all 0.15s;
+  padding: 0;
+}
+.mt-settings-swatch:hover { transform: scale(1.1); }
+.mt-settings-swatch.sel { border-color: #fff; box-shadow: 0 0 0 2px #f0c040; transform: scale(1.1); }
+.mt-settings-crests { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 320px; }
+.mt-settings-crest {
+  background: rgba(255,255,255,0.04); border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 4px; cursor: pointer; transition: all 0.15s;
+}
+.mt-settings-crest svg { width: 100%; height: 100%; display: block; }
+.mt-settings-crest:hover { background: rgba(255,255,255,0.1); }
+.mt-settings-crest.sel { border-color: #f0c040; background: rgba(240,192,64,0.12); }
+.mt-settings-presets { display: flex; gap: 6px; flex-wrap: wrap; }
+.mt-settings-preset {
+  display: flex; padding: 0; border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 20px; overflow: hidden; cursor: pointer; height: 32px;
+}
+.mt-settings-preset:hover { border-color: #f0c040; }
+.mt-settings-preset span { width: 16px; height: 28px; display: block; }
+.mt-settings-preview { display: flex; align-items: center; justify-content: center; }
+.mt-settings-preview svg { width: 100%; height: 100%; }
+#mt-settings-save {
+  display: block; width: 100%; margin-top: 20px;
+}
+
+/* ── 教練 tab ── */
+.mt-coach-tab { padding: 12px; }
+.mt-coach-active {
+  background: rgba(240,192,64,0.08); border: 1px solid rgba(240,192,64,0.3);
+  border-radius: 10px; padding: 12px; margin-top: 12px;
+}
+.mt-coach-active-label { font-size: 11px; color: #f0c040; margin-bottom: 4px; }
+.mt-coach-active-name { font-size: 16px; font-weight: 800; }
+.mt-coach-active-trait { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+.mt-coach-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px;
+}
+.mt-coach-card {
+  background: rgba(255,255,255,0.04); border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 8px; text-align: center; position: relative;
+}
+.mt-coach-card.rarity-SSR { border-color: #f0c040; }
+.mt-coach-card.rarity-SR  { border-color: #9b59b6; }
+.mt-coach-card.active { box-shadow: 0 0 0 2px #f0c040; }
+.mt-coach-badge {
+  position: absolute; top: -8px; right: 8px;
+  background: #f0c040; color: #000; font-size: 10px; font-weight: 800;
+  padding: 2px 6px; border-radius: 4px;
+}
+.mt-coach-card .mt-player-portrait { width: 64px; height: 80px; margin: 0 auto 6px; }
+.mt-coach-card .mt-player-portrait img { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+.mt-coach-set-btn {
+  width: 100%; margin-top: 6px; padding: 4px 8px;
+  background: rgba(240,192,64,0.15); border: 1px solid #f0c040; color: #f0c040;
+  border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 700;
+}
+.mt-coach-set-btn:disabled { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); cursor: default; }
 .mt-hub-team-info { flex: 1; min-width: 0; }
 .mt-hub-team-name {
   font-size: 18px;
@@ -1527,3 +1596,478 @@
   font-size: 14px;
 }
 .mt-tab-todo-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+
+/* ── 新手禮包 overlay ── */
+.mt-starter-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  z-index: 10000; display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s; backdrop-filter: blur(4px);
+}
+.mt-starter-overlay.open { opacity: 1; }
+.mt-starter-card {
+  background: linear-gradient(180deg, #1a1a2e 0%, #0d1224 100%);
+  border: 2px solid #f0c040; border-radius: 16px; padding: 28px 24px;
+  text-align: center; max-width: 360px; width: 92%; color: #fff;
+  box-shadow: 0 20px 60px rgba(240,192,64,0.3);
+}
+.mt-starter-emoji { font-size: 56px; margin-bottom: 8px; }
+.mt-starter-card h2 { margin: 0 0 8px; font-size: 22px; color: #f0c040; }
+.mt-starter-card p { margin: 0 0 6px; opacity: 0.9; }
+.mt-starter-claim { width: 100%; margin-bottom: 8px; }
+.mt-starter-skip {
+  background: none; border: none; color: rgba(255,255,255,0.6);
+  cursor: pointer; font-size: 13px; padding: 6px; width: 100%;
+}
+.mt-starter-skip:hover { color: #fff; }
+
+/* ── 排行榜 tab ── */
+.mt-rank-tab { padding: 12px; }
+.mt-rank-list { display: flex; flex-direction: column; gap: 6px; }
+.mt-rank-row {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px;
+}
+.mt-rank-row.me { background: rgba(240,192,64,0.12); border: 1px solid rgba(240,192,64,0.4); }
+.mt-rank-pos { font-size: 18px; font-weight: 800; min-width: 32px; text-align: center; }
+.mt-rank-crest { width: 38px; height: 38px; flex-shrink: 0; }
+.mt-rank-crest svg { width: 100%; height: 100%; }
+.mt-rank-info { flex: 1; min-width: 0; }
+.mt-rank-name { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mt-rank-meta { font-size: 11px; opacity: 0.7; }
+.mt-rank-stats { text-align: right; }
+.mt-rank-pt { font-size: 18px; font-weight: 800; color: #f0c040; }
+.mt-rank-pt span { font-size: 10px; opacity: 0.7; }
+.mt-rank-record { font-size: 11px; opacity: 0.7; }
+
+/* ── 陣型 picker ── */
+.mt-settings-formations { display: flex; gap: 6px; flex-wrap: wrap; }
+.mt-formation-opt {
+  background: rgba(255,255,255,0.04); border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 8px 14px; cursor: pointer; font-weight: 700;
+  color: #fff; font-size: 14px; min-width: 64px;
+}
+.mt-formation-opt:hover { background: rgba(255,255,255,0.08); }
+.mt-formation-opt.sel { border-color: #f0c040; background: rgba(240,192,64,0.12); color: #f0c040; }
+
+#mt-stadium-upgrade { width: 100%; }
+
+/* ── PvP 區塊 ── */
+.mt-pvp-section {
+  background: linear-gradient(180deg, rgba(231,76,60,0.12) 0%, rgba(0,0,0,0) 100%);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-radius: 10px; padding: 14px; margin-top: 16px;
+}
+.mt-pvp-title { font-size: 14px; font-weight: 800; color: #e74c3c; margin-bottom: 4px; }
+.mt-pvp-stat { font-size: 12px; opacity: 0.85; margin-bottom: 8px; }
+.mt-pvp-btn {
+  width: 100%; padding: 10px;
+  background: linear-gradient(180deg, #e74c3c, #c0392b);
+  border: 0; border-radius: 8px; color: #fff; font-size: 14px; font-weight: 800;
+  cursor: pointer;
+}
+.mt-pvp-btn:disabled { background: #555; cursor: default; }
+
+/* PvP post-match ELO 顯示 */
+.mt-post-pvp {
+  margin-top: 14px; padding: 12px;
+  background: rgba(231,76,60,0.12); border: 1px solid rgba(231,76,60,0.3); border-radius: 10px;
+  text-align: center;
+}
+.mt-post-pvp-title { font-size: 12px; color: #e74c3c; margin-bottom: 4px; }
+.mt-post-pvp-elo { font-size: 16px; font-weight: 800; }
+.mt-post-pvp-elo.up { color: #4caf50; }
+.mt-post-pvp-elo.down { color: #ef9a9a; }
+
+/* SSR 自選券 */
+.mt-ssr-select-section {
+  background: linear-gradient(180deg, rgba(240,192,64,0.12) 0%, rgba(0,0,0,0) 100%);
+  border: 1px solid rgba(240,192,64,0.4); border-radius: 10px;
+  padding: 14px; margin-top: 14px; text-align: center;
+}
+.mt-ssr-select-title { font-size: 16px; font-weight: 800; color: #f0c040; margin-bottom: 4px; }
+.mt-ssr-select-sub { font-size: 12px; opacity: 0.85; margin-bottom: 10px; }
+
+.mt-ssr-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10001;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s; backdrop-filter: blur(4px);
+}
+.mt-ssr-overlay.open { opacity: 1; }
+.mt-ssr-card-modal {
+  background: #0d1224; border: 2px solid #f0c040; border-radius: 14px;
+  width: 92%; max-width: 720px; max-height: 86vh; overflow-y: auto;
+  padding: 18px; position: relative;
+}
+.mt-ssr-modal-title {
+  font-size: 16px; font-weight: 800; color: #f0c040; text-align: center;
+  margin-bottom: 12px;
+}
+.mt-ssr-close {
+  position: absolute; top: 10px; right: 14px; background: none; border: 0;
+  color: #fff; font-size: 24px; cursor: pointer;
+}
+.mt-ssr-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px;
+}
+.mt-ssr-pickable { cursor: pointer; transition: transform 0.15s; }
+.mt-ssr-pickable:hover { transform: translateY(-2px); }
+
+/* ── 任務 tab ── */
+.mt-quest-tab { padding: 12px; }
+.mt-quest-group { margin-bottom: 20px; }
+.mt-quest-group-title { font-size: 13px; font-weight: 800; color: #f0c040; margin-bottom: 8px; }
+.mt-quest-row {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px;
+  margin-bottom: 6px;
+}
+.mt-quest-row.ready { background: rgba(240,192,64,0.12); border: 1px solid rgba(240,192,64,0.4); }
+.mt-quest-row.claimed { opacity: 0.5; }
+.mt-quest-info { flex: 1; min-width: 0; }
+.mt-quest-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.mt-quest-bar {
+  height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;
+}
+.mt-quest-bar > div { height: 100%; background: linear-gradient(90deg, #f0c040, #e07020); transition: width 0.3s; }
+.mt-quest-progress { font-size: 11px; opacity: 0.7; margin-top: 3px; }
+.mt-quest-reward { font-size: 12px; font-weight: 700; }
+.mt-quest-claim {
+  background: rgba(240,192,64,0.15); border: 1px solid #f0c040; color: #f0c040;
+  border-radius: 6px; padding: 6px 12px; font-weight: 700; cursor: pointer; font-size: 12px;
+  min-width: 70px;
+}
+.mt-quest-claim:disabled { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); cursor: default; }
+.mt-quest-row.ready .mt-quest-claim {
+  background: #f0c040; color: #000; animation: mt-pulse 1.4s infinite;
+}
+@keyframes mt-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+/* ── 商店 tab ── */
+.mt-shop-tab { padding: 12px; }
+.mt-shop-grid, .mt-inv-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px; margin-bottom: 14px;
+}
+.mt-shop-card, .mt-inv-card {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 10px; text-align: center;
+}
+.mt-shop-icon { font-size: 32px; margin-bottom: 4px; }
+.mt-shop-name { font-size: 13px; font-weight: 700; }
+.mt-shop-desc { font-size: 11px; opacity: 0.7; margin: 4px 0 8px; min-height: 30px; }
+.mt-shop-buy, .mt-inv-use {
+  width: 100%; padding: 6px;
+  background: linear-gradient(180deg, #f0c040, #e07020);
+  border: 0; border-radius: 6px; color: #000; font-weight: 700; cursor: pointer;
+  font-size: 12px;
+}
+.mt-shop-buy span { font-weight: 500; opacity: 0.7; }
+.mt-shop-buy:disabled, .mt-inv-use:disabled { background: #555; color: #fff; cursor: default; }
+
+/* ── 圖鑑 tab ── */
+.mt-dex-tab { padding: 12px; }
+.mt-dex-title { font-size: 16px; font-weight: 800; color: #f0c040; margin-bottom: 4px; text-align: center; }
+.mt-dex-sub { font-size: 12px; opacity: 0.8; text-align: center; margin-bottom: 12px; }
+.mt-dex-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px;
+}
+.mt-dex-card {
+  background: rgba(255,255,255,0.04); border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 8px; text-align: center;
+}
+.mt-dex-card.owned { border-color: #f0c040; }
+.mt-dex-card.locked { opacity: 0.4; }
+.mt-dex-card.locked .mt-player-portrait { background: rgba(0,0,0,0.3); }
+.mt-dex-card.locked .mt-player-portrait img { display: none; }
+.mt-dex-card .mt-player-portrait { width: 64px; height: 80px; margin: 0 auto 4px; position: relative; }
+.mt-dex-card.locked .mt-player-portrait::after {
+  content: '?'; position: absolute; inset: 0; display: flex; align-items: center;
+  justify-content: center; font-size: 32px; color: rgba(255,255,255,0.3);
+}
+.mt-dex-card .mt-player-portrait img { width: 100%; height: 100%; image-rendering: pixelated; }
+.mt-dex-name { font-size: 12px; font-weight: 700; }
+.mt-dex-pos { font-size: 10px; opacity: 0.7; }
+
+/* ─── 球場視覺化主頁 (Kairosoft 風) ─── */
+.mt-stadium-tab { padding: 8px; }
+.mt-stadium-pitch {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5/7;
+  max-width: 480px;
+  margin: 0 auto;
+  background:
+    repeating-linear-gradient(0deg, #2e7d32 0px, #2e7d32 20px, #357c3b 20px, #357c3b 40px),
+    linear-gradient(180deg, #2e7d32, #1b5e20);
+  border: 3px solid #1a4d1f;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.3);
+}
+.mt-pitch-line {
+  position: absolute; background: rgba(255,255,255,0.4);
+}
+.mt-pitch-mid { left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-1px); }
+.mt-pitch-circle {
+  position: absolute; left: 50%; top: 50%;
+  width: 22%; aspect-ratio: 1; border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 50%; transform: translate(-50%, -50%);
+}
+.mt-pitch-box {
+  position: absolute; left: 18%; right: 18%; height: 18%;
+  border: 2px solid rgba(255,255,255,0.4);
+}
+.mt-pitch-box-top { top: 0; border-top: none; }
+.mt-pitch-box-bottom { bottom: 0; border-bottom: none; }
+.mt-pitch-goalbox {
+  position: absolute; left: 36%; right: 36%; height: 8%;
+  border: 2px solid rgba(255,255,255,0.4);
+}
+.mt-pitch-goalbox-top { top: 0; border-top: none; }
+.mt-pitch-goalbox-bottom { bottom: 0; border-bottom: none; }
+
+.mt-pitch-formation-label {
+  position: absolute; left: 8px; top: 8px;
+  background: rgba(0,0,0,0.5); color: #f0c040;
+  font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px;
+}
+
+.mt-pitch-player {
+  position: absolute; transform: translate(-50%, -50%);
+  background: none; border: 0; padding: 0; cursor: pointer;
+  text-align: center; color: #fff;
+  animation: mt-bob 2.4s ease-in-out infinite;
+  transition: transform 0.2s;
+  z-index: 2;
+}
+.mt-pitch-player:nth-child(odd) { animation-delay: 0.4s; }
+.mt-pitch-player:nth-child(3n) { animation-delay: 0.8s; }
+.mt-pitch-player:hover { z-index: 5; }
+.mt-pitch-player:hover .mt-pitch-player-portrait {
+  transform: scale(1.15);
+  filter: drop-shadow(0 4px 12px rgba(240,192,64,0.6));
+}
+.mt-pitch-player.rarity-SSR .mt-pitch-player-portrait {
+  filter: drop-shadow(0 0 8px rgba(240,192,64,0.7));
+}
+.mt-pitch-player.rarity-SR .mt-pitch-player-portrait {
+  filter: drop-shadow(0 0 6px rgba(155,135,245,0.6));
+}
+@keyframes mt-bob {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50%      { transform: translate(-50%, calc(-50% - 3px)); }
+}
+.mt-pitch-player-portrait {
+  width: 56px; height: 70px;
+  margin: 0 auto;
+  position: relative;
+  transition: all 0.2s;
+}
+.mt-pitch-player-portrait img {
+  width: 100%; height: 100%; display: block;
+  image-rendering: pixelated;
+}
+.mt-pitch-injury {
+  position: absolute; top: -4px; right: -4px;
+  background: rgba(229,57,53,0.95); color: #fff;
+  font-size: 12px; padding: 1px 4px; border-radius: 4px;
+}
+.mt-pitch-player-name {
+  font-size: 10px; font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.95), 0 0 4px rgba(0,0,0,0.7);
+  margin-top: 1px; white-space: nowrap;
+}
+.mt-pitch-player-stat {
+  font-size: 9px; opacity: 0.9;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.95);
+}
+
+/* 板凳 strip */
+.mt-bench-section { margin-top: 16px; }
+.mt-bench-title { font-size: 13px; font-weight: 800; color: #f0c040; margin-bottom: 6px; }
+.mt-bench-strip {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px;
+}
+.mt-bench-player {
+  background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 6px;
+  flex-shrink: 0; width: 80px; text-align: center;
+  cursor: pointer; position: relative; color: #fff;
+}
+.mt-bench-player.rarity-SSR { border-color: #f0c040; }
+.mt-bench-player.rarity-SR  { border-color: #9b87f5; }
+.mt-bench-player img {
+  width: 56px; height: 70px; image-rendering: pixelated;
+  margin-bottom: 2px;
+}
+.mt-bench-rarity {
+  position: absolute; top: 2px; right: 2px;
+  background: rgba(0,0,0,0.5); font-size: 9px; padding: 1px 4px; border-radius: 3px;
+}
+.mt-bench-injury {
+  position: absolute; top: 2px; left: 2px;
+  background: rgba(229,57,53,0.95); font-size: 11px; padding: 1px 3px; border-radius: 3px;
+}
+.mt-bench-name { font-size: 10px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mt-bench-pos { font-size: 9px; opacity: 0.7; }
+
+/* ─── 球員個人主頁 ─── */
+.mt-profile-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10002; opacity: 0; transition: opacity 0.2s;
+  backdrop-filter: blur(6px); padding: 16px;
+}
+.mt-profile-overlay.open { opacity: 1; }
+.mt-profile-card {
+  background: linear-gradient(180deg, #1a1a2e 0%, #0d1224 100%);
+  border: 2px solid #444; border-radius: 14px;
+  width: 100%; max-width: 380px; max-height: 92vh; overflow-y: auto;
+  padding: 20px; position: relative; color: #fff;
+}
+.mt-profile-card.rarity-SSR { border-color: #f0c040; box-shadow: 0 0 32px rgba(240,192,64,0.4); }
+.mt-profile-card.rarity-SR  { border-color: #9b87f5; box-shadow: 0 0 24px rgba(155,135,245,0.3); }
+.mt-profile-close {
+  position: absolute; top: 10px; right: 14px; background: none; border: 0;
+  color: #fff; font-size: 28px; cursor: pointer; z-index: 2;
+}
+.mt-profile-injury-banner {
+  background: rgba(229,57,53,0.2); border: 1px solid rgba(229,57,53,0.6);
+  color: #ef9a9a; text-align: center; padding: 6px; border-radius: 6px;
+  font-weight: 700; margin-bottom: 12px;
+}
+.mt-profile-hero {
+  display: flex; gap: 14px; align-items: center; margin-bottom: 14px;
+}
+.mt-profile-portrait-wrap {
+  position: relative; flex-shrink: 0;
+  background: linear-gradient(135deg, #2a1855, #0d1224);
+  border-radius: 12px; padding: 8px;
+}
+.mt-profile-portrait {
+  width: 120px; height: 150px;
+  image-rendering: pixelated; display: block;
+}
+.mt-profile-rarity {
+  position: absolute; bottom: 6px; right: 6px;
+  background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 4px;
+  font-size: 11px; font-weight: 800;
+}
+.mt-profile-card.rarity-SSR .mt-profile-rarity { background: #f0c040; color: #000; }
+.mt-profile-card.rarity-SR  .mt-profile-rarity { background: #9b87f5; color: #fff; }
+.mt-profile-meta { flex: 1; min-width: 0; }
+.mt-profile-name { font-size: 24px; font-weight: 900; }
+.mt-profile-nick { font-size: 13px; opacity: 0.8; margin-bottom: 6px; }
+.mt-profile-pos { font-size: 14px; color: #f0c040; }
+.mt-profile-talent {
+  display: inline-block; margin-top: 6px;
+  background: rgba(240,192,64,0.15); border: 1px solid rgba(240,192,64,0.4);
+  padding: 3px 8px; border-radius: 4px; font-size: 12px;
+}
+
+.mt-profile-radar { margin-bottom: 14px; }
+.mt-radar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.mt-radar-label { font-size: 12px; width: 36px; flex-shrink: 0; color: rgba(255,255,255,0.7); }
+.mt-radar-bar {
+  flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;
+}
+.mt-radar-bar > div { height: 100%; border-radius: 4px; transition: width 0.5s; }
+.mt-radar-val { font-size: 13px; font-weight: 800; width: 32px; text-align: right; }
+
+.mt-profile-lore {
+  background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px;
+  margin-bottom: 14px;
+}
+.mt-profile-lore-title { font-size: 12px; color: #f0c040; margin-bottom: 4px; }
+.mt-profile-lore-text { font-size: 13px; line-height: 1.6; opacity: 0.9; }
+
+.mt-profile-actions { display: flex; gap: 8px; }
+.mt-profile-btn {
+  flex: 1; padding: 10px 8px; font-size: 13px; font-weight: 700;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  color: #fff; border-radius: 8px; cursor: pointer; transition: all 0.15s;
+}
+.mt-profile-btn:hover { background: rgba(240,192,64,0.15); border-color: #f0c040; }
+
+/* ─── 隊徽特效 ─── */
+.mt-hub-team-crest {
+  position: relative;
+}
+.mt-hub-team-crest::before {
+  content: ''; position: absolute; inset: -3px; border-radius: 50%;
+  background: conic-gradient(from 0deg, #f0c040, transparent 30%, transparent 60%, #f0c040);
+  animation: mt-crest-rot 4s linear infinite;
+  z-index: -1; opacity: 0.5;
+}
+@keyframes mt-crest-rot {
+  to { transform: rotate(360deg); }
+}
+.mt-hub-team-crest svg {
+  position: relative; z-index: 1;
+  filter: drop-shadow(0 0 8px rgba(240,192,64,0.3));
+  animation: mt-crest-pulse 3s ease-in-out infinite;
+}
+@keyframes mt-crest-pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(240,192,64,0.3)); }
+  50%      { filter: drop-shadow(0 0 14px rgba(240,192,64,0.7)); }
+}
+
+/* ── 朋友 tab ── */
+.mt-friends-tab { padding: 12px; }
+.mt-friends-list { display: flex; flex-direction: column; gap: 6px; }
+.mt-friend-row {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px;
+  cursor: pointer;
+}
+.mt-friend-row:hover { background: rgba(255,255,255,0.08); }
+.mt-friend-remove {
+  background: rgba(229,57,53,0.15); border: 0;
+  color: #ef9a9a; width: 26px; height: 26px;
+  border-radius: 50%; font-size: 16px; cursor: pointer;
+}
+.mt-rank-friend-btn {
+  background: rgba(76,175,80,0.2); border: 0;
+  color: #4caf50; width: 24px; height: 24px; min-width: 24px;
+  border-radius: 50%; font-size: 14px; font-weight: 800;
+  cursor: pointer; margin-left: 4px;
+}
+.mt-rank-row { cursor: pointer; }
+.mt-rank-row:hover { background: rgba(255,255,255,0.08); }
+
+/* ── 看別人陣容 ── */
+.mt-opp-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+  text-align: left;
+}
+.mt-opp-crest { width: 56px; height: 56px; flex-shrink: 0; }
+.mt-opp-crest svg { width: 100%; height: 100%; }
+.mt-opp-name { font-size: 20px; font-weight: 900; }
+.mt-opp-meta { font-size: 12px; opacity: 0.7; }
+.mt-opp-radar { text-align: left; margin-bottom: 12px; }
+.mt-opp-coach {
+  background: rgba(240,192,64,0.1); padding: 6px 10px; border-radius: 6px;
+  font-size: 13px; margin-bottom: 12px;
+}
+.mt-opp-players-title { font-size: 13px; color: #f0c040; margin-bottom: 8px; text-align: left; }
+.mt-opp-players {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+}
+.mt-opp-player {
+  background: rgba(255,255,255,0.04); border-radius: 6px; padding: 4px; text-align: center;
+}
+.mt-opp-player img {
+  width: 100%; aspect-ratio: 4/5; image-rendering: pixelated; object-fit: contain;
+}
+.mt-opp-pname { font-size: 10px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mt-opp-ppos { font-size: 9px; opacity: 0.7; }
+
+/* ── 球員受傷 badge ── */
+.mt-player-card.injured { opacity: 0.7; filter: grayscale(0.3); }
+.mt-player-injury-badge {
+  position: absolute; top: 4px; left: 4px;
+  background: rgba(229,57,53,0.95); color: #fff;
+  font-size: 10px; font-weight: 800;
+  padding: 2px 6px; border-radius: 4px;
+  z-index: 2;
+}

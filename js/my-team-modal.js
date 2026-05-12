@@ -51,7 +51,60 @@
       renderOnboarding();
     } else {
       renderHub();
+      // 新手禮包：第一次進來且還沒領 → 觸發新手指引
+      if (team.starter_pack_claimed === false) {
+        setTimeout(() => _showStarterPackIntro(), 400);
+      }
     }
+  }
+
+  // ── 新手禮包：歡迎彈窗 + 一鍵領 10 連抽 ──
+  async function _showStarterPackIntro() {
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-starter-overlay';
+    overlay.innerHTML = `
+      <div class="mt-starter-card">
+        <div class="mt-starter-emoji">🎁</div>
+        <h2>歡迎來到我的球隊</h2>
+        <p>第一次來？我們幫你準備好一支基本陣容！</p>
+        <ul style="text-align:left;margin:14px 0;font-size:14px;line-height:1.7">
+          <li>🌟 <b>1 張 SSR 王牌前鋒</b>（保證 SSR）</li>
+          <li>⭐ 2 張 SR 球員（中場 + 後衛）</li>
+          <li>🃏 7 張 R 球員（含 1 門將）</li>
+          <li>✅ 全部 11 人自動上首發，立刻可比賽</li>
+        </ul>
+        <button class="mt-gacha-btn mt-starter-claim">領取套裝 ✨</button>
+        <button class="mt-starter-skip">先逛逛</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    overlay.querySelector('.mt-starter-skip').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    });
+
+    overlay.querySelector('.mt-starter-claim').addEventListener('click', async () => {
+      const btn = overlay.querySelector('.mt-starter-claim');
+      btn.disabled = true; btn.textContent = '抽取中…';
+      try {
+        const { data, error } = await window.DB.rpc('claim_starter_pack');
+        if (error) throw error;
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.remove(), 200);
+        // 跳到球員 tab + refresh
+        await window.MyTeam.refresh?.();
+        _currentTab = 'roster';
+        renderHub();
+        if (typeof showToast === 'function') {
+          setTimeout(() => showToast(`🎉 收到 ${data.count || 10} 張球員卡！`), 300);
+        }
+      } catch (e) {
+        alert('領取失敗：' + (e.message || e));
+        btn.disabled = false; btn.textContent = '領取套裝 ✨';
+      }
+    });
   }
 
   function close() {
@@ -187,7 +240,7 @@
     body.innerHTML = `
       <div class="mt-hub-header">
         <div class="mt-hub-team">
-          <div class="mt-hub-team-crest">${team.team_crest || '⚽'}</div>
+          <div class="mt-hub-team-crest">${_renderCrest(team)}</div>
           <div class="mt-hub-team-info">
             <div class="mt-hub-team-name">${escapeHtml(team.team_name)}</div>
             <div class="mt-hub-team-meta">Lv.${team.stadium_level} 球場 · ${team.fans} 球迷</div>
@@ -219,8 +272,15 @@
       <div class="mt-hub-tabs">
         <button class="mt-hub-tab ${_currentTab === 'roster' ? 'active' : ''}" data-tab="roster">球員</button>
         <button class="mt-hub-tab ${_currentTab === 'gacha' ? 'active' : ''}" data-tab="gacha">抽卡</button>
+        <button class="mt-hub-tab ${_currentTab === 'coach' ? 'active' : ''}" data-tab="coach">教練</button>
         <button class="mt-hub-tab ${_currentTab === 'match' ? 'active' : ''}" data-tab="match">比賽</button>
         <button class="mt-hub-tab ${_currentTab === 'train' ? 'active' : ''}" data-tab="train">訓練</button>
+        <button class="mt-hub-tab ${_currentTab === 'quest' ? 'active' : ''}" data-tab="quest">任務</button>
+        <button class="mt-hub-tab ${_currentTab === 'shop' ? 'active' : ''}" data-tab="shop">商店</button>
+        <button class="mt-hub-tab ${_currentTab === 'dex' ? 'active' : ''}" data-tab="dex">圖鑑</button>
+        <button class="mt-hub-tab ${_currentTab === 'rank' ? 'active' : ''}" data-tab="rank">排行</button>
+        <button class="mt-hub-tab ${_currentTab === 'friends' ? 'active' : ''}" data-tab="friends">好友</button>
+        <button class="mt-hub-tab ${_currentTab === 'settings' ? 'active' : ''}" data-tab="settings">設定</button>
       </div>
       <div class="mt-hub-content" id="mt-hub-content"></div>
     `;
@@ -249,15 +309,23 @@
     const content = _overlay.querySelector('#mt-hub-content');
     if (!content) return;
     switch (_currentTab) {
-      case 'roster': return renderRosterTab(content);
-      case 'gacha':  return renderGachaTab(content);
-      case 'match':  return renderMatchTab(content);
-      case 'train':  return renderTrainTab(content);
+      case 'roster':   return renderRosterTab(content);
+      case 'gacha':    return renderGachaTab(content);
+      case 'coach':    return renderCoachTab(content);
+      case 'match':    return renderMatchTab(content);
+      case 'train':    return renderTrainTab(content);
+      case 'quest':    return renderQuestTab(content);
+      case 'shop':     return renderShopTab(content);
+      case 'dex':      return renderDexTab(content);
+      case 'rank':     return renderRankTab(content);
+      case 'friends':  return renderFriendsTab(content);
+      case 'settings': return renderSettingsTab(content);
     }
   }
 
   async function renderRosterTab(content) {
     content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入球員中…</div>';
+    const team = window.MyTeam.getCached();
     const players = await window.MyTeam.fetchPlayers();
     if (!players.length) {
       content.innerHTML = `
@@ -274,36 +342,990 @@
       });
       return;
     }
-    // 渲染卡片格
-    const grid = document.createElement('div');
-    grid.className = 'mt-roster-grid';
-    const posEmoji = { GK: '🧤', DEF: '🛡️', MID: '⚙️', FWD: '⚽' };
-    players.forEach(p => {
-      const c = p.card || {};
-      const rarityClass = c.rarity ? `rarity-${c.rarity}` : '';
-      const card = document.createElement('div');
-      card.className = `mt-player-card ${rarityClass}`;
-      const portraitUrl = (typeof window.MyTeamPortrait === 'function')
-        ? window.MyTeamPortrait(c.card_id, c.rarity) : '';
-      card.innerHTML = `
-        ${p.in_starting_11 ? '<span class="mt-player-starting-badge">先發</span>' : ''}
-        <span class="mt-player-card-rarity">${c.rarity || 'R'}</span>
-        <div class="mt-player-portrait">
-          <img class="mt-player-portrait-img" src="${portraitUrl}" alt="${escapeHtml(c.name || '')}" loading="lazy">
-          <span class="mt-player-portrait-pos">${posEmoji[c.position] || '⚽'}</span>
+
+    // ── 排陣型：依 team.formation 算 11 個位置 ──
+    const formation = team?.formation || '4-3-3';
+    const positions = _formationPositions(formation);
+
+    // 首發 11（依 in_starting_11，沒選滿就補強卡）
+    let starters = players.filter(p => p.in_starting_11);
+    const now = new Date();
+    starters = starters.filter(p => !p.injured_until || new Date(p.injured_until) <= now);
+    if (starters.length < 11) {
+      const rest = players.filter(p => !starters.includes(p) &&
+        (!p.injured_until || new Date(p.injured_until) <= now))
+        .sort((a, b) => (b.current_attack + b.current_defense) - (a.current_attack + a.current_defense));
+      starters = starters.concat(rest.slice(0, 11 - starters.length));
+    }
+    const bench = players.filter(p => !starters.includes(p));
+
+    content.innerHTML = `
+      <div class="mt-stadium-tab">
+        <div class="mt-stadium-pitch" id="mt-stadium-pitch">
+          <!-- 球場線條 -->
+          <div class="mt-pitch-line mt-pitch-mid"></div>
+          <div class="mt-pitch-circle"></div>
+          <div class="mt-pitch-box mt-pitch-box-bottom"></div>
+          <div class="mt-pitch-box mt-pitch-box-top"></div>
+          <div class="mt-pitch-goalbox mt-pitch-goalbox-bottom"></div>
+          <div class="mt-pitch-goalbox mt-pitch-goalbox-top"></div>
+          <!-- 球員會塞進來 -->
+          <div class="mt-pitch-formation-label">📋 ${formation}</div>
         </div>
-        <div class="mt-player-name">${escapeHtml(c.name || '?')}</div>
-        <div class="mt-player-position">${c.position || ''} · Lv.${p.level}${p.bond ? ' ★'.repeat(p.bond) : ''}</div>
-        <div class="mt-player-stats">
-          <div class="mt-player-stat">攻 <b>${p.current_attack}</b></div>
-          <div class="mt-player-stat">防 <b>${p.current_defense}</b></div>
-          <div class="mt-player-stat">速 <b>${p.current_speed}</b></div>
+
+        <div class="mt-bench-section">
+          <div class="mt-bench-title">板凳球員 <span style="opacity:0.6">(${bench.length})</span></div>
+          <div class="mt-bench-strip" id="mt-bench-strip"></div>
+        </div>
+      </div>
+    `;
+
+    // 把首發 11 放進球場（依 positions）
+    const pitch = content.querySelector('#mt-stadium-pitch');
+    starters.forEach((p, i) => {
+      const pos = positions[i] || { x: 50, y: 50 };
+      const el = _buildStadiumPlayer(p, pos, 'starter');
+      pitch.appendChild(el);
+    });
+
+    // 板凳球員 — 橫向 strip
+    const strip = content.querySelector('#mt-bench-strip');
+    if (!bench.length) {
+      strip.innerHTML = '<div style="opacity:0.5;font-size:12px;padding:8px">沒有板凳球員</div>';
+    } else {
+      bench.forEach(p => {
+        const el = _buildBenchPlayer(p);
+        strip.appendChild(el);
+      });
+    }
+  }
+
+  // 陣型 → 11 個 (x, y) %（pitch 是 home 視角，下半場為我方）
+  function _formationPositions(f) {
+    const parts = String(f || '4-3-3').split('-').map(n => parseInt(n)).filter(Number.isFinite);
+    let def, mid, amc, fwd;
+    if (parts.length === 3) { def = parts[0]; mid = parts[1]; amc = 0; fwd = parts[2]; }
+    else if (parts.length === 4) { def = parts[0]; mid = parts[1]; amc = parts[2]; fwd = parts[3]; }
+    else { def = 4; mid = 3; amc = 0; fwd = 3; }
+
+    const positions = [];
+    positions.push({ x: 50, y: 90, role: 'GK' });
+    const place = (count, yPct, role) => {
+      for (let i = 0; i < count; i++) {
+        positions.push({ x: (i + 1) / (count + 1) * 100, y: yPct, role });
+      }
+    };
+    place(def, 73, 'DEF');
+    place(mid, 53, 'MID');
+    if (amc > 0) place(amc, 40, 'AMC');
+    place(fwd, 25, 'FWD');
+    return positions;
+  }
+
+  function _buildStadiumPlayer(p, pos, kind) {
+    const c = p.card || {};
+    const el = document.createElement('button');
+    el.className = `mt-pitch-player rarity-${c.rarity || 'R'}`;
+    el.style.left = pos.x + '%';
+    el.style.top = pos.y + '%';
+    el.dataset.playerId = p.id;
+    const imgId = `pitch-${p.id}`;
+    const isInjured = p.injured_until && new Date(p.injured_until) > new Date();
+    el.innerHTML = `
+      <div class="mt-pitch-player-portrait">
+        <img id="${imgId}" alt="${escapeHtml(c.name || '')}" loading="lazy">
+        ${isInjured ? '<span class="mt-pitch-injury">🏥</span>' : ''}
+      </div>
+      <div class="mt-pitch-player-name">${escapeHtml(c.name || '?')}</div>
+      <div class="mt-pitch-player-stat">Lv.${p.level}${p.bond ? ' ★'.repeat(p.bond) : ''}</div>
+    `;
+    const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+    if (look && window.LpcRenderer) {
+      window.LpcRenderer.portrait(look).then(url => {
+        const img = document.getElementById(imgId);
+        if (img && url) img.src = url;
+      }).catch(() => {});
+    }
+    el.addEventListener('click', () => _openPlayerProfile(p));
+    return el;
+  }
+
+  function _buildBenchPlayer(p) {
+    const c = p.card || {};
+    const el = document.createElement('button');
+    el.className = `mt-bench-player rarity-${c.rarity || 'R'}`;
+    el.dataset.playerId = p.id;
+    const imgId = `bench-${p.id}`;
+    const isInjured = p.injured_until && new Date(p.injured_until) > new Date();
+    el.innerHTML = `
+      ${isInjured ? '<span class="mt-bench-injury">🏥</span>' : ''}
+      <span class="mt-bench-rarity">${c.rarity || 'R'}</span>
+      <img id="${imgId}" alt="${escapeHtml(c.name || '')}">
+      <div class="mt-bench-name">${escapeHtml(c.name || '?')}</div>
+      <div class="mt-bench-pos">${c.position || ''} Lv.${p.level}</div>
+    `;
+    const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+    if (look && window.LpcRenderer) {
+      window.LpcRenderer.portrait(look).then(url => {
+        const img = document.getElementById(imgId);
+        if (img && url) img.src = url;
+      }).catch(() => {});
+    }
+    el.addEventListener('click', () => _openPlayerProfile(p));
+    return el;
+  }
+
+  // ── helper：把 team_crest 渲染為 SVG（fallback emoji）──
+  function _renderCrest(team) {
+    if (!team || !window.TeamCrests) return '⚽';
+    const id = team.team_crest && window.TeamCrests.listCrests().includes(team.team_crest)
+      ? team.team_crest : 'football';
+    const primary = team.crest_primary || '#c0392b';
+    const accent  = team.crest_accent  || '#f1c40f';
+    return window.TeamCrests.getSvg(id, primary, accent);
+  }
+
+  // ─────────── 教練 tab ───────────────────────────────────
+  async function renderCoachTab(content) {
+    const team = window.MyTeam.getCached();
+    if (!team || team === 'not_created') return;
+    const coachTickets = team.coach_tickets || 0;
+    const coaches = await _fetchUserCoaches();
+    const active = coaches.find(c => c.id === team.active_coach_id);
+
+    content.innerHTML = `
+      <div class="mt-coach-tab">
+        <div class="mt-gacha-banner">
+          <div class="mt-gacha-banner-title">👔 教練聘任</div>
+          <div class="mt-gacha-banner-sub">SSR 5% / SR 25% / R 70%・連 30 抽保底</div>
+          <div class="mt-gacha-banner-resources">
+            <div class="mt-gacha-banner-res">🎫 教練券 <b id="mt-coach-tickets">${coachTickets}</b></div>
+          </div>
+          <button class="mt-gacha-btn mt-coach-draw-btn" data-count="1" ${coachTickets < 1 ? 'disabled' : ''}>1 抽（1 券）</button>
+          <button class="mt-gacha-btn mt-gacha-btn-10 mt-coach-draw-btn" data-count="10" ${coachTickets < 10 ? 'disabled' : ''}>10 連抽（10 券）</button>
+        </div>
+        <div class="mt-coach-active">
+          <div class="mt-coach-active-label">主教練</div>
+          ${active ? `
+            <div class="mt-coach-active-card">
+              <div class="mt-coach-active-name">${escapeHtml(active.coach?.name || '?')} <span style="opacity:0.7">${active.coach?.rarity || ''}</span></div>
+              <div class="mt-coach-active-trait">${escapeHtml(active.coach?.nickname || '')}・${escapeHtml(_traitLabel(active.coach?.trait, active.coach?.trait_value))}</div>
+            </div>
+          ` : '<div style="color:rgba(255,255,255,0.5)">尚未指派主教練</div>'}
+        </div>
+        <div class="mt-coach-roster">
+          <div style="font-size:14px;font-weight:600;margin:14px 0 8px">已聘教練 (${coaches.length})</div>
+          <div class="mt-coach-grid" id="mt-coach-grid"></div>
+        </div>
+      </div>
+    `;
+
+    const grid = content.querySelector('#mt-coach-grid');
+    if (!coaches.length) {
+      grid.innerHTML = '<div style="opacity:0.5;font-size:13px">還沒有教練，去抽吧！</div>';
+    } else {
+      coaches.forEach(uc => {
+        const c = uc.coach || {};
+        const isActive = uc.id === team.active_coach_id;
+        const div = document.createElement('div');
+        div.className = `mt-coach-card rarity-${c.rarity || 'R'}${isActive ? ' active' : ''}`;
+        const imgId = `coach-portrait-${uc.id.slice(0,8)}`;
+        div.innerHTML = `
+          ${isActive ? '<span class="mt-coach-badge">主教練</span>' : ''}
+          <span class="mt-player-card-rarity">${c.rarity || 'R'}</span>
+          <div class="mt-player-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy"></div>
+          <div class="mt-player-name">${escapeHtml(c.name || '?')}</div>
+          <div class="mt-player-position" style="font-size:11px">${escapeHtml(c.nickname || '')}</div>
+          <div class="mt-player-position" style="font-size:10px;opacity:0.7">${escapeHtml(_traitLabel(c.trait, c.trait_value))}</div>
+          <button class="mt-coach-set-btn" data-ucid="${uc.id}" ${isActive ? 'disabled' : ''}>${isActive ? '已指派' : '設為主教練'}</button>
+        `;
+        grid.appendChild(div);
+        // LPC portrait
+        const look = uc.look_data || c.look_data;
+        if (look && window.LpcRenderer) {
+          window.LpcRenderer.portrait(look).then(url => {
+            const img = document.getElementById(imgId);
+            if (img && url) img.src = url;
+          }).catch(() => {});
+        }
+      });
+    }
+
+    // 抽教練按鈕
+    content.querySelectorAll('.mt-coach-draw-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const cnt = parseInt(btn.dataset.count, 10);
+        try {
+          await window.MyTeam.drawCoach(cnt);
+          await window.MyTeam.refresh?.();
+          renderTab();
+        } catch (e) {
+          alert('抽教練失敗：' + (e.message || e));
+        }
+      });
+    });
+
+    // 設為主教練按鈕
+    content.querySelectorAll('.mt-coach-set-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const ucid = btn.dataset.ucid;
+        btn.disabled = true; btn.textContent = '設定中…';
+        try {
+          await window.DB.rpc('set_active_coach', { p_user_coach_id: ucid });
+          await window.MyTeam.refresh?.();
+          renderTab();
+        } catch (e) {
+          alert('設定失敗：' + (e.message || e));
+          btn.disabled = false; btn.textContent = '設為主教練';
+        }
+      });
+    });
+  }
+
+  function _traitLabel(trait, value) {
+    if (!trait) return '';
+    if (value && value.description) return value.description;
+    if (value && value.attr) {
+      const attrCN = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
+      return `${attrCN[value.attr] || value.attr} +${Math.round(value.pct * 100)}%`;
+    }
+    return trait;
+  }
+
+  async function _fetchUserCoaches() {
+    if (!window.DB || !window.currentUser) return [];
+    const { data, error } = await window.DB.from('user_coach')
+      .select('*, coach:coach_pool(*)')
+      .order('hired_at', { ascending: false });
+    if (error) { console.warn('fetch coaches', error); return []; }
+    return data || [];
+  }
+
+  // ─────────── 球員個人主頁 ───────────────────────────
+  function _openPlayerProfile(p) {
+    const c = p.card || {};
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay';
+    const isInjured = p.injured_until && new Date(p.injured_until) > new Date();
+    const injuryDays = isInjured ? Math.ceil((new Date(p.injured_until) - new Date()) / 86400000) : 0;
+
+    const lore = _generateLore(c.card_id, c.name, c.position, c.rarity);
+    const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+    const portraitId = `profile-portrait-${p.id}`;
+
+    const talentMap = {
+      speedster: '⚡ 衝刺型', bodybuilder: '💪 體能怪', shooter: '🎯 神射手',
+      wall: '🛡️ 城牆', magician: '✨ 魔法師',
+    };
+    const talentLabel = c.talent ? talentMap[c.talent] || c.talent : '';
+    const rarityClass = `rarity-${c.rarity || 'R'}`;
+
+    overlay.innerHTML = `
+      <div class="mt-profile-card ${rarityClass}">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+
+        ${isInjured ? `<div class="mt-profile-injury-banner">🏥 受傷中・剩 ${injuryDays} 天</div>` : ''}
+
+        <div class="mt-profile-hero">
+          <div class="mt-profile-portrait-wrap">
+            <img id="${portraitId}" class="mt-profile-portrait" alt="${escapeHtml(c.name)}">
+            <span class="mt-profile-rarity">${c.rarity || 'R'}</span>
+          </div>
+          <div class="mt-profile-meta">
+            <div class="mt-profile-name">${escapeHtml(c.name || '?')}</div>
+            ${c.nickname ? `<div class="mt-profile-nick">「${escapeHtml(c.nickname)}」</div>` : ''}
+            <div class="mt-profile-pos">${c.position}・Lv.${p.level}${p.bond ? ' ★'.repeat(p.bond) : ''}</div>
+            ${talentLabel ? `<div class="mt-profile-talent">${talentLabel}</div>` : ''}
+          </div>
+        </div>
+
+        <div class="mt-profile-radar">
+          ${_radarBar('攻擊', p.current_attack)}
+          ${_radarBar('防守', p.current_defense)}
+          ${_radarBar('速度', p.current_speed)}
+          ${_radarBar('中場', p.current_midfield)}
+          ${_radarBar('體力', p.current_stamina)}
+          ${_radarBar('氣場', p.current_aura)}
+        </div>
+
+        <div class="mt-profile-lore">
+          <div class="mt-profile-lore-title">📖 球員小傳</div>
+          <div class="mt-profile-lore-text">${escapeHtml(lore)}</div>
+        </div>
+
+        <div class="mt-profile-actions">
+          <button class="mt-profile-btn" data-act="toggle-start">
+            ${p.in_starting_11 ? '🪑 撤下先發' : '⚽ 設為先發'}
+          </button>
+          <button class="mt-profile-btn" data-act="train">⚙️ 訓練</button>
+          ${isInjured ? '<button class="mt-profile-btn" data-act="heal">💊 用恢復包</button>' : ''}
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    if (look && window.LpcRenderer) {
+      window.LpcRenderer.portrait(look, { scale: 6 }).then(url => {
+        const img = document.getElementById(portraitId);
+        if (img && url) img.src = url;
+      }).catch(() => {});
+    }
+
+    overlay.querySelector('.mt-profile-close').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    });
+
+    overlay.querySelector('[data-act="toggle-start"]').addEventListener('click', async () => {
+      try {
+        await window.DB.from('team_player').update({ in_starting_11: !p.in_starting_11 }).eq('id', p.id);
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.remove(), 200);
+        renderTab();
+      } catch (e) {
+        alert('更新失敗：' + (e.message || e));
+      }
+    });
+    overlay.querySelector('[data-act="train"]').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+      _currentTab = 'train';
+      document.querySelector('.mt-hub-tab[data-tab="train"]')?.click();
+    });
+    overlay.querySelector('[data-act="heal"]')?.addEventListener('click', async () => {
+      try {
+        await window.MyTeam.useItem('recovery_kit', p.id);
+        if (typeof showToast === 'function') showToast('💊 已治療');
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.remove(), 200);
+        renderTab();
+      } catch (e) {
+        const msg = (e.message || String(e));
+        alert(msg.includes('NOT_OWNED') ? '沒有恢復包，去商店買吧' : '治療失敗：' + msg);
+      }
+    });
+  }
+
+  function _radarBar(label, val) {
+    const pct = Math.min(100, Math.max(0, val));
+    const color = pct >= 85 ? '#f0c040' : pct >= 70 ? '#9b87f5' : pct >= 50 ? '#90caf9' : '#888';
+    return `
+      <div class="mt-radar-row">
+        <span class="mt-radar-label">${label}</span>
+        <div class="mt-radar-bar"><div style="width:${pct}%;background:${color}"></div></div>
+        <span class="mt-radar-val">${val}</span>
+      </div>
+    `;
+  }
+
+  // 球員 lore：依 card_id seed 產生穩定描述
+  function _generateLore(cardId, name, position, rarity) {
+    if (!cardId) return '神秘來歷的球員。';
+    let h = 0;
+    for (const ch of String(cardId)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    const rand = () => { h = (h * 9301 + 49297) % 233280; return h / 233280; };
+
+    const origins = ['南美雨林之中', '北歐冰原邊陲', '東歐古鎮', '西非草原', '地中海沿岸',
+      '東亞港都', '中亞高原', '南亞河谷', '巴爾幹半島', '中東沙漠綠洲'];
+    const traits = ['沉默寡言', '熱血直率', '冷靜分析', '愛開玩笑', '虔誠專注',
+      '神秘難測', '勤奮努力', '天才橫溢'];
+    const hobbies = ['彈吉他', '收集球鞋', '畫畫', '看老電影', '養貓', '料理',
+      '健身', '寫詩', '看書', '玩電玩'];
+    const ageBase = rarity === 'SSR' ? 24 : rarity === 'SR' ? 22 : 20;
+    const age = ageBase + Math.floor(rand() * 12) - 4;
+    const origin = origins[Math.floor(rand() * origins.length)];
+    const trait = traits[Math.floor(rand() * traits.length)];
+    const hobby = hobbies[Math.floor(rand() * hobbies.length)];
+
+    return `${age} 歲，來自${origin}。性格${trait}，閒暇時${hobby}。${
+      rarity === 'SSR' ? '球壇公認的天才，被各國強隊爭相挖角。' :
+      rarity === 'SR'  ? '正當打之年，下一個 SSR 候選人。' :
+      '充滿潛力的新秀，等待綻放的一天。'
+    }`;
+  }
+
+  // ─────────── 任務 tab ───────────────────────────────
+  async function renderQuestTab(content) {
+    content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入任務中…</div>';
+    const { templates, state } = await window.MyTeam.fetchQuests();
+    const stateMap = {};
+    state.forEach(s => { stateMap[s.quest_id + '|' + s.period_key] = s; });
+    const today = new Date();
+    const dayKey = today.toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+    const weekNum = (() => {
+      const onejan = new Date(today.getFullYear(), 0, 1);
+      return Math.ceil(((today - onejan) / 86400000 + onejan.getDay() + 1) / 7);
+    })();
+    const weekKey = today.getFullYear() + '-W' + String(weekNum).padStart(2, '0');
+
+    const groupRender = (type, title) => {
+      const list = templates.filter(t => t.quest_type === type);
+      if (!list.length) return '';
+      return `
+        <div class="mt-quest-group">
+          <div class="mt-quest-group-title">${title}</div>
+          ${list.map(t => {
+            const pk = type === 'daily' ? dayKey : type === 'weekly' ? weekKey : 'all-time';
+            const st = stateMap[t.quest_id + '|' + pk] || { current_count: 0, claimed: false };
+            const cur = Math.min(st.current_count, t.target_count);
+            const pct = (cur / t.target_count) * 100;
+            const done = cur >= t.target_count && !st.claimed;
+            const claimed = st.claimed;
+            const rewardLabel = _rewardLabel(t.reward);
+            return `
+              <div class="mt-quest-row ${claimed ? 'claimed' : done ? 'ready' : ''}">
+                <div class="mt-quest-info">
+                  <div class="mt-quest-name">${escapeHtml(t.name)}</div>
+                  <div class="mt-quest-bar"><div style="width:${pct}%"></div></div>
+                  <div class="mt-quest-progress">${cur} / ${t.target_count}</div>
+                </div>
+                <div class="mt-quest-reward">${rewardLabel}</div>
+                <button class="mt-quest-claim" data-qid="${t.quest_id}" ${done ? '' : 'disabled'}>
+                  ${claimed ? '✓' : done ? '領取' : '進行中'}
+                </button>
+              </div>
+            `;
+          }).join('')}
         </div>
       `;
-      grid.appendChild(card);
+    };
+
+    content.innerHTML = `
+      <div class="mt-quest-tab">
+        ${groupRender('daily',  '📋 每日任務（每日 00:00 重置）')}
+        ${groupRender('weekly', '📆 每週任務（每週一重置）')}
+        ${groupRender('season', '🏆 賽季成就（永久里程碑）')}
+      </div>
+    `;
+
+    content.querySelectorAll('.mt-quest-claim').forEach(btn => {
+      if (btn.disabled) return;
+      btn.addEventListener('click', async () => {
+        const qid = btn.dataset.qid;
+        btn.disabled = true; btn.textContent = '領取中…';
+        try {
+          const res = await window.MyTeam.claimQuest(qid);
+          if (typeof showToast === 'function') showToast(`✅ 領取：${_rewardLabel(res.reward)}`);
+          renderTab();
+        } catch (e) {
+          alert('領取失敗：' + (e.message || e));
+          btn.disabled = false; btn.textContent = '領取';
+        }
+      });
     });
-    content.innerHTML = '';
-    content.appendChild(grid);
+  }
+
+  function _rewardLabel(r) {
+    if (!r) return '';
+    const parts = [];
+    if (r.tickets)        parts.push('🎟️ ' + r.tickets);
+    if (r.coach_tickets)  parts.push('👔 ' + r.coach_tickets);
+    if (r.gems)           parts.push('💎 ' + r.gems);
+    if (r.rp_all)         parts.push('⚙️ ' + r.rp_all);
+    return parts.join(' ');
+  }
+
+  // ─────────── 商店 tab ───────────────────────────────
+  async function renderShopTab(content) {
+    content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入商店…</div>';
+    const { items, inventory } = await window.MyTeam.fetchShopAndInventory();
+    const invMap = {};
+    inventory.forEach(i => { invMap[i.item_id] = i.count; });
+
+    const shopList = items.filter(i => i.shop_cost_gems != null);
+    const myList = items.filter(i => (invMap[i.item_id] || 0) > 0);
+
+    content.innerHTML = `
+      <div class="mt-shop-tab">
+        <div class="mt-quest-group-title" style="margin-top:8px">🏪 商店</div>
+        <div class="mt-shop-grid">
+          ${shopList.map(i => `
+            <div class="mt-shop-card">
+              <div class="mt-shop-icon">${i.icon || '📦'}</div>
+              <div class="mt-shop-name">${escapeHtml(i.name)}</div>
+              <div class="mt-shop-desc">${escapeHtml(i.description || '')}</div>
+              <button class="mt-shop-buy" data-iid="${i.item_id}">
+                💎 ${i.shop_cost_gems} <span>購買</span>
+              </button>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="mt-quest-group-title" style="margin-top:20px">🎒 我的道具</div>
+        ${myList.length ? `
+          <div class="mt-inv-grid">
+            ${myList.map(i => `
+              <div class="mt-inv-card">
+                <div class="mt-shop-icon">${i.icon}</div>
+                <div class="mt-shop-name">${escapeHtml(i.name)} × ${invMap[i.item_id]}</div>
+                <div class="mt-shop-desc">${escapeHtml(i.description || '')}</div>
+                <button class="mt-inv-use" data-iid="${i.item_id}" data-effect="${i.effect}">使用</button>
+              </div>
+            `).join('')}
+          </div>
+        ` : '<div style="opacity:0.5;font-size:13px;padding:12px">背包是空的</div>'}
+      </div>
+    `;
+
+    content.querySelectorAll('.mt-shop-buy').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const iid = btn.dataset.iid;
+        btn.disabled = true; btn.textContent = '購買中…';
+        try {
+          await window.MyTeam.buyShopItem(iid, 1);
+          if (typeof showToast === 'function') showToast(`✅ 已購買`);
+          renderTab();
+        } catch (e) {
+          const msg = (e.message || String(e));
+          alert(msg.includes('INSUFFICIENT_GEMS') ? '寶石不足' : '購買失敗：' + msg);
+          btn.disabled = false;
+          btn.innerHTML = btn.innerHTML;
+        }
+      });
+    });
+
+    content.querySelectorAll('.mt-inv-use').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const iid = btn.dataset.iid;
+        const eff = btn.dataset.effect;
+        let target = null;
+        if (eff === 'xp_book' || eff === 'recovery') {
+          const players = await window.MyTeam.fetchPlayers();
+          const choices = players.map((p, i) =>
+            `${i + 1}. ${p.card?.name || '?'} Lv.${p.level}${p.injured_until && new Date(p.injured_until) > new Date() ? ' 🏥' : ''}`
+          ).join('\n');
+          const pick = prompt(`對哪位球員使用？\n${choices}`);
+          const idx = parseInt(pick, 10) - 1;
+          if (Number.isFinite(idx) && players[idx]) target = players[idx].id;
+          else return;
+        }
+        try {
+          await window.MyTeam.useItem(iid, target);
+          if (typeof showToast === 'function') showToast('✅ 已使用');
+          renderTab();
+        } catch (e) {
+          alert('使用失敗：' + (e.message || e));
+        }
+      });
+    });
+  }
+
+  // ─────────── 圖鑑 tab ───────────────────────────────
+  async function renderDexTab(content) {
+    content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入圖鑑…</div>';
+    const [ssrCards, players] = await Promise.all([
+      window.DB.from('player_card_pool').select('*').eq('rarity', 'SSR').order('position'),
+      window.MyTeam.fetchPlayers(),
+    ]);
+    const ownedSet = new Set((players || []).map(p => p.card?.card_id || p.card_id));
+    const ssrs = ssrCards.data || [];
+    const ownedCount = ssrs.filter(c => ownedSet.has(c.card_id)).length;
+
+    content.innerHTML = `
+      <div class="mt-dex-tab">
+        <div class="mt-dex-title">⭐ SSR 圖鑑</div>
+        <div class="mt-dex-sub">收集 ${ownedCount} / ${ssrs.length} 張</div>
+        <div class="mt-dex-grid">
+          ${ssrs.map(c => {
+            const owned = ownedSet.has(c.card_id);
+            const imgId = 'dex-' + c.card_id;
+            return `
+              <div class="mt-dex-card ${owned ? 'owned' : 'locked'}">
+                <div class="mt-player-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}"></div>
+                <div class="mt-dex-name">${owned ? escapeHtml(c.name) : '???'}</div>
+                <div class="mt-dex-pos">${c.position}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+
+    ssrs.forEach(c => {
+      if (!ownedSet.has(c.card_id)) return; // locked 不 render
+      const look = c.look_data;
+      if (look && window.LpcRenderer) {
+        window.LpcRenderer.portrait(look).then(url => {
+          const img = document.getElementById('dex-' + c.card_id);
+          if (img && url) img.src = url;
+        }).catch(() => {});
+      }
+    });
+  }
+
+  // ─────────── 排行榜 tab ───────────────────────────────
+  async function renderRankTab(content) {
+    content.innerHTML = `
+      <div class="mt-rank-tab">
+        <div class="mt-settings-title" style="margin:8px 0 6px">🏆 我的球隊・賽季排行</div>
+        <div class="mt-rank-list" id="mt-rank-list">載入中…</div>
+      </div>
+    `;
+    const list = content.querySelector('#mt-rank-list');
+    if (!window.DB) { list.innerHTML = '請登入'; return; }
+    try {
+      const { data, error } = await window.DB.from('my_team_leaderboard')
+        .select('*')
+        .order('points', { ascending: false })
+        .order('goals_for', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      if (!data || !data.length) { list.innerHTML = '<div style="opacity:0.5">還沒有玩家上榜</div>'; return; }
+      const me = window.currentUser?.id;
+      list.innerHTML = data.map((row, i) => {
+        const crestSvg = window.TeamCrests ? window.TeamCrests.getSvg(
+          row.team_crest || 'football', row.crest_primary, row.crest_accent
+        ) : '⚽';
+        const medal = ['🥇','🥈','🥉'][i] || (i + 1);
+        const isMe = row.user_id === me;
+        return `<div class="mt-rank-row ${isMe ? 'me' : ''}" data-uid="${row.user_id}">
+          <div class="mt-rank-pos">${medal}</div>
+          <div class="mt-rank-crest">${crestSvg}</div>
+          <div class="mt-rank-info">
+            <div class="mt-rank-name">${escapeHtml(row.team_name || '')}</div>
+            <div class="mt-rank-meta">${escapeHtml(row.player_name)} · S${row.season_num || 1} · Tier ${row.current_tier || 1}</div>
+          </div>
+          <div class="mt-rank-stats">
+            <div class="mt-rank-pt">${row.points || 0} <span>pt</span></div>
+            <div class="mt-rank-record">${row.wins || 0}-${row.draws || 0}-${row.losses || 0}</div>
+          </div>
+          ${!isMe ? `<button class="mt-rank-friend-btn" data-add="${row.user_id}" title="加好友">＋</button>` : ''}
+        </div>`;
+      }).join('');
+
+      // 加好友
+      list.querySelectorAll('.mt-rank-friend-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const uid = btn.dataset.add;
+          btn.disabled = true; btn.textContent = '…';
+          try {
+            await window.DB.from('user_friend').insert({ user_id: me, friend_id: uid });
+            btn.textContent = '✓';
+            if (typeof showToast === 'function') showToast('✅ 已加為好友');
+          } catch (e) {
+            if (String(e.message || '').includes('duplicate')) {
+              btn.textContent = '✓';
+            } else {
+              alert('加好友失敗：' + (e.message || e));
+              btn.disabled = false; btn.textContent = '＋';
+            }
+          }
+        });
+      });
+
+      // 點隊伍 → 看陣容
+      list.querySelectorAll('.mt-rank-row').forEach(row => {
+        row.addEventListener('click', () => {
+          const uid = row.dataset.uid;
+          if (uid && uid !== me) _openOpponentTeamView(uid);
+        });
+      });
+    } catch (e) {
+      list.innerHTML = '排行榜載入失敗：' + (e.message || e);
+    }
+  }
+
+  // ─────────── 朋友 tab ───────────────────────────────
+  async function renderFriendsTab(content) {
+    content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入好友…</div>';
+    const me = window.currentUser?.id;
+    if (!me) { content.innerHTML = '請先登入'; return; }
+    const { data: friends, error } = await window.DB.from('user_friend')
+      .select('friend_id, added_at').eq('user_id', me).order('added_at', { ascending: false });
+    if (error) { content.innerHTML = '載入失敗：' + error.message; return; }
+    if (!friends || !friends.length) {
+      content.innerHTML = `
+        <div class="mt-tab-todo">
+          <div class="mt-tab-todo-icon">👥</div>
+          <div>還沒有好友</div>
+          <div style="font-size:12px;margin:8px 0">去排行榜點 + 號加好友</div>
+          <button class="mt-gacha-btn" data-go-rank>看排行榜</button>
+        </div>
+      `;
+      content.querySelector('[data-go-rank]').addEventListener('click', () => {
+        _currentTab = 'rank';
+        document.querySelector('.mt-hub-tab[data-tab="rank"]')?.click();
+      });
+      return;
+    }
+
+    // 撈每個朋友的隊伍 snapshot
+    const fids = friends.map(f => f.friend_id);
+    const { data: teams } = await window.DB.from('my_team_leaderboard')
+      .select('*').in('user_id', fids);
+    const teamMap = {};
+    (teams || []).forEach(t => { teamMap[t.user_id] = t; });
+
+    content.innerHTML = `
+      <div class="mt-friends-tab">
+        <div class="mt-quest-group-title">👥 好友列表 (${friends.length})</div>
+        <div class="mt-friends-list">
+          ${friends.map(f => {
+            const t = teamMap[f.friend_id];
+            if (!t) return '';
+            const crest = window.TeamCrests ? window.TeamCrests.getSvg(
+              t.team_crest || 'football', t.crest_primary, t.crest_accent) : '⚽';
+            return `<div class="mt-friend-row" data-uid="${f.friend_id}">
+              <div class="mt-rank-crest">${crest}</div>
+              <div class="mt-rank-info">
+                <div class="mt-rank-name">${escapeHtml(t.team_name || '')}</div>
+                <div class="mt-rank-meta">${escapeHtml(t.player_name)} · Tier ${t.current_tier || 1} · ELO ${t.pvp_elo || '—'}</div>
+              </div>
+              <button class="mt-friend-remove" data-rm="${f.friend_id}" title="移除好友">×</button>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+
+    content.querySelectorAll('.mt-friend-row').forEach(row => {
+      row.addEventListener('click', (e) => {
+        if (e.target.matches('.mt-friend-remove')) return;
+        _openOpponentTeamView(row.dataset.uid);
+      });
+    });
+    content.querySelectorAll('.mt-friend-remove').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!confirm('移除好友？')) return;
+        try {
+          await window.DB.from('user_friend').delete().eq('user_id', me).eq('friend_id', btn.dataset.rm);
+          renderTab();
+        } catch (e) { alert('移除失敗：' + e.message); }
+      });
+    });
+  }
+
+  // 看別人陣容 — 用 get_pvp_team_snapshot
+  async function _openOpponentTeamView(userId) {
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay';
+    overlay.innerHTML = `
+      <div class="mt-profile-card" style="max-width:480px">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <div id="mt-opp-view" style="text-align:center"><div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入中…</div></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    overlay.querySelector('.mt-profile-close').addEventListener('click', () => {
+      overlay.classList.remove('open'); setTimeout(() => overlay.remove(), 200);
+    });
+
+    try {
+      const { data, error } = await window.DB.rpc('get_pvp_team_snapshot', { p_user_id: userId });
+      if (error) throw error;
+      if (!data) { overlay.querySelector('#mt-opp-view').innerHTML = '找不到隊伍'; return; }
+      const crest = window.TeamCrests ? window.TeamCrests.getSvg(
+        data.flag || 'football', data.crest_primary, data.crest_accent) : '';
+      const players = data.keyPlayers || [];
+      overlay.querySelector('#mt-opp-view').innerHTML = `
+        <div class="mt-opp-header">
+          <div class="mt-opp-crest">${crest}</div>
+          <div>
+            <div class="mt-opp-name">${escapeHtml(data.nameCN)}</div>
+            <div class="mt-opp-meta">陣型 ${data.formation || '4-3-3'} · ELO ${data.pvp_elo || '—'}</div>
+          </div>
+        </div>
+        <div class="mt-opp-radar">
+          ${_radarBar('攻擊', data.radar?.attack || 50)}
+          ${_radarBar('防守', data.radar?.defense || 50)}
+          ${_radarBar('中場', data.radar?.midfield || 50)}
+          ${_radarBar('速度', data.radar?.speed || 50)}
+        </div>
+        ${data.coach ? `<div class="mt-opp-coach">👔 主教練：${escapeHtml(data.coach.name)}</div>` : ''}
+        <div class="mt-opp-players-title">⚽ 首發 11 人</div>
+        <div class="mt-opp-players">
+          ${players.map((kp, i) => {
+            const imgId = `opp-${i}`;
+            return `<div class="mt-opp-player">
+              <img id="${imgId}" alt="${escapeHtml(kp.name)}">
+              <div class="mt-opp-pname">${escapeHtml(kp.name)}</div>
+              <div class="mt-opp-ppos">${kp.pos}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      `;
+      players.forEach((kp, i) => {
+        if (kp.look_data && window.LpcRenderer) {
+          window.LpcRenderer.portrait(kp.look_data).then(url => {
+            const img = document.getElementById(`opp-${i}`);
+            if (img && url) img.src = url;
+          }).catch(() => {});
+        }
+      });
+    } catch (e) {
+      overlay.querySelector('#mt-opp-view').innerHTML = '載入失敗：' + (e.message || e);
+    }
+  }
+
+  // ─────────── 設定 tab：Kit + 隊徽 + 球場 + 陣型 ───────────────────────
+  function renderSettingsTab(content) {
+    const team = window.MyTeam.getCached();
+    if (!team || team === 'not_created') return;
+
+    const KIT_COLORS = ['red','blue','black','white','green','yellow','teal','purple','orange'];
+    const PANTS_COLORS = ['red','blue','black','white','green','yellow','teal','purple','orange','brown','tan'];
+    const SHOE_COLORS = ['black','brown','white','red','blue','yellow','green'];
+    const CREST_IDS = window.TeamCrests ? window.TeamCrests.listCrests() : [];
+
+    function swatchRow(category, value, colors) {
+      return colors.map(c => `
+        <button class="mt-settings-swatch ${value === c ? 'sel' : ''}"
+          data-cat="${category}" data-val="${c}" style="background:${_colorHex(c)}"></button>
+      `).join('');
+    }
+
+    const crestPicker = CREST_IDS.map(id => `
+      <button class="mt-settings-crest ${team.team_crest === id ? 'sel' : ''}" data-cat="team_crest" data-val="${id}">
+        ${window.TeamCrests.getSvg(id, team.crest_primary, team.crest_accent)}
+      </button>
+    `).join('');
+
+    const FORMATIONS = ['4-3-3', '4-4-2', '3-5-2', '5-3-2'];
+    const formationPicker = FORMATIONS.map(f => `
+      <button class="mt-formation-opt ${team.formation === f ? 'sel' : ''}" data-cat="formation" data-val="${f}">${f}</button>
+    `).join('');
+
+    const lv = team.stadium_level || 1;
+    const nextCost = lv >= 10 ? null : ({2:30,3:60,4:120,5:200,6:350,7:550,8:800,9:1200,10:2000})[lv+1];
+
+    content.innerHTML = `
+      <div class="mt-settings-tab">
+        <div class="mt-settings-section">
+          <div class="mt-settings-title">🏟️ 球場等級 Lv. ${lv} / 10</div>
+          <div style="font-size:12px;opacity:0.8;margin-bottom:6px">
+            目前球迷上限：${team.fans || 100}・體力上限：${team.stamina_max}
+          </div>
+          ${nextCost ? `
+            <button class="mt-gacha-btn" id="mt-stadium-upgrade">升 Lv. ${lv+1}（${nextCost} 💎）</button>
+          ` : '<div style="opacity:0.7">已達最高等級！</div>'}
+        </div>
+        <div class="mt-settings-section">
+          <div class="mt-settings-title">📋 陣型</div>
+          <div class="mt-settings-formations">${formationPicker}</div>
+        </div>
+        <div class="mt-settings-section">
+          <div class="mt-settings-title">👕 球衣顏色</div>
+          <div class="mt-settings-swatches">${swatchRow('kit_shirt_color', team.kit_shirt_color, KIT_COLORS)}</div>
+        </div>
+        <div class="mt-settings-section">
+          <div class="mt-settings-title">👖 球褲顏色</div>
+          <div class="mt-settings-swatches">${swatchRow('kit_pants_color', team.kit_pants_color, PANTS_COLORS)}</div>
+        </div>
+        <div class="mt-settings-section">
+          <div class="mt-settings-title">👟 球鞋顏色</div>
+          <div class="mt-settings-swatches">${swatchRow('kit_shoes_color', team.kit_shoes_color, SHOE_COLORS)}</div>
+        </div>
+        <div class="mt-settings-section">
+          <div class="mt-settings-title">🛡️ 隊徽圖案</div>
+          <div class="mt-settings-crests">${crestPicker}</div>
+        </div>
+        <div class="mt-settings-section">
+          <div class="mt-settings-title">🎨 隊徽配色</div>
+          <div class="mt-settings-presets" id="mt-crest-presets"></div>
+          <div style="margin-top:10px;display:flex;gap:10px;align-items:center;font-size:13px">
+            <label>主色 <input type="color" id="mt-crest-primary" value="${team.crest_primary || '#c0392b'}"></label>
+            <label>副色 <input type="color" id="mt-crest-accent"  value="${team.crest_accent  || '#f1c40f'}"></label>
+          </div>
+        </div>
+        <div class="mt-settings-section">
+          <div class="mt-settings-title">👁 預覽</div>
+          <div class="mt-settings-preview" id="mt-settings-preview-crest" style="width:120px;height:120px">${_renderCrest(team)}</div>
+        </div>
+        <button class="mt-gacha-btn" id="mt-settings-save">儲存球衣 / 隊徽 / 陣型</button>
+      </div>
+    `;
+
+    // 球場升級按鈕
+    const upBtn = content.querySelector('#mt-stadium-upgrade');
+    if (upBtn) {
+      upBtn.addEventListener('click', async () => {
+        upBtn.disabled = true; upBtn.textContent = '升級中…';
+        try {
+          const { data, error } = await window.DB.rpc('upgrade_stadium');
+          if (error) throw error;
+          await window.MyTeam.refresh?.();
+          if (typeof showToast === 'function') showToast(`🏟️ 球場升到 Lv. ${data.new_level}！花費 ${data.cost} 💎`);
+          renderTab();
+        } catch (e) {
+          alert('升級失敗：' + (e.message || e));
+          upBtn.disabled = false;
+        }
+      });
+    }
+    // 陣型 click
+    content.querySelectorAll('.mt-formation-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        content.querySelectorAll('.mt-formation-opt').forEach(b => b.classList.toggle('sel', b === btn));
+        _pendingSettings.formation = btn.dataset.val;
+      });
+    });
+
+    // 預設色組合
+    const presets = window.TeamCrests?.PRESET_COLOR_COMBOS || [];
+    const presetEl = content.querySelector('#mt-crest-presets');
+    presets.forEach(([p, a]) => {
+      const b = document.createElement('button');
+      b.className = 'mt-settings-preset';
+      b.innerHTML = `<span style="background:${p}"></span><span style="background:${a}"></span>`;
+      b.addEventListener('click', () => {
+        content.querySelector('#mt-crest-primary').value = p;
+        content.querySelector('#mt-crest-accent').value  = a;
+        _settingsPreviewUpdate(content);
+      });
+      presetEl.appendChild(b);
+    });
+
+    // swatch / crest click
+    content.querySelectorAll('.mt-settings-swatch, .mt-settings-crest').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cat = btn.dataset.cat, val = btn.dataset.val;
+        content.querySelectorAll(`[data-cat="${cat}"]`).forEach(b => b.classList.toggle('sel', b === btn));
+        btn.dataset.pending = val;
+        _pendingSettings[cat] = val;
+        _settingsPreviewUpdate(content);
+      });
+    });
+    content.querySelector('#mt-crest-primary').addEventListener('change', () => _settingsPreviewUpdate(content));
+    content.querySelector('#mt-crest-accent').addEventListener('change', () => _settingsPreviewUpdate(content));
+
+    // 儲存
+    content.querySelector('#mt-settings-save').addEventListener('click', async () => {
+      const updates = { ..._pendingSettings };
+      updates.crest_primary = content.querySelector('#mt-crest-primary').value;
+      updates.crest_accent  = content.querySelector('#mt-crest-accent').value;
+      try {
+        await window.DB.from('my_team').update(updates).eq('user_id', window.currentUser.id);
+        await window.MyTeam.refresh?.();
+        _pendingSettings = {};
+        alert('已儲存');
+        renderTab();
+      } catch (e) {
+        alert('儲存失敗：' + (e.message || e));
+      }
+    });
+  }
+
+  let _pendingSettings = {};
+
+  function _settingsPreviewUpdate(content) {
+    const team = window.MyTeam.getCached();
+    const teamSnap = { ...team, ..._pendingSettings,
+      crest_primary: content.querySelector('#mt-crest-primary').value,
+      crest_accent:  content.querySelector('#mt-crest-accent').value };
+    const preview = content.querySelector('#mt-settings-preview-crest');
+    if (preview) preview.innerHTML = _renderCrest(teamSnap);
+  }
+
+  function _colorHex(name) {
+    return ({
+      red:'#c0392b', blue:'#2196f3', black:'#1a1a1a', white:'#eee', green:'#27ae60',
+      yellow:'#f1c40f', teal:'#16a085', purple:'#9b59b6', orange:'#e67e22',
+      brown:'#8b4513', tan:'#d2b48c',
+    })[name] || '#888';
   }
 
   function renderGachaTab(content) {
@@ -356,22 +1378,102 @@
             <div class="mt-gacha-btn-cost">💎 50</div>
           </button>
         </div>
+
+        ${(team.ssr_select_tickets || 0) > 0 ? `
+          <div class="mt-ssr-select-section">
+            <div class="mt-ssr-select-title">🌟 SSR 自選券 × ${team.ssr_select_tickets}</div>
+            <div class="mt-ssr-select-sub">賽季冠軍獎勵・任選一張 SSR 球員加入隊伍</div>
+            <button class="mt-gacha-btn" id="mt-ssr-select-open">兌換 SSR 自選券</button>
+          </div>
+        ` : ''}
       </div>
     `;
 
-    // 1 抽
     content.querySelector('#mt-gacha-1').addEventListener('click', () => _runGacha(1));
-    // 10 連
     content.querySelector('#mt-gacha-10').addEventListener('click', () => _runGacha(10));
-    // 寶石抽（暫時跳訊息，Phase 1.7 接 gems.js）
     content.querySelector('#mt-gacha-gem-1').addEventListener('click', () => {
       if (typeof showToast === 'function') showToast('💎 寶石抽卡 Phase 1.7 接 gems.js');
+    });
+    content.querySelector('#mt-ssr-select-open')?.addEventListener('click', () => _openSSRSelect());
+  }
+
+  // ── SSR 自選券：選 1 張 SSR ──
+  async function _openSSRSelect() {
+    const team = window.MyTeam.getCached();
+    if (!team || (team.ssr_select_tickets || 0) < 1) return;
+
+    // 撈所有 SSR
+    const { data: ssrs, error } = await window.DB.from('player_card_pool')
+      .select('*').eq('rarity', 'SSR').order('position');
+    if (error) { alert('載入 SSR 名單失敗：' + error.message); return; }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-ssr-overlay';
+    overlay.innerHTML = `
+      <div class="mt-ssr-card-modal">
+        <div class="mt-ssr-modal-title">🌟 選一張 SSR（剩 ${team.ssr_select_tickets} 張券）</div>
+        <button class="mt-modal-close mt-ssr-close" type="button">×</button>
+        <div class="mt-ssr-grid" id="mt-ssr-grid">
+          ${ssrs.map(c => {
+            const imgId = `ssrsel-${c.card_id}`;
+            return `
+              <button class="mt-coach-card rarity-SSR mt-ssr-pickable" data-card-id="${c.card_id}">
+                <span class="mt-player-card-rarity">SSR</span>
+                <div class="mt-player-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}"></div>
+                <div class="mt-player-name">${escapeHtml(c.name)}</div>
+                <div class="mt-player-position" style="font-size:11px">${escapeHtml(c.nickname || '')}</div>
+                <div class="mt-player-position" style="font-size:10px">${c.position}</div>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    // 載 portrait
+    ssrs.forEach(c => {
+      const look = c.look_data;
+      if (look && window.LpcRenderer) {
+        window.LpcRenderer.portrait(look).then(url => {
+          const img = document.getElementById(`ssrsel-${c.card_id}`);
+          if (img && url) img.src = url;
+        }).catch(() => {});
+      }
+    });
+
+    overlay.querySelector('.mt-ssr-close').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    });
+
+    overlay.querySelectorAll('.mt-ssr-pickable').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const cardId = btn.dataset.cardId;
+        if (!confirm(`確定要兌換 ${ssrs.find(s=>s.card_id===cardId)?.name}？\n（消耗 1 張自選券）`)) return;
+        btn.disabled = true;
+        try {
+          const res = await window.MyTeam.redeemSSRSelect(cardId);
+          overlay.classList.remove('open');
+          setTimeout(() => overlay.remove(), 200);
+          if (typeof showToast === 'function') {
+            showToast(res.is_duplicate ? `⭐ ${res.name} ★+1` : `🎉 收到 ${res.name}！`);
+          }
+          await window.MyTeam.refresh?.();
+          renderTab();
+        } catch (e) {
+          alert('兌換失敗：' + (e.message || e));
+          btn.disabled = false;
+        }
+      });
     });
   }
 
   async function _runGacha(count) {
     try {
       await window.MyTeam.gacha(count, { source: 'gacha-tab' });
+      window.MyTeam.trackQuest?.('gacha_draw', count).catch(() => {});
       // 動畫跑完 → 重畫 hub
       renderHub();
     } catch (err) {
@@ -427,12 +1529,37 @@
           <span class="mt-match-start-cost">耗 1 ⚡（剩 ${team.stamina}/${team.stamina_max}）</span>
         </button>
         ${team.stamina < 1 ? '<div class="mt-match-low-stamina">⚡ 體力 0 — 預測比賽、看文章可賺體力</div>' : ''}
+
+        <!-- PvP 對戰 -->
+        <div class="mt-pvp-section">
+          <div class="mt-pvp-title">⚔️ PvP 排位戰</div>
+          <div class="mt-pvp-stat">當前 ELO <b>${team.pvp_elo || 1000}</b> · 今日已戰 <b>${team.pvp_today_count || 0}</b> / 5</div>
+          <button class="mt-pvp-btn" id="mt-pvp-find" ${(team.pvp_today_count || 0) >= 5 || team.stamina < 1 ? 'disabled' : ''}>
+            找對手對戰（耗 1 ⚡）
+          </button>
+        </div>
       </div>
     `;
 
     content.querySelector('#mt-match-start')?.addEventListener('click', () => {
       if (typeof window.MyTeam.runMatch === 'function') {
         window.MyTeam.runMatch();
+      }
+    });
+
+    content.querySelector('#mt-pvp-find')?.addEventListener('click', async () => {
+      try {
+        if (typeof window.MyTeam.runPvpMatch === 'function') {
+          await window.MyTeam.runPvpMatch();
+          renderTab();
+        }
+      } catch (e) {
+        const msg = (e.message || String(e));
+        const friendly = msg.includes('PVP_DAILY_LIMIT') ? '今日 PvP 5 場已用完、明天再戰'
+          : msg.includes('NO_PVP_OPPONENT') ? '目前沒有可對戰的對手（再過一下試）'
+          : msg.includes('INSUFFICIENT_STAMINA') ? '體力不足'
+          : '對戰失敗：' + msg;
+        if (typeof showToast === 'function') showToast(friendly);
       }
     });
   }
@@ -510,6 +1637,7 @@
         list.querySelectorAll('[data-train]').forEach(b => b.disabled = true);
         try {
           const result = await window.MyTeam.trainPlayer(pid, mode);
+          window.MyTeam.trackQuest?.('train', 1).catch(() => {});
           const g = result.gains;
           if (typeof showToast === 'function') {
             showToast(`💪 Lv.${result.level_after}！攻+${g.attack}/防+${g.defense}/速+${g.speed}/中+${g.midfield}/體+${g.stamina}/環+${g.aura}`);

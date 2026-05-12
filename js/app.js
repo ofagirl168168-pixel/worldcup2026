@@ -4239,6 +4239,10 @@ function saveMyPred(matchId) {
             window.MyTeam.triggerInstantGacha?.(2, 'predict_5').catch(() => {});
           }, 1500);
         }
+        // 任務：每場預測都算一次
+        if (window.MyTeamBetaEnabled?.() && window.MyTeam) {
+          window.MyTeam.trackQuest?.('predict_match', 1).catch(() => {});
+        }
       }
     } catch (e) {}
 

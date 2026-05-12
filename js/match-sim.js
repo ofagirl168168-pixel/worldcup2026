@@ -221,13 +221,28 @@
       ctx.fill();
 
       // 取 sprite sheet 並 drawImage
-      const sheet = state.spriteCache?.get(p.card_id);
-      if (sheet && sheet.complete && sheet.naturalWidth > 0) {
-        const srcX = frame * FRAME_PX;
-        const srcY = dirRow * FRAME_PX;
-        const dx = Math.round(cx - SPRITE_DRAW_W / 2);
-        const dy = Math.round(cy - SPRITE_DRAW_H / 2);
-        ctx.drawImage(sheet, srcX, srcY, FRAME_PX, FRAME_PX, dx, dy, SPRITE_DRAW_W, SPRITE_DRAW_H);
+      // sheet 可能是 PIPOYA HTMLImageElement，或 LPC 預合成的 { source, frameW, frameH }
+      const sheetEntry = state.spriteCache?.get(p.card_id);
+      let sheet, frameW, frameH, drawW, drawH;
+      if (sheetEntry && sheetEntry.source) {
+        // LPC：{ source: canvas, frameW: 32, frameH: 40 }
+        sheet = sheetEntry.source;
+        frameW = sheetEntry.frameW; frameH = sheetEntry.frameH;
+        drawW = SPRITE_DRAW_W;
+        drawH = Math.round(SPRITE_DRAW_W * (frameH / frameW));  // 保 LPC 比例
+      } else if (sheetEntry && sheetEntry.complete && sheetEntry.naturalWidth > 0) {
+        // PIPOYA HTMLImageElement（舊路徑、fallback）
+        sheet = sheetEntry;
+        frameW = FRAME_PX; frameH = FRAME_PX;
+        drawW = SPRITE_DRAW_W; drawH = SPRITE_DRAW_H;
+      }
+
+      if (sheet) {
+        const srcX = frame * frameW;
+        const srcY = dirRow * frameH;
+        const dx = Math.round(cx - drawW / 2);
+        const dy = Math.round(cy - drawH / 2);
+        ctx.drawImage(sheet, srcX, srcY, frameW, frameH, dx, dy, drawW, drawH);
       } else {
         // fallback: 簡單色圈（sprite 還沒載入完成）
         ctx.fillStyle = teamColor;
@@ -357,17 +372,37 @@
       ...aF.map((p, i) => ({ ...p, team: 'a', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y, flair: makeFlair(), card_id: _cardIdFor(away, i) })),
     ];
 
-    // Phase 2.2+：preload PIPOYA sprite sheets per player
+    // Phase 2.3+：preload LPC sprite per player（有 look_data 用 LPC、沒有 fallback PIPOYA）
     const _matchSpriteCache = new Map();
-    for (const p of players) {
-      if (p.card_id && !_matchSpriteCache.has(p.card_id)) {
+    const _getLookFor = (teamData, idx) => {
+      const kp = teamData.keyPlayers && teamData.keyPlayers[idx];
+      return kp && kp.look_data ? kp.look_data : null;
+    };
+    // 隊伍 kit 顏色：home 從 teamData.kit 取（玩家自訂）、away 預設黑紅
+    const homeKit = home.kit || { shirtColor: 'red', pantsColor: 'white', shoeColor: 'white' };
+    const awayKit = away.kit || { shirtColor: 'black', pantsColor: 'red',   shoeColor: 'black' };
+
+    players.forEach((p, idx) => {
+      if (!p.card_id || _matchSpriteCache.has(p.card_id)) return;
+      const teamData = p.team === 'h' ? home : away;
+      const teamIdx = idx < 11 ? idx : idx - 11;
+      const look = _getLookFor(teamData, teamIdx);
+      const kit = p.team === 'h' ? homeKit : awayKit;
+
+      if (look && window.LpcRenderer) {
+        // 非同步生成 LPC sheet（生成完才會被 render 用到、之前 fallback 色圈）
+        window.LpcRenderer.matchSpriteSheet(look, kit).then(result => {
+          if (result) _matchSpriteCache.set(p.card_id, result);
+        }).catch(e => console.warn('LPC sheet failed for', p.card_id, e));
+      } else {
+        // 沒 look_data → 退回 PIPOYA PNG
         const img = new Image();
         img.src = (typeof window.MyTeamSprite === 'function')
           ? window.MyTeamSprite(p.card_id)
           : `img/sprites/${p.card_id}.png`;
         _matchSpriteCache.set(p.card_id, img);
       }
-    }
+    });
     const ball = { x: 0.5, y: 0.5 };
 
     // 速度倍率（0.5x / 1x / 2x）— accumulator 在下方 tick() 內處理
