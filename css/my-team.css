@@ -333,7 +333,7 @@
 
 /* ───────── Hub（球隊管理）─────────── */
 .mt-hub-header {
-  padding: 50px 20px 16px;
+  padding: 38px 16px 12px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 .mt-hub-team {
@@ -2103,12 +2103,13 @@
 .mt-dex-pos { font-size: 10px; opacity: 0.7; }
 
 /* ─── 球場視覺化主頁 (Kairosoft 風) ─── */
-.mt-stadium-tab { padding: 8px; }
+.mt-stadium-tab { padding: 6px; }
 .mt-stadium-pitch {
   position: relative;
   width: 100%;
   aspect-ratio: 5/7;
-  max-width: 480px;
+  max-width: 380px;
+  max-height: 56vh;        /* 不會撐爆螢幕 */
   margin: 0 auto;
   background:
     repeating-linear-gradient(0deg, #2e7d32 0px, #2e7d32 20px, #357c3b 20px, #357c3b 40px),
@@ -2172,7 +2173,7 @@
   50%      { transform: translate(-50%, calc(-50% - 3px)); }
 }
 .mt-pitch-player-portrait {
-  width: 56px; height: 70px;
+  width: 48px; height: 60px;
   margin: 0 auto;
   position: relative;
   transition: all 0.2s;
@@ -2197,21 +2198,21 @@
 }
 
 /* 板凳 strip */
-.mt-bench-section { margin-top: 16px; }
-.mt-bench-title { font-size: 13px; font-weight: 800; color: #f0c040; margin-bottom: 6px; }
+.mt-bench-section { margin-top: 10px; }
+.mt-bench-title { font-size: 12px; font-weight: 800; color: #f0c040; margin-bottom: 4px; }
 .mt-bench-strip {
-  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px;
+  display: flex; gap: 5px; overflow-x: auto; padding-bottom: 4px;
 }
 .mt-bench-player {
   background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
-  border-radius: 8px; padding: 6px;
-  flex-shrink: 0; width: 80px; text-align: center;
+  border-radius: 8px; padding: 4px;
+  flex-shrink: 0; width: 68px; text-align: center;
   cursor: pointer; position: relative; color: #fff;
 }
 .mt-bench-player.rarity-SSR { border-color: #f0c040; }
 .mt-bench-player.rarity-SR  { border-color: #9b87f5; }
 .mt-bench-player img {
-  width: 56px; height: 70px; image-rendering: pixelated;
+  width: 48px; height: 60px; image-rendering: pixelated;
   margin-bottom: 2px;
 }
 .mt-bench-rarity {
