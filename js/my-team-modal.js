@@ -58,52 +58,132 @@
     }
   }
 
-  // ── 新手禮包：歡迎彈窗 + 一鍵領 10 連抽 ──
+  // ── 新手指引：階段式 tutorial、最後觸發 10 連抽動畫 ──
   async function _showStarterPackIntro() {
+    const steps = [
+      {
+        emoji: '🏟️',
+        title: '歡迎來到你的球場',
+        body: '這裡是你的足球俱樂部 — 你會抽球員、訓練、組陣、和其他玩家對戰。',
+        cta: '繼續 →',
+      },
+      {
+        emoji: '⚽',
+        title: '球員是俱樂部的核心',
+        body: '抽到的每張球員卡會自動站在球場上對應位置。SSR 是稀有強卡，SR 是中堅，R 是基礎陣容。',
+        cta: '繼續 →',
+      },
+      {
+        emoji: '🎁',
+        title: '幫你準備了首抽套裝',
+        body: `這次<b>免費</b>送你一發保底好抽：<br>
+          🌟 <b>1 張 SSR</b> 王牌前鋒<br>
+          ⭐ 2 張 SR 主力（中場+後衛）<br>
+          🃏 7 張 R（含 1 門將）<br>
+          全部自動上首發、立刻可比賽`,
+        cta: '抽我的首批球員！ 🎰',
+      },
+    ];
+
+    let stepIdx = 0;
     const overlay = document.createElement('div');
-    overlay.className = 'mt-starter-overlay';
+    overlay.className = 'mt-tutorial-overlay';
     overlay.innerHTML = `
-      <div class="mt-starter-card">
-        <div class="mt-starter-emoji">🎁</div>
-        <h2>歡迎來到我的球隊</h2>
-        <p>第一次來？我們幫你準備好一支基本陣容！</p>
-        <ul style="text-align:left;margin:14px 0;font-size:14px;line-height:1.7">
-          <li>🌟 <b>1 張 SSR 王牌前鋒</b>（保證 SSR）</li>
-          <li>⭐ 2 張 SR 球員（中場 + 後衛）</li>
-          <li>🃏 7 張 R 球員（含 1 門將）</li>
-          <li>✅ 全部 11 人自動上首發，立刻可比賽</li>
-        </ul>
-        <button class="mt-gacha-btn mt-starter-claim">領取套裝 ✨</button>
-        <button class="mt-starter-skip">先逛逛</button>
+      <div class="mt-tutorial-card">
+        <div class="mt-tutorial-progress" id="mt-tut-progress"></div>
+        <div class="mt-tutorial-emoji" id="mt-tut-emoji"></div>
+        <h2 id="mt-tut-title"></h2>
+        <p id="mt-tut-body"></p>
+        <button class="mt-tutorial-cta" id="mt-tut-cta"></button>
+        <button class="mt-tutorial-skip" id="mt-tut-skip">先跳過、稍後手動領取</button>
       </div>
     `;
     document.body.appendChild(overlay);
     requestAnimationFrame(() => overlay.classList.add('open'));
 
-    overlay.querySelector('.mt-starter-skip').addEventListener('click', () => {
+    function render() {
+      const s = steps[stepIdx];
+      overlay.querySelector('#mt-tut-emoji').textContent = s.emoji;
+      overlay.querySelector('#mt-tut-title').textContent = s.title;
+      overlay.querySelector('#mt-tut-body').innerHTML = s.body;
+      overlay.querySelector('#mt-tut-cta').textContent = s.cta;
+      overlay.querySelector('#mt-tut-progress').innerHTML = steps.map((_, i) =>
+        `<span class="mt-tut-dot ${i === stepIdx ? 'active' : i < stepIdx ? 'done' : ''}"></span>`
+      ).join('');
+    }
+    render();
+
+    const skipBtn = overlay.querySelector('#mt-tut-skip');
+    skipBtn.addEventListener('click', () => {
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 200);
     });
 
-    overlay.querySelector('.mt-starter-claim').addEventListener('click', async () => {
-      const btn = overlay.querySelector('.mt-starter-claim');
-      btn.disabled = true; btn.textContent = '抽取中…';
+    const ctaBtn = overlay.querySelector('#mt-tut-cta');
+    ctaBtn.addEventListener('click', async () => {
+      if (stepIdx < steps.length - 1) {
+        stepIdx++;
+        // 動畫過渡：淡出再淡入
+        const card = overlay.querySelector('.mt-tutorial-card');
+        card.classList.add('mt-tutorial-step-out');
+        setTimeout(() => {
+          render();
+          card.classList.remove('mt-tutorial-step-out');
+          card.classList.add('mt-tutorial-step-in');
+          setTimeout(() => card.classList.remove('mt-tutorial-step-in'), 300);
+        }, 200);
+        return;
+      }
+      // 最後一步：觸發新手套裝 + 跑完整 10 連抽動畫
+      ctaBtn.disabled = true; ctaBtn.textContent = '召喚中…';
       try {
         const { data, error } = await window.DB.rpc('claim_starter_pack');
         if (error) throw error;
+        // 關掉教學
         overlay.classList.remove('open');
         setTimeout(() => overlay.remove(), 200);
-        // 跳到球員 tab + refresh
+        // 播放完整 gacha 動畫（Stage 0 卡包 → Stage 2.5 翻牌）
+        if (window.MyTeam?.openGachaAnimation) {
+          await window.MyTeam.openGachaAnimation(data.cards || [], {
+            title: '🎁 首抽套裝召喚',
+            subtitle: '保證 SSR + SR×2 + 完整陣容',
+          });
+        }
+        // 動畫結束 → refresh + 跳球員 tab + 結尾彩蛋
         await window.MyTeam.refresh?.();
         _currentTab = 'roster';
         renderHub();
-        if (typeof showToast === 'function') {
-          setTimeout(() => showToast(`🎉 收到 ${data.count || 10} 張球員卡！`), 300);
-        }
+        setTimeout(() => _showStarterCompleteToast(data.count || 10), 200);
       } catch (e) {
-        alert('領取失敗：' + (e.message || e));
-        btn.disabled = false; btn.textContent = '領取套裝 ✨';
+        const msg = (e.message || String(e));
+        if (msg.includes('ALREADY_CLAIMED')) {
+          // 已領過：直接關 tutorial
+          overlay.classList.remove('open');
+          setTimeout(() => overlay.remove(), 200);
+        } else {
+          alert('召喚失敗：' + msg);
+          ctaBtn.disabled = false; render();
+        }
       }
+    });
+  }
+
+  function _showStarterCompleteToast(n) {
+    const t = document.createElement('div');
+    t.className = 'mt-starter-complete';
+    t.innerHTML = `
+      <div class="mt-starter-complete-card">
+        <div style="font-size:48px">🏆</div>
+        <h3>陣容到位！</h3>
+        <p>${n} 位球員已自動上首發。試試比賽 tab 打場聯賽吧</p>
+        <button class="mt-gacha-btn mt-starter-complete-ok">好的</button>
+      </div>
+    `;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('open'));
+    t.querySelector('.mt-starter-complete-ok').addEventListener('click', () => {
+      t.classList.remove('open');
+      setTimeout(() => t.remove(), 200);
     });
   }
 

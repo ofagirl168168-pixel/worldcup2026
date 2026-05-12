@@ -222,9 +222,31 @@
     overlay.dataset.peak = peakRarity;
     overlay.innerHTML = `
       <div class="mt-gacha-stars"></div>
-      <div class="mt-gacha-beam" data-rarity="${peakRarity}"></div>
+      <div class="mt-gacha-beam" data-rarity="${peakRarity}" hidden></div>
       <div class="mt-gacha-rays" hidden></div>
-      <div class="mt-gacha-stage">
+
+      <!-- Stage 0：卡包互動 -->
+      <div class="mt-gacha-pack" id="mt-gacha-pack" data-rarity="${peakRarity}">
+        <div class="mt-gacha-pack-banner">
+          <div class="mt-gacha-pack-title">${escapeHtml(options.title || '🎰 球員召喚')}</div>
+          ${options.subtitle ? `<div class="mt-gacha-pack-sub">${escapeHtml(options.subtitle)}</div>` : ''}
+        </div>
+        <div class="mt-gacha-pack-stack" id="mt-gacha-pack-stack">
+          <div class="mt-gacha-pack-card mt-gacha-pack-card-3"></div>
+          <div class="mt-gacha-pack-card mt-gacha-pack-card-2"></div>
+          <div class="mt-gacha-pack-card mt-gacha-pack-card-1">
+            <div class="mt-gacha-back-pattern"></div>
+            <div class="mt-gacha-back-emblem">⚽</div>
+          </div>
+        </div>
+        <div class="mt-gacha-pack-glow"></div>
+        <div class="mt-gacha-pack-cta">
+          <span class="mt-gacha-pack-finger">👆</span>
+          <span>點擊召喚 ${cards.length} 張球員</span>
+        </div>
+      </div>
+
+      <div class="mt-gacha-stage" id="mt-gacha-stage" hidden>
         <button class="mt-gacha-skip" id="mt-gacha-skip" hidden type="button" aria-label="跳過">⏭ 跳過</button>
         <div class="mt-gacha-banner" id="mt-gacha-banner">
           <div class="mt-gacha-banner-title">${escapeHtml(options.title || '🎰 球員召喚')}</div>
@@ -232,6 +254,12 @@
         </div>
         <div class="mt-gacha-cards-wrap">
           <div class="mt-gacha-cards" id="mt-gacha-cards"></div>
+        </div>
+        <div class="mt-gacha-flip-prompt" id="mt-gacha-flip-prompt" hidden>
+          <button class="mt-gacha-flip-btn" id="mt-gacha-flip-btn">
+            <span class="mt-gacha-pack-finger">👆</span>
+            <span>點擊翻開全部</span>
+          </button>
         </div>
         <div class="mt-gacha-rarity-hint" id="mt-gacha-rarity-hint"></div>
         <div class="mt-gacha-actions" id="mt-gacha-actions" hidden>
@@ -265,54 +293,88 @@
       const skipBtn = overlay.querySelector('#mt-gacha-skip');
       skipBtn.addEventListener('click', () => { skipped = true; });
 
-      // Stage 1: build-up（200ms - 1400ms）
-      (async () => {
+      const pack    = overlay.querySelector('#mt-gacha-pack');
+      const stage   = overlay.querySelector('#mt-gacha-stage');
+      const beam    = overlay.querySelector('.mt-gacha-beam');
+      const flipPrompt = overlay.querySelector('#mt-gacha-flip-prompt');
+      const flipBtn = overlay.querySelector('#mt-gacha-flip-btn');
+
+      // Stage 0：等用戶點卡包
+      pack.addEventListener('click', () => {
+        if (pack.classList.contains('opening')) return;
+        pack.classList.add('opening');
+        // 卡包散開動畫 → 600ms → 切到 Stage 1
+        setTimeout(() => {
+          pack.style.display = 'none';
+          beam.hidden = false;
+          stage.hidden = false;
+          startStage1();
+        }, 600);
+      });
+
+      async function startStage1() {
         // 200ms 後顯示 skip
         await _sleep(skipped ? 0 : 250);
         skipBtn.hidden = false;
 
-        // 1100ms 等光柱漲起來
-        await _sleep(skipped ? 0 : 950);
+        // 900ms 等光柱漲起來
+        await _sleep(skipped ? 0 : 850);
 
-        // SSR：螢幕閃白 + 微震動 + 光線爆發
         if (peakRarity === 'SSR' && !skipped) {
           overlay.querySelector('#mt-gacha-flash').classList.add('mt-flash-active');
           overlay.querySelector('.mt-gacha-rays').hidden = false;
-          overlay.querySelector('.mt-gacha-stage').classList.add('mt-shake');
+          stage.classList.add('mt-shake');
           await _sleep(skipped ? 0 : 500);
-          overlay.querySelector('.mt-gacha-stage').classList.remove('mt-shake');
+          stage.classList.remove('mt-shake');
         } else if (peakRarity === 'SR' && !skipped) {
-          overlay.querySelector('.mt-gacha-stage').classList.add('mt-pulse-sr');
+          stage.classList.add('mt-pulse-sr');
           await _sleep(skipped ? 0 : 250);
         }
 
-        // Stage 2: 卡背飛入 + 翻牌 reveal
+        // Stage 2：卡背飛入（不翻牌、等用戶點）
         const cardsEl = overlay.querySelector('#mt-gacha-cards');
         for (let i = 0; i < cards.length; i++) {
           const c = cards[i];
           const cardEl = _buildCard3D(c, i);
           cardsEl.appendChild(cardEl);
-          // 等卡背飛入完成
-          await _sleep(skipped ? 0 : 350);
-          // 翻牌
-          cardEl.classList.add('flipped');
-          // 觸發粒子（SSR=多 + 金、SR=中 + 紫、R=少 + 銀）
-          _emitParticles(cardEl, c.rarity, skipped);
-          // count-up 屬性數字
-          if (!skipped) _animateCounts(cardEl, c);
-          // 卡間隔
-          await _sleep(skipped ? 0 : (c.rarity === 'SSR' ? 900 : 500));
+          await _sleep(skipped ? 0 : (cards.length > 5 ? 80 : 200));
         }
 
-        // 顯示 CTA
-        await _sleep(skipped ? 0 : 400);
+        if (skipped) {
+          // skip：一口氣翻 + count + 顯示 CTA
+          revealAll(true);
+          return;
+        }
+
+        // Stage 2.5：等用戶點翻牌
+        flipPrompt.hidden = false;
+      }
+
+      flipBtn.addEventListener('click', () => {
+        flipPrompt.hidden = true;
+        revealAll(false);
+      });
+
+      async function revealAll(instant) {
+        const cardEls = Array.from(overlay.querySelectorAll('.mt-gacha-card3d'));
+        for (let i = 0; i < cardEls.length; i++) {
+          const cardEl = cardEls[i];
+          const c = cards[i];
+          cardEl.classList.add('flipped');
+          _emitParticles(cardEl, c.rarity, instant);
+          if (!instant) _animateCounts(cardEl, c);
+          // 連續翻牌的間隔（SSR 多停一下、有儀式感）
+          await _sleep(instant ? 0 : (c.rarity === 'SSR' ? 350 : 150));
+        }
+
+        await _sleep(instant ? 0 : 400);
         skipBtn.hidden = true;
         overlay.querySelector('#mt-gacha-actions').hidden = false;
         overlay.querySelector('#mt-gacha-actions').classList.add('reveal');
         const hint = overlay.querySelector('#mt-gacha-rarity-hint');
         if (peakRarity === 'SSR') hint.innerHTML = '✨ <b>SSR</b> 召喚成功！';
         else if (peakRarity === 'SR') hint.innerHTML = '💜 <b>SR</b> 不錯！';
-      })();
+      }
 
       // 按鈕：用 delegation
       overlay.addEventListener('click', e => {

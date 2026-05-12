@@ -738,6 +738,121 @@
 .mt-gacha-overlay[data-peak="SSR"] { background: radial-gradient(ellipse at center, #3a1a05 0%, #1a0a02 70%, #000 100%); }
 
 /* ─── 星空背景 ─── */
+/* ── Stage 0：卡包互動 ── */
+.mt-gacha-pack {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  animation: mt-pack-float 2.6s ease-in-out infinite;
+}
+.mt-gacha-pack:hover { transform: scale(1.04); }
+.mt-gacha-pack.opening {
+  animation: mt-pack-burst 0.6s ease-out forwards;
+}
+@keyframes mt-pack-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes mt-pack-burst {
+  0%   { transform: scale(1) rotateY(0deg); opacity: 1; }
+  60%  { transform: scale(1.4) rotateY(180deg); opacity: 1; }
+  100% { transform: scale(2.2) rotateY(360deg); opacity: 0; }
+}
+.mt-gacha-pack-banner {
+  text-align: center; margin-bottom: 24px;
+}
+.mt-gacha-pack-title {
+  font-size: 22px; font-weight: 900; color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(240,192,64,0.6);
+}
+.mt-gacha-pack-sub {
+  font-size: 13px; color: rgba(255,255,255,0.8); margin-top: 4px;
+}
+.mt-gacha-pack-stack {
+  position: relative;
+  width: 140px; height: 200px;
+}
+.mt-gacha-pack-card {
+  position: absolute; inset: 0; border-radius: 12px;
+  background: linear-gradient(135deg, #2a1855 0%, #1a1a2e 100%);
+  border: 3px solid #f0c040;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 30px rgba(240,192,64,0.3);
+}
+.mt-gacha-pack-card-1 {
+  display: flex; align-items: center; justify-content: center;
+  z-index: 3;
+}
+.mt-gacha-pack-card-2 {
+  transform: translate(8px, 8px) rotate(4deg);
+  z-index: 2; opacity: 0.85;
+}
+.mt-gacha-pack-card-3 {
+  transform: translate(-8px, 16px) rotate(-5deg);
+  z-index: 1; opacity: 0.7;
+}
+.mt-gacha-pack[data-rarity="SSR"] .mt-gacha-pack-card { border-color: #f0c040; box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 50px rgba(240,192,64,0.6); }
+.mt-gacha-pack[data-rarity="SR"]  .mt-gacha-pack-card { border-color: #9b87f5; box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 40px rgba(155,135,245,0.5); }
+.mt-gacha-pack-card .mt-gacha-back-pattern {
+  position: absolute; inset: 8px;
+  background:
+    repeating-linear-gradient(45deg, transparent 0, transparent 4px, rgba(240,192,64,0.15) 4px, rgba(240,192,64,0.15) 5px);
+  border-radius: 6px;
+}
+.mt-gacha-pack-card .mt-gacha-back-emblem {
+  font-size: 48px; opacity: 0.9; position: relative; z-index: 2;
+}
+.mt-gacha-pack-glow {
+  position: absolute; inset: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240,192,64,0.4) 0%, transparent 70%);
+  z-index: -1;
+  animation: mt-pack-glow-pulse 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes mt-pack-glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+.mt-gacha-pack-cta {
+  margin-top: 24px;
+  display: flex; gap: 8px; align-items: center;
+  background: rgba(0,0,0,0.5); padding: 10px 18px;
+  border-radius: 24px; border: 1px solid rgba(240,192,64,0.5);
+  color: #f0c040; font-weight: 800; font-size: 15px;
+  animation: mt-pack-cta-blink 1.2s ease-in-out infinite;
+}
+@keyframes mt-pack-cta-blink {
+  0%, 100% { box-shadow: 0 0 8px rgba(240,192,64,0.3); }
+  50%      { box-shadow: 0 0 20px rgba(240,192,64,0.7); }
+}
+.mt-gacha-pack-finger {
+  animation: mt-finger-tap 1s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes mt-finger-tap {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(3px); }
+}
+
+/* ── Stage 2.5：點擊翻牌 ── */
+.mt-gacha-flip-prompt {
+  display: flex; justify-content: center;
+  margin-top: 20px;
+  animation: mt-pack-cta-blink 1.2s ease-in-out infinite;
+}
+.mt-gacha-flip-btn {
+  background: linear-gradient(180deg, #f0c040 0%, #e07020 100%);
+  color: #000; font-weight: 900; font-size: 16px;
+  padding: 12px 32px; border: 0; border-radius: 28px;
+  display: flex; gap: 8px; align-items: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 30px rgba(240,192,64,0.6);
+}
+.mt-gacha-flip-btn:hover { transform: translateY(-2px); }
+.mt-gacha-flip-btn:active { transform: translateY(1px); }
+
 .mt-gacha-stars {
   position: absolute; inset: 0;
   background-image:
@@ -1609,28 +1724,83 @@
 }
 .mt-tab-todo-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
 
-/* ── 新手禮包 overlay ── */
-.mt-starter-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+/* ── 新手 Tutorial overlay（階段式）── */
+.mt-tutorial-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.78);
   z-index: 12000; display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s; backdrop-filter: blur(6px);
+  padding: 16px;
+}
+.mt-tutorial-overlay.open { opacity: 1; }
+.mt-tutorial-card {
+  background: linear-gradient(180deg, #1a1a2e 0%, #0d1224 100%);
+  border: 2px solid #f0c040; border-radius: 20px;
+  padding: 28px 24px 20px; text-align: center;
+  max-width: 380px; width: 100%; color: #fff;
+  box-shadow: 0 20px 60px rgba(240,192,64,0.35);
+  transition: opacity 0.2s, transform 0.3s;
+}
+.mt-tutorial-step-out { opacity: 0; transform: translateX(-30px); }
+.mt-tutorial-step-in  { animation: mt-tut-in 0.3s ease-out; }
+@keyframes mt-tut-in {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.mt-tutorial-progress { display: flex; justify-content: center; gap: 6px; margin-bottom: 12px; }
+.mt-tut-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.2s;
+}
+.mt-tut-dot.active { background: #f0c040; transform: scale(1.4); }
+.mt-tut-dot.done   { background: rgba(240,192,64,0.5); }
+.mt-tutorial-emoji {
+  font-size: 64px; margin-bottom: 6px;
+  animation: mt-tut-emoji-bounce 1.6s ease-in-out infinite;
+}
+@keyframes mt-tut-emoji-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.mt-tutorial-card h2 {
+  margin: 0 0 10px; font-size: 22px; color: #f0c040;
+}
+.mt-tutorial-card p {
+  margin: 0 0 18px; line-height: 1.7;
+  font-size: 14px; color: rgba(255,255,255,0.9);
+}
+.mt-tutorial-cta {
+  display: block; width: 100%; margin-bottom: 8px; padding: 14px;
+  background: linear-gradient(180deg, #f0c040, #e07020);
+  border: 0; border-radius: 10px;
+  color: #000; font-size: 16px; font-weight: 900; cursor: pointer;
+}
+.mt-tutorial-cta:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(240,192,64,0.4); }
+.mt-tutorial-cta:disabled { opacity: 0.6; cursor: default; }
+.mt-tutorial-skip {
+  background: none; border: 0; color: rgba(255,255,255,0.5);
+  font-size: 12px; cursor: pointer; padding: 6px; width: 100%;
+}
+.mt-tutorial-skip:hover { color: rgba(255,255,255,0.9); }
+
+/* 結尾完成 toast */
+.mt-starter-complete {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  z-index: 12100; display: flex; align-items: center; justify-content: center;
   opacity: 0; transition: opacity 0.2s; backdrop-filter: blur(4px);
 }
-.mt-starter-overlay.open { opacity: 1; }
-.mt-starter-card {
-  background: linear-gradient(180deg, #1a1a2e 0%, #0d1224 100%);
-  border: 2px solid #f0c040; border-radius: 16px; padding: 28px 24px;
-  text-align: center; max-width: 360px; width: 92%; color: #fff;
-  box-shadow: 0 20px 60px rgba(240,192,64,0.3);
+.mt-starter-complete.open { opacity: 1; }
+.mt-starter-complete-card {
+  background: linear-gradient(180deg, #1a1a2e, #0d1224);
+  border: 2px solid #f0c040; border-radius: 18px;
+  padding: 32px 28px; text-align: center;
+  max-width: 320px; color: #fff;
+  box-shadow: 0 20px 60px rgba(240,192,64,0.5);
+  animation: mt-tut-in 0.4s ease-out;
 }
-.mt-starter-emoji { font-size: 56px; margin-bottom: 8px; }
-.mt-starter-card h2 { margin: 0 0 8px; font-size: 22px; color: #f0c040; }
-.mt-starter-card p { margin: 0 0 6px; opacity: 0.9; }
-.mt-starter-claim { width: 100%; margin-bottom: 8px; }
-.mt-starter-skip {
-  background: none; border: none; color: rgba(255,255,255,0.6);
-  cursor: pointer; font-size: 13px; padding: 6px; width: 100%;
-}
-.mt-starter-skip:hover { color: #fff; }
+.mt-starter-complete-card h3 { margin: 8px 0; color: #f0c040; font-size: 22px; }
+.mt-starter-complete-card p { font-size: 13px; opacity: 0.9; margin-bottom: 16px; }
+.mt-starter-complete-ok { width: 100%; }
 
 /* ── 排行榜 tab ── */
 .mt-rank-tab { padding: 12px; }
