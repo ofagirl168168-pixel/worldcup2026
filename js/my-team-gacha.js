@@ -430,16 +430,29 @@
     return ({ GK: '🧤', DEF: '🛡️', MID: '⚙️', FWD: '⚽' })[pos] || '⚽';
   }
 
-  // Phase 2.1++：LPC pixel art portrait（CC-BY-SA 3.0，self-hosted PNG）
-  // 由 scripts/build-lpc-portraits.js 預先合成 230 張獨特 64×48 頭像 +
-  //   存到 img/lpc-portraits/{card_id}.png
-  // 800 種 layer combo × hash(card_id) = 幾乎每張卡都獨一無二
+  // Phase 2.1+++：DiceBear `adventurer` 風格（RPG 角色 portrait、有清楚臉孔 + 髮型）
+  // LPC 在小尺寸臉部辨識度太差、改用 vector 卡通風更乾淨精美
+  const _DICEBEAR_BASE = 'https://api.dicebear.com/9.x/adventurer/svg';
   function _portraitUrlFor(cardId, rarity) {
-    if (!cardId) return 'img/lpc-portraits/default.png';
-    // v=3：crop 修正為 32×22 頭+肩特寫，cache bust 強制重 fetch
-    return `img/lpc-portraits/${encodeURIComponent(cardId)}.png?v=3`;
+    const seed = encodeURIComponent(cardId || 'default');
+    // 稀有度漸層 bg（trading card 質感）
+    const bg = rarity === 'SSR' ? 'f0c040,ff8030'
+             : rarity === 'SR'  ? '9b87f5,6a4fcc'
+             :                    '506478,2a3340';
+    const params = [
+      `seed=${seed}`,
+      `backgroundColor=${bg}`,
+      'backgroundType=gradientLinear',
+      'backgroundRotation=180',
+      'radius=50',
+      'glassesProbability=20',
+      'earringsProbability=15',
+      'featuresProbability=30',
+      'size=256',
+    ].join('&');
+    return `${_DICEBEAR_BASE}?${params}`;
   }
-  window.MyTeamPortrait = _portraitUrlFor;  // 公開讓 modal/match 共用
+  window.MyTeamPortrait = _portraitUrlFor;
 
   function escapeHtml(s) {
     return String(s == null ? '' : s)

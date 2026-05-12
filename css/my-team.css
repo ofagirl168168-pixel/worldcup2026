@@ -967,10 +967,9 @@
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;             /* 32×22 頭+肩 source 在圓框 cover */
+  object-fit: cover;
   object-position: center center;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+  /* DiceBear adventurer 是 vector SVG，不要強制 pixelated 否則模糊 */
 }
 .mt-gacha-front-portrait-pos {
   position: absolute;
