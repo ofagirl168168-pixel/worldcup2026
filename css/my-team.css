@@ -450,23 +450,23 @@
   box-shadow: 0 0 14px rgba(155,135,245,0.4), 0 4px 14px rgba(0,0,0,0.5);
 }
 
-/* roster 卡片頭像 */
+/* roster 卡片頭像 — Phase 2.1 */
 .mt-player-portrait {
   position: relative;
-  width: 60px; height: 60px;
+  width: 64px; height: 64px;
   margin: 6px auto 8px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), rgba(0,0,0,0.3) 75%);
   border: 2px solid rgba(255,255,255,0.2);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
+  overflow: hidden;
+  background: rgba(0,0,0,0.3);
 }
-.mt-player-card.rarity-SR  .mt-player-portrait { border-color: #b5a4ff; }
-.mt-player-card.rarity-SSR .mt-player-portrait { border-color: #ffd455; }
-.mt-player-portrait-emoji {
-  font-size: 36px;
-  line-height: 1;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+.mt-player-card.rarity-SR  .mt-player-portrait { border-color: #b5a4ff; box-shadow: 0 0 12px rgba(155,135,245,0.4); }
+.mt-player-card.rarity-SSR .mt-player-portrait { border-color: #ffd455; box-shadow: 0 0 14px rgba(240,192,64,0.55); }
+.mt-player-portrait-img {
+  width: 100%; height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 .mt-player-portrait-pos {
   position: absolute;
@@ -925,24 +925,26 @@
   position: relative; z-index: 2;
 }
 
-/* 球員頭像（圓形相框 + 人物 emoji + 位置 emoji 小角標）*/
+/* 球員頭像 — Phase 2.1：DiceBear pixel-art SVG（圓框 + img + 位置小角標）*/
 .mt-gacha-front-portrait {
   position: relative;
-  width: 92px; height: 92px;
+  width: 96px; height: 96px;
   margin: 10px auto 8px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), rgba(0,0,0,0.3) 75%);
   border: 3px solid rgba(255,255,255,0.25);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.5), inset 0 0 18px rgba(255,255,255,0.05);
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
   z-index: 2;
+  background: rgba(0,0,0,0.3);  /* fallback 載入時的底色 */
 }
 .mt-gacha-card3d.rarity-SR  .mt-gacha-front-portrait { border-color: #b5a4ff; box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 0 18px rgba(155,135,245,0.5); }
 .mt-gacha-card3d.rarity-SSR .mt-gacha-front-portrait { border-color: #ffd455; box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 0 22px rgba(240,192,64,0.7); }
-.mt-gacha-front-portrait-emoji {
-  font-size: 56px;
-  line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+.mt-gacha-front-portrait-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;   /* 保持 pixel art 銳利、不要插值平滑 */
+  image-rendering: crisp-edges;
 }
 .mt-gacha-front-portrait-pos {
   position: absolute;

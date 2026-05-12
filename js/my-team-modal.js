@@ -278,12 +278,13 @@
       const rarityClass = c.rarity ? `rarity-${c.rarity}` : '';
       const card = document.createElement('div');
       card.className = `mt-player-card ${rarityClass}`;
-      const portrait = (typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id) : '👤';
+      const portraitUrl = (typeof window.MyTeamPortrait === 'function')
+        ? window.MyTeamPortrait(c.card_id, c.rarity) : '';
       card.innerHTML = `
         ${p.in_starting_11 ? '<span class="mt-player-starting-badge">先發</span>' : ''}
         <span class="mt-player-card-rarity">${c.rarity || 'R'}</span>
         <div class="mt-player-portrait">
-          <span class="mt-player-portrait-emoji">${portrait}</span>
+          <img class="mt-player-portrait-img" src="${portraitUrl}" alt="${escapeHtml(c.name || '')}" loading="lazy">
           <span class="mt-player-portrait-pos">${posEmoji[c.position] || '⚽'}</span>
         </div>
         <div class="mt-player-name">${escapeHtml(c.name || '?')}</div>

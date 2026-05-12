@@ -358,7 +358,9 @@
             <span class="mt-gacha-front-stars">${stars}</span>
           </div>
           <div class="mt-gacha-front-portrait">
-            <span class="mt-gacha-front-portrait-emoji">${_portraitFor(card.card_id)}</span>
+            <img class="mt-gacha-front-portrait-img"
+              src="${_portraitUrlFor(card.card_id, card.rarity)}"
+              alt="${escapeHtml(card.name)}" loading="lazy" />
             <span class="mt-gacha-front-portrait-pos">${_emojiFor(card.position)}</span>
           </div>
           <div class="mt-gacha-front-name">${escapeHtml(card.name)}</div>
@@ -428,20 +430,18 @@
     return ({ GK: '🧤', DEF: '🛡️', MID: '⚙️', FWD: '⚽' })[pos] || '⚽';
   }
 
-  // 12 種人物 emoji 池，依 card_id 穩定 hash 指派
-  // Phase 2 換成等距 pixel art sprite 時再退役
-  const PORTRAIT_POOL = [
-    '👨🏻', '👨🏼', '👨🏽', '👨🏾', '👨🏿',
-    '👨🏻‍🦱', '👨🏽‍🦱', '👨🏾‍🦲',
-    '👨🏼‍🦳', '🏃🏻', '🏃🏽', '🏃🏾',
-  ];
-  function _portraitFor(cardId) {
-    if (!cardId) return '👤';
-    let h = 0;
-    for (let i = 0; i < cardId.length; i++) h = (h * 31 + cardId.charCodeAt(i)) >>> 0;
-    return PORTRAIT_POOL[h % PORTRAIT_POOL.length];
+  // Phase 2.1：DiceBear pixel-art 頭像（MIT 免費 API、seed-based 穩定）
+  // 同 card_id 永遠同頭像、不同卡不同頭像、SVG 不用 bundle 資產
+  const _DICEBEAR_BASE = 'https://api.dicebear.com/9.x/pixel-art/svg';
+  function _portraitUrlFor(cardId, rarity) {
+    const seed = encodeURIComponent(cardId || 'default');
+    // 背景色 by rarity（gradient 看起來像 trading card 質感）
+    const bg = rarity === 'SSR' ? 'f0c040,ff8030'
+             : rarity === 'SR'  ? '9b87f5,6a4fcc'
+             :                    '506478,2a3340';
+    return `${_DICEBEAR_BASE}?seed=${seed}&backgroundColor=${bg}&backgroundType=gradientLinear&backgroundRotation=180&radius=50`;
   }
-  window.MyTeamPortrait = _portraitFor;  // 公開讓 modal 也能用
+  window.MyTeamPortrait = _portraitUrlFor;  // 公開讓 modal/match 共用
 
   function escapeHtml(s) {
     return String(s == null ? '' : s)
