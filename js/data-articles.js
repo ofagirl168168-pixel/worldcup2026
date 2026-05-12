@@ -12,21 +12,21 @@ const ARTICLES = [
 <tr style="background:#f8f8f8"><td style="padding:8px">🇧🇷 巴西</td><td style="padding:8px">第 6</td><td style="padding:8px">Vinicius Jr、Endrick、Marquinhos</td><td style="padding:8px">Ancelotti 執教首屆世界盃，Militão + Rodrygo 雙傷報銷</td></tr>
 <tr><td style="padding:8px">🇲🇦 摩洛哥</td><td style="padding:8px">第 8</td><td style="padding:8px">Hakimi、Amrabat、Bouaddi</td><td style="padding:8px">2022 四強後陣容升級，Ouahbi 接班 Regragui</td></tr>
 <tr style="background:#f8f8f8"><td style="padding:8px">🏴󠁧󠁢󠁳󠁣󠁴󠁿 蘇格蘭</td><td style="padding:8px">第 43</td><td style="padding:8px">McTominay、Robertson、Adams</td><td style="padding:8px">1998 年後首度參賽，Clarke 的紀律防守是王牌</td></tr>
-<tr><td style="padding:8px">🇭🇹 海地</td><td style="padding:8px">第 83</td><td style="padding:8px">Isidor、Bellegarde、Placide</td><td style="padding:8px">1974 後首度參賽，加勒比海唯一世界盃國家</td></tr>
+<tr><td style="padding:8px">🇭🇹 海地</td><td style="padding:8px">第 83</td><td style="padding:8px">Isidor、Bellegarde、Placide</td><td style="padding:8px">1974 後首度參賽，加勒比海僅有的兩支世界盃國家之一</td></tr>
 </table>
 
 <h3>🇧🇷 巴西：Ancelotti 的夢幻與噩夢</h3>
 
 <p>Carlo Ancelotti 在皇馬帶出兩座歐冠後轉戰國際賽場，接手巴西國家隊是他職業生涯最後一塊拼圖。但命運並不客氣——<b>Eder Militão 大腿股二頭肌手術確定缺席世界盃</b>（4月底 vs 阿拉維斯受傷，恢復期 5 個月），加上 <b>Rodrygo 前十字韌帶 + 半月板撕裂賽季報銷</b>，巴西在右翼和中衛兩個位置痛失核心。</p>
 
-<p><b>Estevao</b>（切爾西）也因腿後肌傷飛回巴西治療，世界盃出賽存疑。不過 Ancelotti 的 55 人初選名單驚喜地包含了 <b>Neymar</b>——這位 34 歲的老將在桑托斯的表現有回春跡象，但能否入選最終 26 人仍是問號。Ancelotti 預計 5 月 18 日在里約「明日博物館」公布最終名單。</p>
+<p><b>Estevao</b>（切爾西）因腿後肌傷飛回巴西治療，已確認落選 55 人初選名單，確定無緣世界盃。不過 Ancelotti 的 55 人初選名單驚喜地包含了 <b>Neymar</b>——這位 34 歲的老將在桑托斯的表現有回春跡象，但能否入選最終 26 人仍是問號。Ancelotti 預計 5 月 18 日在里約「明日博物館」公布最終名單。</p>
 
 <p><b>預計先發陣容（4-2-3-1）</b></p>
 <ul>
-<li><b>門將</b>：Ederson（曼城）</li>
-<li><b>後衛</b>：Danilo（尤文圖斯）、Marquinhos（PSG）、Gabriel（兵工廠）、Wendell（波爾圖）</li>
-<li><b>中場</b>：Bruno Guimarães（紐卡索）、Lucas Paquetá（西漢姆）</li>
-<li><b>攻擊</b>：Raphinha（巴塞隆納）、Endrick（皇馬）、Savinho（曼城）</li>
+<li><b>門將</b>：Ederson（費內巴切）</li>
+<li><b>後衛</b>：Danilo（弗拉門戈）、Marquinhos（PSG）、Gabriel（兵工廠）、Wendell（聖保羅）</li>
+<li><b>中場</b>：Bruno Guimarães（紐卡索）、Lucas Paquetá（弗拉門戈）</li>
+<li><b>攻擊</b>：Raphinha（巴塞隆納）、Endrick（里昂，外借自皇馬）、Rayan（伯恩茅斯）</li>
 <li><b>前鋒</b>：Vinicius Jr（皇馬）</li>
 </ul>
 
@@ -46,7 +46,7 @@ const ARTICLES = [
 
 <p>蘇格蘭上一次參加世界盃是 1998 年法國世界盃。整整 <b>28 年</b>後，Steve Clarke 帶領這支球隊重返世界最高舞台。</p>
 
-<p>蘇格蘭的王牌是<b>紀律防守</b>——Clarke 的球隊不華麗但極難擊敗。資格賽以歐洲區穩定表現晉級，關鍵球員多在英超效力：<b>Scott McTominay</b>（曼聯 → 那不勒斯，本季在意甲表現亮眼）、<b>Andrew Robertson</b>（利物浦隊長）、<b>John McGinn</b>（阿斯頓維拉隊長）。前鋒線則依靠 <b>Che Adams</b>（拖連奴）和 <b>Lyndon Dykes</b> 的拼搶。</p>
+<p>蘇格蘭的王牌是<b>紀律防守</b>——Clarke 的球隊不華麗但極難擊敗。資格賽以歐洲區穩定表現晉級，關鍵球員多在英超效力：<b>Scott McTominay</b>（曼聯 → 那不勒斯，本季在意甲表現亮眼）、<b>Andrew Robertson</b>（利物浦，賽季後離隊）、<b>John McGinn</b>（阿斯頓維拉隊長）。前鋒線則依靠 <b>Che Adams</b>（拖連奴）和 <b>Lyndon Dykes</b> 的拼搶。</p>
 
 <p>傷兵方面，門將 <b>Craig Gordon</b> 正從肩傷中恢復；後衛 <b>Aaron Hickey</b>（布倫特福德）最近已復出上場 61 分鐘，是重大利好。Clarke 的 55 人初選已提交，最終名單預計 5/22 公布。</p>
 
@@ -54,7 +54,7 @@ const ARTICLES = [
 
 <h3>🇭🇹 海地：加勒比海的驕傲</h3>
 
-<p>海地是本屆世界盃最動人的故事之一。1974 年西德世界盃後，他們等了 <b>52 年</b>才重返世界舞台——也是至今<b>唯一參加過世界盃的加勒比海國家</b>。</p>
+<p>海地是本屆世界盃最動人的故事之一。1974 年西德世界盃後，他們等了 <b>52 年</b>才重返世界舞台——也是繼古巴（1938）之後<b>第二支參加世界盃的加勒比海國家</b>。</p>
 
 <p>在法國教練 <b>Sébastien Migné</b> 的帶領下，海地以 10 場資格賽僅 2 敗的成績出線。陣中最亮眼的是桑德蘭前鋒 <b>Wilson Isidor</b>、狼隊中場 <b>Jean-Ricner Bellegarde</b>，以及老將門將 <b>Johny Placide</b>（巴斯蒂亞）。隊中大量球員效力歐美聯賽，僑民力量是海地足球的命脈。</p>
 
