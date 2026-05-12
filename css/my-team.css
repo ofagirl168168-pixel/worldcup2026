@@ -2126,43 +2126,49 @@
   border-radius: 0 0 12px 12px;
 }
 
-/* 天空（佔上方 ~40%）*/
+/* 天空（佔上方 ~30%）*/
 .mt-home-sky {
-  position: absolute; inset: 0 0 60% 0;
-  background: linear-gradient(180deg, #5db5ff 0%, #87ceeb 60%, #b8e6ff 100%);
+  position: absolute; inset: 0 0 70% 0;
+  background: linear-gradient(180deg, #5db5ff 0%, #87ceeb 70%, #b8e6ff 100%);
 }
 .mt-home-sun {
-  position: absolute; top: 12%; right: 18%;
-  width: 32px; height: 32px; border-radius: 50%;
+  position: absolute; top: 18%; right: 14%;
+  width: 26px; height: 26px; border-radius: 50%;
   background: radial-gradient(circle, #fff7c0 0%, #ffd866 70%, #ffaa33 100%);
-  box-shadow: 0 0 30px rgba(255,200,80,0.7);
+  box-shadow: 0 0 24px rgba(255,200,80,0.7);
 }
 .mt-home-cloud {
   position: absolute;
   background: rgba(255,255,255,0.9);
   border-radius: 50px;
-  height: 14px;
-  filter: blur(0.5px);
-  animation: mt-cloud-drift 28s linear infinite;
+  height: 12px;
+  filter: blur(0.4px);
+  animation:
+    mt-cloud-drift 90s linear infinite,
+    mt-cloud-bob 6s ease-in-out infinite;
 }
 .mt-home-cloud::before, .mt-home-cloud::after {
-  content: ''; position: absolute; top: -8px;
+  content: ''; position: absolute; top: -6px;
   background: rgba(255,255,255,0.9); border-radius: 50%;
-  width: 18px; height: 18px;
+  width: 14px; height: 14px;
 }
 .mt-home-cloud::before { left: 20%; }
-.mt-home-cloud::after  { right: 20%; width: 22px; height: 22px; top: -12px; }
-.mt-home-cloud-1 { top: 8%;  left: -20%; width: 70px; animation-duration: 38s; }
-.mt-home-cloud-2 { top: 16%; left: -10%; width: 50px; animation-duration: 28s; animation-delay: -8s; }
-.mt-home-cloud-3 { top: 22%; left: -30%; width: 90px; animation-duration: 48s; animation-delay: -20s; }
+.mt-home-cloud::after  { right: 20%; width: 18px; height: 18px; top: -10px; }
+.mt-home-cloud-1 { top: 14%;  left: -20%; width: 56px; animation-duration: 110s, 7s; }
+.mt-home-cloud-2 { top: 35%;  left: -10%; width: 40px; animation-duration: 85s, 5s;  animation-delay: -28s, -2s; }
+.mt-home-cloud-3 { top: 55%;  left: -30%; width: 72px; animation-duration: 140s, 8s; animation-delay: -60s, -4s; }
 @keyframes mt-cloud-drift {
   from { transform: translateX(0); }
   to   { transform: translateX(140vw); }
 }
+@keyframes mt-cloud-bob {
+  0%, 100% { margin-top: 0; }
+  50%      { margin-top: 6px; }
+}
 
 /* 遠景：建築 + 樹（佔中間帶）*/
 .mt-home-distance {
-  position: absolute; left: 0; right: 0; top: 28%; height: 22%;
+  position: absolute; left: 0; right: 0; top: 18%; height: 20%;
   z-index: 2;
   display: flex; align-items: flex-end; justify-content: space-between;
   padding: 0 4%;
@@ -2233,9 +2239,9 @@
 .mt-home-cw-1 { left: 18%; }
 .mt-home-cw-2 { right: 18%; }
 
-/* 操場（佔底部 50%）*/
+/* 操場（佔底部 60%、給球員更多空間）*/
 .mt-home-ground {
-  position: absolute; left: 0; right: 0; bottom: 0; top: 50%;
+  position: absolute; left: 0; right: 0; bottom: 0; top: 38%;
   background:
     linear-gradient(180deg, #6cb96a 0%, #4d9b4a 50%, #3a7c3a 100%);
   /* 透視感：上窄下寬幻象 */
@@ -2275,7 +2281,7 @@
   position: absolute;
   left: 50%; bottom: 0;
   transform: translate(-50%, 4px);
-  width: 38px; height: 8px;
+  width: 28px; height: 6px;
   background: radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%);
   pointer-events: none;
 }

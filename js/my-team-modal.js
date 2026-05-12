@@ -519,10 +519,14 @@
       return {
         player: p, sheetUrl, sheetW, sheetH,
         x: 0.1 + Math.random() * 0.8,
-        y: 0.2 + Math.random() * 0.7,
-        vx: 0, vy: 0, dir: 0, frame: 1,
-        idleUntil: performance.now() + 600 + Math.random() * 2400,
-        el: null, frameTick: 0, scale: 2,
+        y: 0.25 + Math.random() * 0.65,
+        vx: 0, vy: 0,
+        state: 'walk',           // 'walk' | 'idle' | 'kick' | 'stretch'
+        stateUntil: performance.now() + 600 + Math.random() * 2400,
+        row: 0,                  // sprite row（依方向 / 動作）
+        frame: 1,
+        el: null, frameTick: 0, scale: 1.4,
+        actionCooldown: performance.now() + 6000 + Math.random() * 10000,
       };
     }));
 
@@ -549,49 +553,79 @@
 
     // 動畫迴圈
     const W_LO = 0.04, W_HI = 0.96;
-    const H_LO = 0.10, H_HI = 0.95;
+    const H_LO = 0.12, H_HI = 0.94;
     function tick(t) {
       for (const w of wanderers) {
         if (!w.el) continue;
-        if (t < w.idleUntil) {
-          w.frame = 1;
-        } else {
+        // 狀態結束 → 切回 walk 或 idle
+        if (t >= w.stateUntil) {
+          if (w.state === 'idle') {
+            // 機會觸發特殊動作（每 ≥ cooldown 才 roll）
+            if (t > w.actionCooldown && Math.random() < 0.5) {
+              const action = Math.random() < 0.55 ? 'kick' : 'stretch';
+              w.state = action;
+              w.row = action === 'kick' ? 4 : 5;
+              w.frame = 0; w.frameTick = 0; w.vx = 0; w.vy = 0;
+              w.stateUntil = t + 1400 + Math.random() * 600;
+              w.actionCooldown = t + 8000 + Math.random() * 12000;
+            } else {
+              w.state = 'walk';
+              w.vx = 0; w.vy = 0;
+            }
+          } else if (w.state === 'walk') {
+            // 隨機 idle
+            if (Math.random() < 0.4) {
+              w.state = 'idle'; w.vx = 0; w.vy = 0;
+              w.stateUntil = t + 1500 + Math.random() * 3000;
+            } else {
+              w.stateUntil = t + 3000 + Math.random() * 4000;
+              // 重選方向
+              w.vx = 0; w.vy = 0;
+            }
+          } else {
+            // kick / stretch 結束 → walk
+            w.state = 'walk'; w.vx = 0; w.vy = 0;
+            w.stateUntil = t + 2500 + Math.random() * 3000;
+          }
+        }
+
+        if (w.state === 'walk') {
           if (w.vx === 0 && w.vy === 0) {
             const dirs = [
-              { vx: 0,        vy: 0.0008,  dir: 0 },  // down
-              { vx: -0.0010,  vy: 0,       dir: 1 },  // left
-              { vx: 0.0010,   vy: 0,       dir: 2 },  // right
-              { vx: 0,        vy: -0.0008, dir: 3 },  // up
+              { vx: 0,        vy: 0.0007,  row: 0 },
+              { vx: -0.0009,  vy: 0,       row: 1 },
+              { vx: 0.0009,   vy: 0,       row: 2 },
+              { vx: 0,        vy: -0.0007, row: 3 },
             ];
             const d = dirs[Math.floor(Math.random() * 4)];
-            w.vx = d.vx; w.vy = d.vy; w.dir = d.dir;
+            w.vx = d.vx; w.vy = d.vy; w.row = d.row;
           }
           w.x += w.vx;
           w.y += w.vy;
-          if (w.x <= W_LO) { w.x = W_LO; w.vx = -w.vx; w.dir = 2; }
-          if (w.x >= W_HI) { w.x = W_HI; w.vx = -w.vx; w.dir = 1; }
-          if (w.y <= H_LO) { w.y = H_LO; w.vy = -w.vy; w.dir = 0; }
-          if (w.y >= H_HI) { w.y = H_HI; w.vy = -w.vy; w.dir = 3; }
+          if (w.x <= W_LO) { w.x = W_LO; w.vx = -w.vx; w.row = 2; }
+          if (w.x >= W_HI) { w.x = W_HI; w.vx = -w.vx; w.row = 1; }
+          if (w.y <= H_LO) { w.y = H_LO; w.vy = -w.vy; w.row = 0; }
+          if (w.y >= H_HI) { w.y = H_HI; w.vy = -w.vy; w.row = 3; }
           w.frameTick++;
-          if (w.frameTick > 9) {
-            w.frame = (w.frame + 1) % 3;
-            w.frameTick = 0;
-          }
-          if (Math.random() < 0.003) {
-            w.vx = 0; w.vy = 0;
-            w.idleUntil = t + 1200 + Math.random() * 3500;
-          }
+          if (w.frameTick > 10) { w.frame = (w.frame + 1) % 3; w.frameTick = 0; }
+        } else if (w.state === 'kick' || w.state === 'stretch') {
+          // 動作 frame 慢一點（每 14 tick 換 frame）
+          w.frameTick++;
+          if (w.frameTick > 14) { w.frame = (w.frame + 1) % 3; w.frameTick = 0; }
+        } else {
+          // idle
+          w.frame = 1;
         }
+
         w.el.style.left = (w.x * 100) + '%';
         w.el.style.top  = (w.y * 100) + '%';
-        // y 越下、scale 越大（透視感）
-        const persp = 0.85 + w.y * 0.3;
+        const persp = 0.78 + w.y * 0.35;
         w.el.style.setProperty('--persp', persp);
         const sprite = w.el.children[1];
         if (sprite && w.sheetUrl) {
           const SCALE = w.scale;
           const bgX = -(w.frame * w.sheetW * SCALE);
-          const bgY = -(w.dir * w.sheetH * SCALE);
+          const bgY = -(w.row   * w.sheetH * SCALE);
           sprite.style.backgroundPosition = `${bgX}px ${bgY}px`;
         }
       }
@@ -712,8 +746,10 @@
       <div class="mt-pitch-player-stat">Lv.${p.level}${p.bond ? ' ★'.repeat(p.bond) : ''}</div>
     `;
     const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+    const team = window.MyTeam.getCached();
+    const kit = team ? { shirtColor: team.kit_shirt_color, pantsColor: team.kit_pants_color } : null;
     if (look && window.LpcRenderer) {
-      window.LpcRenderer.portrait(look).then(url => {
+      window.LpcRenderer.portrait(look, { kit }).then(url => {
         const img = document.getElementById(imgId);
         if (img && url) img.src = url;
       }).catch(() => {});
@@ -738,8 +774,10 @@
       <div class="mt-bench-pos">${c.position || ''} Lv.${p.level}</div>
     `;
     const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+    const team = window.MyTeam.getCached();
+    const kit = team ? { shirtColor: team.kit_shirt_color, pantsColor: team.kit_pants_color } : null;
     if (look && window.LpcRenderer) {
-      window.LpcRenderer.portrait(look).then(url => {
+      window.LpcRenderer.portrait(look, { kit }).then(url => {
         const img = document.getElementById(imgId);
         if (img && url) img.src = url;
       }).catch(() => {});

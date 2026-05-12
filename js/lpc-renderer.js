@@ -64,9 +64,11 @@
   }
 
   // 卡片頭像 — 取 walk-down idle frame、SY=640+4, SH=40 = 頭+軀幹
+  // 可選 kit: { shirtColor, pantsColor, shoeColor }（穿球衣時用）
   async function portrait(look, opts = {}) {
-    if (!look || !look.body) return ''; // 沒 look_data 時返回空
-    const key = JSON.stringify(look);
+    if (!look || !look.body) return '';
+    const kit = opts.kit;
+    const key = JSON.stringify(look) + (kit ? '|K|' + kit.shirtColor + '|' + kit.pantsColor : '');
     if (portraitCache.has(key)) return portraitCache.get(key);
 
     const SCALE = opts.scale || 4;
@@ -74,13 +76,20 @@
     const W = SW * SCALE, H = SH * SCALE;
 
     const [body, head, wrinkles, eyes, eyebrows, beard, mustache, hair, headband] = await getLayers(look);
+    let shirt = null, pants = null;
+    if (kit) {
+      [shirt, pants] = await Promise.all([
+        getLayerSafe('shirt', `shortsleeve-${kit.shirtColor || 'red'}`),
+        getLayerSafe('pants', kit.pantsColor || 'white'),
+      ]);
+    }
 
     const cv = document.createElement('canvas');
     cv.width = W; cv.height = H;
     const ctx = cv.getContext('2d');
     ctx.imageSmoothingEnabled = false;
-    // 順序：body → head → wrinkles → eyes → eyebrows → beard → mustache → hair → headband
-    for (const layer of [body, head, wrinkles, eyes, eyebrows, beard, mustache, hair, headband]) {
+    // 順序：body → pants → shirt → head → wrinkles → eyes → eyebrows → beard → mustache → hair → headband
+    for (const layer of [body, pants, shirt, head, wrinkles, eyes, eyebrows, beard, mustache, hair, headband]) {
       if (layer) ctx.drawImage(layer, SX, SY, SW, SH, 0, 0, W, H);
     }
     const url = cv.toDataURL('image/png');
@@ -179,10 +188,19 @@
     if (fullBodyCache.has(key)) return fullBodyCache.get(key);
 
     const FRAME_W = 32, FRAME_H = 60;
-    const FRAME_COLS = 3, FRAME_ROWS = 4;
-    // 方向順序：0=down, 1=left, 2=right, 3=up
-    const ROW_TO_LPC_Y = [10*64, 9*64, 11*64, 8*64];
-    const FRAMES_TO_USE = [1, 4, 7];
+    const FRAME_COLS = 3, FRAME_ROWS = 6;
+    // row 順序：0=walk-down, 1=walk-left, 2=walk-right, 3=walk-up,
+    //          4=kick(slash-down), 5=stretch(spellcast-down)
+    // LPC y 行：walk=8/9/10/11、slash=12-15、spellcast=0-3
+    const ROW_TO_LPC_Y = [10*64, 9*64, 11*64, 8*64, 14*64, 2*64];
+    const ROW_FRAMES = [
+      [1, 4, 7],  // walk-down 3 frames
+      [1, 4, 7],
+      [1, 4, 7],
+      [1, 4, 7],
+      [2, 4, 5],  // kick：slash-down 取揮腿幾 frame
+      [3, 5, 6],  // stretch：spellcast-down 取手抬高幾 frame
+    ];
 
     const SX = 16, SY_OFF = 4;  // frame y=4 to y=64 = 60 高（含腳）
     const [body, head, wrinkles, eyes, eyebrows, beard, mustache, hair, headband, shirt, pants, shoes] = await Promise.all([
@@ -213,8 +231,9 @@
 
     for (let row = 0; row < FRAME_ROWS; row++) {
       const lpcY = ROW_TO_LPC_Y[row];
+      const frames = ROW_FRAMES[row];
       for (let col = 0; col < FRAME_COLS; col++) {
-        const lpcFrame = FRAMES_TO_USE[col];
+        const lpcFrame = frames[col];
         const srcX = lpcFrame * 64 + SX;
         const srcY = lpcY + SY_OFF;
         const dx = col * FRAME_W;
