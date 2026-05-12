@@ -30,9 +30,9 @@
   const PITCH_H = 200;
   const FPS = 30;
   const MATCH_MINUTES = 90;
-  const REAL_SECONDS = 60;
-  const HT_PAUSE_SEC = 0.8;
-  const GOAL_PAUSE_SEC = 2.6;   // 進球後暫停看慶祝動畫
+  const REAL_SECONDS = 110;        // 60 → 110 秒（開羅式慢節奏、看得清楚每個動作）
+  const HT_PAUSE_SEC = 1.2;
+  const GOAL_PAUSE_SEC = 4.5;      // 進球暫停 → 4.5 秒（看完慶祝 + GOAL banner）
   const TOTAL_FRAMES = FPS * REAL_SECONDS;
 
   // ── 陣型解析 ────────────────────────────────────────────
@@ -299,7 +299,14 @@
           <div class="msim-hud-val msim-a-chance" style="color:#ef9a9a">—</div>
         </div>
       </div>
-      <canvas class="msim-canvas"></canvas>
+      <div class="msim-canvas-wrap">
+        <canvas class="msim-canvas"></canvas>
+        <div class="msim-goal-banner" hidden>
+          <div class="msim-goal-banner-text">GOAL!</div>
+          <div class="msim-goal-banner-team"></div>
+        </div>
+        <div class="msim-confetti"></div>
+      </div>
       <div class="msim-speed-bar">
         <button class="msim-speed-btn" data-speed="0.5" title="慢放">🐢 0.5×</button>
         <button class="msim-speed-btn active" data-speed="1" title="正常">▶️ 1×</button>
@@ -319,9 +326,50 @@
       aScore: container.querySelector('.msim-a-score'),
       time: container.querySelector('.msim-time'),
       canvas: container.querySelector('.msim-canvas'),
+      canvasWrap: container.querySelector('.msim-canvas-wrap'),
+      goalBanner: container.querySelector('.msim-goal-banner'),
+      goalBannerTeam: container.querySelector('.msim-goal-banner-team'),
+      confetti: container.querySelector('.msim-confetti'),
       summary: container.querySelector('.msim-summary'),
       speedBtns: container.querySelectorAll('.msim-speed-btn'),
     };
+  }
+
+  // 進球儀式 — banner + 彩花 + 視角縮放
+  function _triggerGoalCelebration(ui, teamName, teamSide) {
+    if (!ui.goalBanner) return;
+    ui.goalBannerTeam.textContent = teamName + ' 進球!';
+    ui.goalBanner.dataset.side = teamSide;
+    ui.goalBanner.hidden = false;
+    ui.goalBanner.classList.remove('msim-goal-show');
+    void ui.goalBanner.offsetWidth;
+    ui.goalBanner.classList.add('msim-goal-show');
+    // 視角 zoom in
+    if (ui.canvasWrap) {
+      ui.canvasWrap.classList.add('msim-zoom-in');
+      setTimeout(() => ui.canvasWrap.classList.remove('msim-zoom-in'), 4000);
+    }
+    // 彩花
+    if (ui.confetti) {
+      const color = teamSide === 'h' ? ['#2196f3','#90caf9','#fff','#f0c040'] : ['#e53935','#ef9a9a','#fff','#f0c040'];
+      ui.confetti.innerHTML = '';
+      for (let i = 0; i < 30; i++) {
+        const c = document.createElement('i');
+        c.className = 'msim-conf-piece';
+        c.style.left = (Math.random() * 100) + '%';
+        c.style.background = color[i % color.length];
+        c.style.animationDelay = (Math.random() * 0.3) + 's';
+        c.style.animationDuration = (1.4 + Math.random() * 1.2) + 's';
+        c.style.transform = `rotate(${Math.random() * 360}deg)`;
+        ui.confetti.appendChild(c);
+      }
+      setTimeout(() => { ui.confetti.innerHTML = ''; }, 3000);
+    }
+    // 4 秒後收 banner
+    setTimeout(() => {
+      ui.goalBanner.classList.remove('msim-goal-show');
+      setTimeout(() => { ui.goalBanner.hidden = true; }, 400);
+    }, 3500);
   }
 
   // ── 主模擬 ──────────────────────────────────────────────
@@ -603,6 +651,9 @@
         state.phase = 'celebrate';
         ui.hScore.textContent = state.score.h;
         ui.aScore.textContent = state.score.a;
+        // 進球儀式：banner + 彩花 + 視角 zoom
+        const scoringTeam = state.possession === 'h' ? home : away;
+        _triggerGoalCelebration(ui, scoringTeam.nameCN, state.possession);
       } else {
         // 被撲 / 沒中 → 對方球門員帶球
         const newTeam = state.possession === 'h' ? 'a' : 'h';

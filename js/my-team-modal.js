@@ -1067,6 +1067,15 @@
   async function renderQuestTab(content) {
     content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入任務中…</div>';
     const { templates, state } = await window.MyTeam.fetchQuests();
+    if (!templates || !templates.length) {
+      content.innerHTML = `
+        <div class="mt-tab-todo">
+          <div class="mt-tab-todo-icon">📋</div>
+          <div>任務尚未開放</div>
+          <div style="font-size:11px;opacity:0.6;margin-top:6px">資料庫尚未 seed、待管理員初始化</div>
+        </div>`;
+      return;
+    }
     const stateMap = {};
     state.forEach(s => { stateMap[s.quest_id + '|' + s.period_key] = s; });
     const today = new Date();
@@ -1148,6 +1157,15 @@
   async function renderShopTab(content) {
     content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入商店…</div>';
     const { items, inventory } = await window.MyTeam.fetchShopAndInventory();
+    if (!items || !items.length) {
+      content.innerHTML = `
+        <div class="mt-tab-todo">
+          <div class="mt-tab-todo-icon">🏪</div>
+          <div>商店尚未開放</div>
+          <div style="font-size:11px;opacity:0.6;margin-top:6px">資料庫尚未 seed、待管理員初始化</div>
+        </div>`;
+      return;
+    }
     const invMap = {};
     inventory.forEach(i => { invMap[i.item_id] = i.count; });
 

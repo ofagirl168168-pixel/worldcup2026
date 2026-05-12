@@ -5610,6 +5610,58 @@ body.opinion-open .btn-arena-float { display: none; }
   padding: 6px 0;
   border-top: 1px solid rgba(255,255,255,0.06);
 }
+/* ── 進球儀式：banner + 彩花 + 視角 zoom ── */
+.msim-canvas-wrap {
+  position: relative;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: center center;
+}
+.msim-canvas-wrap.msim-zoom-in { transform: scale(1.18); }
+
+.msim-goal-banner {
+  position: absolute; top: 35%; left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 100;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+}
+.msim-goal-banner.msim-goal-show {
+  animation: msim-goal-pop 0.6s cubic-bezier(0.34, 1.8, 0.64, 1) forwards;
+}
+@keyframes msim-goal-pop {
+  0%   { transform: translate(-50%, -50%) scale(0) rotate(-15deg); opacity: 0; }
+  60%  { transform: translate(-50%, -50%) scale(1.2) rotate(5deg);  opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1) rotate(0deg);    opacity: 1; }
+}
+.msim-goal-banner-text {
+  font-size: 64px; font-weight: 900;
+  color: #f0c040;
+  text-shadow: 0 0 20px rgba(240,192,64,0.9), 0 4px 0 #c0392b, 0 8px 20px rgba(0,0,0,0.8);
+  letter-spacing: 4px; font-style: italic;
+  animation: msim-goal-shine 1.4s ease-in-out infinite;
+}
+@keyframes msim-goal-shine {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.4) drop-shadow(0 0 10px #f0c040); }
+}
+.msim-goal-banner-team {
+  font-size: 16px; font-weight: 800; color: #fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9); margin-top: 6px;
+}
+.msim-confetti {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 99;
+}
+.msim-conf-piece {
+  position: absolute; top: -10px;
+  width: 5px; height: 11px;
+  animation: msim-conf-fall 2s linear forwards;
+}
+@keyframes msim-conf-fall {
+  0%   { transform: translateY(-10px) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(360px) rotate(720deg); opacity: 0; }
+}
+
 .msim-summary {
   margin-top: 10px; padding: 10px 12px;
   background: rgba(0,0,0,0.25); border-radius: 8px;
