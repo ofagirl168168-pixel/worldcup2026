@@ -167,22 +167,37 @@
 
   function _showStarterCompleteToast(n) {
     const team = window.MyTeam.getCached();
-    // 還沒體驗過訓練 → 引導訓練教學
+    // 教學鏈：先比賽（tutorial_match_done false）→ 訓練（tutorial_first_training_used false）
+    const needsTutorialMatch = team && team.tutorial_match_done === false;
     const needsTrainingTutorial = team && team.tutorial_first_training_used === false;
+
+    let title, body, primaryBtn, action;
+    if (needsTutorialMatch) {
+      title = '太棒了！';
+      body = '球員都到位了！<br>接下來打<b>第一場熱身賽</b>看你的隊伍表現 ⚽';
+      primaryBtn = '🏟️ 開始熱身賽';
+      action = 'match';
+    } else if (needsTrainingTutorial) {
+      title = '太棒了！';
+      body = '接下來教你<b>訓練</b>球員 — 讓他們變更強';
+      primaryBtn = '🏋️ 教我訓練';
+      action = 'train';
+    } else {
+      title = '太棒了！';
+      body = '接下來去 <b>球員</b> 或 <b>設定</b> 安排陣容';
+      primaryBtn = '📋 去安排隊伍';
+      action = 'roster';
+    }
 
     const t = document.createElement('div');
     t.className = 'mt-starter-complete';
     t.innerHTML = `
       <div class="mt-starter-complete-card">
         <div style="font-size:48px">🎉</div>
-        <h3>太棒了！</h3>
-        <p>球員都到位了！${needsTrainingTutorial
-          ? '<br>接下來我教你<b>訓練</b>球員 — 讓他們變更強'
-          : '<br>接下來去 <b>球員</b> 或 <b>設定</b> 安排陣容、就可以打第一場比賽'}</p>
+        <h3>${title}</h3>
+        <p>${body}</p>
         <div class="mt-starter-complete-buttons">
-          ${needsTrainingTutorial
-            ? '<button class="mt-gacha-btn mt-starter-train">🏋️ 教我訓練</button>'
-            : '<button class="mt-gacha-btn mt-starter-arrange">📋 去安排隊伍</button>'}
+          <button class="mt-gacha-btn mt-starter-primary">${primaryBtn}</button>
           <button class="mt-starter-complete-skip">稍後再說</button>
         </div>
       </div>
@@ -193,19 +208,22 @@
       t.classList.remove('open');
       setTimeout(() => t.remove(), 200);
     };
-    t.querySelector('.mt-starter-arrange')?.addEventListener('click', () => {
+    t.querySelector('.mt-starter-primary').addEventListener('click', () => {
       close();
-      _currentTab = 'roster';
-      document.querySelector('.mt-hub-tab[data-tab="roster"]')?.click();
-    });
-    t.querySelector('.mt-starter-train')?.addEventListener('click', () => {
-      close();
-      _runTrainingTutorial();
+      if (action === 'match') {
+        window.MyTeam?.runMatch?.({ tutorial: true });
+      } else if (action === 'train') {
+        _runTrainingTutorial();
+      } else {
+        _currentTab = 'roster';
+        document.querySelector('.mt-hub-tab[data-tab="roster"]')?.click();
+      }
     });
     t.querySelector('.mt-starter-complete-skip').addEventListener('click', close);
   }
 
-  // ── 訓練教學：自動幫第一位球員跑 3 秒速度訓練 ──
+  // ── 訓練教學：自動幫第一位球員跑 3 秒速度訓練（暴露給 my-team-match.js 在賽後 chain）──
+  window._runTrainingTutorial = _runTrainingTutorial;
   async function _runTrainingTutorial() {
     const players = await window.MyTeam.fetchPlayers();
     if (!players.length) return;

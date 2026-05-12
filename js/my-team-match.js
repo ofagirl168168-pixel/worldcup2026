@@ -193,6 +193,17 @@
   // ── 結算 RPC ──
   async function _finalize(opponent, scoreH, scoreA, isBoss) {
     let data;
+    if (opponent._isTutorial) {
+      // 教學賽：純設旗標、不寫 league_progress、不扣體力
+      try {
+        await window.DB.from('my_team')
+          .update({ tutorial_match_done: true })
+          .eq('user_id', window.currentUser.id);
+        await window.MyTeam.refresh?.();
+      } catch (e) {}
+      const result = scoreH > scoreA ? 'W' : (scoreH < scoreA ? 'L' : 'D');
+      return { result, rp_earned: 0, gems_earned: 0, fans_delta: 0, isTutorial: true };
+    }
     if (opponent._isPvp) {
       const oppSnap = {
         nameCN: opponent.nameCN, flag: opponent.flag, radar: opponent.radar,
@@ -226,13 +237,14 @@
   }
 
   // ── 公開：跑一場（match modal）──
-  async function runMatch() {
+  async function runMatch(opts = {}) {
     const team = window.MyTeam.getCached();
     if (!team || team === 'not_created') {
       if (typeof showToast === 'function') showToast('⚠️ 請先建立球隊');
       return;
     }
-    if (team.stamina < 1) {
+    // 教學賽不消耗體力
+    if (!opts.tutorial && team.stamina < 1) {
       if (typeof showToast === 'function') showToast('⚡ 體力不足，今天打太多了！明天再來、或預測比分賺體力');
       return;
     }
@@ -268,18 +280,28 @@
       return;
     }
 
-    // 撈聯賽進度
-    const { data: prog } = await window.DB
-      .from('league_progress')
-      .select('*')
-      .eq('user_id', team.user_id)
-      .maybeSingle();
-    const tier = prog?.current_tier || 1;
-    const matchIdx = prog?.matches_played || 0;
-    const opponent = _pickOpponent(tier, matchIdx);
-    const isBoss = !!opponent._isReal;
+    let tier = 1, matchIdx = 0, opponent, isBoss = false, isTutorial = false;
+    if (opts.tutorial) {
+      // 教學賽：弱對手保證新手贏（radar 全 25-30、無 talent）
+      isTutorial = true;
+      opponent = {
+        nameCN: '友隊 FC',
+        flag: '🏟️',
+        _isReal: false,
+        _isTutorial: true,
+        radar: { attack: 25, defense: 22, midfield: 25, speed: 25, experience: 30 },
+        keyPlayers: _generateAIPlayers(99999),
+      };
+    } else {
+      const { data: prog } = await window.DB
+        .from('league_progress').select('*').eq('user_id', team.user_id).maybeSingle();
+      tier = prog?.current_tier || 1;
+      matchIdx = prog?.matches_played || 0;
+      opponent = _pickOpponent(tier, matchIdx);
+      isBoss = !!opponent._isReal;
+    }
 
-    _openMatchModal({ team, homeData, opponent, tier, matchIdx, isBoss });
+    _openMatchModal({ team, homeData, opponent, tier, matchIdx, isBoss, isTutorial });
   }
 
   // ── 比賽 modal ──
@@ -465,6 +487,13 @@
       `;
     }
 
+    const tutorialHtml = ctx.isTutorial ? `
+      <div class="mt-post-tutorial-banner">
+        🎓 教學賽完成！<br>
+        <span style="font-size:13px;opacity:0.9">接下來教你<b>訓練</b>球員、讓他們變更強</span>
+      </div>
+    ` : '';
+
     content.innerHTML = `
       <div class="mt-post-match ${colorClass}">
         ${result.result === 'W' ? '<div class="mt-post-confetti"></div>' : ''}
@@ -477,32 +506,39 @@
         </div>
         <div class="mt-post-match-vs">${escapeHtml(ctx.team.team_name)} <span style="opacity:0.5">vs</span> ${escapeHtml(ctx.opponent.nameCN)}</div>
         ${ctx.isBoss && result.result === 'W' ? '<div class="mt-post-match-boss-bonus">⭐ 擊敗真實隊伍 BOSS！</div>' : ''}
-        <div class="mt-post-match-rewards">
-          <div class="mt-post-reward">
-            <div class="mt-post-reward-icon">⚙️</div>
-            <div class="mt-post-reward-val">+<span data-count="${result.rp_earned}">0</span></div>
-            <div class="mt-post-reward-label">RP ×4</div>
+        ${tutorialHtml}
+        ${!ctx.isTutorial ? `
+          <div class="mt-post-match-rewards">
+            <div class="mt-post-reward">
+              <div class="mt-post-reward-icon">⚙️</div>
+              <div class="mt-post-reward-val">+<span data-count="${result.rp_earned}">0</span></div>
+              <div class="mt-post-reward-label">RP ×4</div>
+            </div>
+            <div class="mt-post-reward">
+              <div class="mt-post-reward-icon">💎</div>
+              <div class="mt-post-reward-val">+<span data-count="${result.gems_earned}">0</span></div>
+              <div class="mt-post-reward-label">寶石</div>
+            </div>
+            <div class="mt-post-reward">
+              <div class="mt-post-reward-icon">${result.fans_delta >= 0 ? '👥' : '😞'}</div>
+              <div class="mt-post-reward-val">${result.fans_delta >= 0 ? '+' : ''}<span data-count="${Math.abs(result.fans_delta)}">0</span></div>
+              <div class="mt-post-reward-label">球迷</div>
+            </div>
           </div>
-          <div class="mt-post-reward">
-            <div class="mt-post-reward-icon">💎</div>
-            <div class="mt-post-reward-val">+<span data-count="${result.gems_earned}">0</span></div>
-            <div class="mt-post-reward-label">寶石</div>
-          </div>
-          <div class="mt-post-reward">
-            <div class="mt-post-reward-icon">${result.fans_delta >= 0 ? '👥' : '😞'}</div>
-            <div class="mt-post-reward-val">${result.fans_delta >= 0 ? '+' : ''}<span data-count="${Math.abs(result.fans_delta)}">0</span></div>
-            <div class="mt-post-reward-label">球迷</div>
-          </div>
-        </div>
+        ` : ''}
         ${pvpHtml}
         ${seasonHtml}
-        <button class="mt-pre-match-go" id="mt-match-close">確認收下</button>
+        <button class="mt-pre-match-go" id="mt-match-close">${ctx.isTutorial ? '🏋️ 接著教我訓練 →' : '確認收下'}</button>
       </div>
     `;
     overlay.querySelector('#mt-match-close').addEventListener('click', () => {
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 250);
       window.dispatchEvent(new CustomEvent('my-team-changed'));
+      // 教學賽 → 接訓練 tutorial
+      if (ctx.isTutorial && typeof window._runTrainingTutorial === 'function') {
+        setTimeout(() => window._runTrainingTutorial(), 400);
+      }
     });
     // count-up
     setTimeout(() => {
