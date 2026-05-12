@@ -25,7 +25,8 @@
   function _localKeys() {
     return [
       'mt_beta',
-      'mt_pending_gacha',
+      'mt_pending_gacha',   // 舊版（v0.6 抽券 pending）
+      'mt_preview_cards',   // v0.7：preview 卡 ID 陣列
       'mt_arena_vote_date_v1',
       'mt_daily_login_date_v1',
       'my_team_cache_v1',
@@ -52,7 +53,8 @@
     console.log(`beta enabled: ${enabled}`);
     console.log(`user id: ${uid || '(not logged in)'}`);
     console.log(`team: `, team);
-    console.log(`pending tickets (localStorage): ${localStorage.getItem('mt_pending_gacha') || 0}`);
+    const preview = (() => { try { return JSON.parse(localStorage.getItem('mt_preview_cards') || '[]').length; } catch (e) { return 0; } })();
+    console.log(`pending preview cards (localStorage): ${preview}`);
     console.log(`arena_vote_date: ${localStorage.getItem('mt_arena_vote_date_v1') || '(none)'}`);
     console.log(`daily_login_date: ${localStorage.getItem('mt_daily_login_date_v1') || '(none)'}`);
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });

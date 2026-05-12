@@ -37,7 +37,7 @@
     return result;
   }
 
-  // ── 即時觸發（§5.6）— 站外動作獎勵 → 不耗抽券直接抽 ──
+  // ── 即時觸發（§5.6）— 站外動作獎勵 → 直接彈抽卡動畫 ──
   async function triggerInstantGacha(count, source) {
     // Feature flag：未啟用直接 skip（路人保護）
     if (typeof window.MyTeamBetaEnabled === 'function' && !window.MyTeamBetaEnabled()) {
@@ -49,9 +49,8 @@
     }
     const team = await window.MyTeam.fetch();
     if (!team || team === 'not_created') {
-      // 沒建隊 → 存 pending、引導建隊
-      _showPendingTicketToast(count, source);
-      return null;
+      // 沒建隊 → 客戶端預覽抽卡 → 動畫秀卡 → 存 localStorage → 建隊後收下卡
+      return await _previewGachaForOnboarding(count, source);
     }
 
     // ≤3 張 → 直接彈動畫；>3 → 進背包
@@ -92,36 +91,116 @@
     })[source] || '免費抽卡';
   }
 
-  // ── 沒建隊：存 pending 抽券到 localStorage、出 toast 邀請建隊 ──
-  function _showPendingTicketToast(count, source) {
-    try {
-      const cur = parseInt(localStorage.getItem('mt_pending_gacha') || '0') || 0;
-      localStorage.setItem('mt_pending_gacha', String(cur + count));
-    } catch (e) {}
-    const total = (parseInt(localStorage.getItem('mt_pending_gacha') || '0') || 0);
-    if (typeof showToast === 'function') {
-      showToast(`🎉 +${count} 免費抽券 — 建隊就能立刻抽！（累積 ${total}）`);
+  // ── 沒建隊：客戶端預覽抽卡 → 動畫立刻彈 → 存卡 ID 等建隊後收下 ──
+  async function _previewGachaForOnboarding(count, source) {
+    const pool = await window.MyTeam.fetchCardPool();
+    if (!pool.length) return null;
+
+    const cards = [];
+    for (let i = 0; i < count; i++) {
+      cards.push(_clientPickCard(pool));
     }
-    // 點 FAB 提示樣式：讓 FAB 紅點變強
+
+    // 存卡片 ID 到 localStorage（建隊後 _mtConsumePreviewCards 會收進球員列表）
     try {
-      const badge = document.getElementById('mt-fab-badge');
-      if (badge) {
-        badge.textContent = '!';
-        badge.hidden = false;
-      }
+      const existing = JSON.parse(localStorage.getItem('mt_preview_cards') || '[]');
+      const newCardIds = cards.map(c => c.card_id);
+      localStorage.setItem('mt_preview_cards', JSON.stringify([...existing, ...newCardIds]));
     } catch (e) {}
+
+    // 跑抽卡動畫（CTA = 引導建隊）
+    await openGachaAnimation(cards, {
+      title: '🎉 ' + _sourceLabel(source),
+      subtitle: '建隊就能收下這張卡！',
+      ctaCreateTeam: true,
+    });
+    return { granted: count, mode: 'preview', cards };
   }
-  // 公開給 modal 在 create() 完成後讀
-  window._mtConsumePendingGacha = async function () {
-    let pending = 0;
-    try {
-      pending = parseInt(localStorage.getItem('mt_pending_gacha') || '0') || 0;
-      localStorage.removeItem('mt_pending_gacha');
-    } catch (e) {}
-    if (pending > 0) {
-      // 等 modal 動畫關完再彈
-      setTimeout(() => triggerInstantGacha(pending, 'pending').catch(() => {}), 300);
+
+  // 客戶端依稀有度權重抽 1 張卡（沒建隊時用）
+  function _clientPickCard(pool) {
+    const roll = Math.random() * 100;
+    let rarity;
+    if (roll < 5) rarity = 'SSR';
+    else if (roll < 25) rarity = 'SR';
+    else rarity = 'R';
+    const candidates = pool.filter(c => c.rarity === rarity);
+    const card = candidates[Math.floor(Math.random() * candidates.length)];
+    return {
+      card_id:      card.card_id,
+      rarity:       card.rarity,
+      name:         card.name,
+      nickname:     card.nickname,
+      position:     card.position,
+      attack:       card.base_attack,
+      defense:      card.base_defense,
+      speed:        card.base_speed,
+      midfield:     card.base_midfield,
+      stamina:      card.base_stamina,
+      aura:         card.base_aura,
+      talent:       card.talent,
+      illustration: card.illustration,
+      is_duplicate: false,
+      forced_ssr:   false,
+    };
+  }
+
+  // 公開：建隊完成後 modal 呼叫 → 把 preview 卡收進 team_player
+  window._mtConsumePreviewCards = async function () {
+    let cardIds = [];
+    try { cardIds = JSON.parse(localStorage.getItem('mt_preview_cards') || '[]'); }
+    catch (e) {}
+    if (!cardIds.length) return 0;
+    try { localStorage.removeItem('mt_preview_cards'); } catch (e) {}
+
+    const uid = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.id : null;
+    if (!uid) return 0;
+
+    // 拿這幾張卡的完整資料
+    const { data: cards, error: pErr } = await window.DB
+      .from('player_card_pool').select('*').in('card_id', cardIds);
+    if (pErr || !cards || !cards.length) return 0;
+
+    // 已擁有的不重複 insert（同卡 bond++）
+    const { data: existing } = await window.DB
+      .from('team_player').select('id, card_id, bond')
+      .eq('team_user_id', uid)
+      .in('card_id', cardIds);
+    const existingMap = new Map((existing || []).map(p => [p.card_id, p]));
+
+    const newInserts = [];
+    const bondUpdates = [];
+    for (const cardId of cardIds) {
+      const card = cards.find(c => c.card_id === cardId);
+      if (!card) continue;
+      const ex = existingMap.get(cardId);
+      if (ex) {
+        if (ex.bond < 5) bondUpdates.push(ex);
+      } else {
+        newInserts.push({
+          team_user_id: uid,
+          card_id: card.card_id,
+          current_attack: card.base_attack,
+          current_defense: card.base_defense,
+          current_speed: card.base_speed,
+          current_midfield: card.base_midfield,
+          current_stamina: card.base_stamina,
+          current_aura: card.base_aura,
+        });
+      }
     }
+    if (newInserts.length) {
+      await window.DB.from('team_player').insert(newInserts);
+    }
+    for (const ex of bondUpdates) {
+      await window.DB.from('team_player').update({ bond: ex.bond + 1 }).eq('id', ex.id);
+    }
+    // 重撈 my_team 反映變化
+    await window.MyTeam.fetch();
+    if (typeof showToast === 'function') {
+      showToast(`🎁 已收下 ${cardIds.length} 張球員卡到球隊！`);
+    }
+    return cardIds.length;
   };
 
   // ── 抽卡動畫 ──
@@ -143,7 +222,10 @@
           </div>
           <div class="mt-gacha-cards" id="mt-gacha-cards" hidden></div>
           <div class="mt-gacha-actions" id="mt-gacha-actions" hidden>
-            ${options.ctaToHub ? `
+            ${options.ctaCreateTeam ? `
+              <button class="mt-gacha-btn mt-gacha-btn-primary" data-cta="create">🎯 建隊收下這張卡 →</button>
+              <button class="mt-gacha-btn mt-gacha-btn-secondary" data-cta="close">稍後再說</button>
+            ` : options.ctaToHub ? `
               <button class="mt-gacha-btn mt-gacha-btn-primary" data-cta="hub">進入我的球隊 →</button>
               <button class="mt-gacha-btn mt-gacha-btn-secondary" data-cta="close">收進球隊</button>
             ` : `
@@ -182,7 +264,7 @@
       overlay.addEventListener('click', e => {
         const cta = e.target.dataset?.cta;
         if (!cta) return;
-        if (cta === 'hub') {
+        if (cta === 'create' || cta === 'hub') {
           cleanup();
           if (typeof window.openMyTeamModal === 'function') window.openMyTeamModal();
         } else if (cta === 'close') {

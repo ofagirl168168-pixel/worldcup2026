@@ -65,6 +65,15 @@
   // ── Onboarding：建隊 ──
   function renderOnboarding() {
     const body = _overlay.querySelector('#mt-modal-body');
+
+    // 檢查 localStorage 有沒有 preview 卡（投擂台後預覽到的、等領）
+    let pendingCards = [];
+    try { pendingCards = JSON.parse(localStorage.getItem('mt_preview_cards') || '[]'); }
+    catch (e) {}
+    const pendingHint = pendingCards.length > 0
+      ? `<div class="mt-onboard-pending">🎁 你有 <b>${pendingCards.length}</b> 張等領取的球員卡（建隊後自動收進球隊）</div>`
+      : '';
+
     body.innerHTML = `
       <div class="mt-onboard">
         <div class="mt-onboard-title">🎉 建立你的球隊</div>
@@ -72,6 +81,7 @@
           選個隊名 + 隊徽就能開始抽卡養隊。<br>
           建隊送你 <b style="color:#f0c040">5 張免費抽券</b>！
         </div>
+        ${pendingHint}
 
         <div class="mt-onboard-section">
           <div class="mt-onboard-label">隊名（最多 24 字）</div>
@@ -118,14 +128,14 @@
       submitBtn.textContent = '建立中…';
       try {
         await window.MyTeam.create(nameInput.value, selectedCrest);
-        // 成功 → 切換到 hub
+        // 收下投擂台時預覽到的卡（自然流程）
+        if (typeof window._mtConsumePreviewCards === 'function') {
+          await window._mtConsumePreviewCards();
+        }
+        // 切換到 hub
         renderHub();
         if (typeof showToast === 'function') {
           showToast(`🎉 球隊「${nameInput.value.trim()}」建立成功！5 張抽券已送`);
-        }
-        // 有 pending 抽券 → 立刻彈抽卡動畫（§5.6 自然流程）
-        if (typeof window._mtConsumePendingGacha === 'function') {
-          window._mtConsumePendingGacha();
         }
       } catch (err) {
         console.error('[my-team] create error', err);
