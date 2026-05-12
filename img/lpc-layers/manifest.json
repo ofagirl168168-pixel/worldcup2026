@@ -3,7 +3,25 @@
     "light",
     "olive",
     "amber",
-    "brown"
+    "brown",
+    "bronze"
+  ],
+  "heads": [
+    "light",
+    "olive",
+    "amber",
+    "brown",
+    "bronze"
+  ],
+  "eye_colors": [
+    "blue",
+    "brown",
+    "gray",
+    "green",
+    "orange",
+    "purple",
+    "red",
+    "yellow"
   ],
   "hair_styles": [
     "messy1",
@@ -12,13 +30,59 @@
     "spiked",
     "loose",
     "curly_long",
-    "bedhead"
+    "bedhead",
+    "afro",
+    "pixie",
+    "shorthawk",
+    "swoop",
+    "wavy",
+    "plain",
+    "bangs",
+    "bangsshort",
+    "bangslong",
+    "dreadlocks_long",
+    "flat_top_fade",
+    "high_and_tight",
+    "high_ponytail",
+    "long_messy",
+    "mop",
+    "spiked_liberty",
+    "balding",
+    "buzzcut"
   ],
   "hair_colors": [
     "black",
     "blonde",
     "red",
-    "white"
+    "white",
+    "ginger",
+    "blue",
+    "purple",
+    "gray"
+  ],
+  "beard_styles": [
+    "5oclock_shadow",
+    "basic",
+    "medium",
+    "trimmed"
+  ],
+  "mustache_styles": [
+    "basic",
+    "handlebar",
+    "horseshoe",
+    "walrus",
+    "french",
+    "chevron",
+    "bigstache",
+    "lampshade"
+  ],
+  "beard_colors": [
+    "black",
+    "blonde",
+    "red",
+    "white",
+    "gray",
+    "ginger"
   ],
   "shirt_styles": [
     "shortsleeve",
@@ -53,5 +117,54 @@
     "orange",
     "brown",
     "tan"
+  ],
+  "shoe_styles": [
+    "flat",
+    "boots"
+  ],
+  "shoe_colors": [
+    "black",
+    "brown",
+    "white",
+    "red",
+    "blue",
+    "yellow",
+    "green"
+  ],
+  "wrist_colors": [
+    "red",
+    "blue",
+    "black",
+    "white",
+    "green",
+    "yellow"
+  ],
+  "wrinkle_skins": [
+    "light",
+    "olive",
+    "amber",
+    "brown",
+    "bronze"
+  ],
+  "eyebrow_styles": [
+    "thick",
+    "thin"
+  ],
+  "eyebrow_colors": [
+    "black",
+    "blonde",
+    "red",
+    "white",
+    "gray",
+    "ginger"
+  ],
+  "headband_colors": [
+    "red",
+    "blue",
+    "black",
+    "white",
+    "green",
+    "yellow",
+    "purple"
   ]
 }

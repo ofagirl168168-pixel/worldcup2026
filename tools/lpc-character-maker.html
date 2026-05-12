@@ -182,8 +182,32 @@
       <div class="color-row" id="opt-pants-color"></div>
     </div>
     <div class="panel">
-      <h3>😀 表情</h3>
-      <div class="opt-grid" id="opt-face"></div>
+      <h3>👁 眼睛顏色</h3>
+      <div class="color-row" id="opt-eye-color"></div>
+    </div>
+    <div class="panel">
+      <h3>😬 皺紋/傷疤（老將標記）</h3>
+      <div class="opt-grid" id="opt-wrinkles"></div>
+    </div>
+    <div class="panel">
+      <h3>🧔 鬍子</h3>
+      <div class="opt-grid" id="opt-beard-style"></div>
+    </div>
+    <div class="panel">
+      <h3>👨 鬍髭</h3>
+      <div class="opt-grid" id="opt-mustache-style"></div>
+    </div>
+    <div class="panel">
+      <h3>🎨 鬍子顏色（鬍子+鬍髭共用）</h3>
+      <div class="color-row" id="opt-beard-color"></div>
+    </div>
+    <div class="panel">
+      <h3>👟 球鞋顏色</h3>
+      <div class="color-row" id="opt-shoe-color"></div>
+    </div>
+    <div class="panel">
+      <h3>💪 護腕顏色</h3>
+      <div class="color-row" id="opt-wrist-color"></div>
     </div>
   </div>
 
@@ -193,120 +217,53 @@
 const BASE = '../img/lpc-layers';
 // 內建 manifest（避開 file:// fetch 限制；雙擊本檔開啟也能跑）
 const manifest = {
-  bodies: ['light', 'olive', 'amber', 'brown'],
-  hair_styles: ['messy1', 'messy2', 'long', 'spiked', 'loose', 'curly_long', 'bedhead'],
-  hair_colors: ['black', 'blonde', 'red', 'white'],
+  bodies: ['light', 'olive', 'amber', 'brown', 'bronze'],
+  eye_colors: ['blue', 'brown', 'gray', 'green', 'orange', 'purple', 'red', 'yellow'],
+  eyebrow_styles: ['none', 'thick', 'thin'],
+  eyebrow_colors: ['black', 'blonde', 'red', 'white', 'gray', 'ginger'],
+  headband_colors: ['none', 'red', 'blue', 'black', 'white', 'green', 'yellow', 'purple'],
+  wrinkle_options: ['none', 'on'],   // on = 套用該膚色的皺紋層
+  hair_styles: ['bald', 'messy1', 'messy2', 'long', 'spiked', 'loose', 'curly_long', 'bedhead',
+                'afro', 'pixie', 'shorthawk', 'swoop', 'wavy', 'plain',
+                'bangs', 'bangsshort', 'bangslong', 'dreadlocks_long', 'flat_top_fade',
+                'high_and_tight', 'high_ponytail', 'long_messy', 'mop', 'spiked_liberty',
+                'balding', 'buzzcut'],
+  hair_colors: ['black', 'blonde', 'red', 'white', 'ginger', 'blue', 'purple', 'gray'],
+  beard_styles: ['none', '5oclock_shadow', 'basic', 'medium', 'trimmed'],
+  mustache_styles: ['none', 'basic', 'handlebar', 'horseshoe', 'walrus', 'french', 'chevron', 'bigstache', 'lampshade'],
+  beard_colors: ['black', 'blonde', 'red', 'white', 'gray', 'ginger'],
   shirt_styles: ['shortsleeve', 'sleeveless'],
   shirt_colors_short: ['red','blue','black','white','green','yellow','teal','purple','orange'],
   shirt_colors_sleeve: ['red','blue','black','yellow'],
   pants_colors: ['red','blue','black','white','green','yellow','teal','purple','orange','brown','tan'],
+  // 球鞋固定 flat、不開款式選單；只挑顏色（含 none = 光腳）
+  shoe_styles: ['flat'],
+  shoe_colors: ['none', 'black', 'brown', 'white', 'red', 'blue', 'yellow', 'green'],
+  wrist_colors: ['none', 'red', 'blue', 'black', 'white', 'green', 'yellow'],
 };
 const state = {
   body: 'light',
+  eye_color: 'blue',
+  wrinkles: 'none',
   hair_style: 'messy1',
   hair_color: 'black',
+  beard_style: 'none',
+  beard_color: 'black',
+  mustache_style: 'none',
   shirt_style: 'shortsleeve',
   shirt_color: 'red',
   pants_color: 'blue',
-  face: 'normal',  // 手繪臉部表情 overlay
+  shoe_style: 'flat',
+  shoe_color: 'none',
+  wrist_color: 'none',
 };
-
-// ─── 臉部 overlay（補 LPC 「沒臉」的缺）──
-// 每個變體定義 eyes + mouth pixel pattern、繪在 source 32×36 內、frame 內位置：
-// 角色頭在 output y=4-14、眼睛 y=10、嘴 y=15
-const FACE_VARIANTS = ['normal', 'smile', 'smug', 'serious', 'focused', 'surprised', 'tough', 'wink'];
-
-function drawFaceOverlay(ctx, variant) {
-  // 在 32×36 offscreen canvas 上手繪臉、要在 hair layer 之後畫
-  // 座標：output y=10 左眼 x=11、右眼 x=19、嘴 x=14 y=15
-  const EYE_COLOR = '#000';
-  const MOUTH_COLOR = '#3a1810';
-  const LE_X = 11, RE_X = 19, EY = 10;       // 雙眼位置
-  const M_X = 14, M_Y = 15;                  // 嘴 baseline
-
-  ctx.fillStyle = EYE_COLOR;
-  switch (variant) {
-    case 'smile':       // 笑眼：彎成 ^^
-      ctx.fillRect(LE_X, EY+1, 1, 1); ctx.fillRect(LE_X-1, EY, 1, 1); ctx.fillRect(LE_X+1, EY, 1, 1);
-      ctx.fillRect(RE_X, EY+1, 1, 1); ctx.fillRect(RE_X-1, EY, 1, 1); ctx.fillRect(RE_X+1, EY, 1, 1);
-      break;
-    case 'smug':        // 瞇眼 ─ ─
-      ctx.fillRect(LE_X-1, EY+1, 3, 1);
-      ctx.fillRect(RE_X-1, EY+1, 3, 1);
-      break;
-    case 'serious':     // 細眼
-      ctx.fillRect(LE_X, EY, 1, 1); ctx.fillRect(LE_X, EY+1, 1, 1);
-      ctx.fillRect(RE_X, EY, 1, 1); ctx.fillRect(RE_X, EY+1, 1, 1);
-      // 眉毛
-      ctx.fillRect(LE_X-1, EY-2, 3, 1);
-      ctx.fillRect(RE_X-1, EY-2, 3, 1);
-      break;
-    case 'focused':     // 方眼
-      ctx.fillRect(LE_X-1, EY, 2, 2);
-      ctx.fillRect(RE_X, EY, 2, 2);
-      // 眉毛
-      ctx.fillRect(LE_X-1, EY-2, 3, 1);
-      ctx.fillRect(RE_X, EY-2, 3, 1);
-      break;
-    case 'surprised':   // 大眼
-      ctx.fillRect(LE_X-1, EY, 3, 3);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(LE_X, EY+1, 1, 1);
-      ctx.fillStyle = EYE_COLOR;
-      ctx.fillRect(RE_X, EY, 3, 3);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(RE_X+1, EY+1, 1, 1);
-      ctx.fillStyle = EYE_COLOR;
-      break;
-    case 'tough':       // 兇眼（眉毛壓低）
-      ctx.fillRect(LE_X, EY+1, 2, 1);
-      ctx.fillRect(RE_X-1, EY+1, 2, 1);
-      ctx.fillRect(LE_X-1, EY, 3, 1);  // 壓低眉
-      ctx.fillRect(RE_X-1, EY, 3, 1);
-      break;
-    case 'wink':        // 眨眼 ●─
-      ctx.fillRect(LE_X, EY, 1, 2);
-      ctx.fillRect(RE_X-1, EY+1, 3, 1);
-      break;
-    case 'normal':
-    default:            // 正常 點點眼
-      ctx.fillRect(LE_X, EY, 1, 2);
-      ctx.fillRect(RE_X, EY, 1, 2);
-      break;
-  }
-
-  // 嘴巴
-  ctx.fillStyle = MOUTH_COLOR;
-  switch (variant) {
-    case 'smile':
-      ctx.fillRect(M_X, M_Y, 1, 1);
-      ctx.fillRect(M_X+1, M_Y+1, 2, 1);
-      ctx.fillRect(M_X+3, M_Y, 1, 1);
-      break;
-    case 'smug':
-      ctx.fillRect(M_X, M_Y, 2, 1);
-      ctx.fillRect(M_X+2, M_Y-1, 1, 1);
-      break;
-    case 'surprised':
-      ctx.fillRect(M_X+1, M_Y-1, 2, 2);
-      break;
-    case 'tough':
-      ctx.fillRect(M_X, M_Y, 4, 1);
-      break;
-    case 'serious':
-    case 'focused':
-    case 'wink':
-    case 'normal':
-    default:
-      ctx.fillRect(M_X, M_Y, 3, 1);
-      break;
-  }
-}
 
 const COLOR_HEX = {
   black: '#1a1a1a', blonde: '#e8d068', red: '#c0392b', white: '#ddd', brown: '#8b4513',
   blue: '#2196f3', green: '#27ae60', yellow: '#f1c40f', teal: '#16a085',
-  purple: '#9b59b6', orange: '#e67e22',
+  purple: '#9b59b6', orange: '#e67e22', ginger: '#cd6e3a', gray: '#888',
+  // 眼睛色：用 LPC 內建 sprite 抓出的近似色當 swatch
+  // blue/brown/gray/green 已存在；補 orange/purple/red/yellow（這些跟其他類別重名 → 就讓 swatch 同色）
 };
 
 const imgCache = new Map();
@@ -328,27 +285,58 @@ async function getLayer(category, name) {
   return await loadImg(url);
 }
 
-// 合成頭像（全身 32×36，含 LPC 4 層 + 手繪臉部 overlay）
+// 可選 layer：傳 null 表示不畫
+async function getHair(look) {
+  if (look.hair_style === 'bald') return null;
+  return await getLayer('hair', `${look.hair_style}-${look.hair_color}`);
+}
+async function getBeard(look) {
+  if (look.beard_style === 'none') return null;
+  return await getLayer('beard', `${look.beard_style}-${look.beard_color}`);
+}
+async function getMustache(look) {
+  if (look.mustache_style === 'none') return null;
+  return await getLayer('mustache', `${look.mustache_style}-${look.beard_color}`);
+}
+async function getShoes(look) {
+  if (look.shoe_color === 'none') return null;
+  return await getLayer(`shoes-flat`, look.shoe_color);  // 固定 flat
+}
+async function getWrist(look) {
+  if (look.wrist_color === 'none') return null;
+  return await getLayer('wrist', look.wrist_color);
+}
+async function getWrinkles(look) {
+  if (look.wrinkles === 'none') return null;
+  return await getLayer('wrinkles', look.body);
+}
+
+// 合成頭像（含 LPC 5 層 + 手繪表情 override）
+// 角色佔 frame y=4..43（頭+軀幹+大腿）、source 32×40 → 4× = 128×160
 async function renderPortrait(canvas, look) {
-  const [body, hair, shirt, pants] = await Promise.all([
+  const [body, head, wrinkles, eyes, beard, mustache, hair, shirt, pants, wrist] = await Promise.all([
     getLayer('body', look.body),
-    getLayer('hair', `${look.hair_style}-${look.hair_color}`),
+    getLayer('head', look.body),
+    getWrinkles(look),
+    getLayer('eyes', look.eye_color),
+    getBeard(look),
+    getMustache(look),
+    getHair(look),
     getLayer('shirt', `${look.shirt_style}-${look.shirt_color}`),
     getLayer('pants', look.pants_color),
+    getWrist(look),
   ]);
-  const SX = 16, SY = 640 + 28, SW = 32, SH = 36;
-  // 先 render LPC 至 offscreen 32×36（pixel-perfect 1:1）
+  const SX = 16, SY = 640 + 4, SW = 32, SH = 40;
   const off = document.createElement('canvas');
   off.width = SW; off.height = SH;
   const offCtx = off.getContext('2d');
   offCtx.imageSmoothingEnabled = false;
-  for (const layer of [body, pants, shirt, hair]) {
-    offCtx.drawImage(layer, SX, SY, SW, SH, 0, 0, SW, SH);
+  // 圖層順序：body → pants → shirt → cuffs → head → wrinkles → eyes → beard → mustache → hair
+  // 卡片頭像看不到鞋（feet 在 SH=40 切掉了）
+  for (const layer of [body, pants, shirt, wrist, head, wrinkles, eyes, beard, mustache, hair]) {
+    if (layer) offCtx.drawImage(layer, SX, SY, SW, SH, 0, 0, SW, SH);
   }
-  // 手繪臉部疊在最上層（在 hair 之後 = 臉部在前面）
-  drawFaceOverlay(offCtx, look.face);
 
-  // 4× scale 顯示
   const SCALE = 4;
   canvas.width = 160; canvas.height = 160;
   const ctx = canvas.getContext('2d');
@@ -395,35 +383,37 @@ async function renderWalk(canvas, look) {
 let walkAnimId = null;
 async function animateWalk(canvas, look) {
   if (walkAnimId) cancelAnimationFrame(walkAnimId);
-  // 4× 放大、render 至 128×144 canvas
-  const SCALE = 4;
-  canvas.width = 32 * SCALE; canvas.height = 36 * SCALE;
+  // 比賽用側面右走（LPC row 11, y=704）— 足球場標準視角
+  // 不畫 face overlay：側臉沒清晰眼睛、加 overlay 反而會歪
+  const SW = 40, SH = 60, SX_OFFSET = 12, SY_OFFSET = 4;
+  const WALK_RIGHT_Y = 704;
+  const SCALE = 3;
+  canvas.width = SW * SCALE; canvas.height = SH * SCALE;
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
-  const [body, hair, shirt, pants] = await Promise.all([
+  const [body, head, wrinkles, eyes, beard, mustache, hair, shirt, pants, shoes, wrist] = await Promise.all([
     getLayer('body', look.body),
-    getLayer('hair', `${look.hair_style}-${look.hair_color}`),
+    getLayer('head', look.body),
+    getWrinkles(look),
+    getLayer('eyes', look.eye_color),
+    getBeard(look),
+    getMustache(look),
+    getHair(look),
     getLayer('shirt', `${look.shirt_style}-${look.shirt_color}`),
     getLayer('pants', look.pants_color),
+    getShoes(look),
+    getWrist(look),
   ]);
 
   const frames = [1, 2, 3, 4, 5, 6, 7, 8];
   let tick = 0;
-  // offscreen 32×36 用來 composite + face overlay
-  const off = document.createElement('canvas');
-  off.width = 32; off.height = 36;
-  const offCtx = off.getContext('2d');
-  offCtx.imageSmoothingEnabled = false;
   function frame() {
     const f = frames[Math.floor(tick / 6) % frames.length];
-    offCtx.clearRect(0, 0, 32, 36);
-    for (const layer of [body, pants, shirt, hair]) {
-      offCtx.drawImage(layer, f * 64, 640 + 28, 32, 36, 0, 0, 32, 36);
+    ctx.clearRect(0, 0, SW * SCALE, SH * SCALE);
+    // 圖層順序：body → pants → shoes → shirt → cuffs → head → wrinkles → eyes → beard → mustache → hair
+    for (const layer of [body, pants, shoes, shirt, wrist, head, wrinkles, eyes, beard, mustache, hair]) {
+      if (layer) ctx.drawImage(layer, f * 64 + SX_OFFSET, WALK_RIGHT_Y + SY_OFFSET, SW, SH, 0, 0, SW * SCALE, SH * SCALE);
     }
-    // face overlay 只在 idle / down 方向才畫（走路時臉部會跟著動偏，這版簡單處理）
-    drawFaceOverlay(offCtx, look.face);
-    ctx.clearRect(0, 0, 32 * SCALE, 36 * SCALE);
-    ctx.drawImage(off, 0, 0, 32, 36, 0, 0, 32 * SCALE, 36 * SCALE);
     tick++;
     walkAnimId = requestAnimationFrame(frame);
   }
@@ -453,10 +443,17 @@ async function buildOption(containerId, category, items, isColor) {
     div.className = isColor ? 'swatch' : 'opt';
     div.dataset[category] = item;
     if (isColor) {
-      div.style.background = COLOR_HEX[item] || '#888';
+      if (item === 'none') {
+        // 「無」swatch：透明背景 + 對角紅線（表示「不戴」）
+        div.style.background =
+          'linear-gradient(135deg, transparent 45%, #c00 45%, #c00 55%, transparent 55%)';
+        div.title = '無';
+      } else {
+        div.style.background = COLOR_HEX[item] || '#888';
+      }
     } else {
       const cv = document.createElement('canvas');
-      cv.width = 32; cv.height = 36;
+      cv.width = 32; cv.height = 40;
       div.appendChild(cv);
       const label = document.createElement('div');
       label.className = 'opt-label';
@@ -466,25 +463,28 @@ async function buildOption(containerId, category, items, isColor) {
       setTimeout(async () => {
         const ctx = cv.getContext('2d');
         ctx.imageSmoothingEnabled = false;
-        // Compose default with this option swapped
         const tempLook = { ...state, [category]: item };
         try {
-          const [body, hair, shirt, pants] = await Promise.all([
+          const [body, head, wrinkles, eyes, beard, mustache, hair, shirt, pants, wrist] = await Promise.all([
             getLayer('body', tempLook.body),
-            getLayer('hair', `${tempLook.hair_style}-${tempLook.hair_color}`),
+            getLayer('head', tempLook.body),
+            getWrinkles(tempLook),
+            getLayer('eyes', tempLook.eye_color),
+            getBeard(tempLook),
+            getMustache(tempLook),
+            getHair(tempLook),
             getLayer('shirt', `${tempLook.shirt_style}-${tempLook.shirt_color}`),
             getLayer('pants', tempLook.pants_color),
+            getWrist(tempLook),
           ]);
-          // 縮圖：先在小 offscreen 32×36 合成、再縮到 32×36 顯示 canvas
           const tmp = document.createElement('canvas');
-          tmp.width = 32; tmp.height = 36;
+          tmp.width = 32; tmp.height = 40;
           const tctx = tmp.getContext('2d');
           tctx.imageSmoothingEnabled = false;
-          for (const layer of [body, pants, shirt, hair]) {
-            tctx.drawImage(layer, 16, 640 + 28, 32, 36, 0, 0, 32, 36);
+          for (const layer of [body, pants, shirt, wrist, head, wrinkles, eyes, beard, mustache, hair]) {
+            if (layer) tctx.drawImage(layer, 16, 640 + 4, 32, 40, 0, 0, 32, 40);
           }
-          drawFaceOverlay(tctx, tempLook.face);
-          ctx.clearRect(0, 0, 32, 36);
+          ctx.clearRect(0, 0, 32, 40);
           ctx.drawImage(tmp, 0, 0);
         } catch (e) {}
       }, 0);
@@ -497,27 +497,39 @@ async function buildOption(containerId, category, items, isColor) {
 
 async function init() {
   await buildOption('opt-body', 'body', manifest.bodies);
+  await buildOption('opt-eye-color', 'eye_color', manifest.eye_colors, true);
+  await buildOption('opt-wrinkles', 'wrinkles', manifest.wrinkle_options);
   await buildOption('opt-hair-style', 'hair_style', manifest.hair_styles);
   await buildOption('opt-hair-color', 'hair_color', manifest.hair_colors, true);
+  await buildOption('opt-beard-style', 'beard_style', manifest.beard_styles);
+  await buildOption('opt-mustache-style', 'mustache_style', manifest.mustache_styles);
+  await buildOption('opt-beard-color', 'beard_color', manifest.beard_colors, true);
   await buildOption('opt-shirt-style', 'shirt_style', manifest.shirt_styles);
   await buildOption('opt-shirt-color', 'shirt_color',
     [...new Set([...manifest.shirt_colors_short, ...manifest.shirt_colors_sleeve])], true);
   await buildOption('opt-pants-color', 'pants_color', manifest.pants_colors, true);
-  await buildOption('opt-face', 'face', FACE_VARIANTS);
+  await buildOption('opt-shoe-color', 'shoe_color', manifest.shoe_colors, true);
+  await buildOption('opt-wrist-color', 'wrist_color', manifest.wrist_colors, true);
   rerender();
 }
 
 function randomize() {
   const pick = a => a[Math.floor(Math.random() * a.length)];
   state.body = pick(manifest.bodies);
+  state.eye_color = pick(manifest.eye_colors);
+  state.wrinkles = Math.random() < 0.1 ? 'on' : 'none';     // 老將比例 ~10%
   state.hair_style = pick(manifest.hair_styles);
   state.hair_color = pick(manifest.hair_colors);
+  state.beard_style = Math.random() < 0.1 ? pick(manifest.beard_styles.filter(s => s !== 'none')) : 'none';
+  state.mustache_style = Math.random() < 0.05 ? pick(manifest.mustache_styles.filter(s => s !== 'none')) : 'none';
+  state.beard_color = pick(manifest.beard_colors);
   state.shirt_style = pick(manifest.shirt_styles);
   state.shirt_color = state.shirt_style === 'shortsleeve'
     ? pick(manifest.shirt_colors_short)
     : pick(manifest.shirt_colors_sleeve);
   state.pants_color = pick(manifest.pants_colors);
-  state.face = pick(FACE_VARIANTS);
+  state.shoe_color = pick(manifest.shoe_colors.filter(c => c !== 'none'));
+  state.wrist_color = Math.random() < 0.3 ? pick(manifest.wrist_colors.filter(c => c !== 'none')) : 'none';
   Object.keys(state).forEach(k => {
     document.querySelectorAll(`[data-${k}]`).forEach(el => {
       el.classList.toggle('sel', el.dataset[k] === state[k]);
