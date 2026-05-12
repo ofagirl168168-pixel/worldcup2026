@@ -85,6 +85,13 @@ if (!TOKEN || !CHAT_ID) {
 
 const API = `https://api.telegram.org/bot${TOKEN}`;
 
+// ─── Session token ────────────────────────────────────────────
+// 每個 opinion-telegram 啟動時自己一組 4 碼 token，烤進每個 button 的 callback_data
+// 用途：同時跑兩個 process（如 7am 明日題 + 2pm 熱點題）會共用同一個 bot token，
+// 兩邊 getUpdates 都會收到同一個 callback。token 確保每個 process 只處理自己送出的按鈕，
+// 避免「按 7am 那題的 換下一題、卻冒出 2pm 的候選」這種錯亂。
+const SESSION = Math.random().toString(36).slice(2, 6); // 4 碼，足夠區分
+
 // Supabase（用來在 callback 直通時更新 user_feedback / opinion_comments）
 const SUPA_URL = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -215,11 +222,11 @@ async function sendCandidate(candidate, idx, total) {
     reply_markup: {
       inline_keyboard: [
         [
-          { text: '✅ 使用這題', callback_data: `use:${idx}` },
-          { text: '➡️ 換下一題', callback_data: `next:${idx}` },
+          { text: '✅ 使用這題', callback_data: `use:${SESSION}:${idx}` },
+          { text: '➡️ 換下一題', callback_data: `next:${SESSION}:${idx}` },
         ],
         [
-          { text: '❌ 全部取消', callback_data: `cancel:${idx}` },
+          { text: '❌ 全部取消', callback_data: `cancel:${SESSION}:${idx}` },
         ],
       ],
     },
@@ -288,6 +295,7 @@ async function main() {
     process.exit(1);
   }
   writeLock();
+  console.log(`🪪 SESSION=${SESSION} pid=${process.pid}（按鈕 callback_data 會綁這 token，多個 process 共存時不會錯認）`);
   const rawCandidates = JSON.parse(fs.readFileSync(candidatesPath, 'utf8'));
   if (!Array.isArray(rawCandidates) || !rawCandidates.length) {
     console.error('❌ 候選題檔案格式錯誤或空的');
@@ -356,7 +364,23 @@ async function main() {
       const dataStr = cb.data || '';
       const parts = dataStr.split(':');
       const action = parts[0];
-      const idxStr = parts[1];
+
+      // ─── Session 過濾 ───
+      // use/next/cancel 格式：action:SESSION:idx
+      // 兩個 process 共用 bot token → getUpdates 雙方都會看到所有 callback。
+      // SESSION 不對 → 跳過（不 ack、不處理），由 SESSION 相符的 process 處理。
+      // offset 仍正常前進 — Telegram 長輪詢機制下，兩個 process 幾乎同時拿到 update，
+      // 所以「正主」那一邊也會看到並處理。
+      const OWN_ACTIONS = new Set(['use', 'next', 'cancel']);
+      if (OWN_ACTIONS.has(action)) {
+        const tok = parts[1];
+        if (tok !== SESSION) {
+          console.log(`⏭️ 忽略他人 callback（session ${tok} ≠ 本 ${SESSION}）：${dataStr}`);
+          continue;
+        }
+      }
+
+      const idxStr = OWN_ACTIONS.has(action) ? parts[2] : parts[1];
       const idx = parseInt(idxStr);
 
       // 回應 callback 避免轉圈
@@ -515,7 +539,7 @@ async function main() {
           message_id: cb.message.message_id,
           reply_markup: {
             inline_keyboard: [
-              [{ text: '✅ 使用這題', callback_data: `use:${idx}` }],
+              [{ text: '✅ 使用這題', callback_data: `use:${SESSION}:${idx}` }],
             ],
           },
         }).catch(() => {});
