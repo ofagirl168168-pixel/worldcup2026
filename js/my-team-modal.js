@@ -310,7 +310,7 @@
       submitBtn.disabled = true;
       submitBtn.textContent = '建立中…';
       try {
-        await window.MyTeam.create(nameInput.value, selectedCrest);
+        const created = await window.MyTeam.create(nameInput.value, selectedCrest);
         // 收下投擂台時預覽到的卡（自然流程）
         if (typeof window._mtConsumePreviewCards === 'function') {
           await window._mtConsumePreviewCards();
@@ -318,7 +318,11 @@
         // 切換到 hub
         renderHub();
         if (typeof showToast === 'function') {
-          showToast(`🎉 球隊「${nameInput.value.trim()}」建立成功！5 張抽券已送`);
+          showToast(`🎉 球隊「${nameInput.value.trim()}」建立成功！`);
+        }
+        // 新建隊 → 跑新手教學（starter_pack_claimed === false）
+        if (created && created.starter_pack_claimed === false) {
+          setTimeout(() => _showStarterPackIntro(), 500);
         }
       } catch (err) {
         console.error('[my-team] create error', err);
