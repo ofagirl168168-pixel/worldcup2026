@@ -430,29 +430,19 @@
     return ({ GK: '🧤', DEF: '🛡️', MID: '⚙️', FWD: '⚽' })[pos] || '⚽';
   }
 
-  // Phase 2.1+++：DiceBear `adventurer` 風格（RPG 角色 portrait、有清楚臉孔 + 髮型）
-  // LPC 在小尺寸臉部辨識度太差、改用 vector 卡通風更乾淨精美
-  const _DICEBEAR_BASE = 'https://api.dicebear.com/9.x/adventurer/svg';
+  // Phase 2.1++++：PIPOYA 32×32 RPG character（高品質、有清楚臉孔 + 4 方向走路 sprite）
+  // 卡片用 portrait (idle facing down)、比賽用 full sprite sheet 含走路動畫
+  // 同一張卡的角色 = 同一個 PIPOYA 角色（hash 指派、卡片與比賽一致）
   function _portraitUrlFor(cardId, rarity) {
-    const seed = encodeURIComponent(cardId || 'default');
-    // 稀有度漸層 bg（trading card 質感）
-    const bg = rarity === 'SSR' ? 'f0c040,ff8030'
-             : rarity === 'SR'  ? '9b87f5,6a4fcc'
-             :                    '506478,2a3340';
-    const params = [
-      `seed=${seed}`,
-      `backgroundColor=${bg}`,
-      'backgroundType=gradientLinear',
-      'backgroundRotation=180',
-      'radius=50',
-      'glassesProbability=20',
-      'earringsProbability=15',
-      'featuresProbability=30',
-      'size=256',
-    ].join('&');
-    return `${_DICEBEAR_BASE}?${params}`;
+    if (!cardId) return 'img/portraits/default.png';
+    return `img/portraits/${encodeURIComponent(cardId)}.png?v=4`;
+  }
+  function _spriteUrlFor(cardId) {
+    if (!cardId) return null;
+    return `img/sprites/${encodeURIComponent(cardId)}.png?v=4`;
   }
   window.MyTeamPortrait = _portraitUrlFor;
+  window.MyTeamSprite = _spriteUrlFor;
 
   function escapeHtml(s) {
     return String(s == null ? '' : s)

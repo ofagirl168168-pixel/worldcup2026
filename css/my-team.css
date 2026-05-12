@@ -969,7 +969,9 @@
   display: block;
   object-fit: cover;
   object-position: center center;
-  /* DiceBear adventurer 是 vector SVG，不要強制 pixelated 否則模糊 */
+  /* PIPOYA 是 32×32 pixel art，要 pixelated 才能放大保持銳利 */
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 .mt-gacha-front-portrait-pos {
   position: absolute;

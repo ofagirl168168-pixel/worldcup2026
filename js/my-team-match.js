@@ -44,10 +44,12 @@
     return {
       nameCN: team.team_name,
       flag: team.team_crest,
+      // Phase 2.2+ 傳 card_id 給 match-sim、用來 lookup PIPOYA sprite
       keyPlayers: starters.slice(0, 11).map(p => ({
         name: p.card?.name || '?',
         pos: p.card?.position || 'MID',
         club: team.team_name,
+        card_id: p.card?.card_id || p.card_id,
       })),
       radar: {
         attack:     avg('current_attack'),
@@ -57,6 +59,20 @@
         experience: Math.min(95, 50 + (team.stadium_level - 1) * 5),
       },
     };
+  }
+
+  // 為 AI 對手生成 11 個 fake card_id（依 seed 穩定）
+  function _generateAIPlayers(seed) {
+    // 從常見 R/SR 系列 hash 出 11 個
+    const r = _rng(seed);
+    const out = [];
+    const series = ['r-fwd', 'r-mid', 'r-def', 'r-gk', 'sr-fwd', 'sr-mid', 'sr-def'];
+    for (let i = 0; i < 11; i++) {
+      const s = series[Math.floor(r() * series.length)];
+      const num = String(1 + Math.floor(r() * 100)).padStart(3, '0');
+      out.push({ name: 'AI Player', pos: 'MID', club: 'AI', card_id: `${s}-${num}` });
+    }
+    return out;
   }
 
   // ── AI NPC 對手生成 ──
@@ -70,6 +86,7 @@
       nameCN: name,
       flag: '🏴',
       _isReal: false,
+      keyPlayers: _generateAIPlayers(tier * 1000 + matchIdx),
       radar: {
         attack:     roll(baseAvg),
         defense:    roll(baseAvg),
@@ -78,6 +95,23 @@
         experience: roll(baseAvg - 5),
       },
     };
+  }
+
+  function _attachAIPlayers(obj, seed) {
+    if (!obj.keyPlayers || obj.keyPlayers.length < 11) {
+      obj.keyPlayers = _generateAIPlayers(seed);
+    } else {
+      // 真實隊伍的 keyPlayers 沒有 card_id、補上
+      const aiSet = _generateAIPlayers(seed);
+      obj.keyPlayers = obj.keyPlayers.slice(0, 11).map((kp, i) => ({
+        ...kp,
+        card_id: kp.card_id || aiSet[i].card_id,
+      }));
+      while (obj.keyPlayers.length < 11) {
+        obj.keyPlayers.push(aiSet[obj.keyPlayers.length]);
+      }
+    }
+    return obj;
   }
 
   // ── 真實隊伍對手生成（從站內 EPL / UCL）──
@@ -99,7 +133,7 @@
     const rand = _rng(tier * 7000 + matchIdx);
     const candidates = pool.slice(0, sliceEnd);
     const team = candidates[Math.floor(rand() * candidates.length)];
-    return {
+    const obj = {
       nameCN: team.nameCN || team.name,
       flag: team.flag || '🏴',
       keyPlayers: team.keyPlayers || [],
@@ -107,6 +141,7 @@
       _origRadar: team.radar,
       radar: team.radar,
     };
+    return _attachAIPlayers(obj, tier * 7000 + matchIdx + 999);
   }
 
   // ── 抽對手（依 tier 機率混合 NPC / Real）──

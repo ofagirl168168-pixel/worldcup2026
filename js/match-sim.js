@@ -174,52 +174,74 @@
       ctx.fillRect(0, 0, PITCH_W, PITCH_H);
     }
 
-    // 球員 — Phase 2.2 pixel sprite（12×16 chibi，2-frame walk cycle）
+    // 球員 — Phase 2.2++ PIPOYA 32×32 RPG sprite per-player
+    // 每張卡 = 一個 PIPOYA 角色，4 方向走路 + 動畫
     ctx.imageSmoothingEnabled = false;
+    const SPRITE_DRAW_W = 22;   // pitch 320 寬、22px chibi 容易看到
+    const SPRITE_DRAW_H = 22;
+    const FRAME_PX = 32;        // PIPOYA frame = 32×32
     players.forEach((p, i) => {
       const isPos = i === possessorIdx;
-      const isGK = p.role === 'GK';
-      const sprite = _getSprite(p.team, isGK);
-      // 是否在走（移動距離大才動腳）
-      const movingAmt = Math.abs((p.tx || p.x) - p.x) + Math.abs((p.ty || p.y) - p.y);
-      const moving = movingAmt > 0.0005;
-      const frame = moving ? (Math.floor(_renderTick / 5) % 2) : 0;
-      // 朝向（往右 = 預設、往左 flip）
-      const facingRight = ((p.tx || p.x) - p.x) >= -0.0001;
       const cx = p.x * PITCH_W;
       const cy = p.y * PITCH_H;
-      const dx = Math.round(cx - _SPRITE_W / 2);
-      const dy = Math.round(cy - _SPRITE_H / 2);
 
-      // possessor 腳下圓影做提示
+      // 判斷朝向：先比較 ty 變化（南北），再比較 tx 變化（東西）
+      const dyMov = (p.ty || p.y) - p.y;
+      const dxMov = (p.tx || p.x) - p.x;
+      const movingAmt = Math.abs(dxMov) + Math.abs(dyMov);
+      const moving = movingAmt > 0.0005;
+      // PIPOYA row 順序：0=down, 1=left, 2=right, 3=up
+      let dirRow;
+      if (Math.abs(dyMov) > Math.abs(dxMov)) {
+        dirRow = dyMov > 0 ? 0 : 3;  // y 增 = 往下、y 減 = 往上
+      } else {
+        dirRow = dxMov < 0 ? 1 : 2;  // x 減 = 往左、x 增 = 往右
+      }
+      // 走路 3 frames: 0 左腳 / 1 idle / 2 右腳
+      const frame = moving ? (Math.floor(_renderTick / 8) % 3) : 1;
+
+      // possessor 腳下白光圓影
       if (isPos) {
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
         ctx.beginPath();
-        ctx.ellipse(cx, cy + _SPRITE_H / 2 - 1, 6, 2.5, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx, cy + SPRITE_DRAW_H / 2 - 1, 8, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.beginPath();
+        ctx.ellipse(cx, cy + SPRITE_DRAW_H / 2 - 1, 5, 1.8, 0, 0, Math.PI * 2);
         ctx.fill();
       }
-      // 一般球員陰影
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+
+      // 隊伍識別小色圈（左上角小角標）
+      const teamColor = p.team === 'h' ? '#2196f3' : '#e53935';
+      ctx.fillStyle = teamColor;
       ctx.beginPath();
-      ctx.ellipse(cx, cy + _SPRITE_H / 2 - 1, 4, 1.5, 0, 0, Math.PI * 2);
+      ctx.arc(cx - SPRITE_DRAW_W / 2 + 2, cy - SPRITE_DRAW_H / 2 + 2, 2, 0, Math.PI * 2);
       ctx.fill();
 
-      if (facingRight) {
-        ctx.drawImage(sprite, frame * _SPRITE_W, 0, _SPRITE_W, _SPRITE_H, dx, dy, _SPRITE_W, _SPRITE_H);
+      // 取 sprite sheet 並 drawImage
+      const sheet = state.spriteCache?.get(p.card_id);
+      if (sheet && sheet.complete && sheet.naturalWidth > 0) {
+        const srcX = frame * FRAME_PX;
+        const srcY = dirRow * FRAME_PX;
+        const dx = Math.round(cx - SPRITE_DRAW_W / 2);
+        const dy = Math.round(cy - SPRITE_DRAW_H / 2);
+        ctx.drawImage(sheet, srcX, srcY, FRAME_PX, FRAME_PX, dx, dy, SPRITE_DRAW_W, SPRITE_DRAW_H);
       } else {
-        ctx.save();
-        ctx.translate(dx + _SPRITE_W, dy);
-        ctx.scale(-1, 1);
-        ctx.drawImage(sprite, frame * _SPRITE_W, 0, _SPRITE_W, _SPRITE_H, 0, 0, _SPRITE_W, _SPRITE_H);
-        ctx.restore();
+        // fallback: 簡單色圈（sprite 還沒載入完成）
+        ctx.fillStyle = teamColor;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+        ctx.fill();
       }
 
-      // possessor 加白色光暈邊框（用 1px 偏移 stroke 模擬 outline）
+      // possessor 額外白圈
       if (isPos) {
         ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(cx, cy, _SPRITE_W * 0.7, 0, Math.PI * 2);
+        ctx.arc(cx, cy, SPRITE_DRAW_W * 0.65, 0, Math.PI * 2);
         ctx.stroke();
       }
     });
@@ -317,10 +339,35 @@
       yJitter: (rng() - 0.5) * 0.025,
       laziness: 0.78 + rng() * 0.44, // 0.78 ~ 1.22
     });
+    // Phase 2.2+：assign card_id per player（PIPOYA sprite 用）
+    // home/away.keyPlayers[i].card_id 是 my-team-match 帶來的
+    // 沒帶就 hash(隊名+i) 產 fallback id
+    function _cardIdFor(teamData, idx) {
+      const kp = teamData.keyPlayers && teamData.keyPlayers[idx];
+      if (kp && kp.card_id) return kp.card_id;
+      // fallback: 用 ssr-mufeimui-01 ~ r-fwd-150 中的某張當佔位
+      const seed = (teamData.nameCN || '') + ':' + idx;
+      let h = 0;
+      for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+      // 簡單用 r-mid-* 系列當 placeholder
+      return 'r-mid-' + String(71 + (h % 45)).padStart(3, '0');
+    }
     const players = [
-      ...hF.map(p => ({ ...p, team: 'h', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y, flair: makeFlair() })),
-      ...aF.map(p => ({ ...p, team: 'a', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y, flair: makeFlair() })),
+      ...hF.map((p, i) => ({ ...p, team: 'h', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y, flair: makeFlair(), card_id: _cardIdFor(home, i) })),
+      ...aF.map((p, i) => ({ ...p, team: 'a', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y, flair: makeFlair(), card_id: _cardIdFor(away, i) })),
     ];
+
+    // Phase 2.2+：preload PIPOYA sprite sheets per player
+    const _matchSpriteCache = new Map();
+    for (const p of players) {
+      if (p.card_id && !_matchSpriteCache.has(p.card_id)) {
+        const img = new Image();
+        img.src = (typeof window.MyTeamSprite === 'function')
+          ? window.MyTeamSprite(p.card_id)
+          : `img/sprites/${p.card_id}.png`;
+        _matchSpriteCache.set(p.card_id, img);
+      }
+    }
     const ball = { x: 0.5, y: 0.5 };
 
     // 速度倍率（0.5x / 1x / 2x）— accumulator 在下方 tick() 內處理
@@ -334,6 +381,7 @@
 
     // 比賽狀態
     const state = {
+      spriteCache: _matchSpriteCache,  // Phase 2.2+：每球員的 PIPOYA sprite
       possession: 'h',       // 'h' | 'a'
       possessorIdx: -1,      // index into players[]
       phase: 'kickoff',      // 'kickoff' | 'dribble' | 'pass' | 'shoot' | 'celebrate' | 'halftime'
