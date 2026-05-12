@@ -231,15 +231,20 @@
           <div class="mt-gacha-pack-title">${escapeHtml(options.title || '🎰 球員召喚')}</div>
           ${options.subtitle ? `<div class="mt-gacha-pack-sub">${escapeHtml(options.subtitle)}</div>` : ''}
         </div>
-        <div class="mt-gacha-pack-stack" id="mt-gacha-pack-stack">
-          ${cards.length >= 5 ? '<div class="mt-gacha-pack-card mt-gacha-pack-card-3"></div>' : ''}
-          ${cards.length >= 2 ? '<div class="mt-gacha-pack-card mt-gacha-pack-card-2"></div>' : ''}
-          <div class="mt-gacha-pack-card mt-gacha-pack-card-1">
-            <div class="mt-gacha-back-pattern"></div>
-            <div class="mt-gacha-back-emblem">⚽</div>
+        <div class="mt-gacha-pack-3d" id="mt-gacha-pack-3d">
+          <div class="mt-gacha-pack-aurora"></div>
+          <div class="mt-gacha-pack-stack" id="mt-gacha-pack-stack">
+            ${cards.length >= 5 ? '<div class="mt-gacha-pack-card mt-gacha-pack-card-3"></div>' : ''}
+            ${cards.length >= 2 ? '<div class="mt-gacha-pack-card mt-gacha-pack-card-2"></div>' : ''}
+            <div class="mt-gacha-pack-card mt-gacha-pack-card-1">
+              <div class="mt-gacha-back-pattern"></div>
+              <div class="mt-gacha-back-emblem">⚽</div>
+              <div class="mt-gacha-pack-shine"></div>
+            </div>
           </div>
+          <div class="mt-gacha-pack-glow"></div>
+          <div class="mt-gacha-pack-sparks" id="mt-gacha-pack-sparks"></div>
         </div>
-        <div class="mt-gacha-pack-glow"></div>
         <div class="mt-gacha-pack-cta">
           <span class="mt-gacha-pack-finger">👆</span>
           <span>點擊召喚${cards.length > 1 ? ` ${cards.length} 張球員` : ''}</span>
@@ -299,10 +304,64 @@
       const flipPrompt = overlay.querySelector('#mt-gacha-flip-prompt');
       const flipBtn = overlay.querySelector('#mt-gacha-flip-btn');
 
+      // ── Stage 0：神秘 hover 互動（3D 跟隨滑鼠 + 火花粒子）──
+      const pack3D = overlay.querySelector('#mt-gacha-pack-3d');
+      const sparks = overlay.querySelector('#mt-gacha-pack-sparks');
+      let sparkTimer = null;
+
+      function emitSpark(x, y) {
+        const s = document.createElement('i');
+        s.className = 'mt-gacha-spark';
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 40 + Math.random() * 60;
+        s.style.setProperty('--sx', (x || 0) + 'px');
+        s.style.setProperty('--sy', (y || 0) + 'px');
+        s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+        s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+        const hues = ['#f0c040', '#9b87f5', '#ff6b9d', '#5eead4'];
+        s.style.background = hues[Math.floor(Math.random() * hues.length)];
+        sparks.appendChild(s);
+        setTimeout(() => s.remove(), 900);
+      }
+
+      pack.addEventListener('mouseenter', () => {
+        pack.classList.add('hovering');
+        // 火花持續噴
+        if (sparkTimer) return;
+        sparkTimer = setInterval(() => {
+          const rect = pack3D.getBoundingClientRect();
+          const px = rect.width * (0.3 + Math.random() * 0.4);
+          const py = rect.height * (0.3 + Math.random() * 0.4);
+          emitSpark(px, py);
+        }, 90);
+      });
+      pack.addEventListener('mouseleave', () => {
+        pack.classList.remove('hovering');
+        if (sparkTimer) { clearInterval(sparkTimer); sparkTimer = null; }
+        pack3D.style.transform = '';
+      });
+      pack.addEventListener('mousemove', (e) => {
+        const rect = pack3D.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = (e.clientX - cx) / rect.width;   // -0.5 ~ 0.5
+        const dy = (e.clientY - cy) / rect.height;
+        // 反向傾斜（朝滑鼠靠近的感覺）
+        const rotY = dx * 18;
+        const rotX = -dy * 18;
+        pack3D.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+      });
+
       // Stage 0：等用戶點卡包
       pack.addEventListener('click', () => {
         if (pack.classList.contains('opening')) return;
         pack.classList.add('opening');
+        if (sparkTimer) { clearInterval(sparkTimer); sparkTimer = null; }
+        // 點下去爆一波火花
+        for (let i = 0; i < 24; i++) {
+          const rect = pack3D.getBoundingClientRect();
+          emitSpark(rect.width / 2, rect.height / 2);
+        }
         // 卡包散開動畫 → 600ms → 切到 Stage 1
         setTimeout(() => {
           pack.style.display = 'none';

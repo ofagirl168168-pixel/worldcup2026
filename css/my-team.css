@@ -738,16 +738,15 @@
 .mt-gacha-overlay[data-peak="SSR"] { background: radial-gradient(ellipse at center, #3a1a05 0%, #1a0a02 70%, #000 100%); }
 
 /* ─── 星空背景 ─── */
-/* ── Stage 0：卡包互動 ── */
+/* ── Stage 0：卡包互動（神秘 hover + 3D 跟隨滑鼠）── */
 .mt-gacha-pack {
   position: relative;
   display: flex; flex-direction: column; align-items: center;
   cursor: pointer;
   z-index: 2;
-  transition: transform 0.4s ease, opacity 0.4s ease;
+  perspective: 800px;
   animation: mt-pack-float 2.6s ease-in-out infinite;
 }
-.mt-gacha-pack:hover { transform: scale(1.04); }
 .mt-gacha-pack.opening {
   animation: mt-pack-burst 0.6s ease-out forwards;
 }
@@ -770,15 +769,29 @@
 .mt-gacha-pack-sub {
   font-size: 13px; color: rgba(255,255,255,0.8); margin-top: 4px;
 }
-.mt-gacha-pack-stack {
+
+/* 3D 容器：JS 控 transform 跟滑鼠 */
+.mt-gacha-pack-3d {
   position: relative;
   width: 140px; height: 200px;
+  transform-style: preserve-3d;
+  transition: transform 0.18s ease-out;
+}
+.mt-gacha-pack.hovering .mt-gacha-pack-3d {
+  transition: transform 0.05s linear;
+}
+
+.mt-gacha-pack-stack {
+  position: relative; width: 100%; height: 100%;
+  transform-style: preserve-3d;
 }
 .mt-gacha-pack-card {
   position: absolute; inset: 0; border-radius: 12px;
   background: linear-gradient(135deg, #2a1855 0%, #1a1a2e 100%);
   border: 3px solid #f0c040;
   box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 30px rgba(240,192,64,0.3);
+  overflow: hidden;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 .mt-gacha-pack-card-1 {
   display: flex; align-items: center; justify-content: center;
@@ -792,6 +805,17 @@
   transform: translate(-8px, 16px) rotate(-5deg);
   z-index: 1; opacity: 0.7;
 }
+/* hover 時牌散開 */
+.mt-gacha-pack.hovering .mt-gacha-pack-card-2 {
+  transform: translate(22px, 4px) rotate(10deg);
+}
+.mt-gacha-pack.hovering .mt-gacha-pack-card-3 {
+  transform: translate(-22px, 18px) rotate(-12deg);
+}
+.mt-gacha-pack.hovering .mt-gacha-pack-card {
+  box-shadow: 0 14px 40px rgba(0,0,0,0.7), 0 0 60px rgba(240,192,64,0.9);
+}
+
 .mt-gacha-pack[data-rarity="SSR"] .mt-gacha-pack-card { border-color: #f0c040; box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 50px rgba(240,192,64,0.6); }
 .mt-gacha-pack[data-rarity="SR"]  .mt-gacha-pack-card { border-color: #9b87f5; box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 40px rgba(155,135,245,0.5); }
 .mt-gacha-pack-card .mt-gacha-back-pattern {
@@ -803,6 +827,53 @@
 .mt-gacha-pack-card .mt-gacha-back-emblem {
   font-size: 48px; opacity: 0.9; position: relative; z-index: 2;
 }
+
+/* 卡面光澤（hover 才出現、橫過卡面）*/
+.mt-gacha-pack-shine {
+  position: absolute; inset: 0;
+  background: linear-gradient(115deg,
+    transparent 25%,
+    rgba(255,255,255,0.05) 40%,
+    rgba(255,255,255,0.35) 50%,
+    rgba(255,255,255,0.05) 60%,
+    transparent 75%);
+  transform: translateX(-100%);
+  pointer-events: none;
+  z-index: 4;
+}
+.mt-gacha-pack.hovering .mt-gacha-pack-shine {
+  animation: mt-pack-shine 1.4s ease-in-out infinite;
+}
+@keyframes mt-pack-shine {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(120%); }
+}
+
+/* 極光環（hover 強化）*/
+.mt-gacha-pack-aurora {
+  position: absolute; inset: -50px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg,
+    rgba(240,192,64,0.4),
+    rgba(155,135,245,0.4),
+    rgba(94,234,212,0.4),
+    rgba(255,107,157,0.4),
+    rgba(240,192,64,0.4));
+  filter: blur(30px);
+  opacity: 0.3;
+  z-index: -2;
+  animation: mt-aurora-rot 8s linear infinite;
+  pointer-events: none;
+  transition: opacity 0.3s, filter 0.3s;
+}
+.mt-gacha-pack.hovering .mt-gacha-pack-aurora {
+  opacity: 0.8;
+  filter: blur(22px);
+}
+@keyframes mt-aurora-rot {
+  to { transform: rotate(360deg); }
+}
+
 .mt-gacha-pack-glow {
   position: absolute; inset: -40px;
   border-radius: 50%;
@@ -810,11 +881,37 @@
   z-index: -1;
   animation: mt-pack-glow-pulse 2.4s ease-in-out infinite;
   pointer-events: none;
+  transition: opacity 0.3s;
+}
+.mt-gacha-pack.hovering .mt-gacha-pack-glow {
+  animation-duration: 1s;
+  opacity: 1.4;
 }
 @keyframes mt-pack-glow-pulse {
   0%, 100% { opacity: 0.5; transform: scale(1); }
   50%      { opacity: 1;   transform: scale(1.15); }
 }
+
+/* 火花粒子（JS 噴出）*/
+.mt-gacha-pack-sparks {
+  position: absolute; inset: 0; pointer-events: none;
+  z-index: 5;
+}
+.mt-gacha-spark {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  left: var(--sx);
+  top: var(--sy);
+  pointer-events: none;
+  box-shadow: 0 0 10px currentColor;
+  animation: mt-spark-fly 0.9s ease-out forwards;
+}
+@keyframes mt-spark-fly {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+}
+
 .mt-gacha-pack-cta {
   margin-top: 24px;
   display: flex; gap: 8px; align-items: center;
@@ -822,6 +919,12 @@
   border-radius: 24px; border: 1px solid rgba(240,192,64,0.5);
   color: #f0c040; font-weight: 800; font-size: 15px;
   animation: mt-pack-cta-blink 1.2s ease-in-out infinite;
+  transition: transform 0.2s, color 0.2s;
+}
+.mt-gacha-pack.hovering .mt-gacha-pack-cta {
+  transform: scale(1.08);
+  color: #fff;
+  border-color: #fff;
 }
 @keyframes mt-pack-cta-blink {
   0%, 100% { box-shadow: 0 0 8px rgba(240,192,64,0.3); }
