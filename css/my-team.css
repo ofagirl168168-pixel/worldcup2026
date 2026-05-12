@@ -460,7 +460,7 @@
   box-shadow: 0 0 14px rgba(155,135,245,0.4), 0 4px 14px rgba(0,0,0,0.5);
 }
 
-/* roster 卡片頭像 — Phase 2.1+ */
+/* roster 卡片頭像 — Phase 2.1++ LPC */
 .mt-player-portrait {
   position: relative;
   width: 80px; height: 80px;
@@ -468,13 +468,21 @@
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,0.2);
   overflow: hidden;
-  background: rgba(0,0,0,0.3);
+  background: radial-gradient(circle at center, #4a4060 0%, #1a1428 100%);
+}
+.mt-player-card.rarity-SR .mt-player-portrait {
+  background: radial-gradient(circle at center, #5a4a90 0%, #1f1545 100%);
+}
+.mt-player-card.rarity-SSR .mt-player-portrait {
+  background: radial-gradient(circle at center, #8a5520 0%, #2a1808 100%);
 }
 .mt-player-card.rarity-SR  .mt-player-portrait { border-color: #b5a4ff; box-shadow: 0 0 12px rgba(155,135,245,0.4); }
 .mt-player-card.rarity-SSR .mt-player-portrait { border-color: #ffd455; box-shadow: 0 0 14px rgba(240,192,64,0.55); }
 .mt-player-portrait-img {
   width: 100%; height: 100%;
   display: block;
+  object-fit: cover;
+  object-position: center 28%;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
@@ -935,7 +943,7 @@
   position: relative; z-index: 2;
 }
 
-/* 球員頭像 — Phase 2.1+：DiceBear pixel-art SVG，加大尺寸更精美 */
+/* 球員頭像 — Phase 2.1++：LPC pixel art 64×48（CC-BY-SA），稀有度漸層 bg */
 .mt-gacha-front-portrait {
   position: relative;
   width: 120px; height: 120px;
@@ -945,7 +953,13 @@
   overflow: hidden;
   box-shadow: 0 4px 14px rgba(0,0,0,0.5);
   z-index: 2;
-  background: rgba(0,0,0,0.3);
+  background: radial-gradient(circle at center, #4a4060 0%, #1a1428 100%);
+}
+.mt-gacha-card3d.rarity-SR .mt-gacha-front-portrait {
+  background: radial-gradient(circle at center, #5a4a90 0%, #1f1545 100%);
+}
+.mt-gacha-card3d.rarity-SSR .mt-gacha-front-portrait {
+  background: radial-gradient(circle at center, #8a5520 0%, #2a1808 100%);
 }
 .mt-gacha-card3d.rarity-SR  .mt-gacha-front-portrait { border-color: #b5a4ff; box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 0 18px rgba(155,135,245,0.5); }
 .mt-gacha-card3d.rarity-SSR .mt-gacha-front-portrait { border-color: #ffd455; box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 0 22px rgba(240,192,64,0.7); }
@@ -953,7 +967,9 @@
   width: 100%;
   height: 100%;
   display: block;
-  image-rendering: pixelated;   /* 保持 pixel art 銳利、不要插值平滑 */
+  object-fit: cover;             /* 4:3 LPC 圖在圓框中、cover 顯示頭+肩、裁掉兩側 */
+  object-position: center 28%;   /* 上半偏一點、確保頭部居於圓框中央 */
+  image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 .mt-gacha-front-portrait-pos {
