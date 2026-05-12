@@ -538,10 +538,12 @@
       const injured = (w.player.injured_until && new Date(w.player.injured_until) > now)
         ? '<span class="mt-pitch-injury">🏥</span>' : '';
       const SCALE = w.scale;
+      const SHEET_ROWS = 6;  // walk×4 + kick + stretch
+      const SHEET_COLS = 3;
       el.innerHTML = `
         <div class="mt-home-shadow"></div>
         <div class="mt-home-sprite" style="${w.sheetUrl
-          ? `background-image:url(${w.sheetUrl});width:${w.sheetW * SCALE}px;height:${w.sheetH * SCALE}px;background-size:${w.sheetW * SCALE * 3}px ${w.sheetH * SCALE * 4}px`
+          ? `background-image:url(${w.sheetUrl});width:${w.sheetW * SCALE}px;height:${w.sheetH * SCALE}px;background-size:${w.sheetW * SCALE * SHEET_COLS}px ${w.sheetH * SCALE * SHEET_ROWS}px`
           : `width:${32 * SCALE}px;height:${60 * SCALE}px;background:rgba(255,255,255,0.2)`}"></div>
         ${injured}
         <div class="mt-home-name">${escapeHtml(w.player.card?.name || '?')}</div>
