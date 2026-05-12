@@ -1,0 +1,402 @@
+/* my-team.css — 我的球隊系統樣式 */
+
+/* ───────── FAB 懸浮入口 ───────── */
+.mt-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 80px;            /* 避開底部 nav（行動版）*/
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
+  box-shadow: 0 4px 16px rgba(240,192,64,0.4), 0 2px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 9000;            /* 在 modal 之下、其他 UI 之上 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  line-height: 1;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  padding: 0;
+}
+.mt-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 22px rgba(240,192,64,0.6), 0 3px 12px rgba(0,0,0,0.4);
+}
+.mt-fab:active { transform: scale(0.95); }
+
+.mt-fab-crest {
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+}
+
+.mt-fab-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: #ff3030;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #1a1a2e;
+  box-shadow: 0 2px 6px rgba(255,48,48,0.5);
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .mt-fab {
+    right: 12px;
+    bottom: 92px;
+  }
+}
+
+/* ───────── 我的球隊 Modal 殼 ───────── */
+.mt-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 10500;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.mt-modal-overlay.open { opacity: 1; }
+
+.mt-modal {
+  width: 100%;
+  max-width: 560px;
+  background: linear-gradient(180deg, #1a1a2e 0%, #0d1224 100%);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-left: 1px solid rgba(240,192,64,0.2);
+  border-right: 1px solid rgba(240,192,64,0.2);
+}
+
+.mt-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 5;
+  transition: background 0.15s;
+}
+.mt-modal-close:hover { background: rgba(255,255,255,0.15); }
+
+/* ───────── Onboarding（建隊）─────────── */
+.mt-onboard {
+  padding: 60px 28px 40px;
+  text-align: center;
+  flex: 1;
+  overflow-y: auto;
+}
+.mt-onboard-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #f0c040;
+  margin-bottom: 8px;
+}
+.mt-onboard-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 30px;
+  line-height: 1.7;
+}
+.mt-onboard-section {
+  margin-bottom: 24px;
+  text-align: left;
+}
+.mt-onboard-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.mt-onboard-input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+.mt-onboard-input:focus {
+  border-color: #f0c040;
+  outline: none;
+  background: rgba(255,255,255,0.1);
+}
+
+.mt-crest-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+.mt-crest-cell {
+  aspect-ratio: 1;
+  border: 2px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mt-crest-cell:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
+.mt-crest-cell.sel {
+  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
+  border-color: rgba(255,255,255,0.5);
+  box-shadow: 0 0 0 2px rgba(240,192,64,0.4);
+}
+
+.mt-onboard-submit {
+  width: 100%;
+  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  color: #1a1a2e;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  margin-top: 16px;
+  box-shadow: 0 4px 14px rgba(240,192,64,0.3);
+  transition: transform 0.1s;
+}
+.mt-onboard-submit:hover { transform: translateY(-1px); }
+.mt-onboard-submit:disabled {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.4);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.mt-onboard-gift {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #f0c040;
+  text-align: center;
+}
+
+/* ───────── Hub（球隊管理）─────────── */
+.mt-hub-header {
+  padding: 50px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.mt-hub-team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.mt-hub-team-crest {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.mt-hub-team-info { flex: 1; min-width: 0; }
+.mt-hub-team-name {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mt-hub-team-meta {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+}
+
+.mt-hub-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.mt-hub-stat {
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 8px 6px;
+  text-align: center;
+}
+.mt-hub-stat-icon { font-size: 18px; }
+.mt-hub-stat-val {
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+  margin-top: 2px;
+}
+.mt-hub-stat-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+.mt-hub-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  overflow-x: auto;
+}
+.mt-hub-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  padding: 14px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.mt-hub-tab.active {
+  color: #f0c040;
+  border-bottom-color: #f0c040;
+}
+
+.mt-hub-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 40px;
+}
+
+/* ───────── 球員 roster tab ───────── */
+.mt-roster-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255,255,255,0.5);
+}
+.mt-roster-empty-icon { font-size: 64px; margin-bottom: 12px; }
+.mt-roster-empty-cta {
+  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  color: #1a1a2e;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.mt-roster-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.mt-player-card {
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mt-player-card:hover {
+  background: rgba(255,255,255,0.08);
+  transform: translateY(-1px);
+}
+.mt-player-card.rarity-SSR {
+  border-color: rgba(240,192,64,0.5);
+  background: linear-gradient(135deg, rgba(240,192,64,0.1), rgba(255,255,255,0.04));
+}
+.mt-player-card.rarity-SR {
+  border-color: rgba(155,135,245,0.4);
+  background: linear-gradient(135deg, rgba(155,135,245,0.08), rgba(255,255,255,0.04));
+}
+.mt-player-card-rarity {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.mt-player-card.rarity-SSR .mt-player-card-rarity { background: #f0c040; color: #1a1a2e; }
+.mt-player-card.rarity-SR .mt-player-card-rarity { background: #9b87f5; color: #fff; }
+.mt-player-card.rarity-R .mt-player-card-rarity { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+
+.mt-player-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 36px;
+}
+.mt-player-position {
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 6px;
+}
+.mt-player-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  font-size: 10px;
+}
+.mt-player-stat {
+  background: rgba(0,0,0,0.2);
+  border-radius: 4px;
+  padding: 3px 4px;
+  text-align: center;
+  color: rgba(255,255,255,0.8);
+}
+.mt-player-stat b { color: #f0c040; }
+.mt-player-starting-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: #4caf50;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+/* ───────── tab 內各區共用提示 ───────── */
+.mt-tab-todo {
+  text-align: center;
+  padding: 80px 20px;
+  color: rgba(255,255,255,0.4);
+  font-size: 14px;
+}
+.mt-tab-todo-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
