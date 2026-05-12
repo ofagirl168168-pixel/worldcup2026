@@ -272,14 +272,20 @@
     // 渲染卡片格
     const grid = document.createElement('div');
     grid.className = 'mt-roster-grid';
+    const posEmoji = { GK: '🧤', DEF: '🛡️', MID: '⚙️', FWD: '⚽' };
     players.forEach(p => {
       const c = p.card || {};
       const rarityClass = c.rarity ? `rarity-${c.rarity}` : '';
       const card = document.createElement('div');
       card.className = `mt-player-card ${rarityClass}`;
+      const portrait = (typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id) : '👤';
       card.innerHTML = `
         ${p.in_starting_11 ? '<span class="mt-player-starting-badge">先發</span>' : ''}
         <span class="mt-player-card-rarity">${c.rarity || 'R'}</span>
+        <div class="mt-player-portrait">
+          <span class="mt-player-portrait-emoji">${portrait}</span>
+          <span class="mt-player-portrait-pos">${posEmoji[c.position] || '⚽'}</span>
+        </div>
         <div class="mt-player-name">${escapeHtml(c.name || '?')}</div>
         <div class="mt-player-position">${c.position || ''} · Lv.${p.level}${p.bond ? ' ★'.repeat(p.bond) : ''}</div>
         <div class="mt-player-stats">

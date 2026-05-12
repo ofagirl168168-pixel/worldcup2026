@@ -357,7 +357,10 @@
             <span class="mt-gacha-front-rarity-badge">${card.rarity}</span>
             <span class="mt-gacha-front-stars">${stars}</span>
           </div>
-          <div class="mt-gacha-front-emoji">${_emojiFor(card.position)}</div>
+          <div class="mt-gacha-front-portrait">
+            <span class="mt-gacha-front-portrait-emoji">${_portraitFor(card.card_id)}</span>
+            <span class="mt-gacha-front-portrait-pos">${_emojiFor(card.position)}</span>
+          </div>
           <div class="mt-gacha-front-name">${escapeHtml(card.name)}</div>
           ${card.nickname ? `<div class="mt-gacha-front-nick">${escapeHtml(card.nickname)}</div>` : ''}
           <div class="mt-gacha-front-pos">${card.position}</div>
@@ -424,6 +427,21 @@
   function _emojiFor(pos) {
     return ({ GK: '🧤', DEF: '🛡️', MID: '⚙️', FWD: '⚽' })[pos] || '⚽';
   }
+
+  // 12 種人物 emoji 池，依 card_id 穩定 hash 指派
+  // Phase 2 換成等距 pixel art sprite 時再退役
+  const PORTRAIT_POOL = [
+    '👨🏻', '👨🏼', '👨🏽', '👨🏾', '👨🏿',
+    '👨🏻‍🦱', '👨🏽‍🦱', '👨🏾‍🦲',
+    '👨🏼‍🦳', '🏃🏻', '🏃🏽', '🏃🏾',
+  ];
+  function _portraitFor(cardId) {
+    if (!cardId) return '👤';
+    let h = 0;
+    for (let i = 0; i < cardId.length; i++) h = (h * 31 + cardId.charCodeAt(i)) >>> 0;
+    return PORTRAIT_POOL[h % PORTRAIT_POOL.length];
+  }
+  window.MyTeamPortrait = _portraitFor;  // 公開讓 modal 也能用
 
   function escapeHtml(s) {
     return String(s == null ? '' : s)

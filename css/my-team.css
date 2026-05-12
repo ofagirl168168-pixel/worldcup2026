@@ -425,26 +425,62 @@
   gap: 10px;
 }
 .mt-player-card {
-  background: rgba(255,255,255,0.04);
-  border-radius: 10px;
-  padding: 10px;
-  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(165deg, #2a2440 0%, #181428 100%);
+  border-radius: 12px;
+  padding: 12px 10px 10px;
+  border: 2px solid rgba(255,255,255,0.12);
   position: relative;
   cursor: pointer;
   transition: all 0.15s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  text-align: center;
 }
 .mt-player-card:hover {
-  background: rgba(255,255,255,0.08);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.55);
 }
 .mt-player-card.rarity-SSR {
-  border-color: rgba(240,192,64,0.5);
-  background: linear-gradient(135deg, rgba(240,192,64,0.1), rgba(255,255,255,0.04));
+  border-color: #ffd455;
+  background: linear-gradient(165deg, #5a3a0c 0%, #2a1808 100%);
+  box-shadow: 0 0 16px rgba(240,192,64,0.45), 0 4px 14px rgba(0,0,0,0.5);
 }
 .mt-player-card.rarity-SR {
-  border-color: rgba(155,135,245,0.4);
-  background: linear-gradient(135deg, rgba(155,135,245,0.08), rgba(255,255,255,0.04));
+  border-color: #b5a4ff;
+  background: linear-gradient(165deg, #3d2f78 0%, #1f1845 100%);
+  box-shadow: 0 0 14px rgba(155,135,245,0.4), 0 4px 14px rgba(0,0,0,0.5);
 }
+
+/* roster 卡片頭像 */
+.mt-player-portrait {
+  position: relative;
+  width: 60px; height: 60px;
+  margin: 6px auto 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), rgba(0,0,0,0.3) 75%);
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
+}
+.mt-player-card.rarity-SR  .mt-player-portrait { border-color: #b5a4ff; }
+.mt-player-card.rarity-SSR .mt-player-portrait { border-color: #ffd455; }
+.mt-player-portrait-emoji {
+  font-size: 36px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+}
+.mt-player-portrait-pos {
+  position: absolute;
+  bottom: -3px; right: -3px;
+  width: 22px; height: 22px;
+  background: linear-gradient(135deg, #1a1a2e, #2a1855);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+}
+.mt-player-card.rarity-SR  .mt-player-portrait-pos { border-color: #b5a4ff; }
+.mt-player-card.rarity-SSR .mt-player-portrait-pos { border-color: #ffd455; }
+.mt-player-card .mt-player-name { text-align: center; padding-right: 0; }
 .mt-player-card-rarity {
   position: absolute;
   top: 6px;
@@ -820,22 +856,23 @@
   50%      { transform: scale(1.08); filter: drop-shadow(0 0 36px rgba(240,192,64,0.95)); }
 }
 
-/* 卡面 */
+/* 卡面 — 實底色 + 漸層 + 邊框依稀有度 */
 .mt-gacha-card3d-front {
   transform: rotateY(180deg);
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-  border: 2px solid rgba(255,255,255,0.1);
+  background: linear-gradient(165deg, #2a2440 0%, #181428 100%);
+  border: 2px solid rgba(255,255,255,0.18);
   display: flex; flex-direction: column; align-items: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.55);
 }
 .mt-gacha-card3d.rarity-SR .mt-gacha-card3d-front {
-  border-color: #9b87f5;
-  background: linear-gradient(180deg, rgba(155,135,245,0.18) 0%, rgba(80,60,180,0.06) 100%);
-  box-shadow: 0 0 24px rgba(155,135,245,0.45), inset 0 0 20px rgba(155,135,245,0.1);
+  border-color: #b5a4ff;
+  background: linear-gradient(165deg, #3d2f78 0%, #1f1845 100%);
+  box-shadow: 0 0 24px rgba(155,135,245,0.55), 0 6px 20px rgba(0,0,0,0.55);
 }
 .mt-gacha-card3d.rarity-SSR .mt-gacha-card3d-front {
-  border-color: #f0c040;
-  background: linear-gradient(180deg, rgba(240,192,64,0.22) 0%, rgba(224,112,32,0.1) 100%);
-  box-shadow: 0 0 40px rgba(240,192,64,0.65), inset 0 0 26px rgba(240,192,64,0.2);
+  border-color: #ffd455;
+  background: linear-gradient(165deg, #5a3a0c 0%, #2a1808 100%);
+  box-shadow: 0 0 40px rgba(240,192,64,0.7), 0 6px 22px rgba(0,0,0,0.55);
   animation: mt-ssr-card-glow 2s ease-in-out infinite;
 }
 @keyframes mt-ssr-card-glow {
@@ -887,6 +924,38 @@
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
   position: relative; z-index: 2;
 }
+
+/* 球員頭像（圓形相框 + 人物 emoji + 位置 emoji 小角標）*/
+.mt-gacha-front-portrait {
+  position: relative;
+  width: 92px; height: 92px;
+  margin: 10px auto 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), rgba(0,0,0,0.3) 75%);
+  border: 3px solid rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5), inset 0 0 18px rgba(255,255,255,0.05);
+  z-index: 2;
+}
+.mt-gacha-card3d.rarity-SR  .mt-gacha-front-portrait { border-color: #b5a4ff; box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 0 18px rgba(155,135,245,0.5); }
+.mt-gacha-card3d.rarity-SSR .mt-gacha-front-portrait { border-color: #ffd455; box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 0 22px rgba(240,192,64,0.7); }
+.mt-gacha-front-portrait-emoji {
+  font-size: 56px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+.mt-gacha-front-portrait-pos {
+  position: absolute;
+  bottom: -4px; right: -4px;
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #1a1a2e, #2a1855);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.mt-gacha-card3d.rarity-SR  .mt-gacha-front-portrait-pos { border-color: #b5a4ff; }
+.mt-gacha-card3d.rarity-SSR .mt-gacha-front-portrait-pos { border-color: #ffd455; }
 .mt-gacha-front-name {
   font-size: 16px;
   font-weight: 900;
