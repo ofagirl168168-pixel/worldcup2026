@@ -108,20 +108,21 @@ async function postIgPhase(state) {
 
   if (state.date === today) { console.log('Already sent today'); return; }
 
-  // ── 今日比賽 ──（只列「還沒開賽」的；凌晨/早場已踢完不重複提醒）
+  // ── 今日比賽 ──（含「今晚到明早凌晨」窗口；ko ∈ (now, now+22h] 且還沒開賽）
+  // 為什麼 22h：早安 08:00 推送，22h 窗口剛好涵蓋到隔天 06:00 — 把英超凌晨場次
+  // （UK 20:00 = TW 03:00）歸到「今晚看的球」，不會延到隔天早安才提醒（那時已踢完）
   const eplWin = loadJs('js/epl-data-teams.js');
   const uclTeamsWin = loadJs('js/ucl-data-teams.js');
   const uclMatchWin = loadJs('js/ucl-data-matches.js');
   const now = Date.now();
+  const WINDOW_MS = 22 * 3600 * 1000;
   const STARTED = new Set(['live', 'finished', 'ended', 'started']);
   const isUpcoming = (m) => {
-    if (m.date !== today) return false;
     if (STARTED.has(m.status)) return false;
-    if (m.time) {
-      const ko = new Date(`${m.date}T${m.time}:00+08:00`).getTime();
-      if (!isNaN(ko) && ko <= now) return false;
-    }
-    return true;
+    if (!m.date || !m.time) return false;
+    const ko = new Date(`${m.date}T${m.time}:00+08:00`).getTime();
+    if (isNaN(ko)) return false;
+    return ko > now && ko <= now + WINDOW_MS;
   };
   const eplMatches = (eplWin.EPL_MATCHES || []).filter(isUpcoming);
   const uclMatches = (uclMatchWin.UCL_MATCHES || []).filter(isUpcoming);
@@ -132,14 +133,18 @@ async function postIgPhase(state) {
     ...eplMatches.map(m => ({ m, teams: eplTeams, league: 'epl' })),
     ...uclMatches.map(m => ({ m, teams: uclTeams, league: 'ucl' })),
   ]
-    .sort((a, b) => (a.m.time || '').localeCompare(b.m.time || ''))
+    // 用 kickoff 真實時戳排序（同窗口可能跨日，純比較 time 字串會把 03:00 排到 23:30 前）
+    .map(x => ({ ...x, ko: new Date(`${x.m.date}T${x.m.time}:00+08:00`).getTime() }))
+    .sort((a, b) => a.ko - b.ko)
     .map(({ m, teams, league }) => {
       const ht = teams[m.home] || {};
       const at = teams[m.away] || {};
       const home = ht.nameCN || m.home;
       const away = at.nameCN || m.away;
       const tag = league === 'epl' ? '⚽' : '🏆';
-      return `${tag} <b>${m.time}</b> ${escapeHtml(home)} vs ${escapeHtml(away)}`;
+      // 隔天早晨場次標「(明)」前綴，避免使用者以為是當天 03:00（已過）
+      const dayMark = m.date === today ? '' : '<i>(明)</i>';
+      return `${tag} ${dayMark}<b>${m.time}</b> ${escapeHtml(home)} vs ${escapeHtml(away)}`;
     });
 
   // ── 近 36 小時新文章 ──
@@ -200,9 +205,9 @@ async function postIgPhase(state) {
   if (IG_USER_ID && IG_TOKEN) {
     try {
       const matchesForIg = [
-        ...eplMatches.map(m => ({ time: m.time, home: (eplTeams[m.home] || {}).nameCN || m.home, away: (eplTeams[m.away] || {}).nameCN || m.away })),
-        ...uclMatches.map(m => ({ time: m.time, home: (uclTeams[m.home] || {}).nameCN || m.home, away: (uclTeams[m.away] || {}).nameCN || m.away })),
-      ].sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+        ...eplMatches.map(m => ({ time: (m.date === today ? '' : '(明)') + m.time, date: m.date, home: (eplTeams[m.home] || {}).nameCN || m.home, away: (eplTeams[m.away] || {}).nameCN || m.away })),
+        ...uclMatches.map(m => ({ time: (m.date === today ? '' : '(明)') + m.time, date: m.date, home: (uclTeams[m.home] || {}).nameCN || m.home, away: (uclTeams[m.away] || {}).nameCN || m.away })),
+      ].sort((a, b) => new Date(`${a.date}T${a.time.replace(/^\(明\)/,'')}:00+08:00`).getTime() - new Date(`${b.date}T${b.time.replace(/^\(明\)/,'')}:00+08:00`).getTime());
       const articleTitles = recent.map(a => String(a.title || '').replace(/^【[^】]*】\s*/, ''));
       const buf = await igRender.renderSummary({
         date: today, weekday: tweekdayCN(),
