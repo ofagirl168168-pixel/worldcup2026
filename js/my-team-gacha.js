@@ -430,16 +430,39 @@
     return ({ GK: '🧤', DEF: '🛡️', MID: '⚙️', FWD: '⚽' })[pos] || '⚽';
   }
 
-  // Phase 2.1：DiceBear pixel-art 頭像（MIT 免費 API、seed-based 穩定）
-  // 同 card_id 永遠同頭像、不同卡不同頭像、SVG 不用 bundle 資產
+  // Phase 2.1+：DiceBear pixel-art 頭像（解開全部細節選項，每張卡更有個性）
   const _DICEBEAR_BASE = 'https://api.dicebear.com/9.x/pixel-art/svg';
+  // 所有可選 hair variant（短/長）— DiceBear 官網列的全部
+  const _HAIR_POOL = [
+    'short01','short02','short03','short04','short05',
+    'short06','short07','short08','short09','short10',
+    'short11','short12','short13','short14','short15',
+    'short16','short17','short18','short19','short20',
+    'long01','long02','long03','long04','long05',
+    'long06','long07','long08','long09','long10',
+    'long11','long12','long13','long14','long15',
+    'long16','long17','long18','long19','long20',
+    'long21',
+  ].join(',');
   function _portraitUrlFor(cardId, rarity) {
     const seed = encodeURIComponent(cardId || 'default');
-    // 背景色 by rarity（gradient 看起來像 trading card 質感）
+    // 背景色 by rarity（gradient = trading card 質感）
     const bg = rarity === 'SSR' ? 'f0c040,ff8030'
              : rarity === 'SR'  ? '9b87f5,6a4fcc'
              :                    '506478,2a3340';
-    return `${_DICEBEAR_BASE}?seed=${seed}&backgroundColor=${bg}&backgroundType=gradientLinear&backgroundRotation=180&radius=50`;
+    const params = [
+      `seed=${seed}`,
+      `backgroundColor=${bg}`,
+      'backgroundType=gradientLinear',
+      'backgroundRotation=180',
+      'radius=50',
+      `hair=${_HAIR_POOL}`,
+      'accessoriesProbability=45',
+      'glassesProbability=25',
+      'beardProbability=30',
+      'size=256',          // 大圖（高 DPR display 不糊）
+    ].join('&');
+    return `${_DICEBEAR_BASE}?${params}`;
   }
   window.MyTeamPortrait = _portraitUrlFor;  // 公開讓 modal/match 共用
 
