@@ -1,17 +1,21 @@
 /* my-team-fab.js — 我的球隊 全站懸浮入口
  * 設計依據：docs/my-team-design.md v0.7 §11.5
  *
- * 功能：
- *   - 右下角懸浮 ⚽ 按鈕，顯示球隊隊徽
- *   - 抽券 / 體力 / SSR 自選券有 → 紅點數字徽章
- *   - 點擊 → 開 my-team modal（沒建隊 → onboarding；有 → hub）
- *   - 隨登入狀態 / my-team-changed event 自動刷新
- *   - 行動裝置避開底部 nav bar 不擋路
+ * Feature flag：預設關閉，只有 localStorage.mt_beta='1' 才會顯示。
+ * 開啟測試：localStorage.setItem('mt_beta','1'); location.reload()
+ * 關閉：localStorage.removeItem('mt_beta'); location.reload()
  */
 (function () {
   'use strict';
 
   const FAB_ID = 'mt-fab';
+
+  // ── Feature flag check ──
+  function _isEnabled() {
+    try { return localStorage.getItem('mt_beta') === '1'; }
+    catch (e) { return false; }
+  }
+  window.MyTeamBetaEnabled = _isEnabled;
 
   function injectFab() {
     if (document.getElementById(FAB_ID)) return;
@@ -75,6 +79,10 @@
 
   // 初始化：等 DOM ready 再注入
   function init() {
+    if (!_isEnabled()) {
+      console.log('[my-team] disabled (set localStorage.mt_beta="1" to enable)');
+      return;
+    }
     injectFab();
     // 嘗試 fetch（已登入會拿資料、未登入 fetch 回 null）
     if (window.MyTeam) {

@@ -123,6 +123,10 @@
         if (typeof showToast === 'function') {
           showToast(`🎉 球隊「${nameInput.value.trim()}」建立成功！5 張抽券已送`);
         }
+        // 有 pending 抽券 → 立刻彈抽卡動畫（§5.6 自然流程）
+        if (typeof window._mtConsumePendingGacha === 'function') {
+          window._mtConsumePendingGacha();
+        }
       } catch (err) {
         console.error('[my-team] create error', err);
         alert('建隊失敗：' + (err.message || err));

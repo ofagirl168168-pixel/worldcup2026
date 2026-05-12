@@ -39,14 +39,18 @@
 
   // ── 即時觸發（§5.6）— 站外動作獎勵 → 不耗抽券直接抽 ──
   async function triggerInstantGacha(count, source) {
+    // Feature flag：未啟用直接 skip（路人保護）
+    if (typeof window.MyTeamBetaEnabled === 'function' && !window.MyTeamBetaEnabled()) {
+      return null;
+    }
     if (!window.MyTeam || typeof currentUser === 'undefined' || !currentUser) {
       console.log('[my-team] instant gacha skip — not logged in');
       return null;
     }
     const team = await window.MyTeam.fetch();
     if (!team || team === 'not_created') {
-      // 沒建隊 → 改累積抽券留著建隊後抽
-      console.log('[my-team] instant gacha skip — no team, accumulating ticket');
+      // 沒建隊 → 存 pending、引導建隊
+      _showPendingTicketToast(count, source);
       return null;
     }
 
@@ -84,8 +88,41 @@
       'predict_5':     '完成 5 場預測獎勵',
       'predict_exact': '精準預測獎勵',
       'arena_comment': '擂台留言獎勵',
+      'pending':       '排隊中抽券',
     })[source] || '免費抽卡';
   }
+
+  // ── 沒建隊：存 pending 抽券到 localStorage、出 toast 邀請建隊 ──
+  function _showPendingTicketToast(count, source) {
+    try {
+      const cur = parseInt(localStorage.getItem('mt_pending_gacha') || '0') || 0;
+      localStorage.setItem('mt_pending_gacha', String(cur + count));
+    } catch (e) {}
+    const total = (parseInt(localStorage.getItem('mt_pending_gacha') || '0') || 0);
+    if (typeof showToast === 'function') {
+      showToast(`🎉 +${count} 免費抽券 — 建隊就能立刻抽！（累積 ${total}）`);
+    }
+    // 點 FAB 提示樣式：讓 FAB 紅點變強
+    try {
+      const badge = document.getElementById('mt-fab-badge');
+      if (badge) {
+        badge.textContent = '!';
+        badge.hidden = false;
+      }
+    } catch (e) {}
+  }
+  // 公開給 modal 在 create() 完成後讀
+  window._mtConsumePendingGacha = async function () {
+    let pending = 0;
+    try {
+      pending = parseInt(localStorage.getItem('mt_pending_gacha') || '0') || 0;
+      localStorage.removeItem('mt_pending_gacha');
+    } catch (e) {}
+    if (pending > 0) {
+      // 等 modal 動畫關完再彈
+      setTimeout(() => triggerInstantGacha(pending, 'pending').catch(() => {}), 300);
+    }
+  };
 
   // ── 抽卡動畫 ──
   async function openGachaAnimation(cards, options = {}) {
