@@ -74,14 +74,10 @@
         cta: '繼續 →',
       },
       {
-        emoji: '🎁',
-        title: '幫你準備了首抽套裝',
-        body: `這次<b>免費</b>送你一發保底好抽：<br>
-          🌟 <b>1 張 SSR</b> 王牌前鋒<br>
-          ⭐ 2 張 SR 主力（中場+後衛）<br>
-          🃏 7 張 R（含 1 門將）<br>
-          全部自動上首發、立刻可比賽`,
-        cta: '抽我的首批球員！ 🎰',
+        emoji: '🎰',
+        title: '免費送你一發 10 連抽',
+        body: '球員是抽出來的。<br>第一發我們幫你支付、<b>免費</b>抽一發 10 連看看手氣。',
+        cta: '開始 10 連抽 🎰',
       },
     ];
 
@@ -142,14 +138,14 @@
         // 關掉教學
         overlay.classList.remove('open');
         setTimeout(() => overlay.remove(), 200);
-        // 播放完整 gacha 動畫（Stage 0 卡包 → Stage 2.5 翻牌）
+        // 播放完整 gacha 動畫（Stage 0 卡包 → Stage 2.5 翻牌）— 不暴露「首抽套裝」字眼
         if (window.MyTeam?.openGachaAnimation) {
           await window.MyTeam.openGachaAnimation(data.cards || [], {
-            title: '🎁 首抽套裝召喚',
-            subtitle: '保證 SSR + SR×2 + 完整陣容',
+            title: '🎰 10 連抽召喚',
+            subtitle: '看看你的手氣',
           });
         }
-        // 動畫結束 → refresh + 跳球員 tab + 結尾彩蛋
+        // 動畫結束 → refresh + 跳球員 tab + 結尾引導
         await window.MyTeam.refresh?.();
         _currentTab = 'roster';
         renderHub();
@@ -173,18 +169,28 @@
     t.className = 'mt-starter-complete';
     t.innerHTML = `
       <div class="mt-starter-complete-card">
-        <div style="font-size:48px">🏆</div>
-        <h3>陣容到位！</h3>
-        <p>${n} 位球員已自動上首發。試試比賽 tab 打場聯賽吧</p>
-        <button class="mt-gacha-btn mt-starter-complete-ok">好的</button>
+        <div style="font-size:48px">🎉</div>
+        <h3>太棒了！</h3>
+        <p>接下來去 <b>球員</b> 或 <b>設定</b> 安排你的隊伍<br>
+        排好陣容後就可以打<b>第一場比賽</b>了 ⚽</p>
+        <div class="mt-starter-complete-buttons">
+          <button class="mt-gacha-btn mt-starter-arrange">📋 去安排隊伍</button>
+          <button class="mt-starter-complete-skip">稍後再說</button>
+        </div>
       </div>
     `;
     document.body.appendChild(t);
     requestAnimationFrame(() => t.classList.add('open'));
-    t.querySelector('.mt-starter-complete-ok').addEventListener('click', () => {
+    const close = () => {
       t.classList.remove('open');
       setTimeout(() => t.remove(), 200);
+    };
+    t.querySelector('.mt-starter-arrange').addEventListener('click', () => {
+      close();
+      _currentTab = 'roster';
+      document.querySelector('.mt-hub-tab[data-tab="roster"]')?.click();
     });
+    t.querySelector('.mt-starter-complete-skip').addEventListener('click', close);
   }
 
   function close() {

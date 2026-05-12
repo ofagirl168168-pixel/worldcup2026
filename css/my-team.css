@@ -1801,6 +1801,15 @@
 .mt-starter-complete-card h3 { margin: 8px 0; color: #f0c040; font-size: 22px; }
 .mt-starter-complete-card p { font-size: 13px; opacity: 0.9; margin-bottom: 16px; }
 .mt-starter-complete-ok { width: 100%; }
+.mt-starter-complete-buttons {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.mt-starter-arrange { width: 100%; }
+.mt-starter-complete-skip {
+  background: none; border: 0; color: rgba(255,255,255,0.5);
+  font-size: 12px; cursor: pointer; padding: 6px;
+}
+.mt-starter-complete-skip:hover { color: rgba(255,255,255,0.9); }
 
 /* ── 排行榜 tab ── */
 .mt-rank-tab { padding: 12px; }
