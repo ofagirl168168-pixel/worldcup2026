@@ -181,6 +181,10 @@
       <h3>👖 球褲顏色</h3>
       <div class="color-row" id="opt-pants-color"></div>
     </div>
+    <div class="panel">
+      <h3>😀 表情</h3>
+      <div class="opt-grid" id="opt-face"></div>
+    </div>
   </div>
 
 </div>
@@ -204,7 +208,100 @@ const state = {
   shirt_style: 'shortsleeve',
   shirt_color: 'red',
   pants_color: 'blue',
+  face: 'normal',  // 手繪臉部表情 overlay
 };
+
+// ─── 臉部 overlay（補 LPC 「沒臉」的缺）──
+// 每個變體定義 eyes + mouth pixel pattern、繪在 source 32×36 內、frame 內位置：
+// 角色頭在 output y=4-14、眼睛 y=10、嘴 y=15
+const FACE_VARIANTS = ['normal', 'smile', 'smug', 'serious', 'focused', 'surprised', 'tough', 'wink'];
+
+function drawFaceOverlay(ctx, variant) {
+  // 在 32×36 offscreen canvas 上手繪臉、要在 hair layer 之後畫
+  // 座標：output y=10 左眼 x=11、右眼 x=19、嘴 x=14 y=15
+  const EYE_COLOR = '#000';
+  const MOUTH_COLOR = '#3a1810';
+  const LE_X = 11, RE_X = 19, EY = 10;       // 雙眼位置
+  const M_X = 14, M_Y = 15;                  // 嘴 baseline
+
+  ctx.fillStyle = EYE_COLOR;
+  switch (variant) {
+    case 'smile':       // 笑眼：彎成 ^^
+      ctx.fillRect(LE_X, EY+1, 1, 1); ctx.fillRect(LE_X-1, EY, 1, 1); ctx.fillRect(LE_X+1, EY, 1, 1);
+      ctx.fillRect(RE_X, EY+1, 1, 1); ctx.fillRect(RE_X-1, EY, 1, 1); ctx.fillRect(RE_X+1, EY, 1, 1);
+      break;
+    case 'smug':        // 瞇眼 ─ ─
+      ctx.fillRect(LE_X-1, EY+1, 3, 1);
+      ctx.fillRect(RE_X-1, EY+1, 3, 1);
+      break;
+    case 'serious':     // 細眼
+      ctx.fillRect(LE_X, EY, 1, 1); ctx.fillRect(LE_X, EY+1, 1, 1);
+      ctx.fillRect(RE_X, EY, 1, 1); ctx.fillRect(RE_X, EY+1, 1, 1);
+      // 眉毛
+      ctx.fillRect(LE_X-1, EY-2, 3, 1);
+      ctx.fillRect(RE_X-1, EY-2, 3, 1);
+      break;
+    case 'focused':     // 方眼
+      ctx.fillRect(LE_X-1, EY, 2, 2);
+      ctx.fillRect(RE_X, EY, 2, 2);
+      // 眉毛
+      ctx.fillRect(LE_X-1, EY-2, 3, 1);
+      ctx.fillRect(RE_X, EY-2, 3, 1);
+      break;
+    case 'surprised':   // 大眼
+      ctx.fillRect(LE_X-1, EY, 3, 3);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(LE_X, EY+1, 1, 1);
+      ctx.fillStyle = EYE_COLOR;
+      ctx.fillRect(RE_X, EY, 3, 3);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(RE_X+1, EY+1, 1, 1);
+      ctx.fillStyle = EYE_COLOR;
+      break;
+    case 'tough':       // 兇眼（眉毛壓低）
+      ctx.fillRect(LE_X, EY+1, 2, 1);
+      ctx.fillRect(RE_X-1, EY+1, 2, 1);
+      ctx.fillRect(LE_X-1, EY, 3, 1);  // 壓低眉
+      ctx.fillRect(RE_X-1, EY, 3, 1);
+      break;
+    case 'wink':        // 眨眼 ●─
+      ctx.fillRect(LE_X, EY, 1, 2);
+      ctx.fillRect(RE_X-1, EY+1, 3, 1);
+      break;
+    case 'normal':
+    default:            // 正常 點點眼
+      ctx.fillRect(LE_X, EY, 1, 2);
+      ctx.fillRect(RE_X, EY, 1, 2);
+      break;
+  }
+
+  // 嘴巴
+  ctx.fillStyle = MOUTH_COLOR;
+  switch (variant) {
+    case 'smile':
+      ctx.fillRect(M_X, M_Y, 1, 1);
+      ctx.fillRect(M_X+1, M_Y+1, 2, 1);
+      ctx.fillRect(M_X+3, M_Y, 1, 1);
+      break;
+    case 'smug':
+      ctx.fillRect(M_X, M_Y, 2, 1);
+      ctx.fillRect(M_X+2, M_Y-1, 1, 1);
+      break;
+    case 'surprised':
+      ctx.fillRect(M_X+1, M_Y-1, 2, 2);
+      break;
+    case 'tough':
+      ctx.fillRect(M_X, M_Y, 4, 1);
+      break;
+    case 'serious':
+    case 'focused':
+    case 'wink':
+    case 'normal':
+    default:
+      ctx.fillRect(M_X, M_Y, 3, 1);
+      break;
+  }
+}
 
 const COLOR_HEX = {
   black: '#1a1a1a', blonde: '#e8d068', red: '#c0392b', white: '#ddd', brown: '#8b4513',
@@ -231,8 +328,7 @@ async function getLayer(category, name) {
   return await loadImg(url);
 }
 
-// 合成頭像（全身 32×36，crop frame y=28-64 包含完整角色 + pants + 4px 頭頂留白）
-// 直接 render 至 160×160 canvas、保持等比例 4× 放大、置中
+// 合成頭像（全身 32×36，含 LPC 4 層 + 手繪臉部 overlay）
 async function renderPortrait(canvas, look) {
   const [body, hair, shirt, pants] = await Promise.all([
     getLayer('body', look.body),
@@ -240,21 +336,27 @@ async function renderPortrait(canvas, look) {
     getLayer('shirt', `${look.shirt_style}-${look.shirt_color}`),
     getLayer('pants', look.pants_color),
   ]);
-  // walk-down idle: frame y=640，角色 frame y=32-61
-  // crop 32 寬 × 36 高，包頭+全身+腳
   const SX = 16, SY = 640 + 28, SW = 32, SH = 36;
-  // 等比例 4× 放大：128×144、置中於 160×160 canvas
+  // 先 render LPC 至 offscreen 32×36（pixel-perfect 1:1）
+  const off = document.createElement('canvas');
+  off.width = SW; off.height = SH;
+  const offCtx = off.getContext('2d');
+  offCtx.imageSmoothingEnabled = false;
+  for (const layer of [body, pants, shirt, hair]) {
+    offCtx.drawImage(layer, SX, SY, SW, SH, 0, 0, SW, SH);
+  }
+  // 手繪臉部疊在最上層（在 hair 之後 = 臉部在前面）
+  drawFaceOverlay(offCtx, look.face);
+
+  // 4× scale 顯示
   const SCALE = 4;
-  const DW = SW * SCALE, DH = SH * SCALE;
   canvas.width = 160; canvas.height = 160;
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, 160, 160);
-  const dx = (160 - DW) / 2;
-  const dy = (160 - DH) / 2;
-  for (const layer of [body, pants, shirt, hair]) {
-    ctx.drawImage(layer, SX, SY, SW, SH, dx, dy, DW, DH);
-  }
+  const dx = (160 - SW * SCALE) / 2;
+  const dy = (160 - SH * SCALE) / 2;
+  ctx.drawImage(off, 0, 0, SW, SH, dx, dy, SW * SCALE, SH * SCALE);
 }
 
 // 走路動畫 (96×128 full sprite sheet, animated)
@@ -307,12 +409,21 @@ async function animateWalk(canvas, look) {
 
   const frames = [1, 2, 3, 4, 5, 6, 7, 8];
   let tick = 0;
+  // offscreen 32×36 用來 composite + face overlay
+  const off = document.createElement('canvas');
+  off.width = 32; off.height = 36;
+  const offCtx = off.getContext('2d');
+  offCtx.imageSmoothingEnabled = false;
   function frame() {
     const f = frames[Math.floor(tick / 6) % frames.length];
-    ctx.clearRect(0, 0, 32 * SCALE, 36 * SCALE);
+    offCtx.clearRect(0, 0, 32, 36);
     for (const layer of [body, pants, shirt, hair]) {
-      ctx.drawImage(layer, f * 64, 640 + 28, 32, 36, 0, 0, 32 * SCALE, 36 * SCALE);
+      offCtx.drawImage(layer, f * 64, 640 + 28, 32, 36, 0, 0, 32, 36);
     }
+    // face overlay 只在 idle / down 方向才畫（走路時臉部會跟著動偏，這版簡單處理）
+    drawFaceOverlay(offCtx, look.face);
+    ctx.clearRect(0, 0, 32 * SCALE, 36 * SCALE);
+    ctx.drawImage(off, 0, 0, 32, 36, 0, 0, 32 * SCALE, 36 * SCALE);
     tick++;
     walkAnimId = requestAnimationFrame(frame);
   }
@@ -364,9 +475,17 @@ async function buildOption(containerId, category, items, isColor) {
             getLayer('shirt', `${tempLook.shirt_style}-${tempLook.shirt_color}`),
             getLayer('pants', tempLook.pants_color),
           ]);
+          // 縮圖：先在小 offscreen 32×36 合成、再縮到 32×36 顯示 canvas
+          const tmp = document.createElement('canvas');
+          tmp.width = 32; tmp.height = 36;
+          const tctx = tmp.getContext('2d');
+          tctx.imageSmoothingEnabled = false;
           for (const layer of [body, pants, shirt, hair]) {
-            ctx.drawImage(layer, 16, 640 + 28, 32, 36, 0, 0, 32, 36);
+            tctx.drawImage(layer, 16, 640 + 28, 32, 36, 0, 0, 32, 36);
           }
+          drawFaceOverlay(tctx, tempLook.face);
+          ctx.clearRect(0, 0, 32, 36);
+          ctx.drawImage(tmp, 0, 0);
         } catch (e) {}
       }, 0);
     }
@@ -384,6 +503,7 @@ async function init() {
   await buildOption('opt-shirt-color', 'shirt_color',
     [...new Set([...manifest.shirt_colors_short, ...manifest.shirt_colors_sleeve])], true);
   await buildOption('opt-pants-color', 'pants_color', manifest.pants_colors, true);
+  await buildOption('opt-face', 'face', FACE_VARIANTS);
   rerender();
 }
 
@@ -397,6 +517,7 @@ function randomize() {
     ? pick(manifest.shirt_colors_short)
     : pick(manifest.shirt_colors_sleeve);
   state.pants_color = pick(manifest.pants_colors);
+  state.face = pick(FACE_VARIANTS);
   Object.keys(state).forEach(k => {
     document.querySelectorAll(`[data-${k}]`).forEach(el => {
       el.classList.toggle('sel', el.dataset[k] === state[k]);
