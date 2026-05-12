@@ -108,12 +108,23 @@ async function postIgPhase(state) {
 
   if (state.date === today) { console.log('Already sent today'); return; }
 
-  // ── 今日比賽 ──
+  // ── 今日比賽 ──（只列「還沒開賽」的；凌晨/早場已踢完不重複提醒）
   const eplWin = loadJs('js/epl-data-teams.js');
   const uclTeamsWin = loadJs('js/ucl-data-teams.js');
   const uclMatchWin = loadJs('js/ucl-data-matches.js');
-  const eplMatches = (eplWin.EPL_MATCHES || []).filter(m => m.date === today);
-  const uclMatches = (uclMatchWin.UCL_MATCHES || []).filter(m => m.date === today);
+  const now = Date.now();
+  const STARTED = new Set(['live', 'finished', 'ended', 'started']);
+  const isUpcoming = (m) => {
+    if (m.date !== today) return false;
+    if (STARTED.has(m.status)) return false;
+    if (m.time) {
+      const ko = new Date(`${m.date}T${m.time}:00+08:00`).getTime();
+      if (!isNaN(ko) && ko <= now) return false;
+    }
+    return true;
+  };
+  const eplMatches = (eplWin.EPL_MATCHES || []).filter(isUpcoming);
+  const uclMatches = (uclMatchWin.UCL_MATCHES || []).filter(isUpcoming);
   const eplTeams = eplWin.EPL_TEAMS || {};
   const uclTeams = uclTeamsWin.UCL_TEAMS || {};
 
