@@ -88,13 +88,21 @@
 .mt-modal {
   width: 100%;
   max-width: 560px;
+  height: 100vh;
+  max-height: 100vh;
   background: linear-gradient(180deg, #1a1a2e 0%, #0d1224 100%);
   display: flex;
   flex-direction: column;
   position: relative;
   border-left: 1px solid rgba(240,192,64,0.2);
   border-right: 1px solid rgba(240,192,64,0.2);
+  overflow: hidden;       /* 內部 scroll 用 mt-hub-content / mt-modal-body */
 }
+.mt-modal-body {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+}
+.mt-modal-body > .mt-onboard { flex: 1; min-height: 0; overflow-y: auto; }
 
 .mt-modal-close {
   position: absolute;
@@ -486,10 +494,12 @@
 }
 
 .mt-hub-content {
-  flex: 1;
+  flex: 1; min-height: 0;
   overflow-y: auto;
   padding: 16px 20px 40px;
+  -webkit-overflow-scrolling: touch;
 }
+.mt-hub-header, .mt-hub-tabs { flex-shrink: 0; }
 
 /* ───────── 球員 roster tab ───────── */
 .mt-roster-empty {
@@ -2145,6 +2155,64 @@
   position: absolute; left: 8px; top: 8px;
   background: rgba(0,0,0,0.5); color: #f0c040;
   font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px;
+}
+
+/* 場上裝飾物：訓練錐 + 球 */
+.mt-pitch-cone {
+  position: absolute; transform: translate(-50%, -50%);
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid #ff7043;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));
+  pointer-events: none;
+  z-index: 1;
+}
+.mt-pitch-ball {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.6), inset -2px -2px 0 rgba(0,0,0,0.15);
+  pointer-events: none;
+  z-index: 1;
+  animation: mt-ball-spin 4s linear infinite;
+}
+@keyframes mt-ball-spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 漫步球員（取代舊的 mt-pitch-player）*/
+.mt-wander-player {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: none; border: 0; padding: 0; cursor: pointer;
+  color: #fff; text-align: center;
+  transition: left 0.6s linear, top 0.6s linear;
+  z-index: 3;
+}
+.mt-wander-player:hover { z-index: 5; }
+.mt-wander-sprite {
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  margin: 0 auto;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7));
+  transition: transform 0.15s;
+}
+.mt-wander-player:hover .mt-wander-sprite {
+  transform: scale(1.15);
+}
+.mt-wander-player.rarity-SSR .mt-wander-sprite {
+  filter: drop-shadow(0 0 4px rgba(240,192,64,0.9)) drop-shadow(0 2px 3px rgba(0,0,0,0.6));
+}
+.mt-wander-player.rarity-SR .mt-wander-sprite {
+  filter: drop-shadow(0 0 3px rgba(155,135,245,0.8)) drop-shadow(0 2px 3px rgba(0,0,0,0.6));
+}
+.mt-wander-name {
+  font-size: 9px; font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.95);
+  white-space: nowrap;
+  margin-top: -2px;
 }
 
 .mt-pitch-player {

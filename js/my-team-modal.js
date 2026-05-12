@@ -410,6 +410,11 @@
   function renderTab() {
     const content = _overlay.querySelector('#mt-hub-content');
     if (!content) return;
+    // 離開球員 tab 時停掉漫步動畫
+    if (_currentTab !== 'roster' && _stadiumAnimId) {
+      cancelAnimationFrame(_stadiumAnimId);
+      _stadiumAnimId = null;
+    }
     switch (_currentTab) {
       case 'roster':   return renderRosterTab(content);
       case 'gacha':    return renderGachaTab(content);
@@ -425,7 +430,12 @@
     }
   }
 
+  let _stadiumAnimId = null;
+
   async function renderRosterTab(content) {
+    // 先停掉舊的動畫迴圈
+    if (_stadiumAnimId) { cancelAnimationFrame(_stadiumAnimId); _stadiumAnimId = null; }
+
     content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入球員中…</div>';
     const team = window.MyTeam.getCached();
     const players = await window.MyTeam.fetchPlayers();
@@ -445,14 +455,9 @@
       return;
     }
 
-    // ── 排陣型：依 team.formation 算 11 個位置 ──
-    const formation = team?.formation || '4-3-3';
-    const positions = _formationPositions(formation);
-
-    // 首發 11（依 in_starting_11，沒選滿就補強卡）
-    let starters = players.filter(p => p.in_starting_11);
     const now = new Date();
-    starters = starters.filter(p => !p.injured_until || new Date(p.injured_until) <= now);
+    let starters = players.filter(p => p.in_starting_11 &&
+      (!p.injured_until || new Date(p.injured_until) <= now));
     if (starters.length < 11) {
       const rest = players.filter(p => !starters.includes(p) &&
         (!p.injured_until || new Date(p.injured_until) <= now))
@@ -464,17 +469,18 @@
     content.innerHTML = `
       <div class="mt-stadium-tab">
         <div class="mt-stadium-pitch" id="mt-stadium-pitch">
-          <!-- 球場線條 -->
           <div class="mt-pitch-line mt-pitch-mid"></div>
           <div class="mt-pitch-circle"></div>
           <div class="mt-pitch-box mt-pitch-box-bottom"></div>
           <div class="mt-pitch-box mt-pitch-box-top"></div>
           <div class="mt-pitch-goalbox mt-pitch-goalbox-bottom"></div>
           <div class="mt-pitch-goalbox mt-pitch-goalbox-top"></div>
-          <!-- 球員會塞進來 -->
-          <div class="mt-pitch-formation-label">📋 ${formation}</div>
+          <!-- 裝飾物：訓練錐 / 球門 -->
+          <div class="mt-pitch-cone" style="left:18%;top:42%"></div>
+          <div class="mt-pitch-cone" style="left:75%;top:46%"></div>
+          <div class="mt-pitch-cone" style="left:32%;top:62%"></div>
+          <div class="mt-pitch-ball" id="mt-pitch-ball"></div>
         </div>
-
         <div class="mt-bench-section">
           <div class="mt-bench-title">板凳球員 <span style="opacity:0.6">(${bench.length})</span></div>
           <div class="mt-bench-strip" id="mt-bench-strip"></div>
@@ -482,15 +488,117 @@
       </div>
     `;
 
-    // 把首發 11 放進球場（依 positions）
     const pitch = content.querySelector('#mt-stadium-pitch');
-    starters.forEach((p, i) => {
-      const pos = positions[i] || { x: 50, y: 50 };
-      const el = _buildStadiumPlayer(p, pos, 'starter');
+    const kit = {
+      shirtColor: team?.kit_shirt_color || 'red',
+      pantsColor: team?.kit_pants_color || 'white',
+      shoeColor:  team?.kit_shoes_color || 'white',
+    };
+
+    // 為每個 starter 預生 LPC sprite sheet → 用 dataURL 當 background-image
+    const wanderers = await Promise.all(starters.map(async (p) => {
+      const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+      let sheetUrl = null;
+      let sheetW = 32, sheetH = 40;
+      if (look && window.LpcRenderer) {
+        try {
+          const sheet = await window.LpcRenderer.matchSpriteSheet(look, kit);
+          if (sheet) {
+            sheetUrl = sheet.canvas.toDataURL('image/png');
+            sheetW = sheet.frameW;
+            sheetH = sheet.frameH;
+          }
+        } catch (e) {}
+      }
+      // 隨機初始位置（中圈內為主）
+      return {
+        player: p,
+        sheetUrl, sheetW, sheetH,
+        x: 0.15 + Math.random() * 0.7,
+        y: 0.18 + Math.random() * 0.65,
+        vx: 0, vy: 0, dir: 0, frame: 1,
+        idleUntil: performance.now() + 800 + Math.random() * 2400,
+        el: null, frameTick: 0,
+      };
+    }));
+
+    // 建 sprite DOM elements
+    wanderers.forEach(w => {
+      const el = document.createElement('button');
+      el.className = `mt-wander-player rarity-${w.player.card?.rarity || 'R'}`;
+      el.dataset.playerId = w.player.id;
+      const labelInjured = (w.player.injured_until && new Date(w.player.injured_until) > now)
+        ? '<span class="mt-pitch-injury">🏥</span>' : '';
+      el.innerHTML = `
+        <div class="mt-wander-sprite" style="${w.sheetUrl
+          ? `background-image:url(${w.sheetUrl});width:${w.sheetW * 2}px;height:${w.sheetH * 2}px`
+          : 'width:48px;height:60px;background:rgba(255,255,255,0.2)'}"></div>
+        ${labelInjured}
+        <div class="mt-wander-name">${escapeHtml(w.player.card?.name || '?')}</div>
+      `;
+      el.addEventListener('click', () => _openPlayerProfile(w.player));
+      w.el = el;
       pitch.appendChild(el);
     });
 
-    // 板凳球員 — 橫向 strip
+    // 動畫迴圈：random walk + LPC walk frame cycle
+    const FRAME_PER_DIR_ROW = { 0: 0, 1: 1, 2: 2, 3: 3 }; // down/left/right/up
+    function tick(t) {
+      const dt = 1; // 簡化：每 frame 推進 1
+      const W_BOUND_LO = 0.06, W_BOUND_HI = 0.94;
+      const H_BOUND_LO = 0.08, H_BOUND_HI = 0.92;
+      for (const w of wanderers) {
+        if (!w.el) continue;
+        // idle phase
+        if (t < w.idleUntil) {
+          w.frame = 1; // 靜止 frame
+        } else {
+          // 沒方向 → 隨機選一個
+          if (w.vx === 0 && w.vy === 0) {
+            const dirs = [
+              { vx: 0, vy: 0.0009, dir: 0 },  // down
+              { vx: -0.0009, vy: 0, dir: 1 }, // left
+              { vx: 0.0009, vy: 0, dir: 2 },  // right
+              { vx: 0, vy: -0.0009, dir: 3 }, // up
+            ];
+            const d = dirs[Math.floor(Math.random() * 4)];
+            w.vx = d.vx; w.vy = d.vy; w.dir = d.dir;
+          }
+          w.x += w.vx;
+          w.y += w.vy;
+          // 撞牆反彈
+          if (w.x <= W_BOUND_LO) { w.x = W_BOUND_LO; w.vx = -w.vx; w.dir = 2; }
+          if (w.x >= W_BOUND_HI) { w.x = W_BOUND_HI; w.vx = -w.vx; w.dir = 1; }
+          if (w.y <= H_BOUND_LO) { w.y = H_BOUND_LO; w.vy = -w.vy; w.dir = 0; }
+          if (w.y >= H_BOUND_HI) { w.y = H_BOUND_HI; w.vy = -w.vy; w.dir = 3; }
+          // 走路 frame cycle（0, 1, 2 三 frame、每 8 tick 換）
+          w.frameTick++;
+          if (w.frameTick > 8) {
+            w.frame = (w.frame + 1) % 3;
+            w.frameTick = 0;
+          }
+          // 隨機停下
+          if (Math.random() < 0.004) {
+            w.vx = 0; w.vy = 0;
+            w.idleUntil = t + 1200 + Math.random() * 3500;
+          }
+        }
+        // 套用位置與 sprite 框
+        w.el.style.left = (w.x * 100) + '%';
+        w.el.style.top  = (w.y * 100) + '%';
+        const sprite = w.el.firstElementChild;
+        if (sprite && w.sheetUrl) {
+          const bgX = -(w.frame * w.sheetW * 2);
+          const bgY = -(FRAME_PER_DIR_ROW[w.dir] * w.sheetH * 2);
+          sprite.style.backgroundPosition = `${bgX}px ${bgY}px`;
+          sprite.style.backgroundSize = `${w.sheetW * 2 * 3}px ${w.sheetH * 2 * 4}px`;
+        }
+      }
+      _stadiumAnimId = requestAnimationFrame(tick);
+    }
+    _stadiumAnimId = requestAnimationFrame(tick);
+
+    // 板凳
     const strip = content.querySelector('#mt-bench-strip');
     if (!bench.length) {
       strip.innerHTML = '<div style="opacity:0.5;font-size:12px;padding:8px">沒有板凳球員</div>';
