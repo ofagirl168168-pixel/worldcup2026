@@ -41,14 +41,19 @@ https://github.com/sanderfrenken/Universal-LPC-Spritesheet-Character-Generator
 - hair/bedhead/male/white.png
 
 ### Shirts (longsleeve)
-- torso/clothes/longsleeve/longsleeve/male/red.png
-- torso/clothes/longsleeve/longsleeve/male/blue.png
-- torso/clothes/longsleeve/longsleeve/male/black.png
-- torso/clothes/longsleeve/longsleeve/male/white.png
-- torso/clothes/longsleeve/longsleeve/male/green.png
-- torso/clothes/longsleeve/longsleeve/male/yellow.png
-- torso/clothes/longsleeve/longsleeve/male/teal.png
-- torso/clothes/longsleeve/longsleeve/male/purple.png
+- torso/clothes/shortsleeve/shortsleeve/male/red.png
+- torso/clothes/shortsleeve/shortsleeve/male/blue.png
+- torso/clothes/shortsleeve/shortsleeve/male/black.png
+- torso/clothes/shortsleeve/shortsleeve/male/white.png
+- torso/clothes/shortsleeve/shortsleeve/male/green.png
+- torso/clothes/shortsleeve/shortsleeve/male/yellow.png
+- torso/clothes/shortsleeve/shortsleeve/male/teal.png
+- torso/clothes/shortsleeve/shortsleeve/male/purple.png
+- torso/clothes/shortsleeve/shortsleeve/male/orange.png
+- torso/clothes/sleeveless/sleeveless/male/red.png
+- torso/clothes/sleeveless/sleeveless/male/blue.png
+- torso/clothes/sleeveless/sleeveless/male/black.png
+- torso/clothes/sleeveless/sleeveless/male/yellow.png
 
 ## 原作者 attribution
 

@@ -63,24 +63,32 @@ const HAIRS = [
   'hair/bedhead/male/white.png',
 ];
 
+// 用 shortsleeve（短袖、像球衣）+ sleeveless（背心、像球員訓練服）
 const SHIRTS = [
-  'torso/clothes/longsleeve/longsleeve/male/red.png',
-  'torso/clothes/longsleeve/longsleeve/male/blue.png',
-  'torso/clothes/longsleeve/longsleeve/male/black.png',
-  'torso/clothes/longsleeve/longsleeve/male/white.png',
-  'torso/clothes/longsleeve/longsleeve/male/green.png',
-  'torso/clothes/longsleeve/longsleeve/male/yellow.png',
-  'torso/clothes/longsleeve/longsleeve/male/teal.png',
-  'torso/clothes/longsleeve/longsleeve/male/purple.png',
+  'torso/clothes/shortsleeve/shortsleeve/male/red.png',
+  'torso/clothes/shortsleeve/shortsleeve/male/blue.png',
+  'torso/clothes/shortsleeve/shortsleeve/male/black.png',
+  'torso/clothes/shortsleeve/shortsleeve/male/white.png',
+  'torso/clothes/shortsleeve/shortsleeve/male/green.png',
+  'torso/clothes/shortsleeve/shortsleeve/male/yellow.png',
+  'torso/clothes/shortsleeve/shortsleeve/male/teal.png',
+  'torso/clothes/shortsleeve/shortsleeve/male/purple.png',
+  'torso/clothes/shortsleeve/shortsleeve/male/orange.png',
+  'torso/clothes/sleeveless/sleeveless/male/red.png',
+  'torso/clothes/sleeveless/sleeveless/male/blue.png',
+  'torso/clothes/sleeveless/sleeveless/male/black.png',
+  'torso/clothes/sleeveless/sleeveless/male/yellow.png',
 ];
 
-// ─── LPC sprite sheet 佈局 ───
-// 832 寬 × 1344 高，64×64 frame 排列。
-// row 10 = walk-down 動作的 frames，frame 0 = 站立 frame。
-// y=640~640+48 = 頭 + 肩膀（48 px 高）
-const FRAME_W = 64;
-const PORTRAIT_H = 48;
-const SRC_Y = 640;
+// ─── LPC sprite sheet 真實佈局（debug 確認過）───
+// 832 寬 × 2944 高（universal generator extended layout）
+// row 10 = walk-down 動作，frame 0 idle 在 y=640~703
+// 角色在 frame 內位於 y=32~61（bottom-aligned）— LPC 都這樣
+// → 32×32 方形 crop 從 frame y=28 起（4px 上邊距 + 頭 + 肩 + 胸 → 32×32）
+const PORTRAIT_W = 32;
+const PORTRAIT_H = 32;
+const SRC_X = 16;             // 角色 ~30 寬、置中於 64 寬 → x=16 起
+const SRC_Y = 640 + 28;       // walk-down 起點 + 28 px = 頭頂上方
 
 async function fetchImage(url) {
   const resp = await fetch(url);
@@ -149,13 +157,13 @@ async function main() {
     const hair  = validHairs  [(h >> 8)  % validHairs.length];
     const shirt = validShirts [(h >> 16) % validShirts.length];
 
-    const cv = createCanvas(FRAME_W, PORTRAIT_H);
+    const cv = createCanvas(PORTRAIT_W, PORTRAIT_H);
     const ctx = cv.getContext('2d');
     // 1. body, 2. shirt, 3. hair（後者覆蓋前者）
     for (const layer of [body, shirt, hair]) {
       const img = cache.get(layer);
       if (!img) continue;
-      ctx.drawImage(img, 0, SRC_Y, FRAME_W, PORTRAIT_H, 0, 0, FRAME_W, PORTRAIT_H);
+      ctx.drawImage(img, SRC_X, SRC_Y, PORTRAIT_W, PORTRAIT_H, 0, 0, PORTRAIT_W, PORTRAIT_H);
     }
 
     const out = path.join(outDir, cardId + '.png');
