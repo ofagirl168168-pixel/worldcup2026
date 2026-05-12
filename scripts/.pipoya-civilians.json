@@ -1,0 +1,593 @@
+{
+  "civilian": [
+    "resources/characters/Female/Female 01-1.png",
+    "resources/characters/Female/Female 01-3.png",
+    "resources/characters/Female/Female 01-4.png",
+    "resources/characters/Female/Female 02-1.png",
+    "resources/characters/Female/Female 02-3.png",
+    "resources/characters/Female/Female 02-4.png",
+    "resources/characters/Female/Female 03-1.png",
+    "resources/characters/Female/Female 03-3.png",
+    "resources/characters/Female/Female 03-4.png",
+    "resources/characters/Female/Female 08-3.png",
+    "resources/characters/Female/Female 08-4.png",
+    "resources/characters/Female/Female 09-1.png",
+    "resources/characters/Female/Female 09-2.png",
+    "resources/characters/Female/Female 09-3.png",
+    "resources/characters/Female/Female 09-4.png",
+    "resources/characters/Female/Female 10-1.png",
+    "resources/characters/Female/Female 10-2.png",
+    "resources/characters/Female/Female 10-3.png",
+    "resources/characters/Female/Female 10-4.png",
+    "resources/characters/Female/Female 11-1.png",
+    "resources/characters/Female/Female 11-2.png",
+    "resources/characters/Female/Female 11-3.png",
+    "resources/characters/Female/Female 11-4.png",
+    "resources/characters/Female/Female 12-1.png",
+    "resources/characters/Female/Female 12-3.png",
+    "resources/characters/Female/Female 13-1.png",
+    "resources/characters/Female/Female 13-2.png",
+    "resources/characters/Female/Female 13-3.png",
+    "resources/characters/Female/Female 13-4.png",
+    "resources/characters/Female/Female 17-1.png",
+    "resources/characters/Female/Female 17-3.png",
+    "resources/characters/Female/Female 17-4.png",
+    "resources/characters/Female/Female 18-1.png",
+    "resources/characters/Female/Female 18-3.png",
+    "resources/characters/Female/Female 18-4.png",
+    "resources/characters/Female/Female 19-1.png",
+    "resources/characters/Female/Female 19-2.png",
+    "resources/characters/Female/Female 19-3.png",
+    "resources/characters/Female/Female 19-4.png",
+    "resources/characters/Female/Female 20-1.png",
+    "resources/characters/Female/Female 20-3.png",
+    "resources/characters/Female/Female 20-4.png",
+    "resources/characters/Female/Female 21-1.png",
+    "resources/characters/Female/Female 21-3.png",
+    "resources/characters/Female/Female 21-4.png",
+    "resources/characters/Female/Female 22-1.png",
+    "resources/characters/Female/Female 22-2.png",
+    "resources/characters/Female/Female 22-3.png",
+    "resources/characters/Female/Female 22-4.png",
+    "resources/characters/Female/Female 25-1.png",
+    "resources/characters/Male/Male 01-1.png",
+    "resources/characters/Male/Male 01-3.png",
+    "resources/characters/Male/Male 01-4.png",
+    "resources/characters/Male/Male 02-1.png",
+    "resources/characters/Male/Male 02-2.png",
+    "resources/characters/Male/Male 02-3.png",
+    "resources/characters/Male/Male 02-4.png",
+    "resources/characters/Male/Male 03-1.png",
+    "resources/characters/Male/Male 03-2.png",
+    "resources/characters/Male/Male 03-3.png",
+    "resources/characters/Male/Male 03-4.png",
+    "resources/characters/Male/Male 07-1.png",
+    "resources/characters/Male/Male 07-2.png",
+    "resources/characters/Male/Male 07-3.png",
+    "resources/characters/Male/Male 07-4.png",
+    "resources/characters/Male/Male 10-1.png",
+    "resources/characters/Male/Male 10-2.png",
+    "resources/characters/Male/Male 10-3.png",
+    "resources/characters/Male/Male 10-4.png",
+    "resources/characters/Male/Male 11-1.png",
+    "resources/characters/Male/Male 11-2.png",
+    "resources/characters/Male/Male 11-3.png",
+    "resources/characters/Male/Male 11-4.png",
+    "resources/characters/Male/Male 12-1.png",
+    "resources/characters/Male/Male 12-2.png",
+    "resources/characters/Male/Male 12-3.png",
+    "resources/characters/Male/Male 12-4.png",
+    "resources/characters/Male/Male 13-1.png",
+    "resources/characters/Male/Male 13-3.png",
+    "resources/characters/Male/Male 13-4.png",
+    "resources/characters/Male/Male 14-1.png",
+    "resources/characters/Male/Male 14-2.png",
+    "resources/characters/Male/Male 14-3.png",
+    "resources/characters/Male/Male 14-4.png",
+    "resources/characters/Male/Male 16-2.png",
+    "resources/characters/Male/Male 16-3.png",
+    "resources/characters/Male/Male 16-4.png",
+    "resources/characters/Male/Male 17-1.png",
+    "resources/characters/Male/Male 17-2.png",
+    "resources/characters/Male/Male 17-3.png",
+    "resources/characters/Male/Male 17-4.png",
+    "resources/characters/Male/Male 18-1.png"
+  ],
+  "excluded": [
+    {
+      "path": "resources/characters/Female/Female 01-2.png",
+      "name": "Female/Female 01-2.png",
+      "reasons": [
+        "crown(yellow×34)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 02-2.png",
+      "name": "Female/Female 02-2.png",
+      "reasons": [
+        "crown(yellow×36)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 03-2.png",
+      "name": "Female/Female 03-2.png",
+      "reasons": [
+        "crown(yellow×57)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 04-1.png",
+      "name": "Female/Female 04-1.png",
+      "reasons": [
+        "crown(yellow×4)",
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 04-2.png",
+      "name": "Female/Female 04-2.png",
+      "reasons": [
+        "crown(yellow×4)",
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 04-3.png",
+      "name": "Female/Female 04-3.png",
+      "reasons": [
+        "crown(yellow×4)",
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 04-4.png",
+      "name": "Female/Female 04-4.png",
+      "reasons": [
+        "crown(yellow×4)",
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 05-1.png",
+      "name": "Female/Female 05-1.png",
+      "reasons": [
+        "helmet(grey×74)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 05-2.png",
+      "name": "Female/Female 05-2.png",
+      "reasons": [
+        "helmet(grey×74)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 05-3.png",
+      "name": "Female/Female 05-3.png",
+      "reasons": [
+        "helmet(grey×74)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 05-4.png",
+      "name": "Female/Female 05-4.png",
+      "reasons": [
+        "helmet(grey×74)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 06-1.png",
+      "name": "Female/Female 06-1.png",
+      "reasons": [
+        "crown(yellow×14)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 06-2.png",
+      "name": "Female/Female 06-2.png",
+      "reasons": [
+        "crown(yellow×37)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 06-3.png",
+      "name": "Female/Female 06-3.png",
+      "reasons": [
+        "crown(yellow×14)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 06-4.png",
+      "name": "Female/Female 06-4.png",
+      "reasons": [
+        "crown(yellow×14)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 07-1.png",
+      "name": "Female/Female 07-1.png",
+      "reasons": [
+        "crown(yellow×14)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 07-2.png",
+      "name": "Female/Female 07-2.png",
+      "reasons": [
+        "crown(yellow×14)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 07-3.png",
+      "name": "Female/Female 07-3.png",
+      "reasons": [
+        "crown(yellow×14)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 07-4.png",
+      "name": "Female/Female 07-4.png",
+      "reasons": [
+        "crown(yellow×14)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 08-1.png",
+      "name": "Female/Female 08-1.png",
+      "reasons": [
+        "crown(yellow×17)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 08-2.png",
+      "name": "Female/Female 08-2.png",
+      "reasons": [
+        "crown(yellow×28)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 12-2.png",
+      "name": "Female/Female 12-2.png",
+      "reasons": [
+        "crown(yellow×26)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 12-4.png",
+      "name": "Female/Female 12-4.png",
+      "reasons": [
+        "helmet(grey×31)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 14-1.png",
+      "name": "Female/Female 14-1.png",
+      "reasons": [
+        "helmet(grey×45)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 14-2.png",
+      "name": "Female/Female 14-2.png",
+      "reasons": [
+        "crown(yellow×7)",
+        "helmet(grey×45)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 14-3.png",
+      "name": "Female/Female 14-3.png",
+      "reasons": [
+        "helmet(grey×45)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 14-4.png",
+      "name": "Female/Female 14-4.png",
+      "reasons": [
+        "helmet(grey×61)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 15-1.png",
+      "name": "Female/Female 15-1.png",
+      "reasons": [
+        "helmet(grey×45)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 15-2.png",
+      "name": "Female/Female 15-2.png",
+      "reasons": [
+        "helmet(grey×45)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 15-3.png",
+      "name": "Female/Female 15-3.png",
+      "reasons": [
+        "helmet(grey×45)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 15-4.png",
+      "name": "Female/Female 15-4.png",
+      "reasons": [
+        "helmet(grey×45)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 16-1.png",
+      "name": "Female/Female 16-1.png",
+      "reasons": [
+        "helmet(grey×45)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 16-2.png",
+      "name": "Female/Female 16-2.png",
+      "reasons": [
+        "helmet(grey×45)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 16-3.png",
+      "name": "Female/Female 16-3.png",
+      "reasons": [
+        "helmet(grey×45)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 16-4.png",
+      "name": "Female/Female 16-4.png",
+      "reasons": [
+        "helmet(grey×45)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 17-2.png",
+      "name": "Female/Female 17-2.png",
+      "reasons": [
+        "crown(yellow×38)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 18-2.png",
+      "name": "Female/Female 18-2.png",
+      "reasons": [
+        "crown(yellow×41)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 20-2.png",
+      "name": "Female/Female 20-2.png",
+      "reasons": [
+        "crown(yellow×7)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 21-2.png",
+      "name": "Female/Female 21-2.png",
+      "reasons": [
+        "crown(yellow×5)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 23-1.png",
+      "name": "Female/Female 23-1.png",
+      "reasons": [
+        "crown(yellow×14)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Female/Female 24-1.png",
+      "name": "Female/Female 24-1.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 01-2.png",
+      "name": "Male/Male 01-2.png",
+      "reasons": [
+        "crown(yellow×37)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 04-1.png",
+      "name": "Male/Male 04-1.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 04-2.png",
+      "name": "Male/Male 04-2.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 04-3.png",
+      "name": "Male/Male 04-3.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 04-4.png",
+      "name": "Male/Male 04-4.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 05-1.png",
+      "name": "Male/Male 05-1.png",
+      "reasons": [
+        "helmet(grey×44)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 05-2.png",
+      "name": "Male/Male 05-2.png",
+      "reasons": [
+        "helmet(grey×44)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 05-3.png",
+      "name": "Male/Male 05-3.png",
+      "reasons": [
+        "helmet(grey×44)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 05-4.png",
+      "name": "Male/Male 05-4.png",
+      "reasons": [
+        "helmet(grey×44)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 06-1.png",
+      "name": "Male/Male 06-1.png",
+      "reasons": [
+        "crown(yellow×10)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 06-2.png",
+      "name": "Male/Male 06-2.png",
+      "reasons": [
+        "crown(yellow×20)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 06-3.png",
+      "name": "Male/Male 06-3.png",
+      "reasons": [
+        "crown(yellow×10)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 06-4.png",
+      "name": "Male/Male 06-4.png",
+      "reasons": [
+        "crown(yellow×10)",
+        "robe(bottom_w=29)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 08-1.png",
+      "name": "Male/Male 08-1.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 08-2.png",
+      "name": "Male/Male 08-2.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 08-3.png",
+      "name": "Male/Male 08-3.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 08-4.png",
+      "name": "Male/Male 08-4.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 09-1.png",
+      "name": "Male/Male 09-1.png",
+      "reasons": [
+        "helmet(grey×54)",
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 09-2.png",
+      "name": "Male/Male 09-2.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 09-3.png",
+      "name": "Male/Male 09-3.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 09-4.png",
+      "name": "Male/Male 09-4.png",
+      "reasons": [
+        "robe(bottom_w=23)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 13-2.png",
+      "name": "Male/Male 13-2.png",
+      "reasons": [
+        "crown(yellow×9)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 15-1.png",
+      "name": "Male/Male 15-1.png",
+      "reasons": [
+        "crown(yellow×6)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 15-2.png",
+      "name": "Male/Male 15-2.png",
+      "reasons": [
+        "crown(yellow×8)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 15-3.png",
+      "name": "Male/Male 15-3.png",
+      "reasons": [
+        "crown(yellow×6)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 15-4.png",
+      "name": "Male/Male 15-4.png",
+      "reasons": [
+        "crown(yellow×6)"
+      ]
+    },
+    {
+      "path": "resources/characters/Male/Male 16-1.png",
+      "name": "Male/Male 16-1.png",
+      "reasons": [
+        "helmet(grey×44)"
+      ]
+    }
+  ]
+}

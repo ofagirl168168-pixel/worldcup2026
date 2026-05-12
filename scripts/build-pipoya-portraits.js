@@ -52,16 +52,22 @@ function hashSeed(s) {
 }
 
 async function main() {
-  // 1. 列出所有 PIPOYA 角色
-  console.log('Discovering PIPOYA character list...');
-  const charPaths = await listCharacters();
-  console.log(`Found ${charPaths.length} character files`);
-  const malePaths = charPaths.filter(p => p.includes('/Male/')).sort();
-  const femalePaths = charPaths.filter(p => p.includes('/Female/')).sort();
-  console.log(`  Male: ${malePaths.length}  Female: ${femalePaths.length}`);
-
-  // 用全部、不分性別（足球員可以多元）
-  const allPaths = [...malePaths, ...femalePaths];
+  // 1. 讀 civilian filter（過濾掉皇冠/頭盔/長袍類角色）
+  // 之前 user 反饋「怎麼有國王」→ 用 filter-pipoya-civilians.js 過濾
+  const filterPath = path.join(__dirname, '.pipoya-civilians.json');
+  let allPaths;
+  if (fs.existsSync(filterPath)) {
+    const filter = JSON.parse(fs.readFileSync(filterPath, 'utf-8'));
+    allPaths = filter.civilian || [];
+    console.log(`Using ${allPaths.length} civilian sprites (filtered from .pipoya-civilians.json)`);
+    if (!allPaths.length) {
+      throw new Error('Civilian list empty — run scripts/filter-pipoya-civilians.js first');
+    }
+  } else {
+    console.log('No civilian filter found, falling back to discovery (may include kings/knights)');
+    const charPaths = await listCharacters();
+    allPaths = charPaths.filter(p => /\/(Male|Female)\//.test(p)).sort();
+  }
 
   // 2. 讀 230 個 card_ids
   const seedPath = path.join(__dirname, '..', 'supabase', 'migrations', '20260512000001_seed_player_cards.sql');

@@ -435,11 +435,11 @@
   // 同一張卡的角色 = 同一個 PIPOYA 角色（hash 指派、卡片與比賽一致）
   function _portraitUrlFor(cardId, rarity) {
     if (!cardId) return 'img/portraits/default.png';
-    return `img/portraits/${encodeURIComponent(cardId)}.png?v=4`;
+    return `img/portraits/${encodeURIComponent(cardId)}.png?v=5`;
   }
   function _spriteUrlFor(cardId) {
     if (!cardId) return null;
-    return `img/sprites/${encodeURIComponent(cardId)}.png?v=4`;
+    return `img/sprites/${encodeURIComponent(cardId)}.png?v=5`;
   }
   window.MyTeamPortrait = _portraitUrlFor;
   window.MyTeamSprite = _spriteUrlFor;
