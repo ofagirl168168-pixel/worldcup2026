@@ -1612,7 +1612,7 @@
 /* ── 新手禮包 overlay ── */
 .mt-starter-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-  z-index: 10000; display: flex; align-items: center; justify-content: center;
+  z-index: 12000; display: flex; align-items: center; justify-content: center;
   opacity: 0; transition: opacity 0.2s; backdrop-filter: blur(4px);
 }
 .mt-starter-overlay.open { opacity: 1; }
@@ -1700,7 +1700,7 @@
 .mt-ssr-select-sub { font-size: 12px; opacity: 0.85; margin-bottom: 10px; }
 
 .mt-ssr-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10001;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 12001;
   display: flex; align-items: center; justify-content: center;
   opacity: 0; transition: opacity 0.2s; backdrop-filter: blur(4px);
 }
@@ -1927,7 +1927,7 @@
 .mt-profile-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.75);
   display: flex; align-items: center; justify-content: center;
-  z-index: 10002; opacity: 0; transition: opacity 0.2s;
+  z-index: 12002; opacity: 0; transition: opacity 0.2s;
   backdrop-filter: blur(6px); padding: 16px;
 }
 .mt-profile-overlay.open { opacity: 1; }
