@@ -333,24 +333,148 @@
     }
   }
 
-  function renderMatchTab(content) {
+  async function renderMatchTab(content) {
+    content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入聯賽進度…</div>';
+    const team = window.MyTeam.getCached();
+    if (!team) return;
+    const { data: prog } = await window.DB
+      .from('league_progress')
+      .select('*')
+      .eq('user_id', team.user_id)
+      .maybeSingle();
+    const tier = prog?.current_tier || 1;
+    const tierName = ({1:'新手聯賽',2:'業餘聯賽',3:'地區聯賽',4:'全國次級',5:'全國聯賽',6:'大陸盃',7:'歐洲菁英',8:'世界次級',9:'世界聯賽',10:'傳奇聯賽'})[tier];
+    const playedRatio = `${prog?.matches_played || 0}/10`;
+    const wins = prog?.wins || 0;
+    const draws = prog?.draws || 0;
+    const losses = prog?.losses || 0;
+    const tierAvg = { 1:40,2:50,3:60,4:70,5:75,6:80,7:85,8:88,9:92,10:95 }[tier];
+    const realRatio = { 1:0,2:0,3:0,4:0.1,5:0.2,6:0.3,7:0.45,8:0.65,9:0.85,10:1.0 }[tier];
+    const bossNote = realRatio > 0
+      ? `<div class="mt-match-boss-note">⭐ Tier ${tier}：本聯賽約 ${Math.round(realRatio*100)}% 機率遇到真實隊伍 Boss 戰</div>` : '';
+
     content.innerHTML = `
-      <div class="mt-tab-todo">
-        <div class="mt-tab-todo-icon">⚽</div>
-        <div>比賽功能開發中</div>
-        <div style="font-size:11px;opacity:0.6;margin-top:8px">Phase 1.9 會接上 match-sim.js + 聯賽推進</div>
+      <div class="mt-match-tab">
+        <div class="mt-match-season">
+          <div class="mt-match-season-tier">${tierName}（Tier ${tier}）</div>
+          <div class="mt-match-season-sub">對手平均能力 ${tierAvg} · 賽季 ${prog?.season_num || 1}</div>
+          <div class="mt-match-season-progress">
+            <div class="mt-match-season-bar">
+              <div style="width:${(prog?.matches_played || 0) * 10}%"></div>
+            </div>
+            <div class="mt-match-season-stats">
+              ${playedRatio} 場 · <b style="color:#4caf50">${wins} 勝</b> / <span>${draws} 平</span> / <span style="color:#ef9a9a">${losses} 敗</span>
+            </div>
+          </div>
+          <div class="mt-match-season-hint">7 勝以上升級 / 3 勝以下降級 / 賽季冠軍 +SSR 自選券</div>
+        </div>
+        ${bossNote}
+        <button class="mt-match-start" id="mt-match-start" ${team.stamina < 1 ? 'disabled' : ''}>
+          ⚽ 下一場比賽
+          <span class="mt-match-start-cost">耗 1 ⚡（剩 ${team.stamina}/${team.stamina_max}）</span>
+        </button>
+        ${team.stamina < 1 ? '<div class="mt-match-low-stamina">⚡ 體力 0 — 預測比賽、看文章可賺體力</div>' : ''}
       </div>
     `;
+
+    content.querySelector('#mt-match-start')?.addEventListener('click', () => {
+      if (typeof window.MyTeam.runMatch === 'function') {
+        window.MyTeam.runMatch();
+      }
+    });
   }
 
-  function renderTrainTab(content) {
+  async function renderTrainTab(content) {
+    const team = window.MyTeam.getCached();
+    if (!team) return;
+    content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入球員中…</div>';
+    const players = await window.MyTeam.fetchPlayers();
+    if (!players.length) {
+      content.innerHTML = `
+        <div class="mt-roster-empty">
+          <div class="mt-roster-empty-icon">🎰</div>
+          <div>還沒有球員！</div>
+          <div style="font-size:12px;margin:8px 0 16px;opacity:0.7">先抽幾張卡才能訓練</div>
+          <button class="mt-roster-empty-cta" data-go-gacha>🎰 去抽卡</button>
+        </div>
+      `;
+      content.querySelector('[data-go-gacha]').addEventListener('click', () => {
+        _currentTab = 'gacha';
+        document.querySelector('.mt-hub-tab[data-tab="gacha"]')?.click();
+      });
+      return;
+    }
+
     content.innerHTML = `
-      <div class="mt-tab-todo">
-        <div class="mt-tab-todo-icon">💪</div>
-        <div>訓練系統開發中</div>
-        <div style="font-size:11px;opacity:0.6;margin-top:8px">Phase 1.8 會做 RP 消耗升級球員</div>
+      <div class="mt-train-rp">
+        <div class="mt-train-rp-title">⚙️ Research Points</div>
+        <div class="mt-train-rp-grid">
+          <div class="mt-train-rp-cell"><span>戰術</span><b>${team.rp_tactical}</b></div>
+          <div class="mt-train-rp-cell"><span>體能</span><b>${team.rp_physical}</b></div>
+          <div class="mt-train-rp-cell"><span>心</span><b>${team.rp_heart}</b></div>
+          <div class="mt-train-rp-cell"><span>靈感</span><b>${team.rp_idea}</b></div>
+        </div>
+        <div class="mt-train-rp-sub">贏球賺 RP / 一般訓練 戰術+體能各 10、精緻 各 30+心靈感各 10</div>
       </div>
+      <div class="mt-train-list" id="mt-train-list"></div>
     `;
+
+    const list = content.querySelector('#mt-train-list');
+    players.forEach(p => {
+      const c = p.card || {};
+      const canNormal = team.rp_tactical >= 10 && team.rp_physical >= 10 && p.level < 50;
+      const canPremium = team.rp_tactical >= 30 && team.rp_physical >= 30
+                        && team.rp_heart >= 10 && team.rp_idea >= 10 && p.level < 50;
+      const row = document.createElement('div');
+      row.className = `mt-train-row rarity-${c.rarity || 'R'}`;
+      row.innerHTML = `
+        <div class="mt-train-row-head">
+          <span class="mt-player-card-rarity">${c.rarity || 'R'}</span>
+          <div class="mt-player-name">${escapeHtml(c.name || '?')}</div>
+          <div class="mt-player-position">${c.position || ''} · Lv.${p.level}/50 ${p.bond ? '★'.repeat(p.bond) : ''}</div>
+        </div>
+        <div class="mt-train-row-stats">
+          攻 ${p.current_attack} · 防 ${p.current_defense} · 速 ${p.current_speed} ·
+          中 ${p.current_midfield} · 體 ${p.current_stamina} · 環 ${p.current_aura}
+        </div>
+        <div class="mt-train-row-actions">
+          <button class="mt-train-btn" data-train="normal" data-player="${p.id}" ${canNormal ? '' : 'disabled'}>
+            一般訓練（戰術 10 + 體能 10）
+          </button>
+          <button class="mt-train-btn mt-train-btn-premium" data-train="premium" data-player="${p.id}" ${canPremium ? '' : 'disabled'}>
+            精緻訓練（30+30+10+10）
+          </button>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+
+    // click 訓練
+    list.querySelectorAll('[data-train]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const pid = btn.dataset.player;
+        const mode = btn.dataset.train;
+        list.querySelectorAll('[data-train]').forEach(b => b.disabled = true);
+        try {
+          const result = await window.MyTeam.trainPlayer(pid, mode);
+          const g = result.gains;
+          if (typeof showToast === 'function') {
+            showToast(`💪 Lv.${result.level_after}！攻+${g.attack}/防+${g.defense}/速+${g.speed}/中+${g.midfield}/體+${g.stamina}/環+${g.aura}`);
+          }
+          // 重畫 hub（RP 變化）
+          renderHub();
+        } catch (err) {
+          console.error('[my-team] train error', err);
+          const msg = String(err.message || err);
+          let friendly = '訓練失敗：' + msg;
+          if (msg.includes('INSUFFICIENT_RP')) friendly = '⚠️ RP 不足';
+          else if (msg.includes('MAX_LEVEL')) friendly = '⚠️ 已滿級';
+          if (typeof showToast === 'function') showToast(friendly);
+          else alert(friendly);
+          list.querySelectorAll('[data-train]').forEach(b => b.disabled = false);
+        }
+      });
+    });
   }
 
   function escapeHtml(s) {

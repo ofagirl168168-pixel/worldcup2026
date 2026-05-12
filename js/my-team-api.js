@@ -179,6 +179,17 @@
     _emitChange();
   }
 
+  // ── 訓練 RPC ──
+  async function trainPlayer(playerId, mode) {
+    const { data, error } = await window.DB.rpc('train_player', {
+      p_player_id: playerId,
+      p_mode: mode || 'normal',
+    });
+    if (error) throw error;
+    await fetch_(); // 重撈 team 反映 RP 扣除
+    return data;
+  }
+
   window.MyTeam = {
     fetch: fetch_,
     create,
@@ -188,6 +199,7 @@
     awardStamina,
     awardGems,
     awardSSRSelectTicket,
+    trainPlayer,
     getCached,
     clearCache,
   };

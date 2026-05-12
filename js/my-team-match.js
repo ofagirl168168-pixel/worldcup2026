@@ -1,0 +1,340 @@
+/* my-team-match.js — 比賽流程
+ * 設計依據 docs/my-team-design.md §6 §7.5
+ *
+ * 對外：
+ *   MyTeam.runMatch() — 全自動流程（gen 對手 → 跑 sim → 結算 → 顯示獎勵）
+ */
+(function () {
+  'use strict';
+
+  // ── 10 階聯賽 tier 平均能力（§6.1 v0.6）──
+  const TIER_AVG = { 1: 40, 2: 50, 3: 60, 4: 70, 5: 75, 6: 80, 7: 85, 8: 88, 9: 92, 10: 95 };
+
+  // ── 真實隊伍佔比（§7.5 v0.4）──
+  const REAL_TEAM_RATIO = { 1: 0, 2: 0, 3: 0, 4: 0.1, 5: 0.2, 6: 0.3, 7: 0.45, 8: 0.65, 9: 0.85, 10: 1.0 };
+
+  // ── NPC 隊名池（系統生成假隊）──
+  const NPC_NAMES = [
+    '北辰騎士', '南灣海狼', '青蘋果俱樂部', '雷霆獵戶', '黑曜石聯', '銀河使者',
+    '皇家貝爾', '伊斯特海軍', '紅松鴉', '烈火鷹', '紫雲隊', '森林之子',
+    '北極星 FC', '深淵藍鯨', '草原野馬', '高地戰士', '鋼鐵 SC', '聖橡聯',
+  ];
+
+  function _rng(seed) {
+    let x = seed;
+    return () => {
+      x = (x * 9301 + 49297) % 233280;
+      return x / 233280;
+    };
+  }
+
+  // ── 玩家球隊資料 → match-sim 的 home 格式 ──
+  function _buildMyTeamData(team, players) {
+    let starters = players.filter(p => p.in_starting_11);
+    if (starters.length < 11) {
+      // 補滿 11 人：取剩下最強的
+      const rest = players.filter(p => !p.in_starting_11)
+        .sort((a, b) => (b.current_attack + b.current_defense) - (a.current_attack + a.current_defense));
+      starters = starters.concat(rest.slice(0, 11 - starters.length));
+    }
+    if (!starters.length) return null;
+
+    // radar = 首發平均
+    const avg = (key) => Math.round(starters.reduce((s, p) => s + (p[key] || 0), 0) / starters.length);
+    return {
+      nameCN: team.team_name,
+      flag: team.team_crest,
+      keyPlayers: starters.slice(0, 11).map(p => ({
+        name: p.card?.name || '?',
+        pos: p.card?.position || 'MID',
+        club: team.team_name,
+      })),
+      radar: {
+        attack:     avg('current_attack'),
+        defense:    avg('current_defense'),
+        midfield:   avg('current_midfield'),
+        speed:      avg('current_speed'),
+        experience: Math.min(95, 50 + (team.stadium_level - 1) * 5),
+      },
+    };
+  }
+
+  // ── AI NPC 對手生成 ──
+  function _generateNPC(tier, matchIdx) {
+    const baseAvg = TIER_AVG[tier] || 50;
+    const rand = _rng(tier * 1000 + matchIdx);
+    const name = NPC_NAMES[Math.floor(rand() * NPC_NAMES.length)] + ' ' + String.fromCharCode(65 + matchIdx);
+    const variance = 8;
+    const roll = (b) => Math.max(20, Math.min(95, Math.round(b + (rand() - 0.5) * variance * 2)));
+    return {
+      nameCN: name,
+      flag: '🏴',
+      _isReal: false,
+      radar: {
+        attack:     roll(baseAvg),
+        defense:    roll(baseAvg),
+        midfield:   roll(baseAvg),
+        speed:      roll(baseAvg),
+        experience: roll(baseAvg - 5),
+      },
+    };
+  }
+
+  // ── 真實隊伍對手生成（從站內 EPL / UCL）──
+  function _generateReal(tier, matchIdx) {
+    // 從 EPL_TEAMS + UCL_TEAMS 撈一隊
+    const epl = Object.values(window.EPL_TEAMS || {}).filter(t => t.radar);
+    const ucl = Object.values(window.UCL_TEAMS || {}).filter(t => t.radar);
+    const pool = [...epl, ...ucl];
+    if (!pool.length) return _generateNPC(tier, matchIdx);
+    // 高 tier 抽強隊（按 radar 平均排序、tier 越高越偏前段）
+    pool.sort((a, b) => {
+      const sa = (a.radar.attack + a.radar.defense + a.radar.midfield) / 3;
+      const sb = (b.radar.attack + b.radar.defense + b.radar.midfield) / 3;
+      return sb - sa;
+    });
+    // tier 4 = 後段、tier 10 = 前段
+    const topRatio = (tier - 4) / 6; // 0~1
+    const sliceEnd = Math.max(5, Math.round(pool.length * (0.3 + topRatio * 0.7)));
+    const rand = _rng(tier * 7000 + matchIdx);
+    const candidates = pool.slice(0, sliceEnd);
+    const team = candidates[Math.floor(rand() * candidates.length)];
+    return {
+      nameCN: team.nameCN || team.name,
+      flag: team.flag || '🏴',
+      keyPlayers: team.keyPlayers || [],
+      _isReal: true,
+      _origRadar: team.radar,
+      radar: team.radar,
+    };
+  }
+
+  // ── 抽對手（依 tier 機率混合 NPC / Real）──
+  function _pickOpponent(tier, matchIdx) {
+    const realRatio = REAL_TEAM_RATIO[tier] || 0;
+    const r = (Math.random() < realRatio);
+    return r ? _generateReal(tier, matchIdx) : _generateNPC(tier, matchIdx);
+  }
+
+  // ── 結算 RPC ──
+  async function _finalize(opponent, scoreH, scoreA, isBoss) {
+    const opponentSnapshot = {
+      nameCN: opponent.nameCN, flag: opponent.flag,
+      radar: opponent.radar, isReal: !!opponent._isReal,
+    };
+    const { data, error } = await window.DB.rpc('finalize_match', {
+      p_opponent_data: opponentSnapshot,
+      p_opponent_type: opponent._isReal ? 'ai_real' : 'ai_npc',
+      p_is_boss: !!isBoss,
+      p_score_home: scoreH,
+      p_score_away: scoreA,
+      p_match_log: [],
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  // ── 公開：跑一場（match modal）──
+  async function runMatch() {
+    const team = window.MyTeam.getCached();
+    if (!team || team === 'not_created') {
+      if (typeof showToast === 'function') showToast('⚠️ 請先建立球隊');
+      return;
+    }
+    if (team.stamina < 1) {
+      if (typeof showToast === 'function') showToast('⚡ 體力不足，今天打太多了！明天再來、或預測比分賺體力');
+      return;
+    }
+
+    // 撈球員 → 組 home 資料
+    const players = await window.MyTeam.fetchPlayers();
+    if (!players.length) {
+      if (typeof showToast === 'function') showToast('🎰 還沒有球員！先去抽卡');
+      return;
+    }
+    const homeData = _buildMyTeamData(team, players);
+    if (!homeData) {
+      if (typeof showToast === 'function') showToast('⚠️ 球員資料不足');
+      return;
+    }
+
+    // 撈聯賽進度
+    const { data: prog } = await window.DB
+      .from('league_progress')
+      .select('*')
+      .eq('user_id', team.user_id)
+      .maybeSingle();
+    const tier = prog?.current_tier || 1;
+    const matchIdx = prog?.matches_played || 0;
+    const opponent = _pickOpponent(tier, matchIdx);
+    const isBoss = !!opponent._isReal;
+
+    _openMatchModal({ team, homeData, opponent, tier, matchIdx, isBoss });
+  }
+
+  // ── 比賽 modal ──
+  function _openMatchModal(ctx) {
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-match-overlay';
+    overlay.innerHTML = `
+      <div class="mt-match-stage">
+        <button class="mt-modal-close" type="button">×</button>
+        <div id="mt-match-content"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    overlay.querySelector('.mt-modal-close').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 250);
+    });
+
+    _renderPreMatch(overlay, ctx);
+  }
+
+  function _renderPreMatch(overlay, ctx) {
+    const content = overlay.querySelector('#mt-match-content');
+    const hAvg = avgRadar(ctx.homeData.radar);
+    const aAvg = avgRadar(ctx.opponent.radar);
+    const winProb = _estimateWinProb(hAvg, aAvg);
+    const tierName = ({1:'新手聯賽',2:'業餘聯賽',3:'地區聯賽',4:'全國次級',5:'全國聯賽',6:'大陸盃',7:'歐洲菁英',8:'世界次級',9:'世界聯賽',10:'傳奇聯賽'})[ctx.tier];
+    content.innerHTML = `
+      <div class="mt-pre-match">
+        <div class="mt-pre-match-tier">${tierName} · 第 ${ctx.matchIdx + 1}/10 場</div>
+        ${ctx.isBoss ? '<div class="mt-pre-match-boss">⭐ 真實隊伍 BOSS 戰 ⭐</div>' : ''}
+        <div class="mt-pre-match-vs">
+          <div class="mt-pre-match-side">
+            <div class="mt-pre-match-crest">${ctx.team.team_crest}</div>
+            <div class="mt-pre-match-name">${escapeHtml(ctx.team.team_name)}</div>
+            <div class="mt-pre-match-radar">攻 ${ctx.homeData.radar.attack} · 防 ${ctx.homeData.radar.defense} · 速 ${ctx.homeData.radar.speed}</div>
+            <div class="mt-pre-match-avg">綜合 ${hAvg}</div>
+          </div>
+          <div class="mt-pre-match-mid">VS</div>
+          <div class="mt-pre-match-side">
+            <div class="mt-pre-match-crest">${_renderFlag(ctx.opponent.flag)}</div>
+            <div class="mt-pre-match-name">${escapeHtml(ctx.opponent.nameCN)}</div>
+            <div class="mt-pre-match-radar">攻 ${ctx.opponent.radar.attack} · 防 ${ctx.opponent.radar.defense} · 速 ${ctx.opponent.radar.speed}</div>
+            <div class="mt-pre-match-avg">綜合 ${aAvg}</div>
+          </div>
+        </div>
+        <div class="mt-pre-match-prob">
+          <div class="mt-pre-match-prob-bar">
+            <div style="width:${winProb}%;background:#4caf50"></div>
+            <div style="flex:1;background:rgba(255,255,255,0.1)"></div>
+          </div>
+          <div class="mt-pre-match-prob-text">勝率約 ${winProb}%</div>
+        </div>
+        <button class="mt-onboard-submit" id="mt-match-start">⚽ 開始比賽（消耗 1 體力）</button>
+      </div>
+    `;
+    overlay.querySelector('#mt-match-start').addEventListener('click', () => _runSim(overlay, ctx));
+  }
+
+  function _renderFlag(f) {
+    if (!f) return '🏴';
+    if (/^https?:\/\//.test(f)) return `<img src="${f}" style="width:48px;height:48px;border-radius:50%;background:#fff;object-fit:contain">`;
+    return f;
+  }
+
+  function avgRadar(r) {
+    return Math.round((r.attack + r.defense + r.midfield + r.speed) / 4);
+  }
+
+  function _estimateWinProb(hAvg, aAvg) {
+    const diff = hAvg - aAvg;
+    // sigmoid-like
+    return Math.max(5, Math.min(95, Math.round(50 + diff * 1.5)));
+  }
+
+  function _runSim(overlay, ctx) {
+    const content = overlay.querySelector('#mt-match-content');
+    content.innerHTML = `
+      <div class="mt-match-sim">
+        <div id="mt-match-sim-host"></div>
+      </div>
+    `;
+    if (!window.MatchSim || typeof window.MatchSim.runDirect !== 'function') {
+      content.innerHTML = '<div style="color:#ef9a9a;padding:20px;text-align:center">⚠️ match-sim 未載入</div>';
+      return;
+    }
+    window.MatchSim.runDirect(
+      content.querySelector('#mt-match-sim-host'),
+      ctx.homeData,
+      ctx.opponent,
+      {
+        matchId: 'mt-' + Date.now(),
+        seed: Date.now(),
+        hideReplay: true,
+        onEnd: async (score) => {
+          // 結算
+          try {
+            const result = await _finalize(ctx.opponent, score.h, score.a, ctx.isBoss);
+            await window.MyTeam.fetch();
+            _renderPostMatch(overlay, ctx, score, result);
+          } catch (err) {
+            console.error('[my-team] finalize error', err);
+            const msg = String(err.message || err);
+            content.innerHTML = `<div style="color:#ef9a9a;padding:20px;text-align:center">⚠️ 結算失敗：${escapeHtml(msg)}</div>`;
+          }
+        },
+      }
+    );
+  }
+
+  function _renderPostMatch(overlay, ctx, score, result) {
+    const content = overlay.querySelector('#mt-match-content');
+    const resultLabel = ({W:'🎉 勝利',D:'🤝 平手',L:'😢 失利'})[result.result];
+    const colorClass = ({W:'win',D:'draw',L:'loss'})[result.result];
+    let seasonHtml = '';
+    if (result.season_complete) {
+      const tierMsg = result.tier_change === 'up' ? `⬆️ 晉級到 Tier ${result.new_tier}` :
+                      result.tier_change === 'down' ? `⬇️ 降級到 Tier ${result.new_tier}` :
+                      `留在 Tier ${result.new_tier}`;
+      seasonHtml = `
+        <div class="mt-post-match-season">
+          <div class="mt-post-match-season-title">🏆 賽季結束</div>
+          <div>${tierMsg}</div>
+          <div style="margin-top:6px">+${result.season_reward_gems} 💎</div>
+          ${result.season_reward_ssr_ticket > 0 ? '<div>+1 ⭐ SSR 自選券（賽季冠軍獎勵）</div>' : ''}
+        </div>
+      `;
+    }
+    content.innerHTML = `
+      <div class="mt-post-match ${colorClass}">
+        <div class="mt-post-match-result">${resultLabel}</div>
+        <div class="mt-post-match-score">${score.h} - ${score.a}</div>
+        <div class="mt-post-match-vs">${escapeHtml(ctx.team.team_name)} vs ${escapeHtml(ctx.opponent.nameCN)}</div>
+        ${ctx.isBoss && result.result === 'W' ? '<div class="mt-post-match-boss-bonus">⭐ 擊敗 Boss！額外寶石獎勵</div>' : ''}
+        <div class="mt-post-match-rewards">
+          <div>RP +${result.rp_earned} ×4 種</div>
+          <div>💎 +${result.gems_earned}</div>
+          <div>球迷 ${result.fans_delta >= 0 ? '+' : ''}${result.fans_delta}</div>
+        </div>
+        ${seasonHtml}
+        <button class="mt-onboard-submit" id="mt-match-close">確認</button>
+      </div>
+    `;
+    overlay.querySelector('#mt-match-close').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 250);
+      // 重畫 my-team hub
+      if (typeof window.openMyTeamModal === 'function') {
+        const hub = document.querySelector('.mt-modal-overlay.open');
+        if (hub) {
+          // 觸發 modal 內 re-render
+          window.dispatchEvent(new CustomEvent('my-team-changed'));
+        }
+      }
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  if (window.MyTeam) {
+    window.MyTeam.runMatch = runMatch;
+  }
+})();
