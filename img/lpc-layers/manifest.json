@@ -1,0 +1,44 @@
+{
+  "bodies": [
+    "light",
+    "olive",
+    "amber",
+    "brown"
+  ],
+  "hair_styles": [
+    "messy1",
+    "messy2",
+    "long",
+    "spiked",
+    "loose",
+    "curly_long",
+    "bedhead"
+  ],
+  "hair_colors": [
+    "black",
+    "blonde",
+    "red",
+    "white"
+  ],
+  "shirt_styles": [
+    "shortsleeve",
+    "sleeveless"
+  ],
+  "shirt_colors_short": [
+    "red",
+    "blue",
+    "black",
+    "white",
+    "green",
+    "yellow",
+    "teal",
+    "purple",
+    "orange"
+  ],
+  "shirt_colors_sleeve": [
+    "red",
+    "blue",
+    "black",
+    "yellow"
+  ]
+}

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>LPC 角色生成器 — 預覽工具</title>
+<style>
+  body {
+    background: #0d1224;
+    color: #fff;
+    font-family: -apple-system, "Noto Sans TC", sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .hint { color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 18px; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    max-width: 960px;
+  }
+
+  /* Preview area */
+  .preview {
+    background: linear-gradient(180deg, #1a1a2e 0%, #0d1224 100%);
+    border: 2px solid rgba(240,192,64,0.4);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    position: sticky;
+    top: 20px;
+    align-self: start;
+  }
+  .preview h2 { font-size: 14px; color: #f0c040; margin: 0 0 10px; }
+  .preview-portrait {
+    width: 160px; height: 160px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.25);
+    background: radial-gradient(circle, #2a1855 0%, #0d1224 100%);
+    overflow: hidden;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+  .preview-portrait canvas {
+    width: 100%; height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+  .preview-sprite {
+    background: linear-gradient(180deg, #2e7d32 0%, #1b5e20 100%);
+    border-radius: 10px;
+    padding: 8px;
+    display: inline-block;
+  }
+  .preview-sprite canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+  .preview-meta {
+    margin-top: 10px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    font-family: monospace;
+  }
+  .preview-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: center;
+  }
+  .preview-actions button {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .preview-actions button:hover { background: rgba(240,192,64,0.2); border-color: #f0c040; }
+
+  /* Selectors */
+  .panel { margin-bottom: 22px; }
+  .panel h3 {
+    font-size: 13px; color: #f0c040;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 6px;
+    margin: 0 0 10px;
+    letter-spacing: 1px;
+  }
+  .opt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 6px;
+  }
+  .opt {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 11px;
+  }
+  .opt:hover { background: rgba(255,255,255,0.1); }
+  .opt.sel { border-color: #f0c040; background: rgba(240,192,64,0.12); }
+  .opt canvas {
+    width: 48px; height: 48px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    margin-bottom: 4px;
+    image-rendering: pixelated;
+  }
+  .opt-label { font-size: 10px; opacity: 0.8; }
+
+  .color-row { display: flex; gap: 4px; flex-wrap: wrap; }
+  .swatch {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .swatch:hover { transform: scale(1.1); }
+  .swatch.sel { border-color: #fff; transform: scale(1.1); box-shadow: 0 0 0 2px #f0c040; }
+</style>
+</head>
+<body>
+
+<h1>🎮 LPC 角色生成器（預覽工具）</h1>
+<div class="hint">
+  試玩 LPC layered 系統，可換膚色 / 髮型 / 髮色 / 球衣樣式 / 球衣顏色。
+  滿意這套品質就告訴 Claude「整合進 app」、我幫你做 in-app 客製化 modal。
+</div>
+
+<div class="layout">
+
+  <!-- 左：預覽 -->
+  <div class="preview">
+    <h2>頭像（卡片用）</h2>
+    <div class="preview-portrait"><canvas id="preview-portrait" width="64" height="64"></canvas></div>
+    <h2 style="margin-top:14px">走路動畫（比賽用）</h2>
+    <div class="preview-sprite"><canvas id="preview-walk" width="96" height="64"></canvas></div>
+    <div class="preview-meta" id="preview-meta">—</div>
+    <div class="preview-actions">
+      <button onclick="randomize()">🎲 隨機</button>
+      <button onclick="copyLook()">📋 複製設定</button>
+    </div>
+  </div>
+
+  <!-- 右：選項 -->
+  <div class="options">
+    <div class="panel">
+      <h3>🧑 膚色</h3>
+      <div class="opt-grid" id="opt-body"></div>
+    </div>
+    <div class="panel">
+      <h3>💇 髮型</h3>
+      <div class="opt-grid" id="opt-hair-style"></div>
+    </div>
+    <div class="panel">
+      <h3>🎨 髮色</h3>
+      <div class="color-row" id="opt-hair-color"></div>
+    </div>
+    <div class="panel">
+      <h3>👕 球衣樣式</h3>
+      <div class="opt-grid" id="opt-shirt-style"></div>
+    </div>
+    <div class="panel">
+      <h3>🎨 球衣顏色</h3>
+      <div class="color-row" id="opt-shirt-color"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const BASE = '../img/lpc-layers';
+let manifest = null;
+const state = {
+  body: 'light',
+  hair_style: 'messy1',
+  hair_color: 'black',
+  shirt_style: 'shortsleeve',
+  shirt_color: 'red',
+};
+
+const COLOR_HEX = {
+  black: '#1a1a1a', blonde: '#e8d068', red: '#c0392b', white: '#ddd', brown: '#8b4513',
+  blue: '#2196f3', green: '#27ae60', yellow: '#f1c40f', teal: '#16a085',
+  purple: '#9b59b6', orange: '#e67e22',
+};
+
+const imgCache = new Map();
+function loadImg(url) {
+  if (imgCache.has(url)) return imgCache.get(url);
+  const p = new Promise((res, rej) => {
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.onload = () => res(im);
+    im.onerror = rej;
+    im.src = url;
+  });
+  imgCache.set(url, p);
+  return p;
+}
+
+async function getLayer(category, name) {
+  const url = `${BASE}/${category}/${name}.png`;
+  return await loadImg(url);
+}
+
+// 合成頭像 (32×22 head + shoulders crop from walk-down frame 0)
+async function renderPortrait(canvas, look) {
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const body = await getLayer('body', look.body);
+  const hair = await getLayer('hair', `${look.hair_style}-${look.hair_color}`);
+  const shirt = await getLayer('shirt', `${look.shirt_style}-${look.shirt_color}`);
+
+  // walk-down idle frame at y=640, character at frame y=32-61
+  // crop frame y=28~50 (4 padding + head + neck + 上肩), 32 wide
+  const SX = 16, SY = 640 + 28, W = 32, H = 36;
+  // canvas is 64×64 → draw 32×36 source at center, scaled 2x?
+  // For 64×64 canvas with cover, scale appropriately. 32×36 at 2x = 64×72. Crop bottom 8.
+  // Actually let's just render 32×36 to canvas top-left and rely on CSS scale
+  // Or render at 2x for crisper
+  canvas.width = 32; canvas.height = 36;
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, 32, 36);
+  for (const layer of [body, shirt, hair]) {
+    ctx.drawImage(layer, SX, SY, W, H, 0, 0, W, H);
+  }
+}
+
+// 走路動畫 (96×128 full sprite sheet, animated)
+async function renderWalk(canvas, look) {
+  canvas.width = 96 * 3; canvas.height = 64 * 3; // 3x scale for visibility
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  const body = await getLayer('body', look.body);
+  const hair = await getLayer('hair', `${look.hair_style}-${look.hair_color}`);
+  const shirt = await getLayer('shirt', `${look.shirt_style}-${look.shirt_color}`);
+
+  // Show walk-down (row 10, y=640) 9 frames horizontally
+  // Each frame 64×64, character at y=32-61 within frame
+  // Display: 9 frames at 3x scale = 9×192 wide. Too wide.
+  // Better: just 3 frames (walk cycle 0/1/2) of walk-down at 3x = 3×192=576 wide. Still too wide.
+  // Use canvas 96×64 actual, scale via CSS
+  canvas.width = 96; canvas.height = 64;
+  canvas.style.width = (96 * 3) + 'px';
+  canvas.style.height = (64 * 3) + 'px';
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, 96, 64);
+
+  // 3 frames of walk-down (idle / step1 / step2)
+  // LPC walk row has 9 frames: 0=null, 1-8=walk cycle. We pick frames 1, 5, 7
+  const animFrames = [1, 4, 7];
+  for (let i = 0; i < 3; i++) {
+    const srcX = animFrames[i] * 64;
+    const srcY = 640 + 28;  // start above head
+    for (const layer of [body, shirt, hair]) {
+      ctx.drawImage(layer, srcX, srcY, 32, 36, i * 32, 0, 32, 36);
+    }
+  }
+}
+
+let walkAnimId = null;
+async function animateWalk(canvas, look) {
+  if (walkAnimId) cancelAnimationFrame(walkAnimId);
+  canvas.width = 32; canvas.height = 36;
+  canvas.style.width = (32 * 4) + 'px';
+  canvas.style.height = (36 * 4) + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const body = await getLayer('body', look.body);
+  const hair = await getLayer('hair', `${look.hair_style}-${look.hair_color}`);
+  const shirt = await getLayer('shirt', `${look.shirt_style}-${look.shirt_color}`);
+
+  const frames = [1, 2, 3, 4, 5, 6, 7, 8];
+  let tick = 0;
+  function frame() {
+    const f = frames[Math.floor(tick / 6) % frames.length];
+    ctx.clearRect(0, 0, 32, 36);
+    for (const layer of [body, shirt, hair]) {
+      ctx.drawImage(layer, f * 64, 640 + 28, 32, 36, 0, 0, 32, 36);
+    }
+    tick++;
+    walkAnimId = requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+async function rerender() {
+  await renderPortrait(document.getElementById('preview-portrait'), state);
+  // Use animated walk
+  animateWalk(document.getElementById('preview-walk'), state);
+  document.getElementById('preview-meta').textContent =
+    JSON.stringify(state, null, 0).replace(/[{}"]/g, '').replace(/,/g, ' / ');
+}
+
+function setOpt(category, value) {
+  state[category] = value;
+  document.querySelectorAll(`[data-${category}]`).forEach(el => {
+    el.classList.toggle('sel', el.dataset[category] === value);
+  });
+  rerender();
+}
+
+async function buildOption(containerId, category, items, isColor) {
+  const c = document.getElementById(containerId);
+  for (const item of items) {
+    const div = document.createElement('div');
+    div.className = isColor ? 'swatch' : 'opt';
+    div.dataset[category] = item;
+    if (isColor) {
+      div.style.background = COLOR_HEX[item] || '#888';
+    } else {
+      const cv = document.createElement('canvas');
+      cv.width = 32; cv.height = 36;
+      div.appendChild(cv);
+      const label = document.createElement('div');
+      label.className = 'opt-label';
+      label.textContent = item;
+      div.appendChild(label);
+      // 預覽該 option 的 preview thumbnail
+      setTimeout(async () => {
+        const ctx = cv.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+        // Compose default with this option swapped
+        const tempLook = { ...state, [category]: item };
+        try {
+          const body = await getLayer('body', tempLook.body);
+          const hair = await getLayer('hair', `${tempLook.hair_style}-${tempLook.hair_color}`);
+          const shirt = await getLayer('shirt', `${tempLook.shirt_style}-${tempLook.shirt_color}`);
+          for (const layer of [body, shirt, hair]) {
+            ctx.drawImage(layer, 16, 640 + 28, 32, 36, 0, 0, 32, 36);
+          }
+        } catch (e) {}
+      }, 0);
+    }
+    div.onclick = () => setOpt(category, item);
+    if (state[category] === item) div.classList.add('sel');
+    c.appendChild(div);
+  }
+}
+
+async function init() {
+  manifest = await (await fetch(`${BASE}/manifest.json`)).json();
+  await buildOption('opt-body', 'body', manifest.bodies);
+  await buildOption('opt-hair-style', 'hair_style', manifest.hair_styles);
+  await buildOption('opt-hair-color', 'hair_color', manifest.hair_colors, true);
+  await buildOption('opt-shirt-style', 'shirt_style', manifest.shirt_styles);
+  await buildOption('opt-shirt-color', 'shirt_color',
+    [...new Set([...manifest.shirt_colors_short, ...manifest.shirt_colors_sleeve])], true);
+  rerender();
+}
+
+function randomize() {
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  state.body = pick(manifest.bodies);
+  state.hair_style = pick(manifest.hair_styles);
+  state.hair_color = pick(manifest.hair_colors);
+  state.shirt_style = pick(manifest.shirt_styles);
+  state.shirt_color = state.shirt_style === 'shortsleeve'
+    ? pick(manifest.shirt_colors_short)
+    : pick(manifest.shirt_colors_sleeve);
+  Object.keys(state).forEach(k => {
+    document.querySelectorAll(`[data-${k}]`).forEach(el => {
+      el.classList.toggle('sel', el.dataset[k] === state[k]);
+    });
+  });
+  rerender();
+}
+
+function copyLook() {
+  navigator.clipboard.writeText(JSON.stringify(state, null, 2));
+  alert('已複製設定到剪貼簿：\n' + JSON.stringify(state, null, 2));
+}
+
+init();
+</script>
+
+</body>
+</html>
