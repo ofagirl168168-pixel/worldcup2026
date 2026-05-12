@@ -179,7 +179,15 @@
 
 <script>
 const BASE = '../img/lpc-layers';
-let manifest = null;
+// 內建 manifest（避開 file:// fetch 限制；雙擊本檔開啟也能跑）
+const manifest = {
+  bodies: ['light', 'olive', 'amber', 'brown'],
+  hair_styles: ['messy1', 'messy2', 'long', 'spiked', 'loose', 'curly_long', 'bedhead'],
+  hair_colors: ['black', 'blonde', 'red', 'white'],
+  shirt_styles: ['shortsleeve', 'sleeveless'],
+  shirt_colors_short: ['red','blue','black','white','green','yellow','teal','purple','orange'],
+  shirt_colors_sleeve: ['red','blue','black','yellow'],
+};
 const state = {
   body: 'light',
   hair_style: 'messy1',
@@ -199,9 +207,9 @@ function loadImg(url) {
   if (imgCache.has(url)) return imgCache.get(url);
   const p = new Promise((res, rej) => {
     const im = new Image();
-    im.crossOrigin = 'anonymous';
+    // 不設 crossOrigin（file:// 會卡 CORS）
     im.onload = () => res(im);
-    im.onerror = rej;
+    im.onerror = (e) => { console.error('load fail:', url); rej(e); };
     im.src = url;
   });
   imgCache.set(url, p);
@@ -352,7 +360,6 @@ async function buildOption(containerId, category, items, isColor) {
 }
 
 async function init() {
-  manifest = await (await fetch(`${BASE}/manifest.json`)).json();
   await buildOption('opt-body', 'body', manifest.bodies);
   await buildOption('opt-hair-style', 'hair_style', manifest.hair_styles);
   await buildOption('opt-hair-color', 'hair_color', manifest.hair_colors, true);
