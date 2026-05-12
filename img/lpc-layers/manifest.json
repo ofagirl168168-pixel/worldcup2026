@@ -40,5 +40,18 @@
     "blue",
     "black",
     "yellow"
+  ],
+  "pants_colors": [
+    "red",
+    "blue",
+    "black",
+    "white",
+    "green",
+    "yellow",
+    "teal",
+    "purple",
+    "orange",
+    "brown",
+    "tan"
   ]
 }

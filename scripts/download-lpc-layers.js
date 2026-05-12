@@ -39,11 +39,18 @@ for (const c of SHIRT_COLORS_SLEEVE) {
   SHIRTS.push([`shirt/sleeveless-${c}`, `torso/clothes/sleeveless/sleeveless/male/${c}.png`]);
 }
 
+// 球褲（修「沒褲子」問題）— pants 樣式 × 10 顏色
+const PANTS_COLORS = ['red','blue','black','white','green','yellow','teal','purple','orange','brown','tan'];
+const PANTS = [];
+for (const c of PANTS_COLORS) {
+  PANTS.push([`pants/${c}`, `legs/pants/male/${c}.png`]);
+}
+
 const outDir = path.join(__dirname, '..', 'img', 'lpc-layers');
 fs.mkdirSync(outDir, { recursive: true });
 
 (async () => {
-  const all = [...BODIES, ...HAIRS, ...SHIRTS];
+  const all = [...BODIES, ...HAIRS, ...SHIRTS, ...PANTS];
   console.log(`Downloading ${all.length} LPC layers...`);
   let ok = 0, fail = 0;
   for (const [outName, srcPath] of all) {
@@ -71,6 +78,7 @@ fs.mkdirSync(outDir, { recursive: true });
     shirt_styles: SHIRT_STYLES,
     shirt_colors_short: SHIRT_COLORS_SHORT,
     shirt_colors_sleeve: SHIRT_COLORS_SLEEVE,
+    pants_colors: PANTS_COLORS,
   };
   fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
   console.log('Wrote manifest.json');

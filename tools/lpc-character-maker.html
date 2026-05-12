@@ -45,8 +45,12 @@
   }
   .preview-portrait canvas {
     width: 100%; height: 100%;
+    display: block;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+  }
+  .preview-sprite canvas {
+    display: block;
   }
   .preview-sprite {
     background: linear-gradient(180deg, #2e7d32 0%, #1b5e20 100%);
@@ -173,6 +177,10 @@
       <h3>🎨 球衣顏色</h3>
       <div class="color-row" id="opt-shirt-color"></div>
     </div>
+    <div class="panel">
+      <h3>👖 球褲顏色</h3>
+      <div class="color-row" id="opt-pants-color"></div>
+    </div>
   </div>
 
 </div>
@@ -187,6 +195,7 @@ const manifest = {
   shirt_styles: ['shortsleeve', 'sleeveless'],
   shirt_colors_short: ['red','blue','black','white','green','yellow','teal','purple','orange'],
   shirt_colors_sleeve: ['red','blue','black','yellow'],
+  pants_colors: ['red','blue','black','white','green','yellow','teal','purple','orange','brown','tan'],
 };
 const state = {
   body: 'light',
@@ -194,6 +203,7 @@ const state = {
   hair_color: 'black',
   shirt_style: 'shortsleeve',
   shirt_color: 'red',
+  pants_color: 'blue',
 };
 
 const COLOR_HEX = {
@@ -221,28 +231,29 @@ async function getLayer(category, name) {
   return await loadImg(url);
 }
 
-// 合成頭像 (32×22 head + shoulders crop from walk-down frame 0)
+// 合成頭像（全身 32×36，crop frame y=28-64 包含完整角色 + pants + 4px 頭頂留白）
+// 直接 render 至 160×160 canvas、保持等比例 4× 放大、置中
 async function renderPortrait(canvas, look) {
+  const [body, hair, shirt, pants] = await Promise.all([
+    getLayer('body', look.body),
+    getLayer('hair', `${look.hair_style}-${look.hair_color}`),
+    getLayer('shirt', `${look.shirt_style}-${look.shirt_color}`),
+    getLayer('pants', look.pants_color),
+  ]);
+  // walk-down idle: frame y=640，角色 frame y=32-61
+  // crop 32 寬 × 36 高，包頭+全身+腳
+  const SX = 16, SY = 640 + 28, SW = 32, SH = 36;
+  // 等比例 4× 放大：128×144、置中於 160×160 canvas
+  const SCALE = 4;
+  const DW = SW * SCALE, DH = SH * SCALE;
+  canvas.width = 160; canvas.height = 160;
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const body = await getLayer('body', look.body);
-  const hair = await getLayer('hair', `${look.hair_style}-${look.hair_color}`);
-  const shirt = await getLayer('shirt', `${look.shirt_style}-${look.shirt_color}`);
-
-  // walk-down idle frame at y=640, character at frame y=32-61
-  // crop frame y=28~50 (4 padding + head + neck + 上肩), 32 wide
-  const SX = 16, SY = 640 + 28, W = 32, H = 36;
-  // canvas is 64×64 → draw 32×36 source at center, scaled 2x?
-  // For 64×64 canvas with cover, scale appropriately. 32×36 at 2x = 64×72. Crop bottom 8.
-  // Actually let's just render 32×36 to canvas top-left and rely on CSS scale
-  // Or render at 2x for crisper
-  canvas.width = 32; canvas.height = 36;
-  ctx.imageSmoothingEnabled = false;
-  ctx.clearRect(0, 0, 32, 36);
-  for (const layer of [body, shirt, hair]) {
-    ctx.drawImage(layer, SX, SY, W, H, 0, 0, W, H);
+  ctx.clearRect(0, 0, 160, 160);
+  const dx = (160 - DW) / 2;
+  const dy = (160 - DH) / 2;
+  for (const layer of [body, pants, shirt, hair]) {
+    ctx.drawImage(layer, SX, SY, SW, SH, dx, dy, DW, DH);
   }
 }
 
@@ -282,22 +293,25 @@ async function renderWalk(canvas, look) {
 let walkAnimId = null;
 async function animateWalk(canvas, look) {
   if (walkAnimId) cancelAnimationFrame(walkAnimId);
-  canvas.width = 32; canvas.height = 36;
-  canvas.style.width = (32 * 4) + 'px';
-  canvas.style.height = (36 * 4) + 'px';
+  // 4× 放大、render 至 128×144 canvas
+  const SCALE = 4;
+  canvas.width = 32 * SCALE; canvas.height = 36 * SCALE;
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
-  const body = await getLayer('body', look.body);
-  const hair = await getLayer('hair', `${look.hair_style}-${look.hair_color}`);
-  const shirt = await getLayer('shirt', `${look.shirt_style}-${look.shirt_color}`);
+  const [body, hair, shirt, pants] = await Promise.all([
+    getLayer('body', look.body),
+    getLayer('hair', `${look.hair_style}-${look.hair_color}`),
+    getLayer('shirt', `${look.shirt_style}-${look.shirt_color}`),
+    getLayer('pants', look.pants_color),
+  ]);
 
   const frames = [1, 2, 3, 4, 5, 6, 7, 8];
   let tick = 0;
   function frame() {
     const f = frames[Math.floor(tick / 6) % frames.length];
-    ctx.clearRect(0, 0, 32, 36);
-    for (const layer of [body, shirt, hair]) {
-      ctx.drawImage(layer, f * 64, 640 + 28, 32, 36, 0, 0, 32, 36);
+    ctx.clearRect(0, 0, 32 * SCALE, 36 * SCALE);
+    for (const layer of [body, pants, shirt, hair]) {
+      ctx.drawImage(layer, f * 64, 640 + 28, 32, 36, 0, 0, 32 * SCALE, 36 * SCALE);
     }
     tick++;
     walkAnimId = requestAnimationFrame(frame);
@@ -344,10 +358,13 @@ async function buildOption(containerId, category, items, isColor) {
         // Compose default with this option swapped
         const tempLook = { ...state, [category]: item };
         try {
-          const body = await getLayer('body', tempLook.body);
-          const hair = await getLayer('hair', `${tempLook.hair_style}-${tempLook.hair_color}`);
-          const shirt = await getLayer('shirt', `${tempLook.shirt_style}-${tempLook.shirt_color}`);
-          for (const layer of [body, shirt, hair]) {
+          const [body, hair, shirt, pants] = await Promise.all([
+            getLayer('body', tempLook.body),
+            getLayer('hair', `${tempLook.hair_style}-${tempLook.hair_color}`),
+            getLayer('shirt', `${tempLook.shirt_style}-${tempLook.shirt_color}`),
+            getLayer('pants', tempLook.pants_color),
+          ]);
+          for (const layer of [body, pants, shirt, hair]) {
             ctx.drawImage(layer, 16, 640 + 28, 32, 36, 0, 0, 32, 36);
           }
         } catch (e) {}
@@ -366,6 +383,7 @@ async function init() {
   await buildOption('opt-shirt-style', 'shirt_style', manifest.shirt_styles);
   await buildOption('opt-shirt-color', 'shirt_color',
     [...new Set([...manifest.shirt_colors_short, ...manifest.shirt_colors_sleeve])], true);
+  await buildOption('opt-pants-color', 'pants_color', manifest.pants_colors, true);
   rerender();
 }
 
@@ -378,6 +396,7 @@ function randomize() {
   state.shirt_color = state.shirt_style === 'shortsleeve'
     ? pick(manifest.shirt_colors_short)
     : pick(manifest.shirt_colors_sleeve);
+  state.pants_color = pick(manifest.pants_colors);
   Object.keys(state).forEach(k => {
     document.querySelectorAll(`[data-${k}]`).forEach(el => {
       el.classList.toggle('sel', el.dataset[k] === state[k]);
