@@ -67,9 +67,12 @@
     if (!confirm('⚠️ 完整重置：會刪掉你的球隊 / 球員 / 聯賽進度。確定？')) return;
 
     console.log('🧹 開始重置 my-team...');
-    // 順序：team_player → training_log → match_history → league_progress → my_team
+    // 順序：user_coach / user_friend / user_inventory / user_quest_state → team_player → training_log → match_history → league_progress → my_team
     // RLS 會檢查擁有權，自己刪自己的 row OK
-    for (const t of ['team_player','training_log','match_history','sponsor_state','facility_state','league_progress']) {
+    for (const t of [
+      'user_coach','user_friend','user_inventory','user_quest_state',
+      'team_player','training_log','match_history','sponsor_state','facility_state','league_progress'
+    ]) {
       const col = (t === 'team_player' || t === 'training_log') ? 'team_user_id' : 'user_id';
       const { error } = await window.DB.from(t).delete().eq(col, uid);
       if (error) console.warn(`  ⚠️ ${t}: ${error.message}`);
@@ -81,7 +84,9 @@
     else console.log('  ✓ cleared my_team');
 
     resetLocalOnly();
-    console.log('✅ 完整重置完成，重新整理頁面後可從頭測試');
+    console.log('✅ 完整重置完成。');
+    console.log('   下一步：先 location.reload() 重整、再進球隊頁就會跑新手指引');
+    if (confirm('立刻重整頁面？（不重整的話 localStorage 還有舊 cache）')) location.reload();
   }
 
   function resetLocalOnly() {
