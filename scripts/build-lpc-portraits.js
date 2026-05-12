@@ -84,11 +84,13 @@ const SHIRTS = [
 // 832 寬 × 2944 高（universal generator extended layout）
 // row 10 = walk-down 動作，frame 0 idle 在 y=640~703
 // 角色在 frame 內位於 y=32~61（bottom-aligned）— LPC 都這樣
-// → 32×32 方形 crop 從 frame y=28 起（4px 上邊距 + 頭 + 肩 + 胸 → 32×32）
+//
+// 上次 32×32 包含腿 → 頭只佔上半，看起來「人很小、頭不明顯」
+// 改 32×22 只 crop 頭+脖子+肩膀+球衣領口（裁掉腿），頭會放大主導
 const PORTRAIT_W = 32;
-const PORTRAIT_H = 32;
-const SRC_X = 16;             // 角色 ~30 寬、置中於 64 寬 → x=16 起
-const SRC_Y = 640 + 28;       // walk-down 起點 + 28 px = 頭頂上方
+const PORTRAIT_H = 22;            // 4 padding + 16 head + 2 neck
+const SRC_X = 16;
+const SRC_Y = 640 + 28;
 
 async function fetchImage(url) {
   const resp = await fetch(url);

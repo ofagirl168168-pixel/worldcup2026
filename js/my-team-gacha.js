@@ -436,7 +436,8 @@
   // 800 種 layer combo × hash(card_id) = 幾乎每張卡都獨一無二
   function _portraitUrlFor(cardId, rarity) {
     if (!cardId) return 'img/lpc-portraits/default.png';
-    return `img/lpc-portraits/${encodeURIComponent(cardId)}.png`;
+    // v=3：crop 修正為 32×22 頭+肩特寫，cache bust 強制重 fetch
+    return `img/lpc-portraits/${encodeURIComponent(cardId)}.png?v=3`;
   }
   window.MyTeamPortrait = _portraitUrlFor;  // 公開讓 modal/match 共用
 
