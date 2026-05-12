@@ -131,20 +131,53 @@ async function supaPatch(table, id, body) {
 // 同時 polling 會互搶 callback。本腳本啟動時寫 lock，
 // comments-bot 偵測到 lock 就暫停自己的 polling，退出前清掉。
 const LOCK_PATH = path.join(__dirname, '.opinion-telegram.lock');
+// 排隊檔：若啟動時偵測到上一個 opinion-telegram 還活著，
+// 把本次候選寫到這檔，由正在跑的那個 process 結束時自動接著跑。
+const PENDING_PATH = path.join(__dirname, '.opinion-telegram-pending.json');
+
 function writeLock() {
   try { fs.writeFileSync(LOCK_PATH, String(process.pid), 'utf8'); } catch (e) {}
 }
 function clearLock() {
   try { fs.unlinkSync(LOCK_PATH); } catch (e) {}
 }
+function readLockPid() {
+  try { return fs.readFileSync(LOCK_PATH, 'utf8').trim(); } catch (e) { return null; }
+}
+function isPidAlive(pid) {
+  if (!pid) return false;
+  try { process.kill(parseInt(pid), 0); return true; }
+  catch (e) { return false; }
+}
+
+// 退出前若有排隊候選 → spawn detached child 接著跑
+function spawnPendingIfAny() {
+  if (!fs.existsSync(PENDING_PATH)) return;
+  let pending;
+  try { pending = JSON.parse(fs.readFileSync(PENDING_PATH, 'utf8')); }
+  catch (e) { try { fs.unlinkSync(PENDING_PATH); } catch {} return; }
+  try { fs.unlinkSync(PENDING_PATH); } catch {}
+  const { spawn } = require('child_process');
+  const args = [__filename, pending.candidatesPath];
+  if (pending.addOnly) args.push('--add-only');
+  const child = spawn(process.execPath, args, {
+    detached: true,
+    stdio: 'ignore',
+    cwd: path.join(__dirname, '..'),
+  });
+  child.unref();
+  console.log(`▶️ 排隊中的候選已啟動：${pending.candidatesPath}${pending.addOnly ? ' --add-only' : ''} (child pid=${child.pid})`);
+}
+
 // 正常退出 + 各種信號 + 未捕捉例外都要清 lock，避免卡死 comments-bot
-process.on('exit', clearLock);
+process.on('exit', () => { clearLock(); spawnPendingIfAny(); });
 ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK'].forEach(sig => {
-  process.on(sig, () => { clearLock(); process.exit(130); });
+  process.on(sig, () => { clearLock(); spawnPendingIfAny(); process.exit(130); });
 });
 process.on('uncaughtException', err => {
   console.error('💥 uncaughtException:', err);
   clearLock();
+  spawnPendingIfAny();
   process.exit(1);
 });
 
@@ -293,6 +326,33 @@ async function main() {
   if (!candidatesPath) {
     console.error('用法：node scripts/opinion-telegram.js <candidates.json> [--add-only]');
     process.exit(1);
+  }
+  // ─── 排隊檢查 ───
+  // Telegram 不允許兩個 process 同時 polling 同個 bot token（會 Conflict 互殺）。
+  // 偵測到前一個 opinion-telegram 還活著 → 把本次候選排隊、退出。
+  // 對方結束時會在 process.exit hook 裡 spawn 接著跑。
+  const lockPid = readLockPid();
+  if (lockPid && isPidAlive(lockPid) && lockPid !== String(process.pid)) {
+    const pending = {
+      candidatesPath: path.relative(path.join(__dirname, '..'), candidatesPath),
+      addOnly,
+      queuedAt: new Date().toISOString(),
+    };
+    fs.writeFileSync(PENDING_PATH, JSON.stringify(pending, null, 2));
+    console.log(`⏸️ 前一個 opinion-telegram (pid=${lockPid}) 還在跑，本次候選已排隊：${pending.candidatesPath}`);
+    // 通知 TG 使用者
+    try {
+      await tg('sendMessage', {
+        chat_id: CHAT_ID,
+        text: `⏸️ 上一輪擂台候選還沒處理完，本輪候選已排隊。\n等你選完上一輪後，會自動跳出新候選。`,
+      });
+    } catch (e) { /* 不阻擋 */ }
+    process.exit(0);
+  }
+  // 萬一上次 process 被 -Force kill 留下 stale lock（PID 已死）→ 清掉再寫
+  if (lockPid && !isPidAlive(lockPid)) {
+    console.log(`🧹 清掉 stale lock (dead pid=${lockPid})`);
+    clearLock();
   }
   writeLock();
   console.log(`🪪 SESSION=${SESSION} pid=${process.pid}（按鈕 callback_data 會綁這 token，多個 process 共存時不會錯認）`);

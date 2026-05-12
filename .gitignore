@@ -28,6 +28,14 @@ scripts/.bot-stderr.log
 
 # opinion-telegram 執行時互斥鎖（內含 PID，comments-bot 用它來讓開 /getUpdates）
 scripts/.opinion-telegram.lock
+# 排隊檔：前一個 opinion-telegram 還活著時，新進的候選會寫進這、由前一個結束時自動接著跑
+scripts/.opinion-telegram-pending.json
+
+# opinion-telegram 背景啟動 log（透過 bot.py 或 PowerShell Start-Process）
+scripts/.opinion-7am.log
+scripts/.opinion-7am.err
+scripts/.opinion-2pm.log
+scripts/.opinion-2pm.err
 
 # IG instagrapi session — 本機限定，絕對不能 commit
 scripts/.ig-session.json
