@@ -2822,7 +2822,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h4>上半場：White 傷退打亂部署</h4>
 
-<p>第 28 分鐘 Ben White 在攔截 Summerville 時膝蓋受傷離場，Arteta 被迫將 Declan Rice 移到右後衛應急。兵工廠中場因此失去 Rice 的覆蓋與推進能力，Soucek 和 Mateus Fernandes 趁勢在中場搶到控制權。上半場兵工廠雖然 63.7% 控球，卻幾乎沒有製造有效威脅。</p>
+<p>第 28 分鐘 Ben White 在攔截 Summerville 時膝蓋受傷離場，Arteta 被迫將 Declan Rice 移到右後衛應急。兵工廠中場因此失去 Rice 的覆蓋與推進能力，Soucek 和 Mateus Fernandes 趁勢在中場搶到控制權。上半場兵工廠雖然 63.6% 控球，卻幾乎沒有製造有效威脅。</p>
 
 <h4>下半場：換人改變局勢</h4>
 
@@ -2841,7 +2841,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <th style="padding:8px">兵工廠</th>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
-<td style="padding:6px 8px;text-align:left">控球率</td><td>36.3%</td><td>63.7%</td>
+<td style="padding:6px 8px;text-align:left">控球率</td><td>36.4%</td><td>63.6%</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
 <td style="padding:6px 8px;text-align:left">射門（射正）</td><td>9（3）</td><td>15（4）</td>
