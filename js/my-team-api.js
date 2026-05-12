@@ -200,6 +200,23 @@
     return data;
   }
 
+  async function startTimedTraining(playerId, attr, tutorial = false) {
+    if (!window.DB) throw new Error('NOT_LOGGED_IN');
+    const { data, error } = await window.DB.rpc('start_timed_training', {
+      p_player_id: playerId, p_attr: attr, p_tutorial: !!tutorial,
+    });
+    if (error) throw error;
+    return data;
+  }
+  async function claimTimedTraining(playerId) {
+    if (!window.DB) throw new Error('NOT_LOGGED_IN');
+    const { data, error } = await window.DB.rpc('claim_timed_training', {
+      p_player_id: playerId,
+    });
+    if (error) throw error;
+    return data;
+  }
+
   async function redeemSSRSelect(cardId) {
     if (!window.DB) throw new Error('NOT_LOGGED_IN');
     const { data, error } = await window.DB.rpc('redeem_ssr_select_ticket', { p_card_id: cardId });
@@ -289,6 +306,8 @@
     awardSSRSelectTicket,
     trainPlayer,
     drawCoach,
+    startTimedTraining,
+    claimTimedTraining,
     redeemSSRSelect,
     findPvpOpponent,
     finalizePvpMatch,

@@ -1937,12 +1937,69 @@
 .mt-starter-complete-buttons {
   display: flex; flex-direction: column; gap: 6px;
 }
-.mt-starter-arrange { width: 100%; }
+.mt-starter-arrange, .mt-starter-train { width: 100%; }
 .mt-starter-complete-skip {
   background: none; border: 0; color: rgba(255,255,255,0.5);
   font-size: 12px; cursor: pointer; padding: 6px;
 }
 .mt-starter-complete-skip:hover { color: rgba(255,255,255,0.9); }
+
+/* 訓練教學 progress bar */
+.mt-tutorial-progress-wrap {
+  height: 14px; background: rgba(255,255,255,0.1);
+  border-radius: 7px; overflow: hidden;
+  margin: 14px 0 4px;
+}
+.mt-tutorial-progress-bar {
+  height: 100%; width: 0;
+  background: linear-gradient(90deg, #f0c040, #e07020);
+  transition: width 0.1s linear;
+}
+
+/* ⏱️ 時間訓練 */
+.mt-train-timed {
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255,255,255,0.1);
+}
+.mt-train-timed-pick {
+  display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
+  font-size: 12px; color: rgba(255,255,255,0.7);
+}
+.mt-train-timed-attr {
+  background: rgba(94,234,212,0.15); border: 1px solid #5eead4;
+  color: #5eead4; font-weight: 700;
+  padding: 4px 10px; border-radius: 4px;
+  font-size: 12px; cursor: pointer;
+}
+.mt-train-timed-attr:hover { background: rgba(94,234,212,0.3); }
+.mt-train-timed-active {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  background: rgba(94,234,212,0.08);
+  border: 1px solid rgba(94,234,212,0.4);
+  border-radius: 6px; padding: 6px 10px;
+  font-size: 12px;
+}
+.mt-train-timed-active.ready {
+  background: rgba(76,175,80,0.18);
+  border-color: #4caf50;
+  animation: mt-train-ready-pulse 1.2s ease-in-out infinite;
+}
+@keyframes mt-train-ready-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.5); }
+  50%      { box-shadow: 0 0 0 6px rgba(76,175,80,0); }
+}
+.mt-train-countdown { font-family: monospace; font-weight: 800; color: #5eead4; }
+.mt-train-timed-active.ready .mt-train-countdown { color: #4caf50; }
+.mt-train-claim-btn {
+  margin-left: auto;
+  background: #4caf50; border: 0; color: #000;
+  font-weight: 800; padding: 4px 10px; border-radius: 4px;
+  cursor: pointer; font-size: 12px;
+}
+.mt-train-claim-btn:disabled {
+  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); cursor: default;
+}
 
 /* ── 排行榜 tab ── */
 .mt-rank-tab { padding: 12px; }

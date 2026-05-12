@@ -166,16 +166,23 @@
   }
 
   function _showStarterCompleteToast(n) {
+    const team = window.MyTeam.getCached();
+    // 還沒體驗過訓練 → 引導訓練教學
+    const needsTrainingTutorial = team && team.tutorial_first_training_used === false;
+
     const t = document.createElement('div');
     t.className = 'mt-starter-complete';
     t.innerHTML = `
       <div class="mt-starter-complete-card">
         <div style="font-size:48px">🎉</div>
         <h3>太棒了！</h3>
-        <p>接下來去 <b>球員</b> 或 <b>設定</b> 安排你的隊伍<br>
-        排好陣容後就可以打<b>第一場比賽</b>了 ⚽</p>
+        <p>球員都到位了！${needsTrainingTutorial
+          ? '<br>接下來我教你<b>訓練</b>球員 — 讓他們變更強'
+          : '<br>接下來去 <b>球員</b> 或 <b>設定</b> 安排陣容、就可以打第一場比賽'}</p>
         <div class="mt-starter-complete-buttons">
-          <button class="mt-gacha-btn mt-starter-arrange">📋 去安排隊伍</button>
+          ${needsTrainingTutorial
+            ? '<button class="mt-gacha-btn mt-starter-train">🏋️ 教我訓練</button>'
+            : '<button class="mt-gacha-btn mt-starter-arrange">📋 去安排隊伍</button>'}
           <button class="mt-starter-complete-skip">稍後再說</button>
         </div>
       </div>
@@ -186,12 +193,88 @@
       t.classList.remove('open');
       setTimeout(() => t.remove(), 200);
     };
-    t.querySelector('.mt-starter-arrange').addEventListener('click', () => {
+    t.querySelector('.mt-starter-arrange')?.addEventListener('click', () => {
       close();
       _currentTab = 'roster';
       document.querySelector('.mt-hub-tab[data-tab="roster"]')?.click();
     });
+    t.querySelector('.mt-starter-train')?.addEventListener('click', () => {
+      close();
+      _runTrainingTutorial();
+    });
     t.querySelector('.mt-starter-complete-skip').addEventListener('click', close);
+  }
+
+  // ── 訓練教學：自動幫第一位球員跑 3 秒速度訓練 ──
+  async function _runTrainingTutorial() {
+    const players = await window.MyTeam.fetchPlayers();
+    if (!players.length) return;
+    // 挑一位非門將
+    const target = players.find(p => p.card?.position !== 'GK') || players[0];
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-tutorial-overlay';
+    overlay.innerHTML = `
+      <div class="mt-tutorial-card">
+        <div class="mt-tutorial-emoji">🏋️</div>
+        <h2>訓練：${escapeHtml(target.card?.name || '球員')}</h2>
+        <p>正在幫他做<b>速度 +1</b> 訓練<br>（之後等級越高、訓練時間越長）</p>
+        <div class="mt-tutorial-progress-wrap">
+          <div class="mt-tutorial-progress-bar" id="mt-tut-train-bar"></div>
+        </div>
+        <div id="mt-tut-train-status" style="font-size:13px;margin-top:8px;opacity:0.8">準備開始…</div>
+        <button class="mt-tutorial-cta" id="mt-tut-train-cta" disabled>⏱️ 等候中…</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const bar = overlay.querySelector('#mt-tut-train-bar');
+    const status = overlay.querySelector('#mt-tut-train-status');
+    const cta = overlay.querySelector('#mt-tut-train-cta');
+
+    try {
+      const res = await window.MyTeam.startTimedTraining(target.id, 'speed', true);
+      const duration = res.duration_sec || 3;
+      status.textContent = `⏱️ ${duration} 秒後可領取`;
+      const start = Date.now();
+      const t = setInterval(() => {
+        const elapsed = (Date.now() - start) / 1000;
+        const pct = Math.min(100, (elapsed / duration) * 100);
+        bar.style.width = pct + '%';
+        if (pct >= 100) {
+          clearInterval(t);
+          status.textContent = '訓練完成！';
+          cta.disabled = false;
+          cta.textContent = '🎉 領取速度 +1';
+        }
+      }, 100);
+
+      cta.addEventListener('click', async () => {
+        cta.disabled = true; cta.textContent = '領取中…';
+        try {
+          await window.MyTeam.claimTimedTraining(target.id);
+          await window.MyTeam.refresh?.();
+          overlay.classList.remove('open');
+          setTimeout(() => overlay.remove(), 200);
+          if (typeof showToast === 'function') {
+            showToast(`✅ ${target.card?.name || '球員'} 速度 +1！記得常常回來訓練`);
+          }
+          // 跳到球員 tab
+          _currentTab = 'roster';
+          renderHub();
+        } catch (e) {
+          alert('領取失敗：' + (e.message || e));
+        }
+      });
+    } catch (e) {
+      status.textContent = '訓練啟動失敗：' + (e.message || e);
+      cta.textContent = '關閉';
+      cta.disabled = false;
+      cta.addEventListener('click', () => {
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.remove(), 200);
+      });
+    }
   }
 
   function close() {
@@ -1900,6 +1983,45 @@
     });
   }
 
+  function _formatRemain(sec) {
+    if (sec <= 0) return '0:00';
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    return `${m}:${String(s).padStart(2,'0')}`;
+  }
+
+  let _trainCountdownTimer = null;
+  function _refreshCountdowns(list) {
+    if (_trainCountdownTimer) clearInterval(_trainCountdownTimer);
+    const tick = () => {
+      const countdowns = list.querySelectorAll('.mt-train-countdown');
+      if (!countdowns.length) {
+        clearInterval(_trainCountdownTimer); _trainCountdownTimer = null; return;
+      }
+      let anyReadyJustNow = false;
+      countdowns.forEach(span => {
+        const finishAt = new Date(span.dataset.finishAt);
+        const remain = Math.max(0, Math.floor((finishAt - new Date()) / 1000));
+        if (remain === 0) {
+          if (span.textContent !== '已完成') anyReadyJustNow = true;
+          span.textContent = '已完成';
+          span.closest('.mt-train-timed-active')?.classList.add('ready');
+          const claimBtn = list.querySelector(`[data-claim="${span.dataset.player}"]`);
+          if (claimBtn) {
+            claimBtn.disabled = false;
+            claimBtn.innerHTML = '⏱️ 領取 +1';
+          }
+        } else {
+          span.textContent = _formatRemain(remain);
+        }
+      });
+    };
+    tick();
+    _trainCountdownTimer = setInterval(tick, 1000);
+  }
+
   async function renderTrainTab(content) {
     const team = window.MyTeam.getCached();
     if (!team) return;
@@ -1930,19 +2052,32 @@
           <div class="mt-train-rp-cell"><span>心</span><b>${team.rp_heart}</b></div>
           <div class="mt-train-rp-cell"><span>靈感</span><b>${team.rp_idea}</b></div>
         </div>
-        <div class="mt-train-rp-sub">贏球賺 RP / 一般訓練 戰術+體能各 10、精緻 各 30+心靈感各 10</div>
+        <div class="mt-train-rp-sub">
+          ⚙️ <b>RP 訓練</b>（瞬間）：花 RP 升等 + 6 屬性隨機加<br>
+          ⏱️ <b>時間訓練</b>（等候）：選 1 屬性、等時間到 +1，等級越高時間越長
+        </div>
       </div>
       <div class="mt-train-list" id="mt-train-list"></div>
     `;
 
     const list = content.querySelector('#mt-train-list');
+    const ATTR_LABELS = { attack:'攻', defense:'防', speed:'速', midfield:'中', stamina:'體', aura:'氣' };
     players.forEach(p => {
       const c = p.card || {};
       const canNormal = team.rp_tactical >= 10 && team.rp_physical >= 10 && p.level < 50;
       const canPremium = team.rp_tactical >= 30 && team.rp_physical >= 30
                         && team.rp_heart >= 10 && team.rp_idea >= 10 && p.level < 50;
+      const isTraining = p.training_attr && p.training_finish_at;
+      const finishAt = isTraining ? new Date(p.training_finish_at) : null;
+      const remainSec = isTraining ? Math.max(0, Math.floor((finishAt - new Date()) / 1000)) : 0;
+      const isReady = isTraining && remainSec === 0;
+      const estSec = Math.max(30, Math.floor(60 * Math.pow(p.level, 1.4)));
+      const estLabel = estSec >= 3600 ? `${(estSec/3600).toFixed(1)} 小時`
+        : estSec >= 60 ? `${Math.floor(estSec/60)} 分` : `${estSec} 秒`;
+
       const row = document.createElement('div');
       row.className = `mt-train-row rarity-${c.rarity || 'R'}`;
+      row.dataset.playerId = p.id;
       row.innerHTML = `
         <div class="mt-train-row-head">
           <span class="mt-player-card-rarity">${c.rarity || 'R'}</span>
@@ -1955,14 +2090,74 @@
         </div>
         <div class="mt-train-row-actions">
           <button class="mt-train-btn" data-train="normal" data-player="${p.id}" ${canNormal ? '' : 'disabled'}>
-            一般訓練（戰術 10 + 體能 10）
+            ⚙️ 一般訓練（戰術 10 + 體能 10）
           </button>
           <button class="mt-train-btn mt-train-btn-premium" data-train="premium" data-player="${p.id}" ${canPremium ? '' : 'disabled'}>
-            精緻訓練（30+30+10+10）
+            ⚙️ 精緻訓練（30+30+10+10）
           </button>
+        </div>
+        <div class="mt-train-timed">
+          ${isTraining ? `
+            <div class="mt-train-timed-active ${isReady ? 'ready' : ''}">
+              ⏱️ 訓練中：${ATTR_LABELS[p.training_attr]}屬性
+              <span class="mt-train-countdown" data-finish-at="${finishAt.toISOString()}" data-player="${p.id}">
+                ${isReady ? '已完成' : _formatRemain(remainSec)}
+              </span>
+              <button class="mt-train-claim-btn" data-claim="${p.id}" ${isReady ? '' : 'disabled'}>
+                ⏱️ ${isReady ? '領取 +1' : '等候中…'}
+              </button>
+            </div>
+          ` : `
+            <div class="mt-train-timed-pick">
+              ⏱️ 時間訓練（${estLabel}）：
+              ${Object.entries(ATTR_LABELS).map(([k,v]) =>
+                `<button class="mt-train-timed-attr" data-timed="${k}" data-player="${p.id}">${v}+1</button>`
+              ).join('')}
+            </div>
+          `}
         </div>
       `;
       list.appendChild(row);
+    });
+
+    // 倒數計時器
+    _refreshCountdowns(list);
+
+    // ── 時間訓練：開始 ──
+    list.querySelectorAll('[data-timed]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const pid = btn.dataset.player;
+        const attr = btn.dataset.timed;
+        btn.disabled = true; btn.textContent = '…';
+        try {
+          await window.MyTeam.startTimedTraining(pid, attr);
+          renderTab();
+        } catch (e) {
+          const msg = String(e.message || e);
+          if (typeof showToast === 'function') {
+            showToast(msg.includes('ALREADY_TRAINING') ? '⚠️ 該球員已在訓練' : '開始訓練失敗：' + msg);
+          }
+          btn.disabled = false; btn.textContent = ({attack:'攻',defense:'防',speed:'速',midfield:'中',stamina:'體',aura:'氣'})[attr] + '+1';
+        }
+      });
+    });
+
+    // ── 時間訓練：領取 ──
+    list.querySelectorAll('[data-claim]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const pid = btn.dataset.claim;
+        btn.disabled = true; btn.textContent = '領取中…';
+        try {
+          const res = await window.MyTeam.claimTimedTraining(pid);
+          if (typeof showToast === 'function') {
+            const lbl = ({attack:'攻',defense:'防',speed:'速',midfield:'中',stamina:'體',aura:'氣'})[res.attr];
+            showToast(`✅ ${lbl} +${res.gain}！`);
+          }
+          renderTab();
+        } catch (e) {
+          alert('領取失敗：' + (e.message || e));
+        }
+      });
     });
 
     // click 訓練
