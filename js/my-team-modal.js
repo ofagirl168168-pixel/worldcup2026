@@ -57,6 +57,7 @@
   function close() {
     if (!_overlay) return;
     _overlay.classList.remove('open');
+    _stopOnboardScene();
     setTimeout(() => {
       _overlay.style.display = 'none';
     }, 250);
@@ -76,9 +77,10 @@
 
     body.innerHTML = `
       <div class="mt-onboard">
-        <!-- 動態 hero 區 -->
+        <!-- 動態 hero 區（pixel 草地 + 跳動球 + 預覽卡）-->
         <div class="mt-onboard-hero">
           <div class="mt-onboard-hero-stars"></div>
+          <canvas class="mt-onboard-hero-scene" id="mt-onboard-scene" width="320" height="160"></canvas>
           <div class="mt-onboard-hero-card" id="mt-onboard-preview">
             <div class="mt-onboard-hero-crest" id="mt-onboard-preview-crest">⚽</div>
             <div class="mt-onboard-hero-name" id="mt-onboard-preview-name">你的球隊</div>
@@ -118,6 +120,9 @@
 
     const previewCrest = body.querySelector('#mt-onboard-preview-crest');
     const previewName = body.querySelector('#mt-onboard-preview-name');
+
+    // ─── pixel art 場景動畫（草地 + 跳球 + 小 chibi 跑動）───
+    _startOnboardScene(body.querySelector('#mt-onboard-scene'));
 
     // 隊徽選擇 → 同步預覽
     const grid = body.querySelector('#mt-crest-grid');
@@ -529,6 +534,123 @@
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // ── Phase 2.3：onboarding pixel art 場景動畫（草地 + 跳球 + 小 chibi 跑動）──
+  let _sceneRafId = null;
+  function _startOnboardScene(canvas) {
+    if (!canvas || !canvas.getContext) return;
+    if (_sceneRafId) cancelAnimationFrame(_sceneRafId);
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const W = canvas.width = 320 * dpr;
+    const H = canvas.height = 160 * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.imageSmoothingEnabled = false;
+    // 預先 build 一個小 chibi sprite（橘色球衣呼應主題）
+    const chibi = _buildChibiSprite('#f0c040');
+
+    let t = 0;
+    const draw = () => {
+      ctx.clearRect(0, 0, 320, 160);
+      // 不畫背景（讓 CSS 的 hero gradient + stars 顯示）
+
+      // 草地條（底部 30px）
+      const grassY = 130;
+      const grassGrad = ctx.createLinearGradient(0, grassY, 0, 160);
+      grassGrad.addColorStop(0, '#2e7d32');
+      grassGrad.addColorStop(1, '#1b5e20');
+      ctx.fillStyle = grassGrad;
+      ctx.fillRect(0, grassY, 320, 30);
+      // 草地紋路
+      for (let i = 0; i < 320; i += 16) {
+        ctx.fillStyle = (i / 16) % 2 === 0 ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)';
+        ctx.fillRect(i, grassY, 16, 30);
+      }
+      // 中線
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(160, grassY);
+      ctx.lineTo(160, 160);
+      ctx.stroke();
+
+      // 小 chibi 來回跑（橫向 50-270 之間）
+      const cx = 160 + Math.sin(t * 0.02) * 110;
+      const facingRight = Math.cos(t * 0.02) > 0;
+      const moving = true;
+      const frame = Math.floor(t / 8) % 2;
+      const SW = 12, SH = 16;
+      const dx = Math.round(cx - SW / 2);
+      const dy = grassY + 14 - SH / 2 - 4;
+      // 陰影
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.beginPath();
+      ctx.ellipse(cx, grassY + 14, 5, 1.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      if (facingRight) {
+        ctx.drawImage(chibi, frame * SW, 0, SW, SH, dx, dy, SW, SH);
+      } else {
+        ctx.save();
+        ctx.translate(dx + SW, dy);
+        ctx.scale(-1, 1);
+        ctx.drawImage(chibi, frame * SW, 0, SW, SH, 0, 0, SW, SH);
+        ctx.restore();
+      }
+
+      // 跳動足球（左右來回，跳一個 sin 曲線）
+      const bx = 160 + Math.sin(t * 0.025 + 1.5) * 90;
+      const by = grassY + 8 - Math.abs(Math.sin(t * 0.06)) * 22;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(bx, by, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+
+      t += 1;
+      _sceneRafId = requestAnimationFrame(draw);
+    };
+    draw();
+  }
+
+  // 12×16 chibi sprite 2-frame（與 match-sim 同設計、獨立寫一份避免相依）
+  function _buildChibiSprite(jerseyColor) {
+    const SW = 12, SH = 16;
+    const cv = document.createElement('canvas');
+    cv.width = SW * 2; cv.height = SH;
+    const cx = cv.getContext('2d');
+    cx.imageSmoothingEnabled = false;
+    const SKIN = '#f4c194', SHORT = '#fff', BOOT = '#1a1a2e';
+    for (let f = 0; f < 2; f++) {
+      const ox = f * SW;
+      cx.fillStyle = SKIN; cx.fillRect(ox + 4, 0, 4, 4);
+      cx.fillStyle = jerseyColor; cx.fillRect(ox + 3, 4, 6, 4);
+      cx.fillStyle = SHORT; cx.fillRect(ox + 4, 8, 4, 2);
+      cx.fillStyle = SKIN;
+      if (f === 0) {
+        cx.fillRect(ox + 4, 10, 1, 4);
+        cx.fillRect(ox + 7, 10, 1, 4);
+        cx.fillStyle = BOOT;
+        cx.fillRect(ox + 4, 14, 1, 1);
+        cx.fillRect(ox + 7, 14, 1, 1);
+      } else {
+        cx.fillRect(ox + 4, 10, 1, 3);
+        cx.fillRect(ox + 7, 10, 1, 4);
+        cx.fillStyle = BOOT;
+        cx.fillRect(ox + 4, 13, 1, 1);
+        cx.fillRect(ox + 7, 14, 1, 1);
+      }
+    }
+    return cv;
+  }
+  // close modal 時停止動畫
+  function _stopOnboardScene() {
+    if (_sceneRafId) {
+      cancelAnimationFrame(_sceneRafId);
+      _sceneRafId = null;
+    }
   }
 
   // 監聽 team change → 如果 modal 開著，重新渲染 hub stats
