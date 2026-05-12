@@ -166,10 +166,74 @@
     return null;
   }
 
+  // ── 主頁用：全身（含腳） 4 方向 × 3 frames sprite sheet ──
+  // 跟 matchSpriteSheet 差別在 SH=60、含腳 + 比賽用 kit
+  const fullBodyCache = new Map();
+
+  async function walkingFullBody(look, opts = {}) {
+    if (!look || !look.body) return null;
+    const kitShirt = opts.shirtColor || 'red';
+    const kitPants = opts.pantsColor || 'blue';
+    const kitShoes = opts.shoeColor || 'white';
+    const key = JSON.stringify(look) + '|F|' + kitShirt + '|' + kitPants + '|' + kitShoes;
+    if (fullBodyCache.has(key)) return fullBodyCache.get(key);
+
+    const FRAME_W = 32, FRAME_H = 60;
+    const FRAME_COLS = 3, FRAME_ROWS = 4;
+    // 方向順序：0=down, 1=left, 2=right, 3=up
+    const ROW_TO_LPC_Y = [10*64, 9*64, 11*64, 8*64];
+    const FRAMES_TO_USE = [1, 4, 7];
+
+    const SX = 16, SY_OFF = 4;  // frame y=4 to y=64 = 60 高（含腳）
+    const [body, head, wrinkles, eyes, eyebrows, beard, mustache, hair, headband, shirt, pants, shoes] = await Promise.all([
+      getLayer('body', look.body),
+      getLayer('head', look.body),
+      look.wrinkles === 'on' ? getLayerSafe('wrinkles', look.body) : null,
+      getLayer('eyes', look.eye_color),
+      look.eyebrow_style && look.eyebrow_style !== 'none'
+        ? getLayerSafe('eyebrows', `${look.eyebrow_style}-${look.eyebrow_color || look.hair_color}`) : null,
+      look.beard_style && look.beard_style !== 'none'
+        ? getLayerSafe('beard', `${look.beard_style}-${look.beard_color}`) : null,
+      look.mustache_style && look.mustache_style !== 'none'
+        ? getLayerSafe('mustache', `${look.mustache_style}-${look.beard_color}`) : null,
+      look.hair_style && look.hair_style !== 'bald'
+        ? getLayerSafe('hair', `${look.hair_style}-${look.hair_color}`) : null,
+      look.headband_color && look.headband_color !== 'none'
+        ? getLayerSafe('headband', look.headband_color) : null,
+      getLayerSafe('shirt', `shortsleeve-${kitShirt}`),
+      getLayerSafe('pants', kitPants),
+      kitShoes !== 'none' ? getLayerSafe('shoes-flat', kitShoes) : null,
+    ]);
+
+    const cv = document.createElement('canvas');
+    cv.width = FRAME_W * FRAME_COLS;
+    cv.height = FRAME_H * FRAME_ROWS;
+    const ctx = cv.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    for (let row = 0; row < FRAME_ROWS; row++) {
+      const lpcY = ROW_TO_LPC_Y[row];
+      for (let col = 0; col < FRAME_COLS; col++) {
+        const lpcFrame = FRAMES_TO_USE[col];
+        const srcX = lpcFrame * 64 + SX;
+        const srcY = lpcY + SY_OFF;
+        const dx = col * FRAME_W;
+        const dy = row * FRAME_H;
+        for (const layer of [body, pants, shirt, shoes, head, wrinkles, eyes, eyebrows, beard, mustache, hair, headband]) {
+          if (layer) ctx.drawImage(layer, srcX, srcY, FRAME_W, FRAME_H, dx, dy, FRAME_W, FRAME_H);
+        }
+      }
+    }
+    const result = { canvas: cv, frameW: FRAME_W, frameH: FRAME_H, cols: FRAME_COLS, rows: FRAME_ROWS };
+    fullBodyCache.set(key, result);
+    return result;
+  }
+
   // ── public API ──
   window.LpcRenderer = {
     portrait,             // (look, {scale}?) → Promise<dataURL>
     matchSpriteSheet,     // (look, {shirtColor,pantsColor,shoeColor}?) → Promise<{canvas, frameW, frameH, cols, rows}>
+    walkingFullBody,      // 主頁全身 sheet 同 schema
     resolveLook,          // (player) → look_data | null
   };
 })();
