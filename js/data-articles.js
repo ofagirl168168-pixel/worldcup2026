@@ -9,10 +9,10 @@ const ARTICLES = [
 
 <table style="width:100%;border-collapse:collapse;margin:12px 0">
 <tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">球隊</th><th style="padding:8px">FIFA 排名</th><th style="padding:8px">關鍵球員</th><th style="padding:8px">核心看點</th></tr>
-<tr style="background:#f8f8f8"><td style="padding:8px">🇧🇷 巴西</td><td style="padding:8px">第 5</td><td style="padding:8px">Vinicius Jr、Endrick、Marquinhos</td><td style="padding:8px">Ancelotti 執教首屆世界盃，Militão + Rodrygo 雙傷報銷</td></tr>
-<tr><td style="padding:8px">🇲🇦 摩洛哥</td><td style="padding:8px">第 14</td><td style="padding:8px">Hakimi、Amrabat、Bouaddi</td><td style="padding:8px">2022 四強後陣容升級，Ouahbi 接班 Regragui</td></tr>
-<tr style="background:#f8f8f8"><td style="padding:8px">🏴󠁧󠁢󠁳󠁣󠁴󠁿 蘇格蘭</td><td style="padding:8px">第 32</td><td style="padding:8px">McTominay、Robertson、Adams</td><td style="padding:8px">1998 年後首度參賽，Clarke 的紀律防守是王牌</td></tr>
-<tr><td style="padding:8px">🇭🇹 海地</td><td style="padding:8px">第 67</td><td style="padding:8px">Isidor、Bellegarde、Placide</td><td style="padding:8px">1974 後首度參賽，加勒比海唯一世界盃國家</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">🇧🇷 巴西</td><td style="padding:8px">第 6</td><td style="padding:8px">Vinicius Jr、Endrick、Marquinhos</td><td style="padding:8px">Ancelotti 執教首屆世界盃，Militão + Rodrygo 雙傷報銷</td></tr>
+<tr><td style="padding:8px">🇲🇦 摩洛哥</td><td style="padding:8px">第 8</td><td style="padding:8px">Hakimi、Amrabat、Bouaddi</td><td style="padding:8px">2022 四強後陣容升級，Ouahbi 接班 Regragui</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">🏴󠁧󠁢󠁳󠁣󠁴󠁿 蘇格蘭</td><td style="padding:8px">第 43</td><td style="padding:8px">McTominay、Robertson、Adams</td><td style="padding:8px">1998 年後首度參賽，Clarke 的紀律防守是王牌</td></tr>
+<tr><td style="padding:8px">🇭🇹 海地</td><td style="padding:8px">第 83</td><td style="padding:8px">Isidor、Bellegarde、Placide</td><td style="padding:8px">1974 後首度參賽，加勒比海唯一世界盃國家</td></tr>
 </table>
 
 <h3>🇧🇷 巴西：Ancelotti 的夢幻與噩夢</h3>
@@ -30,11 +30,11 @@ const ARTICLES = [
 <li><b>前鋒</b>：Vinicius Jr（皇馬）</li>
 </ul>
 
-<p>Vinicius Jr 是巴西的絕對核心。2024 金球獎第二名的他本季在皇馬表現依然頂級，但<b>巴西國家隊的 Vinicius 和皇馬的 Vinicius 是兩個人</b>——國際賽 65 場僅 8 球的效率，與俱樂部的火力形成強烈反差。Ancelotti 能否在國家隊複製皇馬的戰術環境，讓 Vinicius 解鎖國際賽模式，將決定巴西的上限。</p>
+<p>Vinicius Jr 是巴西的絕對核心。2024 金球獎第二名的他本季在皇馬表現依然頂級，但<b>巴西國家隊的 Vinicius 和皇馬的 Vinicius 是兩個人</b>——國際賽約 47 場僅 8 球的效率，與俱樂部的火力形成強烈反差。Ancelotti 能否在國家隊複製皇馬的戰術環境，讓 Vinicius 解鎖國際賽模式，將決定巴西的上限。</p>
 
 <h3>🇲🇦 摩洛哥：2022 四強不是終點</h3>
 
-<p>2022 卡達世界盃，摩洛哥震驚全球——小組賽力壓比利時和克羅埃西亞出線，淘汰賽連斬西班牙和葡萄牙殺入四強，成為史上第一支闖入世界盃半決賽的非洲球隊。四年後，他們帶著更強的陣容回來了。</p>
+<p>2022 卡達世界盃，摩洛哥震驚全球——小組賽擊敗比利時、逼平克羅埃西亞出線，淘汰賽連斬西班牙和葡萄牙殺入四強，成為史上第一支闖入世界盃半決賽的非洲球隊。四年後，他們帶著更強的陣容回來了。</p>
 
 <p>新任主帥 <b>Mohamed Ouahbi</b> 接替 Regragui，延續高強度防守反擊的DNA。55 人初選名單已於 5 月 11 日提交 FIFA，其中最令人興奮的是 <b>18 歲的 Ayyoub Bouaddi</b>（里爾），這位中場新星本季在法甲已展現出超齡的比賽閱讀能力。最終 26 人名單將於 5 月 21 日公布，6 月 2 日前確認。</p>
 
@@ -63,9 +63,9 @@ const ARTICLES = [
 <h3>賽程與關鍵戰</h3>
 
 <ul>
-<li><b>6/13（五）</b>：巴西 vs 摩洛哥（MetLife Stadium, 紐約）、蘇格蘭 vs 海地（費城 Lincoln Financial Field）</li>
-<li><b>6/19（四）</b>：摩洛哥 vs 蘇格蘭（MetLife Stadium, 紐約）、海地 vs 巴西（費城 Lincoln Financial Field）</li>
-<li><b>6/24（二）</b>：巴西 vs 蘇格蘭（MetLife Stadium, 紐約）、摩洛哥 vs 海地（費城 Lincoln Financial Field）</li>
+<li><b>6/13（五）</b>：巴西 vs 摩洛哥（MetLife Stadium, 紐約）、蘇格蘭 vs 海地（Gillette Stadium, 波士頓）</li>
+<li><b>6/19（四）</b>：摩洛哥 vs 蘇格蘭（Gillette Stadium, 波士頓）、海地 vs 巴西（Lincoln Financial Field, 費城）</li>
+<li><b>6/24（二）</b>：巴西 vs 蘇格蘭（Hard Rock Stadium, 邁阿密）、摩洛哥 vs 海地（Mercedes-Benz Stadium, 亞特蘭大）</li>
 </ul>
 
 <p><b>首輪巴西 vs 摩洛哥</b>是整個 C 組的震央。2022 年摩洛哥連續淘汰歐洲強隊的經驗，加上 Ancelotti 國際賽首戰的未知數，讓這場比賽充滿變數。另一邊，<b>蘇格蘭 vs 海地</b>看似差距明顯，但海地的球員並不弱——如果蘇格蘭首戰失誤，他們的世界盃之旅可能在小組賽就結束。</p>
