@@ -203,64 +203,118 @@
     return cardIds.length;
   };
 
-  // ── 抽卡動畫 ──
+  // ════════════════════════════════════════════════
+  // 抽卡動畫 v2（2026-05-12 polish）
+  // 多階段：星空 → banner → 光柱 build-up → 卡背飛入 → 翻牌 →
+  //         粒子爆發 → SSR 螢幕閃白 + 微震動 → 屬性 count-up → CTA
+  // ════════════════════════════════════════════════
+  const _sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
   async function openGachaAnimation(cards, options = {}) {
     if (!cards || !cards.length) return;
-    return new Promise(resolve => {
-      const overlay = document.createElement('div');
-      overlay.className = 'mt-gacha-overlay';
-      const hasSSR = cards.some(c => c.rarity === 'SSR');
-      const peakRarity = hasSSR ? 'SSR' : cards.some(c => c.rarity === 'SR') ? 'SR' : 'R';
-      overlay.dataset.peak = peakRarity;
-      overlay.innerHTML = `
-        <div class="mt-gacha-stage">
-          <div class="mt-gacha-loading" id="mt-gacha-loading">
-            ${options.title ? `<div class="mt-gacha-banner-title">${escapeHtml(options.title)}</div>` : ''}
-            ${options.subtitle ? `<div class="mt-gacha-banner-sub">${escapeHtml(options.subtitle)}</div>` : ''}
-            <div class="mt-gacha-spinner">🎰</div>
-            <div class="mt-gacha-spinner-text">抽卡中…</div>
-          </div>
-          <div class="mt-gacha-cards" id="mt-gacha-cards" hidden></div>
-          <div class="mt-gacha-actions" id="mt-gacha-actions" hidden>
-            ${options.ctaCreateTeam ? `
-              <button class="mt-gacha-btn mt-gacha-btn-primary" data-cta="create">🎯 建隊收下這張卡 →</button>
-              <button class="mt-gacha-btn mt-gacha-btn-secondary" data-cta="close">稍後再說</button>
-            ` : options.ctaToHub ? `
-              <button class="mt-gacha-btn mt-gacha-btn-primary" data-cta="hub">進入我的球隊 →</button>
-              <button class="mt-gacha-btn mt-gacha-btn-secondary" data-cta="close">收進球隊</button>
-            ` : `
-              <button class="mt-gacha-btn mt-gacha-btn-primary" data-cta="close">確認收下</button>
-            `}
-          </div>
-        </div>
-      `;
-      document.body.appendChild(overlay);
-      requestAnimationFrame(() => overlay.classList.add('open'));
 
+    const hasSSR = cards.some(c => c.rarity === 'SSR');
+    const hasSR  = cards.some(c => c.rarity === 'SR');
+    const peakRarity = hasSSR ? 'SSR' : hasSR ? 'SR' : 'R';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-gacha-overlay';
+    overlay.dataset.peak = peakRarity;
+    overlay.innerHTML = `
+      <div class="mt-gacha-stars"></div>
+      <div class="mt-gacha-beam" data-rarity="${peakRarity}"></div>
+      <div class="mt-gacha-rays" hidden></div>
+      <div class="mt-gacha-stage">
+        <button class="mt-gacha-skip" id="mt-gacha-skip" hidden type="button" aria-label="跳過">⏭ 跳過</button>
+        <div class="mt-gacha-banner" id="mt-gacha-banner">
+          <div class="mt-gacha-banner-title">${escapeHtml(options.title || '🎰 球員召喚')}</div>
+          ${options.subtitle ? `<div class="mt-gacha-banner-sub">${escapeHtml(options.subtitle)}</div>` : ''}
+        </div>
+        <div class="mt-gacha-cards-wrap">
+          <div class="mt-gacha-cards" id="mt-gacha-cards"></div>
+        </div>
+        <div class="mt-gacha-rarity-hint" id="mt-gacha-rarity-hint"></div>
+        <div class="mt-gacha-actions" id="mt-gacha-actions" hidden>
+          ${options.ctaCreateTeam ? `
+            <button class="mt-gacha-btn mt-gacha-btn-primary" data-cta="create">🎯 建隊收下這張卡</button>
+            <button class="mt-gacha-btn mt-gacha-btn-secondary" data-cta="close">稍後再說</button>
+          ` : options.ctaToHub ? `
+            <button class="mt-gacha-btn mt-gacha-btn-primary" data-cta="hub">進入我的球隊 →</button>
+            <button class="mt-gacha-btn mt-gacha-btn-secondary" data-cta="close">收進球隊</button>
+          ` : `
+            <button class="mt-gacha-btn mt-gacha-btn-primary" data-cta="close">確認收下</button>
+          `}
+        </div>
+      </div>
+      <div class="mt-gacha-flash" id="mt-gacha-flash"></div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    return new Promise(resolve => {
+      let skipped = false;
+      let resolved = false;
       const cleanup = () => {
+        if (resolved) return;
+        resolved = true;
         overlay.classList.remove('open');
         setTimeout(() => overlay.remove(), 350);
         resolve();
       };
 
-      // 1.5s 洗卡 → 顯示卡片
-      setTimeout(() => {
-        overlay.querySelector('#mt-gacha-loading').hidden = true;
-        const cardsEl = overlay.querySelector('#mt-gacha-cards');
-        cardsEl.hidden = false;
-        cards.forEach((c, idx) => {
-          const card = _buildCardEl(c, idx, cards.length);
-          cardsEl.appendChild(card);
-        });
-        // 全部 reveal 完才顯示 action
-        const total = cards.length;
-        const lastDelay = (total - 1) * 250 + 600; // 對應 CSS animation
-        setTimeout(() => {
-          overlay.querySelector('#mt-gacha-actions').hidden = false;
-        }, lastDelay);
-      }, 1500);
+      const skipBtn = overlay.querySelector('#mt-gacha-skip');
+      skipBtn.addEventListener('click', () => { skipped = true; });
 
-      // 按鈕
+      // Stage 1: build-up（200ms - 1400ms）
+      (async () => {
+        // 200ms 後顯示 skip
+        await _sleep(skipped ? 0 : 250);
+        skipBtn.hidden = false;
+
+        // 1100ms 等光柱漲起來
+        await _sleep(skipped ? 0 : 950);
+
+        // SSR：螢幕閃白 + 微震動 + 光線爆發
+        if (peakRarity === 'SSR' && !skipped) {
+          overlay.querySelector('#mt-gacha-flash').classList.add('mt-flash-active');
+          overlay.querySelector('.mt-gacha-rays').hidden = false;
+          overlay.querySelector('.mt-gacha-stage').classList.add('mt-shake');
+          await _sleep(skipped ? 0 : 500);
+          overlay.querySelector('.mt-gacha-stage').classList.remove('mt-shake');
+        } else if (peakRarity === 'SR' && !skipped) {
+          overlay.querySelector('.mt-gacha-stage').classList.add('mt-pulse-sr');
+          await _sleep(skipped ? 0 : 250);
+        }
+
+        // Stage 2: 卡背飛入 + 翻牌 reveal
+        const cardsEl = overlay.querySelector('#mt-gacha-cards');
+        for (let i = 0; i < cards.length; i++) {
+          const c = cards[i];
+          const cardEl = _buildCard3D(c, i);
+          cardsEl.appendChild(cardEl);
+          // 等卡背飛入完成
+          await _sleep(skipped ? 0 : 350);
+          // 翻牌
+          cardEl.classList.add('flipped');
+          // 觸發粒子（SSR=多 + 金、SR=中 + 紫、R=少 + 銀）
+          _emitParticles(cardEl, c.rarity, skipped);
+          // count-up 屬性數字
+          if (!skipped) _animateCounts(cardEl, c);
+          // 卡間隔
+          await _sleep(skipped ? 0 : (c.rarity === 'SSR' ? 900 : 500));
+        }
+
+        // 顯示 CTA
+        await _sleep(skipped ? 0 : 400);
+        skipBtn.hidden = true;
+        overlay.querySelector('#mt-gacha-actions').hidden = false;
+        overlay.querySelector('#mt-gacha-actions').classList.add('reveal');
+        const hint = overlay.querySelector('#mt-gacha-rarity-hint');
+        if (peakRarity === 'SSR') hint.innerHTML = '✨ <b>SSR</b> 召喚成功！';
+        else if (peakRarity === 'SR') hint.innerHTML = '💜 <b>SR</b> 不錯！';
+      })();
+
+      // 按鈕：用 delegation
       overlay.addEventListener('click', e => {
         const cta = e.target.dataset?.cta;
         if (!cta) return;
@@ -274,40 +328,97 @@
     });
   }
 
-  function _buildCardEl(card, idx, total) {
+  // 3D 卡片元素：含卡背 + 卡面、翻牌 by adding .flipped
+  function _buildCard3D(card, idx) {
     const el = document.createElement('div');
-    el.className = `mt-gacha-card rarity-${card.rarity}`;
-    el.style.animationDelay = `${idx * 250}ms`;
-    const dup = card.is_duplicate ? '<div class="mt-gacha-dup">重複 → ★+1</div>' : '';
+    el.className = `mt-gacha-card3d rarity-${card.rarity}`;
+    el.style.animationDelay = `${idx * 60}ms`;
     const talentMap = {
-      speedster: '⚡ 速度型',
+      speedster:   '⚡ 速度型',
       bodybuilder: '💪 力量型',
-      shooter: '🎯 射手型',
-      wall: '🛡️ 城牆型',
-      magician: '✨ 魔法型',
+      shooter:     '🎯 射手型',
+      wall:        '🛡️ 城牆型',
+      magician:    '✨ 魔法型',
     };
     const talent = card.talent ? `<div class="mt-gacha-talent">${talentMap[card.talent] || card.talent}</div>` : '';
+    const dup = card.is_duplicate ? '<div class="mt-gacha-dup">重複 → ★+1</div>' : '';
     const force = card.forced_ssr ? '<div class="mt-gacha-pity">🎊 保底必中！</div>' : '';
+    const stars = ({ R: '★', SR: '★★', SSR: '★★★' })[card.rarity];
+
     el.innerHTML = `
-      <div class="mt-gacha-card-glow"></div>
-      <div class="mt-gacha-card-rarity-badge">${card.rarity}</div>
-      <div class="mt-gacha-card-emoji">${_emojiFor(card.position)}</div>
-      <div class="mt-gacha-card-name">${escapeHtml(card.name)}</div>
-      ${card.nickname ? `<div class="mt-gacha-card-nick">${escapeHtml(card.nickname)}</div>` : ''}
-      <div class="mt-gacha-card-pos">${card.position}</div>
-      <div class="mt-gacha-card-stats">
-        <div>攻 <b>${card.attack}</b></div>
-        <div>防 <b>${card.defense}</b></div>
-        <div>速 <b>${card.speed}</b></div>
-        <div>中 <b>${card.midfield}</b></div>
-        <div>體 <b>${card.stamina}</b></div>
-        <div>環 <b>${card.aura}</b></div>
+      <div class="mt-gacha-card3d-inner">
+        <div class="mt-gacha-card3d-back">
+          <div class="mt-gacha-back-pattern"></div>
+          <div class="mt-gacha-back-emblem">⚽</div>
+        </div>
+        <div class="mt-gacha-card3d-front">
+          <div class="mt-gacha-front-shine"></div>
+          <div class="mt-gacha-front-rarity">
+            <span class="mt-gacha-front-rarity-badge">${card.rarity}</span>
+            <span class="mt-gacha-front-stars">${stars}</span>
+          </div>
+          <div class="mt-gacha-front-emoji">${_emojiFor(card.position)}</div>
+          <div class="mt-gacha-front-name">${escapeHtml(card.name)}</div>
+          ${card.nickname ? `<div class="mt-gacha-front-nick">${escapeHtml(card.nickname)}</div>` : ''}
+          <div class="mt-gacha-front-pos">${card.position}</div>
+          <div class="mt-gacha-front-stats">
+            <div>攻 <b data-target="${card.attack}">0</b></div>
+            <div>防 <b data-target="${card.defense}">0</b></div>
+            <div>速 <b data-target="${card.speed}">0</b></div>
+            <div>中 <b data-target="${card.midfield}">0</b></div>
+            <div>體 <b data-target="${card.stamina}">0</b></div>
+            <div>環 <b data-target="${card.aura}">0</b></div>
+          </div>
+          ${talent}
+          ${dup}
+          ${force}
+        </div>
       </div>
-      ${talent}
-      ${dup}
-      ${force}
+      <div class="mt-gacha-particles"></div>
     `;
     return el;
+  }
+
+  // 粒子爆發
+  function _emitParticles(cardEl, rarity, skipped) {
+    if (skipped) return;
+    const container = cardEl.querySelector('.mt-gacha-particles');
+    if (!container) return;
+    const count = ({ R: 8, SR: 14, SSR: 24 })[rarity] || 8;
+    const color = ({ R: '#bcd', SR: '#9b87f5', SSR: '#f0c040' })[rarity];
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('i');
+      const angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.3;
+      const dist = 60 + Math.random() * 80;
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist;
+      p.style.setProperty('--pdx', dx + 'px');
+      p.style.setProperty('--pdy', dy + 'px');
+      p.style.background = color;
+      p.style.animationDelay = (i * 8) + 'ms';
+      container.appendChild(p);
+    }
+    // 0.9s 後移除避免堆積
+    setTimeout(() => { container.innerHTML = ''; }, 900);
+  }
+
+  // 屬性數字 count-up（400ms）
+  function _animateCounts(cardEl, card) {
+    cardEl.querySelectorAll('.mt-gacha-front-stats b[data-target]').forEach(el => {
+      const target = parseInt(el.dataset.target) || 0;
+      const duration = 400;
+      const start = performance.now();
+      const tick = () => {
+        const elapsed = performance.now() - start;
+        const t = Math.min(1, elapsed / duration);
+        // ease-out cubic
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(target * eased);
+        if (t < 1) requestAnimationFrame(tick);
+        else el.textContent = target;
+      };
+      requestAnimationFrame(tick);
+    });
   }
 
   function _emojiFor(pos) {

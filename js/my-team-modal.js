@@ -76,29 +76,50 @@
 
     body.innerHTML = `
       <div class="mt-onboard">
-        <div class="mt-onboard-title">🎉 建立你的球隊</div>
+        <!-- 動態 hero 區 -->
+        <div class="mt-onboard-hero">
+          <div class="mt-onboard-hero-stars"></div>
+          <div class="mt-onboard-hero-card" id="mt-onboard-preview">
+            <div class="mt-onboard-hero-crest" id="mt-onboard-preview-crest">⚽</div>
+            <div class="mt-onboard-hero-name" id="mt-onboard-preview-name">你的球隊</div>
+          </div>
+        </div>
+
+        <div class="mt-onboard-title">🎉 歡迎加入麥迪聯盟</div>
         <div class="mt-onboard-sub">
-          選個隊名 + 隊徽就能開始抽卡養隊。<br>
-          建隊送你 <b style="color:#f0c040">5 張免費抽券</b>！
+          取個隊名 + 選個隊徽就能開始<br>
+          抽 SSR 球員、訓練、打 10 階聯賽
         </div>
         ${pendingHint}
 
         <div class="mt-onboard-section">
-          <div class="mt-onboard-label">隊名（最多 24 字）</div>
-          <input class="mt-onboard-input" id="mt-onboard-name" maxlength="24" placeholder="例：麥迪聯隊" />
+          <div class="mt-onboard-label">🏷️ 隊名（最多 24 字）</div>
+          <input class="mt-onboard-input" id="mt-onboard-name" maxlength="24" placeholder="例：麥迪聯隊" autocomplete="off" />
         </div>
 
         <div class="mt-onboard-section">
-          <div class="mt-onboard-label">選個隊徽</div>
+          <div class="mt-onboard-label">🛡️ 隊徽</div>
           <div class="mt-crest-grid" id="mt-crest-grid"></div>
         </div>
 
-        <button class="mt-onboard-submit" id="mt-onboard-submit" disabled>建立球隊</button>
-        <div class="mt-onboard-gift">⚽ 建隊後直接送 5 張抽券、可抽 5 連 + 保底 SR 起步</div>
+        <div class="mt-onboard-perks">
+          <div class="mt-onboard-perk">🎟️ <b>5</b> 抽券</div>
+          <div class="mt-onboard-perk">⚡ <b>5</b> 體力</div>
+          <div class="mt-onboard-perk">🏆 Tier <b>1</b> 起跑</div>
+        </div>
+
+        <button class="mt-onboard-submit" id="mt-onboard-submit" disabled>
+          <span class="mt-onboard-submit-text">建立球隊</span>
+          <span class="mt-onboard-submit-arrow">→</span>
+        </button>
+        <div class="mt-onboard-gift">建隊立刻可抽 5 連、保底 SR 起步</div>
       </div>
     `;
 
-    // 隊徽選擇
+    const previewCrest = body.querySelector('#mt-onboard-preview-crest');
+    const previewName = body.querySelector('#mt-onboard-preview-name');
+
+    // 隊徽選擇 → 同步預覽
     const grid = body.querySelector('#mt-crest-grid');
     let selectedCrest = '⚽';
     CREST_OPTIONS.forEach((emoji, i) => {
@@ -110,15 +131,21 @@
         grid.querySelectorAll('.mt-crest-cell').forEach(c => c.classList.remove('sel'));
         cell.classList.add('sel');
         selectedCrest = emoji;
+        previewCrest.textContent = emoji;
+        previewCrest.classList.remove('mt-pulse-once');
+        void previewCrest.offsetWidth; // restart animation
+        previewCrest.classList.add('mt-pulse-once');
       });
       grid.appendChild(cell);
     });
 
-    // 名字 / submit 啟用
+    // 名字 / submit 啟用 + 同步預覽
     const nameInput = body.querySelector('#mt-onboard-name');
     const submitBtn = body.querySelector('#mt-onboard-submit');
     const refreshSubmit = () => {
-      submitBtn.disabled = !(nameInput.value || '').trim();
+      const name = (nameInput.value || '').trim();
+      submitBtn.disabled = !name;
+      previewName.textContent = name || '你的球隊';
     };
     nameInput.addEventListener('input', refreshSubmit);
     refreshSubmit();

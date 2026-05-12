@@ -78,15 +78,17 @@ async function handleUserLoggedIn(isNew) {
   await initGems?.();
 
   // 我的球隊：每日登入首次 → 1 抽券（§5.4）
+  // 注意：beta off 時不能消耗 date flag、保留「首次」測試機會
   try {
-    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
-    const lastDate = localStorage.getItem('mt_daily_login_date_v1');
-    if (lastDate !== today && window.MyTeam && typeof window.MyTeam.triggerInstantGacha === 'function') {
-      localStorage.setItem('mt_daily_login_date_v1', today);
-      // 延遲讓登入訊息先跑
-      setTimeout(() => {
-        window.MyTeam.triggerInstantGacha(1, 'daily_login').catch(() => {});
-      }, 2500);
+    if (window.MyTeamBetaEnabled && window.MyTeamBetaEnabled()) {
+      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+      const lastDate = localStorage.getItem('mt_daily_login_date_v1');
+      if (lastDate !== today && window.MyTeam && typeof window.MyTeam.triggerInstantGacha === 'function') {
+        localStorage.setItem('mt_daily_login_date_v1', today);
+        setTimeout(() => {
+          window.MyTeam.triggerInstantGacha(1, 'daily_login').catch(() => {});
+        }, 2500);
+      }
     }
   } catch (e) {}
   // unlockedMatchSet 已就緒，重新檢查階層成就

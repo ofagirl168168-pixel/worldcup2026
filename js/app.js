@@ -4223,8 +4223,9 @@ function saveMyPred(matchId) {
     showToast?.('🎉 參與獎 +1 XP');
 
     // 我的球隊：預測一場 +1 體力（§6.4 即時）+ 累積到 5 場 +2 抽券（§5.4）
+    // 注意：beta off 時什麼都不做、不消耗預測累計、保留「第 5 場觸發」首測機會
     try {
-      if (window.MyTeam) {
+      if (window.MyTeamBetaEnabled && window.MyTeamBetaEnabled() && window.MyTeam) {
         // +1 體力（即時）
         window.MyTeam.awardStamina?.(1, 'predict_match');
 

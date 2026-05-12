@@ -199,35 +199,75 @@
     const winProb = _estimateWinProb(hAvg, aAvg);
     const tierName = ({1:'新手聯賽',2:'業餘聯賽',3:'地區聯賽',4:'全國次級',5:'全國聯賽',6:'大陸盃',7:'歐洲菁英',8:'世界次級',9:'世界聯賽',10:'傳奇聯賽'})[ctx.tier];
     content.innerHTML = `
-      <div class="mt-pre-match">
+      <div class="mt-pre-match ${ctx.isBoss ? 'is-boss' : ''}">
         <div class="mt-pre-match-tier">${tierName} · 第 ${ctx.matchIdx + 1}/10 場</div>
         ${ctx.isBoss ? '<div class="mt-pre-match-boss">⭐ 真實隊伍 BOSS 戰 ⭐</div>' : ''}
-        <div class="mt-pre-match-vs">
-          <div class="mt-pre-match-side">
+
+        <!-- 雙隊衝撞 -->
+        <div class="mt-pre-match-arena">
+          <div class="mt-pre-match-clash-rays"></div>
+          <div class="mt-pre-match-side mt-pre-match-side-home">
             <div class="mt-pre-match-crest">${ctx.team.team_crest}</div>
             <div class="mt-pre-match-name">${escapeHtml(ctx.team.team_name)}</div>
-            <div class="mt-pre-match-radar">攻 ${ctx.homeData.radar.attack} · 防 ${ctx.homeData.radar.defense} · 速 ${ctx.homeData.radar.speed}</div>
-            <div class="mt-pre-match-avg">綜合 ${hAvg}</div>
+            <div class="mt-pre-match-radar">攻 <b>${ctx.homeData.radar.attack}</b> · 防 <b>${ctx.homeData.radar.defense}</b> · 速 <b>${ctx.homeData.radar.speed}</b></div>
+            <div class="mt-pre-match-avg">綜合 <span data-count="${hAvg}">0</span></div>
           </div>
-          <div class="mt-pre-match-mid">VS</div>
-          <div class="mt-pre-match-side">
+          <div class="mt-pre-match-mid">
+            <div class="mt-pre-match-mid-vs">VS</div>
+            <div class="mt-pre-match-mid-spark">⚡</div>
+          </div>
+          <div class="mt-pre-match-side mt-pre-match-side-away">
             <div class="mt-pre-match-crest">${_renderFlag(ctx.opponent.flag)}</div>
             <div class="mt-pre-match-name">${escapeHtml(ctx.opponent.nameCN)}</div>
-            <div class="mt-pre-match-radar">攻 ${ctx.opponent.radar.attack} · 防 ${ctx.opponent.radar.defense} · 速 ${ctx.opponent.radar.speed}</div>
-            <div class="mt-pre-match-avg">綜合 ${aAvg}</div>
+            <div class="mt-pre-match-radar">攻 <b>${ctx.opponent.radar.attack}</b> · 防 <b>${ctx.opponent.radar.defense}</b> · 速 <b>${ctx.opponent.radar.speed}</b></div>
+            <div class="mt-pre-match-avg">綜合 <span data-count="${aAvg}">0</span></div>
           </div>
         </div>
+
+        <!-- 勝率對比條 -->
         <div class="mt-pre-match-prob">
+          <div class="mt-pre-match-prob-label">勝率預估</div>
           <div class="mt-pre-match-prob-bar">
-            <div style="width:${winProb}%;background:#4caf50"></div>
-            <div style="flex:1;background:rgba(255,255,255,0.1)"></div>
+            <div class="mt-pre-match-prob-home" style="width:0%" data-target="${winProb}"></div>
+            <div class="mt-pre-match-prob-away" style="width:0%" data-target="${100-winProb}"></div>
           </div>
-          <div class="mt-pre-match-prob-text">勝率約 ${winProb}%</div>
+          <div class="mt-pre-match-prob-stats">
+            <span class="mt-prob-h">勝 <b data-count="${winProb}">0</b>%</span>
+            <span class="mt-prob-a">敗 <b data-count="${100-winProb}">0</b>%</span>
+          </div>
         </div>
-        <button class="mt-onboard-submit" id="mt-match-start">⚽ 開始比賽（消耗 1 體力）</button>
+
+        <button class="mt-pre-match-go" id="mt-match-start">
+          <span class="mt-pre-match-go-icon">⚽</span>
+          <span>開始比賽</span>
+          <span class="mt-pre-match-go-cost">耗 1 ⚡</span>
+        </button>
       </div>
     `;
     overlay.querySelector('#mt-match-start').addEventListener('click', () => _runSim(overlay, ctx));
+    // 動畫：count-up 數字 + 勝率條 fill
+    setTimeout(() => {
+      content.querySelectorAll('[data-count]').forEach(el => {
+        _countUp(el, parseInt(el.dataset.count), 700);
+      });
+      const homeBar = content.querySelector('.mt-pre-match-prob-home');
+      const awayBar = content.querySelector('.mt-pre-match-prob-away');
+      if (homeBar) homeBar.style.width = homeBar.dataset.target + '%';
+      if (awayBar) awayBar.style.width = awayBar.dataset.target + '%';
+    }, 300);
+  }
+
+  function _countUp(el, target, duration) {
+    const start = performance.now();
+    const tick = () => {
+      const elapsed = performance.now() - start;
+      const t = Math.min(1, elapsed / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(target * eased);
+      if (t < 1) requestAnimationFrame(tick);
+      else el.textContent = target;
+    };
+    requestAnimationFrame(tick);
   }
 
   function _renderFlag(f) {
@@ -283,49 +323,69 @@
 
   function _renderPostMatch(overlay, ctx, score, result) {
     const content = overlay.querySelector('#mt-match-content');
-    const resultLabel = ({W:'🎉 勝利',D:'🤝 平手',L:'😢 失利'})[result.result];
+    const resultLabel = ({W:'勝利',D:'平手',L:'失利'})[result.result];
+    const resultIcon = ({W:'🏆',D:'🤝',L:'😢'})[result.result];
     const colorClass = ({W:'win',D:'draw',L:'loss'})[result.result];
+
     let seasonHtml = '';
     if (result.season_complete) {
-      const tierMsg = result.tier_change === 'up' ? `⬆️ 晉級到 Tier ${result.new_tier}` :
-                      result.tier_change === 'down' ? `⬇️ 降級到 Tier ${result.new_tier}` :
-                      `留在 Tier ${result.new_tier}`;
+      const tierMsg = result.tier_change === 'up' ? `<div class="mt-post-season-tier up">⬆️ 晉級到 Tier ${result.new_tier}</div>` :
+                      result.tier_change === 'down' ? `<div class="mt-post-season-tier down">⬇️ 降級到 Tier ${result.new_tier}</div>` :
+                      `<div class="mt-post-season-tier">留在 Tier ${result.new_tier}</div>`;
       seasonHtml = `
         <div class="mt-post-match-season">
           <div class="mt-post-match-season-title">🏆 賽季結束</div>
-          <div>${tierMsg}</div>
-          <div style="margin-top:6px">+${result.season_reward_gems} 💎</div>
-          ${result.season_reward_ssr_ticket > 0 ? '<div>+1 ⭐ SSR 自選券（賽季冠軍獎勵）</div>' : ''}
+          ${tierMsg}
+          ${result.season_reward_gems > 0 ? `<div class="mt-post-season-reward">💎 +<span data-count="${result.season_reward_gems}">0</span></div>` : ''}
+          ${result.season_reward_ssr_ticket > 0 ? '<div class="mt-post-season-reward">⭐ +1 SSR 自選券（賽季冠軍）</div>' : ''}
         </div>
       `;
     }
+
     content.innerHTML = `
       <div class="mt-post-match ${colorClass}">
+        ${result.result === 'W' ? '<div class="mt-post-confetti"></div>' : ''}
+        <div class="mt-post-match-icon">${resultIcon}</div>
         <div class="mt-post-match-result">${resultLabel}</div>
-        <div class="mt-post-match-score">${score.h} - ${score.a}</div>
-        <div class="mt-post-match-vs">${escapeHtml(ctx.team.team_name)} vs ${escapeHtml(ctx.opponent.nameCN)}</div>
-        ${ctx.isBoss && result.result === 'W' ? '<div class="mt-post-match-boss-bonus">⭐ 擊敗 Boss！額外寶石獎勵</div>' : ''}
+        <div class="mt-post-match-score">
+          <span class="mt-post-score-h" data-count="${score.h}">0</span>
+          <span class="mt-post-score-sep">-</span>
+          <span class="mt-post-score-a" data-count="${score.a}">0</span>
+        </div>
+        <div class="mt-post-match-vs">${escapeHtml(ctx.team.team_name)} <span style="opacity:0.5">vs</span> ${escapeHtml(ctx.opponent.nameCN)}</div>
+        ${ctx.isBoss && result.result === 'W' ? '<div class="mt-post-match-boss-bonus">⭐ 擊敗真實隊伍 BOSS！</div>' : ''}
         <div class="mt-post-match-rewards">
-          <div>RP +${result.rp_earned} ×4 種</div>
-          <div>💎 +${result.gems_earned}</div>
-          <div>球迷 ${result.fans_delta >= 0 ? '+' : ''}${result.fans_delta}</div>
+          <div class="mt-post-reward">
+            <div class="mt-post-reward-icon">⚙️</div>
+            <div class="mt-post-reward-val">+<span data-count="${result.rp_earned}">0</span></div>
+            <div class="mt-post-reward-label">RP ×4</div>
+          </div>
+          <div class="mt-post-reward">
+            <div class="mt-post-reward-icon">💎</div>
+            <div class="mt-post-reward-val">+<span data-count="${result.gems_earned}">0</span></div>
+            <div class="mt-post-reward-label">寶石</div>
+          </div>
+          <div class="mt-post-reward">
+            <div class="mt-post-reward-icon">${result.fans_delta >= 0 ? '👥' : '😞'}</div>
+            <div class="mt-post-reward-val">${result.fans_delta >= 0 ? '+' : ''}<span data-count="${Math.abs(result.fans_delta)}">0</span></div>
+            <div class="mt-post-reward-label">球迷</div>
+          </div>
         </div>
         ${seasonHtml}
-        <button class="mt-onboard-submit" id="mt-match-close">確認</button>
+        <button class="mt-pre-match-go" id="mt-match-close">確認收下</button>
       </div>
     `;
     overlay.querySelector('#mt-match-close').addEventListener('click', () => {
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 250);
-      // 重畫 my-team hub
-      if (typeof window.openMyTeamModal === 'function') {
-        const hub = document.querySelector('.mt-modal-overlay.open');
-        if (hub) {
-          // 觸發 modal 內 re-render
-          window.dispatchEvent(new CustomEvent('my-team-changed'));
-        }
-      }
+      window.dispatchEvent(new CustomEvent('my-team-changed'));
     });
+    // count-up
+    setTimeout(() => {
+      content.querySelectorAll('[data-count]').forEach(el => {
+        _countUp(el, parseInt(el.dataset.count) || 0, 900);
+      });
+    }, 300);
   }
 
   function escapeHtml(s) {

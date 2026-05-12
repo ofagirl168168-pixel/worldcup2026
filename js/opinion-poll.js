@@ -427,15 +427,18 @@
     _insertVote(opinion.id, chosenIdx);
 
     // 我的球隊：擂台投票首投/天 → 免費抽卡（§5.4 + §5.6 即時觸發）
+    // 注意：date flag 必須在 beta 啟用 + 真的 trigger 後才設，避免關閉時錯誤消耗「今日首投」機會
     try {
-      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
-      const lastDate = localStorage.getItem('mt_arena_vote_date_v1');
-      if (lastDate !== today && window.MyTeam && typeof window.MyTeam.triggerInstantGacha === 'function') {
-        localStorage.setItem('mt_arena_vote_date_v1', today);
-        // 延遲 800ms 讓投票結果動畫先跑完
-        setTimeout(() => {
-          window.MyTeam.triggerInstantGacha(1, 'arena_vote').catch(e => console.warn('[mt] instant gacha', e));
-        }, 800);
+      if (window.MyTeamBetaEnabled && window.MyTeamBetaEnabled()) {
+        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+        const lastDate = localStorage.getItem('mt_arena_vote_date_v1');
+        if (lastDate !== today && window.MyTeam && typeof window.MyTeam.triggerInstantGacha === 'function') {
+          localStorage.setItem('mt_arena_vote_date_v1', today);
+          // 延遲 800ms 讓投票結果動畫先跑完
+          setTimeout(() => {
+            window.MyTeam.triggerInstantGacha(1, 'arena_vote').catch(e => console.warn('[mt] instant gacha', e));
+          }, 800);
+        }
       }
     } catch (e) {}
 

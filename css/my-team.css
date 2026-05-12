@@ -101,24 +101,116 @@
 }
 .mt-modal-close:hover { background: rgba(255,255,255,0.15); }
 
-/* ───────── Onboarding（建隊）─────────── */
+/* ───────── Onboarding（建隊）v2 polish ─────────── */
 .mt-onboard {
-  padding: 60px 28px 40px;
+  padding: 50px 24px 40px;
   text-align: center;
   flex: 1;
   overflow-y: auto;
 }
+
+/* Hero 區 — 動態星空 + 預覽卡片 */
+.mt-onboard-hero {
+  position: relative;
+  height: 160px;
+  margin: -20px -24px 18px;
+  background: radial-gradient(ellipse at center, #2a1855 0%, #0d1224 100%);
+  overflow: hidden;
+  border-bottom: 1px solid rgba(240,192,64,0.2);
+}
+.mt-onboard-hero-stars {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 12% 30%, white, transparent 70%),
+    radial-gradient(1px 1px at 38% 70%, white, transparent 70%),
+    radial-gradient(2px 2px at 55% 25%, white, transparent 70%),
+    radial-gradient(1px 1px at 78% 60%, white, transparent 70%),
+    radial-gradient(1px 1px at 25% 85%, white, transparent 70%),
+    radial-gradient(2px 2px at 88% 15%, white, transparent 70%);
+  opacity: 0.6;
+  animation: mt-stars-drift 60s linear infinite;
+}
+.mt-onboard-hero-card {
+  position: relative;
+  z-index: 2;
+  padding-top: 30px;
+  animation: mt-onboard-hero-in 0.6s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+@keyframes mt-onboard-hero-in {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mt-onboard-hero-crest {
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  font-size: 44px;
+  background: linear-gradient(135deg, #f0c040, #e07020);
+  box-shadow: 0 6px 22px rgba(240,192,64,0.5);
+  margin-bottom: 8px;
+  animation: mt-onboard-crest-bob 3s ease-in-out infinite;
+  transition: transform 0.2s;
+}
+@keyframes mt-onboard-crest-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.mt-pulse-once { animation: mt-onboard-crest-pulse 0.4s ease-out; }
+@keyframes mt-onboard-crest-pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.18); box-shadow: 0 8px 30px rgba(240,192,64,0.8); }
+  100% { transform: scale(1); }
+}
+.mt-onboard-hero-name {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  letter-spacing: 0.5px;
+}
+
 .mt-onboard-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 900;
   color: #f0c040;
   margin-bottom: 8px;
 }
 .mt-onboard-sub {
-  font-size: 13px;
-  color: rgba(255,255,255,0.6);
-  margin-bottom: 30px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 22px;
   line-height: 1.7;
+}
+
+/* 福利徽章排（建隊送什麼） */
+.mt-onboard-perks {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 18px 0 12px;
+}
+.mt-onboard-perk {
+  background: rgba(240,192,64,0.1);
+  border: 1px solid rgba(240,192,64,0.3);
+  border-radius: 18px;
+  padding: 4px 12px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.85);
+}
+.mt-onboard-perk b { color: #f0c040; font-size: 13px; }
+
+/* Submit button v2 */
+.mt-onboard-submit {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+}
+.mt-onboard-submit-arrow {
+  font-size: 18px;
+  transition: transform 0.2s;
+}
+.mt-onboard-submit:hover:not(:disabled) .mt-onboard-submit-arrow {
+  transform: translateX(4px);
 }
 .mt-onboard-section {
   margin-bottom: 24px;
@@ -492,207 +584,440 @@
   gap: 4px;
 }
 
-/* ───────── 抽卡動畫 overlay ───────── */
+/* ═══════════════════════════════════════════════════
+   抽卡動畫 v2（2026-05-12 polish）
+   多層次：星空 / 光柱 / 光線 / 3D 翻牌 / 粒子 / 螢幕閃
+   ═══════════════════════════════════════════════════ */
+
 .mt-gacha-overlay {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(0,0,0,0.92), rgba(0,0,0,0.98));
+  position: fixed; inset: 0;
   z-index: 11000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  background: radial-gradient(ellipse at center, #0a0418 0%, #02010a 70%, #000 100%);
   overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  display: flex; align-items: center; justify-content: center;
 }
 .mt-gacha-overlay.open { opacity: 1; }
-.mt-gacha-overlay[data-peak="SSR"] {
-  background: radial-gradient(circle at center, rgba(60,30,0,0.92), rgba(0,0,0,0.98));
+.mt-gacha-overlay[data-peak="SR"]  { background: radial-gradient(ellipse at center, #1a0a3a 0%, #050118 70%, #000 100%); }
+.mt-gacha-overlay[data-peak="SSR"] { background: radial-gradient(ellipse at center, #3a1a05 0%, #1a0a02 70%, #000 100%); }
+
+/* ─── 星空背景 ─── */
+.mt-gacha-stars {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 8% 12%, white, transparent 70%),
+    radial-gradient(1px 1px at 25% 38%, white, transparent 70%),
+    radial-gradient(2px 2px at 42% 18%, white, transparent 70%),
+    radial-gradient(1px 1px at 58% 72%, white, transparent 70%),
+    radial-gradient(2px 2px at 75% 28%, white, transparent 70%),
+    radial-gradient(1px 1px at 88% 65%, white, transparent 70%),
+    radial-gradient(1px 1px at 12% 78%, white, transparent 70%),
+    radial-gradient(2px 2px at 33% 92%, white, transparent 70%),
+    radial-gradient(1px 1px at 67% 5%, white, transparent 70%),
+    radial-gradient(1px 1px at 50% 50%, white, transparent 70%),
+    radial-gradient(1px 1px at 92% 90%, white, transparent 70%),
+    radial-gradient(1px 1px at 3% 50%, white, transparent 70%);
+  opacity: 0.5;
+  animation: mt-stars-drift 80s linear infinite;
+  pointer-events: none;
 }
-.mt-gacha-overlay[data-peak="SR"] {
-  background: radial-gradient(circle at center, rgba(35,15,60,0.92), rgba(0,0,0,0.98));
+@keyframes mt-stars-drift {
+  to { background-position: 100px 100px, -80px 50px, 90px -120px, -100px 60px, 70px -50px, -60px 80px, 100px -90px, -90px 40px, 110px -60px, -50px 90px, 80px -40px, -70px 100px; }
 }
 
+/* ─── 底部光柱（依稀有度長高）─── */
+.mt-gacha-beam {
+  position: absolute;
+  bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 200px;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+  animation: mt-beam-grow 1.4s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes mt-beam-grow {
+  0%   { height: 0;   width: 100px; opacity: 0; }
+  20%  { opacity: 1; }
+  100% { height: 95vh; width: 520px; opacity: 0.85; }
+}
+.mt-gacha-beam[data-rarity="R"]   { background: radial-gradient(ellipse at bottom, rgba(190,205,225,0.85), rgba(190,205,225,0.15) 50%, transparent 75%); }
+.mt-gacha-beam[data-rarity="SR"]  { background: radial-gradient(ellipse at bottom, rgba(180,140,255,0.95), rgba(180,140,255,0.2) 50%, transparent 75%); }
+.mt-gacha-beam[data-rarity="SSR"] { background: radial-gradient(ellipse at bottom, rgba(255,210,90,1), rgba(255,170,40,0.35) 50%, transparent 75%); }
+
+/* ─── SSR 光線爆發（多條放射光線） ─── */
+.mt-gacha-rays {
+  position: absolute; inset: 0;
+  background: repeating-conic-gradient(from 0deg at 50% 50%,
+    rgba(255,210,90,0.0) 0deg,
+    rgba(255,210,90,0.0) 15deg,
+    rgba(255,210,90,0.18) 16deg,
+    rgba(255,210,90,0.0) 17deg);
+  animation: mt-rays-rotate 8s linear infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+@keyframes mt-rays-rotate { to { transform: rotate(360deg); } }
+
+/* ─── 全屏白閃（SSR）─── */
+.mt-gacha-flash {
+  position: absolute; inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+}
+.mt-gacha-flash.mt-flash-active {
+  animation: mt-flash 0.6s ease-out;
+}
+@keyframes mt-flash {
+  0%   { opacity: 0; }
+  25%  { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+/* ─── 螢幕震動（SSR 出現時） ─── */
+@keyframes mt-shake-anim {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5px, -3px); }
+  20% { transform: translate(4px, 2px); }
+  30% { transform: translate(-3px, 4px); }
+  40% { transform: translate(3px, -4px); }
+  50% { transform: translate(-4px, 2px); }
+  60% { transform: translate(4px, 3px); }
+  70% { transform: translate(-2px, -4px); }
+  80% { transform: translate(3px, 2px); }
+  90% { transform: translate(-2px, -2px); }
+}
+.mt-shake { animation: mt-shake-anim 0.5s ease-out; }
+.mt-pulse-sr {
+  animation: mt-pulse-sr-anim 0.4s ease-out;
+}
+@keyframes mt-pulse-sr-anim {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.03); }
+}
+
+/* ─── 主舞台 ─── */
 .mt-gacha-stage {
+  position: relative;
   width: 100%;
-  max-width: 520px;
+  max-width: 560px;
   padding: 20px;
   text-align: center;
+  z-index: 5;
 }
 
-/* loading */
-.mt-gacha-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 60px 0;
-}
-.mt-gacha-spinner {
-  font-size: 80px;
-  animation: mt-spin 1.2s linear infinite;
-}
-@keyframes mt-spin {
-  from { transform: rotate(0deg) scale(1); }
-  50%  { transform: rotate(180deg) scale(1.15); }
-  to   { transform: rotate(360deg) scale(1); }
-}
-.mt-gacha-spinner-text {
-  font-size: 18px;
-  color: #f0c040;
-  font-weight: 800;
-  letter-spacing: 2px;
-}
-
-/* cards reveal */
-.mt-gacha-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.mt-gacha-card {
-  position: relative;
-  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-  border: 2px solid rgba(255,255,255,0.1);
-  border-radius: 14px;
-  padding: 14px 8px 12px;
-  opacity: 0;
-  transform: scale(0.5) rotateY(180deg);
-  animation: mt-card-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-@keyframes mt-card-reveal {
-  to { opacity: 1; transform: scale(1) rotateY(0deg); }
-}
-.mt-gacha-card.rarity-SSR {
-  border-color: #f0c040;
-  background: linear-gradient(180deg, rgba(240,192,64,0.18) 0%, rgba(224,112,32,0.08) 100%);
-  box-shadow: 0 0 30px rgba(240,192,64,0.4), inset 0 0 20px rgba(240,192,64,0.15);
-}
-.mt-gacha-card.rarity-SR {
-  border-color: #9b87f5;
-  background: linear-gradient(180deg, rgba(155,135,245,0.15) 0%, rgba(100,80,200,0.06) 100%);
-  box-shadow: 0 0 18px rgba(155,135,245,0.3);
-}
-
-.mt-gacha-card-glow {
+.mt-gacha-skip {
   position: absolute;
-  inset: -2px;
-  border-radius: 14px;
-  pointer-events: none;
-  z-index: 0;
+  top: 16px; right: 16px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.7);
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  z-index: 10;
 }
-.mt-gacha-card.rarity-SSR .mt-gacha-card-glow {
-  background: conic-gradient(from 0deg, transparent, #f0c040, transparent 40%);
-  filter: blur(8px);
-  opacity: 0.6;
-  animation: mt-rotate-glow 4s linear infinite;
+.mt-gacha-skip:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+.mt-gacha-banner {
+  margin-bottom: 22px;
+  opacity: 0;
+  transform: translateY(-30px) scale(0.9);
+  animation: mt-banner-in 0.6s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
-@keyframes mt-rotate-glow {
-  to { transform: rotate(360deg); }
+@keyframes mt-banner-in {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.mt-gacha-banner-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(240,192,64,0.6), 0 2px 8px rgba(0,0,0,0.6);
+  letter-spacing: 1px;
+}
+.mt-gacha-banner-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  margin-top: 6px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
 
-.mt-gacha-card > *:not(.mt-gacha-card-glow) {
+/* ─── 卡片區 ─── */
+.mt-gacha-cards-wrap {
+  perspective: 1200px;
+  min-height: 300px;
+  display: flex; align-items: center; justify-content: center;
+}
+.mt-gacha-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  max-width: 100%;
+}
+
+/* ─── 3D 卡片 ─── */
+.mt-gacha-card3d {
+  width: 180px;
+  height: 260px;
+  position: relative;
+  transform-style: preserve-3d;
+  opacity: 0;
+  animation: mt-card-fly-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes mt-card-fly-in {
+  from { opacity: 0; transform: translateY(-80px) scale(0.7) rotateZ(-15deg); }
+  to   { opacity: 1; transform: translateY(0) scale(1) rotateZ(0deg); }
+}
+
+.mt-gacha-card3d-inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.mt-gacha-card3d.flipped .mt-gacha-card3d-inner {
+  transform: rotateY(180deg);
+}
+
+.mt-gacha-card3d-back,
+.mt-gacha-card3d-front {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  padding: 14px 10px;
+  overflow: hidden;
+}
+
+/* 卡背 */
+.mt-gacha-card3d-back {
+  background: linear-gradient(135deg, #1a1a2e 0%, #2a1855 100%);
+  border: 2px solid rgba(240,192,64,0.45);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5), inset 0 0 30px rgba(240,192,64,0.15);
+}
+.mt-gacha-back-pattern {
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 14px, rgba(240,192,64,0.05) 14px 15px),
+    repeating-linear-gradient(-45deg, transparent 0 14px, rgba(240,192,64,0.05) 14px 15px);
+  pointer-events: none;
+}
+.mt-gacha-back-emblem {
+  font-size: 84px;
+  filter: drop-shadow(0 0 24px rgba(240,192,64,0.7));
+  animation: mt-back-pulse 1.5s ease-in-out infinite;
   position: relative;
   z-index: 1;
 }
-.mt-gacha-card-rarity-badge {
+@keyframes mt-back-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 24px rgba(240,192,64,0.7)); }
+  50%      { transform: scale(1.08); filter: drop-shadow(0 0 36px rgba(240,192,64,0.95)); }
+}
+
+/* 卡面 */
+.mt-gacha-card3d-front {
+  transform: rotateY(180deg);
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  border: 2px solid rgba(255,255,255,0.1);
+  display: flex; flex-direction: column; align-items: center;
+}
+.mt-gacha-card3d.rarity-SR .mt-gacha-card3d-front {
+  border-color: #9b87f5;
+  background: linear-gradient(180deg, rgba(155,135,245,0.18) 0%, rgba(80,60,180,0.06) 100%);
+  box-shadow: 0 0 24px rgba(155,135,245,0.45), inset 0 0 20px rgba(155,135,245,0.1);
+}
+.mt-gacha-card3d.rarity-SSR .mt-gacha-card3d-front {
+  border-color: #f0c040;
+  background: linear-gradient(180deg, rgba(240,192,64,0.22) 0%, rgba(224,112,32,0.1) 100%);
+  box-shadow: 0 0 40px rgba(240,192,64,0.65), inset 0 0 26px rgba(240,192,64,0.2);
+  animation: mt-ssr-card-glow 2s ease-in-out infinite;
+}
+@keyframes mt-ssr-card-glow {
+  0%, 100% { box-shadow: 0 0 40px rgba(240,192,64,0.65), inset 0 0 26px rgba(240,192,64,0.2); }
+  50%      { box-shadow: 0 0 60px rgba(240,192,64,0.95), inset 0 0 36px rgba(240,192,64,0.35); }
+}
+
+/* 卡面 shine 動畫條 */
+.mt-gacha-front-shine {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: 10px;
-  font-weight: 900;
-  padding: 2px 7px;
-  border-radius: 5px;
-  letter-spacing: 1px;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+.mt-gacha-card3d.flipped .mt-gacha-front-shine {
+  animation: mt-shine-sweep 1.2s 0.6s ease-out;
+}
+@keyframes mt-shine-sweep {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+.mt-gacha-front-rarity {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%;
+  margin-bottom: 4px;
+  position: relative;
   z-index: 2;
 }
-.mt-gacha-card.rarity-SSR .mt-gacha-card-rarity-badge { background: #f0c040; color: #1a1a2e; }
-.mt-gacha-card.rarity-SR .mt-gacha-card-rarity-badge { background: #9b87f5; color: #fff; }
-.mt-gacha-card.rarity-R .mt-gacha-card-rarity-badge { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); }
-
-.mt-gacha-card-emoji {
-  font-size: 40px;
-  line-height: 1;
-  margin: 4px 0 8px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+.mt-gacha-front-rarity-badge {
+  font-size: 11px;
+  font-weight: 900;
+  padding: 3px 7px;
+  border-radius: 4px;
+  letter-spacing: 1px;
 }
-.mt-gacha-card-name {
-  font-size: 15px;
+.mt-gacha-card3d.rarity-R   .mt-gacha-front-rarity-badge { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.85); }
+.mt-gacha-card3d.rarity-SR  .mt-gacha-front-rarity-badge { background: #9b87f5; color: #fff; }
+.mt-gacha-card3d.rarity-SSR .mt-gacha-front-rarity-badge { background: linear-gradient(135deg,#f0c040,#e07020); color: #1a1a2e; }
+.mt-gacha-front-stars { font-size: 13px; color: #f0c040; text-shadow: 0 0 8px rgba(240,192,64,0.8); }
+.mt-gacha-card3d.rarity-R   .mt-gacha-front-stars { color: rgba(255,255,255,0.5); text-shadow: none; }
+.mt-gacha-card3d.rarity-SR  .mt-gacha-front-stars { color: #9b87f5; text-shadow: 0 0 6px rgba(155,135,245,0.6); }
+
+.mt-gacha-front-emoji {
+  font-size: 56px;
+  line-height: 1;
+  margin: 8px 0;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+  position: relative; z-index: 2;
+}
+.mt-gacha-front-name {
+  font-size: 16px;
   font-weight: 900;
   color: #fff;
+  letter-spacing: 0.5px;
   margin-bottom: 1px;
+  position: relative; z-index: 2;
 }
-.mt-gacha-card-nick {
+.mt-gacha-front-nick {
   font-size: 10px;
-  color: rgba(255,255,255,0.6);
-  margin-bottom: 4px;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 5px;
+  position: relative; z-index: 2;
 }
-.mt-gacha-card-pos {
-  font-size: 10px;
+.mt-gacha-front-pos {
+  font-size: 11px;
   color: #f0c040;
   margin-bottom: 8px;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  position: relative; z-index: 2;
 }
-.mt-gacha-card-stats {
+.mt-gacha-front-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  font-size: 10px;
+  gap: 2px 8px;
+  font-size: 11px;
   color: rgba(255,255,255,0.75);
+  margin-bottom: 4px;
+  position: relative; z-index: 2;
 }
-.mt-gacha-card-stats b { color: #f0c040; font-weight: 800; }
+.mt-gacha-front-stats b { color: #f0c040; font-weight: 800; }
+
 .mt-gacha-talent {
-  margin-top: 6px;
+  margin-top: 4px;
   font-size: 10px;
-  background: rgba(240,192,64,0.15);
+  background: rgba(240,192,64,0.18);
   color: #f0c040;
-  padding: 2px 6px;
+  padding: 3px 8px;
   border-radius: 4px;
   display: inline-block;
+  position: relative; z-index: 2;
 }
 .mt-gacha-dup {
   margin-top: 4px;
   font-size: 10px;
   color: #ff8c42;
+  font-weight: 700;
+  position: relative; z-index: 2;
 }
 .mt-gacha-pity {
   position: absolute;
-  top: -10px;
-  left: 50%;
+  top: -10px; left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(135deg, #ff3030, #ff8030);
   color: #fff;
-  font-size: 9px;
-  font-weight: 900;
-  padding: 3px 8px;
-  border-radius: 5px;
+  font-size: 10px; font-weight: 900;
+  padding: 3px 10px;
+  border-radius: 6px;
   white-space: nowrap;
+  z-index: 5;
+  box-shadow: 0 2px 8px rgba(255,48,48,0.5);
+  animation: mt-pity-bounce 0.6s ease-out;
+}
+@keyframes mt-pity-bounce {
+  0%   { transform: translateX(-50%) scale(0); }
+  60%  { transform: translateX(-50%) scale(1.15); }
+  100% { transform: translateX(-50%) scale(1); }
 }
 
-/* actions */
+/* 粒子爆發 */
+.mt-gacha-particles {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 0; height: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.mt-gacha-particles i {
+  position: absolute;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px currentColor;
+  animation: mt-particle 0.85s ease-out forwards;
+}
+@keyframes mt-particle {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--pdx), var(--pdy)) scale(0.2); opacity: 0; }
+}
+
+/* 稀有度 hint 文字（CTA 上方） */
+.mt-gacha-rarity-hint {
+  margin: 14px 0 8px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+}
+.mt-gacha-rarity-hint b { color: #f0c040; font-size: 18px; }
+
+/* CTA */
 .mt-gacha-actions {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.mt-gacha-actions.reveal {
+  opacity: 1;
+  transform: translateY(0);
 }
 .mt-gacha-btn {
   border: none;
   border-radius: 10px;
-  padding: 12px;
-  font-size: 14px;
+  padding: 13px;
+  font-size: 15px;
   font-weight: 900;
   cursor: pointer;
-  transition: transform 0.1s;
+  transition: transform 0.1s, box-shadow 0.15s;
 }
 .mt-gacha-btn:hover { transform: translateY(-1px); }
 .mt-gacha-btn-primary {
   background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
   color: #1a1a2e;
+  box-shadow: 0 4px 16px rgba(240,192,64,0.4);
 }
+.mt-gacha-btn-primary:hover { box-shadow: 0 6px 22px rgba(240,192,64,0.6); }
 .mt-gacha-btn-secondary {
   background: rgba(255,255,255,0.1);
   color: #fff;
+  border: 1px solid rgba(255,255,255,0.15);
 }
 
 /* ───────── 訓練 tab ───────── */
@@ -806,58 +1131,295 @@
   position: relative;
 }
 
+/* ─── Pre-match v2 polish ─── */
 .mt-pre-match { text-align: center; }
-.mt-pre-match-tier { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+.mt-pre-match-tier { font-size: 12px; color: rgba(255,255,255,0.55); margin-bottom: 8px; letter-spacing: 0.5px; }
 .mt-pre-match-boss {
   background: linear-gradient(135deg, #ff8030, #ff3030);
   color: #fff; font-size: 13px; font-weight: 900;
-  padding: 6px; border-radius: 6px; margin-bottom: 12px;
+  padding: 8px 14px; border-radius: 8px; margin: 0 auto 14px;
+  letter-spacing: 1px;
+  display: inline-block;
+  box-shadow: 0 4px 16px rgba(255,48,48,0.4);
+  animation: mt-boss-pulse 1.2s ease-in-out infinite;
+}
+@keyframes mt-boss-pulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(255,48,48,0.4); }
+  50%      { box-shadow: 0 6px 26px rgba(255,48,48,0.75); }
+}
+
+/* 雙隊衝撞 arena */
+.mt-pre-match-arena {
+  position: relative;
+  display: flex; align-items: center;
+  background: radial-gradient(ellipse at center, rgba(240,192,64,0.08), transparent 70%);
+  padding: 18px 8px;
+  margin-bottom: 18px;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.mt-pre-match-clash-rays {
+  position: absolute; inset: 0;
+  background: repeating-conic-gradient(from 90deg at 50% 50%,
+    transparent 0deg, transparent 22deg,
+    rgba(240,192,64,0.06) 23deg, transparent 24deg);
+  pointer-events: none;
+}
+.mt-pre-match-side {
+  flex: 1;
+  position: relative; z-index: 2;
+  opacity: 0;
+}
+.mt-pre-match-side-home {
+  animation: mt-side-slide-l 0.5s ease-out forwards;
+}
+.mt-pre-match-side-away {
+  animation: mt-side-slide-r 0.5s ease-out forwards;
+}
+@keyframes mt-side-slide-l {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes mt-side-slide-r {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.mt-pre-match-crest {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+}
+.mt-pre-match-crest img { display: inline-block; }
+.mt-pre-match-name {
+  font-size: 15px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+.mt-pre-match-radar {
+  font-size: 10px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+.mt-pre-match-radar b { color: #fff; font-weight: 700; }
+.mt-pre-match-avg {
+  font-size: 12px;
+  color: #f0c040;
+  font-weight: 700;
+}
+.mt-pre-match-mid {
+  flex: 0 0 60px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px;
+}
+.mt-pre-match-mid-vs {
+  font-size: 28px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #f0c040, #ff8030);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 20px rgba(240,192,64,0.5);
+  animation: mt-vs-bounce 0.6s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+@keyframes mt-vs-bounce {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+.mt-pre-match-mid-spark {
+  font-size: 22px;
+  animation: mt-spark-rotate 1.6s linear infinite;
+}
+@keyframes mt-spark-rotate {
+  to { transform: rotate(360deg); }
+}
+
+/* 勝率條 */
+.mt-pre-match-prob { margin: 18px 0; }
+.mt-pre-match-prob-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 6px;
   letter-spacing: 1px;
 }
-.mt-pre-match-vs { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
-.mt-pre-match-side { flex: 1; }
-.mt-pre-match-crest { font-size: 48px; line-height: 1; margin-bottom: 8px; }
-.mt-pre-match-crest img { display: inline-block; }
-.mt-pre-match-name { font-size: 15px; font-weight: 900; color: #fff; margin-bottom: 4px; line-height: 1.2; }
-.mt-pre-match-radar { font-size: 10px; color: rgba(255,255,255,0.55); margin-bottom: 4px; }
-.mt-pre-match-avg { font-size: 11px; color: #f0c040; }
-.mt-pre-match-mid { font-size: 24px; font-weight: 900; color: #f0c040; }
+.mt-pre-match-prob-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.mt-pre-match-prob-home {
+  background: linear-gradient(90deg, #4caf50, #66bb6a);
+  transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.mt-pre-match-prob-away {
+  background: linear-gradient(270deg, #ef5350, #e74c3c);
+  transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.mt-pre-match-prob-stats {
+  display: flex; justify-content: space-between;
+  margin-top: 6px;
+  font-size: 12px;
+}
+.mt-prob-h { color: rgba(76,175,80,0.95); }
+.mt-prob-a { color: rgba(239,83,80,0.95); }
+.mt-prob-h b, .mt-prob-a b { font-size: 14px; font-weight: 900; }
 
-.mt-pre-match-prob { margin: 16px 0; }
-.mt-pre-match-prob-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; }
-.mt-pre-match-prob-text { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 6px; }
-
-.mt-match-sim {
-  padding: 4px;
+/* 開始比賽按鈕 */
+.mt-pre-match-go {
+  width: 100%;
+  background: linear-gradient(135deg, #4caf50 0%, #2e8b30 100%);
+  border: none; border-radius: 14px;
+  padding: 16px;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 18px rgba(76,175,80,0.45);
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.mt-pre-match-go:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(76,175,80,0.7);
+}
+.mt-pre-match-go-icon { font-size: 22px; }
+.mt-pre-match-go-cost { font-size: 12px; opacity: 0.85; font-weight: 500; }
+.mt-pre-match.is-boss .mt-pre-match-go {
+  background: linear-gradient(135deg, #ff8030 0%, #c0392b 100%);
+  box-shadow: 0 4px 18px rgba(255,128,48,0.5);
+}
+.mt-pre-match.is-boss .mt-pre-match-go:hover {
+  box-shadow: 0 6px 28px rgba(255,128,48,0.75);
 }
 
-.mt-post-match { text-align: center; padding: 10px 0; }
+.mt-match-sim { padding: 4px; }
+
+/* ─── Post-match v2 polish ─── */
+.mt-post-match {
+  text-align: center;
+  padding: 10px 0 6px;
+  position: relative;
+}
+.mt-post-match-icon {
+  font-size: 64px;
+  line-height: 1;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.5));
+  animation: mt-post-icon-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes mt-post-icon-pop {
+  from { transform: scale(0) rotate(-15deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0); opacity: 1; }
+}
 .mt-post-match.win .mt-post-match-result { color: #4caf50; }
 .mt-post-match.draw .mt-post-match-result { color: #f0c040; }
 .mt-post-match.loss .mt-post-match-result { color: #ef9a9a; }
-.mt-post-match-result { font-size: 28px; font-weight: 900; margin-bottom: 4px; }
-.mt-post-match-score { font-size: 48px; font-weight: 900; color: #fff; margin: 8px 0; }
-.mt-post-match-vs { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 16px; }
-.mt-post-match-boss-bonus {
-  background: rgba(240,192,64,0.15); color: #f0c040;
-  padding: 6px 12px; border-radius: 6px; font-size: 12px;
-  display: inline-block; margin-bottom: 12px;
+.mt-post-match-result {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  margin-bottom: 4px;
+  text-shadow: 0 4px 16px currentColor;
 }
-.mt-post-match-rewards {
-  display: flex; justify-content: center; gap: 18px;
-  background: rgba(255,255,255,0.05); border-radius: 10px;
-  padding: 10px; font-size: 13px; color: rgba(255,255,255,0.85);
+
+/* Confetti for win */
+.mt-post-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(2px 6px at 10% 20%, #f0c040 50%, transparent 50%),
+    radial-gradient(2px 6px at 25% 35%, #4caf50 50%, transparent 50%),
+    radial-gradient(2px 6px at 45% 18%, #9b87f5 50%, transparent 50%),
+    radial-gradient(2px 6px at 65% 30%, #ff8030 50%, transparent 50%),
+    radial-gradient(2px 6px at 85% 22%, #4caf50 50%, transparent 50%),
+    radial-gradient(2px 6px at 18% 50%, #f0c040 50%, transparent 50%),
+    radial-gradient(2px 6px at 88% 50%, #ef5350 50%, transparent 50%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  animation: mt-confetti-fall 2s ease-in;
+  opacity: 0.85;
+}
+@keyframes mt-confetti-fall {
+  from { transform: translateY(-40px); opacity: 0; }
+  10%  { opacity: 1; }
+  to   { transform: translateY(80px); opacity: 0; }
+}
+
+.mt-post-match-score {
+  font-size: 56px;
+  font-weight: 900;
+  color: #fff;
+  margin: 4px 0 8px;
+  display: flex; justify-content: center; align-items: baseline;
+  gap: 16px;
+  text-shadow: 0 4px 24px rgba(240,192,64,0.4);
+}
+.mt-post-score-sep {
+  font-size: 36px;
+  opacity: 0.5;
+  font-weight: 700;
+}
+.mt-post-match-vs {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 16px;
+}
+.mt-post-match-boss-bonus {
+  background: linear-gradient(135deg, rgba(240,192,64,0.25), rgba(224,112,32,0.15));
+  border: 1px solid rgba(240,192,64,0.5);
+  color: #f0c040;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-block;
   margin-bottom: 14px;
 }
-.mt-post-match-rewards div { white-space: nowrap; }
+.mt-post-match-rewards {
+  display: flex; justify-content: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.mt-post-reward {
+  flex: 1;
+  max-width: 110px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 10px 6px;
+  text-align: center;
+}
+.mt-post-reward-icon { font-size: 24px; line-height: 1; }
+.mt-post-reward-val { font-size: 18px; font-weight: 900; color: #f0c040; margin: 4px 0 2px; }
+.mt-post-reward-label { font-size: 10px; color: rgba(255,255,255,0.55); letter-spacing: 0.5px; }
+
 .mt-post-match-season {
   background: linear-gradient(135deg, rgba(240,192,64,0.15), rgba(224,112,32,0.1));
   border: 1px solid rgba(240,192,64,0.4);
-  border-radius: 10px; padding: 12px;
-  font-size: 13px; color: #fff;
+  border-radius: 12px;
+  padding: 14px;
   margin-bottom: 14px;
+  font-size: 13px;
+  color: #fff;
 }
-.mt-post-match-season-title { font-size: 16px; font-weight: 900; color: #f0c040; margin-bottom: 6px; }
+.mt-post-match-season-title { font-size: 17px; font-weight: 900; color: #f0c040; margin-bottom: 6px; }
+.mt-post-season-tier {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.mt-post-season-tier.up { color: #4caf50; }
+.mt-post-season-tier.down { color: #ef9a9a; }
+.mt-post-season-reward { color: #f0c040; font-size: 13px; margin-top: 2px; }
 
 /* ───────── tab 內各區共用提示 ───────── */
 .mt-tab-todo {
