@@ -225,15 +225,15 @@
       <div class="mt-gacha-beam" data-rarity="${peakRarity}" hidden></div>
       <div class="mt-gacha-rays" hidden></div>
 
-      <!-- Stage 0：卡包互動 -->
-      <div class="mt-gacha-pack" id="mt-gacha-pack" data-rarity="${peakRarity}">
+      <!-- Stage 0：卡包互動（卡片數決定堆幾層）-->
+      <div class="mt-gacha-pack" id="mt-gacha-pack" data-rarity="${peakRarity}" data-count="${cards.length}">
         <div class="mt-gacha-pack-banner">
           <div class="mt-gacha-pack-title">${escapeHtml(options.title || '🎰 球員召喚')}</div>
           ${options.subtitle ? `<div class="mt-gacha-pack-sub">${escapeHtml(options.subtitle)}</div>` : ''}
         </div>
         <div class="mt-gacha-pack-stack" id="mt-gacha-pack-stack">
-          <div class="mt-gacha-pack-card mt-gacha-pack-card-3"></div>
-          <div class="mt-gacha-pack-card mt-gacha-pack-card-2"></div>
+          ${cards.length >= 5 ? '<div class="mt-gacha-pack-card mt-gacha-pack-card-3"></div>' : ''}
+          ${cards.length >= 2 ? '<div class="mt-gacha-pack-card mt-gacha-pack-card-2"></div>' : ''}
           <div class="mt-gacha-pack-card mt-gacha-pack-card-1">
             <div class="mt-gacha-back-pattern"></div>
             <div class="mt-gacha-back-emblem">⚽</div>
@@ -242,7 +242,7 @@
         <div class="mt-gacha-pack-glow"></div>
         <div class="mt-gacha-pack-cta">
           <span class="mt-gacha-pack-finger">👆</span>
-          <span>點擊召喚 ${cards.length} 張球員</span>
+          <span>點擊召喚${cards.length > 1 ? ` ${cards.length} 張球員` : ''}</span>
         </div>
       </div>
 
@@ -258,7 +258,7 @@
         <div class="mt-gacha-flip-prompt" id="mt-gacha-flip-prompt" hidden>
           <button class="mt-gacha-flip-btn" id="mt-gacha-flip-btn">
             <span class="mt-gacha-pack-finger">👆</span>
-            <span>點擊翻開全部</span>
+            <span>${cards.length > 1 ? '點擊翻開全部' : '點擊翻牌'}</span>
           </button>
         </div>
         <div class="mt-gacha-rarity-hint" id="mt-gacha-rarity-hint"></div>
