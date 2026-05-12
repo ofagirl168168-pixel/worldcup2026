@@ -131,6 +131,19 @@
     console.log(ok ? `✓ +${n} 體力` : '❌ 失敗（已滿 or 沒建隊）');
   }
 
+  // 再看一次新手指引（不會刪球隊、但會把 starter_pack_claimed 重置）
+  // 警告：完成後會再加 10 張球員到隊伍上
+  async function replayTutorial() {
+    const uid = _uid();
+    if (!uid) { console.error('❌ 沒登入'); return; }
+    if (!confirm('⚠️ 重看新手教學會再送你一次 10 連抽（會多 10 位球員）。確定？')) return;
+    const { error } = await window.DB.from('my_team')
+      .update({ starter_pack_claimed: false }).eq('user_id', uid);
+    if (error) { console.error('❌', error.message); return; }
+    console.log('✅ 已重置 starter_pack_claimed，重新整理頁面就會跳教學');
+    setTimeout(() => location.reload(), 600);
+  }
+
   async function simulateArenaVote() {
     // 清今天的 vote_date → 觸發 instant gacha
     localStorage.removeItem('mt_arena_vote_date_v1');
@@ -153,6 +166,7 @@
     enable, disable, status,
     reset, resetLocalOnly,
     addTickets, addRP, addStamina,
+    replayTutorial,
     simulateArenaVote, simulateDailyLogin, simulatePredict5,
   };
 
