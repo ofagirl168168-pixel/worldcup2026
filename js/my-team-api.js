@@ -65,7 +65,7 @@
     const insertRow = {
       user_id: uid,
       team_name: (name || '').trim() || '我的球隊',
-      team_crest: crest || '⚽',
+      team_crest: crest || 'football',  // SVG crest_id（隊徽圖案 id、非 emoji）
       tickets: 5,  // 新人禮：5 張抽券
     };
     const { data, error } = await window.DB

@@ -177,22 +177,34 @@
     // ─── pixel art 場景動畫（草地 + 跳球 + 小 chibi 跑動）───
     _startOnboardScene(body.querySelector('#mt-onboard-scene'));
 
-    // 隊徽選擇 → 同步預覽
+    // 隊徽選擇 → 用 SVG TeamCrests（不再 emoji）
     const grid = body.querySelector('#mt-crest-grid');
-    let selectedCrest = '⚽';
-    CREST_OPTIONS.forEach((emoji, i) => {
+    const crestIds = window.TeamCrests ? window.TeamCrests.listCrests() : ['football'];
+    const presets = window.TeamCrests?.PRESET_COLOR_COMBOS || [['#c0392b', '#f1c40f']];
+    let selectedCrest = crestIds[0] || 'football';
+    let selectedPrimary = presets[0][0];
+    let selectedAccent  = presets[0][1];
+
+    function refreshPreview() {
+      if (window.TeamCrests) {
+        previewCrest.innerHTML = window.TeamCrests.getSvg(selectedCrest, selectedPrimary, selectedAccent);
+      }
+      previewCrest.classList.remove('mt-pulse-once');
+      void previewCrest.offsetWidth;
+      previewCrest.classList.add('mt-pulse-once');
+    }
+    refreshPreview();
+
+    crestIds.forEach((id, i) => {
       const cell = document.createElement('button');
       cell.type = 'button';
-      cell.className = 'mt-crest-cell' + (i === 0 ? ' sel' : '');
-      cell.textContent = emoji;
+      cell.className = 'mt-crest-cell mt-crest-svg-cell' + (i === 0 ? ' sel' : '');
+      cell.innerHTML = window.TeamCrests ? window.TeamCrests.getSvg(id, selectedPrimary, selectedAccent) : id;
       cell.addEventListener('click', () => {
         grid.querySelectorAll('.mt-crest-cell').forEach(c => c.classList.remove('sel'));
         cell.classList.add('sel');
-        selectedCrest = emoji;
-        previewCrest.textContent = emoji;
-        previewCrest.classList.remove('mt-pulse-once');
-        void previewCrest.offsetWidth; // restart animation
-        previewCrest.classList.add('mt-pulse-once');
+        selectedCrest = id;
+        refreshPreview();
       });
       grid.appendChild(cell);
     });
@@ -431,9 +443,10 @@
     el.dataset.playerId = p.id;
     const imgId = `pitch-${p.id}`;
     const isInjured = p.injured_until && new Date(p.injured_until) > new Date();
+    const fallback = (typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id, c.rarity) : '';
     el.innerHTML = `
       <div class="mt-pitch-player-portrait">
-        <img id="${imgId}" alt="${escapeHtml(c.name || '')}" loading="lazy">
+        <img id="${imgId}" alt="${escapeHtml(c.name || '')}" loading="lazy" src="${fallback}" onerror="this.style.opacity='0.3'">
         ${isInjured ? '<span class="mt-pitch-injury">🏥</span>' : ''}
       </div>
       <div class="mt-pitch-player-name">${escapeHtml(c.name || '?')}</div>
@@ -457,10 +470,11 @@
     el.dataset.playerId = p.id;
     const imgId = `bench-${p.id}`;
     const isInjured = p.injured_until && new Date(p.injured_until) > new Date();
+    const fallback = (typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id, c.rarity) : '';
     el.innerHTML = `
       ${isInjured ? '<span class="mt-bench-injury">🏥</span>' : ''}
       <span class="mt-bench-rarity">${c.rarity || 'R'}</span>
-      <img id="${imgId}" alt="${escapeHtml(c.name || '')}">
+      <img id="${imgId}" alt="${escapeHtml(c.name || '')}" src="${fallback}" onerror="this.style.opacity='0.3'">
       <div class="mt-bench-name">${escapeHtml(c.name || '?')}</div>
       <div class="mt-bench-pos">${c.position || ''} Lv.${p.level}</div>
     `;
@@ -533,7 +547,7 @@
         div.innerHTML = `
           ${isActive ? '<span class="mt-coach-badge">主教練</span>' : ''}
           <span class="mt-player-card-rarity">${c.rarity || 'R'}</span>
-          <div class="mt-player-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy"></div>
+          <div class="mt-player-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
           <div class="mt-player-name">${escapeHtml(c.name || '?')}</div>
           <div class="mt-player-position" style="font-size:11px">${escapeHtml(c.nickname || '')}</div>
           <div class="mt-player-position" style="font-size:10px;opacity:0.7">${escapeHtml(_traitLabel(c.trait, c.trait_value))}</div>
@@ -628,7 +642,9 @@
 
         <div class="mt-profile-hero">
           <div class="mt-profile-portrait-wrap">
-            <img id="${portraitId}" class="mt-profile-portrait" alt="${escapeHtml(c.name)}">
+            <img id="${portraitId}" class="mt-profile-portrait" alt="${escapeHtml(c.name)}"
+              src="${(typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id, c.rarity) : ''}"
+              onerror="this.style.display='none'">
             <span class="mt-profile-rarity">${c.rarity || 'R'}</span>
           </div>
           <div class="mt-profile-meta">
@@ -932,7 +948,7 @@
             const imgId = 'dex-' + c.card_id;
             return `
               <div class="mt-dex-card ${owned ? 'owned' : 'locked'}">
-                <div class="mt-player-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}"></div>
+                <div class="mt-player-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
                 <div class="mt-dex-name">${owned ? escapeHtml(c.name) : '???'}</div>
                 <div class="mt-dex-pos">${c.position}</div>
               </div>
@@ -1141,7 +1157,7 @@
           ${players.map((kp, i) => {
             const imgId = `opp-${i}`;
             return `<div class="mt-opp-player">
-              <img id="${imgId}" alt="${escapeHtml(kp.name)}">
+              <img id="${imgId}" alt="${escapeHtml(kp.name)}" onerror="this.style.opacity='0.3'">
               <div class="mt-opp-pname">${escapeHtml(kp.name)}</div>
               <div class="mt-opp-ppos">${kp.pos}</div>
             </div>`;
@@ -1419,7 +1435,7 @@
             return `
               <button class="mt-coach-card rarity-SSR mt-ssr-pickable" data-card-id="${c.card_id}">
                 <span class="mt-player-card-rarity">SSR</span>
-                <div class="mt-player-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}"></div>
+                <div class="mt-player-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
                 <div class="mt-player-name">${escapeHtml(c.name)}</div>
                 <div class="mt-player-position" style="font-size:11px">${escapeHtml(c.nickname || '')}</div>
                 <div class="mt-player-position" style="font-size:10px">${c.position}</div>

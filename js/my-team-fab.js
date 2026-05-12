@@ -39,7 +39,15 @@
 
     const team = window.MyTeam && window.MyTeam.getCached();
     if (team && team !== 'not_created') {
-      crestEl.textContent = team.team_crest || '⚽';
+      // team_crest 現在是 SVG crest_id（'football'/'shield_stripes' 等）→ 用 TeamCrests render
+      const crestId = team.team_crest;
+      const knownCrests = window.TeamCrests ? window.TeamCrests.listCrests() : [];
+      if (crestId && window.TeamCrests && knownCrests.includes(crestId)) {
+        crestEl.innerHTML = window.TeamCrests.getSvg(crestId, team.crest_primary, team.crest_accent);
+      } else {
+        // 舊資料或未知 → fallback emoji
+        crestEl.textContent = '⚽';
+      }
       // 紅點：未開抽券 / SSR 自選券 > 0 → 顯示總數
       const pending = (team.tickets || 0) + (team.ssr_select_tickets || 0);
       if (pending > 0) {
