@@ -479,7 +479,10 @@
           <div class="mt-home-distance">
             <div class="mt-home-tree mt-home-tree-l"></div>
             <div class="mt-home-clubhouse">
-              <div class="mt-home-clubhouse-roof"></div>
+              <svg class="mt-home-clubhouse-roof" viewBox="0 0 110 32" preserveAspectRatio="none">
+                <polygon points="2,30 55,2 108,30" fill="#c0392b"
+                  stroke="#1a1a2e" stroke-width="3" stroke-linejoin="round"/>
+              </svg>
               <div class="mt-home-clubhouse-sign">${escapeHtml(team?.team_name || '我的訓練館')}</div>
               <div class="mt-home-clubhouse-door"></div>
               <div class="mt-home-clubhouse-window mt-home-cw-1"></div>

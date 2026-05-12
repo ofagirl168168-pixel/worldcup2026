@@ -187,7 +187,8 @@
     const key = JSON.stringify(look) + '|F|' + kitShirt + '|' + kitPants + '|' + kitShoes;
     if (fullBodyCache.has(key)) return fullBodyCache.get(key);
 
-    const FRAME_W = 32, FRAME_H = 60;
+    // 寬一點才裝得下 slash 揮腿、spellcast 舉手張開的手臂
+    const FRAME_W = 48, FRAME_H = 64;
     const FRAME_COLS = 3, FRAME_ROWS = 6;
     // row 順序：0=walk-down, 1=walk-left, 2=walk-right, 3=walk-up,
     //          4=kick(slash-down), 5=stretch(spellcast-down)
@@ -202,7 +203,7 @@
       [3, 5, 6],  // stretch：spellcast-down 取手抬高幾 frame
     ];
 
-    const SX = 16, SY_OFF = 4;  // frame y=4 to y=64 = 60 高（含腳）
+    const SX = 8, SY_OFF = 0;  // 寬 8-55、高 0-63 整個 frame、手臂 + 頂部頭髮都裝得下
     const [body, head, wrinkles, eyes, eyebrows, beard, mustache, hair, headband, shirt, pants, shoes] = await Promise.all([
       getLayer('body', look.body),
       getLayer('head', look.body),

@@ -2226,16 +2226,14 @@
   border-bottom: 0;
   margin: 0 12px;
 }
+/* SVG triangle 屋頂：寬 110% 蓋滿牆頂 + 兩側 eaves overhang */
 .mt-home-clubhouse-roof {
-  position: absolute; left: -16px; right: -16px; top: -24px;
-  height: 30px;
-  background: #c0392b;
-  clip-path: polygon(8% 100%, 50% 0, 92% 100%);
-}
-.mt-home-clubhouse-roof::after {
-  content: ''; position: absolute; inset: 0;
-  background: transparent;
-  border-bottom: 2px solid #1a1a2e;
+  position: absolute;
+  left: -8%; right: -8%; top: -28px;
+  width: 116%;
+  height: 32px;
+  display: block;
+  overflow: visible;
 }
 .mt-home-clubhouse-sign {
   position: absolute; left: 0; right: 0; top: 18%;
