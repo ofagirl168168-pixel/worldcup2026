@@ -960,6 +960,36 @@
       pitch.appendChild(_buildStadiumPlayer(p, pos, 'starter'));
     });
 
+    // 渲染空位（虛線圓圈，可接收 drop / click）
+    for (let i = 0; i < positions.length; i++) {
+      if (usedSlots.has(i)) continue;
+      const pos = positions[i];
+      const empty = document.createElement('button');
+      empty.className = 'mt-pitch-empty-slot';
+      empty.dataset.slot = i;
+      empty.dataset.slotRole = pos.role || '';
+      empty.style.left = pos.x + '%';
+      empty.style.top = pos.y + '%';
+      empty.innerHTML = `
+        <span class="mt-pitch-empty-plus">+</span>
+        <span class="mt-pitch-empty-role">${pos.role || ''}</span>
+      `;
+      empty.addEventListener('click', () => {
+        if (_swapPending) {
+          _placePlayerAtSlot(_swapPending, i);
+        } else {
+          // 空閒模式點空位 → 提示去板凳選人
+          if (typeof showToast === 'function') {
+            showToast('👇 從板凳選一位球員，再點此位置');
+          }
+        }
+      });
+      pitch.appendChild(empty);
+    }
+
+    // 啟用拖拽：場上球員可被拖去其他 slot（互換 / 移到空位）
+    _enableStarterDragDrop(pitch);
+
     const strip = content.querySelector('#mt-bench-strip');
     if (!bench.length) {
       strip.innerHTML = '<div style="opacity:0.5;font-size:12px;padding:8px">沒有板凳球員</div>';
@@ -999,32 +1029,8 @@
     });
   }
 
-  // 進入替換模式：不重繪、只加 class + 注入 banner + 標記場上球員
+  // 進入替換模式：永遠讓使用者挑位置（不再自動 promote）
   async function _enterSwapMode(benchPlayer) {
-    const players = await window.MyTeam.fetchPlayers();
-    const startersCount = players.filter(x => x.in_starting_11 &&
-      (!x.injured_until || new Date(x.injured_until) <= new Date())).length;
-
-    if (startersCount < 11) {
-      // 沒滿 → 直接 promote（依然要 smooth 處理）
-      try {
-        await window.DB.rpc('promote_to_starter', { p_player_id: benchPlayer.id });
-        await window.MyTeam.refresh?.();
-        if (_currentTab !== 'roster') {
-          _currentTab = 'roster';
-          document.querySelector('.mt-hub-tab[data-tab="roster"]')?.click();
-        } else {
-          renderTab();
-        }
-        if (typeof showToast === 'function') {
-          showToast(`✅ ${benchPlayer.card?.name} 上場`);
-        }
-      } catch (e) {
-        alert('上場失敗：' + (e.message || e));
-      }
-      return;
-    }
-
     _swapPending = benchPlayer;
     if (_currentTab !== 'roster') {
       _currentTab = 'roster';
@@ -1530,38 +1536,132 @@
   }
 
   async function _executeSwap(targetStarter, benchPlayer) {
-    const content = _overlay?.querySelector('#mt-hub-content');
-    const targetEl = content?.querySelector(`.mt-pitch-player[data-player-id="${targetStarter.id}"]`);
-    const benchEl  = content?.querySelector(`.mt-bench-player[data-player-id="${benchPlayer.id}"]`);
+    // 點場上球員代表「把板凳的人換到這個 slot」
+    return _placePlayerAtSlot(benchPlayer, targetStarter.starting_slot, {
+      fromBenchEl: true,
+      toStarterId: targetStarter.id,
+      toastName: `${benchPlayer.card?.name} ⇄ ${targetStarter.card?.name}`,
+    });
+  }
 
-    // 動畫：場上球員淡出縮小、板凳球員淡出（暗示移動）
-    if (targetEl) targetEl.classList.add('mt-swap-leaving');
-    if (benchEl)  benchEl.classList.add('mt-swap-leaving');
+  // 統一的放置動作（換 slot / 上場 / 互換）
+  async function _placePlayerAtSlot(player, targetSlot, opts = {}) {
+    const content = _overlay?.querySelector('#mt-hub-content');
+    const playerEl = content?.querySelector(`[data-player-id="${player.id}"]`);
+    if (playerEl) playerEl.classList.add('mt-swap-leaving');
+    const occupierEl = opts.toStarterId
+      ? content?.querySelector(`.mt-pitch-player[data-player-id="${opts.toStarterId}"]`)
+      : null;
+    if (occupierEl) occupierEl.classList.add('mt-swap-leaving');
 
     try {
-      await window.DB.rpc('swap_starter_with_bench', {
-        p_starter_id: targetStarter.id,
-        p_bench_id:   benchPlayer.id,
+      await window.DB.rpc('place_player_at_slot', {
+        p_player_id:   player.id,
+        p_target_slot: targetSlot,
       });
     } catch (e) {
-      // 失敗：解除動畫
-      if (targetEl) targetEl.classList.remove('mt-swap-leaving');
-      if (benchEl)  benchEl.classList.remove('mt-swap-leaving');
-      alert('替換失敗：' + (e.message || e));
+      if (playerEl) playerEl.classList.remove('mt-swap-leaving');
+      if (occupierEl) occupierEl.classList.remove('mt-swap-leaving');
+      const msg = String(e.message || e);
+      if (msg.includes('STARTERS_FULL')) alert('先發已滿、需要替換');
+      else alert('移動失敗：' + msg);
       return;
     }
 
     _swapPending = null;
     await window.MyTeam.refresh?.();
-    // 等動畫 280ms 再重繪、減少跳動感
     setTimeout(() => {
-      // 退出替換模式 class（不重繪 banner）
       content?.querySelector('.mt-stadium-tab')?.classList.remove('mt-swap-mode');
       renderTab();
-      if (typeof showToast === 'function') {
-        showToast(`✅ ${benchPlayer.card?.name} ⇄ ${targetStarter.card?.name}`);
+      if (opts.toastName && typeof showToast === 'function') {
+        showToast(`✅ ${opts.toastName}`);
+      } else if (typeof showToast === 'function') {
+        showToast(`✅ ${player.card?.name || '球員'} 已就定位`);
       }
-    }, 280);
+    }, 220);
+  }
+
+  // ── 拖拽：場上球員 → 其他 slot（pointer events，支援 mouse + touch）──
+  function _enableStarterDragDrop(pitch) {
+    if (!pitch) return;
+    let dragging = null;
+    let ghost = null;
+
+    const onDown = (e) => {
+      const btn = e.target.closest('.mt-pitch-player');
+      if (!btn || _swapPending) return;
+      // 用 pointerdown 後等 150ms 才開始拖（避免誤觸 click 進球員資料）
+      const startX = e.clientX, startY = e.clientY;
+      const playerId = btn.dataset.playerId;
+      const slot = parseInt(btn.dataset.slot, 10);
+      let started = false;
+      let cleanupListeners = null;
+
+      const startDrag = () => {
+        if (started) return;
+        started = true;
+        dragging = { btn, playerId, slot, startX, startY };
+        ghost = btn.cloneNode(true);
+        ghost.classList.add('mt-drag-ghost');
+        ghost.style.position = 'fixed';
+        ghost.style.left = e.clientX + 'px';
+        ghost.style.top  = e.clientY + 'px';
+        ghost.style.pointerEvents = 'none';
+        ghost.style.transform = 'translate(-50%, -50%) scale(1.1)';
+        ghost.style.opacity = '0.85';
+        ghost.style.zIndex = '13000';
+        document.body.appendChild(ghost);
+        btn.classList.add('mt-being-dragged');
+        pitch.classList.add('mt-drag-active');
+      };
+
+      const onMove = (ev) => {
+        const dx = ev.clientX - startX, dy = ev.clientY - startY;
+        if (!started && Math.hypot(dx, dy) > 8) {
+          startDrag();
+        }
+        if (started && ghost) {
+          ghost.style.left = ev.clientX + 'px';
+          ghost.style.top  = ev.clientY + 'px';
+        }
+      };
+
+      const onUp = (ev) => {
+        if (cleanupListeners) cleanupListeners();
+        if (!started) return;
+        // 取消選 highlight
+        if (ghost) { ghost.remove(); ghost = null; }
+        btn.classList.remove('mt-being-dragged');
+        pitch.classList.remove('mt-drag-active');
+        // 找放在哪
+        const dropEl = document.elementFromPoint(ev.clientX, ev.clientY);
+        if (!dropEl) { dragging = null; return; }
+        const targetPlayer = dropEl.closest('.mt-pitch-player');
+        const targetEmpty  = dropEl.closest('.mt-pitch-empty-slot');
+        let targetSlot = null;
+        if (targetPlayer && targetPlayer.dataset.playerId !== playerId) {
+          targetSlot = parseInt(targetPlayer.dataset.slot, 10);
+        } else if (targetEmpty) {
+          targetSlot = parseInt(targetEmpty.dataset.slot, 10);
+        }
+        if (Number.isInteger(targetSlot)) {
+          window.MyTeam.fetchPlayers().then(players => {
+            const player = players.find(p => p.id === playerId);
+            if (player) _placePlayerAtSlot(player, targetSlot, { toastName: `${player.card?.name} 移到新位置` });
+          });
+        }
+        dragging = null;
+      };
+
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp, { once: true });
+      window.addEventListener('pointercancel', onUp, { once: true });
+      cleanupListeners = () => {
+        window.removeEventListener('pointermove', onMove);
+      };
+    };
+
+    pitch.addEventListener('pointerdown', onDown);
   }
 
   function _radarBar(label, val) {
@@ -2211,94 +2311,86 @@
     const ssrSelect = team.ssr_select_tickets || 0;
 
     content.innerHTML = `
-      <div class="mt-gacha-stage">
+      <div class="mt-gacha-shop">
+        <!-- 商店招牌 -->
         <div class="mt-gacha-shopname">
           <span class="mt-gacha-neon">🎰 SOCCERMADDY GACHA 🎰</span>
         </div>
-        <div class="mt-gacha-stats">
-          <span class="mt-gacha-chip mt-gacha-chip-ticket">🎟️ <b>${tickets}</b></span>
-          <span class="mt-gacha-chip mt-gacha-chip-gem">💎 <b>${gems}</b></span>
-          <span class="mt-gacha-chip mt-gacha-chip-pity">🎯 ${pity}/30</span>
-        </div>
 
-        <div class="mt-gacha-machine">
-          <!-- 機身 SVG -->
-          <svg class="mt-gacha-machine-svg" viewBox="0 0 260 380" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <defs>
-              <radialGradient id="mt-gm-glass" cx="50%" cy="40%" r="60%">
-                <stop offset="0%" stop-color="#ffeeaa" stop-opacity="0.95"/>
-                <stop offset="60%" stop-color="#d49a30" stop-opacity="0.7"/>
-                <stop offset="100%" stop-color="#80501a" stop-opacity="0.85"/>
-              </radialGradient>
-              <linearGradient id="mt-gm-body" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#c43040"/>
-                <stop offset="50%" stop-color="#9c1828"/>
-                <stop offset="100%" stop-color="#600c14"/>
-              </linearGradient>
-              <linearGradient id="mt-gm-shadow" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
-                <stop offset="30%" stop-color="rgba(255,255,255,0)"/>
-                <stop offset="70%" stop-color="rgba(0,0,0,0)"/>
-                <stop offset="100%" stop-color="rgba(0,0,0,0.25)"/>
-              </linearGradient>
-            </defs>
-            <!-- 機底 -->
-            <rect x="20" y="280" width="220" height="80" rx="6" fill="url(#mt-gm-body)" stroke="#380810" stroke-width="3"/>
-            <rect x="20" y="280" width="220" height="80" rx="6" fill="url(#mt-gm-shadow)"/>
-            <!-- 出貨口 -->
-            <rect x="80" y="320" width="100" height="30" rx="4" fill="#1a0408" stroke="#380810" stroke-width="2"/>
-            <text x="130" y="340" font-size="11" fill="#f0c040" text-anchor="middle" font-weight="900">PRIZE</text>
-            <!-- 機身上半（紅金） -->
-            <rect x="30" y="40" width="200" height="240" rx="8" fill="url(#mt-gm-body)" stroke="#380810" stroke-width="3"/>
-            <rect x="30" y="40" width="200" height="240" rx="8" fill="url(#mt-gm-shadow)"/>
-            <!-- 頂蓋 -->
-            <ellipse cx="130" cy="38" rx="105" ry="14" fill="#700818" stroke="#380810" stroke-width="2.5"/>
-            <!-- 玻璃球（顯示窗） -->
-            <circle cx="130" cy="148" r="78" fill="url(#mt-gm-glass)" stroke="#552010" stroke-width="3"/>
-            <!-- 反光 -->
-            <ellipse cx="105" cy="115" rx="22" ry="14" fill="#ffffff" opacity="0.45"/>
-            <!-- 投幣口（10連抽紅鈕周圍裝飾） -->
-            <rect x="98" y="240" width="64" height="6" rx="2" fill="#1a0408"/>
-            <!-- 把手連桿 -->
-            <rect x="218" y="140" width="12" height="60" fill="#806030" stroke="#1a0c04" stroke-width="2"/>
-          </svg>
-
-          <!-- 玻璃球內：扭蛋膠囊（彩色） -->
-          <div class="mt-gacha-capsules">
-            <span class="mt-gacha-capsule c1" style="--cx:30%;--cy:55%;background:#e53935"></span>
-            <span class="mt-gacha-capsule c2" style="--cx:55%;--cy:70%;background:#1976d2"></span>
-            <span class="mt-gacha-capsule c3" style="--cx:70%;--cy:48%;background:#f0c040"></span>
-            <span class="mt-gacha-capsule c4" style="--cx:40%;--cy:35%;background:#9b87f5"></span>
-            <span class="mt-gacha-capsule c5" style="--cx:60%;--cy:30%;background:#43a047"></span>
-            <span class="mt-gacha-capsule c6" style="--cx:25%;--cy:38%;background:#ffb74d"></span>
+        <!-- 櫃台場景：左側盲盒架、右側櫃台收銀 -->
+        <div class="mt-gacha-counter-scene">
+          <!-- 左側：盲盒卡牌包堆疊 -->
+          <div class="mt-gacha-blindbox-rack">
+            <div class="mt-gacha-blindbox-shelf">
+              <div class="mt-gacha-blindbox blindbox-ssr" title="SSR 機率 5%">
+                <div class="mt-gacha-blindbox-top"></div>
+                <div class="mt-gacha-blindbox-body">
+                  <span class="mt-gacha-blindbox-star">★</span>
+                  <span class="mt-gacha-blindbox-rarity">SSR</span>
+                </div>
+              </div>
+              <div class="mt-gacha-blindbox blindbox-sr" title="SR 機率 20%">
+                <div class="mt-gacha-blindbox-top"></div>
+                <div class="mt-gacha-blindbox-body">
+                  <span class="mt-gacha-blindbox-star">★</span>
+                  <span class="mt-gacha-blindbox-rarity">SR</span>
+                </div>
+              </div>
+              <div class="mt-gacha-blindbox blindbox-r" title="R 機率 75%">
+                <div class="mt-gacha-blindbox-top"></div>
+                <div class="mt-gacha-blindbox-body">
+                  <span class="mt-gacha-blindbox-star">★</span>
+                  <span class="mt-gacha-blindbox-rarity">R</span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-gacha-blindbox-shelf-board"></div>
           </div>
 
-          <!-- 機台上的可點按鈕 -->
-          <button class="mt-gacha-handle ${tickets < 1 ? 'disabled' : ''}" id="mt-gacha-1"
-            ${tickets < 1 ? 'disabled' : ''}
-            aria-label="抽 1 抽（消耗 1 抽券）">
-            <span class="mt-gacha-handle-knob">●</span>
-            <span class="mt-gacha-handle-label">PULL ×1<br><small>🎟️ 1</small></span>
+          <!-- 右側：商店櫃台 + 收銀資源 -->
+          <div class="mt-gacha-counter">
+            <div class="mt-gacha-counter-clerk">🧑‍💼</div>
+            <div class="mt-gacha-counter-cashreg">
+              <div class="mt-gacha-counter-resource">🎟️ <b>${tickets}</b></div>
+              <div class="mt-gacha-counter-resource">💎 <b>${gems}</b></div>
+              <div class="mt-gacha-counter-pity">🎯 保底 ${pity}/30</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 抽卡按鈕（使用原本的 btn-row 樣式） -->
+        <div class="mt-gacha-buttons">
+          <button class="mt-gacha-btn-row" id="mt-gacha-1" ${tickets < 1 ? 'disabled' : ''}>
+            <div class="mt-gacha-btn-info">
+              <div class="mt-gacha-btn-title">🎴 抽 1 抽</div>
+              <div class="mt-gacha-btn-sub">隨機獲得 1 張球員卡</div>
+            </div>
+            <div class="mt-gacha-btn-cost">🎟️ 1</div>
           </button>
 
-          <button class="mt-gacha-bigbtn ${tickets < 10 ? 'disabled' : ''}" id="mt-gacha-10"
-            ${tickets < 10 ? 'disabled' : ''}
-            aria-label="10 連抽（消耗 10 抽券）">
-            <span class="mt-gacha-bigbtn-inner">10×</span>
+          <button class="mt-gacha-btn-row" id="mt-gacha-10" ${tickets < 10 ? 'disabled' : ''}>
+            <div class="mt-gacha-btn-info">
+              <div class="mt-gacha-btn-title">🎴 10 連抽</div>
+              <div class="mt-gacha-btn-sub">10 張 + 保證至少 1 張 SR 起步</div>
+            </div>
+            <div class="mt-gacha-btn-cost">🎟️ 10</div>
           </button>
 
-          <button class="mt-gacha-gembtn ${gems < 50 ? 'disabled' : ''}" id="mt-gacha-gem-1"
-            ${gems < 50 ? 'disabled' : ''}
-            aria-label="寶石抽卡（消耗 50 寶石）">
-            <span class="mt-gacha-gem-icon">💎</span>
-            <span class="mt-gacha-gem-label">×50</span>
+          <button class="mt-gacha-btn-row" id="mt-gacha-gem-1">
+            <div class="mt-gacha-btn-info">
+              <div class="mt-gacha-btn-title">💎 寶石抽（保底用）</div>
+              <div class="mt-gacha-btn-sub">沒抽券時用寶石</div>
+            </div>
+            <div class="mt-gacha-btn-cost">💎 50</div>
           </button>
 
           ${ssrSelect > 0 ? `
-            <button class="mt-gacha-ssr-sticker" id="mt-ssr-select-open"
-              aria-label="兌換 SSR 自選券">
-              <span class="mt-gacha-ssr-star">🌟</span>
-              <span class="mt-gacha-ssr-text">SSR 自選 ×${ssrSelect}</span>
+            <button class="mt-gacha-btn-row mt-gacha-ssr-row" id="mt-ssr-select-open">
+              <div class="mt-gacha-btn-info">
+                <div class="mt-gacha-btn-title">🌟 SSR 自選券 × ${ssrSelect}</div>
+                <div class="mt-gacha-btn-sub">賽季冠軍獎勵・任選一張 SSR 球員</div>
+              </div>
+              <div class="mt-gacha-btn-cost">兌換</div>
             </button>
           ` : ''}
         </div>

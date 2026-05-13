@@ -3305,9 +3305,215 @@
 .mt-swap-banner-slot:empty { display: none; }
 .mt-swap-banner-slot { margin: 4px 0 6px; }
 
+/* 空位（先發少於 11 人時的可放置點） */
+.mt-pitch-empty-slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 48px; height: 60px;
+  background: rgba(0,0,0,0.25);
+  border: 2.5px dashed rgba(240,192,64,0.65);
+  border-radius: 50%;
+  color: rgba(240,192,64,0.85);
+  cursor: pointer;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px;
+  z-index: 1;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
+  animation: mt-empty-breathe 1.8s ease-in-out infinite;
+}
+.mt-pitch-empty-slot:hover {
+  background: rgba(240,192,64,0.18);
+  border-color: #ffe680;
+  transform: translate(-50%, -50%) scale(1.12);
+}
+.mt-pitch-empty-plus {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+}
+.mt-pitch-empty-role {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+@keyframes mt-empty-breathe {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1;   }
+}
+.mt-swap-mode .mt-pitch-empty-slot {
+  background: rgba(240,192,64,0.22);
+  border-color: #ffe680;
+  animation: mt-empty-swap-glow 0.9s ease-in-out infinite;
+}
+@keyframes mt-empty-swap-glow {
+  0%, 100% { box-shadow: 0 0 0 rgba(240,192,64,0); }
+  50%      { box-shadow: 0 0 14px rgba(240,192,64,0.85); }
+}
+
+/* 拖拽中：被拖的球員淡化、其他成可放置 */
+.mt-being-dragged { opacity: 0.3; pointer-events: none; }
+.mt-drag-active .mt-pitch-player:not(.mt-being-dragged),
+.mt-drag-active .mt-pitch-empty-slot {
+  outline: 2px dashed rgba(76,175,80,0.6);
+  outline-offset: 4px;
+}
+.mt-drag-ghost {
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.65));
+  animation: none !important;
+}
+
 /* ═════════════════════════════════════════════════════════════
-   🎰 GACHA TAB — 扭蛋店場景（機台本身是按鈕）
+   🎰 GACHA TAB — 商店櫃台 + 盲盒卡牌包（旁邊）
    ═════════════════════════════════════════════════════════════ */
+.mt-gacha-shop {
+  position: relative;
+  padding: 0 4px 20px;
+  min-height: 100%;
+}
+.mt-gacha-counter-scene {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  margin: 8px 0 14px;
+  min-height: 140px;
+  align-items: stretch;
+}
+
+/* 左側：盲盒架 */
+.mt-gacha-blindbox-rack {
+  position: relative;
+  flex: 0 0 38%;
+  padding: 6px;
+  background:
+    linear-gradient(180deg, rgba(120,80,40,0.18) 0%, rgba(80,50,20,0.32) 100%);
+  border: 2px solid rgba(180,120,60,0.45);
+  border-radius: 8px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}
+.mt-gacha-blindbox-shelf {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.mt-gacha-blindbox-shelf-board {
+  position: absolute;
+  left: 4px; right: 4px;
+  bottom: 4px;
+  height: 4px;
+  background: linear-gradient(180deg, #8b5a2b 0%, #5a3010 100%);
+  border-radius: 2px;
+}
+.mt-gacha-blindbox {
+  width: 70px; height: 42px;
+  position: relative;
+  border-radius: 4px 4px 6px 6px;
+  cursor: default;
+  transition: transform 0.2s;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.45));
+}
+.mt-gacha-blindbox:hover { transform: translateY(-3px) rotate(-2deg); }
+.mt-gacha-blindbox-top {
+  position: absolute;
+  top: -3px; left: 6px; right: 6px;
+  height: 6px;
+  background: rgba(0,0,0,0.45);
+  border-radius: 3px 3px 0 0;
+}
+.mt-gacha-blindbox-body {
+  position: relative;
+  width: 100%; height: 100%;
+  border-radius: inherit;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.3), inset 0 2px 3px rgba(255,255,255,0.2);
+}
+.mt-gacha-blindbox.blindbox-r .mt-gacha-blindbox-body {
+  background: linear-gradient(135deg, #7d8590 0%, #4a4f56 100%);
+  border: 2px solid #2a2d33;
+}
+.mt-gacha-blindbox.blindbox-sr .mt-gacha-blindbox-body {
+  background: linear-gradient(135deg, #b5a4ff 0%, #6a4fb5 100%);
+  border: 2px solid #2a1850;
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.3), inset 0 2px 3px rgba(255,255,255,0.3), 0 0 10px rgba(155,135,245,0.5);
+}
+.mt-gacha-blindbox.blindbox-ssr .mt-gacha-blindbox-body {
+  background: linear-gradient(135deg, #ffe680 0%, #f0c040 50%, #c08030 100%);
+  border: 2px solid #5a3010;
+  color: #2a1505;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.4);
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.2), inset 0 2px 3px rgba(255,255,255,0.5), 0 0 14px rgba(240,192,64,0.85);
+  animation: mt-blindbox-ssr 2.5s ease-in-out infinite;
+}
+@keyframes mt-blindbox-ssr {
+  0%, 100% { box-shadow: inset 0 -3px 6px rgba(0,0,0,0.2), inset 0 2px 3px rgba(255,255,255,0.5), 0 0 14px rgba(240,192,64,0.85); }
+  50%      { box-shadow: inset 0 -3px 6px rgba(0,0,0,0.2), inset 0 2px 3px rgba(255,255,255,0.5), 0 0 22px rgba(255,210,80,1);    }
+}
+.mt-gacha-blindbox-star {
+  font-size: 14px;
+  line-height: 1;
+}
+.mt-gacha-blindbox-rarity {
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+/* 右側：櫃台 + 收銀台 */
+.mt-gacha-counter {
+  flex: 1;
+  position: relative;
+  display: flex; flex-direction: column;
+  background:
+    linear-gradient(180deg, rgba(80,50,20,0.5) 0%, rgba(40,25,10,0.6) 100%);
+  border: 2px solid rgba(180,120,60,0.45);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}
+.mt-gacha-counter-clerk {
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+.mt-gacha-counter-cashreg {
+  background: rgba(0,0,0,0.5);
+  border: 1.5px solid rgba(240,192,64,0.55);
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: flex; flex-direction: column;
+  gap: 4px;
+  font-family: monospace;
+  font-size: 11px;
+  color: #ffe680;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
+}
+.mt-gacha-counter-resource b { font-size: 14px; color: #fff; }
+.mt-gacha-counter-pity {
+  font-size: 10px;
+  color: rgba(255,180,180,0.85);
+}
+
+/* SSR row 在 mt-gacha-btn-row 之上加金光 */
+.mt-gacha-btn-row.mt-gacha-ssr-row {
+  background: linear-gradient(135deg, #5a3a0c 0%, #2a1808 100%);
+  border-color: #f0c040;
+  box-shadow: 0 0 16px rgba(240,192,64,0.6);
+  animation: mt-bigbtn-glow 2.5s ease-in-out infinite;
+}
+.mt-gacha-btn-row.mt-gacha-ssr-row .mt-gacha-btn-title { color: #ffe680; }
+.mt-gacha-btn-row.mt-gacha-ssr-row .mt-gacha-btn-cost {
+  background: linear-gradient(135deg, #ffe680, #f0c040);
+  color: #2a1505;
+}
+
+/* 舊 .mt-gacha-stage 還在用的 stats chips（保留向後相容） */
 .mt-gacha-stage {
   position: relative;
   padding: 0 8px 20px;
