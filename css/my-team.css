@@ -3368,6 +3368,771 @@
 /* 板凳區上方的替換 banner 槽 */
 .mt-swap-banner-slot:empty { display: none; }
 .mt-swap-banner-slot { margin: 4px 0 6px; }
+
+/* ═════════════════════════════════════════════════════════════
+   🎰 GACHA TAB — 扭蛋店場景（機台本身是按鈕）
+   ═════════════════════════════════════════════════════════════ */
+.mt-gacha-stage {
+  position: relative;
+  padding: 0 8px 20px;
+  min-height: 100%;
+}
+.mt-gacha-shopname {
+  text-align: center;
+  margin: -8px 0 6px;
+  font-family: 'Impact','Arial Black',sans-serif;
+  letter-spacing: 1.5px;
+}
+.mt-gacha-neon {
+  display: inline-block;
+  color: #ffe680;
+  font-size: 15px; font-weight: 900;
+  text-shadow:
+    0 0 4px #f0c040,
+    0 0 8px rgba(240,192,64,0.7),
+    0 0 14px rgba(255,80,40,0.45);
+  animation: mt-neon-flicker 3.5s ease-in-out infinite;
+}
+@keyframes mt-neon-flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96%, 98% { opacity: 0.4; }
+}
+.mt-gacha-stats {
+  display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.mt-gacha-chip {
+  background: linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.3));
+  border: 1.5px solid rgba(240,192,64,0.5);
+  border-radius: 14px;
+  padding: 4px 10px;
+  font-size: 12px; font-weight: 800; color: #fff;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.mt-gacha-chip-ticket { border-color: #f0c040; color: #ffe680; }
+.mt-gacha-chip-gem    { border-color: #9b87f5; color: #cdbfff; }
+.mt-gacha-chip-pity   { border-color: rgba(229,57,53,0.5); color: #ffb0b0; }
+.mt-gacha-chip b { font-size: 14px; }
+
+.mt-gacha-machine {
+  position: relative;
+  width: 100%; max-width: 320px;
+  aspect-ratio: 260/380;
+  margin: 0 auto;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.55));
+}
+.mt-gacha-machine-svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.mt-gacha-capsules {
+  position: absolute;
+  left: 14%; top: 24%;
+  width: 60%; height: 40%;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 50%;
+}
+.mt-gacha-capsule {
+  position: absolute;
+  left: var(--cx); top: var(--cy);
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3);
+  animation: mt-cap-bounce 3s ease-in-out infinite;
+}
+.mt-gacha-capsule.c1 { animation-delay: 0s; }
+.mt-gacha-capsule.c2 { animation-delay: 0.3s; }
+.mt-gacha-capsule.c3 { animation-delay: 0.8s; }
+.mt-gacha-capsule.c4 { animation-delay: 1.2s; }
+.mt-gacha-capsule.c5 { animation-delay: 1.6s; }
+.mt-gacha-capsule.c6 { animation-delay: 2.1s; }
+@keyframes mt-cap-bounce {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(2px, -3px); }
+}
+
+/* 機台上的可點按鈕：把手（旋轉鈕）= 抽 1 */
+.mt-gacha-handle {
+  position: absolute;
+  right: -2%; top: 38%;
+  width: 22%; aspect-ratio: 1;
+  background: radial-gradient(circle at 35% 30%, #ffd680 0%, #d49a30 50%, #805020 100%);
+  border: 3px solid #1a0c04;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 900;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 11px;
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.5),
+    inset 0 3px 4px rgba(255,255,255,0.5),
+    inset 0 -3px 4px rgba(0,0,0,0.4);
+  transition: transform 0.15s;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+}
+.mt-gacha-handle:hover:not(.disabled) { transform: rotate(-12deg) scale(1.05); }
+.mt-gacha-handle:active:not(.disabled) { transform: rotate(-30deg) scale(0.98); }
+.mt-gacha-handle-knob {
+  font-size: 18px; line-height: 1;
+}
+.mt-gacha-handle-label small { font-size: 10px; opacity: 0.9; }
+.mt-gacha-handle.disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.6); }
+
+/* 大紅按鈕 = 10 連抽 */
+.mt-gacha-bigbtn {
+  position: absolute;
+  left: 50%; top: 67%;
+  transform: translateX(-50%);
+  width: 38%; aspect-ratio: 1;
+  background: radial-gradient(circle at 35% 30%, #ff7060 0%, #e53935 50%, #80101a 100%);
+  border: 4px solid #1a0408;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 24px;
+  font-family: 'Impact','Arial Black',sans-serif;
+  letter-spacing: 1px;
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.6),
+    inset 0 4px 6px rgba(255,255,255,0.45),
+    inset 0 -4px 6px rgba(0,0,0,0.45);
+  transition: transform 0.12s, box-shadow 0.12s;
+  text-shadow: 0 2px 3px rgba(0,0,0,0.7);
+  animation: mt-bigbtn-glow 2.5s ease-in-out infinite;
+}
+@keyframes mt-bigbtn-glow {
+  0%, 100% { box-shadow: 0 6px 14px rgba(0,0,0,0.6), inset 0 4px 6px rgba(255,255,255,0.45), inset 0 -4px 6px rgba(0,0,0,0.45), 0 0 0 rgba(229,57,53,0); }
+  50%      { box-shadow: 0 6px 14px rgba(0,0,0,0.6), inset 0 4px 6px rgba(255,255,255,0.45), inset 0 -4px 6px rgba(0,0,0,0.45), 0 0 18px rgba(229,57,53,0.7); }
+}
+.mt-gacha-bigbtn:hover:not(.disabled) { transform: translateX(-50%) scale(1.06); }
+.mt-gacha-bigbtn:active:not(.disabled) {
+  transform: translateX(-50%) scale(0.92) translateY(2px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6), inset 0 3px 4px rgba(0,0,0,0.4);
+}
+.mt-gacha-bigbtn.disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.6); animation: none; }
+
+/* 小寶石鈕 */
+.mt-gacha-gembtn {
+  position: absolute;
+  left: 2%; top: 70%;
+  width: 18%; aspect-ratio: 1;
+  background: radial-gradient(circle at 35% 30%, #c0a0ff 0%, #6a4fb5 60%, #2a1850 100%);
+  border: 2.5px solid #1a0830;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 11px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px;
+  box-shadow:
+    0 3px 8px rgba(0,0,0,0.5),
+    inset 0 2px 3px rgba(255,255,255,0.45),
+    inset 0 -2px 3px rgba(0,0,0,0.4);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+}
+.mt-gacha-gem-icon { font-size: 14px; }
+.mt-gacha-gembtn:hover:not(.disabled) { transform: scale(1.08); }
+.mt-gacha-gembtn:active:not(.disabled) { transform: scale(0.94); }
+.mt-gacha-gembtn.disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.6); }
+
+/* SSR 自選券貼紙 */
+.mt-gacha-ssr-sticker {
+  position: absolute;
+  left: 4%; top: 12%;
+  background: linear-gradient(135deg, #ffe680 0%, #f0c040 50%, #c08020 100%);
+  border: 2.5px solid #fff;
+  border-radius: 8px;
+  padding: 4px 8px;
+  color: #5a3010;
+  font-weight: 900;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center;
+  transform: rotate(-12deg);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+  animation: mt-ssr-sparkle 1.5s ease-in-out infinite;
+}
+@keyframes mt-ssr-sparkle {
+  0%, 100% { box-shadow: 0 3px 8px rgba(0,0,0,0.5), 0 0 0 rgba(240,192,64,0); }
+  50%      { box-shadow: 0 3px 8px rgba(0,0,0,0.5), 0 0 16px rgba(255,210,80,0.95); }
+}
+.mt-gacha-ssr-star { font-size: 16px; }
+.mt-gacha-ssr-text { font-size: 9px; }
+
+.mt-gacha-shopnote {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.75);
+  font-weight: 600;
+}
+.mt-gacha-shopnote .dot { opacity: 0.5; margin: 0 4px; }
+.mt-gacha-pity-warn {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 12px; font-weight: 900;
+  background: linear-gradient(135deg, rgba(229,57,53,0.3), rgba(240,192,64,0.3));
+  border: 2px solid #f0c040;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #ffe680;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  animation: mt-pity-pulse 1s ease-in-out infinite;
+}
+@keyframes mt-pity-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.03); }
+}
+
+/* ═════════════════════════════════════════════════════════════
+   📋 COACH TAB — 教練辦公室（黑板 + 教練站位）
+   ═════════════════════════════════════════════════════════════ */
+.mt-coach-office {
+  position: relative;
+  padding: 8px 6px 100px;
+  min-height: 100%;
+}
+.mt-coach-office-title {
+  text-align: center;
+  font-size: 14px; font-weight: 900;
+  color: #f0c040;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.mt-coach-office-formation {
+  display: inline-block;
+  margin-left: 6px;
+  background: rgba(240,192,64,0.2);
+  border: 1.5px solid #f0c040;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 11px;
+}
+
+.mt-coach-blackboard {
+  position: relative;
+  width: 75%; max-width: 280px;
+  aspect-ratio: 240/180;
+  margin: 0 auto 6px;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.55));
+}
+.mt-coach-blackboard-svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+.mt-coach-board-label {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 8px;
+  text-align: center;
+  color: #f0c040;
+  font-size: 12px;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  font-family: 'Caveat','Comic Sans MS',cursive;
+}
+.mt-coach-board-trait {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: -18px;
+  text-align: center;
+  color: rgba(255,255,255,0.8);
+  font-size: 10px;
+}
+
+/* 教練站位列 */
+.mt-coach-line {
+  position: absolute;
+  top: 40px;
+  width: 12%;
+  display: flex; flex-direction: column;
+  gap: 6px;
+  padding: 0 4px;
+}
+.mt-coach-line-l { left: 0; }
+.mt-coach-line-r { right: 0; }
+
+.mt-coach-slot {
+  background: rgba(0,0,0,0.35);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 4px;
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+  color: #fff;
+  text-align: center;
+  transition: transform 0.12s, border-color 0.15s;
+}
+.mt-coach-slot:hover:not(.mt-coach-slot-ghost) {
+  transform: scale(1.06);
+  border-color: #f0c040;
+}
+.mt-coach-slot.rarity-SSR { border-color: #f0c040; box-shadow: 0 0 8px rgba(240,192,64,0.6); }
+.mt-coach-slot.rarity-SR  { border-color: #9b87f5; box-shadow: 0 0 6px rgba(155,135,245,0.5); }
+.mt-coach-slot.active { background: rgba(240,192,64,0.18); }
+.mt-coach-active-crown {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  font-size: 14px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
+}
+.mt-coach-slot-portrait {
+  width: 100%; aspect-ratio: 1;
+  margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+}
+.mt-coach-slot-portrait img {
+  width: 100%; height: 100%;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+.mt-coach-slot-portrait-ghost {
+  color: rgba(255,255,255,0.25);
+  font-size: 24px;
+  background: rgba(0,0,0,0.3);
+  border: 2px dashed rgba(255,255,255,0.2);
+  border-radius: 6px;
+}
+.mt-coach-slot-name {
+  font-size: 9px; font-weight: 800;
+  margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mt-coach-slot-rarity {
+  position: absolute; top: 2px; left: 2px;
+  font-size: 8px; font-weight: 900;
+  padding: 0 3px; border-radius: 3px;
+  background: rgba(0,0,0,0.6); color: #fff;
+}
+.mt-coach-slot-rarity.rarity-SSR { background: #f0c040; color: #5a3010; }
+.mt-coach-slot-rarity.rarity-SR  { background: #9b87f5; color: #2a1850; }
+.mt-coach-slot.mt-coach-slot-ghost {
+  opacity: 0.45;
+  cursor: default;
+  border-style: dashed;
+}
+.mt-coach-setting { animation: mt-pulse 0.6s ease-in-out; }
+@keyframes mt-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.1); }
+}
+
+.mt-coach-floor {
+  position: absolute;
+  left: 0; right: 0; bottom: 70px;
+  height: 30px;
+  background: linear-gradient(180deg, transparent 0%, rgba(120,70,30,0.3) 50%, rgba(80,50,20,0.5) 100%);
+  pointer-events: none;
+}
+
+.mt-coach-actions {
+  position: absolute;
+  bottom: 12px; left: 8px; right: 8px;
+  display: flex; gap: 6px; align-items: center;
+  background: linear-gradient(135deg, rgba(80,50,20,0.85), rgba(40,25,10,0.85));
+  border: 2px solid #5a3010;
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+.mt-coach-draw-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #f0c040 0%, #c08030 100%);
+  border: 2px solid #5a3010;
+  color: #2a1505;
+  font-weight: 900;
+  font-size: 11px;
+  padding: 8px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.3);
+  transition: transform 0.12s;
+}
+.mt-coach-draw-btn:hover:not(:disabled) { transform: scale(1.04); }
+.mt-coach-draw-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
+
+/* ═════════════════════════════════════════════════════════════
+   ⚽ MATCH TAB — 球場入口隧道
+   ═════════════════════════════════════════════════════════════ */
+.mt-match-stage {
+  position: relative;
+  padding: 0 0 20px;
+  min-height: 100%;
+}
+.mt-match-tunnel-lights {
+  display: flex; justify-content: space-around;
+  padding: 8px 30px 0;
+  margin-bottom: -4px;
+}
+.mt-match-tunnel-light {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffaa 0%, #f0c040 60%, #805020 100%);
+  box-shadow: 0 0 14px rgba(255,235,150,0.85), 0 0 28px rgba(255,235,150,0.45);
+  animation: mt-tunnel-light-flicker 4s ease-in-out infinite;
+}
+.mt-match-tunnel-light:nth-child(2) { animation-delay: 0.7s; }
+.mt-match-tunnel-light:nth-child(3) { animation-delay: 1.4s; }
+@keyframes mt-tunnel-light-flicker {
+  0%, 95%, 100% { opacity: 1; }
+  97% { opacity: 0.55; }
+}
+
+.mt-match-tunnel-arch {
+  display: block;
+  width: 100%; height: 100px;
+}
+
+.mt-match-tunnel-board {
+  margin: -6px 14px 12px;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(20,30,50,0.7));
+  border: 2px solid rgba(240,192,64,0.55);
+  border-radius: 8px;
+  box-shadow: inset 0 0 12px rgba(0,0,0,0.5), 0 0 8px rgba(240,192,64,0.3);
+}
+.mt-match-tier {
+  font-size: 13px; font-weight: 900;
+  color: #ffe680;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+}
+.mt-match-tier small { font-size: 10px; opacity: 0.7; margin-left: 4px; }
+.mt-match-progress-row {
+  display: flex; align-items: center; gap: 8px;
+  margin: 4px 0;
+}
+.mt-match-progress-bar {
+  flex: 1; height: 8px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.15);
+  overflow: hidden;
+}
+.mt-match-progress-bar > div {
+  height: 100%;
+  background: linear-gradient(90deg, #43a047 0%, #f0c040 70%, #e53935 100%);
+  transition: width 0.4s;
+}
+.mt-match-progress-text { font-size: 10px; opacity: 0.75; }
+.mt-match-record {
+  font-size: 11px; color: #fff;
+  display: flex; align-items: center; gap: 4px;
+  flex-wrap: wrap;
+}
+.mt-match-boss-tag {
+  margin-left: auto;
+  background: rgba(229,57,53,0.6);
+  border: 1px solid #ff8080;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  color: #fff;
+  animation: mt-boss-blink 1.4s ease-in-out infinite;
+}
+@keyframes mt-boss-blink {
+  0%, 100% { box-shadow: 0 0 0 rgba(229,57,53,0); }
+  50%      { box-shadow: 0 0 12px rgba(229,57,53,0.9); }
+}
+
+/* 對手卡（中央大卡） */
+.mt-match-opp-card {
+  margin: 0 24px 16px;
+  perspective: 800px;
+}
+.mt-match-opp-card-inner {
+  background: linear-gradient(180deg, #2a1810 0%, #5a3020 100%);
+  border: 3px solid #f0c040;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: center;
+  color: #fff;
+  box-shadow:
+    0 10px 26px rgba(0,0,0,0.7),
+    inset 0 2px 4px rgba(255,255,255,0.2);
+  transform: rotateX(2deg);
+}
+.mt-match-opp-crest {
+  font-size: 38px;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 2px 6px rgba(229,57,53,0.7));
+}
+.mt-match-opp-label {
+  font-size: 11px; opacity: 0.75;
+  text-transform: uppercase; letter-spacing: 2px;
+}
+.mt-match-opp-name {
+  font-size: 18px; font-weight: 900;
+  margin: 2px 0 4px;
+  color: #ffe680;
+}
+.mt-match-opp-power {
+  font-size: 12px; color: #ffb0b0;
+  margin-bottom: 10px;
+}
+
+.mt-match-engage-btn {
+  display: inline-flex; flex-direction: column; align-items: center;
+  background: linear-gradient(135deg, #e53935 0%, #a01020 100%);
+  border: 3px solid #ffe680;
+  color: #fff;
+  font-weight: 900;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Impact','Arial Black',sans-serif;
+  letter-spacing: 2px;
+  box-shadow: 0 6px 14px rgba(229,57,53,0.5), inset 0 2px 4px rgba(255,255,255,0.3);
+  transition: transform 0.12s;
+  text-shadow: 0 2px 3px rgba(0,0,0,0.6);
+}
+.mt-match-engage-btn:hover:not(:disabled) { transform: scale(1.06); }
+.mt-match-engage-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
+.mt-match-engage-sword { font-size: 22px; }
+.mt-match-engage-label { font-size: 16px; }
+.mt-match-engage-cost  { font-size: 10px; opacity: 0.85; letter-spacing: 0; margin-top: 2px; }
+
+/* 隧道牆招牌 */
+.mt-match-wall-sign {
+  display: block;
+  margin: 0 32px 12px;
+  background: linear-gradient(135deg, rgba(80,30,30,0.7), rgba(40,15,15,0.7));
+  border: 2px solid #9b87f5;
+  border-radius: 8px;
+  padding: 8px;
+  color: #fff;
+  cursor: pointer;
+  text-align: center;
+  transform: rotate(-1.5deg);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.45);
+  transition: transform 0.15s;
+}
+.mt-match-wall-sign:hover:not(:disabled) { transform: rotate(0deg) scale(1.04); }
+.mt-match-wall-sign:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
+.mt-match-wall-sign-icon { font-size: 22px; }
+.mt-match-wall-sign-title {
+  font-weight: 900; font-size: 13px;
+  color: #cdbfff;
+}
+.mt-match-wall-sign-sub { font-size: 10px; opacity: 0.75; }
+
+.mt-match-grass {
+  margin-top: 14px;
+  min-height: 30px;
+  background: linear-gradient(180deg, transparent 0%, rgba(46,125,50,0.5) 60%, rgba(20,80,30,0.6) 100%);
+  position: relative;
+}
+.mt-match-grass-warn {
+  text-align: center;
+  padding: 8px;
+  font-size: 11px;
+  color: #ffb0b0;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   💪 TRAIN TAB — 訓練館（機台一排）
+   ═════════════════════════════════════════════════════════════ */
+.mt-train-gym {
+  position: relative;
+  padding: 8px 8px 20px;
+}
+.mt-train-gym-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap; gap: 6px;
+}
+.mt-train-gym-title {
+  font-size: 15px; font-weight: 900;
+  color: #f0c040;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+.mt-train-rp-chips {
+  display: flex; gap: 4px; flex-wrap: wrap;
+}
+.mt-train-rp-chips > span {
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,180,80,0.4);
+  border-radius: 12px;
+  padding: 3px 8px;
+  font-size: 11px; font-weight: 800;
+  color: #ffe680;
+}
+
+.mt-train-machines {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.mt-train-machine {
+  background: linear-gradient(180deg, #555555 0%, #2a2a2a 100%);
+  border: 3px solid #1a1a1a;
+  border-radius: 8px;
+  padding: 8px 4px;
+  cursor: pointer;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.5),
+    inset 0 2px 3px rgba(255,255,255,0.15),
+    inset 0 -2px 3px rgba(0,0,0,0.4);
+  transition: transform 0.12s;
+}
+.mt-train-machine:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 12px rgba(0,0,0,0.6),
+    inset 0 2px 3px rgba(255,255,255,0.2),
+    inset 0 -2px 3px rgba(0,0,0,0.4),
+    0 0 14px rgba(240,192,64,0.55);
+}
+.mt-train-machine:active { transform: translateY(0); }
+.mt-train-machine-icon {
+  width: 42px; height: 36px;
+  margin: 0 auto;
+}
+.mt-train-machine-icon svg { width: 100%; height: 100%; }
+.mt-train-machine-label {
+  font-size: 12px; font-weight: 900;
+  margin-top: 2px;
+  color: #ffe680;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.7);
+}
+.mt-train-machine-sub {
+  font-size: 9px; opacity: 0.75;
+}
+
+.mt-train-active-wrap {
+  background: rgba(0,0,0,0.4);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 8px;
+}
+.mt-train-active-title {
+  font-size: 12px; font-weight: 800;
+  color: #f0c040;
+  margin-bottom: 6px;
+}
+.mt-train-active-list {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.mt-train-active-empty {
+  text-align: center;
+  padding: 12px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+}
+.mt-train-active-row {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: #fff;
+}
+.mt-train-active-row.rarity-SSR { border-color: #f0c040; }
+.mt-train-active-row.rarity-SR  { border-color: #9b87f5; }
+.mt-train-active-row.ready { animation: mt-active-ready 1.4s ease-in-out infinite; }
+@keyframes mt-active-ready {
+  0%, 100% { background: rgba(76,175,80,0.18); }
+  50%      { background: rgba(76,175,80,0.35); }
+}
+.mt-train-active-portrait {
+  width: 36px; height: 44px;
+  flex-shrink: 0;
+}
+.mt-train-active-portrait img {
+  width: 100%; height: 100%;
+  image-rendering: pixelated;
+}
+.mt-train-active-info { flex: 1; min-width: 0; }
+.mt-train-active-name { font-size: 12px; font-weight: 800; }
+.mt-train-active-name small { opacity: 0.75; }
+.mt-train-active-time {
+  font-size: 11px; opacity: 0.85;
+  font-family: monospace;
+}
+
+/* 訓練機台選人彈窗 */
+.mt-train-picker .mt-profile-card { max-width: 420px; }
+.mt-train-picker-title { font-size: 16px; font-weight: 900; color: #f0c040; margin-bottom: 4px; }
+.mt-train-picker-sub { font-size: 11px; opacity: 0.7; margin-bottom: 10px; }
+.mt-train-picker-list {
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 60vh; overflow-y: auto;
+}
+.mt-train-pick-row {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 6px;
+  color: #fff;
+}
+.mt-train-pick-row.rarity-SSR { border-color: #f0c040; }
+.mt-train-pick-row.rarity-SR  { border-color: #9b87f5; }
+.mt-train-pick-portrait { width: 36px; height: 44px; flex-shrink: 0; }
+.mt-train-pick-portrait img { width: 100%; height: 100%; image-rendering: pixelated; }
+.mt-train-pick-info { flex: 1; min-width: 0; }
+.mt-train-pick-name { font-size: 12px; font-weight: 800; }
+.mt-train-pick-name small { opacity: 0.7; font-weight: 600; }
+.mt-train-pick-attr { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+.mt-train-pick-attr b { color: #ffe680; }
+.mt-train-pick-btns { display: flex; gap: 4px; flex-shrink: 0; }
+.mt-train-pick-btn {
+  background: linear-gradient(135deg, #43a047 0%, #1f6024 100%);
+  border: 1.5px solid #1a4d1f;
+  color: #fff; font-size: 10px; font-weight: 800;
+  padding: 4px 8px; border-radius: 6px;
+  cursor: pointer; text-align: center;
+}
+.mt-train-pick-btn small { font-size: 9px; opacity: 0.85; font-weight: 600; }
+.mt-train-pick-rp { background: linear-gradient(135deg, #f0c040 0%, #c08030 100%); border-color: #5a3010; color: #2a1505; }
+.mt-train-pick-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
+.mt-train-pick-busy {
+  font-size: 11px; opacity: 0.7;
+  padding: 4px 8px;
+  color: #f0c040;
+}
+
+/* Coach tab + Match tab + Train tab：移除背景 SVG（場景由內部 DOM 渲染） */
+.mt-hub-content[data-tab="coach"]::before,
+.mt-hub-content[data-tab="match"]::before,
+.mt-hub-content[data-tab="match"]::after,
+.mt-hub-content[data-tab="train"]::before,
+.mt-hub-content[data-tab="gacha"]::before { display: none; }
+.mt-hub-content[data-tab="gacha"]::after { display: none; }
+
+/* 深化各 tab 內場景的環境光 */
+.mt-hub-content[data-tab="gacha"] {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(240,192,64,0.18) 0%, transparent 70%),
+    linear-gradient(180deg, #1a0a14 0%, #2a1015 50%, #14070c 100%);
+}
+.mt-hub-content[data-tab="coach"] {
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(120,70,30,0.04) 0, rgba(120,70,30,0.04) 80px,
+      transparent 80px, transparent 82px),
+    linear-gradient(180deg, #0d1f1a 0%, #142822 55%, #2a1812 55%, #1a0e08 100%);
+}
+.mt-hub-content[data-tab="match"] {
+  background:
+    radial-gradient(ellipse 60% 30% at 50% 0%, rgba(255,255,150,0.1) 0%, transparent 70%),
+    linear-gradient(180deg, #050a18 0%, #0a1430 30%, #1a3050 55%, #1a4520 75%, #0d2a14 100%);
+}
+.mt-hub-content[data-tab="train"] {
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(120,80,40,0.05) 0, rgba(120,80,40,0.05) 60px,
+      transparent 60px, transparent 62px),
+    linear-gradient(180deg, #1f1808 0%, #2a2010 60%, #3a2614 60%, #251a08 100%);
+}
 .mt-pitch-player:nth-child(odd) { animation-delay: 0.4s; }
 .mt-pitch-player:nth-child(3n) { animation-delay: 0.8s; }
 .mt-pitch-player:hover { z-index: 5; }

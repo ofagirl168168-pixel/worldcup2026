@@ -1186,73 +1186,122 @@
     return window.TeamCrests.getSvg(id, primary, accent);
   }
 
-  // ─────────── 教練 tab ───────────────────────────────────
+  // ─────────── 教練 tab：教練辦公室 ───────────────────────────────
   async function renderCoachTab(content) {
     const team = window.MyTeam.getCached();
     if (!team || team === 'not_created') return;
     const coachTickets = team.coach_tickets || 0;
     const coaches = await _fetchUserCoaches();
     const active = coaches.find(c => c.id === team.active_coach_id);
+    const formation = team?.formation || '4-3-3';
+    const positions = _formationPositions(formation);
+    const SLOTS = 8;
 
     content.innerHTML = `
-      <div class="mt-coach-tab">
-        <div class="mt-gacha-banner">
-          <div class="mt-gacha-banner-title">👔 教練聘任</div>
-          <div class="mt-gacha-banner-sub">SSR 5% / SR 25% / R 70%・連 30 抽保底</div>
-          <div class="mt-gacha-banner-resources">
-            <div class="mt-gacha-banner-res">🎫 教練券 <b id="mt-coach-tickets">${coachTickets}</b></div>
-          </div>
-          <button class="mt-gacha-btn mt-coach-draw-btn" data-count="1" ${coachTickets < 1 ? 'disabled' : ''}>1 抽（1 券）</button>
-          <button class="mt-gacha-btn mt-gacha-btn-10 mt-coach-draw-btn" data-count="10" ${coachTickets < 10 ? 'disabled' : ''}>10 連抽（10 券）</button>
+      <div class="mt-coach-office">
+        <div class="mt-coach-office-title">
+          📋 教練辦公室
+          <span class="mt-coach-office-formation">${formation}</span>
         </div>
-        <div class="mt-coach-active">
-          <div class="mt-coach-active-label">主教練</div>
-          ${active ? `
-            <div class="mt-coach-active-card">
-              <div class="mt-coach-active-name">${escapeHtml(active.coach?.name || '?')} <span style="opacity:0.7">${active.coach?.rarity || ''}</span></div>
-              <div class="mt-coach-active-trait">${escapeHtml(active.coach?.nickname || '')}・${escapeHtml(_traitLabel(active.coach?.trait, active.coach?.trait_value))}</div>
-            </div>
-          ` : '<div style="color:rgba(255,255,255,0.5)">尚未指派主教練</div>'}
+
+        <!-- 中央黑板：畫陣型 + X/O 戰術 -->
+        <div class="mt-coach-blackboard">
+          <svg class="mt-coach-blackboard-svg" viewBox="0 0 240 180" preserveAspectRatio="none" aria-hidden="true">
+            <!-- 黑板 -->
+            <rect x="2" y="2" width="236" height="176" rx="3" fill="#1d3a2c" stroke="#7a5230" stroke-width="5"/>
+            <!-- 中線 + 中圈 -->
+            <line x1="20" y1="90" x2="220" y2="90" stroke="rgba(255,255,255,0.35)" stroke-width="1" stroke-dasharray="3,3"/>
+            <circle cx="120" cy="90" r="18" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+            <!-- 球員圓點（依當前陣型） -->
+            ${positions.map(p => `<circle cx="${20 + p.x * 2}" cy="${10 + p.y * 1.6}" r="4" fill="#90caf9" stroke="#fff" stroke-width="1"/>`).join('')}
+            <!-- 戰術箭頭（裝飾） -->
+            <path d="M 60 110 Q 90 90 120 100" stroke="#f0c040" fill="none" stroke-width="1.5" stroke-dasharray="2,2"/>
+            <path d="M 150 80 Q 180 60 200 70" stroke="#f0c040" fill="none" stroke-width="1.5" stroke-dasharray="2,2"/>
+          </svg>
+          <div class="mt-coach-board-label">${escapeHtml(active?.coach?.name || '尚未指派主教練')}</div>
+          ${active ? `<div class="mt-coach-board-trait">${escapeHtml(_traitLabel(active.coach?.trait, active.coach?.trait_value))}</div>` : ''}
         </div>
-        <div class="mt-coach-roster">
-          <div style="font-size:14px;font-weight:600;margin:14px 0 8px">已聘教練 (${coaches.length})</div>
-          <div class="mt-coach-grid" id="mt-coach-grid"></div>
+
+        <!-- 教練站位：左 4 / 右 4 -->
+        <div class="mt-coach-line mt-coach-line-l" id="mt-coach-line-l"></div>
+        <div class="mt-coach-line mt-coach-line-r" id="mt-coach-line-r"></div>
+
+        <!-- 木地板 -->
+        <div class="mt-coach-floor"></div>
+
+        <!-- 底部：抽教練 + 教練券 -->
+        <div class="mt-coach-actions">
+          <span class="mt-gacha-chip mt-gacha-chip-ticket">🎫 <b>${coachTickets}</b></span>
+          <button class="mt-coach-draw-btn mt-coach-draw-1" data-count="1" ${coachTickets < 1 ? 'disabled' : ''}>
+            🎫 抽 1 教練
+          </button>
+          <button class="mt-coach-draw-btn mt-coach-draw-10" data-count="10" ${coachTickets < 10 ? 'disabled' : ''}>
+            🎫 10 連抽
+          </button>
         </div>
       </div>
     `;
 
-    const grid = content.querySelector('#mt-coach-grid');
-    if (!coaches.length) {
-      grid.innerHTML = '<div style="opacity:0.5;font-size:13px">還沒有教練，去抽吧！</div>';
-    } else {
-      coaches.forEach(uc => {
-        const c = uc.coach || {};
-        const isActive = uc.id === team.active_coach_id;
-        const div = document.createElement('div');
-        div.className = `mt-coach-card rarity-${c.rarity || 'R'}${isActive ? ' active' : ''}`;
-        const imgId = `coach-portrait-${uc.id.slice(0,8)}`;
-        div.innerHTML = `
-          ${isActive ? '<span class="mt-coach-badge">主教練</span>' : ''}
-          <span class="mt-player-card-rarity">${c.rarity || 'R'}</span>
-          <div class="mt-player-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
-          <div class="mt-player-name">${escapeHtml(c.name || '?')}</div>
-          <div class="mt-player-position" style="font-size:11px">${escapeHtml(c.nickname || '')}</div>
-          <div class="mt-player-position" style="font-size:10px;opacity:0.7">${escapeHtml(_traitLabel(c.trait, c.trait_value))}</div>
-          <button class="mt-coach-set-btn" data-ucid="${uc.id}" ${isActive ? 'disabled' : ''}>${isActive ? '已指派' : '設為主教練'}</button>
-        `;
-        grid.appendChild(div);
-        // LPC portrait
-        const look = uc.look_data || c.look_data;
-        if (look && window.LpcRenderer) {
-          window.LpcRenderer.portrait(look).then(url => {
-            const img = document.getElementById(imgId);
-            if (img && url) img.src = url;
-          }).catch(() => {});
-        }
-      });
+    // 安排教練到左右兩排（每邊最多 4 位、超過時溢出）
+    const lineL = content.querySelector('#mt-coach-line-l');
+    const lineR = content.querySelector('#mt-coach-line-r');
+    const arrange = (uc, lineEl, idx) => {
+      const c = uc.coach || {};
+      const isActive = uc.id === team.active_coach_id;
+      const slotDiv = document.createElement('button');
+      slotDiv.className = `mt-coach-slot rarity-${c.rarity || 'R'}${isActive ? ' active' : ''}`;
+      slotDiv.dataset.ucid = uc.id;
+      const imgId = `coach-portrait-${uc.id.slice(0,8)}`;
+      slotDiv.innerHTML = `
+        ${isActive ? '<span class="mt-coach-active-crown">👑</span>' : ''}
+        <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
+        <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
+        <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
+      `;
+      lineEl.appendChild(slotDiv);
+      const look = uc.look_data || c.look_data;
+      if (look && window.LpcRenderer) {
+        window.LpcRenderer.portrait(look).then(url => {
+          const img = document.getElementById(imgId);
+          if (img && url) img.src = url;
+        }).catch(() => {});
+      }
+    };
+
+    // 把 active 教練放第一位（任一邊），剩下平均分配
+    const ordered = active ? [active, ...coaches.filter(c => c.id !== active.id)] : coaches;
+    ordered.forEach((uc, i) => arrange(uc, i % 2 === 0 ? lineL : lineR, i));
+
+    // 空位：剪影（未擁有）
+    const remaining = Math.max(0, SLOTS - ordered.length);
+    for (let i = 0; i < remaining; i++) {
+      const ghost = document.createElement('div');
+      ghost.className = 'mt-coach-slot mt-coach-slot-ghost';
+      ghost.innerHTML = `
+        <div class="mt-coach-slot-portrait mt-coach-slot-portrait-ghost">?</div>
+        <div class="mt-coach-slot-name">未聘任</div>
+      `;
+      ((ordered.length + i) % 2 === 0 ? lineL : lineR).appendChild(ghost);
     }
 
-    // 抽教練按鈕
+    // 點教練 → 設為主教練
+    content.querySelectorAll('.mt-coach-slot:not(.mt-coach-slot-ghost)').forEach(slot => {
+      slot.addEventListener('click', async () => {
+        const ucid = slot.dataset.ucid;
+        if (slot.classList.contains('active')) return;
+        slot.classList.add('mt-coach-setting');
+        try {
+          await window.DB.rpc('set_active_coach', { p_user_coach_id: ucid });
+          await window.MyTeam.refresh?.();
+          renderTab();
+        } catch (e) {
+          alert('設定失敗：' + (e.message || e));
+          slot.classList.remove('mt-coach-setting');
+        }
+      });
+    });
+
+    // 抽教練
     content.querySelectorAll('.mt-coach-draw-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const cnt = parseInt(btn.dataset.count, 10);
@@ -1262,22 +1311,6 @@
           renderTab();
         } catch (e) {
           alert('抽教練失敗：' + (e.message || e));
-        }
-      });
-    });
-
-    // 設為主教練按鈕
-    content.querySelectorAll('.mt-coach-set-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const ucid = btn.dataset.ucid;
-        btn.disabled = true; btn.textContent = '設定中…';
-        try {
-          await window.DB.rpc('set_active_coach', { p_user_coach_id: ucid });
-          await window.MyTeam.refresh?.();
-          renderTab();
-        } catch (e) {
-          alert('設定失敗：' + (e.message || e));
-          btn.disabled = false; btn.textContent = '設為主教練';
         }
       });
     });
@@ -2104,59 +2137,113 @@
     const team = window.MyTeam.getCached();
     if (!team || team === 'not_created') return;
     const tickets = team.tickets || 0;
+    const gems = team.gems || 0;
     const pity = team.pity_counter || 0;
     const pityRemaining = Math.max(0, 30 - pity);
+    const ssrSelect = team.ssr_select_tickets || 0;
 
     content.innerHTML = `
-      <div class="mt-gacha-tab">
-        <div class="mt-gacha-banner">
-          <div class="mt-gacha-banner-title">🎰 球員抽卡</div>
-          <div class="mt-gacha-banner-sub">
-            抽券 / 50 寶石 → 隨機獲得 R / SR / SSR 球員<br>
-            重複球員自動 ★+1 加強上限
-          </div>
-          <div class="mt-gacha-rates">
-            <span>R <b>75%</b></span>
-            <span>SR <b>20%</b></span>
-            <span style="color:#f0c040">SSR <b>5%</b></span>
-          </div>
-          <div class="mt-gacha-pity-bar">
-            🎯 保底：再抽 <b>${pityRemaining}</b> 次無 SSR 必出（目前 pity = ${pity}/30）
-          </div>
+      <div class="mt-gacha-stage">
+        <div class="mt-gacha-shopname">
+          <span class="mt-gacha-neon">🎰 SOCCERMADDY GACHA 🎰</span>
+        </div>
+        <div class="mt-gacha-stats">
+          <span class="mt-gacha-chip mt-gacha-chip-ticket">🎟️ <b>${tickets}</b></span>
+          <span class="mt-gacha-chip mt-gacha-chip-gem">💎 <b>${gems}</b></span>
+          <span class="mt-gacha-chip mt-gacha-chip-pity">🎯 ${pity}/30</span>
         </div>
 
-        <div class="mt-gacha-buttons">
-          <button class="mt-gacha-btn-row" id="mt-gacha-1" ${tickets < 1 ? 'disabled' : ''}>
-            <div class="mt-gacha-btn-info">
-              <div class="mt-gacha-btn-title">🎰 抽 1 抽</div>
-              <div class="mt-gacha-btn-sub">隨機獲得 1 張球員卡</div>
-            </div>
-            <div class="mt-gacha-btn-cost">🎟️ 1</div>
+        <div class="mt-gacha-machine">
+          <!-- 機身 SVG -->
+          <svg class="mt-gacha-machine-svg" viewBox="0 0 260 380" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <defs>
+              <radialGradient id="mt-gm-glass" cx="50%" cy="40%" r="60%">
+                <stop offset="0%" stop-color="#ffeeaa" stop-opacity="0.95"/>
+                <stop offset="60%" stop-color="#d49a30" stop-opacity="0.7"/>
+                <stop offset="100%" stop-color="#80501a" stop-opacity="0.85"/>
+              </radialGradient>
+              <linearGradient id="mt-gm-body" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#c43040"/>
+                <stop offset="50%" stop-color="#9c1828"/>
+                <stop offset="100%" stop-color="#600c14"/>
+              </linearGradient>
+              <linearGradient id="mt-gm-shadow" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+                <stop offset="30%" stop-color="rgba(255,255,255,0)"/>
+                <stop offset="70%" stop-color="rgba(0,0,0,0)"/>
+                <stop offset="100%" stop-color="rgba(0,0,0,0.25)"/>
+              </linearGradient>
+            </defs>
+            <!-- 機底 -->
+            <rect x="20" y="280" width="220" height="80" rx="6" fill="url(#mt-gm-body)" stroke="#380810" stroke-width="3"/>
+            <rect x="20" y="280" width="220" height="80" rx="6" fill="url(#mt-gm-shadow)"/>
+            <!-- 出貨口 -->
+            <rect x="80" y="320" width="100" height="30" rx="4" fill="#1a0408" stroke="#380810" stroke-width="2"/>
+            <text x="130" y="340" font-size="11" fill="#f0c040" text-anchor="middle" font-weight="900">PRIZE</text>
+            <!-- 機身上半（紅金） -->
+            <rect x="30" y="40" width="200" height="240" rx="8" fill="url(#mt-gm-body)" stroke="#380810" stroke-width="3"/>
+            <rect x="30" y="40" width="200" height="240" rx="8" fill="url(#mt-gm-shadow)"/>
+            <!-- 頂蓋 -->
+            <ellipse cx="130" cy="38" rx="105" ry="14" fill="#700818" stroke="#380810" stroke-width="2.5"/>
+            <!-- 玻璃球（顯示窗） -->
+            <circle cx="130" cy="148" r="78" fill="url(#mt-gm-glass)" stroke="#552010" stroke-width="3"/>
+            <!-- 反光 -->
+            <ellipse cx="105" cy="115" rx="22" ry="14" fill="#ffffff" opacity="0.45"/>
+            <!-- 投幣口（10連抽紅鈕周圍裝飾） -->
+            <rect x="98" y="240" width="64" height="6" rx="2" fill="#1a0408"/>
+            <!-- 把手連桿 -->
+            <rect x="218" y="140" width="12" height="60" fill="#806030" stroke="#1a0c04" stroke-width="2"/>
+          </svg>
+
+          <!-- 玻璃球內：扭蛋膠囊（彩色） -->
+          <div class="mt-gacha-capsules">
+            <span class="mt-gacha-capsule c1" style="--cx:30%;--cy:55%;background:#e53935"></span>
+            <span class="mt-gacha-capsule c2" style="--cx:55%;--cy:70%;background:#1976d2"></span>
+            <span class="mt-gacha-capsule c3" style="--cx:70%;--cy:48%;background:#f0c040"></span>
+            <span class="mt-gacha-capsule c4" style="--cx:40%;--cy:35%;background:#9b87f5"></span>
+            <span class="mt-gacha-capsule c5" style="--cx:60%;--cy:30%;background:#43a047"></span>
+            <span class="mt-gacha-capsule c6" style="--cx:25%;--cy:38%;background:#ffb74d"></span>
+          </div>
+
+          <!-- 機台上的可點按鈕 -->
+          <button class="mt-gacha-handle ${tickets < 1 ? 'disabled' : ''}" id="mt-gacha-1"
+            ${tickets < 1 ? 'disabled' : ''}
+            aria-label="抽 1 抽（消耗 1 抽券）">
+            <span class="mt-gacha-handle-knob">●</span>
+            <span class="mt-gacha-handle-label">PULL ×1<br><small>🎟️ 1</small></span>
           </button>
 
-          <button class="mt-gacha-btn-row" id="mt-gacha-10" ${tickets < 10 ? 'disabled' : ''}>
-            <div class="mt-gacha-btn-info">
-              <div class="mt-gacha-btn-title">🎰 10 連抽</div>
-              <div class="mt-gacha-btn-sub">10 張 + 保證至少 1 張 SR 起步</div>
-            </div>
-            <div class="mt-gacha-btn-cost">🎟️ 10</div>
+          <button class="mt-gacha-bigbtn ${tickets < 10 ? 'disabled' : ''}" id="mt-gacha-10"
+            ${tickets < 10 ? 'disabled' : ''}
+            aria-label="10 連抽（消耗 10 抽券）">
+            <span class="mt-gacha-bigbtn-inner">10×</span>
           </button>
 
-          <button class="mt-gacha-btn-row" id="mt-gacha-gem-1">
-            <div class="mt-gacha-btn-info">
-              <div class="mt-gacha-btn-title">💎 寶石抽（保底用）</div>
-              <div class="mt-gacha-btn-sub">沒抽券時用寶石</div>
-            </div>
-            <div class="mt-gacha-btn-cost">💎 50</div>
+          <button class="mt-gacha-gembtn ${gems < 50 ? 'disabled' : ''}" id="mt-gacha-gem-1"
+            ${gems < 50 ? 'disabled' : ''}
+            aria-label="寶石抽卡（消耗 50 寶石）">
+            <span class="mt-gacha-gem-icon">💎</span>
+            <span class="mt-gacha-gem-label">×50</span>
           </button>
+
+          ${ssrSelect > 0 ? `
+            <button class="mt-gacha-ssr-sticker" id="mt-ssr-select-open"
+              aria-label="兌換 SSR 自選券">
+              <span class="mt-gacha-ssr-star">🌟</span>
+              <span class="mt-gacha-ssr-text">SSR 自選 ×${ssrSelect}</span>
+            </button>
+          ` : ''}
         </div>
 
-        ${(team.ssr_select_tickets || 0) > 0 ? `
-          <div class="mt-ssr-select-section">
-            <div class="mt-ssr-select-title">🌟 SSR 自選券 × ${team.ssr_select_tickets}</div>
-            <div class="mt-ssr-select-sub">賽季冠軍獎勵・任選一張 SSR 球員加入隊伍</div>
-            <button class="mt-gacha-btn" id="mt-ssr-select-open">兌換 SSR 自選券</button>
-          </div>
+        <div class="mt-gacha-shopnote">
+          <span>R 75%</span><span class="dot">·</span>
+          <span style="color:#9b87f5">SR 20%</span><span class="dot">·</span>
+          <span style="color:#f0c040">SSR 5%</span><span class="dot">·</span>
+          <span>30 抽保底 SSR</span>
+        </div>
+
+        ${pityRemaining <= 3 ? `
+          <div class="mt-gacha-pity-warn">⚡ 再 ${pityRemaining} 抽保底 SSR ⚡</div>
         ` : ''}
       </div>
     `;
@@ -2261,7 +2348,9 @@
   }
 
   async function renderMatchTab(content) {
-    content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入聯賽進度…</div>';
+    if (!content.querySelector('.mt-match-stage')) {
+      content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入聯賽進度…</div>';
+    }
     const team = window.MyTeam.getCached();
     if (!team) return;
     const { data: prog } = await window.DB
@@ -2271,44 +2360,70 @@
       .maybeSingle();
     const tier = prog?.current_tier || 1;
     const tierName = ({1:'新手聯賽',2:'業餘聯賽',3:'地區聯賽',4:'全國次級',5:'全國聯賽',6:'大陸盃',7:'歐洲菁英',8:'世界次級',9:'世界聯賽',10:'傳奇聯賽'})[tier];
-    const playedRatio = `${prog?.matches_played || 0}/10`;
     const wins = prog?.wins || 0;
     const draws = prog?.draws || 0;
     const losses = prog?.losses || 0;
+    const played = prog?.matches_played || 0;
     const tierAvg = { 1:40,2:50,3:60,4:70,5:75,6:80,7:85,8:88,9:92,10:95 }[tier];
     const realRatio = { 1:0,2:0,3:0,4:0.1,5:0.2,6:0.3,7:0.45,8:0.65,9:0.85,10:1.0 }[tier];
-    const bossNote = realRatio > 0
-      ? `<div class="mt-match-boss-note">⭐ Tier ${tier}：本聯賽約 ${Math.round(realRatio*100)}% 機率遇到真實隊伍 Boss 戰</div>` : '';
+    const isBossLikely = realRatio >= 0.3;
+    const pvpCount = team.pvp_today_count || 0;
+    const pvpDisabled = pvpCount >= 5 || team.stamina < 1;
 
     content.innerHTML = `
-      <div class="mt-match-tab">
-        <div class="mt-match-season">
-          <div class="mt-match-season-tier">${tierName}（Tier ${tier}）</div>
-          <div class="mt-match-season-sub">對手平均能力 ${tierAvg} · 賽季 ${prog?.season_num || 1}</div>
-          <div class="mt-match-season-progress">
-            <div class="mt-match-season-bar">
-              <div style="width:${(prog?.matches_played || 0) * 10}%"></div>
-            </div>
-            <div class="mt-match-season-stats">
-              ${playedRatio} 場 · <b style="color:#4caf50">${wins} 勝</b> / <span>${draws} 平</span> / <span style="color:#ef9a9a">${losses} 敗</span>
-            </div>
-          </div>
-          <div class="mt-match-season-hint">7 勝以上升級 / 3 勝以下降級 / 賽季冠軍 +SSR 自選券</div>
+      <div class="mt-match-stage">
+        <!-- 隧道頂燈光 -->
+        <div class="mt-match-tunnel-lights">
+          <span class="mt-match-tunnel-light"></span>
+          <span class="mt-match-tunnel-light"></span>
+          <span class="mt-match-tunnel-light"></span>
         </div>
-        ${bossNote}
-        <button class="mt-match-start" id="mt-match-start" ${team.stamina < 1 ? 'disabled' : ''}>
-          ⚽ 下一場比賽
-          <span class="mt-match-start-cost">耗 1 ⚡（剩 ${team.stamina}/${team.stamina_max}）</span>
-        </button>
-        ${team.stamina < 1 ? '<div class="mt-match-low-stamina">⚡ 體力 0 — 預測比賽、看文章可賺體力</div>' : ''}
+        <!-- 隧道拱門 -->
+        <svg class="mt-match-tunnel-arch" viewBox="0 0 300 150" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 0 150 L 0 60 Q 0 0 60 0 L 240 0 Q 300 0 300 60 L 300 150 Z"
+            fill="rgba(0,0,0,0.55)" stroke="#1a1a2e" stroke-width="3"/>
+          <text x="150" y="35" font-size="14" font-weight="900" fill="#f0c040" text-anchor="middle"
+            font-family="Impact,'Arial Black',sans-serif" letter-spacing="2">STADIUM ENTRANCE</text>
+        </svg>
 
-        <!-- PvP 對戰 -->
-        <div class="mt-pvp-section">
-          <div class="mt-pvp-title">⚔️ PvP 排位戰</div>
-          <div class="mt-pvp-stat">當前 ELO <b>${team.pvp_elo || 1000}</b> · 今日已戰 <b>${team.pvp_today_count || 0}</b> / 5</div>
-          <button class="mt-pvp-btn" id="mt-pvp-find" ${(team.pvp_today_count || 0) >= 5 || team.stamina < 1 ? 'disabled' : ''}>
-            找對手對戰（耗 1 ⚡）
-          </button>
+        <!-- 聯賽進度條（嵌在隧道牆上） -->
+        <div class="mt-match-tunnel-board">
+          <div class="mt-match-tier">🏆 ${escapeHtml(tierName)} <small>Tier ${tier}</small></div>
+          <div class="mt-match-progress-row">
+            <div class="mt-match-progress-bar"><div style="width:${played * 10}%"></div></div>
+            <span class="mt-match-progress-text">${played}/10</span>
+          </div>
+          <div class="mt-match-record">
+            <b style="color:#4caf50">${wins} 勝</b> · ${draws} 平 · <span style="color:#ef9a9a">${losses} 敗</span>
+            ${isBossLikely ? `<span class="mt-match-boss-tag">⭐ Boss ${Math.round(realRatio*100)}%</span>` : ''}
+          </div>
+        </div>
+
+        <!-- 對手卡：散落在隧道中 -->
+        <div class="mt-match-opp-card">
+          <div class="mt-match-opp-card-inner">
+            <div class="mt-match-opp-crest">⚔️</div>
+            <div class="mt-match-opp-label">下一場對手</div>
+            <div class="mt-match-opp-name">Tier ${tier} 對手</div>
+            <div class="mt-match-opp-power">能力 ~${tierAvg}</div>
+            <button class="mt-match-engage-btn" id="mt-match-start" ${team.stamina < 1 ? 'disabled' : ''}>
+              <span class="mt-match-engage-sword">⚔</span>
+              <span class="mt-match-engage-label">開戰</span>
+              <span class="mt-match-engage-cost">⚡ 1（剩 ${team.stamina}/${team.stamina_max}）</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 隧道牆上小招牌：PvP -->
+        <button class="mt-match-wall-sign mt-match-pvp-sign" id="mt-pvp-find" ${pvpDisabled ? 'disabled' : ''}>
+          <div class="mt-match-wall-sign-icon">⚔️</div>
+          <div class="mt-match-wall-sign-title">PvP 排位</div>
+          <div class="mt-match-wall-sign-sub">ELO ${team.pvp_elo || 1000}・${pvpCount}/5</div>
+        </button>
+
+        <!-- 草皮（底部漸層） -->
+        <div class="mt-match-grass">
+          ${team.stamina < 1 ? '<div class="mt-match-grass-warn">⚡ 體力 0 — 預測比賽、看文章可賺體力</div>' : ''}
         </div>
       </div>
     `;
@@ -2378,7 +2493,9 @@
   async function renderTrainTab(content) {
     const team = window.MyTeam.getCached();
     if (!team) return;
-    content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入球員中…</div>';
+    if (!content.querySelector('.mt-train-gym')) {
+      content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入球員中…</div>';
+    }
     const players = await window.MyTeam.fetchPlayers();
     if (!players.length) {
       content.innerHTML = `
@@ -2396,107 +2513,101 @@
       return;
     }
 
+    const ATTR_LABELS = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
+    const ATTR_ICONS = {
+      attack:   '<svg viewBox="0 0 60 40"><rect x="5" y="14" width="14" height="12" rx="2" fill="#404040" stroke="#202020" stroke-width="1.5"/><rect x="41" y="14" width="14" height="12" rx="2" fill="#404040" stroke="#202020" stroke-width="1.5"/><rect x="19" y="18" width="22" height="4" fill="#606060" stroke="#202020" stroke-width="1"/></svg>',
+      defense:  '<svg viewBox="0 0 40 50"><path d="M 20 4 L 36 12 L 36 28 Q 36 42 20 48 Q 4 42 4 28 L 4 12 Z" fill="#90caf9" stroke="#1976d2" stroke-width="2"/><path d="M 20 14 L 28 18 L 20 32 L 12 18 Z" fill="#1976d2"/></svg>',
+      speed:    '<svg viewBox="0 0 60 40"><rect x="5" y="20" width="50" height="14" rx="2" fill="#606060" stroke="#202020" stroke-width="1.5"/><rect x="8" y="22" width="44" height="2" fill="#a0a0a0"/><circle cx="14" cy="34" r="3" fill="#202020"/><circle cx="46" cy="34" r="3" fill="#202020"/><path d="M 25 14 L 35 14 L 32 6 L 28 6 Z" fill="#f0c040"/></svg>',
+      midfield: '<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#ffffff" stroke="#202020" stroke-width="2"/><polygon points="20,9 26,14 24,21 16,21 14,14" fill="#202020"/><line x1="20" y1="9" x2="20" y2="5" stroke="#202020" stroke-width="1"/><line x1="29" y1="17" x2="33" y2="14" stroke="#202020" stroke-width="1"/></svg>',
+      stamina:  '<svg viewBox="0 0 50 40"><path d="M 25 36 L 8 18 Q 4 14 8 10 Q 12 6 18 10 L 25 16 L 32 10 Q 38 6 42 10 Q 46 14 42 18 Z" fill="#e53935" stroke="#801010" stroke-width="2"/></svg>',
+      aura:     '<svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="14" fill="#f0c040" stroke="#805020" stroke-width="2"/><g stroke="#f0c040" stroke-width="2" stroke-linecap="round"><line x1="25" y1="2" x2="25" y2="9"/><line x1="25" y1="41" x2="25" y2="48"/><line x1="2" y1="25" x2="9" y2="25"/><line x1="41" y1="25" x2="48" y2="25"/><line x1="8" y1="8" x2="13" y2="13"/><line x1="37" y1="37" x2="42" y2="42"/><line x1="42" y1="8" x2="37" y2="13"/><line x1="13" y1="37" x2="8" y2="42"/></g></svg>'
+    };
+
+    // 整理目前正在時間訓練的球員
+    const activeTrainings = players.filter(p => p.training_attr && p.training_finish_at)
+      .map(p => ({
+        p,
+        finishAt: new Date(p.training_finish_at),
+        remainSec: Math.max(0, Math.floor((new Date(p.training_finish_at) - new Date()) / 1000)),
+      }));
+
     content.innerHTML = `
-      <div class="mt-train-rp">
-        <div class="mt-train-rp-title">⚙️ Research Points</div>
-        <div class="mt-train-rp-grid">
-          <div class="mt-train-rp-cell"><span>戰術</span><b>${team.rp_tactical}</b></div>
-          <div class="mt-train-rp-cell"><span>體能</span><b>${team.rp_physical}</b></div>
-          <div class="mt-train-rp-cell"><span>心</span><b>${team.rp_heart}</b></div>
-          <div class="mt-train-rp-cell"><span>靈感</span><b>${team.rp_idea}</b></div>
+      <div class="mt-train-gym">
+        <div class="mt-train-gym-header">
+          <span class="mt-train-gym-title">💪 訓練館</span>
+          <div class="mt-train-rp-chips">
+            <span title="戰術 RP">🧠 ${team.rp_tactical}</span>
+            <span title="體能 RP">💪 ${team.rp_physical}</span>
+            <span title="心 RP">❤️ ${team.rp_heart}</span>
+            <span title="靈感 RP">💡 ${team.rp_idea}</span>
+          </div>
         </div>
-        <div class="mt-train-rp-sub">
-          ⚙️ <b>RP 訓練</b>（瞬間）：花 RP 升等 + 6 屬性隨機加<br>
-          ⏱️ <b>時間訓練</b>（等候）：選 1 屬性、等時間到 +1，等級越高時間越長
+
+        <!-- 機台一排 -->
+        <div class="mt-train-machines">
+          ${Object.entries(ATTR_LABELS).map(([attr, label]) => `
+            <button class="mt-train-machine" data-machine="${attr}">
+              <div class="mt-train-machine-icon">${ATTR_ICONS[attr]}</div>
+              <div class="mt-train-machine-label">${label}</div>
+              <div class="mt-train-machine-sub">+1 / 點選</div>
+            </button>
+          `).join('')}
+        </div>
+
+        <!-- 進行中訓練 -->
+        <div class="mt-train-active-wrap">
+          <div class="mt-train-active-title">⏱️ 訓練中（${activeTrainings.length}）</div>
+          <div class="mt-train-active-list" id="mt-train-active-list">
+            ${activeTrainings.length ? '' : '<div class="mt-train-active-empty">點上方機台 → 選球員開始訓練</div>'}
+          </div>
         </div>
       </div>
-      <div class="mt-train-list" id="mt-train-list"></div>
     `;
 
-    const list = content.querySelector('#mt-train-list');
-    const ATTR_LABELS = { attack:'攻', defense:'防', speed:'速', midfield:'中', stamina:'體', aura:'氣' };
-    players.forEach(p => {
+    const activeList = content.querySelector('#mt-train-active-list');
+    activeTrainings.forEach(({ p, finishAt, remainSec }) => {
       const c = p.card || {};
-      const canNormal = team.rp_tactical >= 10 && team.rp_physical >= 10 && p.level < 50;
-      const canPremium = team.rp_tactical >= 30 && team.rp_physical >= 30
-                        && team.rp_heart >= 10 && team.rp_idea >= 10 && p.level < 50;
-      const isTraining = p.training_attr && p.training_finish_at;
-      const finishAt = isTraining ? new Date(p.training_finish_at) : null;
-      const remainSec = isTraining ? Math.max(0, Math.floor((finishAt - new Date()) / 1000)) : 0;
-      const isReady = isTraining && remainSec === 0;
-      const estSec = Math.max(30, Math.floor(60 * Math.pow(p.level, 1.4)));
-      const estLabel = estSec >= 3600 ? `${(estSec/3600).toFixed(1)} 小時`
-        : estSec >= 60 ? `${Math.floor(estSec/60)} 分` : `${estSec} 秒`;
-
+      const isReady = remainSec === 0;
       const row = document.createElement('div');
-      row.className = `mt-train-row rarity-${c.rarity || 'R'}`;
-      row.dataset.playerId = p.id;
+      row.className = `mt-train-active-row rarity-${c.rarity || 'R'} ${isReady ? 'ready' : ''}`;
+      const imgId = `train-active-${p.id}`;
       row.innerHTML = `
-        <div class="mt-train-row-head">
-          <span class="mt-player-card-rarity">${c.rarity || 'R'}</span>
-          <div class="mt-player-name">${escapeHtml(c.name || '?')}</div>
-          <div class="mt-player-position">${c.position || ''} · Lv.${p.level}/50 ${p.bond ? '★'.repeat(p.bond) : ''}</div>
+        <div class="mt-train-active-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
+        <div class="mt-train-active-info">
+          <div class="mt-train-active-name">${escapeHtml(c.name)} <small>${ATTR_LABELS[p.training_attr]}</small></div>
+          <div class="mt-train-active-time">
+            <span class="mt-train-countdown" data-finish-at="${finishAt.toISOString()}" data-player="${p.id}">
+              ${isReady ? '已完成' : _formatRemain(remainSec)}
+            </span>
+          </div>
         </div>
-        <div class="mt-train-row-stats">
-          攻 ${p.current_attack} · 防 ${p.current_defense} · 速 ${p.current_speed} ·
-          中 ${p.current_midfield} · 體 ${p.current_stamina} · 環 ${p.current_aura}
-        </div>
-        <div class="mt-train-row-actions">
-          <button class="mt-train-btn" data-train="normal" data-player="${p.id}" ${canNormal ? '' : 'disabled'}>
-            ⚙️ 一般訓練（戰術 10 + 體能 10）
-          </button>
-          <button class="mt-train-btn mt-train-btn-premium" data-train="premium" data-player="${p.id}" ${canPremium ? '' : 'disabled'}>
-            ⚙️ 精緻訓練（30+30+10+10）
-          </button>
-        </div>
-        <div class="mt-train-timed">
-          ${isTraining ? `
-            <div class="mt-train-timed-active ${isReady ? 'ready' : ''}">
-              ⏱️ 訓練中：${ATTR_LABELS[p.training_attr]}屬性
-              <span class="mt-train-countdown" data-finish-at="${finishAt.toISOString()}" data-player="${p.id}">
-                ${isReady ? '已完成' : _formatRemain(remainSec)}
-              </span>
-              <button class="mt-train-claim-btn" data-claim="${p.id}" ${isReady ? '' : 'disabled'}>
-                ⏱️ ${isReady ? '領取 +1' : '等候中…'}
-              </button>
-            </div>
-          ` : `
-            <div class="mt-train-timed-pick">
-              ⏱️ 時間訓練（${estLabel}）：
-              ${Object.entries(ATTR_LABELS).map(([k,v]) =>
-                `<button class="mt-train-timed-attr" data-timed="${k}" data-player="${p.id}">${v}+1</button>`
-              ).join('')}
-            </div>
-          `}
-        </div>
+        <button class="mt-train-claim-btn" data-claim="${p.id}" ${isReady ? '' : 'disabled'}>
+          ${isReady ? '✋ 領取' : '等候'}
+        </button>
       `;
-      list.appendChild(row);
+      activeList.appendChild(row);
+      const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+      if (look && window.LpcRenderer) {
+        window.LpcRenderer.portrait(look).then(url => {
+          const img = document.getElementById(imgId);
+          if (img && url) img.src = url;
+        }).catch(() => {});
+      }
     });
 
-    // 倒數計時器
-    _refreshCountdowns(list);
-
-    // ── 時間訓練：開始 ──
-    list.querySelectorAll('[data-timed]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const pid = btn.dataset.player;
-        const attr = btn.dataset.timed;
-        btn.disabled = true; btn.textContent = '…';
-        try {
-          await window.MyTeam.startTimedTraining(pid, attr);
-          renderTab();
-        } catch (e) {
-          const msg = String(e.message || e);
-          if (typeof showToast === 'function') {
-            showToast(msg.includes('ALREADY_TRAINING') ? '⚠️ 該球員已在訓練' : '開始訓練失敗：' + msg);
-          }
-          btn.disabled = false; btn.textContent = ({attack:'攻',defense:'防',speed:'速',midfield:'中',stamina:'體',aura:'氣'})[attr] + '+1';
-        }
+    // 點機台 → 開球員選單
+    content.querySelectorAll('.mt-train-machine').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const attr = btn.dataset.machine;
+        _openTrainPicker(attr, players, team);
       });
     });
 
+    // 倒數計時器
+    if (activeTrainings.length) _refreshCountdowns(activeList);
+
     // ── 時間訓練：領取 ──
-    list.querySelectorAll('[data-claim]').forEach(btn => {
+    activeList.querySelectorAll('[data-claim]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const pid = btn.dataset.claim;
         btn.disabled = true; btn.textContent = '領取中…';
@@ -2512,13 +2623,102 @@
         }
       });
     });
+  }
 
-    // click 訓練
-    list.querySelectorAll('[data-train]').forEach(btn => {
+  // 點機台 → 開球員選單，選人後執行訓練
+  function _openTrainPicker(attr, players, team) {
+    const ATTR_LABELS = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-train-picker';
+    overlay.innerHTML = `
+      <div class="mt-profile-card">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <div class="mt-train-picker-title">🏋️ ${ATTR_LABELS[attr]} 訓練站</div>
+        <div class="mt-train-picker-sub">選一位球員開始訓練（時間到 +1）</div>
+        <div class="mt-train-picker-list" id="mt-train-picker-list"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    overlay.querySelector('.mt-profile-close').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    });
+
+    const list = overlay.querySelector('#mt-train-picker-list');
+    players.forEach(p => {
+      const c = p.card || {};
+      const isTraining = p.training_attr && p.training_finish_at;
+      const isReady = isTraining && new Date(p.training_finish_at) <= new Date();
+      const estSec = Math.max(30, Math.floor(60 * Math.pow(p.level, 1.4)));
+      const estLabel = estSec >= 3600 ? `${(estSec/3600).toFixed(1)} 小時`
+        : estSec >= 60 ? `${Math.floor(estSec/60)} 分` : `${estSec} 秒`;
+      const canNormal = team.rp_tactical >= 10 && team.rp_physical >= 10 && p.level < 50;
+      const canPremium = team.rp_tactical >= 30 && team.rp_physical >= 30
+                        && team.rp_heart >= 10 && team.rp_idea >= 10 && p.level < 50;
+
+      const row = document.createElement('div');
+      row.className = `mt-train-pick-row rarity-${c.rarity || 'R'}`;
+      const imgId = `train-pick-${p.id}`;
+      row.innerHTML = `
+        <div class="mt-train-pick-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
+        <div class="mt-train-pick-info">
+          <div class="mt-train-pick-name">${escapeHtml(c.name)} <small>${c.position || ''} Lv.${p.level}</small></div>
+          <div class="mt-train-pick-attr">當前 ${ATTR_LABELS[attr]}：<b>${p['current_' + attr]}</b></div>
+        </div>
+        <div class="mt-train-pick-btns">
+          ${isTraining ? `
+            <span class="mt-train-pick-busy">${isReady ? '⏱️ 已完成' : '⏱️ 訓練中'}</span>
+          ` : `
+            <button class="mt-train-pick-btn mt-train-pick-timed" data-pid="${p.id}">
+              ⏱️ 等 ${estLabel}<br><small>+1 ${ATTR_LABELS[attr][0]}</small>
+            </button>
+            <button class="mt-train-pick-btn mt-train-pick-rp" data-pid="${p.id}" data-mode="normal" ${canNormal ? '' : 'disabled'}>
+              ⚙️ RP 訓練<br><small>戰10 體10</small>
+            </button>
+            <button class="mt-train-pick-btn mt-train-pick-rp" data-pid="${p.id}" data-mode="premium" ${canPremium ? '' : 'disabled'}>
+              ⚙️ 精緻訓練<br><small>30/30/10/10</small>
+            </button>
+          `}
+        </div>
+      `;
+      list.appendChild(row);
+      const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+      if (look && window.LpcRenderer) {
+        window.LpcRenderer.portrait(look).then(url => {
+          const img = document.getElementById(imgId);
+          if (img && url) img.src = url;
+        }).catch(() => {});
+      }
+    });
+
+    // 時間訓練
+    overlay.querySelectorAll('.mt-train-pick-timed').forEach(btn => {
       btn.addEventListener('click', async () => {
-        const pid = btn.dataset.player;
-        const mode = btn.dataset.train;
-        list.querySelectorAll('[data-train]').forEach(b => b.disabled = true);
+        const pid = btn.dataset.pid;
+        btn.disabled = true; btn.innerHTML = '開始中…';
+        try {
+          await window.MyTeam.startTimedTraining(pid, attr);
+          overlay.classList.remove('open');
+          setTimeout(() => overlay.remove(), 200);
+          renderTab();
+        } catch (e) {
+          const msg = String(e.message || e);
+          if (typeof showToast === 'function') {
+            showToast(msg.includes('ALREADY_TRAINING') ? '⚠️ 該球員已在訓練' : '開始訓練失敗：' + msg);
+          }
+          btn.disabled = false;
+          renderTab();
+        }
+      });
+    });
+
+    // RP 訓練
+    overlay.querySelectorAll('.mt-train-pick-rp').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const pid = btn.dataset.pid;
+        const mode = btn.dataset.mode;
+        overlay.querySelectorAll('.mt-train-pick-rp').forEach(b => b.disabled = true);
         try {
           const result = await window.MyTeam.trainPlayer(pid, mode);
           window.MyTeam.trackQuest?.('train', 1).catch(() => {});
@@ -2526,17 +2726,16 @@
           if (typeof showToast === 'function') {
             showToast(`💪 Lv.${result.level_after}！攻+${g.attack}/防+${g.defense}/速+${g.speed}/中+${g.midfield}/體+${g.stamina}/環+${g.aura}`);
           }
-          // 重畫 hub（RP 變化）
+          overlay.classList.remove('open');
+          setTimeout(() => overlay.remove(), 200);
           renderHub();
         } catch (err) {
-          console.error('[my-team] train error', err);
           const msg = String(err.message || err);
           let friendly = '訓練失敗：' + msg;
           if (msg.includes('INSUFFICIENT_RP')) friendly = '⚠️ RP 不足';
           else if (msg.includes('MAX_LEVEL')) friendly = '⚠️ 已滿級';
           if (typeof showToast === 'function') showToast(friendly);
           else alert(friendly);
-          list.querySelectorAll('[data-train]').forEach(b => b.disabled = false);
         }
       });
     });
