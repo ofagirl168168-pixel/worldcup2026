@@ -752,16 +752,15 @@
       const SHEET_ROWS = 7;  // walk×4 + kick + cheer + frustration
       const SHEET_COLS = 3;
       const rarity = w.player.card?.rarity || 'R';
-      const rarityBadge = (rarity === 'SSR' || rarity === 'SR')
-        ? `<div class="mt-home-rarity rarity-${rarity}">${rarity}</div>` : '';
+      const star = rarity === 'SSR' ? '<span class="mt-home-star ssr">★</span>'
+                 : rarity === 'SR'  ? '<span class="mt-home-star sr">★</span>' : '';
       el.innerHTML = `
         <div class="mt-home-shadow"></div>
         <div class="mt-home-sprite" style="${w.sheetUrl
           ? `background-image:url(${w.sheetUrl});width:${w.sheetW * SCALE}px;height:${w.sheetH * SCALE}px;background-size:${w.sheetW * SCALE * SHEET_COLS}px ${w.sheetH * SCALE * SHEET_ROWS}px`
           : `width:${32 * SCALE}px;height:${60 * SCALE}px;background:rgba(255,255,255,0.2)`}"></div>
         ${injured}
-        ${rarityBadge}
-        <div class="mt-home-name">${escapeHtml(w.player.card?.name || '?')}</div>
+        <div class="mt-home-name rarity-${rarity}">${star}${escapeHtml(w.player.card?.name || '?')}</div>
       `;
       el.addEventListener('click', () => _openPlayerProfile(w.player));
       w.el = el;

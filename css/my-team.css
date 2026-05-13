@@ -2220,13 +2220,13 @@
   box-shadow: 0 4px 16px rgba(0,0,0,0.6);
 }
 
-/* Pixel art 風天空 — 三層漸層 + 遠山 silhouette */
+/* Pixel art 風天空 — 三層漸層 + 遠山 silhouette、延伸到操場頂避免縫隙 */
 .mt-home-sky {
-  position: absolute; inset: 0 0 70% 0;
+  position: absolute; inset: 0 0 62% 0;     /* 0 → 38%、剛好接到操場頂 */
   background: linear-gradient(180deg,
     #4ea3ff 0%,
-    #7ac1ff 55%,
-    #b8e0ff 85%,
+    #7ac1ff 45%,
+    #b8e0ff 75%,
     #d6edff 100%);
   image-rendering: pixelated;
   overflow: hidden;
@@ -2460,7 +2460,7 @@
   border: 2px solid #1a1a2e;
   border-bottom: 0;
   z-index: 3;
-  overflow: hidden;
+  /* 不裁切 — 讓球員的頭/上半身能超出操場頂部、覆蓋到建築前面 */
 }
 .mt-home-ground-lines {
   position: absolute; inset: 0;
@@ -2515,33 +2515,25 @@
   background: radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%);
   pointer-events: none;
 }
-/* SSR/SR 不再用 glow 環繞球員、改成名字上方的 badge */
-.mt-home-rarity {
-  display: inline-block;
-  font-size: 9px; font-weight: 900;
-  padding: 1px 5px;
-  border-radius: 3px;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.8);
-  margin-top: -2px;
-  letter-spacing: 0.5px;
-}
-.mt-home-rarity.rarity-SSR {
-  background: linear-gradient(180deg, #f0c040, #c89020);
-  color: #1a0a00;
-  border: 1px solid #6a4500;
-  box-shadow: 0 0 4px rgba(240,192,64,0.5);
-}
-.mt-home-rarity.rarity-SR {
-  background: linear-gradient(180deg, #b09cf5, #7a64d0);
-  color: #1a0a3a;
-  border: 1px solid #3e2a78;
-}
+/* 名字依稀有度上色（取代大 badge）*/
 .mt-home-name {
   font-size: 9px; font-weight: 800;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.95);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.95), 0 0 3px rgba(0,0,0,0.6);
   white-space: nowrap;
   margin-top: 1px;
 }
+.mt-home-name.rarity-SSR { color: #ffd866; }
+.mt-home-name.rarity-SR  { color: #c9b6ff; }
+.mt-home-name.rarity-R   { color: #fff; }
+
+.mt-home-star {
+  display: inline-block;
+  margin-right: 2px;
+  font-size: 9px;
+  vertical-align: 1px;
+}
+.mt-home-star.ssr { color: #ffd866; text-shadow: 0 0 3px rgba(240,192,64,0.8); }
+.mt-home-star.sr  { color: #c9b6ff; text-shadow: 0 0 3px rgba(155,135,245,0.6); }
 
 /* ─── 球場視覺化主頁 (Kairosoft 風) ─── */
 .mt-stadium-tab { padding: 6px; }
