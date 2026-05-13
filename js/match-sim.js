@@ -434,26 +434,22 @@
   }
 
   // 進球儀式 — banner + 彩花 + 視角縮放
-  // 用 ui._goalTimers 追蹤所有 setTimeout、每次觸發前清掉前一次的（避免短時間連續進球
-  // 第二次 banner / zoom 被前一次的 timeout 吃掉）
+  // 注意：「結束」由 _endGoalCelebration 控制、跟著 game pause 結束時呼叫，
+  // 不再用 setTimeout 自動收 → 速度 2x/3x 時不會發生「歡呼還在跑、下一波已開始」
   function _triggerGoalCelebration(ui, teamName, teamSide) {
     if (!ui.goalBanner) return;
-    // 清掉前一次的所有 timer
-    if (ui._goalTimers) ui._goalTimers.forEach(t => clearTimeout(t));
-    ui._goalTimers = [];
+    // 先把上一次的痕跡清掉（避免連續進球時殘留）
+    _endGoalCelebration(ui, /* immediate */ true);
 
     ui.goalBannerTeam.textContent = teamName + ' 進球!';
     ui.goalBanner.dataset.side = teamSide;
     ui.goalBanner.hidden = false;
-    ui.goalBanner.classList.remove('msim-goal-show');
     void ui.goalBanner.offsetWidth;
     ui.goalBanner.classList.add('msim-goal-show');
-    // 視角 zoom in（先把可能殘留的 class 強制重設）
+    // 視角 zoom in
     if (ui.canvasWrap) {
-      ui.canvasWrap.classList.remove('msim-zoom-in');
       void ui.canvasWrap.offsetWidth;
       ui.canvasWrap.classList.add('msim-zoom-in');
-      ui._goalTimers.push(setTimeout(() => ui.canvasWrap.classList.remove('msim-zoom-in'), 4000));
     }
     // 彩花
     if (ui.confetti) {
@@ -469,13 +465,20 @@
         c.style.transform = `rotate(${Math.random() * 360}deg)`;
         ui.confetti.appendChild(c);
       }
-      ui._goalTimers.push(setTimeout(() => { ui.confetti.innerHTML = ''; }, 3000));
     }
-    // 收 banner
-    ui._goalTimers.push(setTimeout(() => {
+  }
+
+  // 進球儀式結束：跟著比賽 pause 結束一起呼叫（從 stepOneFrame 觸發）
+  function _endGoalCelebration(ui, immediate) {
+    if (!ui) return;
+    if (ui.goalBanner) {
       ui.goalBanner.classList.remove('msim-goal-show');
-      ui._goalTimers.push(setTimeout(() => { ui.goalBanner.hidden = true; }, 400));
-    }, 3500));
+      // 等 CSS transition 結束再 hidden（避免閃一下空白）
+      const hideDelay = immediate ? 0 : 300;
+      setTimeout(() => { if (ui.goalBanner) ui.goalBanner.hidden = true; }, hideDelay);
+    }
+    if (ui.canvasWrap) ui.canvasWrap.classList.remove('msim-zoom-in');
+    if (ui.confetti)   ui.confetti.innerHTML = '';
   }
 
   // ── 主模擬 ──────────────────────────────────────────────
@@ -1073,6 +1076,8 @@
       if (state.pauseFrames > 0) {
         state.pauseFrames--;
         if (state.pauseFrames === 0 && state.phase === 'celebrate') {
+          // 暫停結束：先收歡呼視覺、再 kickoff（避免歡呼還在跑、新一波已開始）
+          _endGoalCelebration(ui);
           kickoff(state.possession === 'h' ? 'a' : 'h');
         }
         // 進球暫停期間「比賽時鐘」也停（原本 state.frame++ 會讓時鐘繼續跑）
