@@ -225,7 +225,7 @@
       <div class="mt-gacha-beam" data-rarity="${peakRarity}" hidden></div>
       <div class="mt-gacha-rays" hidden></div>
 
-      <!-- Stage 0：卡包互動（卡片數決定堆幾層）-->
+      <!-- Stage 0：紙袋包裝（Pokémon TCG Pocket 風）-->
       <div class="mt-gacha-pack" id="mt-gacha-pack" data-rarity="${peakRarity}" data-count="${cards.length}">
         <div class="mt-gacha-pack-banner">
           <div class="mt-gacha-pack-title">${escapeHtml(options.title || '🎰 球員召喚')}</div>
@@ -233,13 +233,29 @@
         </div>
         <div class="mt-gacha-pack-3d" id="mt-gacha-pack-3d">
           <div class="mt-gacha-pack-aurora"></div>
-          <div class="mt-gacha-pack-stack" id="mt-gacha-pack-stack">
+          <!-- 紙袋包裝（上半 + 下半 + 撕線）-->
+          <div class="mt-gacha-pack-wrap" id="mt-gacha-pack-wrap">
+            <div class="mt-gacha-pack-top">
+              <div class="mt-gacha-pack-logo">⚽</div>
+              <div class="mt-gacha-pack-stripe"></div>
+              <div class="mt-gacha-pack-shine"></div>
+            </div>
+            <div class="mt-gacha-pack-perforation">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="mt-gacha-pack-bottom">
+              <div class="mt-gacha-pack-label">DRAW PACK</div>
+              <div class="mt-gacha-pack-count">${cards.length} CARDS</div>
+            </div>
+          </div>
+          <!-- 包裝內部、撕開後可見的卡背 -->
+          <div class="mt-gacha-pack-inside">
             ${cards.length >= 5 ? '<div class="mt-gacha-pack-card mt-gacha-pack-card-3"></div>' : ''}
             ${cards.length >= 2 ? '<div class="mt-gacha-pack-card mt-gacha-pack-card-2"></div>' : ''}
             <div class="mt-gacha-pack-card mt-gacha-pack-card-1">
               <div class="mt-gacha-back-pattern"></div>
               <div class="mt-gacha-back-emblem">⚽</div>
-              <div class="mt-gacha-pack-shine"></div>
             </div>
           </div>
           <div class="mt-gacha-pack-glow"></div>
@@ -247,7 +263,7 @@
         </div>
         <div class="mt-gacha-pack-cta">
           <span class="mt-gacha-pack-finger">👆</span>
-          <span>點擊召喚${cards.length > 1 ? ` ${cards.length} 張球員` : ''}</span>
+          <span>點擊撕開${cards.length > 1 ? `（${cards.length} 張）` : ''}</span>
         </div>
       </div>
 
@@ -352,23 +368,23 @@
         pack3D.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
       });
 
-      // Stage 0：等用戶點卡包
+      // Stage 0：等用戶點卡包 → 撕開動畫 → 進 Stage 1
       pack.addEventListener('click', () => {
         if (pack.classList.contains('opening')) return;
         pack.classList.add('opening');
         if (sparkTimer) { clearInterval(sparkTimer); sparkTimer = null; }
-        // 點下去爆一波火花
+        // 撕開那瞬間爆一波火花
         for (let i = 0; i < 24; i++) {
           const rect = pack3D.getBoundingClientRect();
           emitSpark(rect.width / 2, rect.height / 2);
         }
-        // 卡包散開動畫 → 600ms → 切到 Stage 1
+        // 撕開動畫 1.2s → 切到 Stage 1
         setTimeout(() => {
           pack.style.display = 'none';
           beam.hidden = false;
           stage.hidden = false;
           startStage1();
-        }, 600);
+        }, 1200);
       });
 
       async function startStage1() {

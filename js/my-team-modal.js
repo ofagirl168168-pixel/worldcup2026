@@ -897,10 +897,12 @@
           ${['4-3-3','4-4-2','3-5-2','5-3-2','4-2-3-1','3-4-3','4-5-1','4-1-4-1'].map(f => {
             const isUnlocked = unlocked.has(f);
             const isActive = formation === f;
+            // 鎖住的陣型隱藏數字、顯示 ?-?-?
+            const label = isUnlocked ? f : f.replace(/\d/g, '?');
             return `<button class="mt-formation-opt ${isActive ? 'sel' : ''} ${isUnlocked ? '' : 'locked'}"
               data-formation="${f}" ${isUnlocked ? '' : 'disabled'}
-              title="${isUnlocked ? '' : '需要抽到對應教練解鎖'}">
-              ${isUnlocked ? '' : '🔒 '}${f}
+              title="${isUnlocked ? '' : '抽到對應教練才能解鎖'}">
+              ${isUnlocked ? '' : '🔒 '}${label}
             </button>`;
           }).join('')}
         </div>
