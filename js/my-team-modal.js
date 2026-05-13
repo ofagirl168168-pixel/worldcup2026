@@ -851,7 +851,7 @@
       const injured = (w.player.injured_until && new Date(w.player.injured_until) > now)
         ? '<span class="mt-pitch-injury">🏥</span>' : '';
       const SCALE = w.scale;
-      const SHEET_ROWS = 7;  // walk×4 + kick + cheer + frustration
+      const SHEET_ROWS = 8;  // walk×4 + kick + cheer + frustration + tackle
       const SHEET_COLS = 3;
       const rarity = w.player.card?.rarity || 'R';
       const pos = w.player.card?.position || '';
@@ -2876,7 +2876,7 @@
     } catch (e) {}
 
     const SHEET_COLS = 3;
-    const SHEET_ROWS = 7;
+    const SHEET_ROWS = 8;
     const setupSprite = (el, sheetUrl) => {
       el.style.width = frameW + 'px';
       el.style.height = frameH + 'px';

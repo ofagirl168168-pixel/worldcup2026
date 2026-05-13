@@ -287,20 +287,32 @@
       const cx = p.x * PITCH_W;
       const cy = p.y * PITCH_H;
 
-      // 進球慶祝/懊惱：覆寫 row + frame
+      // row 覆寫順序：tackle > fulltime > celebrate > walk
       let dirRow, frame;
-      if (state.phase === 'celebrate' && state.pauseFrames > 0) {
+      const tackleActive = p._tackleVisualUntil && state.frame < p._tackleVisualUntil;
+      if (tackleActive) {
+        // 鏟球 (row 7 = thrust)
+        dirRow = 7;
+        const tackleAge = state.frame - (p._tackleStart || state.frame);
+        frame = Math.min(2, Math.floor(tackleAge / 3));  // 0→1→2 三幀
+      } else if (state.phase === 'fulltime') {
+        // 全場結束：贏的隊伍歡呼 (row 5)、輸的懊惱 (row 6)、平手大家都站著
+        if (state.fulltimeWinner === 'd') {
+          dirRow = 0;
+          frame = 1;
+        } else {
+          dirRow = (p.team === state.fulltimeWinner) ? 5 : 6;
+          frame = Math.floor(_renderTick / 16) % 3;
+        }
+      } else if (state.phase === 'celebrate' && state.pauseFrames > 0) {
         // 得分隊歡呼 (row 5)、敵隊懊惱 (row 6)
         dirRow = (p.team === state.flashTeam) ? 5 : 6;
-        // 動作 frame 緩慢 cycle（每 16 tick 換 frame）
         frame = Math.floor(_renderTick / 16) % 3;
       } else {
-        // 判斷朝向：先比較 ty 變化（南北），再比較 tx 變化（東西）
         const dyMov = (p.ty || p.y) - p.y;
         const dxMov = (p.tx || p.x) - p.x;
         const movingAmt = Math.abs(dxMov) + Math.abs(dyMov);
         const moving = movingAmt > 0.0005;
-        // row 順序：0=down, 1=left, 2=right, 3=up
         if (Math.abs(dyMov) > Math.abs(dxMov)) {
           dirRow = dyMov > 0 ? 0 : 3;
         } else {
@@ -309,6 +321,17 @@
         frame = moving ? (Math.floor(_renderTick / 8) % 3) : 1;
       }
 
+      // 鏟球時加塵土：橢圓灰點散開
+      if (tackleActive) {
+        ctx.fillStyle = 'rgba(220,200,160,0.6)';
+        for (let d = 0; d < 3; d++) {
+          const dustX = cx - 4 - d * 3 + (rng() - 0.5) * 2;
+          const dustY = cy + SPRITE_DRAW_H / 2 - 1 + (rng() - 0.5) * 2;
+          ctx.beginPath();
+          ctx.ellipse(dustX, dustY, 2.5 - d * 0.5, 1.5 - d * 0.3, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
       // 腳下影子：控球者用半透明白小點（不搶戲）、其他用黑影
       if (isPos) {
         ctx.fillStyle = 'rgba(255,255,255,0.65)';
@@ -908,14 +931,19 @@
           // 個人化：搶斷者個人 defense vs 持球者個人 midfield（控球能力）
           const indDef = near.player.stats?.defense ?? defStats.defense;
           const indMid = pos.stats?.midfield ?? atkStats.midfield;
-          let tackleChance = (indDef / 100) * 0.04 - (indMid / 100) * 0.02;
+          // 速度也加成：腳程快的後衛更容易上身鏟到
+          const indSpd = near.player.stats?.speed ?? defStats.speed ?? 70;
+          let tackleChance = (indDef / 100) * 0.04 - (indMid / 100) * 0.02 + (indSpd / 100) * 0.012;
           if (distToGoal < 0.22) tackleChance *= 1.3;
-          tackleChance = Math.max(0.005, Math.min(0.08, tackleChance));
+          tackleChance = Math.max(0.005, Math.min(0.09, tackleChance));
           if (rng() < tackleChance) {
             state.possession = near.player.team;
             state.possessorIdx = players.indexOf(near.player);
             state.phase = 'dribble';
             state.lastActionFrame = state.frame;
+            // 鏟球視覺：搶斷者用 row 7（thrust）12 幀
+            near.player._tackleStart = state.frame;
+            near.player._tackleVisualUntil = state.frame + 12;
             // 換邊 → 清最近經手傳球者記錄、記錄換邊時機讓 movePlayers 降速
             state.recentPassers = [];
             state.recentPassersSet = new Set();
@@ -1237,7 +1265,32 @@
     let prevTickMs = 0;
 
     function tick(nowMs) {
-      if (state.frame >= TOTAL_FRAMES) { showSummary(); return; }
+      if (state.frame >= TOTAL_FRAMES) {
+        // 進入「全場結束」階段：3 秒慶祝/懊惱動畫、然後顯示 summary
+        if (state.phase !== 'fulltime' && state.phase !== 'ended') {
+          state.phase = 'fulltime';
+          state.fulltimeStart = performance.now();
+          // 結算贏家
+          const hScore = state.score.h, aScore = state.score.a;
+          state.fulltimeWinner = hScore > aScore ? 'h' : aScore > hScore ? 'a' : 'd';
+          // 確保 _endGoalCelebration 被收掉（不要殘留進球放大）
+          if (typeof _endGoalCelebration === 'function') _endGoalCelebration(ui);
+        }
+        if (state.phase === 'fulltime') {
+          // 3 秒後切到 ended、顯示 summary
+          if (performance.now() - state.fulltimeStart > 3000) {
+            state.phase = 'ended';
+            showSummary();
+            return;
+          }
+          // 持續 render（讓 winner 歡呼 / loser 懊惱動畫顯示）
+          render(ctx, state);
+          requestAnimationFrame(tick);
+          return;
+        }
+        // phase = 'ended'：已 summary、不再 render
+        return;
+      }
       // 第一個 rAF 的 nowMs 拿來當基準（或瀏覽器某些情況不傳 → fallback performance.now）
       if (typeof nowMs !== 'number') nowMs = performance.now();
       if (!prevTickMs) prevTickMs = nowMs;
