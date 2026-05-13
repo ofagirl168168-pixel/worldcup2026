@@ -814,6 +814,17 @@
     60% 97%, 55% 100%, 50% 97%, 45% 100%, 40% 97%, 35% 100%, 30% 97%, 25% 100%,
     20% 97%, 15% 100%, 10% 97%, 5% 100%, 0% 97%
   );
+  transition: clip-path 0.5s ease-out;
+  perspective: 800px;
+}
+/* 撕開後 wrap 上緣變平、只保留下方鋸齒（避免殘留鋸齒陰影）*/
+.mt-gacha-pack.opening .mt-gacha-pack-wrap {
+  clip-path: polygon(
+    0% 22%, 100% 22%,
+    100% 97%, 95% 100%, 90% 97%, 85% 100%, 80% 97%, 75% 100%, 70% 97%, 65% 100%,
+    60% 97%, 55% 100%, 50% 97%, 45% 100%, 40% 97%, 35% 100%, 30% 97%, 25% 100%,
+    20% 97%, 15% 100%, 10% 97%, 5% 100%, 0% 97%
+  );
 }
 .mt-gacha-pack[data-rarity="SSR"] .mt-gacha-pack-wrap {
   filter: drop-shadow(0 12px 24px rgba(0,0,0,0.7))
@@ -828,6 +839,8 @@
 .mt-gacha-pack-top {
   position: relative;
   flex: 0 0 22%;
+  backface-visibility: hidden;       /* 捲過 90° 自然消失 */
+  transform-style: preserve-3d;
   background:
     /* 中央高光（圓筒亮帶）*/
     radial-gradient(ellipse 60% 200% at 50% 50%,
@@ -1012,16 +1025,41 @@
   transition: none;     /* 拖曳中即時跟隨 */
 }
 
-/* 撕開 → 只上半飛出（下半不動）*/
+/* 撕開 → 上半捲上去（rotateY 從支點側捲、50% 後淡出）*/
 .mt-gacha-pack.opening .mt-gacha-pack-top {
-  animation: mt-pack-tear-top 0.9s cubic-bezier(0.55, 0.05, 0.6, 1) forwards;
+  animation: mt-pack-tear-curl 1.0s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  /* transform-origin 已在 dragging 設定（dir=+1 origin 右、dir=-1 origin 左）*/
 }
 .mt-gacha-pack.opening .mt-gacha-pack-perforation {
   animation: mt-pack-perforation-fade 0.4s ease-out forwards;
 }
-@keyframes mt-pack-tear-top {
-  0%   { transform: rotateZ(0deg) translateY(0); opacity: 1; }
-  100% { transform: rotateZ(calc(var(--tear-dir, 1) * -85deg)) translateY(-120px) translateX(calc(var(--tear-dir, 1) * -120px)); opacity: 0; }
+/* 捲上去動畫：rotateY 從支點側往畫面內捲、捲到 ~50% 淡出 */
+@keyframes mt-pack-tear-curl {
+  0%   {
+    transform: rotateY(0deg) translateY(0);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  30%  {
+    transform: rotateY(calc(var(--tear-dir, 1) * 55deg)) translateY(-6px);
+    opacity: 1;
+    filter: brightness(1.1);
+  }
+  50%  {
+    transform: rotateY(calc(var(--tear-dir, 1) * 100deg)) translateY(-14px);
+    opacity: 0.85;
+    filter: brightness(0.85);
+  }
+  75%  {
+    transform: rotateY(calc(var(--tear-dir, 1) * 145deg)) translateY(-26px);
+    opacity: 0.3;
+    filter: brightness(0.6);
+  }
+  100% {
+    transform: rotateY(calc(var(--tear-dir, 1) * 170deg)) translateY(-40px);
+    opacity: 0;
+    filter: brightness(0.5);
+  }
 }
 @keyframes mt-pack-perforation-fade {
   to { opacity: 0; transform: scaleY(0.2); }
