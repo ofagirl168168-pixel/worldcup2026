@@ -3186,6 +3186,63 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p><b>阿斯頓維拉 1-1 利物浦</b>。維拉有主場優勢但心繫歐霸決賽，利物浦缺少 Salah 後進攻效率打折。兩隊在高壓對抗中各入一球後，誰也不願冒險全線壓上——和局是最可能的結果。Watkins 為維拉破門，Gakpo 或 Szoboszlai 扳平。這個結果讓兩隊繼續同分，歐冠席位之爭要拖到最後一輪靠淨勝球決定。</p>`,
     tags: ['賽前分析', '阿斯頓維拉', '利物浦', 'Watkins', 'Salah', 'Emery', 'Slot', '歐冠資格', '第37輪']
+  },
+  {
+    id: 'epl-059',
+    title: '【賽後回顧】曼城 3-0 水晶宮：Foden 主導進攻，Semenyo、Marmoush、Savinho 連線粉碎宮兵',
+    date: '2026-05-14',
+    category: '賽後深度回顧',
+    summary: '英超補賽——曼城主場 3-0 大勝水晶宮，Semenyo（32\'）、Marmoush（40\'）、Savinho（84\'）各入一球，曼城追至落後兵工廠僅 2 分，冠軍懸念延續到最後兩輪。',
+    content: `<h2>曼城 3-0 水晶宮｜補賽・05/14（三）03:00 台灣時間・伊蒂哈德球場</h2>
+
+<p>曼城在補賽中以 3-0 乾脆利落地擊敗水晶宮，將與榜首兵工廠的差距縮窄至 <b>2 分</b>，英超冠軍懸念延續到最後兩輪。</p>
+
+<h3>上半場：Foden 串聯雙殺</h3>
+
+<p><b>Phil Foden</b> 是本場絕對主角——這是他超過兩個月來首次在英超先發，卻打出了本季最具說服力的一場。</p>
+
+<p><b>32 分鐘</b>，Foden 在中路接球後以一記天才般的<b>後腳跟直塞</b>穿透水晶宮防線，<b>Antoine Semenyo</b> 順勢前插，第一時間右腳低射穿入左下角，1-0。</p>
+
+<p><b>40 分鐘</b>，Foden 在禁區前接高球時用胸口將球巧妙卸向身後，<b>Omar Marmoush</b> 迎球轉身射門騙過 <b>Dean Henderson</b>，2-0。上半場結束前曼城已鎖定優勢。</p>
+
+<h3>下半場：Savinho 收尾，Guardiola 省力備戰</h3>
+
+<p>下半場曼城控制節奏、降低強度——Guardiola 心裡清楚，三天後就是 FA Cup 決賽對陣切爾西，不能在這場補賽消耗過多體能。</p>
+
+<p><b>84 分鐘</b>，替補上場的 <b>Rayan Cherki</b> 在左路盤帶突破後送出精準直塞，<b>Savinho</b> 在禁區中央左腳低射入左下角，3-0 殺死比賽。</p>
+
+<h3>關鍵數據</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">項目</th><th style="padding:8px">曼城</th><th style="padding:8px">水晶宮</th></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">控球率</td><td style="padding:8px">68%</td><td style="padding:8px">32%</td></tr>
+<tr><td style="padding:8px">射門（射正）</td><td style="padding:8px">15（7）</td><td style="padding:8px">4（1）</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">預期進球 xG</td><td style="padding:8px">2.4</td><td style="padding:8px">0.3</td></tr>
+</table>
+
+<h3>Foden 的百場里程碑</h3>
+
+<p>Foden 本場的兩次助攻讓他達成了<b>英超第 100 次直接進球貢獻</b>（進球+助攻）——對一位長期受傷病困擾的球員來說，這個數字證明了他的天賦等級。曼城據報已準備好為他提供一份新合約，本場表現無疑加強了俱樂部的信心。</p>
+
+<h3>冠軍爭奪形勢</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">排名</th><th style="padding:8px">球隊</th><th style="padding:8px">賽</th><th style="padding:8px">積分</th><th style="padding:8px">剩餘</th></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">1</td><td style="padding:8px">兵工廠</td><td style="padding:8px">36</td><td style="padding:8px">79</td><td style="padding:8px">2 場</td></tr>
+<tr><td style="padding:8px">2</td><td style="padding:8px">曼城</td><td style="padding:8px">36</td><td style="padding:8px">77</td><td style="padding:8px">2 場</td></tr>
+</table>
+
+<p>兵工廠只要在最後兩輪全勝就能確定封王。曼城則必須<b>自己全勝 + 兵工廠至少掉分一次</b>才有機會。Guardiola 賽後坦言：「我們只能做好自己的事，然後看結果。」</p>
+
+<h3>水晶宮：無心戀戰</h3>
+
+<p>水晶宮的比賽強度明顯不高——Glasner 也做了大量輪換，因為他們月底還有<b>歐協聯決賽</b>要踢。Palace 本季英超排名第 14，保級已無憂但歐戰也無望，歐協聯才是他們的重心。全場僅 1 次射正說明了一切。</p>
+
+<h3>下一場</h3>
+
+<p><b>曼城</b>：5/16（六）FA Cup 決賽 vs 切爾西（溫布利），然後 5/20 英超第 37 輪。<br>
+<b>水晶宮</b>：5/17（六）英超第 37 輪客場 vs 布倫特福德。</p>`,
+    tags: ['賽後回顧', '曼城', '水晶宮', 'Foden', 'Semenyo', 'Marmoush', 'Savinho', '冠軍爭奪', '補賽']
   }
 ];
 

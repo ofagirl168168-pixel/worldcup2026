@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-059",
+    "tournament": "epl",
+    "title": "【賽後回顧】曼城 3-0 水晶宮：Foden 主導進攻，Semenyo、Marmoush、Savinho 連線粉碎宮兵",
+    "summary": "英超補賽——曼城主場 3-0 大勝水晶宮，Semenyo（32'）、Marmoush（40'）、Savinho（84'）各入一球，曼城追至落後兵工廠僅 2 分，冠軍懸念延續到最後兩輪。",
+    "date": "2026-05-14",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "16",
     "tournament": "wc",
     "title": "倒數29天：C組前瞻——巴西傷兵滿營、摩洛哥黑馬再襲、海地52年後重返世界盃",
@@ -189,7 +199,7 @@ export default [
     "date": "2026-05-06",
     "category": "賽前深度分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-022",
@@ -199,7 +209,7 @@ export default [
     "date": "2026-05-06",
     "category": "賽後回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "11",

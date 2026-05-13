@@ -73,13 +73,13 @@ const EPL_TEAMS = {
     style:'極致控球，位置輪轉，高位壓迫',
     strengths:['Haaland進球效率恐怖','Guardiola戰術無人能及','板凳深度聯賽最強'],
     weaknesses:['Rodri傷癒後狀態仍在回升','夏季新援（Reijnders/Cherki）磨合中','後防傷兵影響輪替'],
-    recentForm:['D','L','W','W','W'],
+    recentForm:['L','W','W','W','W'],
     history:'9次英格蘭頂級聯賽冠軍，2022/23三冠王',
     injuries:[
       {name:'Joško Gvardiol',pos:'後衛',status:'脛骨骨折術後',returnDate:'賽季末可望回歸'},
       {name:'Rúben Dias',pos:'中後衛',status:'腳踝傷勢，預計五月中旬回歸',returnDate:'5/19 vs BOU 目標'},
       {name:'John Stones',pos:'中後衛',status:'已回歸訓練，可出場',returnDate:'已歸隊'},
-      {name:'Rodri',pos:'防守中場',status:'腹股溝傷恢復中，有望 vs CRY（5/13）替補',returnDate:'補賽待評估'}
+      {name:'Rodri',pos:'防守中場',status:'腹股溝傷恢復中，預計五月下旬回歸',returnDate:'5月下旬目標'}
     ]
   },
   'CHE': {
@@ -297,7 +297,7 @@ const EPL_TEAMS = {
     style:'邊路速度衝擊，定位球戰術，反擊犀利',
     strengths:['Sarr+Pino邊路速度優勢','Mateta終結效率穩定','Glasner戰術執行力佳'],
     weaknesses:['Eze夏窗轉兵工廠、Guéhi轉曼城後創造力與中衛深度雙降','進攻過度依賴個人能力','客場拿分困難'],
-    recentForm:['D','W','W','L','L'],
+    recentForm:['W','W','L','L','L'],
     history:'倫敦南部老牌球會，從未贏得頂級聯賽冠軍'
   },
   'WHU': {
@@ -836,7 +836,13 @@ window.EPL_MATCHES = [
 
   // ===== 補賽 (因聯賽盃決賽延期) =====
   // 曼城 vs 水晶宮 | 05/14 03:00 台灣時間 (05/13 20:00 BST)
-  {id:'EPL-RSC-MCI-CRY', matchday:0, date:'2026-05-14', time:'03:00', home:'MCI', away:'CRY', stage:'league', status:'upcoming'},
+  {id:'EPL-RSC-MCI-CRY', matchday:0, date:'2026-05-14', time:'03:00', home:'MCI', away:'CRY', stage:'league',
+   status:'finished', score:{h:3,a:0}, halfTime:{h:2,a:0},
+   goals:[
+     {min:'32',player:'Antoine Semenyo',side:'h'},
+     {min:'40',player:'Omar Marmoush',side:'h'},
+     {min:'84',player:'Savinho',side:'h'}
+   ]},
 
   // ===== 第 37 輪 (2026-05-15 ~ 05-20 台灣時間) =====
 
