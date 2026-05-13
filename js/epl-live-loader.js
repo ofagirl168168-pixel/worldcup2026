@@ -8,11 +8,16 @@
   'use strict';
 
   const ENDPOINT = '/api/epl-live';
-  const CACHE_KEY = 'epl_live_cache';
+  // v2：合併 key 改為 home+away+stage（同季 home/away 對組合是唯一的）
+  // 舊 cache 用 home+away+date，可能殘留 MW38 等未來場次的時間錯位 → 重複
+  const CACHE_KEY = 'epl_live_cache_v2';
   const CACHE_TTL = 2 * 60 * 1000; // 2 分鐘 client-side 快取
   const STANDINGS_ENDPOINT = '/api/epl-standings';
   const STANDINGS_CACHE_KEY = 'epl_standings_cache';
   const STANDINGS_TTL = 30 * 60 * 1000; // 30 分鐘
+
+  // 啟動時清掉舊 cache key，避免遺留資料
+  try { localStorage.removeItem('epl_live_cache'); } catch {}
 
   function getCached(key, ttl) {
     try {
@@ -33,29 +38,39 @@
   // ── 合併比賽到 EPL_MATCHES ──
   function mergeMatches(liveMatches) {
     if (!window.EPL_MATCHES) window.EPL_MATCHES = [];
-    // 去重保護：若 EPL_MATCHES 已有同 (home, away, date) 的多筆（之前 bug 留下的）
-    // 保留最早一筆，其他刪掉
-    const seen = new Set();
-    window.EPL_MATCHES = window.EPL_MATCHES.filter(m => {
-      const k = `${m.home}|${m.away}|${m.date}`;
-      if (seen.has(k)) return false;
-      seen.add(k);
-      return true;
-    });
+
+    // 用 home+away+stage 當 unique key — 同季 EPL home/away 對組合是唯一的，
+    // 跟 date/time 無關（API 的時間可能跟手動寫的差幾分鐘到幾小時，導致 merge 漏判）
+    const matchKey = (m) => `${m.home}|${m.away}|${m.stage || 'league'}`;
+
+    // 去重保護：若同 key 有多筆（之前 bug 或 API/manual 時間差異留下的），
+    // 留下「已完賽 > 進行中 > 預定」優先，再以最早 date 為基準
+    const statusRank = { finished: 3, live: 2, upcoming: 1, scheduled: 0 };
+    const groups = new Map();
+    for (const m of window.EPL_MATCHES) {
+      const k = matchKey(m);
+      const prev = groups.get(k);
+      if (!prev) { groups.set(k, m); continue; }
+      const a = statusRank[m.status] || 0;
+      const b = statusRank[prev.status] || 0;
+      if (a > b || (a === b && (m.date + m.time) < (prev.date + prev.time))) {
+        groups.set(k, m);
+      }
+    }
+    window.EPL_MATCHES = [...groups.values()];
+
     if (!liveMatches?.length) return 0;
 
     let updated = 0;
     for (const live of liveMatches) {
       if (!live.home || !live.away || live.home === 'TBD') continue;
 
-      // 找已有比賽（改用 home+away+date 合併 key；
-      // 之前用 matchday 但 API 跟手動寫的 matchday 偶爾不一致 → 重複新增同場比賽）
-      const idx = window.EPL_MATCHES.findIndex(m =>
-        m.home === live.home && m.away === live.away && m.date === live.date
-      );
+      // 找已有比賽（home+away+stage）
+      const liveKey = matchKey(live);
+      const idx = window.EPL_MATCHES.findIndex(m => matchKey(m) === liveKey);
 
       if (idx >= 0) {
-        // 更新
+        // 已有 → 更新（live 比分覆寫；未開賽則同步時間以避免時差顯示錯誤）
         const existing = window.EPL_MATCHES[idx];
         if (live.score && live.status !== 'scheduled') {
           existing.status = live.status;
@@ -68,6 +83,16 @@
           if (live.referee) existing.referee = live.referee;
           if (live.venue) existing.venue = live.venue;
           updated++;
+        } else if (live.status === 'scheduled' && live.date) {
+          // 未開賽：以 API 時間為準（用 BST 換算過，API 才會是最新）
+          // 但只在差距大於 30 分鐘才覆寫，避免微小時差導致顯示跳動
+          const oldStamp = new Date(`${existing.date}T${existing.time || '00:00'}:00`).getTime();
+          const newStamp = new Date(`${live.date}T${live.time || '00:00'}:00`).getTime();
+          if (Math.abs(newStamp - oldStamp) > 30 * 60 * 1000) {
+            existing.date = live.date;
+            existing.time = live.time;
+            updated++;
+          }
         }
       } else {
         // 新比賽 — 加入
