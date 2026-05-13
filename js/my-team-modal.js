@@ -165,16 +165,28 @@
     });
   }
 
-  function _showStarterCompleteToast(n) {
+  async function _showStarterCompleteToast(n) {
     const team = window.MyTeam.getCached();
-    // 教學鏈：先比賽（tutorial_match_done false）→ 訓練（tutorial_first_training_used false）
+    // 教學鏈：先抽教練 → 比賽 → 訓練
+    // 撈是否已聘過教練（user_coach 有資料 → 跳過教練 step）
+    let hasCoach = false;
+    try {
+      const { count } = await window.DB.from('user_coach').select('id', { count: 'exact', head: true });
+      hasCoach = (count || 0) > 0;
+    } catch (e) {}
+    const needsCoachTutorial = !hasCoach;
     const needsTutorialMatch = team && team.tutorial_match_done === false;
     const needsTrainingTutorial = team && team.tutorial_first_training_used === false;
 
     let title, body, primaryBtn, action;
-    if (needsTutorialMatch) {
+    if (needsCoachTutorial) {
       title = '太棒了！';
-      body = '球員都到位了！<br>接下來打<b>第一場熱身賽</b>看你的隊伍表現 ⚽';
+      body = '接下來<b>抽你的第一位教練</b>！<br>教練會給你 buff + <b>解鎖新陣型</b>';
+      primaryBtn = '👔 抽教練';
+      action = 'coach';
+    } else if (needsTutorialMatch) {
+      title = '教練聘任完成！';
+      body = '接下來打<b>第一場熱身賽</b>看你的隊伍表現 ⚽';
       primaryBtn = '🏟️ 開始熱身賽';
       action = 'match';
     } else if (needsTrainingTutorial) {
@@ -208,9 +220,11 @@
       t.classList.remove('open');
       setTimeout(() => t.remove(), 200);
     };
-    t.querySelector('.mt-starter-primary').addEventListener('click', () => {
+    t.querySelector('.mt-starter-primary').addEventListener('click', async () => {
       close();
-      if (action === 'match') {
+      if (action === 'coach') {
+        await _runCoachTutorial();
+      } else if (action === 'match') {
         window.MyTeam?.runMatch?.({ tutorial: true });
       } else if (action === 'train') {
         _runTrainingTutorial();
@@ -220,6 +234,79 @@
       }
     });
     t.querySelector('.mt-starter-complete-skip').addEventListener('click', close);
+  }
+
+  // ── 教練教學：跳教練 tab + 自動抽 1 教練 + 設為主教練 ──
+  async function _runCoachTutorial() {
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-tutorial-overlay';
+    overlay.innerHTML = `
+      <div class="mt-tutorial-card">
+        <div class="mt-tutorial-emoji">👔</div>
+        <h2>聘任你的第一位教練</h2>
+        <p>新手送你 <b>1 張教練聘任券</b>。<br>
+          抽到的教練自動指派為主教練、解鎖一個新陣型。</p>
+        <button class="mt-tutorial-cta" id="mt-tut-coach-cta">🎰 抽教練</button>
+        <button class="mt-tutorial-skip" id="mt-tut-coach-skip">先跳過</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    };
+    overlay.querySelector('#mt-tut-coach-skip').addEventListener('click', close);
+    overlay.querySelector('#mt-tut-coach-cta').addEventListener('click', async () => {
+      const cta = overlay.querySelector('#mt-tut-coach-cta');
+      cta.disabled = true; cta.textContent = '抽取中…';
+      try {
+        const res = await window.MyTeam.drawCoach(1);
+        close();
+        const c = res.coaches?.[0];
+        if (c) {
+          // 自動指派為主教練
+          try {
+            await window.DB.rpc('set_active_coach', { p_user_coach_id: c.user_coach_id });
+            await window.MyTeam.refresh?.();
+          } catch (e) { console.warn('set_active_coach', e); }
+          // 顯示抽到的教練 + 解鎖陣型
+          _showCoachTutorialResult(c);
+        } else {
+          _showStarterCompleteToast(0);
+        }
+      } catch (e) {
+        alert('抽教練失敗：' + (e.message || e));
+        cta.disabled = false; cta.textContent = '🎰 抽教練';
+      }
+    });
+  }
+
+  function _showCoachTutorialResult(coach) {
+    const unlocked = coach.trait_value?.unlocks_formation;
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-tutorial-overlay';
+    overlay.innerHTML = `
+      <div class="mt-tutorial-card">
+        <div class="mt-tutorial-emoji">🎉</div>
+        <h2>${escapeHtml(coach.name)}</h2>
+        <p>
+          <b>${escapeHtml(coach.nickname || '')}</b>（${coach.rarity}）<br>
+          ${escapeHtml(coach.trait_value?.description || coach.trait || '')}<br>
+          ${unlocked ? `<span style="color:#f0c040">🔓 解鎖陣型 <b>${unlocked}</b></span>` : ''}
+        </p>
+        <p style="font-size:13px;opacity:0.85">已自動指派為主教練！</p>
+        <button class="mt-tutorial-cta" id="mt-tut-coach-next">下一步：教學賽 →</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    overlay.querySelector('#mt-tut-coach-next').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+      window.MyTeam?.runMatch?.({ tutorial: true });
+    });
   }
 
   // ── 訓練教學：自動幫第一位球員跑 3 秒速度訓練（暴露給 my-team-match.js 在賽後 chain）──
@@ -786,8 +873,23 @@
     }
     const bench = players.filter(p => !starters.includes(p));
 
+    // 解鎖的陣型：初始只 4-3-3、抽到的教練會解鎖更多
+    const unlocked = await _fetchUnlockedFormations();
+
     content.innerHTML = `
       <div class="mt-stadium-tab">
+        <div class="mt-formation-bar">
+          <span style="font-size:11px;opacity:0.7;margin-right:8px">📋 陣型</span>
+          ${['4-3-3','4-4-2','3-5-2','5-3-2'].map(f => {
+            const isUnlocked = unlocked.has(f);
+            const isActive = formation === f;
+            return `<button class="mt-formation-opt ${isActive ? 'sel' : ''} ${isUnlocked ? '' : 'locked'}"
+              data-formation="${f}" ${isUnlocked ? '' : 'disabled'}
+              title="${isUnlocked ? '' : '需要抽到對應教練解鎖'}">
+              ${isUnlocked ? '' : '🔒 '}${f}
+            </button>`;
+          }).join('')}
+        </div>
         <div class="mt-stadium-pitch" id="mt-stadium-pitch">
           <div class="mt-pitch-line mt-pitch-mid"></div>
           <div class="mt-pitch-circle"></div>
@@ -795,7 +897,6 @@
           <div class="mt-pitch-box mt-pitch-box-top"></div>
           <div class="mt-pitch-goalbox mt-pitch-goalbox-bottom"></div>
           <div class="mt-pitch-goalbox mt-pitch-goalbox-top"></div>
-          <div class="mt-pitch-formation-label">📋 ${formation}</div>
         </div>
         <div class="mt-bench-section">
           <div class="mt-bench-title">板凳球員 <span style="opacity:0.6">(${bench.length})</span></div>
@@ -803,6 +904,22 @@
         </div>
       </div>
     `;
+
+    // 陣型 click → 切陣型
+    content.querySelectorAll('.mt-formation-opt:not(.locked)').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const f = btn.dataset.formation;
+        if (f === formation) return;
+        try {
+          const uid = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.id : team.user_id;
+          await window.DB.from('my_team').update({ formation: f }).eq('user_id', uid);
+          await window.MyTeam.refresh?.();
+          renderTab();
+        } catch (e) {
+          alert('切換陣型失敗：' + (e.message || e));
+        }
+      });
+    });
 
     const pitch = content.querySelector('#mt-stadium-pitch');
     starters.forEach((p, i) => {
@@ -820,6 +937,21 @@
         strip.appendChild(el);
       });
     }
+  }
+
+  // 撈使用者已解鎖的陣型（4-3-3 預設、抽到的教練解鎖更多）
+  async function _fetchUnlockedFormations() {
+    const set = new Set(['4-3-3']);
+    if (!window.DB || !window.currentUser && typeof currentUser === 'undefined') return set;
+    try {
+      const { data } = await window.DB.from('user_coach')
+        .select('coach:coach_pool(trait_value)');
+      (data || []).forEach(uc => {
+        const f = uc.coach?.trait_value?.unlocks_formation;
+        if (f) set.add(f);
+      });
+    } catch (e) {}
+    return set;
   }
 
   // 陣型 → 11 個 (x, y) %（pitch 是 home 視角，下半場為我方）
@@ -1632,16 +1764,16 @@
       </button>
     `).join('');
 
-    const FORMATIONS = ['4-3-3', '4-4-2', '3-5-2', '5-3-2'];
-    const formationPicker = FORMATIONS.map(f => `
-      <button class="mt-formation-opt ${team.formation === f ? 'sel' : ''}" data-cat="formation" data-val="${f}">${f}</button>
-    `).join('');
-
     const lv = team.stadium_level || 1;
     const nextCost = lv >= 10 ? null : ({2:30,3:60,4:120,5:200,6:350,7:550,8:800,9:1200,10:2000})[lv+1];
 
     content.innerHTML = `
       <div class="mt-settings-tab">
+        <div class="mt-settings-section">
+          <div class="mt-settings-title">🏷️ 球隊名稱</div>
+          <input class="mt-settings-name-input" id="mt-settings-name" maxlength="24"
+            value="${escapeHtml(team.team_name || '')}" placeholder="輸入新隊名" />
+        </div>
         <div class="mt-settings-section">
           <div class="mt-settings-title">🏟️ 球場等級 Lv. ${lv} / 10</div>
           <div style="font-size:12px;opacity:0.8;margin-bottom:6px">
@@ -1650,10 +1782,6 @@
           ${nextCost ? `
             <button class="mt-gacha-btn" id="mt-stadium-upgrade">升 Lv. ${lv+1}（${nextCost} 💎）</button>
           ` : '<div style="opacity:0.7">已達最高等級！</div>'}
-        </div>
-        <div class="mt-settings-section">
-          <div class="mt-settings-title">📋 陣型</div>
-          <div class="mt-settings-formations">${formationPicker}</div>
         </div>
         <div class="mt-settings-section">
           <div class="mt-settings-title">👕 球衣顏色</div>
@@ -1683,7 +1811,7 @@
           <div class="mt-settings-title">👁 預覽</div>
           <div class="mt-settings-preview" id="mt-settings-preview-crest" style="width:120px;height:120px">${_renderCrest(team)}</div>
         </div>
-        <button class="mt-gacha-btn" id="mt-settings-save">儲存球衣 / 隊徽 / 陣型</button>
+        <button class="mt-gacha-btn" id="mt-settings-save">儲存隊名 / 球衣 / 隊徽</button>
       </div>
     `;
 
@@ -1704,13 +1832,13 @@
         }
       });
     }
-    // 陣型 click
-    content.querySelectorAll('.mt-formation-opt').forEach(btn => {
-      btn.addEventListener('click', () => {
-        content.querySelectorAll('.mt-formation-opt').forEach(b => b.classList.toggle('sel', b === btn));
-        _pendingSettings.formation = btn.dataset.val;
+    // 隊名 input change
+    const nameInput = content.querySelector('#mt-settings-name');
+    if (nameInput) {
+      nameInput.addEventListener('change', () => {
+        _pendingSettings.team_name = nameInput.value.trim() || team.team_name;
       });
-    });
+    }
 
     // 預設色組合
     const presets = window.TeamCrests?.PRESET_COLOR_COMBOS || [];
@@ -1746,7 +1874,9 @@
       updates.crest_primary = content.querySelector('#mt-crest-primary').value;
       updates.crest_accent  = content.querySelector('#mt-crest-accent').value;
       try {
-        await window.DB.from('my_team').update(updates).eq('user_id', window.currentUser.id);
+        const uid = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.id : (team?.user_id);
+        if (!uid) throw new Error('找不到使用者');
+        await window.DB.from('my_team').update(updates).eq('user_id', uid);
         await window.MyTeam.refresh?.();
         _pendingSettings = {};
         alert('已儲存');

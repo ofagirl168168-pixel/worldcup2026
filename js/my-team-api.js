@@ -46,6 +46,8 @@
   async function fetch_() {
     const uid = _getUserId();
     if (!uid) return null;
+    // 先嘗試補體力（每 15 分鐘 +1）— 失敗就忽略不擋 fetch
+    try { await window.DB.rpc('recover_stamina_if_due'); } catch (e) {}
     const { data, error } = await window.DB
       .from('my_team')
       .select('*')
