@@ -530,21 +530,60 @@
       laziness: 0.78 + rng() * 0.44, // 0.78 ~ 1.22
     });
     // Phase 2.2+：assign card_id per player（PIPOYA sprite 用）
-    // home/away.keyPlayers[i].card_id 是 my-team-match 帶來的
-    // 沒帶就 hash(隊名+i) 產 fallback id
     function _cardIdFor(teamData, idx) {
       const kp = teamData.keyPlayers && teamData.keyPlayers[idx];
       if (kp && kp.card_id) return kp.card_id;
-      // fallback: 用 ssr-mufeimui-01 ~ r-fwd-150 中的某張當佔位
       const seed = (teamData.nameCN || '') + ':' + idx;
       let h = 0;
       for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-      // 簡單用 r-mid-* 系列當 placeholder
       return 'r-mid-' + String(71 + (h % 45)).padStart(3, '0');
     }
+    // 每位球員的個人數據：優先用 keyPlayers[i].stats、否則從隊伍 radar + 角色 + jitter 推導
+    // 角色加成：GK 守門加成大、DEF defense+、MID midfield+、FWD attack+
+    function _statsFor(teamData, idx, role, isKeyStar) {
+      const radar = teamData.radar || { attack:70, defense:70, midfield:70, speed:70 };
+      const kp = teamData.keyPlayers && teamData.keyPlayers[idx];
+      if (kp && kp.stats) return { ...kp.stats };
+      // 角色基底
+      let attack   = radar.attack;
+      let defense  = radar.defense;
+      let midfield = radar.midfield;
+      let speed    = radar.speed;
+      let goalkeeping = radar.defense;
+      if (role === 'GK')  { goalkeeping = radar.defense + 12; defense += 8; attack -= 25; speed -= 10; }
+      else if (role === 'DEF') { defense += 6; attack -= 10; midfield -= 3; }
+      else if (role === 'MID') { midfield += 5; }
+      else if (role === 'AMC') { midfield += 4; attack += 6; }
+      else if (role === 'FWD') { attack += 7; speed += 4; defense -= 8; }
+      // 球星加成（keyPlayers 前 5 位視為球星）
+      if (isKeyStar) { attack += 4; defense += 2; midfield += 3; speed += 2; goalkeeping += 3; }
+      // 個人差異 jitter（±5 以內、固定 seed = 隊名+idx）
+      const seed = (teamData.nameCN || teamData.name || 't') + ':' + idx;
+      let h = 0;
+      for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+      const jitter = () => { h = (h * 1664525 + 1013904223) >>> 0; return ((h % 100) - 50) / 10; };
+      attack   = Math.max(20, Math.min(99, Math.round(attack + jitter())));
+      defense  = Math.max(20, Math.min(99, Math.round(defense + jitter())));
+      midfield = Math.max(20, Math.min(99, Math.round(midfield + jitter())));
+      speed    = Math.max(20, Math.min(99, Math.round(speed + jitter())));
+      goalkeeping = Math.max(20, Math.min(99, Math.round(goalkeeping + jitter())));
+      return { attack, defense, midfield, speed, goalkeeping };
+    }
     const players = [
-      ...hF.map((p, i) => ({ ...p, team: 'h', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y, flair: makeFlair(), card_id: _cardIdFor(home, i) })),
-      ...aF.map((p, i) => ({ ...p, team: 'a', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y, flair: makeFlair(), card_id: _cardIdFor(away, i) })),
+      ...hF.map((p, i) => ({
+        ...p, team: 'h',
+        baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y,
+        flair: makeFlair(),
+        card_id: _cardIdFor(home, i),
+        stats: _statsFor(home, i, p.role, i < 5),
+      })),
+      ...aF.map((p, i) => ({
+        ...p, team: 'a',
+        baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y,
+        flair: makeFlair(),
+        card_id: _cardIdFor(away, i),
+        stats: _statsFor(away, i, p.role, i < 5),
+      })),
     ];
 
     // Phase 2.3+：preload LPC sprite per player（有 look_data 用 LPC、沒 look_data 也產一個）
@@ -764,12 +803,16 @@
     }
 
     function resolveShot() {
-      const atk = getTeam(state.possession).radar;
-      const def = getTeam(state.possession === 'h' ? 'a' : 'h').radar;
-      // 攻防差放大：def 權重 0.65 → 0.55（攻方 attack 影響更大）、
-      // 轉換係數 0.6 → 0.75、min 0.18 → 0.12（弱隊機會少）、max 0.58 → 0.68
-      const goalProb = Math.max(0.12, Math.min(0.68,
-        ((atk.attack - def.defense * 0.55) / 100) * 0.75
+      // 個人化進球率：射門者的個人 attack vs 對方 GK 的個人 goalkeeping
+      // 沒射門者就 fallback 到隊伍 radar
+      const shooter = players[state.possessorIdx];
+      const defTeam = state.possession === 'h' ? 'a' : 'h';
+      const gk = players.find(p => p.team === defTeam && p.role === 'GK');
+      const shooterAtk = shooter?.stats?.attack ?? getTeam(state.possession).radar.attack;
+      const gkSave     = gk?.stats?.goalkeeping ?? getTeam(defTeam).radar.defense;
+      // 攻防差 → goalProb：射手強 + 守門弱 → 高機率進球
+      const goalProb = Math.max(0.10, Math.min(0.72,
+        ((shooterAtk - gkSave * 0.55) / 100) * 0.78
       ));
       const isGoal = rng() < goalProb;
       if (isGoal) {
@@ -858,8 +901,10 @@
       if (framesInPossession > 15) {
         const near = findNearestOpponent(pos);
         if (near.player && near.dist < ROLE[near.player.role].tackleRange + 0.005) {
-          let tackleChance = (defStats.defense / 100) * 0.04 - (atkStats.midfield / 100) * 0.02;
-          // 防守方在自家禁區內壓迫更兇、但不要太誇張（避免弱隊在禁區內一直搶到球）
+          // 個人化：搶斷者個人 defense vs 持球者個人 midfield（控球能力）
+          const indDef = near.player.stats?.defense ?? defStats.defense;
+          const indMid = pos.stats?.midfield ?? atkStats.midfield;
+          let tackleChance = (indDef / 100) * 0.04 - (indMid / 100) * 0.02;
           if (distToGoal < 0.22) tackleChance *= 1.3;
           tackleChance = Math.max(0.005, Math.min(0.08, tackleChance));
           if (rng() < tackleChance) {
@@ -922,11 +967,11 @@
           const goalX = p.team === 'h' ? 1 : 0;
           const dx = goalX - p.x;
           const role = ROLE[p.role] || ROLE.MID;
-          // y 目標：60% 自己天然 lane + 40% 中線
-          // 邊鋒 baseY=0.25 的人拿到球會保持在左側（~0.35），不會一直朝中間收
           const laneY = p.baseY * 0.6 + 0.5 * 0.4;
           const dy = laneY - p.y;
-          const speed = 0.008 * role.sprint * (getTeam(p.team).radar.speed / 80);
+          // 持球速度：用個人 speed（射門者 70 vs 速度王 95 差約 35% 移動速度）
+          const indSpeed = p.stats?.speed ?? getTeam(p.team).radar.speed;
+          const speed = 0.008 * role.sprint * (indSpeed / 80);
           p.tx = p.x + Math.sign(dx) * Math.min(Math.abs(dx), speed);
           p.ty = p.y + dy * 0.06;
           if (p.team === 'h') p.tx = Math.min(0.92, p.tx);
@@ -1023,6 +1068,13 @@
         if (i === state.possessorIdx) { smoothness = 0.15; maxStep = 0.013; } // 持球者靈活
         else if (p._urgent) { smoothness = 0.11; maxStep = 0.016; }           // 壓迫/衝刺
         smoothness *= flipEase;
+        // 個人 speed 影響：80 為基準，速度 95 跑得快 ~19%、速度 60 跑得慢 ~25%
+        // GK 除外（GK 不需要按 speed 衝刺）
+        if (p.role !== 'GK' && p.stats?.speed) {
+          const speedMult = p.stats.speed / 80;
+          smoothness *= speedMult;
+          maxStep    *= speedMult;
+        }
 
         let stepX = (p.tx - p.x) * smoothness;
         let stepY = (p.ty - p.y) * smoothness;
