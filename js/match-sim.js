@@ -434,18 +434,26 @@
   }
 
   // 進球儀式 — banner + 彩花 + 視角縮放
+  // 用 ui._goalTimers 追蹤所有 setTimeout、每次觸發前清掉前一次的（避免短時間連續進球
+  // 第二次 banner / zoom 被前一次的 timeout 吃掉）
   function _triggerGoalCelebration(ui, teamName, teamSide) {
     if (!ui.goalBanner) return;
+    // 清掉前一次的所有 timer
+    if (ui._goalTimers) ui._goalTimers.forEach(t => clearTimeout(t));
+    ui._goalTimers = [];
+
     ui.goalBannerTeam.textContent = teamName + ' 進球!';
     ui.goalBanner.dataset.side = teamSide;
     ui.goalBanner.hidden = false;
     ui.goalBanner.classList.remove('msim-goal-show');
     void ui.goalBanner.offsetWidth;
     ui.goalBanner.classList.add('msim-goal-show');
-    // 視角 zoom in
+    // 視角 zoom in（先把可能殘留的 class 強制重設）
     if (ui.canvasWrap) {
+      ui.canvasWrap.classList.remove('msim-zoom-in');
+      void ui.canvasWrap.offsetWidth;
       ui.canvasWrap.classList.add('msim-zoom-in');
-      setTimeout(() => ui.canvasWrap.classList.remove('msim-zoom-in'), 4000);
+      ui._goalTimers.push(setTimeout(() => ui.canvasWrap.classList.remove('msim-zoom-in'), 4000));
     }
     // 彩花
     if (ui.confetti) {
@@ -461,13 +469,13 @@
         c.style.transform = `rotate(${Math.random() * 360}deg)`;
         ui.confetti.appendChild(c);
       }
-      setTimeout(() => { ui.confetti.innerHTML = ''; }, 3000);
+      ui._goalTimers.push(setTimeout(() => { ui.confetti.innerHTML = ''; }, 3000));
     }
-    // 4 秒後收 banner
-    setTimeout(() => {
+    // 收 banner
+    ui._goalTimers.push(setTimeout(() => {
       ui.goalBanner.classList.remove('msim-goal-show');
-      setTimeout(() => { ui.goalBanner.hidden = true; }, 400);
-    }, 3500);
+      ui._goalTimers.push(setTimeout(() => { ui.goalBanner.hidden = true; }, 400));
+    }, 3500));
   }
 
   // ── 主模擬 ──────────────────────────────────────────────
@@ -638,6 +646,11 @@
         myFwd.p.x = whoHasBall === 'h' ? 0.52 : 0.48;
         myFwd.p.y = 0.5;
         myFwd.p.tx = myFwd.p.x; myFwd.p.ty = myFwd.p.y;
+      }
+      // 鏡頭直接 snap 到球（避免追焦慢、下一波動作不在鏡頭內 → 看不到第二球過程）
+      if (state.camera) {
+        state.camera.x = Math.max(0, Math.min(PITCH_W - VIEW_W, ball.x * PITCH_W - VIEW_W / 2));
+        state.camera.y = Math.max(0, Math.min(PITCH_H - VIEW_H, ball.y * PITCH_H - VIEW_H / 2));
       }
     }
 
@@ -1062,7 +1075,7 @@
         if (state.pauseFrames === 0 && state.phase === 'celebrate') {
           kickoff(state.possession === 'h' ? 'a' : 'h');
         }
-        state.frame++;
+        // 進球暫停期間「比賽時鐘」也停（原本 state.frame++ 會讓時鐘繼續跑）
         return;
       }
 
