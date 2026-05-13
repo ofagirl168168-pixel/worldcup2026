@@ -736,9 +736,19 @@
         || players.map((p, i) => ({ p, i })).find(x => x.p.team === whoHasBall && x.p.role !== 'GK');
       state.possessorIdx = chosen ? chosen.i : 0;
       ball.x = 0.5; ball.y = 0.5;
-      // 持球者 + 對手鏡像 FWD 必須在中圈（規則上開球兩人在中圈）— 這兩個 snap
+      // 開球：所有人直接 snap 到陣型位置 + 退回己方半場
+      players.forEach(p => {
+        p.x = p.baseX;
+        p.y = p.baseY;
+        if (p.team === 'h') p.x = Math.min(0.48, p.x);
+        else p.x = Math.max(0.52, p.x);
+        p.tx = p.x; p.ty = p.y;
+        p._urgent = false;
+      });
+      // 持球者站到中圈
       const pos = players[state.possessorIdx];
       if (pos) { pos.x = 0.5; pos.y = 0.5; pos.tx = 0.5; pos.ty = 0.5; }
+      // 對方一位前鋒上來接應（真實開球兩人站中圈）
       const myFwd = players
         .map((p, i) => ({ p, i }))
         .filter(x => x.p.team === whoHasBall && x.p.role === 'FWD')[0];
@@ -747,16 +757,6 @@
         myFwd.p.y = 0.5;
         myFwd.p.tx = myFwd.p.x; myFwd.p.ty = myFwd.p.y;
       }
-      // 其他球員「只設目標」不 snap — 他們在歡呼暫停的這 4.5 秒已經走回陣型
-      // 一定都已經各就各位、開球後不會有任何瞬移感
-      players.forEach(p => {
-        if (p === pos || (myFwd && p === myFwd.p)) return;
-        p.tx = p.baseX;
-        p.ty = p.baseY;
-        // home 不超過自家半場、away 不超過自家半場
-        if (p.team === 'h') p.tx = Math.min(0.48, p.tx);
-        else p.tx = Math.max(0.52, p.tx);
-      });
       // 鏡頭直接 snap 到球（中圈）
       if (state.camera) {
         state.camera.x = Math.max(0, Math.min(PITCH_W - VIEW_W, ball.x * PITCH_W - VIEW_W / 2));
@@ -889,15 +889,6 @@
         // 進球儀式：banner + 彩花 + 視角 zoom
         const scoringTeam = state.possession === 'h' ? home : away;
         _triggerGoalCelebration(ui, scoringTeam.nameCN, state.possession);
-        // 進球瞬間就把每個球員的目標位置設回陣型（含半場限制）— 球員會在歡呼暫停
-        // 期間自然慢慢走回去，等暫停結束開球時不會有瞬移
-        players.forEach(p => {
-          p._urgent = false;
-          p.tx = p.baseX;
-          p.ty = p.baseY;
-          if (p.team === 'h') p.tx = Math.min(0.48, p.tx);
-          else p.tx = Math.max(0.52, p.tx);
-        });
       } else {
         // 被撲 / 沒中 → 對方球門員帶球
         const newTeam = state.possession === 'h' ? 'a' : 'h';
@@ -1171,12 +1162,11 @@
       players.forEach((p, i) => {
         // smoothness 決定「以多少比例逼近目標」
         // maxStep 決定「單幀最大位移」— 避免 target 大幅跳動時第一幀飛越過去
-        // ※ 個人 speed 是「硬上限」，無論 urgent 或持球都不能超過自己該有的速度
-        // ※ 鏟球期間：方向跟著 sprite（右），位移用視覺滑行（不靠 tx/ty）
+        // ※ 衝刺（urgent）只比正常快一點點點，不再有「暴衝」感
         let smoothness = 0.035;
-        let maxStep = 0.008;      // 非緊急：慢跑
-        if (i === state.possessorIdx) { smoothness = 0.10; maxStep = 0.010; }  // 持球者靈活
-        else if (p._urgent) { smoothness = 0.055; maxStep = 0.009; }           // 壓迫（極小幅暴衝）
+        let maxStep = 0.008;        // 非緊急：慢跑
+        if (i === state.possessorIdx) { smoothness = 0.060; maxStep = 0.009; }  // 持球者：稍快
+        else if (p._urgent) { smoothness = 0.040; maxStep = 0.0088; }           // 衝刺：只比正常快 ~10%
         // 鏟球中：靠視覺 slide、tx/ty 不再追、避免目標位置跳過去暴衝
         if (p._tackleVisualUntil && state.frame < p._tackleVisualUntil) {
           smoothness = 0.02;
@@ -1274,13 +1264,11 @@
       if (state.pauseFrames > 0) {
         state.pauseFrames--;
         if (state.pauseFrames === 0 && state.phase === 'celebrate') {
-          // 暫停結束：先收歡呼視覺、再 kickoff（避免歡呼還在跑、新一波已開始）
+          // 暫停結束：先收歡呼視覺、再 kickoff（kickoff 內會 snap 所有人回陣型）
           _endGoalCelebration(ui);
           kickoff(state.possession === 'h' ? 'a' : 'h');
         }
-        // 進球暫停期間：時鐘停、不跑邏輯，但球員自然走回陣型（tx 已在進球時設定）
-        // 不呼叫 updatePlayerTargets — 那會依球位置算（球在中圈、會被拉散）
-        if (state.phase === 'celebrate') movePlayers();
+        // 進球暫停期間：所有東西凍結，讓球員在原地做歡呼/懊惱動作
         return;
       }
 
