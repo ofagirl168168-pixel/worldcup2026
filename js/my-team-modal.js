@@ -2530,61 +2530,99 @@
     const pvpCount = team.pvp_today_count || 0;
     const pvpDisabled = pvpCount >= 5 || team.stamina < 1;
 
+    // 闖關地圖：10 關，當前在 played + 1（1-indexed）。已過 = played 個
+    const TOTAL_STAGES = 10;
+    const currentStage = Math.min(played + 1, TOTAL_STAGES);
+    // 每關 Boss 機率：根據 Tier 配 + 第 5 / 10 關必 Boss
+    const stages = [];
+    for (let i = 1; i <= TOTAL_STAGES; i++) {
+      const isBossSlot = (i === 5 || i === 10);
+      const isPast = i <= played;
+      const isNow  = i === currentStage;
+      const isLocked = i > currentStage;
+      stages.push({ idx: i, isBossSlot, isPast, isNow, isLocked });
+    }
+
     content.innerHTML = `
-      <div class="mt-match-stage">
-        <!-- 隧道頂燈光 -->
-        <div class="mt-match-tunnel-lights">
-          <span class="mt-match-tunnel-light"></span>
-          <span class="mt-match-tunnel-light"></span>
-          <span class="mt-match-tunnel-light"></span>
-        </div>
-        <!-- 隧道拱門 -->
-        <svg class="mt-match-tunnel-arch" viewBox="0 0 300 150" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M 0 150 L 0 60 Q 0 0 60 0 L 240 0 Q 300 0 300 60 L 300 150 Z"
-            fill="rgba(0,0,0,0.55)" stroke="#1a1a2e" stroke-width="3"/>
-          <text x="150" y="35" font-size="14" font-weight="900" fill="#f0c040" text-anchor="middle"
-            font-family="Impact,'Arial Black',sans-serif" letter-spacing="2">STADIUM ENTRANCE</text>
-        </svg>
-
-        <!-- 聯賽進度條（嵌在隧道牆上） -->
-        <div class="mt-match-tunnel-board">
-          <div class="mt-match-tier">🏆 ${escapeHtml(tierName)} <small>Tier ${tier}</small></div>
-          <div class="mt-match-progress-row">
-            <div class="mt-match-progress-bar"><div style="width:${played * 10}%"></div></div>
-            <span class="mt-match-progress-text">${played}/10</span>
+      <div class="mt-match-map">
+        <!-- 頂部：主角踢球 2D 卷軸動畫 + tier 標題 -->
+        <div class="mt-match-banner">
+          <div class="mt-match-banner-scroll">
+            <div class="mt-match-banner-clouds">
+              <span class="mt-match-cloud c1"></span>
+              <span class="mt-match-cloud c2"></span>
+              <span class="mt-match-cloud c3"></span>
+            </div>
+            <div class="mt-match-banner-ground">
+              <span class="mt-match-banner-hero">⚽💨🏃</span>
+            </div>
           </div>
-          <div class="mt-match-record">
-            <b style="color:#4caf50">${wins} 勝</b> · ${draws} 平 · <span style="color:#ef9a9a">${losses} 敗</span>
-            ${isBossLikely ? `<span class="mt-match-boss-tag">⭐ Boss ${Math.round(realRatio*100)}%</span>` : ''}
+          <div class="mt-match-banner-overlay">
+            <div class="mt-match-tier">🏆 ${escapeHtml(tierName)} <small>Tier ${tier}</small></div>
+            <div class="mt-match-record-line">
+              <b style="color:#4caf50">${wins}W</b> · ${draws}D · <span style="color:#ef9a9a">${losses}L</span>
+              ${isBossLikely ? `<span class="mt-match-boss-tag">⭐ Boss ${Math.round(realRatio*100)}%</span>` : ''}
+            </div>
           </div>
         </div>
 
-        <!-- 對手卡：散落在隧道中 -->
-        <div class="mt-match-opp-card">
-          <div class="mt-match-opp-card-inner">
-            <div class="mt-match-opp-crest">⚔️</div>
-            <div class="mt-match-opp-label">下一場對手</div>
-            <div class="mt-match-opp-name">Tier ${tier} 對手</div>
-            <div class="mt-match-opp-power">能力 ~${tierAvg}</div>
-            <button class="mt-match-engage-btn" id="mt-match-start" ${team.stamina < 1 ? 'disabled' : ''}>
-              <span class="mt-match-engage-sword">⚔</span>
-              <span class="mt-match-engage-label">開戰</span>
-              <span class="mt-match-engage-cost">⚡ 1（剩 ${team.stamina}/${team.stamina_max}）</span>
-            </button>
+        <!-- 闖關路線（10 站） -->
+        <div class="mt-match-path">
+          <svg class="mt-match-path-line" viewBox="0 0 300 480" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M 30 30
+                     C 90 30, 60 80, 150 80
+                     C 240 80, 230 130, 70 130
+                     C 30 130, 30 180, 150 180
+                     C 270 180, 270 230, 70 230
+                     C 30 230, 30 280, 150 280
+                     C 270 280, 270 330, 70 330
+                     C 30 330, 30 380, 150 380
+                     C 270 380, 270 430, 150 430"
+              fill="none"
+              stroke="rgba(240,192,64,0.5)"
+              stroke-width="4"
+              stroke-linecap="round"
+              stroke-dasharray="3,6"/>
+          </svg>
+          <div class="mt-match-stages">
+            ${stages.map(s => {
+              const cls = [
+                'mt-match-stage-node',
+                s.isBossSlot ? 'is-boss' : '',
+                s.isPast ? 'is-past' : '',
+                s.isNow ? 'is-now' : '',
+                s.isLocked ? 'is-locked' : '',
+              ].filter(Boolean).join(' ');
+              return `
+                <button class="${cls}" data-stage="${s.idx}" ${s.isLocked ? 'disabled' : ''}>
+                  <span class="mt-match-stage-icon">${s.isBossSlot ? '👑' : (s.isPast ? '✓' : '⚽')}</span>
+                  <span class="mt-match-stage-num">${s.idx}</span>
+                </button>
+              `;
+            }).join('')}
           </div>
         </div>
 
-        <!-- 隧道牆上小招牌：PvP -->
+        <!-- 當前關卡資訊 + 開戰鈕 -->
+        <div class="mt-match-current">
+          <div class="mt-match-current-label">第 ${currentStage} 關 · 能力 ~${tierAvg}</div>
+          ${currentStage === 5 || currentStage === 10
+            ? '<div class="mt-match-current-boss">👑 BOSS 戰</div>'
+            : isBossLikely ? '<div class="mt-match-current-boss-hint">⭐ 可能是 Boss</div>' : ''}
+          <button class="mt-match-engage-btn" id="mt-match-start" ${team.stamina < 1 ? 'disabled' : ''}>
+            <span class="mt-match-engage-sword">⚔</span>
+            <span class="mt-match-engage-label">下一關</span>
+            <span class="mt-match-engage-cost">⚡ 1（剩 ${team.stamina}/${team.stamina_max}）</span>
+          </button>
+          ${team.stamina < 1 ? '<div class="mt-match-current-warn">⚡ 體力 0 — 預測比賽、看文章可賺體力</div>' : ''}
+        </div>
+
+        <!-- PvP 招牌 -->
         <button class="mt-match-wall-sign mt-match-pvp-sign" id="mt-pvp-find" ${pvpDisabled ? 'disabled' : ''}>
           <div class="mt-match-wall-sign-icon">⚔️</div>
           <div class="mt-match-wall-sign-title">PvP 排位</div>
           <div class="mt-match-wall-sign-sub">ELO ${team.pvp_elo || 1000}・${pvpCount}/5</div>
         </button>
-
-        <!-- 草皮（底部漸層） -->
-        <div class="mt-match-grass">
-          ${team.stamina < 1 ? '<div class="mt-match-grass-warn">⚡ 體力 0 — 預測比賽、看文章可賺體力</div>' : ''}
-        </div>
       </div>
     `;
 
