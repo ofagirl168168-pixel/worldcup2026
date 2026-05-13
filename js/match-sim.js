@@ -321,12 +321,12 @@
         frame = moving ? (Math.floor(_renderTick / 8) % 3) : 1;
       }
 
-      // 鏟球時加塵土：橢圓灰點散開
+      // 鏟球時加塵土：橢圓灰點散開（用 Math.random — render 在 module 層、拿不到 runSim 的 rng）
       if (tackleActive) {
         ctx.fillStyle = 'rgba(220,200,160,0.6)';
         for (let d = 0; d < 3; d++) {
-          const dustX = cx - 4 - d * 3 + (rng() - 0.5) * 2;
-          const dustY = cy + SPRITE_DRAW_H / 2 - 1 + (rng() - 0.5) * 2;
+          const dustX = cx - 4 - d * 3 + (Math.random() - 0.5) * 2;
+          const dustY = cy + SPRITE_DRAW_H / 2 - 1 + (Math.random() - 0.5) * 2;
           ctx.beginPath();
           ctx.ellipse(dustX, dustY, 2.5 - d * 0.5, 1.5 - d * 0.3, 0, 0, Math.PI * 2);
           ctx.fill();
