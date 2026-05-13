@@ -285,7 +285,7 @@ const EPL_TEAMS = {
   },
   'CRY': {
     name:'Crystal Palace', nameCN:'水晶宮', flag:'https://crests.football-data.org/354.png',
-    league:'Premier League', eplRank:14, coach:'Oliver Glasner', formation:'3-4-3',
+    league:'Premier League', eplRank:15, coach:'Oliver Glasner', formation:'3-4-3',
     keyPlayers:[
       {name:'Ismaïla Sarr',pos:'右翼',club:'水晶宮'},
       {name:'Jean-Philippe Mateta',pos:'前鋒',club:'水晶宮'},
