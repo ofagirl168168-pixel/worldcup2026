@@ -764,18 +764,53 @@
       shoeColor:  team?.kit_shoes_color || 'white',
     };
 
-    // 渲染球迷：fans 上限對應加油人數（每 100 fans = 1 名 NPC）
+    // 渲染球迷：fans 上限對應加油人數（pixel chibi 小人 + 旗 / 圍巾）
     const fansEl = content.querySelector('#mt-home-fans');
     if (fansEl) {
       const fans = team?.fans || 100;
       const fanCount = Math.min(30, Math.max(2, Math.floor(fans / 60)));
-      const FAN_EMOJIS = ['🙋', '🙌', '🎉', '📣', '🚩', '👏', '🥳', '🎊'];
+      // 球迷類型：3 種 SVG chibi（舉手歡呼 / 揮旗 / 戴圍巾）
+      const teamColor = _colorHex(team?.crest_primary || 'red');
       const fragments = [];
       for (let i = 0; i < fanCount; i++) {
-        const emoji = FAN_EMOJIS[i % FAN_EMOJIS.length];
-        const x = 5 + (i * 91) % 90;       // 散佈 5%~95%
+        const type = i % 3;
+        const x = 5 + (i * 91) % 90;
         const delay = (i * 0.27) % 1.5;
-        fragments.push(`<span class="mt-home-fan" style="left:${x}%; animation-delay:${delay}s">${emoji}</span>`);
+        let svg = '';
+        if (type === 0) {
+          // 舉手歡呼
+          svg = `<svg viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="6" cy="4" r="2.6" fill="#f5d0a0" stroke="#1a1a2e" stroke-width="0.6"/>
+            <rect x="3.6" y="6.5" width="4.8" height="6" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.6"/>
+            <rect x="3" y="12.4" width="2" height="4" fill="#1a3050" stroke="#1a1a2e" stroke-width="0.5"/>
+            <rect x="7" y="12.4" width="2" height="4" fill="#1a3050" stroke="#1a1a2e" stroke-width="0.5"/>
+            <rect x="2.5" y="2"  width="1.5" height="5" fill="#f5d0a0" stroke="#1a1a2e" stroke-width="0.4" transform="rotate(-25 3.25 4.5)"/>
+            <rect x="8"   y="2"  width="1.5" height="5" fill="#f5d0a0" stroke="#1a1a2e" stroke-width="0.4" transform="rotate( 25 8.75 4.5)"/>
+          </svg>`;
+        } else if (type === 1) {
+          // 揮旗
+          svg = `<svg viewBox="0 0 14 18" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="6" cy="4" r="2.6" fill="#e8b896" stroke="#1a1a2e" stroke-width="0.6"/>
+            <rect x="3.6" y="6.5" width="4.8" height="6" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.6"/>
+            <rect x="3" y="12.4" width="2" height="4" fill="#202020" stroke="#1a1a2e" stroke-width="0.5"/>
+            <rect x="7" y="12.4" width="2" height="4" fill="#202020" stroke="#1a1a2e" stroke-width="0.5"/>
+            <!-- 旗桿 + 旗 -->
+            <line x1="9" y1="2" x2="9" y2="10" stroke="#6d4c2a" stroke-width="0.7"/>
+            <polygon points="9,2 13,3.5 9,5.5" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.4"/>
+          </svg>`;
+        } else {
+          // 戴圍巾
+          svg = `<svg viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="6" cy="4" r="2.6" fill="#d8b08a" stroke="#1a1a2e" stroke-width="0.6"/>
+            <rect x="3.6" y="6.5" width="4.8" height="6" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.6"/>
+            <rect x="3" y="12.4" width="2" height="4" fill="#3a2410" stroke="#1a1a2e" stroke-width="0.5"/>
+            <rect x="7" y="12.4" width="2" height="4" fill="#3a2410" stroke="#1a1a2e" stroke-width="0.5"/>
+            <!-- 圍巾 -->
+            <rect x="2.6" y="6.4" width="6.8" height="1.8" fill="#f0c040" stroke="#1a1a2e" stroke-width="0.4"/>
+            <rect x="2" y="8" width="1.4" height="3.5" fill="#f0c040" stroke="#1a1a2e" stroke-width="0.4"/>
+          </svg>`;
+        }
+        fragments.push(`<span class="mt-home-fan" style="left:${x}%; animation-delay:${delay}s">${svg}</span>`);
       }
       fansEl.innerHTML = fragments.join('');
     }
@@ -2377,117 +2412,135 @@
     const ssrSelect = team.ssr_select_tickets || 0;
 
     content.innerHTML = `
-      <div class="mt-gacha-shop">
-        <!-- 整片商店場景（牆磚 + 招牌 + 卡牌牆 + 盲盒堆 + 收銀台）-->
-        <div class="mt-gacha-shop-scene">
-          <!-- 霓虹招牌 -->
-          <div class="mt-gacha-neon-board">
-            <span class="mt-gacha-neon">🎰 SOCCERMADDY GACHA 🎰</span>
-            <div class="mt-gacha-neon-stars">
-              <span class="ns ns1">✦</span>
-              <span class="ns ns2">✧</span>
-              <span class="ns ns3">✦</span>
-              <span class="ns ns4">✧</span>
-            </div>
-          </div>
+      <div class="mt-gacha-shop-fullscene" id="mt-gacha-fullshop">
+        <!-- 背牆磚 + 木地板（場景底） -->
+        <div class="mt-gshop-wall"></div>
+        <div class="mt-gshop-floor"></div>
 
-          <!-- 左牆：卡牌展示牆（4 張歪斜貼著） -->
-          <div class="mt-gacha-cardwall">
-            <div class="mt-gacha-walled-card cw-1"><span>★</span></div>
-            <div class="mt-gacha-walled-card cw-2"><span>★</span></div>
-            <div class="mt-gacha-walled-card cw-3"><span>★</span></div>
-          </div>
+        <!-- 天花板掛飾：旗幟串 -->
+        <div class="mt-gshop-bunting">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
 
-          <!-- 右側：盲盒卡牌包金字塔堆 -->
-          <div class="mt-gacha-pyramid">
-            <div class="mt-gacha-pyramid-row">
-              <div class="mt-gacha-blindbox blindbox-ssr" title="SSR 機率 5%">
-                <span class="mt-gacha-blindbox-star">★</span>
-                <span class="mt-gacha-blindbox-rarity">SSR</span>
-              </div>
-            </div>
-            <div class="mt-gacha-pyramid-row">
-              <div class="mt-gacha-blindbox blindbox-sr"><span class="mt-gacha-blindbox-star">★</span><span class="mt-gacha-blindbox-rarity">SR</span></div>
-              <div class="mt-gacha-blindbox blindbox-sr"><span class="mt-gacha-blindbox-star">★</span><span class="mt-gacha-blindbox-rarity">SR</span></div>
-            </div>
-            <div class="mt-gacha-pyramid-row">
-              <div class="mt-gacha-blindbox blindbox-r"><span class="mt-gacha-blindbox-rarity">R</span></div>
-              <div class="mt-gacha-blindbox blindbox-r"><span class="mt-gacha-blindbox-rarity">R</span></div>
-              <div class="mt-gacha-blindbox blindbox-r"><span class="mt-gacha-blindbox-rarity">R</span></div>
-            </div>
-          </div>
-
-          <!-- 收銀員 -->
-          <div class="mt-gacha-clerk">
-            <div class="mt-gacha-clerk-body">🧑‍💼</div>
-            <div class="mt-gacha-clerk-counter"></div>
-            <div class="mt-gacha-clerk-resources">
-              <span class="mt-gacha-counter-resource">🎟️<b>${tickets}</b></span>
-              <span class="mt-gacha-counter-resource">💎<b>${gems}</b></span>
-              <span class="mt-gacha-counter-pity">🎯 ${pity}/30</span>
-            </div>
-          </div>
-
-          <!-- 粒子閃爍 -->
-          <div class="mt-gacha-sparkles" aria-hidden="true">
-            <span></span><span></span><span></span><span></span>
-            <span></span><span></span>
+        <!-- 頂部霓虹招牌（含閃爍星星） -->
+        <div class="mt-gshop-neon-sign">
+          <span class="mt-gshop-neon-text">★ GACHA SHOP ★</span>
+          <div class="mt-gshop-neon-stars">
+            <span class="ns ns1">✦</span><span class="ns ns2">✧</span>
+            <span class="ns ns3">✦</span><span class="ns ns4">✧</span>
           </div>
         </div>
 
-        <!-- 抽卡按鈕（使用原本的 btn-row 樣式） -->
-        <div class="mt-gacha-buttons">
-          <button class="mt-gacha-btn-row" id="mt-gacha-1" ${tickets < 1 ? 'disabled' : ''}>
-            <div class="mt-gacha-btn-info">
-              <div class="mt-gacha-btn-title">🎴 抽 1 抽</div>
-              <div class="mt-gacha-btn-sub">隨機獲得 1 張球員卡</div>
-            </div>
-            <div class="mt-gacha-btn-cost">🎟️ 1</div>
-          </button>
-
-          <button class="mt-gacha-btn-row" id="mt-gacha-10" ${tickets < 10 ? 'disabled' : ''}>
-            <div class="mt-gacha-btn-info">
-              <div class="mt-gacha-btn-title">🎴 10 連抽</div>
-              <div class="mt-gacha-btn-sub">10 張 + 保證至少 1 張 SR 起步</div>
-            </div>
-            <div class="mt-gacha-btn-cost">🎟️ 10</div>
-          </button>
-
-          <button class="mt-gacha-btn-row" id="mt-gacha-gem-1">
-            <div class="mt-gacha-btn-info">
-              <div class="mt-gacha-btn-title">💎 寶石抽（保底用）</div>
-              <div class="mt-gacha-btn-sub">沒抽券時用寶石</div>
-            </div>
-            <div class="mt-gacha-btn-cost">💎 50</div>
-          </button>
-
-          ${ssrSelect > 0 ? `
-            <button class="mt-gacha-btn-row mt-gacha-ssr-row" id="mt-ssr-select-open">
-              <div class="mt-gacha-btn-info">
-                <div class="mt-gacha-btn-title">🌟 SSR 自選券 × ${ssrSelect}</div>
-                <div class="mt-gacha-btn-sub">賽季冠軍獎勵・任選一張 SSR 球員</div>
-              </div>
-              <div class="mt-gacha-btn-cost">兌換</div>
-            </button>
-          ` : ''}
+        <!-- 左牆：卡牌展示掛畫框（3 張不同稀有度） -->
+        <div class="mt-gshop-frames">
+          <div class="mt-gshop-frame frame-ssr">
+            <div class="mt-gshop-frame-card"><span>★</span></div>
+            <div class="mt-gshop-frame-label">SSR</div>
+          </div>
+          <div class="mt-gshop-frame frame-sr">
+            <div class="mt-gshop-frame-card"><span>★</span></div>
+            <div class="mt-gshop-frame-label">SR</div>
+          </div>
+          <div class="mt-gshop-frame frame-r">
+            <div class="mt-gshop-frame-card"><span>★</span></div>
+            <div class="mt-gshop-frame-label">R</div>
+          </div>
         </div>
 
-        <div class="mt-gacha-shopnote">
-          <span>R 75%</span><span class="dot">·</span>
-          <span style="color:#9b87f5">SR 20%</span><span class="dot">·</span>
-          <span style="color:#f0c040">SSR 5%</span><span class="dot">·</span>
-          <span>30 抽保底 SSR</span>
+        <!-- 中央後方：兩層貨架（每層放盲盒卡牌包） -->
+        <div class="mt-gshop-shelf shelf-top">
+          <div class="mt-gshop-shelf-board"></div>
+          <div class="mt-gshop-shelf-items">
+            <div class="mt-gshop-box blindbox-ssr"><span class="mt-gshop-box-rarity">SSR</span></div>
+            <div class="mt-gshop-box blindbox-ssr"><span class="mt-gshop-box-rarity">SSR</span></div>
+            <div class="mt-gshop-box blindbox-sr"><span class="mt-gshop-box-rarity">SR</span></div>
+            <div class="mt-gshop-box blindbox-sr"><span class="mt-gshop-box-rarity">SR</span></div>
+            <div class="mt-gshop-box blindbox-sr"><span class="mt-gshop-box-rarity">SR</span></div>
+          </div>
+        </div>
+        <div class="mt-gshop-shelf shelf-mid">
+          <div class="mt-gshop-shelf-board"></div>
+          <div class="mt-gshop-shelf-items">
+            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
+            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
+            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
+            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
+            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
+            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
+          </div>
         </div>
 
-        ${pityRemaining <= 3 ? `
-          <div class="mt-gacha-pity-warn">⚡ 再 ${pityRemaining} 抽保底 SSR ⚡</div>
-        ` : ''}
+        <!-- 黑板（價目表）掛在牆上 -->
+        <div class="mt-gshop-chalkboard">
+          <div class="mt-gshop-chalk-title">★ MENU ★</div>
+          <div class="mt-gshop-chalk-line">1 抽 ─── 🎟️ 1</div>
+          <div class="mt-gshop-chalk-line">10 連 ─ 🎟️ 10</div>
+          <div class="mt-gshop-chalk-line">寶石 ── 💎 50</div>
+          <div class="mt-gshop-chalk-divider"></div>
+          <div class="mt-gshop-chalk-rate">R 75% · SR 20%</div>
+          <div class="mt-gshop-chalk-rate">SSR 5% · 30 保底</div>
+        </div>
+
+        <!-- 收銀台木櫃 + 帳本 + 電腦 -->
+        <div class="mt-gshop-counter">
+          <div class="mt-gshop-counter-top"></div>
+          <div class="mt-gshop-counter-face"></div>
+          <div class="mt-gshop-counter-screen">
+            <div class="mt-gshop-screen-line">🎟️ <b>${tickets}</b></div>
+            <div class="mt-gshop-screen-line">💎 <b>${gems}</b></div>
+            <div class="mt-gshop-screen-line mt-gshop-pity">🎯 ${pity}/30</div>
+          </div>
+          <div class="mt-gshop-counter-ledger"></div>
+        </div>
+
+        <!-- 收銀員（站在櫃台後）— 用 LPC chibi sprite 風格 SVG -->
+        <div class="mt-gshop-clerk-anchor">
+          <svg class="mt-gshop-clerk" viewBox="0 0 28 50" xmlns="http://www.w3.org/2000/svg">
+            <!-- 帽子 -->
+            <rect x="6" y="3" width="16" height="6" fill="#c0392b" stroke="#1a1a2e" stroke-width="1"/>
+            <rect x="4" y="8" width="20" height="3" fill="#1a1a2e"/>
+            <!-- 頭 -->
+            <rect x="8" y="11" width="12" height="10" fill="#f5d0a0" stroke="#1a1a2e" stroke-width="1"/>
+            <!-- 眼睛 -->
+            <rect x="11" y="15" width="2" height="2" fill="#1a1a2e"/>
+            <rect x="16" y="15" width="2" height="2" fill="#1a1a2e"/>
+            <!-- 笑嘴 -->
+            <rect x="12" y="18" width="4" height="1" fill="#a01020"/>
+            <!-- 領結 -->
+            <polygon points="11,22 17,22 14,24" fill="#f0c040" stroke="#1a1a2e" stroke-width="0.6"/>
+            <!-- 上衣 -->
+            <rect x="6" y="22" width="16" height="14" fill="#1976d2" stroke="#1a1a2e" stroke-width="1"/>
+            <!-- 圍裙 -->
+            <rect x="8" y="24" width="12" height="12" fill="#f0f0f0" stroke="#1a1a2e" stroke-width="0.8"/>
+            <!-- 圍裙口袋 -->
+            <rect x="10" y="28" width="3" height="3" fill="#d0d0d0" stroke="#1a1a2e" stroke-width="0.4"/>
+            <rect x="15" y="28" width="3" height="3" fill="#d0d0d0" stroke="#1a1a2e" stroke-width="0.4"/>
+            <!-- 手 -->
+            <rect x="3" y="22" width="3" height="9" fill="#1976d2" stroke="#1a1a2e" stroke-width="0.8"/>
+            <rect x="22" y="22" width="3" height="9" fill="#1976d2" stroke="#1a1a2e" stroke-width="0.8"/>
+          </svg>
+        </div>
+
+        <!-- 地板上散落的金幣（吸睛） -->
+        <div class="mt-gshop-coins">
+          <span class="mt-gshop-coin" style="left: 18%; bottom: 8px;"></span>
+          <span class="mt-gshop-coin" style="left: 78%; bottom: 12px;"></span>
+          <span class="mt-gshop-coin" style="left: 88%; bottom: 6px;"></span>
+        </div>
+
+        <!-- 粒子閃爍 -->
+        <div class="mt-gshop-sparkles" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
       </div>
     `;
 
-    content.querySelector('#mt-gacha-1').addEventListener('click', () => _runGacha(1));
-    content.querySelector('#mt-gacha-10').addEventListener('click', () => _runGacha(10));
-    content.querySelector('#mt-gacha-gem-1').addEventListener('click', () => {
+    // 抽卡按鈕暫時拿掉、給設計預覽用。後續放回會綁回這些 handler
+    content.querySelector('#mt-gacha-1')?.addEventListener('click', () => _runGacha(1));
+    content.querySelector('#mt-gacha-10')?.addEventListener('click', () => _runGacha(10));
+    content.querySelector('#mt-gacha-gem-1')?.addEventListener('click', () => {
       if (typeof showToast === 'function') showToast('💎 寶石抽卡 Phase 1.7 接 gems.js');
     });
     content.querySelector('#mt-ssr-select-open')?.addEventListener('click', () => _openSSRSelect());
@@ -2662,8 +2715,26 @@
               </div>
               <!-- 主角 sprite -->
               <div class="mt-match-hero" id="mt-match-hero"></div>
-              <!-- 飛球（射門時動畫） -->
-              <div class="mt-match-ball" id="mt-match-ball">⚽</div>
+              <!-- 球（主角腳下、會跟著一起跑、射門時飛走） -->
+              <div class="mt-match-ball" id="mt-match-ball">
+                <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <radialGradient id="mt-ball-shade" cx="35%" cy="30%">
+                      <stop offset="0%" stop-color="#ffffff"/>
+                      <stop offset="60%" stop-color="#e0e0e0"/>
+                      <stop offset="100%" stop-color="#808080"/>
+                    </radialGradient>
+                  </defs>
+                  <circle cx="16" cy="16" r="14" fill="url(#mt-ball-shade)" stroke="#1a1a1a" stroke-width="1.5"/>
+                  <!-- 五邊形塊 -->
+                  <polygon points="16,8 21,11.5 19,17 13,17 11,11.5" fill="#1a1a1a"/>
+                  <polygon points="8,16 11,12 11,18" fill="#1a1a1a"/>
+                  <polygon points="24,16 21,12 21,18" fill="#1a1a1a"/>
+                  <polygon points="16,24 13,20 19,20" fill="#1a1a1a"/>
+                  <!-- 反光高光 -->
+                  <ellipse cx="12" cy="11" rx="3" ry="2" fill="rgba(255,255,255,0.6)"/>
+                </svg>
+              </div>
             </div>
           </div>
           <div class="mt-match-banner-overlay">
@@ -2761,10 +2832,12 @@
     });
   }
 
-  // ── 比賽 tab 卷軸：主角跑步 → 到達球門 → 踢球 → 進球 → 重新循環 ──
+  // ── 比賽 tab 卷軸：主角從左帶球到右、到球門 → 射門進球 → 重新循環 ──
   let _matchBannerLoop = null;
+  let _matchGkLoop = null;
   async function _renderMatchBanner(content, mascot, team) {
     if (_matchBannerLoop) { clearTimeout(_matchBannerLoop); _matchBannerLoop = null; }
+    if (_matchGkLoop) { clearInterval(_matchGkLoop); _matchGkLoop = null; }
     if (!mascot || !window.LpcRenderer) return;
 
     const heroEl = content.querySelector('#mt-match-hero');
@@ -2787,15 +2860,23 @@
     } catch (e) {}
     if (!heroSheetUrl) return;
 
-    // 守門員：用 random look（紅黑配對抗）
+    // 守門員：固定不同 look（暗膚 + 黑髮，明顯跟主角不同）
+    const gkLook = {
+      body: 'dark',
+      eye_color: 'black',
+      hair_style: 'short',
+      hair_color: 'black',
+    };
     let gkSheetUrl = null;
     try {
-      const gkLook = window.LpcRenderer.randomLook?.() || heroLook;
-      const sheet = await window.LpcRenderer.walkingFullBody(gkLook, { shirtColor: 'black', pantsColor: 'black', shoeColor: 'black' });
+      const sheet = await window.LpcRenderer.walkingFullBody(gkLook, {
+        shirtColor: 'black', pantsColor: 'green', shoeColor: 'black',
+      });
       if (sheet) gkSheetUrl = sheet.canvas.toDataURL('image/png');
     } catch (e) {}
 
-    const SHEET_ROWS = 7; const SHEET_COLS = 3;
+    const SHEET_COLS = 3;
+    const SHEET_ROWS = 7;
     const setupSprite = (el, sheetUrl) => {
       el.style.width = frameW + 'px';
       el.style.height = frameH + 'px';
@@ -2807,71 +2888,88 @@
     setupSprite(heroEl, heroSheetUrl);
     if (gkSheetUrl) setupSprite(goalkeeperEl, gkSheetUrl);
 
-    // 動畫狀態：跑(右) -> 踢(右) -> 球飛 -> 進球 -> 從頭
-    let phase = 'run';     // 'run' | 'kick' | 'goal' | 'restart'
-    let heroX = -frameW;   // 起點：畫面左外
+    // 走向約定：依專案的 walkingFullBody — row 0=down, 1=left, 2=right, 3=up, 4=kick, 5=cheer, 6=hurt
+    const ROW_WALK_RIGHT = 2;
+    const ROW_WALK_LEFT  = 1;
+    const ROW_KICK = 4;
+    const ROW_CHEER = 5;
+
+    // 動畫狀態
+    let phase = 'run';     // 'run' | 'shoot' | 'ball-flight' | 'goal' | 'restart'
+    let heroX = -frameW;
     let frame = 1;
     let frameTick = 0;
     const bannerWidth = () => content.querySelector('.mt-match-banner')?.clientWidth || 320;
-    const goalX = () => bannerWidth() - 60;  // 球門固定在右側
-    const HERO_SPEED = 1.2;  // px/frame
+    const goalX = () => bannerWidth() - 60;
+    const HERO_SPEED = 1.2;
 
-    // walk 朝右 = row 2（依 LPC：0=up, 1=left, 2=down, 3=right；其實 walkingFullBody 用 0-3 對應 down,left,right,up）
-    // 這裡採: walk-right row=2（依專案的 walkingFullBody 約定，row 0 down, 1 left, 2 right, 3 up）
-    const ROW_WALK_RIGHT = 2;
-    const ROW_KICK = 4;
+    // 球初始狀態：在主角腳下、跟著主角移動（dribble）
+    ballEl.style.opacity = '1';
+    ballEl.style.position = 'absolute';
+    ballEl.style.bottom = '6px';
+    ballEl.style.left = '0px';
+    ballEl.style.transition = 'none';
+    ballEl.style.transform = 'rotate(0deg)';
 
     const tick = () => {
-      const w = bannerWidth();
       if (phase === 'run') {
         heroX += HERO_SPEED;
         frameTick++;
         if (frameTick % 6 === 0) frame = (frame + 1) % SHEET_COLS;
         heroEl.style.left = heroX + 'px';
         heroEl.style.backgroundPosition = `-${frame * frameW}px -${ROW_WALK_RIGHT * frameH}px`;
-        if (heroX >= goalX() - frameW - 20) {
-          phase = 'kick';
+
+        // 球跟著主角腳前、跑步時微微跳動
+        const ballX = heroX + frameW - 12;
+        const ballBounce = 6 + Math.abs(Math.sin(frameTick / 4)) * 4;
+        ballEl.style.left = ballX + 'px';
+        ballEl.style.bottom = ballBounce + 'px';
+        ballEl.style.transform = `rotate(${frameTick * 16}deg)`;
+
+        if (heroX >= goalX() - frameW - 26) {
+          phase = 'shoot';
           frame = 1;
           frameTick = 0;
+          // 切踢球姿勢
           heroEl.style.backgroundPosition = `-${1 * frameW}px -${ROW_KICK * frameH}px`;
-          // 球從主角前方飛出
-          ballEl.style.left = (heroX + frameW - 8) + 'px';
-          ballEl.style.bottom = '14px';
-          ballEl.style.opacity = '1';
-          ballEl.style.transform = 'scale(1) rotate(0deg)';
+          // 球加速飛入網
+          const targetX = goalX() + 8;
+          const targetY = 32;
+          ballEl.style.transition = 'left 0.42s cubic-bezier(0.4,0,0.2,1), bottom 0.42s cubic-bezier(0.3,1.5,0.8,1), transform 0.42s linear';
+          requestAnimationFrame(() => {
+            ballEl.style.left = targetX + 'px';
+            ballEl.style.bottom = targetY + 'px';
+            ballEl.style.transform = 'rotate(1080deg) scale(1.15)';
+          });
           setTimeout(() => {
-            // 球飛入網
-            ballEl.style.transition = 'left 0.5s ease-out, bottom 0.5s ease-out, transform 0.5s linear';
-            ballEl.style.left = (goalX() + 12) + 'px';
-            ballEl.style.bottom = '32px';
-            ballEl.style.transform = 'scale(1.3) rotate(720deg)';
+            phase = 'goal';
+            // 主角歡呼
+            heroEl.style.backgroundPosition = `-${1 * frameW}px -${ROW_CHEER * frameH}px`;
             setTimeout(() => {
-              phase = 'goal';
-              // 主角歡呼
-              heroEl.style.backgroundPosition = `-${1 * frameW}px -${5 * frameH}px`;
-              setTimeout(() => {
-                phase = 'restart';
-                // 主角從左邊重新進來
-                heroX = -frameW;
-                heroEl.style.left = heroX + 'px';
-                ballEl.style.transition = 'none';
-                ballEl.style.opacity = '0';
-                phase = 'run';
-              }, 800);
-            }, 500);
-          }, 350);
+              // 重置
+              heroX = -frameW;
+              frame = 1; frameTick = 0;
+              heroEl.style.left = heroX + 'px';
+              ballEl.style.transition = 'none';
+              ballEl.style.bottom = '6px';
+              ballEl.style.transform = 'rotate(0deg)';
+              phase = 'run';
+            }, 900);
+          }, 460);
         }
       }
       _matchBannerLoop = setTimeout(tick, 1000 / 30);
     };
-    // 守門員：原地小幅左右晃
+
+    // 守門員：左右小幅晃動（撲球姿勢）
     let gkPhase = 0;
-    setInterval(() => {
+    _matchGkLoop = setInterval(() => {
       if (!goalkeeperEl) return;
-      gkPhase = (gkPhase + 1) % 4;
-      const row = gkPhase < 2 ? 1 /* left */ : 2 /* right */;
-      goalkeeperEl.style.backgroundPosition = `-${(gkPhase % SHEET_COLS) * frameW}px -${row * frameH}px`;
-    }, 380);
+      gkPhase = (gkPhase + 1) % 6;
+      const row = gkPhase < 3 ? ROW_WALK_LEFT : ROW_WALK_RIGHT;
+      const f = gkPhase % SHEET_COLS;
+      goalkeeperEl.style.backgroundPosition = `-${f * frameW}px -${row * frameH}px`;
+    }, 320);
 
     tick();
   }
