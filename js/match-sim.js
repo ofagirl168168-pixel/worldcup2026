@@ -306,18 +306,8 @@
         // 24 幀分 3 段（0→1→2→2 hold）
         frame = Math.min(2, Math.floor(tackleAge / 8));
       } else if (state.phase === 'fulltime') {
-        // 全場結束：先用 walk 動畫走到排隊位置，到位才開始慶祝 / 懊惱
-        const dxMov = (p.tx || p.x) - p.x;
-        const dyMov = (p.ty || p.y) - p.y;
-        const stillWalking = Math.abs(dxMov) + Math.abs(dyMov) > 0.006;
-        if (stillWalking) {
-          if (Math.abs(dyMov) > Math.abs(dxMov)) {
-            dirRow = dyMov > 0 ? 0 : 3;
-          } else {
-            dirRow = dxMov < 0 ? 1 : 2;
-          }
-          frame = Math.floor(_renderTick / 8) % 3;
-        } else if (state.fulltimeWinner === 'd') {
+        // 全場結束：已 snap 到排隊位置、直接播慶祝/懊惱/站立
+        if (state.fulltimeWinner === 'd') {
           dirRow = 0; frame = 1;
         } else {
           dirRow = (p.team === state.fulltimeWinner) ? 5 : 6;
@@ -736,12 +726,12 @@
         || players.map((p, i) => ({ p, i })).find(x => x.p.team === whoHasBall && x.p.role !== 'GK');
       state.possessorIdx = chosen ? chosen.i : 0;
       ball.x = 0.5; ball.y = 0.5;
-      // 開球：所有人直接 snap 到陣型位置 + 退回己方半場
+      // 開球：直接 snap 到陣型自然位置（baseX/baseY）— 不再強制全員推回己方半場
+      // 之前 home 全員 x <= 0.48 → FWD 全擠中線、然後又跑到 0.85+ 看起來像「擠了又散」
+      // 雖然足球規則開球時所有人應在己方半場，但模擬只是個動畫、視覺優先
       players.forEach(p => {
         p.x = p.baseX;
         p.y = p.baseY;
-        if (p.team === 'h') p.x = Math.min(0.48, p.x);
-        else p.x = Math.max(0.52, p.x);
         p.tx = p.x; p.ty = p.y;
         p._urgent = false;
       });
@@ -1165,12 +1155,16 @@
 
       players.forEach((p, i) => {
         // smoothness（lerp 係數）+ maxStep（單幀上限）共同控制速度
-        // ※ 所有人都走「相同的基準速度」、個體差異完全靠 stats.speed 倍率
-        //   不再有「urgent 加速」這種隱形 buff 造成莫名暴衝
+        // 個體差異主要靠 stats.speed 倍率 — 拿掉了 urgent 隱形 buff
         let smoothness = 0.045;
         let maxStep = 0.010;
         // 持球者：smoothness 稍高（盤帶反應快、但 maxStep 跟一般一樣）
         if (i === state.possessorIdx) { smoothness = 0.055; maxStep = 0.010; }
+        // 散球追球：rank-0（最近的人）才有小幅 sprint — 模擬「無人控球時球員會衝去搶」
+        if (state.phase === 'loose' && p._urgent) {
+          smoothness = 0.060;
+          maxStep = 0.013;
+        }
         // 鏟球中：靠視覺 slide、tx/ty 不再追
         if (p._tackleVisualUntil && state.frame < p._tackleVisualUntil) {
           smoothness = 0.02;
@@ -1329,14 +1323,22 @@
           state.fulltimeWinner = hScore > aScore ? 'h' : aScore > hScore ? 'a' : 'd';
           // 收掉進球放大殘留
           if (typeof _endGoalCelebration === 'function') _endGoalCelebration(ui);
-          // 全部 22 人排成「一橫列」：中線以左是 home 隊、中線以右是 away 隊
-          // home 11 人在 x 0.04~0.46、away 11 人在 x 0.54~0.96、全部 y = 0.5
+          // 全部 22 人「直接 snap」排成一橫列（不用走過去）
+          // home 在 x 0.04~0.46（中線以左）、away 在 x 0.54~0.96（中線以右）、y = 0.5
           const homeP = players.filter(p => p.team === 'h');
           const awayP = players.filter(p => p.team === 'a');
           const lineX = (idx, n, xStart, xEnd) =>
             xStart + idx * ((xEnd - xStart) / Math.max(1, n - 1));
-          homeP.forEach((p, i) => { p.tx = lineX(i, homeP.length, 0.04, 0.46); p.ty = 0.50; });
-          awayP.forEach((p, i) => { p.tx = lineX(i, awayP.length, 0.54, 0.96); p.ty = 0.50; });
+          homeP.forEach((p, i) => {
+            const px = lineX(i, homeP.length, 0.04, 0.46);
+            p.x = px; p.tx = px;
+            p.y = 0.50; p.ty = 0.50;
+          });
+          awayP.forEach((p, i) => {
+            const px = lineX(i, awayP.length, 0.54, 0.96);
+            p.x = px; p.tx = px;
+            p.y = 0.50; p.ty = 0.50;
+          });
           // 清掉 urgent / tackle 殘留
           players.forEach(p => { p._urgent = false; p._tackleVisualUntil = 0; });
           // 鏡頭拉回中央
@@ -1349,10 +1351,9 @@
           state.possessorIdx = -1;
         }
         if (state.phase === 'fulltime') {
-          // 持續移動球員到排隊位置
-          movePlayers();
-          // 4.5 秒後切到 ended、顯示 summary（前 2 秒走過去、後 2.5 秒慶祝/懊惱）
-          if (performance.now() - state.fulltimeStart > 4500) {
+          // 球員已 snap 到排隊位置、不再移動 — 直接 render 慶祝/懊惱動畫
+          // 3 秒後切到 ended、顯示 summary
+          if (performance.now() - state.fulltimeStart > 3000) {
             state.phase = 'ended';
             showSummary();
             return;
