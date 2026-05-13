@@ -501,24 +501,45 @@
   position: relative;
 }
 
-/* ── 各 tab 沉浸式背景（依當前 tab 換場景）── */
+/* ── 各 tab 沉浸式場景背景（依當前 tab 換場景）── */
+/* 每個 tab 都用 ::before 畫場景主體、::after 加細節，融入功能 icon */
+
+/* 🎰 GACHA：抽券店場景（紅金霓虹 + 扭蛋機 + 浮卡） */
 .mt-hub-content[data-tab="gacha"] {
   background:
     /* 中央光柱 */
-    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(240,192,64,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 25%, rgba(240,192,64,0.18) 0%, transparent 65%),
+    /* 牆面磚紋 */
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px,
+      transparent 1px, transparent 40px),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px,
+      transparent 1px, transparent 40px),
     /* 紅金主色 */
     linear-gradient(180deg, #1a0a1f 0%, #2a1015 50%, #1a0a14 100%);
 }
 .mt-hub-content[data-tab="gacha"]::before {
   content: ''; position: absolute; inset: 0;
-  background:
-    radial-gradient(circle 1px at 20% 30%, rgba(240,192,64,0.8) 50%, transparent 51%),
-    radial-gradient(circle 1px at 70% 20%, rgba(240,192,64,0.6) 50%, transparent 51%),
-    radial-gradient(circle 1px at 40% 60%, rgba(240,192,64,0.7) 50%, transparent 51%),
-    radial-gradient(circle 1px at 85% 70%, rgba(240,192,64,0.5) 50%, transparent 51%),
-    radial-gradient(circle 1px at 15% 85%, rgba(240,192,64,0.6) 50%, transparent 51%),
-    radial-gradient(circle 1px at 60% 90%, rgba(240,192,64,0.5) 50%, transparent 51%);
-  background-size: 300px 300px;
+  background-image:
+    /* 扭蛋機 bottom-left */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'><defs><radialGradient id='g' cx='50%25' cy='40%25'><stop offset='0%25' stop-color='%23ffe8a0'/><stop offset='100%25' stop-color='%23c0892a'/></radialGradient></defs><rect x='20' y='80' width='60' height='55' rx='4' fill='%23a02030' stroke='%23501018' stroke-width='2'/><rect x='28' y='95' width='44' height='14' fill='%23200a10' rx='2'/><rect x='42' y='115' width='16' height='14' fill='%23f0c040' rx='2' stroke='%23805020' stroke-width='1'/><circle cx='50' cy='40' r='30' fill='url(%23g)' stroke='%23805020' stroke-width='2'/><circle cx='42' cy='32' r='4' fill='%23e53935'/><circle cx='55' cy='38' r='4' fill='%2343a047'/><circle cx='45' cy='48' r='4' fill='%231976d2'/><circle cx='58' cy='28' r='4' fill='%23f0c040'/><circle cx='38' cy='42' r='4' fill='%239b87f5'/><rect x='44' y='75' width='12' height='6' fill='%23805020'/></svg>"),
+    /* 浮卡 top-right */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100'><rect x='10' y='30' width='35' height='50' rx='3' fill='%23f0c040' stroke='%23805020' stroke-width='2' transform='rotate(-12 27 55)'/><rect x='45' y='20' width='35' height='50' rx='3' fill='%239b87f5' stroke='%23403080' stroke-width='2' transform='rotate(5 62 45)'/><rect x='75' y='35' width='35' height='50' rx='3' fill='%23e53935' stroke='%23601015' stroke-width='2' transform='rotate(15 92 60)'/><text x='27' y='62' font-size='14' fill='%23805020' text-anchor='middle' transform='rotate(-12 27 55)'>★</text><text x='62' y='52' font-size='14' fill='%23fff' text-anchor='middle' transform='rotate(5 62 45)'>★</text><text x='92' y='67' font-size='14' fill='%23fff' text-anchor='middle' transform='rotate(15 92 60)'>★</text></svg>");
+  background-position: 6px bottom, top right 6px;
+  background-repeat: no-repeat;
+  background-size: 110px auto, 130px auto;
+  pointer-events: none;
+  opacity: 0.42;
+}
+.mt-hub-content[data-tab="gacha"]::after {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle 1.5px at 20% 30%, rgba(240,192,64,0.7) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 70% 20%, rgba(240,192,64,0.5) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 40% 55%, rgba(240,192,64,0.6) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 85% 60%, rgba(240,192,64,0.5) 50%, transparent 51%);
+  background-size: 280px 280px;
   pointer-events: none;
   animation: mt-bg-twinkle 4s ease-in-out infinite alternate;
 }
@@ -527,87 +548,211 @@
   100% { opacity: 0.85; }
 }
 
+/* 📋 COACH：戰術室（黑板 + 戰術 X/O + 哨子 + 戰術筆） */
 .mt-hub-content[data-tab="coach"] {
   background:
-    /* 黑板紋 */
-    repeating-linear-gradient(135deg,
-      rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px,
-      transparent 1px, transparent 8px),
-    /* 戰術室深綠主色 */
-    linear-gradient(180deg, #0d1f1a 0%, #1a2d27 50%, #0a1814 100%);
+    /* 木地板紋（底部） */
+    repeating-linear-gradient(90deg,
+      rgba(180,120,60,0.05) 0, rgba(180,120,60,0.05) 60px,
+      transparent 60px, transparent 62px),
+    /* 牆 → 木地板分界 */
+    linear-gradient(180deg, #0d1f1a 0%, #142822 65%, #2a1d10 65%, #1a1208 100%);
 }
 .mt-hub-content[data-tab="coach"]::before {
   content: ''; position: absolute; inset: 0;
-  /* X / O 戰術圖 hint */
-  background:
-    radial-gradient(circle 3px at 15% 20%, rgba(155,135,245,0.18) 50%, transparent 51%),
-    radial-gradient(circle 3px at 80% 30%, rgba(94,234,212,0.15) 50%, transparent 51%),
-    radial-gradient(circle 3px at 25% 70%, rgba(94,234,212,0.15) 50%, transparent 51%),
-    radial-gradient(circle 3px at 75% 80%, rgba(155,135,245,0.18) 50%, transparent 51%);
-  background-size: 200px 200px;
+  background-image:
+    /* 黑板 X/O 戰術圖（上中） */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect x='4' y='4' width='192' height='92' rx='3' fill='%231a3025' stroke='%23805030' stroke-width='4'/><line x1='100' y1='8' x2='100' y2='92' stroke='rgba(255,255,255,0.25)' stroke-width='1' stroke-dasharray='3,3'/><circle cx='30' cy='30' r='5' fill='none' stroke='%2390caf9' stroke-width='2'/><circle cx='60' cy='50' r='5' fill='none' stroke='%2390caf9' stroke-width='2'/><circle cx='40' cy='70' r='5' fill='none' stroke='%2390caf9' stroke-width='2'/><line x1='30' y1='30' x2='60' y2='50' stroke='%23f0c040' stroke-width='1.5' stroke-dasharray='2,2'/><line x1='60' y1='50' x2='40' y2='70' stroke='%23f0c040' stroke-width='1.5' stroke-dasharray='2,2'/><text x='140' y='28' font-size='14' font-weight='900' fill='%23e53935' text-anchor='middle'>X</text><text x='160' y='52' font-size='14' font-weight='900' fill='%23e53935' text-anchor='middle'>X</text><text x='175' y='75' font-size='14' font-weight='900' fill='%23e53935' text-anchor='middle'>X</text><path d='M 145 30 Q 155 40 158 50' stroke='%23f0c040' fill='none' stroke-width='1.5' stroke-dasharray='2,2' marker-end='url(%23arr)'/></svg>"),
+    /* 哨子 bottom-right */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 50'><ellipse cx='25' cy='28' rx='18' ry='12' fill='%23c0c0c0' stroke='%23606060' stroke-width='2'/><rect x='40' y='24' width='12' height='8' fill='%23c0c0c0' stroke='%23606060' stroke-width='2' rx='2'/><circle cx='22' cy='28' r='3' fill='%23202020'/><path d='M 8 18 Q 0 14 -3 8' stroke='%23ffffff' fill='none' stroke-width='1.5' opacity='0.6'/></svg>"),
+    /* 戰術筆 top-right */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 30'><rect x='10' y='12' width='55' height='6' fill='%23f0c040' rx='2'/><polygon points='65,9 75,15 65,21' fill='%23805030'/><circle cx='14' cy='15' r='3' fill='%23805030'/></svg>");
+  background-position: center 10px, right 8px bottom 8px, right 8px top 90px;
+  background-repeat: no-repeat;
+  background-size: min(70%, 280px) auto, 56px auto, 70px auto;
   pointer-events: none;
+  opacity: 0.5;
 }
 
+/* ⚽ MATCH：球場（夜空 + 聚光燈 + 計分板 + 觀眾席剪影） */
 .mt-hub-content[data-tab="match"] {
   background:
-    /* 球場聚光燈 */
-    radial-gradient(ellipse 100% 50% at 50% 0%, rgba(255,255,255,0.12) 0%, transparent 70%),
-    /* 草皮 + 觀眾席漸層 */
-    linear-gradient(180deg, #0a1428 0%, #1a3050 30%, #1a4520 60%, #0d2a14 100%);
+    /* 聚光燈光線 */
+    radial-gradient(ellipse 60% 40% at 30% 0%, rgba(255,255,210,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 70% 0%, rgba(255,255,210,0.16) 0%, transparent 70%),
+    /* 夜空 → 看台 → 草皮 */
+    linear-gradient(180deg,
+      #0a1230 0%,
+      #1a2545 25%,
+      #1a3050 50%,
+      #1a4520 62%,
+      #0d2a14 100%);
 }
 .mt-hub-content[data-tab="match"]::before {
   content: ''; position: absolute; inset: 0;
-  background: repeating-linear-gradient(0deg,
-    transparent 0, transparent 22px,
-    rgba(255,255,255,0.04) 22px, rgba(255,255,255,0.04) 24px);
+  background-image:
+    /* 計分板 top-center */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 50'><rect x='4' y='4' width='132' height='42' rx='4' fill='%23101820' stroke='%23f0c040' stroke-width='2'/><line x1='70' y1='4' x2='70' y2='46' stroke='%23f0c040' stroke-width='2'/><text x='35' y='32' font-size='22' font-weight='900' fill='%23ff4030' text-anchor='middle' font-family='monospace'>0</text><text x='105' y='32' font-size='22' font-weight='900' fill='%23ff4030' text-anchor='middle' font-family='monospace'>0</text></svg>"),
+    /* 聚光燈柱 left */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 130'><rect x='22' y='40' width='6' height='90' fill='%23606060'/><rect x='10' y='30' width='30' height='15' rx='2' fill='%23a0a0a0' stroke='%23303030' stroke-width='1.5'/><circle cx='14' cy='37' r='2.5' fill='%23ffe080'/><circle cx='25' cy='37' r='2.5' fill='%23ffe080'/><circle cx='36' cy='37' r='2.5' fill='%23ffe080'/></svg>"),
+    /* 聚光燈柱 right */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 130'><rect x='22' y='40' width='6' height='90' fill='%23606060'/><rect x='10' y='30' width='30' height='15' rx='2' fill='%23a0a0a0' stroke='%23303030' stroke-width='1.5'/><circle cx='14' cy='37' r='2.5' fill='%23ffe080'/><circle cx='25' cy='37' r='2.5' fill='%23ffe080'/><circle cx='36' cy='37' r='2.5' fill='%23ffe080'/></svg>");
+  background-position: center 50px, left 4px top 8px, right 4px top 8px;
+  background-repeat: no-repeat;
+  background-size: 130px auto, 42px auto, 42px auto;
+  pointer-events: none;
+  opacity: 0.55;
+}
+.mt-hub-content[data-tab="match"]::after {
+  content: ''; position: absolute; inset: 0;
+  background:
+    /* 觀眾席剪影（45% 處） */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 30' preserveAspectRatio='none'><path d='M 0 30 Q 10 10 20 18 Q 30 8 40 18 Q 50 12 60 18 Q 70 6 80 18 Q 90 10 100 18 Q 110 14 120 18 Q 130 8 140 18 Q 150 12 160 18 Q 170 6 180 18 Q 190 10 200 18 Q 210 14 220 18 Q 230 8 240 18 Q 250 12 260 18 Q 270 6 280 18 Q 290 10 300 18 Q 310 14 320 18 Q 330 8 340 18 Q 350 12 360 18 Q 370 6 380 18 Q 390 10 400 18 L 400 30 Z' fill='%23000000' opacity='0.5'/></svg>") repeat-x left 46%,
+    /* 草皮條紋 */
+    repeating-linear-gradient(0deg,
+      transparent 0, transparent 22px,
+      rgba(255,255,255,0.03) 22px, rgba(255,255,255,0.03) 24px);
+  background-size: 200px 30px, auto auto;
   pointer-events: none;
 }
 
+/* 💪 TRAIN：訓練館（牆 + 啞鈴 + 跑步機 + 訓練錐） */
 .mt-hub-content[data-tab="train"] {
   background:
-    linear-gradient(180deg, #1a1505 0%, #2a2010 50%, #14100a 100%);
+    /* 木地板 */
+    repeating-linear-gradient(90deg,
+      rgba(120,80,40,0.06) 0, rgba(120,80,40,0.06) 80px,
+      transparent 80px, transparent 82px),
+    /* 牆 → 地板 */
+    linear-gradient(180deg, #1f1808 0%, #2a2010 55%, #3a2614 55%, #251a08 100%);
 }
 .mt-hub-content[data-tab="train"]::before {
   content: ''; position: absolute; inset: 0;
-  background:
-    /* 啞鈴/能量 hint */
-    radial-gradient(ellipse 60% 30% at 50% 20%, rgba(255,140,40,0.1) 0%, transparent 70%);
+  background-image:
+    /* 啞鈴 bottom-left */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40'><rect x='5' y='8' width='14' height='24' rx='2' fill='%23404040' stroke='%23202020' stroke-width='2'/><rect x='81' y='8' width='14' height='24' rx='2' fill='%23404040' stroke='%23202020' stroke-width='2'/><rect x='19' y='17' width='62' height='6' fill='%23606060' stroke='%23202020' stroke-width='1.5'/><rect x='25' y='19' width='2' height='2' fill='%23202020'/><rect x='30' y='19' width='2' height='2' fill='%23202020'/></svg>"),
+    /* 訓練錐 bottom-right */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 60'><polygon points='25,8 40,50 10,50' fill='%23ff8030' stroke='%23a04010' stroke-width='2'/><rect x='6' y='48' width='38' height='6' fill='%23a04010' rx='1'/><rect x='13' y='22' width='24' height='3' fill='%23ffffff' opacity='0.7'/><rect x='15' y='34' width='20' height='3' fill='%23ffffff' opacity='0.7'/></svg>"),
+    /* 能量條紋 top */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 30'><text x='100' y='22' font-size='20' text-anchor='middle' fill='%23ff8040' opacity='0.6'>⚡ TRAINING ⚡</text></svg>");
+  background-position: left 8px bottom 8px, right 8px bottom 8px, center top 8px;
+  background-repeat: no-repeat;
+  background-size: 110px auto, 50px auto, min(60%, 240px) auto;
   pointer-events: none;
+  opacity: 0.55;
 }
 
+/* 📜 QUEST：任務告示板（木紋 + 釘紙 + 卷軸） */
 .mt-hub-content[data-tab="quest"] {
   background:
-    linear-gradient(180deg, #0a1430 0%, #1a2050 50%, #0a1428 100%);
+    /* 木紋背板 */
+    repeating-linear-gradient(0deg,
+      rgba(180,120,60,0.06) 0, rgba(180,120,60,0.06) 50px,
+      transparent 50px, transparent 52px),
+    linear-gradient(180deg, #1a1530 0%, #2a2050 50%, #1a1530 100%);
 }
 .mt-hub-content[data-tab="quest"]::before {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse 80% 40% at 50% 15%, rgba(155,135,245,0.18) 0%, transparent 70%);
+  background-image:
+    /* 釘紙 top-left */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 90'><rect x='5' y='10' width='70' height='75' fill='%23f0e0a0' stroke='%23805030' stroke-width='2' transform='rotate(-6 40 47)'/><line x1='15' y1='30' x2='62' y2='28' stroke='%23805030' stroke-width='1.5' transform='rotate(-6 40 47)' opacity='0.5'/><line x1='15' y1='40' x2='62' y2='38' stroke='%23805030' stroke-width='1.5' transform='rotate(-6 40 47)' opacity='0.5'/><line x1='15' y1='50' x2='52' y2='48' stroke='%23805030' stroke-width='1.5' transform='rotate(-6 40 47)' opacity='0.5'/><circle cx='40' cy='10' r='4' fill='%23e53935' stroke='%23801010' stroke-width='1'/></svg>"),
+    /* 釘紙 right */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 90'><rect x='5' y='10' width='70' height='75' fill='%23a0d0f0' stroke='%23204060' stroke-width='2' transform='rotate(8 40 47)'/><text x='40' y='40' font-size='20' fill='%23204060' text-anchor='middle' transform='rotate(8 40 47)'>★</text><text x='40' y='65' font-size='14' fill='%23204060' text-anchor='middle' transform='rotate(8 40 47)'>QUEST</text><circle cx='40' cy='10' r='4' fill='%23f0c040' stroke='%23805020' stroke-width='1'/></svg>");
+  background-position: left 8px top 8px, right 8px top 60px;
+  background-repeat: no-repeat;
+  background-size: 75px auto, 75px auto;
   pointer-events: none;
+  opacity: 0.45;
 }
 
+/* 🛒 SHOP：商店（貨架 + 價格牌 + 收銀機） */
 .mt-hub-content[data-tab="shop"] {
   background:
+    /* 貨架橫線 */
+    repeating-linear-gradient(0deg,
+      transparent 0, transparent 120px,
+      rgba(255,255,255,0.05) 120px, rgba(255,255,255,0.05) 124px),
     linear-gradient(180deg, #1a0a28 0%, #2a1840 50%, #14081f 100%);
 }
-
-.mt-hub-content[data-tab="dex"] {
-  background:
-    linear-gradient(180deg, #0a1f1a 0%, #1a2a25 50%, #08140f 100%);
+.mt-hub-content[data-tab="shop"]::before {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    /* 價格牌 top-right */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 50'><polygon points='8,4 75,4 75,46 8,46 0,25' fill='%23f0c040' stroke='%23805020' stroke-width='2'/><circle cx='12' cy='25' r='3' fill='%23805020'/><text x='45' y='32' font-size='18' font-weight='900' fill='%23805020' text-anchor='middle'>$</text></svg>"),
+    /* 收銀機 bottom-left */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 60'><rect x='4' y='20' width='72' height='38' rx='3' fill='%23606060' stroke='%23202020' stroke-width='2'/><rect x='14' y='6' width='52' height='18' rx='2' fill='%23a0d0f0' stroke='%23204060' stroke-width='2'/><text x='40' y='20' font-size='10' fill='%23204060' text-anchor='middle' font-family='monospace'>$ 999</text><rect x='10' y='28' width='10' height='6' fill='%23404040' rx='1'/><rect x='25' y='28' width='10' height='6' fill='%23404040' rx='1'/><rect x='40' y='28' width='10' height='6' fill='%23404040' rx='1'/><rect x='55' y='28' width='10' height='6' fill='%23e53935' rx='1'/></svg>");
+  background-position: right 8px top 10px, left 8px bottom 10px;
+  background-repeat: no-repeat;
+  background-size: 70px auto, 90px auto;
+  pointer-events: none;
+  opacity: 0.5;
 }
 
+/* 📖 DEX：圖鑑（書架 + 翻開的書 + 放大鏡） */
+.mt-hub-content[data-tab="dex"] {
+  background:
+    /* 書本邊條紋 */
+    repeating-linear-gradient(90deg,
+      rgba(120,80,40,0.06) 0, rgba(120,80,40,0.06) 30px,
+      rgba(80,40,20,0.08) 30px, rgba(80,40,20,0.08) 32px,
+      transparent 32px, transparent 64px),
+    linear-gradient(180deg, #0a1f1a 0%, #1a2a25 50%, #08140f 100%);
+}
+.mt-hub-content[data-tab="dex"]::before {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    /* 翻開的書 bottom-center */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 100'><path d='M 10 20 Q 80 10 80 20 L 80 90 Q 10 80 10 90 Z' fill='%23f0e0a0' stroke='%23805030' stroke-width='2'/><path d='M 150 20 Q 80 10 80 20 L 80 90 Q 150 80 150 90 Z' fill='%23e0d090' stroke='%23805030' stroke-width='2'/><line x1='80' y1='15' x2='80' y2='88' stroke='%23805030' stroke-width='1.5'/><line x1='20' y1='32' x2='72' y2='28' stroke='%23805030' stroke-width='1' opacity='0.5'/><line x1='20' y1='42' x2='72' y2='38' stroke='%23805030' stroke-width='1' opacity='0.5'/><line x1='20' y1='52' x2='62' y2='48' stroke='%23805030' stroke-width='1' opacity='0.5'/><line x1='88' y1='28' x2='140' y2='32' stroke='%23805030' stroke-width='1' opacity='0.5'/><line x1='88' y1='38' x2='140' y2='42' stroke='%23805030' stroke-width='1' opacity='0.5'/><line x1='88' y1='48' x2='130' y2='52' stroke='%23805030' stroke-width='1' opacity='0.5'/></svg>"),
+    /* 放大鏡 top-right */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><circle cx='25' cy='25' r='18' fill='rgba(160,200,240,0.3)' stroke='%23a0a0a0' stroke-width='3'/><line x1='38' y1='38' x2='52' y2='52' stroke='%23a0a0a0' stroke-width='4' stroke-linecap='round'/><circle cx='20' cy='20' r='5' fill='%23ffffff' opacity='0.5'/></svg>");
+  background-position: center bottom 6px, right 8px top 8px;
+  background-repeat: no-repeat;
+  background-size: min(50%, 170px) auto, 50px auto;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+/* 🏆 RANK：頒獎台（獎盃 + 彩帶 + 領獎台） */
 .mt-hub-content[data-tab="rank"] {
   background:
-    linear-gradient(180deg, #1a1505 0%, #2a2510 50%, #1a1408 100%);
+    /* 中央光暈 */
+    radial-gradient(ellipse 70% 30% at 50% 0%, rgba(240,192,64,0.22) 0%, transparent 70%),
+    linear-gradient(180deg, #1a1505 0%, #2a2510 55%, #1a1408 100%);
 }
 .mt-hub-content[data-tab="rank"]::before {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse 60% 30% at 50% 5%, rgba(240,192,64,0.18) 0%, transparent 70%);
+  background-image:
+    /* 領獎台 + 三獎盃 bottom-center */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 130'><rect x='80' y='30' width='60' height='90' fill='%23f0c040' stroke='%23805020' stroke-width='2'/><text x='110' y='80' font-size='32' font-weight='900' fill='%23805020' text-anchor='middle'>1</text><rect x='10' y='60' width='65' height='60' fill='%23c0c0c0' stroke='%23606060' stroke-width='2'/><text x='42' y='100' font-size='28' font-weight='900' fill='%23606060' text-anchor='middle'>2</text><rect x='145' y='80' width='65' height='40' fill='%23cd7f32' stroke='%23703a14' stroke-width='2'/><text x='177' y='110' font-size='22' font-weight='900' fill='%23703a14' text-anchor='middle'>3</text><g transform='translate(110 14)'><path d='M -10 -8 L 10 -8 L 8 2 L -8 2 Z' fill='%23f0c040' stroke='%23805020' stroke-width='1.5'/><circle cx='0' cy='-2' r='4' fill='%23ffe680'/></g></svg>"),
+    /* 彩帶 top */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 30'><path d='M 0 15 Q 30 0 60 15 T 120 15 T 180 15 T 240 15 T 300 15' stroke='%23e53935' fill='none' stroke-width='3'/><path d='M 0 20 Q 30 5 60 20 T 120 20 T 180 20 T 240 20 T 300 20' stroke='%23f0c040' fill='none' stroke-width='3'/></svg>");
+  background-position: center bottom 8px, center top 6px;
+  background-repeat: no-repeat;
+  background-size: min(80%, 240px) auto, 90% auto;
   pointer-events: none;
+  opacity: 0.55;
 }
 
+/* 👥 FRIENDS：交誼廳（沙發 + 對話泡泡 + 牆面） */
 .mt-hub-content[data-tab="friends"] {
   background:
-    linear-gradient(180deg, #0a1428 0%, #1a2a50 50%, #08142a 100%);
+    /* 牆面線板 */
+    linear-gradient(180deg, #0a1428 0%, #1a2a50 60%, #14203e 60%, #08142a 100%);
+}
+.mt-hub-content[data-tab="friends"]::before {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    /* 對話泡泡 top-right */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 70'><path d='M 10 10 L 65 10 Q 75 10 75 20 L 75 45 Q 75 55 65 55 L 40 55 L 32 65 L 35 55 L 20 55 Q 10 55 10 45 Z' fill='%2390caf9' stroke='%23204060' stroke-width='2'/><circle cx='25' cy='32' r='3' fill='%23204060'/><circle cx='42' cy='32' r='3' fill='%23204060'/><circle cx='59' cy='32' r='3' fill='%23204060'/></svg>"),
+    /* 對話泡泡 left */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 70'><path d='M 70 10 L 15 10 Q 5 10 5 20 L 5 45 Q 5 55 15 55 L 40 55 L 48 65 L 45 55 L 60 55 Q 70 55 70 45 Z' fill='%23ffb0c0' stroke='%23802040' stroke-width='2'/><text x='40' y='40' font-size='16' fill='%23802040' text-anchor='middle'>♥</text></svg>"),
+    /* 沙發 bottom-center */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70'><rect x='10' y='20' width='180' height='40' rx='8' fill='%23805030' stroke='%23402010' stroke-width='2'/><rect x='5' y='25' width='30' height='35' rx='6' fill='%23a06840' stroke='%23402010' stroke-width='2'/><rect x='165' y='25' width='30' height='35' rx='6' fill='%23a06840' stroke='%23402010' stroke-width='2'/><rect x='40' y='15' width='35' height='20' rx='4' fill='%23c08060' stroke='%23402010' stroke-width='1.5'/><rect x='85' y='15' width='35' height='20' rx='4' fill='%23c08060' stroke='%23402010' stroke-width='1.5'/><rect x='130' y='15' width='35' height='20' rx='4' fill='%23c08060' stroke='%23402010' stroke-width='1.5'/></svg>");
+  background-position: right 8px top 10px, left 8px top 80px, center bottom 8px;
+  background-repeat: no-repeat;
+  background-size: 70px auto, 70px auto, min(70%, 220px) auto;
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 /* 確保內容在背景之上 */
@@ -3121,6 +3266,78 @@
   animation: mt-bob 2.4s ease-in-out infinite;
   transition: transform 0.2s;
   z-index: 2;
+}
+
+/* 替換模式：場上球員可被點擊取代 */
+.mt-swap-mode .mt-pitch-player {
+  cursor: cell;
+}
+.mt-swap-mode .mt-pitch-player::after {
+  content: ''; position: absolute; inset: -8px;
+  border: 2px dashed rgba(240,192,64,0.7);
+  border-radius: 50%;
+  animation: mt-swap-pulse 1.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.mt-swap-mode .mt-pitch-player.mt-swap-target-match::after {
+  border-color: rgba(76,175,80,0.95);
+  border-width: 3px;
+  box-shadow: 0 0 12px rgba(76,175,80,0.6);
+}
+@keyframes mt-swap-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.08); }
+}
+.mt-swap-mode .mt-pitch-player:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+/* 替換模式提示橫幅 */
+.mt-swap-prompt-banner {
+  display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, rgba(240,192,64,0.18), rgba(229,57,53,0.18));
+  border: 2px solid #f0c040; border-radius: 10px;
+  padding: 8px 12px; margin-bottom: 8px;
+  color: #fff; font-size: 12px;
+  box-shadow: 0 2px 8px rgba(240,192,64,0.25);
+  animation: mt-swap-banner-in 0.25s ease-out;
+}
+@keyframes mt-swap-banner-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mt-swap-prompt-icon {
+  font-size: 18px;
+  animation: mt-swap-finger 1s ease-in-out infinite;
+}
+@keyframes mt-swap-finger {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(3px); }
+}
+.mt-swap-prompt-text { flex: 1; }
+.mt-swap-prompt-text b { color: #f0c040; }
+.mt-swap-cancel-btn {
+  background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.3);
+  color: #fff; font-size: 11px; font-weight: 800;
+  padding: 4px 10px; border-radius: 6px; cursor: pointer;
+}
+.mt-swap-cancel-btn:hover { background: rgba(229,57,53,0.4); border-color: #e53935; }
+
+/* 位置不符警告 */
+.mt-pos-warn {
+  display: inline-block;
+  font-size: 9px;
+  margin-left: 2px;
+  filter: drop-shadow(0 0 2px rgba(255,180,0,0.9));
+  animation: mt-pos-warn-blink 1.6s ease-in-out infinite;
+}
+@keyframes mt-pos-warn-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+.mt-pitch-player.mt-pos-mismatch .mt-pitch-player-pos {
+  background: rgba(255,140,40,0.9) !important;
+  box-shadow: 0 0 6px rgba(255,180,0,0.8);
 }
 .mt-pitch-player:nth-child(odd) { animation-delay: 0.4s; }
 .mt-pitch-player:nth-child(3n) { animation-delay: 0.8s; }
