@@ -14,6 +14,11 @@ const DAILY_OPINIONS = [
 
   // ── 本週時事 ─────────────────────────────────────────
 
+  { id:'op-20260513-b', date:'', type:'trending',
+    q:"Maddison 賽後怒轟 VAR：「裁判們嚇壞了不敢判」，103 分鐘該判點球嗎？",
+    opts:["該判！Nmecha 根本沒碰到球，Maddison 被放倒了 ⚖️","不該判，Nmecha 有觸球、VAR 判斷正確 🟢","裁判不敢判才是問題，整個 VAR 制度需要大改革 🔧","熱刺自己保級表現太差，不能怪裁判 💀"],
+    context:"熱刺 1-1 里茲聯（第36輪），Tel 50' 世界波破門但 74' 危險動作送點被扳平。補時第 103 分鐘 Maddison 在禁區被 Nmecha 放倒，裁判 Jarred Gillett 和 VAR 均未判罰，理由是 Nmecha 有碰到球。Maddison 賽後社群發文怒批「Officials are petrified to make decisions because of VAR」並發布新角度影片佐證自己被犯規，面臨 FA 紀律處分風險。De Zerbi 也說裁判「not calm」。熱刺 38 分僅領先降級區 2 分、剩 2 輪。" },
+
   { id:'op-20260514-a', date:'2026-05-14', type:'trending',
     q:"🔥 曼城補賽結束！英超冠軍你押誰？兵工廠 vs 曼城最後兩輪定生死",
     opts:["兵工廠封王！底蘊+穩定性就是比曼城強，Arteta 王朝確立 🔴","曼城逆轉！Guardiola 永遠不能被低估，連勝到底奪第 10 冠 🩵","還要看最後一輪！兩隊都可能掉鏈子，冠軍懸念到最後 90 分鐘 🔥","不管誰贏都無所謂，英超爭冠最精彩的就是這種白刃戰 🍿"],
