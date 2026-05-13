@@ -613,19 +613,32 @@
       target.removeEventListener('click', onTargetClick);
       window.removeEventListener('resize', reposition);
       window.removeEventListener('scroll', reposition, true);
+      document.removeEventListener('click', onAnySectionLeave, true);
       if (byClick) {
         // 使用者按了開房 → 等他走完整個挑戰賽流程（建房/邀請/房間 modal）才彈每日任務
         _flushWhenChallengeFlowExits();
       } else {
-        // 60 秒沒按 → 直接補彈
+        // 沒按到（離開 / timeout）→ 直接補彈每日任務
         _flushDeferredDailyTask();
       }
     }
     function onTargetClick() { clickedTarget = true; cleanup(true); }
+    // 監聽：離開 friend-room（按其他 section 按鈕、底部 nav、header、文章連結等）→ cleanup
+    function onAnySectionLeave(e) {
+      const sectionBtn = e.target.closest('[data-section]');
+      // 1. 按了 section 切換按鈕、且不是回到 friend-room
+      if (sectionBtn && sectionBtn.dataset.section !== 'friend-room') {
+        cleanup(false); return;
+      }
+      // 2. 按了任何「會跳離大廳」的常見入口（文章卡、回首頁、其他懸浮鈕）
+      const navAway = e.target.closest('.article-card, .back-btn, [data-back], [data-go-home], .mt-fab');
+      if (navAway) { cleanup(false); return; }
+    }
     target.addEventListener('click', onTargetClick);
     window.addEventListener('resize', reposition);
     window.addEventListener('scroll', reposition, true);
-    // 60 秒沒按也自動消失（這條 timeout 走 cleanup(false) → 直接 flush）
+    document.addEventListener('click', onAnySectionLeave, true);
+    // 60 秒沒按也自動消失
     setTimeout(() => cleanup(false), 60000);
   }
 

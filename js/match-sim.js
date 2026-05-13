@@ -69,6 +69,88 @@
     FWD: { pushOn: 0.32, pullBack: 0.06, tackleRange: 0.04, sprint: 1.0 },
   };
 
+  // ────────── 球員 look_data 產生器（明星表 + 名字 hash fallback） ──────────
+  // 明星表：手動配置出名球員的 LPC 樣貌，盡量貼近本人特徵
+  const FAMOUS_LOOKS = {
+    // ─── EPL 大牌 ───
+    'Mohamed Salah':       { body:'amber', eye_color:'brown', hair_style:'curly_long',  hair_color:'black',  beard_style:'5oclock_shadow', beard_color:'black' },
+    'Erling Haaland':      { body:'light', eye_color:'blue',  hair_style:'long',         hair_color:'blonde' },
+    'Virgil van Dijk':     { body:'brown', eye_color:'brown', hair_style:'high_and_tight', hair_color:'black', beard_style:'trimmed', beard_color:'black' },
+    'Bukayo Saka':         { body:'brown', eye_color:'brown', hair_style:'high_and_tight', hair_color:'black' },
+    'Martin Ødegaard':     { body:'light', eye_color:'blue',  hair_style:'messy1',       hair_color:'blonde' },
+    'Declan Rice':         { body:'light', eye_color:'brown', hair_style:'spiked',       hair_color:'black',  beard_style:'5oclock_shadow', beard_color:'black' },
+    'Bruno Fernandes':     { body:'olive', eye_color:'brown', hair_style:'flat_top_fade',hair_color:'black',  beard_style:'5oclock_shadow', beard_color:'black' },
+    'Cole Palmer':         { body:'light', eye_color:'blue',  hair_style:'mop',          hair_color:'blonde' },
+    'Phil Foden':          { body:'light', eye_color:'blue',  hair_style:'messy1',       hair_color:'blonde' },
+    'Son Heung-min':       { body:'light', eye_color:'brown', hair_style:'bangs',        hair_color:'black' },
+    'Heung-Min Son':       { body:'light', eye_color:'brown', hair_style:'bangs',        hair_color:'black' },
+    'Rodri':               { body:'olive', eye_color:'brown', hair_style:'long',         hair_color:'black',  beard_style:'trimmed', beard_color:'black' },
+    'Kevin De Bruyne':     { body:'light', eye_color:'blue',  hair_style:'messy1',       hair_color:'ginger' },
+    'William Saliba':      { body:'brown', eye_color:'brown', hair_style:'buzzcut',      hair_color:'black' },
+    'Viktor Gyökeres':     { body:'light', eye_color:'blue',  hair_style:'long_messy',   hair_color:'blonde', beard_style:'trimmed', beard_color:'blonde' },
+    'Alexis Mac Allister': { body:'light', eye_color:'brown', hair_style:'messy1',       hair_color:'brown' },
+    'Ryan Gravenberch':    { body:'brown', eye_color:'brown', hair_style:'high_and_tight', hair_color:'black' },
+    'Dominik Szoboszlai':  { body:'light', eye_color:'brown', hair_style:'spiked',       hair_color:'black' },
+    'Tijjani Reijnders':   { body:'light', eye_color:'brown', hair_style:'short',        hair_color:'black' },
+    'Rayan Cherki':        { body:'olive', eye_color:'brown', hair_style:'spiked',       hair_color:'black' },
+    // ─── La Liga / 歐洲 ───
+    'Jude Bellingham':     { body:'light', eye_color:'brown', hair_style:'high_and_tight', hair_color:'black' },
+    'Kylian Mbappé':       { body:'brown', eye_color:'brown', hair_style:'buzzcut',      hair_color:'black' },
+    'Vinicius Junior':     { body:'amber', eye_color:'brown', hair_style:'long',         hair_color:'black' },
+    'Vinícius Júnior':     { body:'amber', eye_color:'brown', hair_style:'long',         hair_color:'black' },
+    'Lamine Yamal':        { body:'olive', eye_color:'brown', hair_style:'curly_long',   hair_color:'black' },
+    'Pedri':               { body:'light', eye_color:'brown', hair_style:'curly_long',   hair_color:'brown' },
+    'Robert Lewandowski':  { body:'light', eye_color:'blue',  hair_style:'short',        hair_color:'blonde' },
+    'Harry Kane':          { body:'light', eye_color:'brown', hair_style:'short',        hair_color:'brown',  beard_style:'5oclock_shadow', beard_color:'brown' },
+    'Lionel Messi':        { body:'light', eye_color:'brown', hair_style:'messy1',       hair_color:'brown',  beard_style:'5oclock_shadow', beard_color:'brown' },
+    'Cristiano Ronaldo':   { body:'olive', eye_color:'brown', hair_style:'high_and_tight', hair_color:'black' },
+    'Neymar':              { body:'light', eye_color:'brown', hair_style:'mop',          hair_color:'blonde' },
+    'Erling Braut Haaland':{ body:'light', eye_color:'blue',  hair_style:'long',         hair_color:'blonde' },
+    'Florian Wirtz':       { body:'light', eye_color:'blue',  hair_style:'messy1',       hair_color:'brown' },
+    'Jamal Musiala':       { body:'amber', eye_color:'brown', hair_style:'curly_long',   hair_color:'black' },
+    'Lautaro Martínez':    { body:'olive', eye_color:'brown', hair_style:'short',        hair_color:'black',  beard_style:'5oclock_shadow', beard_color:'black' },
+  };
+
+  // 名字 hash → 確定性 look（同名字永遠產同一個樣子）
+  function _generateGenericLook(seed) {
+    let h = 0;
+    for (const c of String(seed)) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+    const advance = () => { h = (h * 1664525 + 1013904223) >>> 0; };
+    const pick = (arr) => { const v = arr[h % arr.length]; advance(); return v; };
+    const bodies      = ['light','olive','amber','brown','bronze'];
+    const eyeColors   = ['blue','brown','gray','green'];
+    const hairStyles  = ['messy1','messy2','spiked','high_and_tight','curly_long','buzzcut','short','flat_top_fade','mop','bangs'];
+    const hairColors  = ['black','blonde','brown','ginger'];
+    const body        = pick(bodies);
+    const eye_color   = pick(eyeColors);
+    const hair_style  = pick(hairStyles);
+    const hair_color  = (body === 'brown' || body === 'bronze' || body === 'amber') ? 'black' : pick(hairColors);
+    advance();
+    const hasBeard    = h % 3 === 0;
+    advance();
+    const beard_color = hair_color;
+    return {
+      body, eye_color, hair_style, hair_color,
+      ...(hasBeard ? { beard_style:'5oclock_shadow', beard_color } : {})
+    };
+  }
+
+  function _lookForPlayerName(name, pos) {
+    if (!name) return _generateGenericLook(pos || 'unknown');
+    // 嘗試精準 match（含原始大小寫 + 去除特殊字元）
+    if (FAMOUS_LOOKS[name]) return FAMOUS_LOOKS[name];
+    // 嘗試 normalize（變音符號移除）
+    const norm = name.normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    if (FAMOUS_LOOKS[norm]) return FAMOUS_LOOKS[norm];
+    // 找 surname 配對（最後一個 token）
+    const tokens = name.split(/\s+/);
+    const lastName = tokens[tokens.length - 1];
+    for (const key of Object.keys(FAMOUS_LOOKS)) {
+      if (key.endsWith(' ' + lastName)) return FAMOUS_LOOKS[key];
+    }
+    return _generateGenericLook(name);
+  }
+
   // ── 繪製 ────────────────────────────────────────────────
   // ────────── Phase 2.2 pixel sprite ──────────
   const _SPRITE_W = 12;
@@ -427,11 +509,14 @@
       ...aF.map((p, i) => ({ ...p, team: 'a', baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y, flair: makeFlair(), card_id: _cardIdFor(away, i) })),
     ];
 
-    // Phase 2.3+：preload LPC sprite per player（有 look_data 用 LPC、沒有 fallback PIPOYA）
+    // Phase 2.3+：preload LPC sprite per player（有 look_data 用 LPC、沒 look_data 也產一個）
     const _matchSpriteCache = new Map();
     const _getLookFor = (teamData, idx) => {
       const kp = teamData.keyPlayers && teamData.keyPlayers[idx];
-      return kp && kp.look_data ? kp.look_data : null;
+      if (!kp) return _generateGenericLook(`${teamData.nameCN || teamData.name || 't'}:${idx}`);
+      if (kp.look_data) return kp.look_data;
+      // 沒 look_data → 依球員名字產（含明星表 + hash fallback）
+      return _lookForPlayerName(kp.name, kp.pos);
     };
     // 隊伍 kit 顏色：home 從 teamData.kit 取（玩家自訂）、away 預設黑紅
     const homeKit = home.kit || { shirtColor: 'red', pantsColor: 'white', shoeColor: 'white' };
@@ -445,13 +530,13 @@
       const kit = p.team === 'h' ? homeKit : awayKit;
 
       if (look && window.LpcRenderer) {
-        // 改用 walkingFullBody（含腳、有 kick/cheer/frustration row）
+        // 統一用 walkingFullBody（含腳 + kick/cheer/frustration row）
         const gen = window.LpcRenderer.walkingFullBody || window.LpcRenderer.matchSpriteSheet;
         gen(look, kit).then(result => {
           if (result) _matchSpriteCache.set(p.card_id, result);
         }).catch(e => console.warn('LPC sheet failed for', p.card_id, e));
       } else {
-        // 沒 look_data → 退回 PIPOYA PNG
+        // 沒 LpcRenderer（不應該發生）→ 退回 PIPOYA
         const img = new Image();
         img.src = (typeof window.MyTeamSprite === 'function')
           ? window.MyTeamSprite(p.card_id)
