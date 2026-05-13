@@ -392,18 +392,22 @@
         e.preventDefault();
       }
 
+      const perf = overlay.querySelector('.mt-gacha-pack-perforation');
       function onDragMove(e) {
         if (!dragging) return;
         const pt = e.touches ? e.touches[0] : e;
         const dx = pt.clientX - startX;
-        if (direction === 0 && Math.abs(dx) > 8) direction = dx > 0 ? 1 : -1;
+        if (direction === 0 && Math.abs(dx) > 8) {
+          direction = dx > 0 ? 1 : -1;
+          if (perf) perf.dataset.dir = String(direction);
+        }
         const progress = Math.min(1, Math.abs(dx) / TEAR_THRESHOLD);
         pack3D.style.setProperty('--tear-dir', direction);
         setProgress(progress);
         // 拉超過 50% 開始噴火花
         if (progress > 0.5 && Math.random() < 0.4) {
           const rect = pack3D.getBoundingClientRect();
-          emitSpark(rect.width / 2, rect.height * 0.5);
+          emitSpark(rect.width / 2, rect.height * 0.18);  // 從撕線位置噴
         }
         e.preventDefault();
       }

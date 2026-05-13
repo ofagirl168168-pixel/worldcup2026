@@ -799,14 +799,13 @@
   transform-style: preserve-3d;
 }
 
-/* ── 精美紙袋包裝（鋸齒邊 + 3D 光影 + 金箔反光）── */
+/* ── 精美紙袋包裝（鋸齒邊 + 3D 光影 + 自然皺褶）── */
 .mt-gacha-pack-wrap {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   filter: drop-shadow(0 12px 24px rgba(0,0,0,0.7))
           drop-shadow(0 0 24px rgba(240,192,64,0.4));
   z-index: 5;
-  /* 上下鋸齒邊（10 個齒）*/
   clip-path: polygon(
     0% 3%, 5% 0%, 10% 3%, 15% 0%, 20% 3%, 25% 0%, 30% 3%, 35% 0%,
     40% 3%, 45% 0%, 50% 3%, 55% 0%, 60% 3%, 65% 0%, 70% 3%, 75% 0%,
@@ -825,51 +824,48 @@
           drop-shadow(0 0 36px rgba(155,135,245,0.6));
 }
 
-/* 上半紙袋（金屬質感、立體漸層、logo）*/
+/* 上半紙袋（窄條、撕掉的那一塊）*/
 .mt-gacha-pack-top {
-  position: relative; flex: 1;
+  position: relative;
+  flex: 0 0 22%;       /* 只占 22%、像真的卡包撕條 */
   background:
-    /* 金箔光澤條紋（橫向細紋）*/
+    /* 自然皺褶（豎向細微亮暗交替）*/
+    repeating-linear-gradient(90deg,
+      transparent 0, transparent 18px,
+      rgba(0,0,0,0.08) 18px, rgba(0,0,0,0.08) 19px,
+      transparent 19px, transparent 37px,
+      rgba(255,255,255,0.06) 37px, rgba(255,255,255,0.06) 38px),
+    /* 金箔細紋 */
     repeating-linear-gradient(90deg,
       rgba(255,255,255,0.04) 0, rgba(255,255,255,0.04) 1px,
       transparent 1px, transparent 4px),
-    /* 主漸層（左上亮、右下暗）*/
+    /* 主漸層 */
     linear-gradient(135deg, #ff6452 0%, #d44b3a 25%, #c0392b 55%, #8a2a1f 100%);
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
-  /* 內陰影模擬包裝紙立體感 */
   box-shadow:
-    inset 6px 6px 0 rgba(255,255,255,0.12),
-    inset -6px -6px 0 rgba(0,0,0,0.3),
+    inset 4px 3px 0 rgba(255,255,255,0.14),
+    inset -4px -3px 0 rgba(0,0,0,0.32),
     inset 0 -2px 0 rgba(0,0,0,0.4);
 }
 .mt-gacha-pack-logo {
-  font-size: 52px;
+  font-size: 24px;       /* 上半變窄 → logo 縮小 */
   color: #ffd866;
   text-shadow:
-    /* 浮雕效果（多層 shadow）*/
     -1px -1px 0 #fff7c0,
     1px 1px 0 #6a4500,
-    2px 2px 0 #5a3a00,
-    0 4px 14px rgba(0,0,0,0.7),
-    0 0 16px rgba(240,192,64,0.6);
-  transform: rotate(-8deg);
+    1px 2px 4px rgba(0,0,0,0.7),
+    0 0 8px rgba(240,192,64,0.6);
+  transform: rotate(-5deg);
   z-index: 2;
 }
 .mt-gacha-pack-stripe {
   position: absolute;
-  left: -30%; right: -30%;
-  top: 60%;
-  height: 18px;
-  background:
-    linear-gradient(90deg, transparent 0%, rgba(106,69,0,0.5) 10%,
-      #d4a730 25%, #ffd866 45%, #fff7c0 50%, #ffd866 55%, #d4a730 75%,
-      rgba(106,69,0,0.5) 90%, transparent 100%);
-  transform: rotate(-12deg);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.3),
-    0 2px 6px rgba(0,0,0,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.5);
+  left: -10%; right: -10%; top: 50%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent 0%, #ffd866 30%, #fff7c0 50%, #ffd866 70%, transparent 100%);
+  transform: translateY(-50%);
+  opacity: 0.4;
   z-index: 1;
 }
 .mt-gacha-pack-shine {
@@ -887,9 +883,9 @@
   animation: mt-pack-shine 1.4s ease-in-out infinite;
 }
 
-/* 撕線（金邊穿孔 + 立體浮雕）*/
+/* 撕線（金邊穿孔 + 立體浮雕、隨拖曳進度發光）*/
 .mt-gacha-pack-perforation {
-  height: 10px;
+  height: 8px;
   background:
     linear-gradient(180deg, #0a0a14 0%, #2a2440 50%, #0a0a14 100%);
   display: flex; align-items: center; justify-content: space-around;
@@ -899,32 +895,83 @@
     inset 0 2px 4px rgba(0,0,0,0.8),
     inset 0 -1px 0 rgba(255,255,255,0.15),
     0 1px 0 rgba(255,255,255,0.08);
+  overflow: hidden;
 }
 .mt-gacha-pack-perforation span {
-  width: 5px; height: 5px;
+  width: 4px; height: 4px;
   background: radial-gradient(circle at 30% 30%, #ffd866 0%, #c0392b 100%);
   border-radius: 50%;
   box-shadow: 0 1px 1px rgba(0,0,0,0.6), inset 1px 1px 0 rgba(255,255,255,0.4);
+  position: relative; z-index: 2;
+}
+/* 撕線發光：依進度從手指拖的方向逐步擴展 */
+.mt-gacha-pack-perforation::before {
+  content: ''; position: absolute;
+  top: 0; bottom: 0;
+  /* dir=+1 從左往右、dir=-1 從右往左 */
+  left: 0; right: calc(100% * (1 - var(--tear-progress, 0)));
+  background:
+    linear-gradient(90deg,
+      rgba(255,80,40,0.8) 0%, #ffd866 40%, #fff7c0 70%, transparent 100%);
+  box-shadow:
+    0 0 8px rgba(255,200,80,0.9),
+    0 0 16px rgba(240,192,64,0.6);
+  pointer-events: none;
+  z-index: 1;
+  transition: right 0.05s linear;
+}
+.mt-gacha-pack-perforation[data-dir="-1"]::before {
+  left: calc(100% * (1 - var(--tear-progress, 0)));
+  right: 0;
+  background:
+    linear-gradient(270deg,
+      rgba(255,80,40,0.8) 0%, #ffd866 40%, #fff7c0 70%, transparent 100%);
 }
 
-/* 下半紙袋（深色 + 浮雕字 + 金邊框）*/
+/* 下半紙袋（主體、不會撕走、有自然皺褶光影）*/
 .mt-gacha-pack-bottom {
   position: relative; flex: 1;
   background:
-    repeating-linear-gradient(90deg,
-      rgba(255,255,255,0.04) 0, rgba(255,255,255,0.04) 1px,
-      transparent 1px, transparent 4px),
-    linear-gradient(135deg, #8a2a1f 0%, #6a1f15 50%, #c0392b 100%);
+    /* 縱向自然皺褶（左右明暗交替）*/
+    linear-gradient(90deg,
+      rgba(0,0,0,0.18) 0%, transparent 8%,
+      rgba(255,255,255,0.06) 18%, transparent 28%,
+      rgba(0,0,0,0.12) 38%, transparent 48%,
+      rgba(255,255,255,0.05) 60%, transparent 72%,
+      rgba(0,0,0,0.14) 82%, transparent 92%,
+      rgba(0,0,0,0.2) 100%),
+    /* 大 logo emboss 圓暈 */
+    radial-gradient(ellipse 70% 60% at 50% 45%,
+      rgba(255,255,255,0.1) 0%, transparent 60%),
+    /* 主漸層 */
+    linear-gradient(155deg, #d44b3a 0%, #c0392b 30%, #8a2a1f 70%, #6a1f15 100%);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   color: #ffd866;
   box-shadow:
-    inset 6px 6px 0 rgba(255,255,255,0.08),
-    inset -6px -6px 0 rgba(0,0,0,0.4),
+    inset 6px 6px 0 rgba(255,255,255,0.1),
+    inset -6px -6px 0 rgba(0,0,0,0.42),
     inset 0 2px 0 rgba(0,0,0,0.5);
+  padding: 24px 12px;
+}
+/* 大 ⚽ logo（主體 logo、不是 top 的小 logo）*/
+.mt-gacha-pack-bottom::before {
+  content: '⚽';
+  position: absolute;
+  top: 18%; left: 50%; transform: translateX(-50%) rotate(-6deg);
+  font-size: 56px;
+  color: #ffd866;
+  text-shadow:
+    -1px -1px 0 #fff7c0,
+    1px 1px 0 #6a4500,
+    2px 2px 0 #5a3a00,
+    0 4px 16px rgba(0,0,0,0.7),
+    0 0 20px rgba(240,192,64,0.6);
+  pointer-events: none;
 }
 .mt-gacha-pack-label {
   font-size: 20px; font-weight: 900;
   letter-spacing: 5px;
+  margin-top: 28%;       /* 讓出大 logo 空間 */
   text-shadow:
     -1px -1px 0 #fff7c0,
     1px 1px 0 #6a4500,
@@ -940,23 +987,19 @@
   text-shadow: 0 1px 0 #6a4500, 0 2px 4px rgba(0,0,0,0.6);
 }
 
-/* ── 即時拖曳撕開（--tear-progress 0~1、--tear-dir -1/0/+1）── */
-/* 上半根據撕扯方向往對側翻、進度越大翻越多 */
+/* ── 即時拖曳撕開：只撕上半、從手指方向那角開始翹 ── */
+/* dir=+1 拉右 → 從左角翹起；dir=-1 拉左 → 從右角翹起 */
 .mt-gacha-pack-top {
   transform:
-    translateX(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * -8px))
-    translateY(calc(var(--tear-progress, 0) * -6px))
-    rotateZ(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * 4deg));
+    rotateZ(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * -22deg))
+    translateY(calc(var(--tear-progress, 0) * -8px));
   transition: transform 0.18s ease-out;
-  transform-origin: bottom center;
+  /* 撕的支點：dir=+1 origin 右、dir=-1 origin 左 */
+  transform-origin: calc(50% + var(--tear-dir, 0) * 50%) bottom;
 }
+/* 下半不動（只撕上方）*/
 .mt-gacha-pack-bottom {
-  transform:
-    translateX(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * 6px))
-    translateY(calc(var(--tear-progress, 0) * 4px))
-    rotateZ(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * -3deg));
-  transition: transform 0.18s ease-out;
-  transform-origin: top center;
+  transform: none;
 }
 /* 撕線：依進度從一邊「裂開」（clip-path 漸進）*/
 .mt-gacha-pack-perforation {
@@ -975,26 +1018,19 @@
   transition: none;     /* 拖曳中即時跟隨 */
 }
 
-/* 拖曳結束 → opening：上下翻飛出 + 內部 reveal */
+/* 撕開 → 只上半飛出（下半不動）*/
 .mt-gacha-pack.opening .mt-gacha-pack-top {
   animation: mt-pack-tear-top 0.9s cubic-bezier(0.55, 0.05, 0.6, 1) forwards;
 }
 .mt-gacha-pack.opening .mt-gacha-pack-perforation {
-  animation: mt-pack-perforation-fade 0.25s ease-out forwards;
-}
-.mt-gacha-pack.opening .mt-gacha-pack-bottom {
-  animation: mt-pack-tear-bottom 0.9s cubic-bezier(0.55, 0.05, 0.6, 1) forwards;
+  animation: mt-pack-perforation-fade 0.4s ease-out forwards;
 }
 @keyframes mt-pack-tear-top {
-  0%   { transform: translateX(0) translateY(0) rotateZ(0deg); opacity: 1; }
-  100% { transform: translateX(calc(var(--tear-dir, 1) * -240px)) translateY(-100px) rotateZ(calc(var(--tear-dir, 1) * 25deg)); opacity: 0; }
+  0%   { transform: rotateZ(0deg) translateY(0); opacity: 1; }
+  100% { transform: rotateZ(calc(var(--tear-dir, 1) * -85deg)) translateY(-120px) translateX(calc(var(--tear-dir, 1) * -120px)); opacity: 0; }
 }
 @keyframes mt-pack-perforation-fade {
   to { opacity: 0; transform: scaleY(0.2); }
-}
-@keyframes mt-pack-tear-bottom {
-  0%   { transform: translateX(0) translateY(0) rotateZ(0deg); opacity: 1; }
-  100% { transform: translateX(calc(var(--tear-dir, 1) * 180px)) translateY(120px) rotateZ(calc(var(--tear-dir, 1) * -18deg)); opacity: 0; }
 }
 
 /* 兩根手指動畫 hint：左右擺動 */
