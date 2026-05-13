@@ -2829,6 +2829,110 @@
   padding: 0 4%;
 }
 
+/* 球場等級裝飾 — 看台 / 聚光燈 / 旗桿 / 球迷 */
+.mt-home-stand {
+  position: absolute;
+  bottom: 0;
+  width: 30px; height: 50%;
+  background: linear-gradient(180deg, #5a4030 0%, #3a2410 100%);
+  border: 2px solid #1a1a2e;
+  border-bottom: 0;
+  z-index: 1;
+}
+.mt-home-stand-l { left: -32px; }
+.mt-home-stand-r { right: -32px; }
+.mt-home-stand::before {
+  content: ''; position: absolute;
+  left: 2px; right: 2px; top: 2px; height: 6px;
+  background: repeating-linear-gradient(90deg,
+    #f0c040 0, #f0c040 3px, #e07020 3px, #e07020 6px);
+}
+
+.mt-home-floodlight {
+  position: absolute;
+  top: -34px;
+  width: 5px; height: 38px;
+  background: #404040;
+  border: 1.5px solid #1a1a2e;
+  z-index: 3;
+}
+.mt-home-floodlight-l { left: -38px; }
+.mt-home-floodlight-r { right: -38px; }
+.mt-home-floodlight::after {
+  content: ''; position: absolute;
+  left: -6px; right: -6px; top: -10px;
+  width: 17px; height: 10px;
+  background: linear-gradient(180deg, #ffffaa 0%, #f0c040 100%);
+  border: 1.5px solid #1a1a2e;
+  border-radius: 2px;
+  box-shadow: 0 0 12px rgba(255,235,150,0.9), 0 0 20px rgba(255,235,150,0.45);
+  animation: mt-floodlight-flicker 3s ease-in-out infinite;
+}
+@keyframes mt-floodlight-flicker {
+  0%, 95%, 100% { opacity: 1; }
+  97% { opacity: 0.6; }
+}
+
+.mt-home-flag {
+  position: absolute;
+  top: -28px;
+  width: 2px; height: 32px;
+  background: #6d4c2a;
+  z-index: 3;
+}
+.mt-home-flag-l { left: 10%; }
+.mt-home-flag-r { right: 10%; }
+.mt-home-flag::after {
+  content: ''; position: absolute;
+  left: 2px; top: 0;
+  width: 14px; height: 10px;
+  background: linear-gradient(135deg, #e53935 0%, #f0c040 100%);
+  border: 1px solid #1a1a2e;
+  animation: mt-flag-wave 1.8s ease-in-out infinite;
+}
+@keyframes mt-flag-wave {
+  0%, 100% { transform: skewX(0deg);  }
+  50%      { transform: skewX(-12deg); }
+}
+
+/* 球場等級 → clubhouse 漸進變更 */
+.mt-home-distance[data-stadium-level="2"] .mt-home-clubhouse { max-width: 240px; }
+.mt-home-distance[data-stadium-level="3"] .mt-home-clubhouse,
+.mt-home-distance[data-stadium-level="4"] .mt-home-clubhouse { max-width: 260px; }
+.mt-home-distance[data-stadium-level="5"] .mt-home-clubhouse,
+.mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse { max-width: 280px; }
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse,
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse { max-width: 300px; }
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse,
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse { max-width: 320px; }
+/* 高等級換金頂 */
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-roof polygon,
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-roof polygon,
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-roof polygon,
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-roof polygon {
+  fill: #f0c040 !important;
+}
+
+/* 球迷加油 NPC（看台上方飄出） */
+.mt-home-fans {
+  position: absolute;
+  left: 0; right: 0; top: -10px;
+  height: 24px;
+  pointer-events: none;
+  z-index: 4;
+}
+.mt-home-fan {
+  position: absolute;
+  top: 0;
+  font-size: 13px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.55));
+  animation: mt-fan-cheer 1.4s ease-in-out infinite;
+}
+@keyframes mt-fan-cheer {
+  0%, 100% { transform: translateY(0)    rotate(-8deg); }
+  50%      { transform: translateY(-6px) rotate( 8deg); }
+}
+
 /* Pixel art 樹 — 純色塊 + 黑框 */
 .mt-home-tree {
   position: relative;
@@ -3407,20 +3511,233 @@
 }
 
 /* ═════════════════════════════════════════════════════════════
-   🎰 GACHA TAB — 商店櫃台 + 盲盒卡牌包（旁邊）
+   🎰 GACHA TAB — 沉浸式商店場景（無方塊感）
    ═════════════════════════════════════════════════════════════ */
 .mt-gacha-shop {
   position: relative;
-  padding: 0 4px 20px;
+  padding: 0 4px 16px;
   min-height: 100%;
 }
-.mt-gacha-counter-scene {
+
+/* 商店整體場景容器（沒有 box、純背景畫） */
+.mt-gacha-shop-scene {
   position: relative;
+  width: 100%;
+  height: 240px;
+  margin-bottom: 14px;
+  background:
+    /* 牆磚紋 */
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,0.04) 0, rgba(0,0,0,0.04) 1px,
+      transparent 1px, transparent 28px),
+    repeating-linear-gradient(0deg,
+      rgba(0,0,0,0.06) 0, rgba(0,0,0,0.06) 1px,
+      transparent 1px, transparent 26px),
+    /* 牆面 → 地板漸層 */
+    linear-gradient(180deg,
+      #2a0d18 0%,
+      #3a1420 35%,
+      #4a1828 60%,
+      #2a1015 60%,
+      #1a0a10 100%);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.55),
+    inset 0 -16px 24px rgba(0,0,0,0.45),
+    inset 0 6px 12px rgba(0,0,0,0.35);
+}
+
+/* 霓虹店招（頂部置中）*/
+.mt-gacha-neon-board {
+  position: absolute;
+  top: 10px; left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 14px;
+  background: rgba(20,8,12,0.6);
+  border: 2px solid #f0c040;
+  border-radius: 8px;
+  box-shadow: 0 0 14px rgba(240,192,64,0.55), inset 0 0 8px rgba(240,192,64,0.25);
+  z-index: 5;
+}
+.mt-gacha-neon-stars {
+  position: absolute;
+  inset: -10px;
+  pointer-events: none;
+}
+.mt-gacha-neon-stars .ns {
+  position: absolute;
+  font-size: 12px;
+  color: #ffe680;
+  text-shadow: 0 0 8px rgba(255,235,150,0.95);
+  animation: mt-neon-twinkle 1.6s ease-in-out infinite alternate;
+}
+.mt-gacha-neon-stars .ns1 { left:  -4px; top: -8px; }
+.mt-gacha-neon-stars .ns2 { right: -4px; top: -8px; animation-delay: 0.4s; }
+.mt-gacha-neon-stars .ns3 { left:  -4px; bottom: -8px; animation-delay: 0.8s; }
+.mt-gacha-neon-stars .ns4 { right: -4px; bottom: -8px; animation-delay: 1.2s; }
+@keyframes mt-neon-twinkle {
+  0%   { opacity: 0.35; transform: scale(0.85); }
+  100% { opacity: 1;    transform: scale(1.15); }
+}
+
+/* 左側卡牌牆（3 張歪斜貼著） */
+.mt-gacha-cardwall {
+  position: absolute;
+  left: 8px;
+  top: 56px;
+  width: 38%;
+  height: 110px;
+}
+.mt-gacha-walled-card {
+  position: absolute;
+  width: 36px; height: 50px;
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,0.55));
+  border: 2px solid #fff;
+}
+.mt-gacha-walled-card.cw-1 {
+  left: 4px;  top: 0;
+  background: linear-gradient(135deg, #f0c040, #c08030);
+  color: #2a1505;
+  transform: rotate(-12deg);
+}
+.mt-gacha-walled-card.cw-2 {
+  left: 50px; top: 18px;
+  background: linear-gradient(135deg, #b5a4ff, #6a4fb5);
+  color: #fff;
+  transform: rotate(6deg);
+}
+.mt-gacha-walled-card.cw-3 {
+  left: 4px;  top: 56px;
+  background: linear-gradient(135deg, #ff8080, #c0303a);
+  color: #fff;
+  transform: rotate(-4deg);
+}
+
+/* 右側盲盒金字塔堆（地板上）*/
+.mt-gacha-pyramid {
+  position: absolute;
+  right: 10px;
+  bottom: 24px;
   display: flex;
-  gap: 10px;
-  margin: 8px 0 14px;
-  min-height: 140px;
-  align-items: stretch;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 2px;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5));
+}
+.mt-gacha-pyramid-row {
+  display: flex; gap: 3px;
+}
+.mt-gacha-blindbox {
+  width: 38px; height: 26px;
+  position: relative;
+  border-radius: 3px 3px 5px 5px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-weight: 900;
+  font-size: 8px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  box-shadow: inset 0 -3px 5px rgba(0,0,0,0.3), inset 0 2px 3px rgba(255,255,255,0.25);
+}
+.mt-gacha-blindbox::before {
+  content: ''; position: absolute;
+  top: -3px; left: 4px; right: 4px;
+  height: 5px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 3px 3px 0 0;
+}
+.mt-gacha-blindbox.blindbox-r {
+  background: linear-gradient(135deg, #7d8590 0%, #4a4f56 100%);
+  border: 1.5px solid #2a2d33;
+}
+.mt-gacha-blindbox.blindbox-sr {
+  background: linear-gradient(135deg, #b5a4ff 0%, #6a4fb5 100%);
+  border: 1.5px solid #2a1850;
+  box-shadow: inset 0 -3px 5px rgba(0,0,0,0.3), inset 0 2px 3px rgba(255,255,255,0.35), 0 0 8px rgba(155,135,245,0.55);
+}
+.mt-gacha-blindbox.blindbox-ssr {
+  background: linear-gradient(135deg, #ffe680 0%, #f0c040 50%, #c08030 100%);
+  border: 1.5px solid #5a3010;
+  color: #2a1505;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+  box-shadow: inset 0 -3px 5px rgba(0,0,0,0.2), inset 0 2px 3px rgba(255,255,255,0.5), 0 0 14px rgba(240,192,64,0.95);
+  animation: mt-blindbox-ssr 2.5s ease-in-out infinite;
+}
+@keyframes mt-blindbox-ssr {
+  0%, 100% { box-shadow: inset 0 -3px 5px rgba(0,0,0,0.2), inset 0 2px 3px rgba(255,255,255,0.5), 0 0 14px rgba(240,192,64,0.95); }
+  50%      { box-shadow: inset 0 -3px 5px rgba(0,0,0,0.2), inset 0 2px 3px rgba(255,255,255,0.5), 0 0 22px rgba(255,210,80,1);    }
+}
+.mt-gacha-blindbox-star { font-size: 10px; line-height: 1; }
+.mt-gacha-blindbox-rarity { font-size: 8px; letter-spacing: 1px; }
+
+/* 收銀員 + 櫃台 */
+.mt-gacha-clerk {
+  position: absolute;
+  left: 4%;
+  bottom: 4px;
+  z-index: 4;
+}
+.mt-gacha-clerk-body {
+  font-size: 38px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.55));
+  animation: mt-clerk-bob 1.8s ease-in-out infinite;
+}
+@keyframes mt-clerk-bob {
+  0%, 100% { transform: translateY(0);    }
+  50%      { transform: translateY(-3px); }
+}
+.mt-gacha-clerk-counter {
+  position: absolute;
+  left: -8px; right: -100px;
+  bottom: -2px;
+  height: 18px;
+  background: linear-gradient(180deg, #8b5a2b 0%, #5a3010 100%);
+  border-top: 2px solid #2a1505;
+  z-index: -1;
+}
+.mt-gacha-clerk-resources {
+  position: absolute;
+  left: 50px; bottom: 2px;
+  display: flex;
+  gap: 6px;
+  font-family: monospace;
+  font-size: 11px;
+  color: #ffe680;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+}
+.mt-gacha-clerk-resources b { color: #fff; font-size: 13px; }
+.mt-gacha-counter-pity {
+  font-size: 10px;
+  color: rgba(255,180,180,0.85);
+}
+
+/* 粒子閃爍 */
+.mt-gacha-sparkles {
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+.mt-gacha-sparkles span {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: #ffe680;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255,235,150,0.95);
+  animation: mt-sparkle-fade 2.4s ease-in-out infinite;
+}
+.mt-gacha-sparkles span:nth-child(1) { left: 18%; top: 28%; animation-delay: 0s;   }
+.mt-gacha-sparkles span:nth-child(2) { left: 35%; top: 18%; animation-delay: 0.4s; }
+.mt-gacha-sparkles span:nth-child(3) { left: 60%; top: 32%; animation-delay: 0.8s; }
+.mt-gacha-sparkles span:nth-child(4) { left: 78%; top: 22%; animation-delay: 1.2s; }
+.mt-gacha-sparkles span:nth-child(5) { left: 42%; top: 48%; animation-delay: 1.6s; }
+.mt-gacha-sparkles span:nth-child(6) { left: 88%; top: 42%; animation-delay: 2.0s; }
+@keyframes mt-sparkle-fade {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50%      { opacity: 1; transform: scale(1.4); }
 }
 
 /* 左側：盲盒架 */
@@ -4065,7 +4382,7 @@
 /* 頂部 2D 主角卷軸 banner */
 .mt-match-banner {
   position: relative;
-  height: 86px;
+  height: 120px;
   border-radius: 12px;
   overflow: hidden;
   background: linear-gradient(180deg, #74cfff 0%, #b6e6ff 70%, #c7e9ff 100%);
@@ -4107,27 +4424,47 @@
       rgba(255,255,255,0.07) 16px, rgba(255,255,255,0.07) 18px),
     linear-gradient(180deg, #6ec24a 0%, #3a7a25 100%);
 }
-.mt-match-banner-hero {
+/* 主角 LPC sprite（JS 控位置/sprite frame） */
+.mt-match-hero {
   position: absolute;
-  bottom: 4px;
-  left: -50px;
-  font-size: 22px;
-  letter-spacing: -2px;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
-  animation: mt-hero-run 5s linear infinite;
+  bottom: 2px;
+  left: -40px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+  z-index: 3;
+  pointer-events: none;
 }
-@keyframes mt-hero-run {
-  0%   { left: -50px; transform: translateY(0); }
-  10%  { transform: translateY(-3px); }
-  20%  { transform: translateY(0);    }
-  30%  { transform: translateY(-3px); }
-  40%  { transform: translateY(0);    }
-  50%  { transform: translateY(-3px); }
-  60%  { transform: translateY(0);    }
-  70%  { transform: translateY(-3px); }
-  80%  { transform: translateY(0);    }
-  90%  { transform: translateY(-3px); }
-  100% { left: 110%; transform: translateY(0); }
+/* 守門員 sprite */
+.mt-match-goalkeeper {
+  position: absolute;
+  right: 8px;
+  bottom: 2px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+  z-index: 2;
+  pointer-events: none;
+}
+/* 球門 SVG */
+.mt-match-goal {
+  position: absolute;
+  right: 4px;
+  bottom: 18px;
+  width: 50px;
+  height: 50px;
+  z-index: 1;
+}
+.mt-match-goal svg {
+  width: 100%; height: 100%;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+}
+/* 飛球 */
+.mt-match-ball {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  font-size: 16px;
+  opacity: 0;
+  z-index: 4;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
 }
 .mt-match-banner-overlay {
   position: absolute;
