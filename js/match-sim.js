@@ -469,13 +469,23 @@
   }
 
   // 進球儀式結束：跟著比賽 pause 結束一起呼叫（從 stepOneFrame 觸發）
+  // immediate=true：連續進球前的清乾淨（不能 setTimeout 設 hidden，否則會在
+  // 下一次 _triggerGoalCelebration 設完 hidden=false 後才 fire、把新 banner 蓋掉）
   function _endGoalCelebration(ui, immediate) {
     if (!ui) return;
+    // 清掉前一個 hide timer（避免 stale 把新 banner 蓋掉）
+    if (ui._goalHideTimer) { clearTimeout(ui._goalHideTimer); ui._goalHideTimer = null; }
     if (ui.goalBanner) {
       ui.goalBanner.classList.remove('msim-goal-show');
-      // 等 CSS transition 結束再 hidden（避免閃一下空白）
-      const hideDelay = immediate ? 0 : 300;
-      setTimeout(() => { if (ui.goalBanner) ui.goalBanner.hidden = true; }, hideDelay);
+      if (immediate) {
+        // 立即收（給 _triggerGoalCelebration 接著重新顯示用）— 不能設 hidden=true
+      } else {
+        // 等 CSS transition 結束再 hidden
+        ui._goalHideTimer = setTimeout(() => {
+          if (ui.goalBanner) ui.goalBanner.hidden = true;
+          ui._goalHideTimer = null;
+        }, 300);
+      }
     }
     if (ui.canvasWrap) ui.canvasWrap.classList.remove('msim-zoom-in');
     if (ui.confetti)   ui.confetti.innerHTML = '';
