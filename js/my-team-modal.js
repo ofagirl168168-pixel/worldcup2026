@@ -770,30 +770,7 @@
     // 動畫迴圈：H_LO 低一點讓球員可走到操場前端、頭蓋過建築（前景效果）
     const W_LO = 0.04, W_HI = 0.96;
     const H_LO = 0.05, H_HI = 0.95;
-    const COLLIDE_RX = 0.08;   // x 軸碰撞半徑（百分比）
-    const COLLIDE_RY = 0.04;   // y 軸碰撞半徑（球員瘦高、y 半徑小）
     function tick(t) {
-      // 先做兩兩 collision 推擠（避免球員疊在一起）
-      for (let i = 0; i < wanderers.length; i++) {
-        const a = wanderers[i];
-        for (let j = i + 1; j < wanderers.length; j++) {
-          const b = wanderers[j];
-          const dx = a.x - b.x;
-          const dy = a.y - b.y;
-          const overlapX = COLLIDE_RX - Math.abs(dx);
-          const overlapY = COLLIDE_RY - Math.abs(dy);
-          if (overlapX > 0 && overlapY > 0) {
-            // x 軸推開（左右推遠）
-            const pushX = overlapX / 2;
-            if (dx >= 0) { a.x += pushX; b.x -= pushX; }
-            else         { a.x -= pushX; b.x += pushX; }
-            // y 軸推開稍微（避免完全重疊）
-            const pushY = overlapY / 2;
-            if (dy >= 0) { a.y += pushY; b.y -= pushY; }
-            else         { a.y -= pushY; b.y += pushY; }
-          }
-        }
-      }
       for (const w of wanderers) {
         if (!w.el) continue;
         // 狀態結束 → 切回 walk 或 idle
@@ -917,7 +894,7 @@
       <div class="mt-stadium-tab">
         <div class="mt-formation-bar">
           <span style="font-size:11px;opacity:0.7;margin-right:8px">📋 陣型</span>
-          ${['4-3-3','4-4-2','3-5-2','5-3-2'].map(f => {
+          ${['4-3-3','4-4-2','3-5-2','5-3-2','4-2-3-1','3-4-3','4-5-1','4-1-4-1'].map(f => {
             const isUnlocked = unlocked.has(f);
             const isActive = formation === f;
             return `<button class="mt-formation-opt ${isActive ? 'sel' : ''} ${isUnlocked ? '' : 'locked'}"
@@ -1265,7 +1242,9 @@
     requestAnimationFrame(() => overlay.classList.add('open'));
 
     if (look && window.LpcRenderer) {
-      window.LpcRenderer.portrait(look, { scale: 6 }).then(url => {
+      const team = window.MyTeam.getCached();
+      const kit = team ? { shirtColor: team.kit_shirt_color, pantsColor: team.kit_pants_color } : null;
+      window.LpcRenderer.portrait(look, { scale: 6, kit }).then(url => {
         const img = document.getElementById(portraitId);
         if (img && url) img.src = url;
       }).catch(() => {});
