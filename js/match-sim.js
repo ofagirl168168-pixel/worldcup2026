@@ -26,8 +26,11 @@
   }
 
   // ── 視覺參數 ────────────────────────────────────────────
-  const PITCH_W = 320;
-  const PITCH_H = 200;
+  // 球場用較大的「邏輯尺寸」、canvas viewport 只顯示其中一部分 → 鏡頭追焦
+  const PITCH_W = 480;            // 邏輯球場寬（球員座標 p.x ∈ [0,1] × PITCH_W）
+  const PITCH_H = 280;            // 邏輯球場高
+  const VIEW_W  = 320;            // canvas 視窗寬（顯示的球場區域）
+  const VIEW_H  = 200;            // canvas 視窗高
   const FPS = 30;
   const MATCH_MINUTES = 90;
   const REAL_SECONDS = 110;        // 60 → 110 秒（開羅式慢節奏、看得清楚每個動作）
@@ -218,6 +221,23 @@
   function render(ctx, state) {
     _renderTick++;
     const { players, ball, flashTeam, flashAlpha, possessorIdx } = state;
+
+    // 追焦鏡頭：每 frame 朝球位置 lerp，clamp 在球場內
+    const targetCamX = ball.x * PITCH_W - VIEW_W / 2;
+    const targetCamY = ball.y * PITCH_H - VIEW_H / 2;
+    const LERP = 0.08;
+    state.camera.x = state.camera.x + (targetCamX - state.camera.x) * LERP;
+    state.camera.y = state.camera.y + (targetCamY - state.camera.y) * LERP;
+    state.camera.x = Math.max(0, Math.min(PITCH_W - VIEW_W, state.camera.x));
+    state.camera.y = Math.max(0, Math.min(PITCH_H - VIEW_H, state.camera.y));
+
+    // 清掉視窗（黑底）
+    ctx.clearRect(0, 0, VIEW_W, VIEW_H);
+
+    // 套用鏡頭位移
+    ctx.save();
+    ctx.translate(-state.camera.x, -state.camera.y);
+
     const grad = ctx.createLinearGradient(0, 0, 0, PITCH_H);
     grad.addColorStop(0, '#2e7d32');
     grad.addColorStop(1, '#1b5e20');
@@ -289,11 +309,11 @@
         frame = moving ? (Math.floor(_renderTick / 8) % 3) : 1;
       }
 
-      // possessor 腳下白光圓影
+      // 腳下影子：控球者用半透明白小點（不搶戲）、其他用黑影
       if (isPos) {
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillStyle = 'rgba(255,255,255,0.65)';
         ctx.beginPath();
-        ctx.ellipse(cx, cy + SPRITE_DRAW_H / 2 - 1, 8, 3, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx, cy + SPRITE_DRAW_H / 2 - 1, 4, 1.8, 0, 0, Math.PI * 2);
         ctx.fill();
       } else {
         ctx.fillStyle = 'rgba(0,0,0,0.3)';
@@ -340,14 +360,7 @@
         ctx.fill();
       }
 
-      // possessor 額外白圈
-      if (isPos) {
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(cx, cy, SPRITE_DRAW_W * 0.65, 0, Math.PI * 2);
-        ctx.stroke();
-      }
+      // 控球者：只在腳下加小白點（已在前面畫的白橢圓），不再加全身白圈
     });
 
     // 球（帶陰影）
@@ -358,6 +371,9 @@
     ctx.arc(ball.x * PITCH_W, ball.y * PITCH_H, 3, 0, Math.PI * 2);
     ctx.fill();
     ctx.shadowBlur = 0;
+
+    // 還原鏡頭變換
+    ctx.restore();
   }
 
   // ── HUD ─────────────────────────────────────────────────
@@ -470,11 +486,12 @@
     }
     const canvas = ui.canvas;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = PITCH_W * dpr;
-    canvas.height = PITCH_H * dpr;
+    // canvas 視窗大小 = VIEW_W × VIEW_H（只顯示球場其中一部分，鏡頭追焦）
+    canvas.width = VIEW_W * dpr;
+    canvas.height = VIEW_H * dpr;
     canvas.style.width = '100%';
-    canvas.style.maxWidth = '360px';
-    canvas.style.aspectRatio = `${PITCH_W} / ${PITCH_H}`;
+    canvas.style.maxWidth = '380px';
+    canvas.style.aspectRatio = `${VIEW_W} / ${VIEW_H}`;
     canvas.style.borderRadius = '8px';
     canvas.style.display = 'block';
     canvas.style.margin = '8px auto';
@@ -572,6 +589,8 @@
       halftimeDone: false,
       lastActionFrame: 0,
       players, ball,
+      // 追焦鏡頭：起始置於球場中央，每 frame 朝球位置 lerp
+      camera: { x: (PITCH_W - VIEW_W) / 2, y: (PITCH_H - VIEW_H) / 2 },
       get possessorIdx() { return this._possessorIdx; },
       set possessorIdx(v) { this._possessorIdx = v; },
     };
