@@ -531,26 +531,26 @@
     body.innerHTML = `
       <div class="mt-hub-header">
         <div class="mt-hub-team">
-          <div class="mt-hub-team-crest">${_renderCrest(team)}</div>
+          <div class="mt-hub-team-crest" id="mt-hub-crest">${_renderCrest(team)}</div>
           <div class="mt-hub-team-info">
-            <div class="mt-hub-team-name">${escapeHtml(team.team_name)}</div>
-            <div class="mt-hub-team-meta">Lv.${team.stadium_level} 球場 · ${team.fans} 球迷</div>
+            <div class="mt-hub-team-name" id="mt-hub-team-name">${escapeHtml(team.team_name)}</div>
+            <div class="mt-hub-team-meta" id="mt-hub-team-meta">Lv.${team.stadium_level} 球場 · ${team.fans} 球迷</div>
           </div>
         </div>
         <div class="mt-hub-stats">
           <div class="mt-hub-stat">
             <div class="mt-hub-stat-icon">🎟️</div>
-            <div class="mt-hub-stat-val">${team.tickets || 0}</div>
+            <div class="mt-hub-stat-val" id="mt-hub-tickets">${team.tickets || 0}</div>
             <div class="mt-hub-stat-label">抽券</div>
           </div>
           <div class="mt-hub-stat">
             <div class="mt-hub-stat-icon">⚡</div>
-            <div class="mt-hub-stat-val">${team.stamina || 0}/${team.stamina_max || 5}</div>
+            <div class="mt-hub-stat-val" id="mt-hub-stamina">${team.stamina || 0}/${team.stamina_max || 5}</div>
             <div class="mt-hub-stat-label">體力</div>
           </div>
           <div class="mt-hub-stat">
             <div class="mt-hub-stat-icon">⭐</div>
-            <div class="mt-hub-stat-val">${team.ssr_select_tickets || 0}</div>
+            <div class="mt-hub-stat-val" id="mt-hub-ssr">${team.ssr_select_tickets || 0}</div>
             <div class="mt-hub-stat-label">SSR券</div>
           </div>
           <div class="mt-hub-stat">
@@ -770,7 +770,30 @@
     // 動畫迴圈：H_LO 低一點讓球員可走到操場前端、頭蓋過建築（前景效果）
     const W_LO = 0.04, W_HI = 0.96;
     const H_LO = 0.05, H_HI = 0.95;
+    const COLLIDE_RX = 0.08;   // x 軸碰撞半徑（百分比）
+    const COLLIDE_RY = 0.04;   // y 軸碰撞半徑（球員瘦高、y 半徑小）
     function tick(t) {
+      // 先做兩兩 collision 推擠（避免球員疊在一起）
+      for (let i = 0; i < wanderers.length; i++) {
+        const a = wanderers[i];
+        for (let j = i + 1; j < wanderers.length; j++) {
+          const b = wanderers[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const overlapX = COLLIDE_RX - Math.abs(dx);
+          const overlapY = COLLIDE_RY - Math.abs(dy);
+          if (overlapX > 0 && overlapY > 0) {
+            // x 軸推開（左右推遠）
+            const pushX = overlapX / 2;
+            if (dx >= 0) { a.x += pushX; b.x -= pushX; }
+            else         { a.x -= pushX; b.x += pushX; }
+            // y 軸推開稍微（避免完全重疊）
+            const pushY = overlapY / 2;
+            if (dy >= 0) { a.y += pushY; b.y -= pushY; }
+            else         { a.y -= pushY; b.y += pushY; }
+          }
+        }
+      }
       for (const w of wanderers) {
         if (!w.el) continue;
         // 狀態結束 → 切回 walk 或 idle
@@ -837,6 +860,8 @@
         w.el.style.top  = (w.y * 100) + '%';
         const persp = 0.78 + w.y * 0.35;
         w.el.style.setProperty('--persp', persp);
+        // Y-sort：y 越大（越下方）z-index 越高 → 前景；上方球員會被下方擋住
+        w.el.style.zIndex = String(100 + Math.round(w.y * 100));
         const sprite = w.el.children[1];
         if (sprite && w.sheetUrl) {
           const SCALE = w.scale;
@@ -2483,13 +2508,38 @@
     }
   }
 
-  // 監聽 team change → 如果 modal 開著，重新渲染 hub stats
+  // 監聽 team change → 只更新 header 的數字、不重渲染整個 hub
+  // （重建會 reset scroll + 中斷 home 動畫 + 中斷使用者互動）
+  function _updateHeaderStats() {
+    if (!_overlay) return;
+    const team = window.MyTeam?.getCached();
+    if (!team || team === 'not_created') return;
+    const set = (id, val) => {
+      const el = _overlay.querySelector('#' + id);
+      if (el && el.textContent !== String(val)) el.textContent = val;
+    };
+    set('mt-hub-tickets', team.tickets || 0);
+    set('mt-hub-stamina', `${team.stamina || 0}/${team.stamina_max || 5}`);
+    set('mt-hub-ssr', team.ssr_select_tickets || 0);
+    set('mt-hub-team-name', team.team_name || '');
+    set('mt-hub-team-meta', `Lv.${team.stadium_level} 球場 · ${team.fans} 球迷`);
+    // 更新隊徽（如果 crest_id / 顏色變了）
+    const crestEl = _overlay.querySelector('#mt-hub-crest');
+    if (crestEl) crestEl.innerHTML = _renderCrest(team);
+    // 寶石（用 gems.js）
+    if (typeof window.fetchGemBalance === 'function') {
+      window.fetchGemBalance().then(balance => {
+        const el = _overlay.querySelector('#mt-hub-gem');
+        if (el) el.textContent = balance != null ? balance : '—';
+      });
+    }
+  }
+
   window.addEventListener('my-team-changed', () => {
     if (_overlay && _overlay.classList.contains('open')) {
       const body = _overlay.querySelector('#mt-modal-body');
-      // 只在已是 hub 視圖才更新 stats（避免蓋掉 onboarding）
       if (body && body.querySelector('.mt-hub-header')) {
-        renderHub();
+        _updateHeaderStats();
       }
     }
   });
