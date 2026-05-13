@@ -857,7 +857,11 @@
   }
 
   async function renderRosterTab(content) {
-    content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入球員中…</div>';
+    // 只在第一次或空畫面才顯 loading；後續 re-render 不閃
+    const alreadyHasStadium = content.querySelector('.mt-stadium-tab');
+    if (!alreadyHasStadium) {
+      content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入球員中…</div>';
+    }
     const team = window.MyTeam.getCached();
     const players = await window.MyTeam.fetchPlayers();
     if (!players.length) {
@@ -880,35 +884,23 @@
     const formation = team?.formation || '4-3-3';
     const positions = _formationPositions(formation);
 
-    let starters = players.filter(p => p.in_starting_11);
     const now = new Date();
-    starters = starters.filter(p => !p.injured_until || new Date(p.injured_until) <= now);
-    if (starters.length < 11) {
-      const rest = players.filter(p => !starters.includes(p) &&
-        (!p.injured_until || new Date(p.injured_until) <= now))
-        .sort((a, b) => (b.current_attack + b.current_defense) - (a.current_attack + a.current_defense));
-      starters = starters.concat(rest.slice(0, 11 - starters.length));
-    }
-    const bench = players.filter(p => !starters.includes(p));
+    // 場上 = in_starting_11 且非傷停（傷停顯示在板凳）
+    const starters = players.filter(p => p.in_starting_11 &&
+      (!p.injured_until || new Date(p.injured_until) <= now));
+    const bench = players.filter(p => !p.in_starting_11 ||
+      (p.injured_until && new Date(p.injured_until) > now));
 
     // 解鎖的陣型：初始只 4-3-3、抽到的教練會解鎖更多
     const unlocked = await _fetchUnlockedFormations();
 
     content.innerHTML = `
       <div class="mt-stadium-tab ${_swapPending ? 'mt-swap-mode' : ''}">
-        ${_swapPending ? `
-          <div class="mt-swap-prompt-banner">
-            <span class="mt-swap-prompt-icon">👇</span>
-            <span class="mt-swap-prompt-text">點選位置以換上 <b>${escapeHtml(_swapPending.card?.name || '')}</b>（${_swapPending.card?.position || ''}）</span>
-            <button class="mt-swap-cancel-btn" id="mt-swap-cancel">取消</button>
-          </div>
-        ` : ''}
         <div class="mt-formation-bar">
           <span style="font-size:11px;opacity:0.7;margin-right:8px">📋 陣型</span>
           ${['4-3-3','4-4-2','3-5-2','5-3-2','4-2-3-1','3-4-3','4-5-1','4-1-4-1'].map(f => {
             const isUnlocked = unlocked.has(f);
             const isActive = formation === f;
-            // 鎖住的陣型隱藏數字、顯示 ?-?-?
             const label = isUnlocked ? f : f.replace(/\d/g, '?');
             return `<button class="mt-formation-opt ${isActive ? 'sel' : ''} ${isUnlocked ? '' : 'locked'}"
               data-formation="${f}" ${isUnlocked ? '' : 'disabled'}
@@ -927,16 +919,11 @@
         </div>
         <div class="mt-bench-section">
           <div class="mt-bench-title">板凳球員 <span style="opacity:0.6">(${bench.length})</span></div>
+          <div class="mt-swap-banner-slot" id="mt-swap-banner-slot"></div>
           <div class="mt-bench-strip" id="mt-bench-strip"></div>
         </div>
       </div>
     `;
-
-    // 替換模式：取消鈕
-    content.querySelector('#mt-swap-cancel')?.addEventListener('click', () => {
-      _swapPending = null;
-      renderTab();
-    });
 
     // 陣型 click → 切陣型
     content.querySelectorAll('.mt-formation-opt:not(.locked)').forEach(btn => {
@@ -954,11 +941,23 @@
       });
     });
 
+    // 場上：依 starting_slot 放定點。沒 slot 的（舊資料）退到 index 補位
     const pitch = content.querySelector('#mt-stadium-pitch');
-    starters.forEach((p, i) => {
-      const pos = positions[i] || { x: 50, y: 50 };
-      const el = _buildStadiumPlayer(p, pos, 'starter');
-      pitch.appendChild(el);
+    const usedSlots = new Set();
+    starters.forEach(p => {
+      if (Number.isInteger(p.starting_slot)) {
+        usedSlots.add(p.starting_slot);
+        const pos = positions[p.starting_slot] || { x: 50, y: 50 };
+        pitch.appendChild(_buildStadiumPlayer(p, pos, 'starter'));
+      }
+    });
+    // 沒 slot 的退到剩餘 slot
+    let nextFreeSlot = 0;
+    starters.filter(p => !Number.isInteger(p.starting_slot)).forEach(p => {
+      while (usedSlots.has(nextFreeSlot) && nextFreeSlot < 11) nextFreeSlot++;
+      const pos = positions[nextFreeSlot] || { x: 50, y: 50 };
+      usedSlots.add(nextFreeSlot);
+      pitch.appendChild(_buildStadiumPlayer(p, pos, 'starter'));
     });
 
     const strip = content.querySelector('#mt-bench-strip');
@@ -970,6 +969,80 @@
         strip.appendChild(el);
       });
     }
+
+    // 進場時若已在替換模式 → 注入 banner
+    if (_swapPending) _mountSwapBanner(content);
+  }
+
+  // 動態注入替換橫幅到板凳區上方
+  function _mountSwapBanner(content) {
+    const slot = content.querySelector('#mt-swap-banner-slot');
+    if (!slot || !_swapPending) return;
+    slot.innerHTML = `
+      <div class="mt-swap-prompt-banner">
+        <span class="mt-swap-prompt-icon">👆</span>
+        <span class="mt-swap-prompt-text">點上方位置以換上 <b>${escapeHtml(_swapPending.card?.name || '')}</b>（${_swapPending.card?.position || ''}）</span>
+        <button class="mt-swap-cancel-btn" id="mt-swap-cancel">取消</button>
+      </div>
+    `;
+    slot.querySelector('#mt-swap-cancel').addEventListener('click', () => _exitSwapMode());
+  }
+
+  function _exitSwapMode() {
+    _swapPending = null;
+    const content = _overlay?.querySelector('#mt-hub-content');
+    if (!content) return;
+    content.querySelector('.mt-stadium-tab')?.classList.remove('mt-swap-mode');
+    content.querySelector('#mt-swap-banner-slot').innerHTML = '';
+    content.querySelectorAll('.mt-pitch-player').forEach(el => {
+      el.classList.remove('mt-swap-target', 'mt-swap-target-match');
+    });
+  }
+
+  // 進入替換模式：不重繪、只加 class + 注入 banner + 標記場上球員
+  async function _enterSwapMode(benchPlayer) {
+    const players = await window.MyTeam.fetchPlayers();
+    const startersCount = players.filter(x => x.in_starting_11 &&
+      (!x.injured_until || new Date(x.injured_until) <= new Date())).length;
+
+    if (startersCount < 11) {
+      // 沒滿 → 直接 promote（依然要 smooth 處理）
+      try {
+        await window.DB.rpc('promote_to_starter', { p_player_id: benchPlayer.id });
+        await window.MyTeam.refresh?.();
+        if (_currentTab !== 'roster') {
+          _currentTab = 'roster';
+          document.querySelector('.mt-hub-tab[data-tab="roster"]')?.click();
+        } else {
+          renderTab();
+        }
+        if (typeof showToast === 'function') {
+          showToast(`✅ ${benchPlayer.card?.name} 上場`);
+        }
+      } catch (e) {
+        alert('上場失敗：' + (e.message || e));
+      }
+      return;
+    }
+
+    _swapPending = benchPlayer;
+    if (_currentTab !== 'roster') {
+      _currentTab = 'roster';
+      document.querySelector('.mt-hub-tab[data-tab="roster"]')?.click();
+      return;
+    }
+    // 已在 roster：smooth 加 class + banner
+    const content = _overlay?.querySelector('#mt-hub-content');
+    if (!content) return;
+    content.querySelector('.mt-stadium-tab')?.classList.add('mt-swap-mode');
+    _mountSwapBanner(content);
+    // 標記場上球員（同位置亮綠框）
+    const benchPos = benchPlayer.card?.position || '';
+    content.querySelectorAll('.mt-pitch-player').forEach(el => {
+      el.classList.add('mt-swap-target');
+      const slotRole = el.dataset.slotRole || '';
+      if (_positionMatches(slotRole, benchPos)) el.classList.add('mt-swap-target-match');
+    });
   }
 
   // 撈使用者已解鎖的陣型（4-3-3 預設、抽到的教練解鎖更多）
@@ -1012,13 +1085,11 @@
   function _buildStadiumPlayer(p, pos, kind) {
     const c = p.card || {};
     const el = document.createElement('button');
-    // 位置不符：陣型槽的角色 vs 球員實際位置（AMC 算 MID/FWD 通用、其餘嚴格）
     const slotRole = pos.role || '';
     const playerPos = c.position || '';
     const posMatch = _positionMatches(slotRole, playerPos);
     el.className = `mt-pitch-player rarity-${c.rarity || 'R'}` + (posMatch ? '' : ' mt-pos-mismatch');
 
-    // 在替換模式中，標記是否為合適換上目標（同位置 highlight）
     if (_swapPending) {
       el.classList.add('mt-swap-target');
       const benchPos = _swapPending.card?.position || '';
@@ -1030,15 +1101,20 @@
     el.style.left = pos.x + '%';
     el.style.top = pos.y + '%';
     el.dataset.playerId = p.id;
+    el.dataset.slotRole = slotRole;
+    if (Number.isInteger(p.starting_slot)) el.dataset.slot = p.starting_slot;
     const imgId = `pitch-${p.id}`;
     const isInjured = p.injured_until && new Date(p.injured_until) > new Date();
     const fallback = (typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id, c.rarity) : '';
-    const warnIcon = posMatch ? '' : `<span class="mt-pos-warn" title="位置不符：槽位 ${slotRole}、球員 ${playerPos}">⚠️</span>`;
+    // 紅色遊戲感驚嘆號 — 標籤之外，獨立漂浮
+    const warnBubble = posMatch ? '' :
+      `<span class="mt-pos-warn-bubble" title="位置不符：槽位 ${slotRole}、球員 ${playerPos}">!</span>`;
     el.innerHTML = `
       <div class="mt-pitch-player-portrait">
         <img id="${imgId}" alt="${escapeHtml(c.name || '')}" loading="lazy" src="${fallback}" onerror="this.style.opacity='0.3'">
         ${isInjured ? '<span class="mt-pitch-injury">🏥</span>' : ''}
-        <span class="mt-pitch-player-pos pos-${c.position || ''}">${c.position || ''}${warnIcon}</span>
+        <span class="mt-pitch-player-pos pos-${c.position || ''}">${c.position || ''}</span>
+        ${warnBubble}
       </div>
       <div class="mt-pitch-player-name">${escapeHtml(c.name || '?')}</div>
       <div class="mt-pitch-player-stat">Lv.${p.level}${p.bond ? ' ★'.repeat(p.bond) : ''}</div>
@@ -1309,16 +1385,17 @@
     overlay.querySelector('[data-act="toggle-start"]').addEventListener('click', async () => {
       try {
         if (p.in_starting_11) {
-          // 已在先發 → 直接撤下
-          await window.DB.from('team_player').update({ in_starting_11: false }).eq('id', p.id);
+          // 已在先發 → 直接撤下（用 RPC 清 slot）
+          await window.DB.rpc('demote_to_bench', { p_player_id: p.id });
           overlay.classList.remove('open');
           setTimeout(() => overlay.remove(), 200);
+          await window.MyTeam.refresh?.();
           renderTab();
         } else {
-          // 板凳 → 開替換對話框
+          // 板凳 → 切替換模式
           overlay.classList.remove('open');
           setTimeout(() => overlay.remove(), 200);
-          setTimeout(() => _openSwapDialog(p), 220);
+          setTimeout(() => _enterSwapMode(p), 220);
         }
       } catch (e) {
         alert('更新失敗：' + (e.message || e));
@@ -1346,37 +1423,44 @@
 
   // ── 替換模式：切到 roster tab + 點陣型上的位置換上 bench player ──
   let _swapPending = null;
+  // 舊呼叫端 → 轉接到新流程
   async function _openSwapDialog(benchPlayer) {
-    const players = await window.MyTeam.fetchPlayers();
-    const starters = players.filter(x => x.in_starting_11);
-    if (starters.length < 11) {
-      // 沒滿 11 人 → 直接上場、不需替換
-      try {
-        await window.DB.from('team_player').update({ in_starting_11: true }).eq('id', benchPlayer.id);
-        renderTab();
-      } catch (e) { alert('上場失敗：' + e.message); }
-      return;
-    }
-    // 開啟「選位置」模式 → 切到球員 tab、提示用戶在陣型上點要換的位置
-    _swapPending = benchPlayer;
-    _currentTab = 'roster';
-    document.querySelector('.mt-hub-tab[data-tab="roster"]')?.click();
+    return _enterSwapMode(benchPlayer);
   }
 
   async function _executeSwap(targetStarter, benchPlayer) {
+    const content = _overlay?.querySelector('#mt-hub-content');
+    const targetEl = content?.querySelector(`.mt-pitch-player[data-player-id="${targetStarter.id}"]`);
+    const benchEl  = content?.querySelector(`.mt-bench-player[data-player-id="${benchPlayer.id}"]`);
+
+    // 動畫：場上球員淡出縮小、板凳球員淡出（暗示移動）
+    if (targetEl) targetEl.classList.add('mt-swap-leaving');
+    if (benchEl)  benchEl.classList.add('mt-swap-leaving');
+
     try {
-      await Promise.all([
-        window.DB.from('team_player').update({ in_starting_11: false }).eq('id', targetStarter.id),
-        window.DB.from('team_player').update({ in_starting_11: true }).eq('id', benchPlayer.id),
-      ]);
-      _swapPending = null;
+      await window.DB.rpc('swap_starter_with_bench', {
+        p_starter_id: targetStarter.id,
+        p_bench_id:   benchPlayer.id,
+      });
+    } catch (e) {
+      // 失敗：解除動畫
+      if (targetEl) targetEl.classList.remove('mt-swap-leaving');
+      if (benchEl)  benchEl.classList.remove('mt-swap-leaving');
+      alert('替換失敗：' + (e.message || e));
+      return;
+    }
+
+    _swapPending = null;
+    await window.MyTeam.refresh?.();
+    // 等動畫 280ms 再重繪、減少跳動感
+    setTimeout(() => {
+      // 退出替換模式 class（不重繪 banner）
+      content?.querySelector('.mt-stadium-tab')?.classList.remove('mt-swap-mode');
       renderTab();
       if (typeof showToast === 'function') {
-        showToast(`✅ ${benchPlayer.card?.name} 上場、${targetStarter.card?.name} 下場`);
+        showToast(`✅ ${benchPlayer.card?.name} ⇄ ${targetStarter.card?.name}`);
       }
-    } catch (e) {
-      alert('替換失敗：' + (e.message || e));
-    }
+    }, 280);
   }
 
   function _radarBar(label, val) {

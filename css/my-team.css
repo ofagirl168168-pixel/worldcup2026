@@ -3323,22 +3323,51 @@
 }
 .mt-swap-cancel-btn:hover { background: rgba(229,57,53,0.4); border-color: #e53935; }
 
-/* 位置不符警告 */
-.mt-pos-warn {
-  display: inline-block;
-  font-size: 9px;
-  margin-left: 2px;
-  filter: drop-shadow(0 0 2px rgba(255,180,0,0.9));
-  animation: mt-pos-warn-blink 1.6s ease-in-out infinite;
+/* 位置不符警告 — 紅色遊戲感感嘆號（圓圈獨立於標籤外） */
+.mt-pos-warn-bubble {
+  position: absolute;
+  top: -7px;
+  right: -14px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8080 0%, #e53935 55%, #a01020 100%);
+  color: #fff;
+  font-family: 'Arial Black', 'Impact', sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  border: 2px solid #fff;
+  box-shadow:
+    0 0 8px rgba(229,57,53,0.95),
+    0 2px 3px rgba(0,0,0,0.5),
+    inset 0 -2px 2px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+  z-index: 4;
+  pointer-events: auto;
+  animation: mt-warn-pulse 1.2s ease-in-out infinite;
 }
-@keyframes mt-pos-warn-blink {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.55; }
+@keyframes mt-warn-pulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 8px rgba(229,57,53,0.95), 0 2px 3px rgba(0,0,0,0.5), inset 0 -2px 2px rgba(0,0,0,0.3); }
+  50%      { transform: scale(1.15); box-shadow: 0 0 14px rgba(229,57,53,1),   0 2px 3px rgba(0,0,0,0.5), inset 0 -2px 2px rgba(0,0,0,0.3); }
 }
-.mt-pitch-player.mt-pos-mismatch .mt-pitch-player-pos {
-  background: rgba(255,140,40,0.9) !important;
-  box-shadow: 0 0 6px rgba(255,180,0,0.8);
+
+/* 替換動畫：場上 + 板凳元素淡出（避免重繪閃跳） */
+.mt-pitch-player.mt-swap-leaving,
+.mt-bench-player.mt-swap-leaving {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.7);
+  pointer-events: none;
 }
+.mt-bench-player.mt-swap-leaving {
+  /* bench 沒有 translate(-50%,-50%)，調整 transform 起點 */
+  transform: scale(0.7);
+}
+
+/* 板凳區上方的替換 banner 槽 */
+.mt-swap-banner-slot:empty { display: none; }
+.mt-swap-banner-slot { margin: 4px 0 6px; }
 .mt-pitch-player:nth-child(odd) { animation-delay: 0.4s; }
 .mt-pitch-player:nth-child(3n) { animation-delay: 0.8s; }
 .mt-pitch-player:hover { z-index: 5; }
