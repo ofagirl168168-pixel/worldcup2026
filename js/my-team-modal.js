@@ -546,7 +546,7 @@
           <div class="mt-hub-stat">
             <div class="mt-hub-stat-icon">⚡</div>
             <div class="mt-hub-stat-val" id="mt-hub-stamina">${team.stamina || 0}/${team.stamina_max || 5}</div>
-            <div class="mt-hub-stat-label">體力</div>
+            <div class="mt-hub-stat-label">體力<span class="mt-hub-stamina-countdown" id="mt-hub-stamina-countdown"></span></div>
           </div>
           <div class="mt-hub-stat">
             <div class="mt-hub-stat-icon">⭐</div>
@@ -594,7 +594,41 @@
       });
     });
 
+    // 啟動體力倒數
+    _startStaminaCountdown();
+
     renderTab();
+  }
+
+  // ── 體力倒數顯示 ──
+  let _staminaTimer = null;
+  function _startStaminaCountdown() {
+    if (_staminaTimer) clearInterval(_staminaTimer);
+    const tick = () => {
+      const el = document.getElementById('mt-hub-stamina-countdown');
+      if (!el) { clearInterval(_staminaTimer); _staminaTimer = null; return; }
+      const team = window.MyTeam?.getCached();
+      if (!team || team === 'not_created') { el.textContent = ''; return; }
+      if (team.stamina >= team.stamina_max) { el.textContent = ' 滿'; return; }
+      // 下次恢復時間 = stamina_recover_at + 15 分鐘
+      const recoverAt = team.stamina_recover_at ? new Date(team.stamina_recover_at) : null;
+      if (!recoverAt) { el.textContent = ''; return; }
+      const nextMs = recoverAt.getTime() + 15 * 60 * 1000;
+      const remainSec = Math.max(0, Math.floor((nextMs - Date.now()) / 1000));
+      if (remainSec === 0) {
+        // 觸發後端 recover
+        if (window.DB?.rpc) {
+          window.DB.rpc('recover_stamina_if_due').then(() => window.MyTeam?.refresh?.());
+        }
+        el.textContent = '';
+        return;
+      }
+      const m = Math.floor(remainSec / 60);
+      const s = remainSec % 60;
+      el.textContent = ` +1 ${m}:${String(s).padStart(2,'0')}`;
+    };
+    tick();
+    _staminaTimer = setInterval(tick, 1000);
   }
 
   function renderTab() {
@@ -1555,10 +1589,11 @@
     if (occupierEl) occupierEl.classList.add('mt-swap-leaving');
 
     try {
-      await window.DB.rpc('place_player_at_slot', {
+      const { error } = await window.DB.rpc('place_player_at_slot', {
         p_player_id:   player.id,
         p_target_slot: targetSlot,
       });
+      if (error) throw error;
     } catch (e) {
       if (playerEl) playerEl.classList.remove('mt-swap-leaving');
       if (occupierEl) occupierEl.classList.remove('mt-swap-leaving');
@@ -2569,15 +2604,15 @@
         <!-- 闖關路線（10 站） -->
         <div class="mt-match-path">
           <svg class="mt-match-path-line" viewBox="0 0 300 480" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M 30 30
-                     C 90 30, 60 80, 150 80
-                     C 240 80, 230 130, 70 130
-                     C 30 130, 30 180, 150 180
-                     C 270 180, 270 230, 70 230
-                     C 30 230, 30 280, 150 280
-                     C 270 280, 270 330, 70 330
-                     C 30 330, 30 380, 150 380
-                     C 270 380, 270 430, 150 430"
+            <path d="M 150 456
+                     C 240 456, 230 400, 70 400
+                     C 30 400, 30 345, 150 345
+                     C 270 345, 270 290, 70 290
+                     C 30 290, 30 240, 150 240
+                     C 270 240, 270 187, 70 187
+                     C 30 187, 30 134, 150 134
+                     C 270 134, 270 82, 150 82
+                     C 90 82, 60 43, 234 14"
               fill="none"
               stroke="rgba(240,192,64,0.5)"
               stroke-width="4"

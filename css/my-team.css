@@ -1,41 +1,49 @@
 /* my-team.css — 我的球隊系統樣式 */
 
-/* ───────── FAB 懸浮入口 ───────── */
+/* ───────── FAB 懸浮入口（圓形 icon + 下方文字標籤） ───────── */
 .mt-fab {
   position: fixed;
   right: 16px;
-  bottom: 80px;            /* 避開底部 nav（行動版）*/
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.2);
-  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
-  box-shadow: 0 4px 16px rgba(240,192,64,0.4), 0 2px 8px rgba(0,0,0,0.3);
+  bottom: 80px;
+  width: 64px;
+  height: 76px;
+  border-radius: 16px;
+  border: 2.5px solid rgba(255,255,255,0.45);
+  background: linear-gradient(180deg, #f0c040 0%, #e07020 100%);
+  box-shadow:
+    0 6px 18px rgba(240,192,64,0.45),
+    0 3px 10px rgba(0,0,0,0.35),
+    inset 0 2px 3px rgba(255,255,255,0.4),
+    inset 0 -2px 3px rgba(0,0,0,0.25);
   cursor: pointer;
-  z-index: 9000;            /* 在 modal 之下、其他 UI 之上 */
+  z-index: 9000;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  line-height: 1;
+  justify-content: flex-start;
+  padding: 6px 4px 4px;
+  gap: 1px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  padding: 0;
 }
 .mt-fab:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 22px rgba(240,192,64,0.6), 0 3px 12px rgba(0,0,0,0.4);
+  transform: translateY(-3px) scale(1.04);
+  box-shadow:
+    0 8px 22px rgba(240,192,64,0.7),
+    0 3px 12px rgba(0,0,0,0.4),
+    inset 0 2px 3px rgba(255,255,255,0.4),
+    inset 0 -2px 3px rgba(0,0,0,0.25);
 }
-.mt-fab:active { transform: scale(0.95); }
+.mt-fab:active { transform: translateY(0) scale(0.96); }
 
 .mt-fab-crest {
   pointer-events: none;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
-  font-size: 28px;
+  font-size: 26px;
   line-height: 1;
 }
 .mt-fab-crest svg {
@@ -44,10 +52,24 @@
   display: block;
 }
 
+.mt-fab-label {
+  pointer-events: none;
+  font-size: 11px;
+  font-weight: 900;
+  color: #2a1505;
+  letter-spacing: 1px;
+  font-family: 'Noto Sans TC', system-ui, sans-serif;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.55),
+    0 -1px 0 rgba(0,0,0,0.15);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
 .mt-fab-badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: -6px;
+  right: -6px;
   min-width: 22px;
   height: 22px;
   padding: 0 6px;
@@ -468,6 +490,14 @@
   color: rgba(255,255,255,0.5);
   margin-top: 2px;
   letter-spacing: 0.5px;
+}
+.mt-hub-stamina-countdown {
+  display: inline-block;
+  margin-left: 3px;
+  font-family: monospace;
+  color: #ffe680;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
 .mt-hub-tabs {
@@ -3363,6 +3393,19 @@
   animation: none !important;
 }
 
+/* 禁止瀏覽器原生 img 拖拽（會搶走 pointer event），整張卡都能 pointerdown */
+.mt-pitch-player,
+.mt-pitch-player * {
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.mt-pitch-player img {
+  pointer-events: none;  /* 確保事件冒泡到 button */
+  -webkit-user-drag: none;
+}
+
 /* ═════════════════════════════════════════════════════════════
    🎰 GACHA TAB — 商店櫃台 + 盲盒卡牌包（旁邊）
    ═════════════════════════════════════════════════════════════ */
@@ -4202,17 +4245,17 @@
   50%      { transform: translate(-50%, -50%) scale(1.18); box-shadow: 0 6px 14px rgba(0,0,0,0.7), 0 0 32px rgba(229,57,53,1);    }
 }
 
-/* 路線節點位置（對應 SVG path 的 10 個彎曲處）— 路徑是 S 形蛇形 */
-.mt-match-stage-node[data-stage="1"]  { left: 10%; top:  6%; transform: translate(-50%, -50%); }
-.mt-match-stage-node[data-stage="2"]  { left: 50%; top: 17%; transform: translate(-50%, -50%); }
-.mt-match-stage-node[data-stage="3"]  { left: 23%; top: 28%; transform: translate(-50%, -50%); }
-.mt-match-stage-node[data-stage="4"]  { left: 50%; top: 39%; transform: translate(-50%, -50%); }
-.mt-match-stage-node[data-stage="5"]  { left: 23%; top: 50%; transform: translate(-50%, -50%); }
-.mt-match-stage-node[data-stage="6"]  { left: 50%; top: 61%; transform: translate(-50%, -50%); }
-.mt-match-stage-node[data-stage="7"]  { left: 23%; top: 72%; transform: translate(-50%, -50%); }
-.mt-match-stage-node[data-stage="8"]  { left: 50%; top: 83%; transform: translate(-50%, -50%); }
-.mt-match-stage-node[data-stage="9"]  { left: 78%; top: 89%; transform: translate(-50%, -50%); }
-.mt-match-stage-node[data-stage="10"] { left: 50%; top: 95%; transform: translate(-50%, -50%); }
+/* 路線節點位置（往上爬塔：1 在下、10 在頂）— 路徑是 S 形蛇形 */
+.mt-match-stage-node[data-stage="1"]  { left: 50%; top: 95%; transform: translate(-50%, -50%); }
+.mt-match-stage-node[data-stage="2"]  { left: 23%; top: 83%; transform: translate(-50%, -50%); }
+.mt-match-stage-node[data-stage="3"]  { left: 50%; top: 72%; transform: translate(-50%, -50%); }
+.mt-match-stage-node[data-stage="4"]  { left: 78%; top: 61%; transform: translate(-50%, -50%); }
+.mt-match-stage-node[data-stage="5"]  { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.mt-match-stage-node[data-stage="6"]  { left: 23%; top: 39%; transform: translate(-50%, -50%); }
+.mt-match-stage-node[data-stage="7"]  { left: 50%; top: 28%; transform: translate(-50%, -50%); }
+.mt-match-stage-node[data-stage="8"]  { left: 78%; top: 17%; transform: translate(-50%, -50%); }
+.mt-match-stage-node[data-stage="9"]  { left: 50%; top:  9%; transform: translate(-50%, -50%); }
+.mt-match-stage-node[data-stage="10"] { left: 78%; top:  3%; transform: translate(-50%, -50%); }
 
 /* 當前關卡資訊面板（地圖下方） */
 .mt-match-current {

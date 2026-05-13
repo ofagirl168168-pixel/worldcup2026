@@ -26,6 +26,7 @@
     fab.setAttribute('aria-label', '開啟我的球隊');
     fab.innerHTML = `
       <span class="mt-fab-crest" id="mt-fab-crest">⚽</span>
+      <span class="mt-fab-label">我的隊伍</span>
       <span class="mt-fab-badge" id="mt-fab-badge" hidden>0</span>
     `;
     fab.addEventListener('click', onClick);
