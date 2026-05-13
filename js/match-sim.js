@@ -726,12 +726,14 @@
         || players.map((p, i) => ({ p, i })).find(x => x.p.team === whoHasBall && x.p.role !== 'GK');
       state.possessorIdx = chosen ? chosen.i : 0;
       ball.x = 0.5; ball.y = 0.5;
-      // 開球：直接 snap 到陣型自然位置（baseX/baseY）— 不再強制全員推回己方半場
-      // 之前 home 全員 x <= 0.48 → FWD 全擠中線、然後又跑到 0.85+ 看起來像「擠了又散」
-      // 雖然足球規則開球時所有人應在己方半場，但模擬只是個動畫、視覺優先
+      // 開球規則：全員退回己方半場（home x<0.5、away x>0.5）
+      // 之前的「擠中線」感是因為形位 tx 跳遠後 max-step 暴衝、現在 setIdealTarget
+      // 限制了每幀位移、即使 FWD 從 0.48 出發也是自然走到 0.85（不會暴衝）
       players.forEach(p => {
         p.x = p.baseX;
         p.y = p.baseY;
+        if (p.team === 'h') p.x = Math.min(0.48, p.x);
+        else p.x = Math.max(0.52, p.x);
         p.tx = p.x; p.ty = p.y;
         p._urgent = false;
       });
@@ -1028,52 +1030,60 @@
       const ATK_LIMIT_H = 0.88;
       const ATK_LIMIT_A = 0.12;
 
+      // ★ 核心：tx/ty 不再是「絕對目標」，而是「每幀只能往理想位置走 naturalStep 距離」
+      // 這樣無論理想位置怎麼跳（陣型變、攻防換、ball 移動），tx 永遠靠近 p.x，
+      // movePlayers 不會偵測到大距離 → 不會 max-step 暴衝
+      // sprintMult：rare 情況才用 — 散球追球 1.3、持球者 role.sprint × 1.1
+      const setIdealTarget = (p, idealTx, idealTy, sprintMult = 1) => {
+        const speedMult = (p.role !== 'GK' && p.stats?.speed) ? p.stats.speed / 80 : 1;
+        const naturalStep = 0.011 * speedMult * sprintMult;
+        const dxToIdeal = idealTx - p.x;
+        const dyToIdeal = idealTy - p.y;
+        const distMag = Math.hypot(dxToIdeal, dyToIdeal);
+        if (distMag <= naturalStep) {
+          p.tx = idealTx;
+          p.ty = idealTy;
+        } else {
+          p.tx = p.x + (dxToIdeal / distMag) * naturalStep;
+          p.ty = p.y + (dyToIdeal / distMag) * naturalStep;
+        }
+      };
+
       players.forEach((p, i) => {
         p._urgent = false;
-        // 散球：兩隊最近的人朝球跑（自然速度、不暴衝）、其他人維持陣型
+        // 散球：兩隊最近的人朝球跑（會小衝刺）、其他人鬆動站回基本位置
         if (isLoose) {
           if (p.role === 'GK') {
-            p.tx = p.baseX;
-            p.ty = 0.5 + (ball.y - 0.5) * 0.25;
+            setIdealTarget(p, p.baseX, 0.5 + (ball.y - 0.5) * 0.25);
             return;
           }
           const myRank = rankIdx[i];
           if (myRank === 0) {
-            // 每隊最近一人去追球（urgent 但 maxStep 已限制）
             p._urgent = true;
-            p.tx = ball.x;
-            p.ty = ball.y;
+            // 散球：rank-0 衝刺去搶（1.3x natural speed）
+            setIdealTarget(p, ball.x, ball.y, 1.3);
           } else {
-            // 其他人鬆動站回基本位置 + 些微跟球
             const fl = p.flair || { xJitter: 0, yJitter: 0 };
-            p.tx = p.baseX + (ball.x - 0.5) * 0.18 + fl.xJitter;
-            p.ty = p.baseY + (ball.y - p.baseY) * 0.30 + fl.yJitter;
+            setIdealTarget(p,
+              p.baseX + (ball.x - 0.5) * 0.18 + fl.xJitter,
+              p.baseY + (ball.y - p.baseY) * 0.30 + fl.yJitter);
           }
           return;
         }
-        // 持球者：朝對方球門盤帶（但不能踩到 GK）
+        // 持球者：朝對方球門盤帶（用 role.sprint 作為 sprintMult，FWD 1.0、DEF 0.7）
         if (i === state.possessorIdx) {
-          const goalX = p.team === 'h' ? 1 : 0;
-          const dx = goalX - p.x;
           const role = ROLE[p.role] || ROLE.MID;
           const laneY = p.baseY * 0.6 + 0.5 * 0.4;
-          const dy = laneY - p.y;
-          // 持球速度：用個人 speed（射門者 70 vs 速度王 95 差約 35% 移動速度）
-          const indSpeed = p.stats?.speed ?? getTeam(p.team).radar.speed;
-          const speed = 0.008 * role.sprint * (indSpeed / 80);
-          p.tx = p.x + Math.sign(dx) * Math.min(Math.abs(dx), speed);
-          p.ty = p.y + dy * 0.06;
-          if (p.team === 'h') p.tx = Math.min(0.92, p.tx);
-          else p.tx = Math.max(0.08, p.tx);
-          p.tx += (rng() - 0.5) * 0.004;
-          p.ty += (rng() - 0.5) * 0.006;
+          const idealX = (p.team === 'h' ? Math.min(0.92, p.x + 0.1) : Math.max(0.08, p.x - 0.1))
+                       + (rng() - 0.5) * 0.004;
+          const idealY = laneY + (rng() - 0.5) * 0.006;
+          setIdealTarget(p, idealX, idealY, role.sprint * 1.1);
           return;
         }
 
         // GK：永遠站門線、跟球左右
         if (p.role === 'GK') {
-          p.tx = p.baseX;
-          p.ty = 0.5 + (ball.y - 0.5) * 0.25;
+          setIdealTarget(p, p.baseX, 0.5 + (ball.y - 0.5) * 0.25);
           return;
         }
 
@@ -1083,63 +1093,59 @@
         const myRank = rankIdx[i] != null ? rankIdx[i] : 99;
         const fl = p.flair || { xJitter: 0, yJitter: 0, laziness: 1 };
 
+        let idealX, idealY;
+
         if (!myTeamAttacking) {
           // ── 防守方 ──────────────────────────
           if (myRank === 0) {
             // 最近的去壓持球者
             p._urgent = true;
-            p.tx = ball.x - sideSign * 0.015;
-            p.ty = ball.y;
-            p.tx += (rng() - 0.5) * 0.006;
-            p.ty += (rng() - 0.5) * 0.008;
+            idealX = ball.x - sideSign * 0.015 + (rng() - 0.5) * 0.006;
+            idealY = ball.y + (rng() - 0.5) * 0.008;
           } else if (myRank === 1) {
             // 第二近的覆蓋
             p._urgent = true;
-            p.tx = ball.x - sideSign * 0.08;
-            p.ty = p.baseY + (ball.y - p.baseY) * 0.7;
+            idealX = ball.x - sideSign * 0.08;
+            idealY = p.baseY + (ball.y - p.baseY) * 0.7;
           } else {
             // 其他：維持陣型但個人差異 + 近球側踩高/遠球側收腳
             const sameSide = Math.abs(ball.y - p.baseY) < 0.22;
             const stepAdj = sameSide ? 0.06 : -0.03;
-            p.tx = p.baseX - role.pullBack * sideSign + (ball.x - 0.5) * 0.20
+            idealX = p.baseX - role.pullBack * sideSign + (ball.x - 0.5) * 0.20
                    + stepAdj * sideSign + fl.xJitter;
-            p.ty = p.baseY + (ball.y - p.baseY) * 0.42 + fl.yJitter;
+            idealY = p.baseY + (ball.y - p.baseY) * 0.42 + fl.yJitter;
           }
           // 所有防守者都不能跑到自家 GK 後面（GK 在 0.05 / 0.95）
-          if (p.team === 'h') p.tx = Math.max(0.10, p.tx);
-          else p.tx = Math.min(0.90, p.tx);
+          if (p.team === 'h') idealX = Math.max(0.10, idealX);
+          else idealX = Math.min(0.90, idealX);
+          setIdealTarget(p, idealX, idealY);
           return;
         }
 
         // ── 進攻方（非持球者）───────────────
-        // 只有 rank 0（最近的隊友）跑短接應路線，其他人維持陣型拉開空間
-        // 原本 rank 0+1 都跑向持球者 → 視覺上「兩個進攻球員圍住持球者」不合理
         if (myRank === 0 && possessor) {
           p._urgent = true;
           const fwdOffset = 0.10 * sideSign;
-          // 接應角度拉寬一點（0.12 而不是 0.08），讓接應者離持球者有橫向空間，不是貼身
           const sideOffset = (p.baseY < 0.5 ? -0.12 : 0.12);
           let newTx = possessor.x + fwdOffset;
-          // FWD/AMC 不要被拉回來，保持前壓
           if (p.role === 'FWD' || p.role === 'AMC') {
             if (p.team === 'h') newTx = Math.max(newTx, p.x);
             else newTx = Math.min(newTx, p.x);
           }
-          p.tx = newTx;
-          p.ty = possessor.y + sideOffset;
+          idealX = newTx + (rng() - 0.5) * 0.008;
+          idealY = possessor.y + sideOffset + (rng() - 0.5) * 0.008;
           const atkLimit = p.team === 'h' ? ATK_LIMIT_H : ATK_LIMIT_A;
-          p.tx = p.team === 'h' ? Math.min(atkLimit, p.tx) : Math.max(atkLimit, p.tx);
-          p.tx += (rng() - 0.5) * 0.008;
-          p.ty += (rng() - 0.5) * 0.008;
+          idealX = p.team === 'h' ? Math.min(atkLimit, idealX) : Math.max(atkLimit, idealX);
+          setIdealTarget(p, idealX, idealY);
           return;
         }
         // 其他：依角色前插 + 個人差異（y 維持自身 lane 為主，只微幅跟球）
-        p.tx = p.baseX + role.pushOn * sideSign + (ball.x - 0.5) * 0.22 + fl.xJitter;
-        p.ty = p.baseY + (ball.y - p.baseY) * 0.22 * role.sprint + fl.yJitter;
-        // 攻方通用站位上限
+        idealX = p.baseX + role.pushOn * sideSign + (ball.x - 0.5) * 0.22 + fl.xJitter;
+        idealY = p.baseY + (ball.y - p.baseY) * 0.22 * role.sprint + fl.yJitter;
         const atkLimit = p.team === 'h' ? ATK_LIMIT_H : ATK_LIMIT_A;
-        if (p.team === 'h') p.tx = Math.min(atkLimit, p.tx);
-        else p.tx = Math.max(atkLimit, p.tx);
+        if (p.team === 'h') idealX = Math.min(atkLimit, idealX);
+        else idealX = Math.max(atkLimit, idealX);
+        setIdealTarget(p, idealX, idealY);
       });
     }
 
@@ -1154,18 +1160,12 @@
         : 1;
 
       players.forEach((p, i) => {
-        // smoothness（lerp 係數）+ maxStep（單幀上限）共同控制速度
-        // 個體差異主要靠 stats.speed 倍率 — 拿掉了 urgent 隱形 buff
-        let smoothness = 0.045;
-        let maxStep = 0.010;
-        // 持球者：smoothness 稍高（盤帶反應快、但 maxStep 跟一般一樣）
-        if (i === state.possessorIdx) { smoothness = 0.055; maxStep = 0.010; }
-        // 散球追球：rank-0（最近的人）才有小幅 sprint — 模擬「無人控球時球員會衝去搶」
-        if (state.phase === 'loose' && p._urgent) {
-          smoothness = 0.060;
-          maxStep = 0.013;
-        }
-        // 鏟球中：靠視覺 slide、tx/ty 不再追
+        // tx/ty 由 updatePlayerTargets 的 setIdealTarget 保證「最多在 naturalStep 內」
+        // → 距離永遠小、smoothness/maxStep 不會被 clamp、移動速度只由 setIdealTarget 控
+        // 這裡用較大的 smoothness 確保能在 1-2 幀內跟上 tx 變化
+        let smoothness = 0.50;
+        let maxStep = 0.020;
+        // 鏟球中：tx 不變、靠視覺 slide
         if (p._tackleVisualUntil && state.frame < p._tackleVisualUntil) {
           smoothness = 0.02;
           maxStep = 0.004;
