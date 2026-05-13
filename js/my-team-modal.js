@@ -569,12 +569,12 @@
     content.innerHTML = `
       <div class="mt-home-tab">
         <div class="mt-home-scene" id="mt-home-scene">
-          <!-- 天空 -->
+          <!-- 天空（雲在太陽之上）-->
           <div class="mt-home-sky">
+            <div class="mt-home-sun"></div>
             <div class="mt-home-cloud mt-home-cloud-1"></div>
             <div class="mt-home-cloud mt-home-cloud-2"></div>
             <div class="mt-home-cloud mt-home-cloud-3"></div>
-            <div class="mt-home-sun"></div>
           </div>
           <!-- 遠景：建築 + 樹 -->
           <div class="mt-home-distance">
@@ -584,16 +584,27 @@
                 <polygon points="2,30 55,2 108,30" fill="#c0392b"
                   stroke="#1a1a2e" stroke-width="3" stroke-linejoin="round"/>
               </svg>
+              <!-- 屋頂磚瓦紋路 -->
+              <div class="mt-home-clubhouse-roof-tiles"></div>
+              <!-- 屋頂上小煙囪 -->
+              <div class="mt-home-clubhouse-chimney"></div>
               <div class="mt-home-clubhouse-sign">${escapeHtml(team?.team_name || '我的訓練館')}</div>
-              <div class="mt-home-clubhouse-door"></div>
-              <div class="mt-home-clubhouse-window mt-home-cw-1"></div>
-              <div class="mt-home-clubhouse-window mt-home-cw-2"></div>
+              <div class="mt-home-clubhouse-door">
+                <div class="mt-home-clubhouse-handle"></div>
+              </div>
+              <div class="mt-home-clubhouse-window mt-home-cw-1">
+                <div class="mt-home-clubhouse-window-cross"></div>
+              </div>
+              <div class="mt-home-clubhouse-window mt-home-cw-2">
+                <div class="mt-home-clubhouse-window-cross"></div>
+              </div>
             </div>
             <div class="mt-home-tree mt-home-tree-r"></div>
           </div>
           <!-- 地面（操場）-->
           <div class="mt-home-ground" id="mt-home-ground">
             <div class="mt-home-ground-lines"></div>
+            <div class="mt-home-ground-tufts"></div>
           </div>
         </div>
       </div>
@@ -623,7 +634,7 @@
       return {
         player: p, sheetUrl, sheetW, sheetH,
         x: 0.1 + Math.random() * 0.8,
-        y: 0.25 + Math.random() * 0.65,
+        y: 0.5 + Math.random() * 0.4,    // 初始 y 限制在操場中下方
         vx: 0, vy: 0,
         state: 'walk',           // 'walk' | 'idle' | 'kick' | 'stretch'
         stateUntil: performance.now() + 600 + Math.random() * 2400,
@@ -657,9 +668,9 @@
       ground.appendChild(el);
     });
 
-    // 動畫迴圈
+    // 動畫迴圈：H_LO 高一點避免球員頭頂插到建築
     const W_LO = 0.04, W_HI = 0.96;
-    const H_LO = 0.12, H_HI = 0.94;
+    const H_LO = 0.45, H_HI = 0.95;
     function tick(t) {
       for (const w of wanderers) {
         if (!w.el) continue;

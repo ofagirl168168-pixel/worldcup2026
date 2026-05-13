@@ -2218,6 +2218,7 @@
   background: #fff;
   border: 2px solid #1a1a2e;
   height: 14px;
+  z-index: 5;             /* 在太陽 (z 0) 之上 */
   animation:
     mt-cloud-drift 90s linear infinite,
     mt-cloud-bob 6s ease-in-out infinite;
@@ -2290,7 +2291,14 @@
   position: relative;
   flex: 1; max-width: 220px; min-width: 140px;
   height: 100%;
-  background: #e8dcc2;
+  background:
+    repeating-linear-gradient(0deg,
+      transparent 0, transparent 14px,
+      rgba(0,0,0,0.08) 14px, rgba(0,0,0,0.08) 15px),
+    repeating-linear-gradient(90deg,
+      transparent 0, transparent 24px,
+      rgba(0,0,0,0.06) 24px, rgba(0,0,0,0.06) 25px),
+    #e8dcc2;
   border: 2px solid #1a1a2e;
   border-bottom: 0;
   margin: 0 12px;
@@ -2303,6 +2311,34 @@
   height: 32px;
   display: block;
   overflow: visible;
+  z-index: 2;
+}
+/* 屋頂磚瓦紋路（橫條紋）*/
+.mt-home-clubhouse-roof-tiles {
+  position: absolute;
+  left: -8%; right: -8%; top: -26px;
+  width: 116%; height: 28px;
+  background: repeating-linear-gradient(0deg,
+    transparent 0, transparent 5px,
+    rgba(0,0,0,0.18) 5px, rgba(0,0,0,0.18) 6px);
+  clip-path: polygon(10% 100%, 50% 5%, 90% 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+/* 煙囪 */
+.mt-home-clubhouse-chimney {
+  position: absolute;
+  left: 70%; top: -40px;
+  width: 9px; height: 18px;
+  background: #b03a2e;
+  border: 2px solid #1a1a2e;
+  border-bottom: 0;
+  z-index: 1;
+}
+.mt-home-clubhouse-chimney::after {
+  content: ''; position: absolute;
+  left: -3px; right: -3px; top: -3px;
+  height: 4px; background: #1a1a2e;
 }
 .mt-home-clubhouse-sign {
   position: absolute; left: 0; right: 0; top: 18%;
@@ -2316,22 +2352,50 @@
 .mt-home-clubhouse-door {
   position: absolute; left: 42%; bottom: 0;
   width: 16%; height: 40%;
-  background: #5d3a1a;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.12) 0%, transparent 30%),
+    linear-gradient(90deg, rgba(255,255,255,0.08) 0%, transparent 50%),
+    #5d3a1a;
   border: 2px solid #1a1a2e;
   border-bottom: 0;
 }
+/* 門把 */
+.mt-home-clubhouse-handle {
+  position: absolute;
+  right: 4px; top: 50%;
+  width: 4px; height: 4px;
+  background: #f0c040;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #1a1a2e;
+}
 .mt-home-clubhouse-window {
   position: absolute; width: 14%; height: 18%; top: 45%;
-  background: #87ceeb;
+  background: linear-gradient(135deg, #b0ddef 0%, #87ceeb 60%, #6fa8d6 100%);
   border: 2px solid #1a1a2e;
+}
+/* 窗框十字 */
+.mt-home-clubhouse-window-cross {
+  position: absolute; inset: 0;
+}
+.mt-home-clubhouse-window-cross::before,
+.mt-home-clubhouse-window-cross::after {
+  content: ''; position: absolute;
+  background: #1a1a2e;
+}
+.mt-home-clubhouse-window-cross::before {
+  left: 50%; top: 0; bottom: 0; width: 2px; transform: translateX(-50%);
+}
+.mt-home-clubhouse-window-cross::after {
+  top: 50%; left: 0; right: 0; height: 2px; transform: translateY(-50%);
 }
 .mt-home-cw-1 { left: 18%; }
 .mt-home-cw-2 { right: 18%; }
 
-/* Pixel art 操場 — 純綠 + 條紋 + 黑框 */
+/* Pixel art 操場 — 多層綠色漸層 + 條紋 + 草簇紋路 */
 .mt-home-ground {
   position: absolute; left: 0; right: 0; bottom: 0; top: 38%;
-  background: #4d9b4a;
+  background:
+    linear-gradient(180deg, #5fad5c 0%, #4d9b4a 40%, #3c8a3e 100%);
   border: 2px solid #1a1a2e;
   border-bottom: 0;
   z-index: 3;
@@ -2340,13 +2404,29 @@
 .mt-home-ground-lines {
   position: absolute; inset: 0;
   background:
-    /* 水平條紋（草地）*/
+    /* 水平亮帶（草坪修剪痕）*/
     repeating-linear-gradient(180deg,
-      transparent 0, transparent 26px,
-      rgba(0,0,0,0.12) 26px, rgba(0,0,0,0.12) 28px),
-    repeating-linear-gradient(180deg,
-      transparent 0, transparent 26px,
-      rgba(255,255,255,0.08) 28px, rgba(255,255,255,0.08) 30px);
+      transparent 0, transparent 30px,
+      rgba(255,255,255,0.06) 30px, rgba(255,255,255,0.06) 60px);
+  pointer-events: none;
+}
+/* 隨機草簇 dots — 用 radial-gradient repeat 模擬 */
+.mt-home-ground-tufts {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle 1.5px at 12% 18%, rgba(0,0,0,0.22) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 32% 35%, rgba(255,255,255,0.18) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 58% 22%, rgba(0,0,0,0.22) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 78% 48%, rgba(255,255,255,0.18) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 88% 12%, rgba(0,0,0,0.22) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 22% 68%, rgba(0,0,0,0.22) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 48% 78%, rgba(255,255,255,0.18) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 68% 88%, rgba(0,0,0,0.22) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 82% 72%, rgba(255,255,255,0.18) 50%, transparent 51%),
+    radial-gradient(circle 1.5px at 8% 52%, rgba(0,0,0,0.22) 50%, transparent 51%);
+  background-size: 200px 200px;
+  background-repeat: repeat;
+  pointer-events: none;
 }
 
 /* 全身球員（站在操場上、有透視縮放）*/
