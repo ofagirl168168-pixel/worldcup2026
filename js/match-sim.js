@@ -736,20 +736,9 @@
         || players.map((p, i) => ({ p, i })).find(x => x.p.team === whoHasBall && x.p.role !== 'GK');
       state.possessorIdx = chosen ? chosen.i : 0;
       ball.x = 0.5; ball.y = 0.5;
-      // 開球時：所有球員退回己方半場（前鋒不會站在對方門前等開球）
-      // home 己方半場 x<0.5、away 己方半場 x>0.5
-      players.forEach(p => {
-        p.x = p.baseX;
-        p.y = p.baseY;
-        if (p.team === 'h') p.x = Math.min(0.48, p.x);
-        else p.x = Math.max(0.52, p.x);
-        // tx/ty 也同步，避免下一幀 updatePlayerTargets 還沒跑就 render 到舊位置
-        p.tx = p.x; p.ty = p.y;
-      });
-      // 持球者站到中圈
+      // 持球者 + 對手鏡像 FWD 必須在中圈（規則上開球兩人在中圈）— 這兩個 snap
       const pos = players[state.possessorIdx];
       if (pos) { pos.x = 0.5; pos.y = 0.5; pos.tx = 0.5; pos.ty = 0.5; }
-      // 己方一位前鋒上來接應（真實開球兩人站中圈）
       const myFwd = players
         .map((p, i) => ({ p, i }))
         .filter(x => x.p.team === whoHasBall && x.p.role === 'FWD')[0];
@@ -758,7 +747,17 @@
         myFwd.p.y = 0.5;
         myFwd.p.tx = myFwd.p.x; myFwd.p.ty = myFwd.p.y;
       }
-      // 鏡頭直接 snap 到球（避免追焦慢、下一波動作不在鏡頭內 → 看不到第二球過程）
+      // 其他球員「只設目標」不 snap — 他們在歡呼暫停的這 4.5 秒已經走回陣型
+      // 一定都已經各就各位、開球後不會有任何瞬移感
+      players.forEach(p => {
+        if (p === pos || (myFwd && p === myFwd.p)) return;
+        p.tx = p.baseX;
+        p.ty = p.baseY;
+        // home 不超過自家半場、away 不超過自家半場
+        if (p.team === 'h') p.tx = Math.min(0.48, p.tx);
+        else p.tx = Math.max(0.52, p.tx);
+      });
+      // 鏡頭直接 snap 到球（中圈）
       if (state.camera) {
         state.camera.x = Math.max(0, Math.min(PITCH_W - VIEW_W, ball.x * PITCH_W - VIEW_W / 2));
         state.camera.y = Math.max(0, Math.min(PITCH_H - VIEW_H, ball.y * PITCH_H - VIEW_H / 2));
@@ -890,6 +889,15 @@
         // 進球儀式：banner + 彩花 + 視角 zoom
         const scoringTeam = state.possession === 'h' ? home : away;
         _triggerGoalCelebration(ui, scoringTeam.nameCN, state.possession);
+        // 進球瞬間就把每個球員的目標位置設回陣型（含半場限制）— 球員會在歡呼暫停
+        // 期間自然慢慢走回去，等暫停結束開球時不會有瞬移
+        players.forEach(p => {
+          p._urgent = false;
+          p.tx = p.baseX;
+          p.ty = p.baseY;
+          if (p.team === 'h') p.tx = Math.min(0.48, p.tx);
+          else p.tx = Math.max(0.52, p.tx);
+        });
       } else {
         // 被撲 / 沒中 → 對方球門員帶球
         const newTeam = state.possession === 'h' ? 'a' : 'h';
@@ -1151,10 +1159,14 @@
     }
 
     function movePlayers() {
-      // 剛換邊 20 幀內降低 smoothness，讓角色翻轉時球員用「小碎步」過渡
+      // 剛換邊 40 幀內降低 smoothness，讓角色翻轉時球員用「小碎步」過渡
+      // 之前 20 幀太短、smoothness 0.5 還是會看到一陣加速
       const flipFrames = state.frame - (state.possessionChangeFrame || -999);
-      const justFlipped = flipFrames >= 0 && flipFrames < 20;
-      const flipEase = justFlipped ? 0.5 : 1;
+      const justFlipped = flipFrames >= 0 && flipFrames < 40;
+      // 0~20 幀 0.35x、20~40 幀漸進回到 1x
+      const flipEase = justFlipped
+        ? (flipFrames < 20 ? 0.35 : 0.35 + (flipFrames - 20) / 20 * 0.65)
+        : 1;
 
       players.forEach((p, i) => {
         // smoothness 決定「以多少比例逼近目標」
@@ -1266,7 +1278,9 @@
           _endGoalCelebration(ui);
           kickoff(state.possession === 'h' ? 'a' : 'h');
         }
-        // 進球暫停期間「比賽時鐘」也停（原本 state.frame++ 會讓時鐘繼續跑）
+        // 進球暫停期間：時鐘停、不跑邏輯，但球員自然走回陣型（tx 已在進球時設定）
+        // 不呼叫 updatePlayerTargets — 那會依球位置算（球在中圈、會被拉散）
+        if (state.phase === 'celebrate') movePlayers();
         return;
       }
 
@@ -1323,12 +1337,13 @@
           state.fulltimeWinner = hScore > aScore ? 'h' : aScore > hScore ? 'a' : 'd';
           // 收掉進球放大殘留
           if (typeof _endGoalCelebration === 'function') _endGoalCelebration(ui);
-          // 為兩隊各 11 人排成一橫排：home 上半場、away 下半場
+          // 兩隊各排成「自己半場的直行」— home 攻右、自己半場是左側；away 反之
+          // 11 人垂直均分 y=0.08~0.92，每人間隔 ~0.084
           const homeP = players.filter(p => p.team === 'h');
           const awayP = players.filter(p => p.team === 'a');
-          const lineX = (idx, n) => 0.08 + idx * (0.84 / Math.max(1, n - 1));
-          homeP.forEach((p, i) => { p.tx = lineX(i, homeP.length); p.ty = 0.40; });
-          awayP.forEach((p, i) => { p.tx = lineX(i, awayP.length); p.ty = 0.60; });
+          const lineY = (idx, n) => 0.08 + idx * (0.84 / Math.max(1, n - 1));
+          homeP.forEach((p, i) => { p.tx = 0.25; p.ty = lineY(i, homeP.length); });
+          awayP.forEach((p, i) => { p.tx = 0.75; p.ty = lineY(i, awayP.length); });
           // 清掉 urgent / tackle 殘留
           players.forEach(p => { p._urgent = false; p._tackleVisualUntil = 0; });
           // 鏡頭拉回中央
