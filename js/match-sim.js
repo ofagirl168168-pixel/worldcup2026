@@ -762,6 +762,10 @@
         state.camera.x = Math.max(0, Math.min(PITCH_W - VIEW_W, ball.x * PITCH_W - VIEW_W / 2));
         state.camera.y = Math.max(0, Math.min(PITCH_H - VIEW_H, ball.y * PITCH_H - VIEW_H / 2));
       }
+      // 套用 flipEase：開球後 40 幀 smoothness × 0.35→1，球員不會「卡中線然後暴衝前壓」
+      state.possessionChangeFrame = state.frame;
+      state.recentPassers = [];
+      state.recentPassersSet = new Set();
     }
 
     function findNearestOpponent(p) {
@@ -1160,14 +1164,14 @@
         : 1;
 
       players.forEach((p, i) => {
-        // smoothness 決定「以多少比例逼近目標」
-        // maxStep 決定「單幀最大位移」— 避免 target 大幅跳動時第一幀飛越過去
-        // ※ 衝刺（urgent）只比正常快一點點點，不再有「暴衝」感
-        let smoothness = 0.035;
-        let maxStep = 0.008;        // 非緊急：慢跑
-        if (i === state.possessorIdx) { smoothness = 0.060; maxStep = 0.009; }  // 持球者：稍快
-        else if (p._urgent) { smoothness = 0.040; maxStep = 0.0088; }           // 衝刺：只比正常快 ~10%
-        // 鏟球中：靠視覺 slide、tx/ty 不再追、避免目標位置跳過去暴衝
+        // smoothness（lerp 係數）+ maxStep（單幀上限）共同控制速度
+        // ※ 所有人都走「相同的基準速度」、個體差異完全靠 stats.speed 倍率
+        //   不再有「urgent 加速」這種隱形 buff 造成莫名暴衝
+        let smoothness = 0.045;
+        let maxStep = 0.010;
+        // 持球者：smoothness 稍高（盤帶反應快、但 maxStep 跟一般一樣）
+        if (i === state.possessorIdx) { smoothness = 0.055; maxStep = 0.010; }
+        // 鏟球中：靠視覺 slide、tx/ty 不再追
         if (p._tackleVisualUntil && state.frame < p._tackleVisualUntil) {
           smoothness = 0.02;
           maxStep = 0.004;
@@ -1325,13 +1329,14 @@
           state.fulltimeWinner = hScore > aScore ? 'h' : aScore > hScore ? 'a' : 'd';
           // 收掉進球放大殘留
           if (typeof _endGoalCelebration === 'function') _endGoalCelebration(ui);
-          // 兩隊各排成「自己半場的直行」— home 攻右、自己半場是左側；away 反之
-          // 11 人垂直均分 y=0.08~0.92，每人間隔 ~0.084
+          // 全部 22 人排成「一橫列」：中線以左是 home 隊、中線以右是 away 隊
+          // home 11 人在 x 0.04~0.46、away 11 人在 x 0.54~0.96、全部 y = 0.5
           const homeP = players.filter(p => p.team === 'h');
           const awayP = players.filter(p => p.team === 'a');
-          const lineY = (idx, n) => 0.08 + idx * (0.84 / Math.max(1, n - 1));
-          homeP.forEach((p, i) => { p.tx = 0.25; p.ty = lineY(i, homeP.length); });
-          awayP.forEach((p, i) => { p.tx = 0.75; p.ty = lineY(i, awayP.length); });
+          const lineX = (idx, n, xStart, xEnd) =>
+            xStart + idx * ((xEnd - xStart) / Math.max(1, n - 1));
+          homeP.forEach((p, i) => { p.tx = lineX(i, homeP.length, 0.04, 0.46); p.ty = 0.50; });
+          awayP.forEach((p, i) => { p.tx = lineX(i, awayP.length, 0.54, 0.96); p.ty = 0.50; });
           // 清掉 urgent / tackle 殘留
           players.forEach(p => { p._urgent = false; p._tackleVisualUntil = 0; });
           // 鏡頭拉回中央
