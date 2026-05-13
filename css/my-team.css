@@ -642,117 +642,56 @@
   opacity: 0.55;
 }
 
-/* 📜 QUEST：任務告示板（木紋 + 釘紙 + 卷軸） */
+/* Settings tab 儲存 / 升級鈕（明確可見、有金邊） */
+.mt-settings-action-btn {
+  display: block;
+  width: 100%;
+  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
+  color: #1a1a2e;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  margin-top: 8px;
+  box-shadow:
+    0 4px 14px rgba(240,192,64,0.45),
+    inset 0 2px 3px rgba(255,255,255,0.4);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.4);
+  transition: transform 0.12s, box-shadow 0.15s;
+}
+.mt-settings-action-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 18px rgba(240,192,64,0.65),
+    inset 0 2px 3px rgba(255,255,255,0.4);
+}
+.mt-settings-action-btn:active:not(:disabled) { transform: translateY(0); }
+.mt-settings-action-btn:disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(0.4); }
+.mt-settings-save-btn {
+  margin-top: 16px;
+  /* 黏在最底部更明顯 */
+  position: sticky;
+  bottom: 12px;
+  z-index: 5;
+}
+
+/* 📜 QUEST / 🛒 SHOP / 📖 DEX / 🏆 RANK / 👥 FRIENDS：純色背景（簡潔） */
 .mt-hub-content[data-tab="quest"] {
-  background:
-    /* 木紋背板 */
-    repeating-linear-gradient(0deg,
-      rgba(180,120,60,0.06) 0, rgba(180,120,60,0.06) 50px,
-      transparent 50px, transparent 52px),
-    linear-gradient(180deg, #1a1530 0%, #2a2050 50%, #1a1530 100%);
+  background: linear-gradient(180deg, #1a1530 0%, #2a2050 50%, #1a1530 100%);
 }
-.mt-hub-content[data-tab="quest"]::before {
-  content: ''; position: absolute; inset: 0;
-  background-image:
-    /* 釘紙 top-left */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 90'><rect x='5' y='10' width='70' height='75' fill='%23f0e0a0' stroke='%23805030' stroke-width='2' transform='rotate(-6 40 47)'/><line x1='15' y1='30' x2='62' y2='28' stroke='%23805030' stroke-width='1.5' transform='rotate(-6 40 47)' opacity='0.5'/><line x1='15' y1='40' x2='62' y2='38' stroke='%23805030' stroke-width='1.5' transform='rotate(-6 40 47)' opacity='0.5'/><line x1='15' y1='50' x2='52' y2='48' stroke='%23805030' stroke-width='1.5' transform='rotate(-6 40 47)' opacity='0.5'/><circle cx='40' cy='10' r='4' fill='%23e53935' stroke='%23801010' stroke-width='1'/></svg>"),
-    /* 釘紙 right */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 90'><rect x='5' y='10' width='70' height='75' fill='%23a0d0f0' stroke='%23204060' stroke-width='2' transform='rotate(8 40 47)'/><text x='40' y='40' font-size='20' fill='%23204060' text-anchor='middle' transform='rotate(8 40 47)'>★</text><text x='40' y='65' font-size='14' fill='%23204060' text-anchor='middle' transform='rotate(8 40 47)'>QUEST</text><circle cx='40' cy='10' r='4' fill='%23f0c040' stroke='%23805020' stroke-width='1'/></svg>");
-  background-position: left 8px top 8px, right 8px top 60px;
-  background-repeat: no-repeat;
-  background-size: 75px auto, 75px auto;
-  pointer-events: none;
-  opacity: 0.45;
-}
-
-/* 🛒 SHOP：商店（貨架 + 價格牌 + 收銀機） */
 .mt-hub-content[data-tab="shop"] {
-  background:
-    /* 貨架橫線 */
-    repeating-linear-gradient(0deg,
-      transparent 0, transparent 120px,
-      rgba(255,255,255,0.05) 120px, rgba(255,255,255,0.05) 124px),
-    linear-gradient(180deg, #1a0a28 0%, #2a1840 50%, #14081f 100%);
+  background: linear-gradient(180deg, #1a0a28 0%, #2a1840 50%, #14081f 100%);
 }
-.mt-hub-content[data-tab="shop"]::before {
-  content: ''; position: absolute; inset: 0;
-  background-image:
-    /* 價格牌 top-right */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 50'><polygon points='8,4 75,4 75,46 8,46 0,25' fill='%23f0c040' stroke='%23805020' stroke-width='2'/><circle cx='12' cy='25' r='3' fill='%23805020'/><text x='45' y='32' font-size='18' font-weight='900' fill='%23805020' text-anchor='middle'>$</text></svg>"),
-    /* 收銀機 bottom-left */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 60'><rect x='4' y='20' width='72' height='38' rx='3' fill='%23606060' stroke='%23202020' stroke-width='2'/><rect x='14' y='6' width='52' height='18' rx='2' fill='%23a0d0f0' stroke='%23204060' stroke-width='2'/><text x='40' y='20' font-size='10' fill='%23204060' text-anchor='middle' font-family='monospace'>$ 999</text><rect x='10' y='28' width='10' height='6' fill='%23404040' rx='1'/><rect x='25' y='28' width='10' height='6' fill='%23404040' rx='1'/><rect x='40' y='28' width='10' height='6' fill='%23404040' rx='1'/><rect x='55' y='28' width='10' height='6' fill='%23e53935' rx='1'/></svg>");
-  background-position: right 8px top 10px, left 8px bottom 10px;
-  background-repeat: no-repeat;
-  background-size: 70px auto, 90px auto;
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-/* 📖 DEX：圖鑑（書架 + 翻開的書 + 放大鏡） */
 .mt-hub-content[data-tab="dex"] {
-  background:
-    /* 書本邊條紋 */
-    repeating-linear-gradient(90deg,
-      rgba(120,80,40,0.06) 0, rgba(120,80,40,0.06) 30px,
-      rgba(80,40,20,0.08) 30px, rgba(80,40,20,0.08) 32px,
-      transparent 32px, transparent 64px),
-    linear-gradient(180deg, #0a1f1a 0%, #1a2a25 50%, #08140f 100%);
+  background: linear-gradient(180deg, #0a1f1a 0%, #1a2a25 50%, #08140f 100%);
 }
-.mt-hub-content[data-tab="dex"]::before {
-  content: ''; position: absolute; inset: 0;
-  background-image:
-    /* 翻開的書 bottom-center */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 100'><path d='M 10 20 Q 80 10 80 20 L 80 90 Q 10 80 10 90 Z' fill='%23f0e0a0' stroke='%23805030' stroke-width='2'/><path d='M 150 20 Q 80 10 80 20 L 80 90 Q 150 80 150 90 Z' fill='%23e0d090' stroke='%23805030' stroke-width='2'/><line x1='80' y1='15' x2='80' y2='88' stroke='%23805030' stroke-width='1.5'/><line x1='20' y1='32' x2='72' y2='28' stroke='%23805030' stroke-width='1' opacity='0.5'/><line x1='20' y1='42' x2='72' y2='38' stroke='%23805030' stroke-width='1' opacity='0.5'/><line x1='20' y1='52' x2='62' y2='48' stroke='%23805030' stroke-width='1' opacity='0.5'/><line x1='88' y1='28' x2='140' y2='32' stroke='%23805030' stroke-width='1' opacity='0.5'/><line x1='88' y1='38' x2='140' y2='42' stroke='%23805030' stroke-width='1' opacity='0.5'/><line x1='88' y1='48' x2='130' y2='52' stroke='%23805030' stroke-width='1' opacity='0.5'/></svg>"),
-    /* 放大鏡 top-right */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><circle cx='25' cy='25' r='18' fill='rgba(160,200,240,0.3)' stroke='%23a0a0a0' stroke-width='3'/><line x1='38' y1='38' x2='52' y2='52' stroke='%23a0a0a0' stroke-width='4' stroke-linecap='round'/><circle cx='20' cy='20' r='5' fill='%23ffffff' opacity='0.5'/></svg>");
-  background-position: center bottom 6px, right 8px top 8px;
-  background-repeat: no-repeat;
-  background-size: min(50%, 170px) auto, 50px auto;
-  pointer-events: none;
-  opacity: 0.45;
-}
-
-/* 🏆 RANK：頒獎台（獎盃 + 彩帶 + 領獎台） */
 .mt-hub-content[data-tab="rank"] {
-  background:
-    /* 中央光暈 */
-    radial-gradient(ellipse 70% 30% at 50% 0%, rgba(240,192,64,0.22) 0%, transparent 70%),
-    linear-gradient(180deg, #1a1505 0%, #2a2510 55%, #1a1408 100%);
+  background: linear-gradient(180deg, #1a1505 0%, #2a2510 50%, #1a1408 100%);
 }
-.mt-hub-content[data-tab="rank"]::before {
-  content: ''; position: absolute; inset: 0;
-  background-image:
-    /* 領獎台 + 三獎盃 bottom-center */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 130'><rect x='80' y='30' width='60' height='90' fill='%23f0c040' stroke='%23805020' stroke-width='2'/><text x='110' y='80' font-size='32' font-weight='900' fill='%23805020' text-anchor='middle'>1</text><rect x='10' y='60' width='65' height='60' fill='%23c0c0c0' stroke='%23606060' stroke-width='2'/><text x='42' y='100' font-size='28' font-weight='900' fill='%23606060' text-anchor='middle'>2</text><rect x='145' y='80' width='65' height='40' fill='%23cd7f32' stroke='%23703a14' stroke-width='2'/><text x='177' y='110' font-size='22' font-weight='900' fill='%23703a14' text-anchor='middle'>3</text><g transform='translate(110 14)'><path d='M -10 -8 L 10 -8 L 8 2 L -8 2 Z' fill='%23f0c040' stroke='%23805020' stroke-width='1.5'/><circle cx='0' cy='-2' r='4' fill='%23ffe680'/></g></svg>"),
-    /* 彩帶 top */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 30'><path d='M 0 15 Q 30 0 60 15 T 120 15 T 180 15 T 240 15 T 300 15' stroke='%23e53935' fill='none' stroke-width='3'/><path d='M 0 20 Q 30 5 60 20 T 120 20 T 180 20 T 240 20 T 300 20' stroke='%23f0c040' fill='none' stroke-width='3'/></svg>");
-  background-position: center bottom 8px, center top 6px;
-  background-repeat: no-repeat;
-  background-size: min(80%, 240px) auto, 90% auto;
-  pointer-events: none;
-  opacity: 0.55;
-}
-
-/* 👥 FRIENDS：交誼廳（沙發 + 對話泡泡 + 牆面） */
 .mt-hub-content[data-tab="friends"] {
-  background:
-    /* 牆面線板 */
-    linear-gradient(180deg, #0a1428 0%, #1a2a50 60%, #14203e 60%, #08142a 100%);
-}
-.mt-hub-content[data-tab="friends"]::before {
-  content: ''; position: absolute; inset: 0;
-  background-image:
-    /* 對話泡泡 top-right */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 70'><path d='M 10 10 L 65 10 Q 75 10 75 20 L 75 45 Q 75 55 65 55 L 40 55 L 32 65 L 35 55 L 20 55 Q 10 55 10 45 Z' fill='%2390caf9' stroke='%23204060' stroke-width='2'/><circle cx='25' cy='32' r='3' fill='%23204060'/><circle cx='42' cy='32' r='3' fill='%23204060'/><circle cx='59' cy='32' r='3' fill='%23204060'/></svg>"),
-    /* 對話泡泡 left */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 70'><path d='M 70 10 L 15 10 Q 5 10 5 20 L 5 45 Q 5 55 15 55 L 40 55 L 48 65 L 45 55 L 60 55 Q 70 55 70 45 Z' fill='%23ffb0c0' stroke='%23802040' stroke-width='2'/><text x='40' y='40' font-size='16' fill='%23802040' text-anchor='middle'>♥</text></svg>"),
-    /* 沙發 bottom-center */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70'><rect x='10' y='20' width='180' height='40' rx='8' fill='%23805030' stroke='%23402010' stroke-width='2'/><rect x='5' y='25' width='30' height='35' rx='6' fill='%23a06840' stroke='%23402010' stroke-width='2'/><rect x='165' y='25' width='30' height='35' rx='6' fill='%23a06840' stroke='%23402010' stroke-width='2'/><rect x='40' y='15' width='35' height='20' rx='4' fill='%23c08060' stroke='%23402010' stroke-width='1.5'/><rect x='85' y='15' width='35' height='20' rx='4' fill='%23c08060' stroke='%23402010' stroke-width='1.5'/><rect x='130' y='15' width='35' height='20' rx='4' fill='%23c08060' stroke='%23402010' stroke-width='1.5'/></svg>");
-  background-position: right 8px top 10px, left 8px top 80px, center bottom 8px;
-  background-repeat: no-repeat;
-  background-size: 70px auto, 70px auto, min(70%, 220px) auto;
-  pointer-events: none;
-  opacity: 0.5;
+  background: linear-gradient(180deg, #0a1428 0%, #1a2a50 50%, #08142a 100%);
 }
 
 /* 確保內容在背景之上 */
@@ -3323,33 +3262,30 @@
 }
 .mt-swap-cancel-btn:hover { background: rgba(229,57,53,0.4); border-color: #e53935; }
 
-/* 位置不符警告 — 紅色遊戲感感嘆號（圓圈獨立於標籤外） */
+/* 位置不符警告 — 紅色遊戲感感嘆號（純文字、無圓圈） */
 .mt-pos-warn-bubble {
   position: absolute;
-  top: -7px;
-  right: -14px;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #ff8080 0%, #e53935 55%, #a01020 100%);
-  color: #fff;
-  font-family: 'Arial Black', 'Impact', sans-serif;
+  top: -9px;
+  right: -10px;
+  background: transparent;
+  color: #ff3030;
+  font-family: 'Impact', 'Arial Black', sans-serif;
   font-weight: 900;
-  font-size: 12px;
-  line-height: 16px;
-  text-align: center;
-  border: 2px solid #fff;
-  box-shadow:
-    0 0 8px rgba(229,57,53,0.95),
-    0 2px 3px rgba(0,0,0,0.5),
-    inset 0 -2px 2px rgba(0,0,0,0.3);
-  text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+  font-size: 18px;
+  line-height: 1;
+  text-shadow:
+    -1px -1px 0 #fff,
+     1px -1px 0 #fff,
+    -1px  1px 0 #fff,
+     1px  1px 0 #fff,
+     0 0 6px rgba(229,57,53,0.85);
   z-index: 4;
   pointer-events: auto;
-  animation: mt-warn-pulse 1.2s ease-in-out infinite;
+  animation: mt-warn-pulse 1s ease-in-out infinite;
 }
 @keyframes mt-warn-pulse {
-  0%, 100% { transform: scale(1);    box-shadow: 0 0 8px rgba(229,57,53,0.95), 0 2px 3px rgba(0,0,0,0.5), inset 0 -2px 2px rgba(0,0,0,0.3); }
-  50%      { transform: scale(1.15); box-shadow: 0 0 14px rgba(229,57,53,1),   0 2px 3px rgba(0,0,0,0.5), inset 0 -2px 2px rgba(0,0,0,0.3); }
+  0%, 100% { transform: scale(1)    rotate(-6deg); }
+  50%      { transform: scale(1.25) rotate( 6deg); }
 }
 
 /* 替換動畫：場上 + 板凳元素淡出（避免重繪閃跳） */
@@ -3733,28 +3669,141 @@
 .mt-coach-actions {
   position: absolute;
   bottom: 12px; left: 8px; right: 8px;
-  display: flex; gap: 6px; align-items: center;
-  background: linear-gradient(135deg, rgba(80,50,20,0.85), rgba(40,25,10,0.85));
-  border: 2px solid #5a3010;
-  border-radius: 10px;
-  padding: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  display: flex; gap: 8px; align-items: center;
+  background: linear-gradient(135deg, rgba(80,50,20,0.92), rgba(40,25,10,0.92));
+  border: 3px solid #f0c040;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.55),
+    0 0 12px rgba(240,192,64,0.35);
 }
 .mt-coach-draw-btn {
   flex: 1;
-  background: linear-gradient(135deg, #f0c040 0%, #c08030 100%);
-  border: 2px solid #5a3010;
-  color: #2a1505;
+  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
+  border: 2.5px solid #fff;
+  color: #1a1a2e;
   font-weight: 900;
-  font-size: 11px;
-  padding: 8px 4px;
-  border-radius: 8px;
+  font-size: 13px;
+  padding: 12px 6px;
+  border-radius: 10px;
   cursor: pointer;
-  text-shadow: 0 1px 1px rgba(255,255,255,0.3);
-  transition: transform 0.12s;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.4);
+  box-shadow:
+    0 4px 10px rgba(240,192,64,0.5),
+    inset 0 2px 3px rgba(255,255,255,0.4);
+  transition: transform 0.12s, box-shadow 0.15s;
+  animation: mt-draw-glow 2.4s ease-in-out infinite;
 }
-.mt-coach-draw-btn:hover:not(:disabled) { transform: scale(1.04); }
-.mt-coach-draw-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
+.mt-coach-draw-btn:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow:
+    0 6px 14px rgba(240,192,64,0.7),
+    inset 0 2px 3px rgba(255,255,255,0.4);
+}
+.mt-coach-draw-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); animation: none; }
+.mt-coach-draw-10 {
+  background: linear-gradient(135deg, #ffe680 0%, #f0c040 50%, #c08030 100%);
+}
+@keyframes mt-draw-glow {
+  0%, 100% { box-shadow: 0 4px 10px rgba(240,192,64,0.5), inset 0 2px 3px rgba(255,255,255,0.4); }
+  50%      { box-shadow: 0 4px 10px rgba(240,192,64,0.5), inset 0 2px 3px rgba(255,255,255,0.4), 0 0 18px rgba(240,192,64,0.9); }
+}
+
+/* 抽教練結果彈窗 */
+.mt-coach-result-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 12010;
+  opacity: 0; transition: opacity 0.2s;
+  padding: 20px;
+}
+.mt-coach-result-overlay.open { opacity: 1; }
+.mt-coach-result-modal {
+  background: linear-gradient(180deg, #2a1810 0%, #1a0d08 100%);
+  border: 3px solid #f0c040;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 480px; width: 100%;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.7), 0 0 28px rgba(240,192,64,0.35);
+}
+.mt-coach-result-title {
+  font-size: 22px; font-weight: 900;
+  color: #ffe680;
+  text-align: center;
+  margin-bottom: 14px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.7), 0 0 12px rgba(240,192,64,0.5);
+  animation: mt-coach-title-pop 0.5s ease-out;
+}
+@keyframes mt-coach-title-pop {
+  0%   { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+.mt-coach-result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+.mt-coach-result-card {
+  background: rgba(255,255,255,0.05);
+  border: 2.5px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 8px;
+  text-align: center;
+  color: #fff;
+  opacity: 0;
+  animation: mt-coach-card-in 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  position: relative;
+}
+@keyframes mt-coach-card-in {
+  0%   { transform: scale(0.3) rotate(180deg); opacity: 0; }
+  60%  { transform: scale(1.1) rotate(0deg);   opacity: 1; }
+  100% { transform: scale(1)   rotate(0deg);   opacity: 1; }
+}
+.mt-coach-result-card.rarity-SSR {
+  border-color: #f0c040;
+  box-shadow: 0 0 18px rgba(240,192,64,0.7);
+  background: radial-gradient(circle at 50% 0%, rgba(240,192,64,0.25), rgba(255,255,255,0.05));
+}
+.mt-coach-result-card.rarity-SR {
+  border-color: #9b87f5;
+  box-shadow: 0 0 12px rgba(155,135,245,0.6);
+  background: radial-gradient(circle at 50% 0%, rgba(155,135,245,0.2), rgba(255,255,255,0.05));
+}
+.mt-coach-result-rarity {
+  position: absolute; top: 6px; left: 6px;
+  background: rgba(0,0,0,0.6);
+  padding: 1px 6px; border-radius: 4px;
+  font-size: 10px; font-weight: 900;
+  color: #fff;
+}
+.mt-coach-result-card.rarity-SSR .mt-coach-result-rarity { background: #f0c040; color: #5a3010; }
+.mt-coach-result-card.rarity-SR  .mt-coach-result-rarity { background: #9b87f5; color: #2a1850; }
+.mt-coach-result-dup {
+  position: absolute; top: 6px; right: 6px;
+  background: #43a047;
+  color: #fff;
+  font-size: 9px; font-weight: 900;
+  padding: 1px 6px; border-radius: 4px;
+}
+.mt-coach-result-portrait {
+  width: 80px; height: 100px;
+  margin: 4px auto;
+}
+.mt-coach-result-portrait img {
+  width: 100%; height: 100%;
+  image-rendering: pixelated;
+}
+.mt-coach-result-name {
+  font-size: 13px; font-weight: 900;
+  color: #ffe680;
+  margin-top: 4px;
+}
+.mt-coach-result-nickname { font-size: 10px; opacity: 0.75; margin-top: 1px; }
+.mt-coach-result-trait { font-size: 10px; color: #cdbfff; margin-top: 4px; }
 
 /* ═════════════════════════════════════════════════════════════
    ⚽ MATCH TAB — 球場入口隧道

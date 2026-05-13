@@ -1301,18 +1301,86 @@
       });
     });
 
-    // 抽教練
+    // 抽教練（有動畫 + 結果彈窗）
     content.querySelectorAll('.mt-coach-draw-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const cnt = parseInt(btn.dataset.count, 10);
+        btn.disabled = true;
+        const originalLabel = btn.innerHTML;
+        btn.innerHTML = '⏳ 簽約中…';
         try {
-          await window.MyTeam.drawCoach(cnt);
+          const res = await window.MyTeam.drawCoach(cnt);
           await window.MyTeam.refresh?.();
-          renderTab();
+          // 抽完顯示結果動畫
+          _showCoachDrawResult(res?.coaches || res || []);
         } catch (e) {
-          alert('抽教練失敗：' + (e.message || e));
+          const msg = String(e.message || e);
+          let friendly = '抽教練失敗：' + msg;
+          if (msg.includes('INSUFFICIENT_COACH_TICKETS')) friendly = '⚠️ 教練券不足';
+          else if (msg.includes('NO_TEAM')) friendly = '⚠️ 請先建立球隊';
+          if (typeof showToast === 'function') showToast(friendly);
+          else alert(friendly);
+          btn.disabled = false;
+          btn.innerHTML = originalLabel;
         }
       });
+    });
+  }
+
+  // 教練抽卡結果動畫：彈出大卡 + 揭曉動畫
+  async function _showCoachDrawResult(results) {
+    const list = Array.isArray(results) ? results : [];
+    if (!list.length) {
+      renderTab();
+      return;
+    }
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-coach-result-overlay';
+    overlay.innerHTML = `
+      <div class="mt-coach-result-modal">
+        <div class="mt-coach-result-title">👔 新教練加入！</div>
+        <div class="mt-coach-result-grid" id="mt-coach-result-grid"></div>
+        <button class="mt-settings-action-btn" id="mt-coach-result-close" style="max-width:200px;margin:14px auto 0">確認</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const grid = overlay.querySelector('#mt-coach-result-grid');
+    list.forEach((c, i) => {
+      const rarity = c.rarity || 'R';
+      const isDup = c.is_duplicate || c.duplicate;
+      const card = document.createElement('div');
+      card.className = `mt-coach-result-card rarity-${rarity}`;
+      card.style.animationDelay = `${i * 0.18}s`;
+      const imgId = `coach-result-${i}`;
+      card.innerHTML = `
+        <div class="mt-coach-result-rarity">${rarity}</div>
+        ${isDup ? '<div class="mt-coach-result-dup">★+1 升級</div>' : ''}
+        <div class="mt-coach-result-portrait"><img id="${imgId}" alt="${escapeHtml(c.name || '')}" onerror="this.style.opacity='0.3'"></div>
+        <div class="mt-coach-result-name">${escapeHtml(c.name || '?')}</div>
+        <div class="mt-coach-result-nickname">${escapeHtml(c.nickname || '')}</div>
+        <div class="mt-coach-result-trait">${escapeHtml(_traitLabel(c.trait, c.trait_value))}</div>
+      `;
+      grid.appendChild(card);
+      if (c.look_data && window.LpcRenderer) {
+        window.LpcRenderer.portrait(c.look_data).then(url => {
+          const img = document.getElementById(imgId);
+          if (img && url) img.src = url;
+        }).catch(() => {});
+      }
+    });
+
+    overlay.querySelector('#mt-coach-result-close').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => {
+        overlay.remove();
+        renderTab();
+      }, 200);
+    });
+    // 點背景也關
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.querySelector('#mt-coach-result-close').click();
     });
   }
 
@@ -2007,7 +2075,7 @@
             目前球迷上限：${team.fans || 100}・體力上限：${team.stamina_max}
           </div>
           ${nextCost ? `
-            <button class="mt-gacha-btn" id="mt-stadium-upgrade">升 Lv. ${lv+1}（${nextCost} 💎）</button>
+            <button class="mt-settings-action-btn" id="mt-stadium-upgrade">🏟️ 升級到 Lv. ${lv+1}（${nextCost} 💎）</button>
           ` : '<div style="opacity:0.7">已達最高等級！</div>'}
         </div>
         <div class="mt-settings-section">
@@ -2038,7 +2106,7 @@
           <div class="mt-settings-title">👁 預覽</div>
           <div class="mt-settings-preview" id="mt-settings-preview-crest" style="width:120px;height:120px">${_renderCrest(team)}</div>
         </div>
-        <button class="mt-gacha-btn" id="mt-settings-save">儲存隊名 / 球衣 / 隊徽</button>
+        <button class="mt-settings-action-btn mt-settings-save-btn" id="mt-settings-save">💾 儲存隊名 / 球衣 / 隊徽</button>
       </div>
     `;
 
