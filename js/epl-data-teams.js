@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-05-13 早安更新）
+   資料截止：2025/26 賽季（2026-05-13 午後更新）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -787,27 +787,27 @@ window.EPL_MATCHES = [
   // 利物浦 vs 切爾西 | 05/09 19:30 台灣時間 (05/09 12:30 BST)
   {id:'EPL-MW36-LIV-CHE', matchday:36, date:'2026-05-09', time:'19:30', home:'LIV', away:'CHE', stage:'league',
    status:'finished', score:{h:1,a:1}, halfTime:{h:1,a:1},
-   goals:[{team:'LIV',player:'Gravenberch',minute:6},{team:'CHE',player:'Enzo Fernández',minute:35,assist:'自由球'}]},
+   goals:[{min:'6',player:'Ryan Gravenberch',side:'h'},{min:'35',player:'Enzo Fernández',side:'a'}]},
 
   // 布萊頓 vs 狼隊 | 05/09 22:00 台灣時間 (05/09 15:00 BST)
   {id:'EPL-MW36-BHA-WOL', matchday:36, date:'2026-05-09', time:'22:00', home:'BHA', away:'WOL', stage:'league',
    status:'finished', score:{h:3,a:0}, halfTime:{h:2,a:0},
-   goals:[{team:'BHA',player:'Hinshelwood',minute:1},{team:'BHA',player:'Dunk',minute:5},{team:'BHA',player:'Minteh',minute:86}]},
+   goals:[{min:'1',player:'Jack Hinshelwood',side:'h'},{min:'5',player:'Lewis Dunk',side:'h'},{min:'86',player:'Yankuba Minteh',side:'h'}]},
 
   // 伯恩利 vs 阿斯頓維拉 | 05/10 21:00 台灣時間 (05/10 14:00 BST，因歐霸延賽)
   {id:'EPL-MW36-BUR-AVL', matchday:36, date:'2026-05-10', time:'21:00', home:'BUR', away:'AVL', stage:'league',
    status:'finished', score:{h:2,a:2}, halfTime:{h:1,a:1},
-   goals:[{team:'BUR',player:'Jaidon Anthony',minute:8},{team:'AVL',player:'Barkley',minute:42},{team:'AVL',player:'Watkins',minute:56},{team:'BUR',player:'Flemming',minute:58}]},
+   goals:[{min:'8',player:'Jaidon Anthony',side:'h'},{min:'42',player:'Ross Barkley',side:'a'},{min:'56',player:'Ollie Watkins',side:'a'},{min:'58',player:'Zian Flemming',side:'h'}]},
 
   // 水晶宮 vs 愛華頓 | 05/10 21:00 台灣時間 (05/10 14:00 BST，因歐會盃延賽)
   {id:'EPL-MW36-CRY-EVE', matchday:36, date:'2026-05-10', time:'21:00', home:'CRY', away:'EVE', stage:'league',
    status:'finished', score:{h:2,a:2}, halfTime:{h:1,a:1},
-   goals:[{team:'EVE',player:'Tarkowski',minute:6},{team:'CRY',player:'Sarr',minute:34},{team:'EVE',player:'Beto',minute:47},{team:'CRY',player:'Mateta',minute:77}]},
+   goals:[{min:'6',player:'James Tarkowski',side:'a'},{min:'34',player:'Ismaïla Sarr',side:'h'},{min:'47',player:'Beto',side:'a'},{min:'77',player:'Jean-Philippe Mateta',side:'h'}]},
 
   // 富勒姆 vs 伯恩茅斯 | 05/09 22:00 台灣時間
   {id:'EPL-MW36-FUL-BOU', matchday:36, date:'2026-05-09', time:'22:00', home:'FUL', away:'BOU', stage:'league',
    status:'finished', score:{h:0,a:1}, halfTime:{h:0,a:0},
-   goals:[{team:'BOU',player:'Rayan',minute:53}]},
+   goals:[{min:'53',player:'Rayan',side:'a'}]},
 
   // 桑德蘭 vs 曼聯 | 05/09 22:00 台灣時間
   {id:'EPL-MW36-SUN-MUN', matchday:36, date:'2026-05-09', time:'22:00', home:'SUN', away:'MUN', stage:'league',
@@ -817,22 +817,22 @@ window.EPL_MATCHES = [
   // 曼城 vs 布倫特福德 | 05/10 00:30 台灣時間 (05/09 17:30 BST)
   {id:'EPL-MW36-MCI-BRE', matchday:36, date:'2026-05-10', time:'00:30', home:'MCI', away:'BRE', stage:'league',
    status:'finished', score:{h:3,a:0}, halfTime:{h:0,a:0},
-   goals:[{team:'MCI',player:'Doku',minute:60},{team:'MCI',player:'Haaland',minute:75},{team:'MCI',player:'Marmoush',minute:90}]},
+   goals:[{min:'60',player:'Jérémy Doku',side:'h'},{min:'75',player:'Erling Haaland',side:'h'},{min:'90',player:'Omar Marmoush',side:'h'}]},
 
   // 諾丁漢森林 vs 紐卡索 | 05/10 21:00 台灣時間 (05/10 14:00 BST)
   {id:'EPL-MW36-NFO-NEW', matchday:36, date:'2026-05-10', time:'21:00', home:'NFO', away:'NEW', stage:'league',
    status:'finished', score:{h:1,a:1}, halfTime:{h:0,a:0},
-   goals:[{team:'NEW',player:'Harvey Barnes',minute:74},{team:'NFO',player:'Elliot Anderson',minute:88}]},
+   goals:[{min:'74',player:'Harvey Barnes',side:'a'},{min:'88',player:'Elliot Anderson',side:'h'}]},
 
   // 西漢姆 vs 兵工廠 | 05/10 23:30 台灣時間 (05/10 16:30 BST)
   {id:'EPL-MW36-WHU-ARS', matchday:36, date:'2026-05-10', time:'23:30', home:'WHU', away:'ARS', stage:'league',
    status:'finished', score:{h:0,a:1}, halfTime:{h:0,a:0},
-   goals:[{team:'ARS',player:'Trossard',minute:83}]},
+   goals:[{min:'83',player:'Leandro Trossard',side:'a'}]},
 
   // 熱刺 vs 里茲聯 | 05/12 03:00 台灣時間 (05/11 20:00 BST)
   {id:'EPL-MW36-TOT-LEE', matchday:36, date:'2026-05-12', time:'03:00', home:'TOT', away:'LEE', stage:'league',
    status:'finished', score:{h:1,a:1}, halfTime:{h:0,a:0},
-   goals:[{team:'TOT',player:'Mathys Tel',minute:50},{team:'LEE',player:'Calvert-Lewin',minute:74,type:'pen'}]},
+   goals:[{min:'50',player:'Mathys Tel',side:'h'},{min:'74',player:'Dominic Calvert-Lewin',side:'a',type:'pen'}]},
 
   // ===== 補賽 (因聯賽盃決賽延期) =====
   // 曼城 vs 水晶宮 | 05/14 03:00 台灣時間 (05/13 20:00 BST)
@@ -869,6 +869,38 @@ window.EPL_MATCHES = [
 
   // 切爾西 vs 熱刺 | 05/20 03:15 台灣時間 (05/19 20:15 BST，因足總盃決賽延期)
   {id:'EPL-MW37-CHE-TOT', matchday:37, date:'2026-05-20', time:'03:15', home:'CHE', away:'TOT', stage:'league', status:'upcoming'},
+
+  // ===== 第 38 輪 (2026-05-25 00:00 台灣時間，全場同時開球 05/24 17:00 BST) =====
+
+  // 布萊頓 vs 曼聯 | 05/25 00:00 台灣時間
+  {id:'EPL-MW38-BHA-MUN', matchday:38, date:'2026-05-25', time:'00:00', home:'BHA', away:'MUN', stage:'league', status:'upcoming'},
+
+  // 伯恩利 vs 狼隊 | 05/25 00:00 台灣時間
+  {id:'EPL-MW38-BUR-WOL', matchday:38, date:'2026-05-25', time:'00:00', home:'BUR', away:'WOL', stage:'league', status:'upcoming'},
+
+  // 水晶宮 vs 兵工廠 | 05/25 00:00 台灣時間
+  {id:'EPL-MW38-CRY-ARS', matchday:38, date:'2026-05-25', time:'00:00', home:'CRY', away:'ARS', stage:'league', status:'upcoming'},
+
+  // 富勒姆 vs 紐卡索 | 05/25 00:00 台灣時間
+  {id:'EPL-MW38-FUL-NEW', matchday:38, date:'2026-05-25', time:'00:00', home:'FUL', away:'NEW', stage:'league', status:'upcoming'},
+
+  // 利物浦 vs 布倫特福德 | 05/25 00:00 台灣時間
+  {id:'EPL-MW38-LIV-BRE', matchday:38, date:'2026-05-25', time:'00:00', home:'LIV', away:'BRE', stage:'league', status:'upcoming'},
+
+  // 曼城 vs 阿斯頓維拉 | 05/25 00:00 台灣時間
+  {id:'EPL-MW38-MCI-AVL', matchday:38, date:'2026-05-25', time:'00:00', home:'MCI', away:'AVL', stage:'league', status:'upcoming'},
+
+  // 諾丁漢森林 vs 伯恩茅斯 | 05/25 00:00 台灣時間
+  {id:'EPL-MW38-NFO-BOU', matchday:38, date:'2026-05-25', time:'00:00', home:'NFO', away:'BOU', stage:'league', status:'upcoming'},
+
+  // 桑德蘭 vs 切爾西 | 05/25 00:00 台灣時間
+  {id:'EPL-MW38-SUN-CHE', matchday:38, date:'2026-05-25', time:'00:00', home:'SUN', away:'CHE', stage:'league', status:'upcoming'},
+
+  // 熱刺 vs 愛華頓 | 05/25 00:00 台灣時間
+  {id:'EPL-MW38-TOT-EVE', matchday:38, date:'2026-05-25', time:'00:00', home:'TOT', away:'EVE', stage:'league', status:'upcoming'},
+
+  // 西漢姆 vs 里茲聯 | 05/25 00:00 台灣時間
+  {id:'EPL-MW38-WHU-LEE', matchday:38, date:'2026-05-25', time:'00:00', home:'WHU', away:'LEE', stage:'league', status:'upcoming'},
 
 ];
 
