@@ -770,9 +770,13 @@
     function startPass(target) {
       state.ballFromX = ball.x;
       state.ballFromY = ball.y;
-      state.ballTargetX = target.p.x;
-      state.ballTargetY = target.p.y;
-      const dist = Math.hypot(target.p.x - ball.x, target.p.y - ball.y);
+      // Lead prediction：朝接球者「跑去的方向」加一點預判（tx/ty - x/y 是他的運動向量）
+      // 0.3 倍預判 = 給接球者一點時間跑到位、但不要 over-shoot
+      const leadX = (target.p.tx - target.p.x) * 0.3;
+      const leadY = (target.p.ty - target.p.y) * 0.3;
+      state.ballTargetX = target.p.x + leadX;
+      state.ballTargetY = target.p.y + leadY;
+      const dist = Math.hypot(state.ballTargetX - ball.x, state.ballTargetY - ball.y);
       state.ballTravelTotal = Math.max(5, Math.round(dist * 60));
       state.ballTravelLeft = state.ballTravelTotal;
       state.phase = 'pass';
@@ -940,6 +944,7 @@
     function updatePlayerTargets() {
       const atkTeam = state.possession;
       const possessor = players[state.possessorIdx];
+      const isLoose = state.phase === 'loose';
 
       // 先把非持球球員依「離球距離」排序（分隊）
       const rank = { h: [], a: [] };
@@ -957,11 +962,32 @@
       rank.a.forEach((r, n) => rankIdx[r.i] = n);
 
       // 攻方「站位上限」— 不能超過對方 GK（GK 在 0.05 / 0.95）
-      const ATK_LIMIT_H = 0.88; // home 攻 right goal，攻方上限 0.88
-      const ATK_LIMIT_A = 0.12; // away 攻 left goal，攻方上限 0.12
+      const ATK_LIMIT_H = 0.88;
+      const ATK_LIMIT_A = 0.12;
 
       players.forEach((p, i) => {
         p._urgent = false;
+        // 散球：兩隊最近的人朝球跑（自然速度、不暴衝）、其他人維持陣型
+        if (isLoose) {
+          if (p.role === 'GK') {
+            p.tx = p.baseX;
+            p.ty = 0.5 + (ball.y - 0.5) * 0.25;
+            return;
+          }
+          const myRank = rankIdx[i];
+          if (myRank === 0) {
+            // 每隊最近一人去追球（urgent 但 maxStep 已限制）
+            p._urgent = true;
+            p.tx = ball.x;
+            p.ty = ball.y;
+          } else {
+            // 其他人鬆動站回基本位置 + 些微跟球
+            const fl = p.flair || { xJitter: 0, yJitter: 0 };
+            p.tx = p.baseX + (ball.x - 0.5) * 0.18 + fl.xJitter;
+            p.ty = p.baseY + (ball.y - p.baseY) * 0.30 + fl.yJitter;
+          }
+          return;
+        }
         // 持球者：朝對方球門盤帶（但不能踩到 GK）
         if (i === state.possessorIdx) {
           const goalX = p.team === 'h' ? 1 : 0;
@@ -1063,13 +1089,13 @@
       players.forEach((p, i) => {
         // smoothness 決定「以多少比例逼近目標」
         // maxStep 決定「單幀最大位移」— 避免 target 大幅跳動時第一幀飛越過去
+        // ※ 個人 speed 是「硬上限」，無論 urgent 或持球都不能超過自己該有的速度
         let smoothness = 0.045;
         let maxStep = 0.010;      // 非緊急：慢跑
-        if (i === state.possessorIdx) { smoothness = 0.15; maxStep = 0.013; } // 持球者靈活
-        else if (p._urgent) { smoothness = 0.11; maxStep = 0.016; }           // 壓迫/衝刺
+        if (i === state.possessorIdx) { smoothness = 0.13; maxStep = 0.012; } // 持球者靈活
+        else if (p._urgent) { smoothness = 0.08; maxStep = 0.012; }           // 壓迫（不再暴衝）
         smoothness *= flipEase;
-        // 個人 speed 影響：80 為基準，速度 95 跑得快 ~19%、速度 60 跑得慢 ~25%
-        // GK 除外（GK 不需要按 speed 衝刺）
+        // 個人 speed 影響：80 為基準，95 快 19%、60 慢 25%（GK 不套）
         if (p.role !== 'GK' && p.stats?.speed) {
           const speedMult = p.stats.speed / 80;
           smoothness *= speedMult;
@@ -1092,35 +1118,57 @@
 
     function moveBall() {
       if (state.phase === 'pass' || state.phase === 'shoot') {
-        // 傳球時持續追蹤目標球員當下位置（接球者在飛行中可能位移，
-        // 不鎖死起飛時的舊座標，否則球抵達時會 snap 到新位置變成突然彈跳）
-        if (state.phase === 'pass' && state.passTargetIdx != null) {
-          const t = players[state.passTargetIdx];
-          if (t) { state.ballTargetX = t.x; state.ballTargetY = t.y; }
-        }
+        // 球飛直線到「起飛時鎖定的目標點」— 不再 homing 追接球者
+        // → 接球者必須自己跑到目標點才能接到球，沒到就變散球
         state.ballTravelLeft--;
         const t = 1 - (state.ballTravelLeft / Math.max(1, state.ballTravelTotal));
         ball.x = state.ballFromX + (state.ballTargetX - state.ballFromX) * t;
         ball.y = state.ballFromY + (state.ballTargetY - state.ballFromY) * t;
-        // 拋物線弧度（4×t×(1-t) = 中段 peak）
+        // 拋物線弧度
         ball.y -= 0.03 * (4 * t * (1 - t));
         if (state.ballTravelLeft <= 0) {
           if (state.phase === 'shoot') {
             resolveShot();
           } else {
-            // pass 抵達：那個人變成持球者（ball 位置已經貼近目標當下位置，不 snap）
+            // pass 抵達：看誰最靠近球
             const newIdx = state.passTargetIdx;
-            if (newIdx != null && players[newIdx]) {
+            const target = newIdx != null ? players[newIdx] : null;
+            const distToTarget = target
+              ? Math.hypot(target.x - ball.x, target.y - ball.y)
+              : Infinity;
+            // 預期接球者離球 < 0.04 → 順利接到
+            if (target && distToTarget < 0.04) {
               state.possessorIdx = newIdx;
-              state.possession = players[newIdx].team;
-              // 只輕微校正到球員腳下，避免殘留幾 px 誤差
-              ball.x += (players[newIdx].x - ball.x) * 0.5;
-              ball.y += (players[newIdx].y - ball.y) * 0.5;
+              state.possession = target.team;
+              state.phase = 'dribble';
+              state.lastActionFrame = state.frame;
+            } else {
+              // 預期接球者不在 → 散球（任何最近球員都能撿）
+              state.phase = 'loose';
+              state.possessorIdx = -1;
+              state.lastActionFrame = state.frame;
             }
-            state.phase = 'dribble';
-            state.lastActionFrame = state.frame;
           }
         }
+      } else if (state.phase === 'loose') {
+        // 散球：球停在原地（或微微滾），等最近的球員跑過來撿
+        let nearest = null, nearestDist = Infinity;
+        players.forEach((p, idx) => {
+          const d = Math.hypot(p.x - ball.x, p.y - ball.y);
+          if (d < nearestDist) { nearestDist = d; nearest = { p, idx }; }
+        });
+        if (nearest && nearestDist < 0.025) {
+          // 自然撿到球
+          state.possessorIdx = nearest.idx;
+          state.possession = nearest.p.team;
+          state.phase = 'dribble';
+          state.lastActionFrame = state.frame;
+          state.recentPassers = [];
+          state.recentPassersSet = new Set();
+          state.possessionChangeFrame = state.frame;
+        }
+        // 散球期間球微微滾動阻力（不完全停住）
+        // 已經被 moveBall 的 phase===pass 計算放下，這裡不做額外位移
       } else if (state.phase === 'dribble') {
         // 球跟著持球者
         const pos = players[state.possessorIdx];
