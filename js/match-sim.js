@@ -284,8 +284,17 @@
     const FRAME_PX = 32;        // PIPOYA frame = 32×32
     players.forEach((p, i) => {
       const isPos = i === possessorIdx;
-      const cx = p.x * PITCH_W;
-      const cy = p.y * PITCH_H;
+      let cx = p.x * PITCH_W;
+      let cy = p.y * PITCH_H;
+      // 鏟球視覺位移：朝鏟球方向滑行（前半 fast slide、後半略 overshoot）
+      if (p._tackleVisualUntil && state.frame < p._tackleVisualUntil) {
+        const tAge = state.frame - (p._tackleStart || state.frame);
+        const tNorm = Math.min(1, tAge / 24);
+        // ease-out：前半快滑、後半慢
+        const slideAmt = (1 - Math.pow(1 - tNorm, 2)) * 18; // 最遠滑 18px 視覺
+        cx += (p._tackleDirX || 0) * slideAmt;
+        cy += (p._tackleDirY || 0) * slideAmt;
+      }
 
       // row 覆寫順序：tackle > fulltime > celebrate > walk
       let dirRow, frame;
@@ -294,12 +303,22 @@
         // 鏟球 (row 7 = thrust)
         dirRow = 7;
         const tackleAge = state.frame - (p._tackleStart || state.frame);
-        frame = Math.min(2, Math.floor(tackleAge / 3));  // 0→1→2 三幀
+        // 24 幀分 3 段（0→1→2→2 hold）
+        frame = Math.min(2, Math.floor(tackleAge / 8));
       } else if (state.phase === 'fulltime') {
-        // 全場結束：贏的隊伍歡呼 (row 5)、輸的懊惱 (row 6)、平手大家都站著
-        if (state.fulltimeWinner === 'd') {
-          dirRow = 0;
-          frame = 1;
+        // 全場結束：先用 walk 動畫走到排隊位置，到位才開始慶祝 / 懊惱
+        const dxMov = (p.tx || p.x) - p.x;
+        const dyMov = (p.ty || p.y) - p.y;
+        const stillWalking = Math.abs(dxMov) + Math.abs(dyMov) > 0.006;
+        if (stillWalking) {
+          if (Math.abs(dyMov) > Math.abs(dxMov)) {
+            dirRow = dyMov > 0 ? 0 : 3;
+          } else {
+            dirRow = dxMov < 0 ? 1 : 2;
+          }
+          frame = Math.floor(_renderTick / 8) % 3;
+        } else if (state.fulltimeWinner === 'd') {
+          dirRow = 0; frame = 1;
         } else {
           dirRow = (p.team === state.fulltimeWinner) ? 5 : 6;
           frame = Math.floor(_renderTick / 16) % 3;
@@ -321,15 +340,32 @@
         frame = moving ? (Math.floor(_renderTick / 8) % 3) : 1;
       }
 
-      // 鏟球時加塵土：橢圓灰點散開（用 Math.random — render 在 module 層、拿不到 runSim 的 rng）
+      // 鏟球時加大量塵土 + 動態線（更明顯）
       if (tackleActive) {
-        ctx.fillStyle = 'rgba(220,200,160,0.6)';
-        for (let d = 0; d < 3; d++) {
-          const dustX = cx - 4 - d * 3 + (Math.random() - 0.5) * 2;
-          const dustY = cy + SPRITE_DRAW_H / 2 - 1 + (Math.random() - 0.5) * 2;
+        const tAge = state.frame - (p._tackleStart || state.frame);
+        const tNorm = Math.min(1, tAge / 24);
+        // 多層灰雲 — 後方拖尾
+        ctx.fillStyle = `rgba(220,200,160,${0.75 * (1 - tNorm * 0.4)})`;
+        for (let d = 0; d < 6; d++) {
+          const back = d * 4;
+          const dustX = cx - (p._tackleDirX || 0) * back + (Math.random() - 0.5) * 4;
+          const dustY = cy + SPRITE_DRAW_H / 2 - 1 - (p._tackleDirY || 0) * back + (Math.random() - 0.5) * 3;
           ctx.beginPath();
-          ctx.ellipse(dustX, dustY, 2.5 - d * 0.5, 1.5 - d * 0.3, 0, 0, Math.PI * 2);
+          ctx.ellipse(dustX, dustY, 3.5 - d * 0.4, 2 - d * 0.2, 0, 0, Math.PI * 2);
           ctx.fill();
+        }
+        // 動態線：朝鏟球方向 3 條白線
+        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+        ctx.lineWidth = 1.3;
+        for (let l = 0; l < 3; l++) {
+          const lineLen = 8 + l * 2;
+          const offY = (l - 1) * 3;
+          ctx.beginPath();
+          ctx.moveTo(cx - (p._tackleDirX || 0) * lineLen,
+                     cy - (p._tackleDirY || 0) * lineLen + offY);
+          ctx.lineTo(cx - (p._tackleDirX || 0) * (lineLen + 6),
+                     cy - (p._tackleDirY || 0) * (lineLen + 6) + offY);
+          ctx.stroke();
         }
       }
       // 腳下影子：控球者用半透明白小點（不搶戲）、其他用黑影
@@ -941,9 +977,15 @@
             state.possessorIdx = players.indexOf(near.player);
             state.phase = 'dribble';
             state.lastActionFrame = state.frame;
-            // 鏟球視覺：搶斷者用 row 7（thrust）12 幀
+            // 鏟球視覺：用 row 7（thrust）24 幀（~0.8 秒、明顯一點）
+            // 記錄滑行方向：朝持球者方向、視覺上往那邊滑
             near.player._tackleStart = state.frame;
-            near.player._tackleVisualUntil = state.frame + 12;
+            near.player._tackleVisualUntil = state.frame + 24;
+            near.player._tackleDirX = pos.x - near.player.x;
+            near.player._tackleDirY = pos.y - near.player.y;
+            const tMag = Math.hypot(near.player._tackleDirX, near.player._tackleDirY) || 1;
+            near.player._tackleDirX /= tMag;
+            near.player._tackleDirY /= tMag;
             // 換邊 → 清最近經手傳球者記錄、記錄換邊時機讓 movePlayers 降速
             state.recentPassers = [];
             state.recentPassersSet = new Set();
@@ -1118,10 +1160,16 @@
         // smoothness 決定「以多少比例逼近目標」
         // maxStep 決定「單幀最大位移」— 避免 target 大幅跳動時第一幀飛越過去
         // ※ 個人 speed 是「硬上限」，無論 urgent 或持球都不能超過自己該有的速度
-        let smoothness = 0.045;
-        let maxStep = 0.010;      // 非緊急：慢跑
-        if (i === state.possessorIdx) { smoothness = 0.13; maxStep = 0.012; } // 持球者靈活
-        else if (p._urgent) { smoothness = 0.08; maxStep = 0.012; }           // 壓迫（不再暴衝）
+        // ※ 鏟球期間：方向跟著 sprite（右），位移用視覺滑行（不靠 tx/ty）
+        let smoothness = 0.035;
+        let maxStep = 0.008;      // 非緊急：慢跑
+        if (i === state.possessorIdx) { smoothness = 0.10; maxStep = 0.010; }  // 持球者靈活
+        else if (p._urgent) { smoothness = 0.055; maxStep = 0.009; }           // 壓迫（極小幅暴衝）
+        // 鏟球中：靠視覺 slide、tx/ty 不再追、避免目標位置跳過去暴衝
+        if (p._tackleVisualUntil && state.frame < p._tackleVisualUntil) {
+          smoothness = 0.02;
+          maxStep = 0.004;
+        }
         smoothness *= flipEase;
         // 個人 speed 影響：80 為基準，95 快 19%、60 慢 25%（GK 不套）
         if (p.role !== 'GK' && p.stats?.speed) {
@@ -1266,29 +1314,45 @@
 
     function tick(nowMs) {
       if (state.frame >= TOTAL_FRAMES) {
-        // 進入「全場結束」階段：3 秒慶祝/懊惱動畫、然後顯示 summary
+        // 進入「全場結束」階段：先排隊、走過去、然後慶祝/懊惱動畫
         if (state.phase !== 'fulltime' && state.phase !== 'ended') {
           state.phase = 'fulltime';
           state.fulltimeStart = performance.now();
           // 結算贏家
           const hScore = state.score.h, aScore = state.score.a;
           state.fulltimeWinner = hScore > aScore ? 'h' : aScore > hScore ? 'a' : 'd';
-          // 確保 _endGoalCelebration 被收掉（不要殘留進球放大）
+          // 收掉進球放大殘留
           if (typeof _endGoalCelebration === 'function') _endGoalCelebration(ui);
+          // 為兩隊各 11 人排成一橫排：home 上半場、away 下半場
+          const homeP = players.filter(p => p.team === 'h');
+          const awayP = players.filter(p => p.team === 'a');
+          const lineX = (idx, n) => 0.08 + idx * (0.84 / Math.max(1, n - 1));
+          homeP.forEach((p, i) => { p.tx = lineX(i, homeP.length); p.ty = 0.40; });
+          awayP.forEach((p, i) => { p.tx = lineX(i, awayP.length); p.ty = 0.60; });
+          // 清掉 urgent / tackle 殘留
+          players.forEach(p => { p._urgent = false; p._tackleVisualUntil = 0; });
+          // 鏡頭拉回中央
+          if (state.camera) {
+            state.camera.x = (PITCH_W - VIEW_W) / 2;
+            state.camera.y = (PITCH_H - VIEW_H) / 2;
+          }
+          // 球放回中圈
+          ball.x = 0.5; ball.y = 0.5;
+          state.possessorIdx = -1;
         }
         if (state.phase === 'fulltime') {
-          // 3 秒後切到 ended、顯示 summary
-          if (performance.now() - state.fulltimeStart > 3000) {
+          // 持續移動球員到排隊位置
+          movePlayers();
+          // 4.5 秒後切到 ended、顯示 summary（前 2 秒走過去、後 2.5 秒慶祝/懊惱）
+          if (performance.now() - state.fulltimeStart > 4500) {
             state.phase = 'ended';
             showSummary();
             return;
           }
-          // 持續 render（讓 winner 歡呼 / loser 懊惱動畫顯示）
           render(ctx, state);
           requestAnimationFrame(tick);
           return;
         }
-        // phase = 'ended'：已 summary、不再 render
         return;
       }
       // 第一個 rAF 的 nowMs 拿來當基準（或瀏覽器某些情況不傳 → fallback performance.now）
