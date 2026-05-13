@@ -656,12 +656,21 @@
     content.innerHTML = `
       <div class="mt-home-tab">
         <div class="mt-home-scene" id="mt-home-scene">
-          <!-- 天空（雲在太陽之上）-->
+          <!-- 天空（雲在太陽之上、遠山 silhouette 墊底）-->
           <div class="mt-home-sky">
+            <svg class="mt-home-mountains" viewBox="0 0 200 50" preserveAspectRatio="none">
+              <!-- 後排淺色遠山 -->
+              <polygon points="0,50 30,28 60,40 95,18 130,32 170,20 200,42 200,50"
+                fill="#8a9db0" opacity="0.55"/>
+              <!-- 前排深色遠山 -->
+              <polygon points="0,50 25,38 55,28 90,40 125,26 165,38 200,30 200,50"
+                fill="#5a6b85" opacity="0.75"/>
+            </svg>
             <div class="mt-home-sun"></div>
             <div class="mt-home-cloud mt-home-cloud-1"></div>
             <div class="mt-home-cloud mt-home-cloud-2"></div>
             <div class="mt-home-cloud mt-home-cloud-3"></div>
+            <div class="mt-home-birds">˜ ˜</div>
           </div>
           <!-- 遠景：建築 + 樹 -->
           <div class="mt-home-distance">
@@ -721,7 +730,7 @@
       return {
         player: p, sheetUrl, sheetW, sheetH,
         x: 0.1 + Math.random() * 0.8,
-        y: 0.5 + Math.random() * 0.4,    // 初始 y 限制在操場中下方
+        y: 0.2 + Math.random() * 0.7,    // 散在整個操場
         vx: 0, vy: 0,
         state: 'walk',           // 'walk' | 'idle' | 'kick' | 'stretch'
         stateUntil: performance.now() + 600 + Math.random() * 2400,
@@ -742,12 +751,16 @@
       const SCALE = w.scale;
       const SHEET_ROWS = 7;  // walk×4 + kick + cheer + frustration
       const SHEET_COLS = 3;
+      const rarity = w.player.card?.rarity || 'R';
+      const rarityBadge = (rarity === 'SSR' || rarity === 'SR')
+        ? `<div class="mt-home-rarity rarity-${rarity}">${rarity}</div>` : '';
       el.innerHTML = `
         <div class="mt-home-shadow"></div>
         <div class="mt-home-sprite" style="${w.sheetUrl
           ? `background-image:url(${w.sheetUrl});width:${w.sheetW * SCALE}px;height:${w.sheetH * SCALE}px;background-size:${w.sheetW * SCALE * SHEET_COLS}px ${w.sheetH * SCALE * SHEET_ROWS}px`
           : `width:${32 * SCALE}px;height:${60 * SCALE}px;background:rgba(255,255,255,0.2)`}"></div>
         ${injured}
+        ${rarityBadge}
         <div class="mt-home-name">${escapeHtml(w.player.card?.name || '?')}</div>
       `;
       el.addEventListener('click', () => _openPlayerProfile(w.player));
@@ -755,9 +768,9 @@
       ground.appendChild(el);
     });
 
-    // 動畫迴圈：H_LO 高一點避免球員頭頂插到建築
+    // 動畫迴圈：H_LO 低一點讓球員可走到操場前端、頭蓋過建築（前景效果）
     const W_LO = 0.04, W_HI = 0.96;
-    const H_LO = 0.45, H_HI = 0.95;
+    const H_LO = 0.05, H_HI = 0.95;
     function tick(t) {
       for (const w of wanderers) {
         if (!w.el) continue;
