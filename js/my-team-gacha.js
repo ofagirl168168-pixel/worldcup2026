@@ -262,8 +262,9 @@
           <div class="mt-gacha-pack-sparks" id="mt-gacha-pack-sparks"></div>
         </div>
         <div class="mt-gacha-pack-cta">
-          <span class="mt-gacha-pack-finger">👆</span>
-          <span>點擊撕開${cards.length > 1 ? `（${cards.length} 張）` : ''}</span>
+          <span class="mt-gacha-pack-finger mt-gacha-pack-finger-swipe">👈</span>
+          <span>左右拖曳撕開包裝${cards.length > 1 ? `（${cards.length} 張）` : ''}</span>
+          <span class="mt-gacha-pack-finger mt-gacha-pack-finger-swipe-r">👉</span>
         </div>
       </div>
 
@@ -357,35 +358,90 @@
         pack3D.style.transform = '';
       });
       pack.addEventListener('mousemove', (e) => {
+        if (pack.classList.contains('dragging') || pack.classList.contains('opening')) return;
         const rect = pack3D.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
-        const dx = (e.clientX - cx) / rect.width;   // -0.5 ~ 0.5
+        const dx = (e.clientX - cx) / rect.width;
         const dy = (e.clientY - cy) / rect.height;
-        // 反向傾斜（朝滑鼠靠近的感覺）
         const rotY = dx * 18;
         const rotX = -dy * 18;
         pack3D.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
       });
 
-      // Stage 0：等用戶點卡包 → 撕開動畫 → 進 Stage 1
-      pack.addEventListener('click', () => {
+      // Stage 0：拖曳撕開（滑鼠 / 觸控都支援）
+      let dragging = false;
+      let startX = 0;
+      let direction = 0;   // -1=左拉、+1=右拉、0=未定
+      const TEAR_THRESHOLD = 100;  // 拉超過 100px 就算撕開
+      const wrap = overlay.querySelector('#mt-gacha-pack-wrap');
+
+      function setProgress(p) {
+        // p: 0 ~ 1
+        pack3D.style.setProperty('--tear-progress', p);
+      }
+
+      function onDragStart(e) {
         if (pack.classList.contains('opening')) return;
-        pack.classList.add('opening');
+        const pt = e.touches ? e.touches[0] : e;
+        startX = pt.clientX;
+        dragging = true;
+        direction = 0;
+        pack.classList.add('dragging');
         if (sparkTimer) { clearInterval(sparkTimer); sparkTimer = null; }
-        // 撕開那瞬間爆一波火花
-        for (let i = 0; i < 24; i++) {
+        e.preventDefault();
+      }
+
+      function onDragMove(e) {
+        if (!dragging) return;
+        const pt = e.touches ? e.touches[0] : e;
+        const dx = pt.clientX - startX;
+        if (direction === 0 && Math.abs(dx) > 8) direction = dx > 0 ? 1 : -1;
+        const progress = Math.min(1, Math.abs(dx) / TEAR_THRESHOLD);
+        pack3D.style.setProperty('--tear-dir', direction);
+        setProgress(progress);
+        // 拉超過 50% 開始噴火花
+        if (progress > 0.5 && Math.random() < 0.4) {
           const rect = pack3D.getBoundingClientRect();
-          emitSpark(rect.width / 2, rect.height / 2);
+          emitSpark(rect.width / 2, rect.height * 0.5);
         }
-        // 撕開動畫 1.2s → 切到 Stage 1
-        setTimeout(() => {
-          pack.style.display = 'none';
-          beam.hidden = false;
-          stage.hidden = false;
-          startStage1();
-        }, 1200);
-      });
+        e.preventDefault();
+      }
+
+      function onDragEnd(e) {
+        if (!dragging) return;
+        dragging = false;
+        pack.classList.remove('dragging');
+        const pt = (e.changedTouches ? e.changedTouches[0] : e);
+        const dx = pt ? pt.clientX - startX : 0;
+        if (Math.abs(dx) >= TEAR_THRESHOLD) {
+          // 撕開！
+          pack.classList.add('opening');
+          setProgress(1);
+          // 爆一波火花
+          for (let i = 0; i < 24; i++) {
+            const rect = pack3D.getBoundingClientRect();
+            emitSpark(rect.width / 2, rect.height / 2);
+          }
+          setTimeout(() => {
+            pack.style.display = 'none';
+            beam.hidden = false;
+            stage.hidden = false;
+            startStage1();
+          }, 900);
+        } else {
+          // 撕力不夠、snap back
+          setProgress(0);
+        }
+      }
+
+      pack.addEventListener('mousedown', onDragStart);
+      pack.addEventListener('touchstart', onDragStart, { passive: false });
+      document.addEventListener('mousemove', onDragMove);
+      document.addEventListener('touchmove', onDragMove, { passive: false });
+      document.addEventListener('mouseup', onDragEnd);
+      document.addEventListener('touchend', onDragEnd);
+      document.addEventListener('touchcancel', onDragEnd);
 
       async function startStage1() {
         // 200ms 後顯示 skip

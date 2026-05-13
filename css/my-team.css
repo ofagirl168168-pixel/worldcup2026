@@ -752,11 +752,14 @@
 .mt-gacha-pack {
   position: relative;
   display: flex; flex-direction: column; align-items: center;
-  cursor: pointer;
+  cursor: grab;
   z-index: 2;
   perspective: 800px;
   animation: mt-pack-float 2.6s ease-in-out infinite;
+  user-select: none;
+  touch-action: none;
 }
+.mt-gacha-pack.dragging { cursor: grabbing; }
 .mt-gacha-pack.opening {
   animation: mt-pack-burst 0.6s ease-out forwards;
 }
@@ -886,30 +889,73 @@
   letter-spacing: 2px;
 }
 
-/* 撕開動畫：上半飛出 + 翻轉、下半下滑 */
-.mt-gacha-pack.opening .mt-gacha-pack-top {
-  animation: mt-pack-tear-top 1.2s cubic-bezier(0.55, 0.05, 0.6, 1) forwards;
+/* ── 即時拖曳撕開（--tear-progress 0~1、--tear-dir -1/0/+1）── */
+/* 上半根據撕扯方向往對側翻、進度越大翻越多 */
+.mt-gacha-pack-top {
+  transform:
+    translateX(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * -8px))
+    translateY(calc(var(--tear-progress, 0) * -6px))
+    rotateZ(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * 4deg));
+  transition: transform 0.18s ease-out;
   transform-origin: bottom center;
 }
-.mt-gacha-pack.opening .mt-gacha-pack-perforation {
-  animation: mt-pack-perforation-fade 0.3s ease-out 0.2s forwards;
-}
-.mt-gacha-pack.opening .mt-gacha-pack-bottom {
-  animation: mt-pack-tear-bottom 1.2s cubic-bezier(0.55, 0.05, 0.6, 1) forwards;
+.mt-gacha-pack-bottom {
+  transform:
+    translateX(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * 6px))
+    translateY(calc(var(--tear-progress, 0) * 4px))
+    rotateZ(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * -3deg));
+  transition: transform 0.18s ease-out;
   transform-origin: top center;
 }
+/* 撕線：依進度從一邊「裂開」（clip-path 漸進）*/
+.mt-gacha-pack-perforation {
+  position: relative;
+}
+.mt-gacha-pack-perforation::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg,
+    rgba(255,200,80,1) 0%, rgba(255,160,40,1) 50%, transparent 100%);
+  opacity: var(--tear-progress, 0);
+  pointer-events: none;
+}
+.mt-gacha-pack.dragging .mt-gacha-pack-top,
+.mt-gacha-pack.dragging .mt-gacha-pack-bottom {
+  transition: none;     /* 拖曳中即時跟隨 */
+}
+
+/* 拖曳結束 → opening：上下翻飛出 + 內部 reveal */
+.mt-gacha-pack.opening .mt-gacha-pack-top {
+  animation: mt-pack-tear-top 0.9s cubic-bezier(0.55, 0.05, 0.6, 1) forwards;
+}
+.mt-gacha-pack.opening .mt-gacha-pack-perforation {
+  animation: mt-pack-perforation-fade 0.25s ease-out forwards;
+}
+.mt-gacha-pack.opening .mt-gacha-pack-bottom {
+  animation: mt-pack-tear-bottom 0.9s cubic-bezier(0.55, 0.05, 0.6, 1) forwards;
+}
 @keyframes mt-pack-tear-top {
-  0%   { transform: translateY(0) rotateX(0deg) rotateZ(0deg); opacity: 1; }
-  30%  { transform: translateY(-10px) rotateX(-25deg); }
-  100% { transform: translateY(-200px) rotateX(-90deg) rotateZ(8deg); opacity: 0; }
+  0%   { transform: translateX(0) translateY(0) rotateZ(0deg); opacity: 1; }
+  100% { transform: translateX(calc(var(--tear-dir, 1) * -240px)) translateY(-100px) rotateZ(calc(var(--tear-dir, 1) * 25deg)); opacity: 0; }
 }
 @keyframes mt-pack-perforation-fade {
   to { opacity: 0; transform: scaleY(0.2); }
 }
 @keyframes mt-pack-tear-bottom {
-  0%   { transform: translateY(0) rotateX(0deg); opacity: 1; }
-  30%  { transform: translateY(8px) rotateX(15deg); }
-  100% { transform: translateY(120px) rotateX(60deg) scale(0.85); opacity: 0; }
+  0%   { transform: translateX(0) translateY(0) rotateZ(0deg); opacity: 1; }
+  100% { transform: translateX(calc(var(--tear-dir, 1) * 180px)) translateY(120px) rotateZ(calc(var(--tear-dir, 1) * -18deg)); opacity: 0; }
+}
+
+/* 兩根手指動畫 hint：左右擺動 */
+.mt-gacha-pack-finger-swipe { animation: mt-finger-swipe-l 1.4s ease-in-out infinite; }
+.mt-gacha-pack-finger-swipe-r { animation: mt-finger-swipe-r 1.4s ease-in-out infinite; }
+@keyframes mt-finger-swipe-l {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(-4px); }
+}
+@keyframes mt-finger-swipe-r {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(4px); }
 }
 
 /* 包裝內部、撕開後可見的卡背 stack */
