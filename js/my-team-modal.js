@@ -600,6 +600,8 @@
   function renderTab() {
     const content = _overlay.querySelector('#mt-hub-content');
     if (!content) return;
+    // 依當前 tab 設置背景主題
+    content.dataset.tab = _currentTab;
     // 離開主頁時停掉漫步動畫
     if (_currentTab !== 'home' && _homeAnimId) {
       cancelAnimationFrame(_homeAnimId);
@@ -752,6 +754,7 @@
       const SHEET_ROWS = 7;  // walk×4 + kick + cheer + frustration
       const SHEET_COLS = 3;
       const rarity = w.player.card?.rarity || 'R';
+      const pos = w.player.card?.position || '';
       const star = rarity === 'SSR' ? '<span class="mt-home-star ssr">★</span>'
                  : rarity === 'SR'  ? '<span class="mt-home-star sr">★</span>' : '';
       el.innerHTML = `
@@ -760,6 +763,7 @@
           ? `background-image:url(${w.sheetUrl});width:${w.sheetW * SCALE}px;height:${w.sheetH * SCALE}px;background-size:${w.sheetW * SCALE * SHEET_COLS}px ${w.sheetH * SCALE * SHEET_ROWS}px`
           : `width:${32 * SCALE}px;height:${60 * SCALE}px;background:rgba(255,255,255,0.2)`}"></div>
         ${injured}
+        <div class="mt-home-pos pos-${pos}">${pos}</div>
         <div class="mt-home-name rarity-${rarity}">${star}${escapeHtml(w.player.card?.name || '?')}</div>
       `;
       el.addEventListener('click', () => _openPlayerProfile(w.player));
@@ -1006,6 +1010,7 @@
       <div class="mt-pitch-player-portrait">
         <img id="${imgId}" alt="${escapeHtml(c.name || '')}" loading="lazy" src="${fallback}" onerror="this.style.opacity='0.3'">
         ${isInjured ? '<span class="mt-pitch-injury">🏥</span>' : ''}
+        <span class="mt-pitch-player-pos pos-${c.position || ''}">${c.position || ''}</span>
       </div>
       <div class="mt-pitch-player-name">${escapeHtml(c.name || '?')}</div>
       <div class="mt-pitch-player-stat">Lv.${p.level}${p.bond ? ' ★'.repeat(p.bond) : ''}</div>
@@ -1034,9 +1039,10 @@
     el.innerHTML = `
       ${isInjured ? '<span class="mt-bench-injury">🏥</span>' : ''}
       <span class="mt-bench-rarity">${c.rarity || 'R'}</span>
+      <span class="mt-bench-position pos-${c.position || ''}">${c.position || ''}</span>
       <img id="${imgId}" alt="${escapeHtml(c.name || '')}" src="${fallback}" onerror="this.style.opacity='0.3'">
       <div class="mt-bench-name">${escapeHtml(c.name || '?')}</div>
-      <div class="mt-bench-pos">${c.position || ''} Lv.${p.level}</div>
+      <div class="mt-bench-pos">Lv.${p.level}</div>
     `;
     const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
     const team = window.MyTeam.getCached();
@@ -1259,10 +1265,18 @@
 
     overlay.querySelector('[data-act="toggle-start"]').addEventListener('click', async () => {
       try {
-        await window.DB.from('team_player').update({ in_starting_11: !p.in_starting_11 }).eq('id', p.id);
-        overlay.classList.remove('open');
-        setTimeout(() => overlay.remove(), 200);
-        renderTab();
+        if (p.in_starting_11) {
+          // 已在先發 → 直接撤下
+          await window.DB.from('team_player').update({ in_starting_11: false }).eq('id', p.id);
+          overlay.classList.remove('open');
+          setTimeout(() => overlay.remove(), 200);
+          renderTab();
+        } else {
+          // 板凳 → 開替換對話框
+          overlay.classList.remove('open');
+          setTimeout(() => overlay.remove(), 200);
+          setTimeout(() => _openSwapDialog(p), 220);
+        }
       } catch (e) {
         alert('更新失敗：' + (e.message || e));
       }
@@ -1283,6 +1297,91 @@
       } catch (e) {
         const msg = (e.message || String(e));
         alert(msg.includes('NOT_OWNED') ? '沒有恢復包，去商店買吧' : '治療失敗：' + msg);
+      }
+    });
+  }
+
+  // ── 替換對話框：上場 bench player、選一位 starter 下來 ──
+  async function _openSwapDialog(benchPlayer) {
+    const players = await window.MyTeam.fetchPlayers();
+    const starters = players.filter(x => x.in_starting_11);
+    if (starters.length < 11) {
+      // 沒滿 11 人 → 直接上場、不需替換
+      try {
+        await window.DB.from('team_player').update({ in_starting_11: true }).eq('id', benchPlayer.id);
+        renderTab();
+      } catch (e) { alert('上場失敗：' + e.message); }
+      return;
+    }
+
+    const c = benchPlayer.card || {};
+    const POS_LABEL = { GK: '🧤 守門員', DEF: '🛡️ 後衛', MID: '⚙️ 中場', FWD: '⚡ 前鋒' };
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay';
+    overlay.innerHTML = `
+      <div class="mt-profile-card" style="max-width:480px">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <h2 style="margin-top:0;color:#f0c040">替換球員上場</h2>
+        <p style="font-size:13px;opacity:0.85;margin:6px 0 14px">
+          <b>${escapeHtml(c.name)}</b>（${POS_LABEL[c.position] || c.position}）將上場<br>
+          請選一位先發球員下來：
+        </p>
+        <div class="mt-swap-grid" id="mt-swap-grid"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    };
+    overlay.querySelector('.mt-profile-close').addEventListener('click', close);
+
+    // 顯示 11 starters、同位置高亮（建議替換同位置的）
+    const grid = overlay.querySelector('#mt-swap-grid');
+    starters.forEach(s => {
+      const sc = s.card || {};
+      const sameRole = sc.position === c.position;
+      const el = document.createElement('button');
+      el.className = `mt-swap-row rarity-${sc.rarity || 'R'} ${sameRole ? 'same-role' : ''}`;
+      const imgId = `swap-${s.id}`;
+      const look = window.LpcRenderer && window.LpcRenderer.resolveLook(s);
+      el.innerHTML = `
+        <img id="${imgId}" alt="${escapeHtml(sc.name)}" onerror="this.style.opacity='0.3'">
+        <div class="mt-swap-info">
+          <div class="mt-swap-name">${escapeHtml(sc.name || '?')}</div>
+          <div class="mt-swap-pos">${POS_LABEL[sc.position] || sc.position} · Lv.${s.level}</div>
+          <div class="mt-swap-stat">攻 ${s.current_attack} · 防 ${s.current_defense} · 速 ${s.current_speed}</div>
+        </div>
+        ${sameRole ? '<span class="mt-swap-tag">同位置</span>' : ''}
+      `;
+      el.addEventListener('click', async () => {
+        if (!confirm(`確定讓 ${sc.name} 下來、換 ${c.name} 上嗎？`)) return;
+        try {
+          // 雙向 update
+          await Promise.all([
+            window.DB.from('team_player').update({ in_starting_11: false }).eq('id', s.id),
+            window.DB.from('team_player').update({ in_starting_11: true }).eq('id', benchPlayer.id),
+          ]);
+          close();
+          renderTab();
+          if (typeof showToast === 'function') {
+            showToast(`✅ ${c.name} 上場、${sc.name} 下場`);
+          }
+        } catch (e) {
+          alert('替換失敗：' + (e.message || e));
+        }
+      });
+      grid.appendChild(el);
+      // LPC 頭像
+      const team = window.MyTeam.getCached();
+      const kit = team ? { shirtColor: team.kit_shirt_color, pantsColor: team.kit_pants_color } : null;
+      if (look && window.LpcRenderer) {
+        window.LpcRenderer.portrait(look, { kit }).then(url => {
+          const img = document.getElementById(imgId);
+          if (img && url) img.src = url;
+        }).catch(() => {});
       }
     });
   }
