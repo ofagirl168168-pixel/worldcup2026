@@ -3564,17 +3564,15 @@
    ═════════════════════════════════════════════════════════════ */
 .mt-gacha-shop-fullscene {
   position: relative;
-  /* 強制橫向滿版：寬度 = 父層內容寬 + 左右 padding 40px */
   width: calc(100% + 40px);
   margin: -16px -20px -40px;
   padding: 0;
   overflow: hidden;
+  /* 鎖 3:4 比例（同 bg 圖）→ % 位置才準、不會被裁切偏移 */
+  aspect-ratio: 3 / 4;
   background:
-    url('../img/my-team/gacha-bg.jpg') center center / cover no-repeat,
+    url('../img/my-team/gacha-bg.jpg') 0 0 / 100% 100% no-repeat,
     #1a0a14;
-  /* 撐滿父層 mt-hub-content 的可視高度 */
-  height: calc(100% + 56px);
-  min-height: 600px;
 }
 
 /* 背景圖：已改用 background-image、img 元素隱藏避免雙重渲染 */
@@ -3699,22 +3697,22 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.6);
 }
 
-/* 黑板告示：根據實際截圖再下移 — 黑板在獎盃旁、足球後方、約畫面 70-78% */
+/* 黑板告示：直接看 bg 圖找位置 — 黑板實際在 x 14~26%、y 57~68% */
 .mt-gshop-chalk-overlay {
   position: absolute;
-  top: 70%;
-  left: 13%;
-  width: 13%;
-  height: 9%;
+  top: 59%;
+  left: 14.5%;
+  width: 11.5%;
+  height: 8%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: center;
   font-family: 'Caveat','Comic Sans MS',cursive;
   color: #ffffff;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.15;
   text-shadow: 0 1px 1px rgba(0,0,0,0.95);
   z-index: 4;
   transform: rotate(-2deg);
@@ -3744,57 +3742,79 @@
 /* 抽卡按鈕（疊在背景的木地板區域）*/
 .mt-gshop-buttons {
   position: absolute;
-  bottom: 4%;
+  bottom: 3%;
   left: 5%; right: 5%;
   display: flex;
   gap: 10px;
+  align-items: flex-start;   /* 兩 wrap 從頂端對齊、副標位置不影響按鈕高度 */
   z-index: 5;
 }
-.mt-gshop-btn {
-  flex: 1;
+.mt-gshop-btn-wrap {
   position: relative;
-  padding: 10px 8px;
-  border-radius: 12px;
-  border: 3px solid #1a1a2e;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.mt-gshop-btn-wrap-10 { flex: 1.4; }   /* 10 抽稍寬 */
+
+.mt-gshop-btn {
+  width: 100%;
+  position: relative;
+  padding: 8px 8px;
+  border-radius: 10px;
   color: #fff;
   font-weight: 900;
   cursor: pointer;
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.65),
-    inset 0 2px 3px rgba(255,255,255,0.3),
-    inset 0 -3px 4px rgba(0,0,0,0.25);
   transition: transform 0.12s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  /* 兩顆按鈕保證一樣高 */
+  min-height: 58px;
 }
 .mt-gshop-btn:hover:not(:disabled) { transform: translateY(-2px); }
 .mt-gshop-btn:active:not(:disabled) { transform: translateY(1px); }
 .mt-gshop-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
 .mt-gshop-btn-1 {
-  /* 純亮藍、不要漸層到深色（深色撞地板看起來會像透明） */
-  background: linear-gradient(180deg, #6fd0ff 0%, #29b6f6 50%, #039be5 100%) !important;
-  background-color: #29b6f6 !important;
-  flex: 0 0 38%;
-  border: 3px solid #ffffff !important;
+  /* 藍色金屬光澤：上亮反光 + 中段純藍 + 下緣暗藍邊（不是漸到深、是「壓邊」）*/
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.55) 0%,
+      rgba(255,255,255,0.15) 12%,
+      transparent 28%,
+      transparent 78%,
+      rgba(0,40,90,0.25) 100%),
+    linear-gradient(180deg, #29b6f6, #0288d1) !important;
+  background-color: #0288d1 !important;
+  border: 2.5px solid #ffffff !important;
   color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.85), 0 0 4px rgba(0,80,180,1);
+  text-shadow: 0 2px 3px rgba(0,40,90,0.95);
   box-shadow:
-    0 0 0 2px #0277bd,
-    0 5px 16px rgba(2,119,189,0.85),
-    inset 0 3px 4px rgba(255,255,255,0.65),
-    inset 0 -4px 6px rgba(2,80,140,0.4) !important;
+    0 0 0 2px #01579b,
+    0 6px 14px rgba(2,119,189,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.8) !important;
   opacity: 1 !important;
 }
 .mt-gshop-btn-10 {
-  /* 純亮金、像金幣那種光澤 */
-  background: linear-gradient(180deg, #fff59d 0%, #ffd54f 35%, #ffb300 75%, #ff8f00 100%) !important;
-  background-color: #ffd54f !important;
-  color: #1a0a00;
-  border: 3px solid #ffffff !important;
+  /* 金屬金光澤 */
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.6) 0%,
+      rgba(255,255,255,0.15) 12%,
+      transparent 28%,
+      transparent 78%,
+      rgba(100,50,0,0.2) 100%),
+    linear-gradient(180deg, #ffd54f, #ffa726) !important;
+  background-color: #ffa726 !important;
+  color: #2a1505;
+  border: 2.5px solid #ffffff !important;
   text-shadow: 0 1px 0 rgba(255,255,255,0.85);
   box-shadow:
-    0 0 0 2px #f57c00,
-    0 5px 18px rgba(245,124,0,0.9),
-    inset 0 3px 4px rgba(255,255,255,0.85),
-    inset 0 -4px 6px rgba(150,80,0,0.35) !important;
+    0 0 0 2px #e65100,
+    0 6px 16px rgba(245,124,0,0.8),
+    inset 0 1px 0 rgba(255,255,255,0.85) !important;
   opacity: 1 !important;
   animation: mt-gshop-btn10-glow 1.6s ease-in-out infinite;
 }
@@ -3823,22 +3843,25 @@
   font-size: 10px;
   text-align: center;
   margin-top: 4px;
-  color: #4a1c28;
-  font-weight: 700;
+  color: #ffe680;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.95);
+  letter-spacing: 0.5px;
 }
-.mt-gshop-btn-sub b { color: #c0392b; font-size: 12px; }
+.mt-gshop-btn-sub b { color: #ffb300; font-size: 11px; }
 .mt-gshop-btn-promo {
   position: absolute;
-  top: -8px; right: -8px;
-  background: linear-gradient(135deg, #ff7060, #c0303a);
+  top: -10px; right: -6px;
+  background: linear-gradient(135deg, #ff5252, #c62828);
   color: #fff;
   font-size: 11px;
   font-weight: 900;
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 12px;
-  transform: rotate(8deg);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  transform: rotate(10deg);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.55);
   border: 2px solid #fff;
+  z-index: 6;
 }
 
 /* SSR 自選券（疊在背景頂部右上、有的話）*/
