@@ -1026,62 +1026,46 @@
   transform-style: preserve-3d;
 }
 
-/* ── 精美紙袋包裝（鋸齒邊 + 3D 光影 + 自然皺褶）── */
+/* ── 精美紙袋包裝（鋸齒邊由 top/bottom 各自帶、wrap 不再 clip）── */
+/* 把鋸齒從 wrap 移走 → 撕開時 flap 飛走鋸齒會跟著一起飛、不殘留在原位置 */
 .mt-gacha-pack-wrap {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
-  filter: drop-shadow(0 12px 24px rgba(0,0,0,0.7))
-          drop-shadow(0 0 24px rgba(240,192,64,0.4));
   z-index: 5;
-  clip-path: polygon(
-    0% 3%, 5% 0%, 10% 3%, 15% 0%, 20% 3%, 25% 0%, 30% 3%, 35% 0%,
-    40% 3%, 45% 0%, 50% 3%, 55% 0%, 60% 3%, 65% 0%, 70% 3%, 75% 0%,
-    80% 3%, 85% 0%, 90% 3%, 95% 0%, 100% 3%,
-    100% 97%, 95% 100%, 90% 97%, 85% 100%, 80% 97%, 75% 100%, 70% 97%, 65% 100%,
-    60% 97%, 55% 100%, 50% 97%, 45% 100%, 40% 97%, 35% 100%, 30% 97%, 25% 100%,
-    20% 97%, 15% 100%, 10% 97%, 5% 100%, 0% 97%
-  );
-  transition: clip-path 0.5s ease-out;
-  perspective: 800px;
-}
-/* 撕開後 wrap 上緣變平、只保留下方鋸齒（避免殘留鋸齒陰影）*/
-.mt-gacha-pack.opening .mt-gacha-pack-wrap {
-  clip-path: polygon(
-    0% 22%, 100% 22%,
-    100% 97%, 95% 100%, 90% 97%, 85% 100%, 80% 97%, 75% 100%, 70% 97%, 65% 100%,
-    60% 97%, 55% 100%, 50% 97%, 45% 100%, 40% 97%, 35% 100%, 30% 97%, 25% 100%,
-    20% 97%, 15% 100%, 10% 97%, 5% 100%, 0% 97%
-  );
+  perspective: 1200px;
+  perspective-origin: 50% 60%;
 }
 .mt-gacha-pack[data-rarity="SSR"] .mt-gacha-pack-wrap {
-  filter: drop-shadow(0 12px 24px rgba(0,0,0,0.7))
-          drop-shadow(0 0 40px rgba(240,192,64,0.75));
+  filter: drop-shadow(0 0 40px rgba(240,192,64,0.75));
 }
 .mt-gacha-pack[data-rarity="SR"] .mt-gacha-pack-wrap {
-  filter: drop-shadow(0 12px 24px rgba(0,0,0,0.7))
-          drop-shadow(0 0 36px rgba(155,135,245,0.6));
+  filter: drop-shadow(0 0 36px rgba(155,135,245,0.6));
 }
 
-/* 上半紙袋（撕條、22%）— 圓筒型自然光影、不是直條紋 */
+/* 上半紙袋（撕條、22%）— 圓筒型自然光影、頂部鋸齒熱封邊（隨 flap 一起飛走） */
 .mt-gacha-pack-top {
   position: relative;
   flex: 0 0 22%;
   backface-visibility: hidden;       /* 捲過 90° 自然消失 */
   transform-style: preserve-3d;
   background:
-    /* 中央高光（圓筒亮帶）*/
     radial-gradient(ellipse 60% 200% at 50% 50%,
       rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 30%, transparent 60%),
-    /* 左側陰影 */
     radial-gradient(ellipse 35% 150% at 0% 50%,
       rgba(0,0,0,0.35) 0%, transparent 70%),
-    /* 右側陰影 */
     radial-gradient(ellipse 35% 150% at 100% 50%,
       rgba(0,0,0,0.4) 0%, transparent 70%),
-    /* 主漸層 */
     linear-gradient(150deg, #d44b3a 0%, #c0392b 50%, #8a2a1f 100%);
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
+  /* 鋸齒熱封邊（佔 top 高度 14% 的鋸齒）→ flap 飛走時鋸齒跟著飛 */
+  clip-path: polygon(
+    0% 14%, 5% 0%, 10% 14%, 15% 0%, 20% 14%, 25% 0%, 30% 14%, 35% 0%,
+    40% 14%, 45% 0%, 50% 14%, 55% 0%, 60% 14%, 65% 0%, 70% 14%, 75% 0%,
+    80% 14%, 85% 0%, 90% 14%, 95% 0%, 100% 14%,
+    100% 100%, 0% 100%
+  );
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.55));
 }
 .mt-gacha-pack-logo {
   font-size: 24px;       /* 上半變窄 → logo 縮小 */
@@ -1163,30 +1147,32 @@
       rgba(255,80,40,0.8) 0%, #ffd866 40%, #fff7c0 70%, transparent 100%);
 }
 
-/* 下半紙袋（主體、圓筒漸層光影、不死板）*/
+/* 下半紙袋（主體、圓筒漸層光影、底部鋸齒袋底）*/
 .mt-gacha-pack-bottom {
   position: relative; flex: 1;
   background:
-    /* 上方暗（下半的「天」較暗）*/
     radial-gradient(ellipse 120% 30% at 50% 0%,
       rgba(0,0,0,0.35) 0%, transparent 60%),
-    /* 中央橫向亮帶（圓筒高光）*/
     radial-gradient(ellipse 70% 50% at 50% 40%,
       rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 40%, transparent 70%),
-    /* 左邊圓筒暗邊 */
     radial-gradient(ellipse 30% 100% at 0% 50%,
       rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 25%, transparent 60%),
-    /* 右邊圓筒暗邊 */
     radial-gradient(ellipse 30% 100% at 100% 50%,
       rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 25%, transparent 60%),
-    /* 底部加深 */
     radial-gradient(ellipse 120% 25% at 50% 100%,
       rgba(0,0,0,0.4) 0%, transparent 60%),
-    /* 主底色 */
     linear-gradient(180deg, #c44132 0%, #c0392b 40%, #a83020 100%);
   display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
   color: #ffd866;
   padding: 14px 12px 22px;
+  /* 底部鋸齒袋底（撕線在上方乾淨切口、不要鋸齒）*/
+  clip-path: polygon(
+    0% 0%, 100% 0%,
+    100% 96%, 95% 100%, 90% 96%, 85% 100%, 80% 96%, 75% 100%, 70% 96%, 65% 100%,
+    60% 96%, 55% 100%, 50% 96%, 45% 100%, 40% 96%, 35% 100%, 30% 96%, 25% 100%,
+    20% 96%, 15% 100%, 10% 96%, 5% 100%, 0% 96%
+  );
+  filter: drop-shadow(0 8px 14px rgba(0,0,0,0.55));
 }
 /* 大 ⚽ logo — 移到上 1/3、不擋到字 */
 .mt-gacha-pack-bottom::before {
@@ -1221,14 +1207,16 @@
   text-shadow: 0 1px 0 #6a4500, 0 2px 4px rgba(0,0,0,0.6);
 }
 
-/* ── 即時拖曳撕開：只撕上半、從手指方向那角開始翹 ── */
-/* dir=+1 拉右 → 從左角翹起；dir=-1 拉左 → 從右角翹起 */
+/* ── 即時拖曳撕開：只撕上半、3D 從手指反向那角翹起（Z 軸捲動）── */
+/* dir=+1 拖右 → 支點右下、左上角往上翹（朝向 viewer）*/
+/* dir=-1 拖左 → 支點左下、右上角往上翹 */
 .mt-gacha-pack-top {
   transform:
-    rotateZ(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * -22deg))
+    rotateX(calc(var(--tear-progress, 0) * 30deg))
+    rotateY(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * -18deg))
+    translateZ(calc(var(--tear-progress, 0) * 10px))
     translateY(calc(var(--tear-progress, 0) * -8px));
   transition: transform 0.18s ease-out;
-  /* 撕的支點：dir=+1 origin 右、dir=-1 origin 左 */
   transform-origin: calc(50% + var(--tear-dir, 0) * 50%) bottom;
 }
 /* 下半不動（只撕上方）*/
@@ -1252,38 +1240,53 @@
   transition: none;     /* 拖曳中即時跟隨 */
 }
 
-/* 撕開 → 上半捲上去（rotateY 從支點側捲、50% 後淡出）*/
+/* 撕開 → 上半 3D 捲上去（rotateX 把上緣往觀眾翻 + rotateY 朝撕方向側傾） */
 .mt-gacha-pack.opening .mt-gacha-pack-top {
-  animation: mt-pack-tear-curl 1.0s cubic-bezier(0.4, 0, 0.6, 1) forwards;
-  /* transform-origin 已在 dragging 設定（dir=+1 origin 右、dir=-1 origin 左）*/
+  animation: mt-pack-tear-curl 1.0s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
 }
 .mt-gacha-pack.opening .mt-gacha-pack-perforation {
   animation: mt-pack-perforation-fade 0.4s ease-out forwards;
 }
-/* 捲上去動畫：rotateY 從支點側往畫面內捲、捲到 ~50% 淡出 */
+/* 3D 捲動：rotateX 讓上緣翻向觀眾、rotateY 讓自由側更高、translateZ 拉前景 */
 @keyframes mt-pack-tear-curl {
   0%   {
-    transform: rotateY(0deg) translateY(0);
+    transform: rotateX(0) rotateY(0) translateZ(0) translateY(0);
     opacity: 1;
     filter: brightness(1);
   }
-  30%  {
-    transform: rotateY(calc(var(--tear-dir, 1) * 55deg)) translateY(-6px);
+  25%  {
+    transform:
+      rotateX(45deg)
+      rotateY(calc(var(--tear-dir, 1) * -22deg))
+      translateZ(20px)
+      translateY(-12px);
     opacity: 1;
-    filter: brightness(1.1);
+    filter: brightness(1.08);
   }
   50%  {
-    transform: rotateY(calc(var(--tear-dir, 1) * 100deg)) translateY(-14px);
+    transform:
+      rotateX(95deg)
+      rotateY(calc(var(--tear-dir, 1) * -45deg))
+      translateZ(38px)
+      translateY(-28px);
     opacity: 0.85;
-    filter: brightness(0.85);
+    filter: brightness(0.9);
   }
   75%  {
-    transform: rotateY(calc(var(--tear-dir, 1) * 145deg)) translateY(-26px);
-    opacity: 0.3;
-    filter: brightness(0.6);
+    transform:
+      rotateX(140deg)
+      rotateY(calc(var(--tear-dir, 1) * -65deg))
+      translateZ(36px)
+      translateY(-48px);
+    opacity: 0.35;
+    filter: brightness(0.65);
   }
   100% {
-    transform: rotateY(calc(var(--tear-dir, 1) * 170deg)) translateY(-40px);
+    transform:
+      rotateX(175deg)
+      rotateY(calc(var(--tear-dir, 1) * -80deg))
+      translateZ(20px)
+      translateY(-70px);
     opacity: 0;
     filter: brightness(0.5);
   }
