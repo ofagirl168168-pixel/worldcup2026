@@ -3639,12 +3639,14 @@
         <div class="mt-train-info-section">
           <div class="mt-train-info-q">✨ 氣場有什麼用？</div>
           <div class="mt-train-info-a">
-            兩種加成：<br>
-            ① <b>射門穩定</b>：氣場 80 比 50 射門精準度多 +3.6%<br>
-            ② <b>🔥 狂熱模式</b>：氣場越高、比賽中越容易觸發「狂熱模式」<br>
-            &nbsp;&nbsp;&nbsp;氣場 50：5% 觸發機率 / 80：17% / 99：30%<br>
-            &nbsp;&nbsp;&nbsp;狂熱持續 10 秒、團隊射門 +15%、對方射門 -10%<br>
-            &nbsp;&nbsp;&nbsp;cd 30 秒、雙方獨立計算
+            <b>① 射門穩定</b>：氣場 80 比 50 射門精準度多 +3.6%<br>
+            <b>② 🔥 個人狂熱模式</b>（開羅式）：<br>
+            &nbsp;&nbsp;每球員有獨立「氣場量表」、比賽中自動累積<br>
+            &nbsp;&nbsp;氣場越高 → 累積越快（50:1× / 80:1.6× / 99:2×）<br>
+            &nbsp;&nbsp;進球 +35、鏟到 +12、量表滿 100 → 進狂熱<br>
+            &nbsp;&nbsp;狂熱期間：<b>該球員所有屬性 +25%</b>、持續 10 秒<br>
+            &nbsp;&nbsp;頭頂金光環 + 場上方跳「XX 狂熱中！」<br>
+            &nbsp;&nbsp;結束後 cd 25 秒、養王牌靠他帶比賽
           </div>
         </div>
 

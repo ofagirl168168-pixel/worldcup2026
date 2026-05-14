@@ -363,6 +363,28 @@
           ctx.stroke();
         }
       }
+      // 個人狂熱光環（球員腳下發光 + 上方光暈）
+      if (p.fever > 0) {
+        const pulse = 0.7 + Math.sin(state.frame / 4) * 0.3;
+        // 腳下金色發光圈
+        const grd = ctx.createRadialGradient(cx, cy + SPRITE_DRAW_H / 2 - 1, 0, cx, cy + SPRITE_DRAW_H / 2 - 1, 14);
+        grd.addColorStop(0, `rgba(255,213,74,${0.75 * pulse})`);
+        grd.addColorStop(0.5, `rgba(255,165,30,${0.45 * pulse})`);
+        grd.addColorStop(1, 'rgba(255,140,0,0)');
+        ctx.fillStyle = grd;
+        ctx.fillRect(cx - 14, cy + SPRITE_DRAW_H / 2 - 8, 28, 14);
+        // 上方光點向上飄（每幀 3 個）
+        for (let s = 0; s < 3; s++) {
+          const t = ((state.frame + i * 5 + s * 17) % 36) / 36;
+          const sx = cx + Math.sin(t * Math.PI * 2 + s) * 5;
+          const sy = cy - SPRITE_DRAW_H / 2 + 4 - t * 10;
+          ctx.fillStyle = `rgba(255,235,128,${1 - t})`;
+          ctx.beginPath();
+          ctx.arc(sx, sy, 1.3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
       // 腳下影子：控球者用半透明白小點（不搶戲）、其他用黑影
       if (isPos) {
         ctx.fillStyle = 'rgba(255,255,255,0.65)';
@@ -462,17 +484,92 @@
           ctx.fill();
         }
       }
+
+      // 被搶球者頭頂「!」愣神特效（30 幀）
+      if (p._stunUntil && state.frame < p._stunUntil) {
+        const stunAge = state.frame - (p._stunUntil - 30);
+        const wig = Math.sin(stunAge / 3) * 1.5;
+        const sx = cx + wig;
+        const sy = cy - SPRITE_DRAW_H / 2 - 4;
+        ctx.fillStyle = '#ffeb3b';
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.lineWidth = 1.5;
+        ctx.font = 'bold 14px Impact, Arial Black';
+        ctx.textAlign = 'center';
+        ctx.strokeText('!', sx, sy);
+        ctx.fillText('!', sx, sy);
+        ctx.textAlign = 'start';
+      }
     });
 
+    // 鏟球成功閃光 + 「搶到!」文字（持續 18 幀）
+    if (state.tackleFlash && state.frame < state.tackleFlash.endFrame) {
+      const tf = state.tackleFlash;
+      const age = state.frame - tf.startFrame;
+      const t = age / 18;
+      const cx = tf.x * PITCH_W;
+      const cy = tf.y * PITCH_H;
+      // 放射狀爆炸線（8 條、向外發散）
+      ctx.strokeStyle = `rgba(255,213,74,${1 - t})`;
+      ctx.lineWidth = 2;
+      const radius = 6 + t * 14;
+      for (let i = 0; i < 8; i++) {
+        const ang = (i / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(ang) * (radius - 4), cy + Math.sin(ang) * (radius - 4));
+        ctx.lineTo(cx + Math.cos(ang) * radius, cy + Math.sin(ang) * radius);
+        ctx.stroke();
+      }
+      // 中央白色閃光
+      ctx.fillStyle = `rgba(255,255,255,${0.8 * (1 - t)})`;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5 - t * 3, 0, Math.PI * 2);
+      ctx.fill();
+      // 「搶到!」文字向上飄
+      const textY = cy - 10 - t * 12;
+      const textScale = 1 + (1 - t) * 0.3;
+      ctx.save();
+      ctx.translate(cx, textY);
+      ctx.scale(textScale, textScale);
+      ctx.font = 'bold 11px Impact, Arial Black';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillText(tf.text || '搶到!', 1, 1);
+      ctx.fillText(tf.text || '搶到!', -1, 1);
+      ctx.fillStyle = '#ffd54a';
+      ctx.fillText(tf.text || '搶到!', 0, 0);
+      ctx.restore();
+      ctx.textAlign = 'start';
+    }
+
     // 球（帶陰影）— 視覺 y offset 9px 讓球在球員腳邊（之前剛好在胸口）
+    // 鏟球後球的小彈跳：從原位置滑到新持球者（10 幀過渡）
     const BALL_VISUAL_Y_OFFSET = 9;
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0,0,0,0.45)';
-    ctx.shadowBlur = 5;
-    ctx.beginPath();
-    ctx.arc(ball.x * PITCH_W, ball.y * PITCH_H + BALL_VISUAL_Y_OFFSET, 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
+    let ballRenderX = ball.x, ballRenderY = ball.y;
+    if (state.ballPopOff && state.frame < state.ballPopOff.endFrame) {
+      const po = state.ballPopOff;
+      const t = (state.frame - po.startFrame) / (po.endFrame - po.startFrame);
+      const eased = 1 - Math.pow(1 - t, 2);
+      ballRenderX = po.fromX + (po.toX - po.fromX) * eased;
+      ballRenderY = po.fromY + (po.toY - po.fromY) * eased;
+      // 球彈起的弧線（中間時最高）
+      const hop = Math.sin(t * Math.PI) * 6;
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0,0,0,0.45)';
+      ctx.shadowBlur = 5;
+      ctx.beginPath();
+      ctx.arc(ballRenderX * PITCH_W, ballRenderY * PITCH_H + BALL_VISUAL_Y_OFFSET - hop, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    } else {
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0,0,0,0.45)';
+      ctx.shadowBlur = 5;
+      ctx.beginPath();
+      ctx.arc(ball.x * PITCH_W, ball.y * PITCH_H + BALL_VISUAL_Y_OFFSET, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
 
     // 還原鏡頭變換
     ctx.restore();
@@ -597,21 +694,23 @@
     }
   }
 
-  // 狂熱模式 banner — 氣場觸發、團隊 buff 10 秒
-  function _triggerFeverBanner(ui, side, teamName) {
+  // 個人狂熱 banner — 球員進入狂熱、3 秒後 fade out
+  function _triggerFeverBanner(ui, side, playerName) {
     if (!ui.feverBanner) return;
-    ui.feverTeam.textContent = (teamName || (side === 'h' ? 'HOME' : 'AWAY')) + ' 進入狂熱';
+    ui.feverTeam.textContent = (playerName || '?') + ' 狂熱中！';
     ui.feverBanner.dataset.side = side;
     ui.feverBanner.hidden = false;
     void ui.feverBanner.offsetWidth;
+    ui.feverBanner.classList.remove('msim-fever-show');
+    void ui.feverBanner.offsetWidth;
     ui.feverBanner.classList.add('msim-fever-show');
-    // 10 秒後自動 hide（跟 fever 持續時間同步）
+    // 3 秒後 fade（個人 banner 不需要持續 10 秒 — 給人看到即可）
     setTimeout(() => {
       if (ui.feverBanner) {
         ui.feverBanner.classList.remove('msim-fever-show');
         setTimeout(() => { if (ui.feverBanner) ui.feverBanner.hidden = true; }, 400);
       }
-    }, 10000);
+    }, 3000);
   }
 
   // 全場結束 banner（HomeTeam X-Y AwayTeam + 贏家標籤）— 跟 GOAL 同風格、in-canvas 顯示
@@ -837,9 +936,8 @@
       halftimeDone: false,
       lastActionFrame: 0,
       players, ball,
-      // 狂熱模式：氣場觸發、團隊全屬性 +15%、持續 600 frames (≈10s)
-      fever: { h: 0, a: 0 },   // > 0 表示該隊狂熱中，每幀 -1
-      feverCooldown: { h: 0, a: 0 },
+      // 個人狂熱模式：每球員 feverGauge 0~100、滿了進狂熱（個人 +25% 屬性、持續 10s）
+      // 球員物件上會有：feverGauge (0~100)、fever (剩餘 frames、>0 = 狂熱中)、feverShownAt (顯示 banner 用)
       // 追焦鏡頭：起始置於球場中央，每 frame 朝球位置 lerp
       camera: { x: (PITCH_W - VIEW_W) / 2, y: (PITCH_H - VIEW_H) / 2 },
       get possessorIdx() { return this._possessorIdx; },
@@ -1008,16 +1106,18 @@
       const shooter = players[state.possessorIdx];
       const defTeam = state.possession === 'h' ? 'a' : 'h';
       const gk = players.find(p => p.team === defTeam && p.role === 'GK');
-      const shooterAtk = shooter?.stats?.attack ?? getTeam(state.possession).radar.attack;
-      const gkSave     = gk?.stats?.goalkeeping ?? getTeam(defTeam).radar.defense;
+      // 個人狂熱加成：射手 + 25%、守門員狂熱 +20% 撲球
+      const shooterFevered = shooter && shooter.fever > 0;
+      const gkFevered = gk && gk.fever > 0;
+      const shooterAtk = (shooter?.stats?.attack ?? getTeam(state.possession).radar.attack)
+                       * (shooterFevered ? 1.25 : 1);
+      const gkSave     = (gk?.stats?.goalkeeping ?? getTeam(defTeam).radar.defense)
+                       * (gkFevered ? 1.20 : 1);
       // 氣場加成：高氣場 = 大場面更穩 = 射門精準度提升（最多 +12%）
       const shooterAura = shooter?.stats?.aura ?? getTeam(state.possession).radar.aura ?? 50;
       const auraBonus  = (shooterAura - 50) / 100 * 0.12;
-      // 狂熱模式：進攻方狂熱 → 射門 +15%；防守方狂熱 → 對方射門 -10%
-      const feverBonus = (state.fever[state.possession] > 0 ? 0.15 : 0) -
-                         (state.fever[defTeam] > 0 ? 0.10 : 0);
       const goalProb = Math.max(0.10, Math.min(0.88,
-        ((shooterAtk - gkSave * 0.55) / 100) * 0.78 + auraBonus + feverBonus
+        ((shooterAtk - gkSave * 0.55) / 100) * 0.78 + auraBonus
       ));
       const isGoal = rng() < goalProb;
       if (isGoal) {
@@ -1032,6 +1132,10 @@
         // 進球儀式：banner + 彩花 + 視角 zoom
         const scoringTeam = state.possession === 'h' ? home : away;
         _triggerGoalCelebration(ui, scoringTeam.nameCN, state.possession);
+        // 進球者 fever gauge +35（接近滿）
+        if (shooter && shooter.fever === 0 && shooter.feverCooldown === 0) {
+          shooter.feverGauge = Math.min(100, (shooter.feverGauge || 0) + 35);
+        }
       } else {
         // 被撲 / 沒中 → 對方球門員帶球
         const newTeam = state.possession === 'h' ? 'a' : 'h';
@@ -1107,9 +1211,12 @@
         const near = findNearestOpponent(pos);
         if (near.player && near.dist < ROLE[near.player.role].tackleRange + 0.005) {
           // 個人化：搶斷者個人 defense vs 持球者個人 midfield（控球能力）
-          const indDef = near.player.stats?.defense ?? defStats.defense;
-          const indMid = pos.stats?.midfield ?? atkStats.midfield;
-          const indSpd = near.player.stats?.speed ?? defStats.speed ?? 70;
+          // 狂熱中：搶斷者 +25% defense、持球者 +25% midfield（更難搶）
+          const tFever = near.player.fever > 0 ? 1.25 : 1;
+          const pFever = pos.fever > 0 ? 1.25 : 1;
+          const indDef = (near.player.stats?.defense ?? defStats.defense) * tFever;
+          const indMid = (pos.stats?.midfield ?? atkStats.midfield) * pFever;
+          const indSpd = (near.player.stats?.speed ?? defStats.speed ?? 70) * tFever;
           // 體力疲勞影響：後半場 stamina 低的後衛 defense 效力下降 + 鏟過球的人更累
           const gtf = state.frame / TOTAL_FRAMES;
           const tStamina = near.player.stats?.stamina ?? 75;
@@ -1133,6 +1240,25 @@
             near.player._tackleDirY /= tMag;
             // 鏟球額外消耗體力（每次 +0.05、stamina 越差影響越久）
             near.player._tackleFatigue = (near.player._tackleFatigue || 0) + 0.05;
+            // ── 鏟球視覺加強：被搶者頭上「!」+ 鏟球點閃光 + 球小幅彈走 ──
+            pos._stunUntil = state.frame + 30;          // 被搶者愣 30 幀（頭上「!」）
+            state.tackleFlash = {                        // 鏟球點閃光
+              x: ball.x, y: ball.y,
+              startFrame: state.frame,
+              endFrame: state.frame + 18,
+              text: '搶到!',
+            };
+            // 球從原持球者位置彈到鏟球者位置（不再瞬移、有過渡）
+            state.ballPopOff = {
+              fromX: pos.x, fromY: pos.y,
+              toX: near.player.x, toY: near.player.y,
+              startFrame: state.frame,
+              endFrame: state.frame + 10,
+            };
+            // 鏟球者 fever gauge +12（成功鏟球的爽感累積）
+            if (near.player.fever === 0 && near.player.feverCooldown === 0) {
+              near.player.feverGauge = Math.min(100, (near.player.feverGauge || 0) + 12);
+            }
             // 換邊 → 清最近經手傳球者記錄、記錄換邊時機讓 movePlayers 降速
             state.recentPassers = [];
             state.recentPassersSet = new Set();
@@ -1426,27 +1552,34 @@
         return;
       }
 
-      // ── 狂熱模式倒計 + 觸發 ──
-      if (state.fever.h > 0) state.fever.h--;
-      if (state.fever.a > 0) state.fever.a--;
-      if (state.feverCooldown.h > 0) state.feverCooldown.h--;
-      if (state.feverCooldown.a > 0) state.feverCooldown.a--;
-      // 每 5 秒（300 frames）roll 一次氣場觸發狂熱
-      if (state.frame > 0 && state.frame % 300 === 0) {
-        ['h', 'a'].forEach(side => {
-          if (state.fever[side] > 0 || state.feverCooldown[side] > 0) return;
-          const aura = getTeam(side).radar.aura || 50;
-          // 50 氣場 5% 機率、80 氣場 17%、99 氣場 30%
-          const triggerProb = Math.max(0, (aura - 40) / 200);
-          if (rng() < triggerProb) {
-            state.fever[side] = Math.round(FPS * 10);   // 持續 10 秒
-            state.feverCooldown[side] = Math.round(FPS * 30);  // 30 秒 cd
+      // ── 個人狂熱模式：每球員氣場累積 gauge、滿了進個人狂熱 ──
+      const FEVER_DURATION = Math.round(FPS * 10);  // 10 秒
+      const FEVER_BASE_FILL = 0.05;                 // 每幀基礎累積（aura 50 約 50 秒滿）
+      players.forEach((p, i) => {
+        if (p.fever > 0) {
+          p.fever--;
+          // 狂熱結束 → gauge 歸 0、進入 cooldown（避免立刻又滿）
+          if (p.fever === 0) {
+            p.feverGauge = 0;
+            p.feverCooldown = Math.round(FPS * 25);
+          }
+        } else if (p.feverCooldown > 0) {
+          p.feverCooldown--;
+        } else {
+          // 累積 gauge：aura 越高累積越快（50→1×、80→1.6×、99→2.0×）
+          const pAura = p.stats?.aura ?? 50;
+          const auraSpeed = 0.4 + (pAura / 100) * 1.2;
+          p.feverGauge = Math.min(100, (p.feverGauge || 0) + FEVER_BASE_FILL * auraSpeed);
+          // 滿了 → 進狂熱
+          if (p.feverGauge >= 100) {
+            p.fever = FEVER_DURATION;
+            p.feverShownAt = state.frame;
             if (typeof _triggerFeverBanner === 'function') {
-              _triggerFeverBanner(ui, side, getTeam(side).nameCN);
+              _triggerFeverBanner(ui, p.team, p.name || (p.team === 'h' ? '我方球員' : '對方球員'));
             }
           }
-        });
-      }
+        }
+      });
 
       const gameMin = (state.frame / TOTAL_FRAMES) * MATCH_MINUTES;
       const gameMinInt = Math.floor(gameMin);
