@@ -1661,6 +1661,8 @@
             ? await window.MyTeam.drawCoach(cnt)
             : await window.MyTeam.drawCoachWithGems(cnt);
           await window.MyTeam.refresh?.();
+          // 自動把第一張高稀有度教練指派為主教練（如果還沒主）+ 補上助教
+          await _autoAssignNewCoaches(res?.coaches || []);
           _showCoachDrawResult(res?.coaches || res || []);
         } catch (e) {
           const msg = String(e.message || e);
@@ -1742,6 +1744,35 @@
       return `${attrCN[value.attr] || value.attr} +${Math.round(value.pct * 100)}%`;
     }
     return trait;
+  }
+
+  // 抽完教練 → 自動指派到空 slot（主教練優先 SSR > SR > R）
+  async function _autoAssignNewCoaches(drawnCoaches) {
+    if (!Array.isArray(drawnCoaches) || drawnCoaches.length === 0) return;
+    const team = window.MyTeam.getCached();
+    if (!team) return;
+    // 按稀有度排序新抽的教練
+    const rarityRank = { SSR: 0, SR: 1, R: 2 };
+    const sorted = [...drawnCoaches].sort((a, b) =>
+      (rarityRank[a.rarity] ?? 9) - (rarityRank[b.rarity] ?? 9));
+    // 找空 slot 並依序指派
+    const slots = [
+      { id: 'head',    needsAssign: !team.active_coach_id },
+      { id: 'assist1', needsAssign: !team.assist_coach_id_1 },
+      { id: 'assist2', needsAssign: !team.assist_coach_id_2 },
+    ].filter(s => s.needsAssign);
+    if (slots.length === 0) return;
+    for (let i = 0; i < Math.min(slots.length, sorted.length); i++) {
+      const ucid = sorted[i].user_coach_id;
+      if (!ucid) continue;
+      try {
+        await window.DB.rpc('assign_coach_role', {
+          p_user_coach_id: ucid,
+          p_role: slots[i].id,
+        });
+      } catch (e) { console.warn('auto-assign failed', e); }
+    }
+    await window.MyTeam.refresh?.();
   }
 
   async function _fetchUserCoaches() {
