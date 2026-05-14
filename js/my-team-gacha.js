@@ -239,7 +239,6 @@
               <div class="mt-gacha-pack-top-fold">
                 <div class="mt-gacha-pack-logo">⚽</div>
                 <div class="mt-gacha-pack-stripe"></div>
-                <div class="mt-gacha-pack-shine"></div>
               </div>
             </div>
             <div class="mt-gacha-pack-perforation">
@@ -250,6 +249,8 @@
               <div class="mt-gacha-pack-label">DRAW PACK</div>
               <div class="mt-gacha-pack-count">${cards.length} CARDS</div>
             </div>
+            <!-- 整包覆蓋的橫掃光（永遠在播）-->
+            <div class="mt-gacha-pack-shine"></div>
           </div>
           <!-- 包裝內部、撕開後可見的卡背 -->
           <div class="mt-gacha-pack-inside">

@@ -1109,19 +1109,19 @@
   opacity: 0.4;
   z-index: 1;
 }
+/* 整包橫掃光：永遠在播、覆蓋整包（不只上半）*/
 .mt-gacha-pack-shine {
   position: absolute; inset: 0;
   background: linear-gradient(115deg,
     transparent 30%,
-    rgba(255,255,255,0.25) 48%,
-    rgba(255,255,255,0.4) 50%,
-    rgba(255,255,255,0.25) 52%,
+    rgba(255,255,255,0.18) 48%,
+    rgba(255,255,255,0.32) 50%,
+    rgba(255,255,255,0.18) 52%,
     transparent 70%);
   pointer-events: none;
-  z-index: 3;
-}
-.mt-gacha-pack.hovering .mt-gacha-pack-shine {
-  animation: mt-pack-shine 1.4s ease-in-out infinite;
+  z-index: 4;
+  /* clip-path 跟 bottom 一致、確保光不會跑出包裝外面 */
+  animation: mt-pack-shine 2.6s ease-in-out infinite;
 }
 
 /* 撕線（金邊穿孔 + 立體浮雕、隨拖曳進度發光）*/
@@ -1410,25 +1410,11 @@
   font-size: 48px; opacity: 0.9; position: relative; z-index: 2;
 }
 
-/* 卡面光澤（hover 才出現、橫過卡面）*/
-.mt-gacha-pack-shine {
-  position: absolute; inset: 0;
-  background: linear-gradient(115deg,
-    transparent 25%,
-    rgba(255,255,255,0.05) 40%,
-    rgba(255,255,255,0.35) 50%,
-    rgba(255,255,255,0.05) 60%,
-    transparent 75%);
-  transform: translateX(-100%);
-  pointer-events: none;
-  z-index: 4;
-}
-.mt-gacha-pack.hovering .mt-gacha-pack-shine {
-  animation: mt-pack-shine 1.4s ease-in-out infinite;
-}
+/* 橫掃光動畫（行 1112-1127 已定義 .mt-gacha-pack-shine 樣式、這邊只留 keyframes）*/
 @keyframes mt-pack-shine {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(120%); }
+  0%   { transform: translateX(-110%); }
+  60%  { transform: translateX(110%); }
+  100% { transform: translateX(110%); }
 }
 
 /* 極光環（hover 強化）*/
