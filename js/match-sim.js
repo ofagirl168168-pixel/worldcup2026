@@ -307,15 +307,17 @@
         frame = Math.min(2, Math.floor(tackleAge / 8));
       } else if (state.phase === 'fulltime') {
         // 全場結束：先播動畫到最有戲的那格、然後停住（不要一直 loop）
+        // 平手：兩隊都拍手歡呼（一場好比賽、互敬）→ 都用 row 5
+        // 有輸贏：贏方歡呼 row 5、輸方懊惱 row 6
         if (state.fulltimeWinner === 'd') {
-          dirRow = 0; frame = 1;
+          dirRow = 5;
         } else {
           dirRow = (p.team === state.fulltimeWinner) ? 5 : 6;
-          // 0~700ms 播 0→1→2、之後 hold 在 frame 2（歡呼最高 / 跪地最低）
-          const elapsed = performance.now() - (state.fulltimeStart || performance.now());
-          if (elapsed < 700) frame = Math.min(2, Math.floor(elapsed / 240));
-          else frame = 2;
         }
+        // 0~700ms 播 0→1→2、之後 hold 在 frame 2（歡呼最高 / 跪地最低）
+        const elapsed = performance.now() - (state.fulltimeStart || performance.now());
+        if (elapsed < 700) frame = Math.min(2, Math.floor(elapsed / 240));
+        else frame = 2;
       } else if (state.phase === 'celebrate' && state.pauseFrames > 0) {
         // 得分隊歡呼 (row 5)、敵隊懊惱 (row 6)
         dirRow = (p.team === state.flashTeam) ? 5 : 6;
@@ -430,23 +432,23 @@
         ctx.fillRect(bx, by, barW * remaining, barH);
       }
 
-      // 疲勞汗珠：fatigue > 0.18 開始顯示、越累越多
+      // 疲勞汗珠：fatigue > 0.18 開始顯示、越累越多（直接蓋在額頭/頭頂上）
       if (fatigue > 0.18 && p.role !== 'GK') {
         const intensity = Math.min(1, (fatigue - 0.18) / 0.30);
-        ctx.fillStyle = `rgba(140,200,255,${0.55 + intensity * 0.4})`;
-        const headY = cy - SPRITE_DRAW_H / 2 + 3;
-        // 2 顆汗珠左右各一、會微晃
-        const wig = Math.sin((state.frame + i * 7) / 8) * 1.2;
+        ctx.fillStyle = `rgba(140,200,255,${0.7 + intensity * 0.3})`;
+        // 額頭位置：sprite top + 7px（直接在頭髮/額頭上、不懸空）
+        const headY = cy - SPRITE_DRAW_H / 2 + 7;
+        const wig = Math.sin((state.frame + i * 7) / 8) * 1.0;
         ctx.beginPath();
-        ctx.ellipse(cx - 5 + wig, headY, 1.1, 1.9, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx - 4 + wig, headY, 1.1, 1.8, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.ellipse(cx + 5 - wig, headY + 1, 1.1, 1.9, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx + 4 - wig, headY + 1, 1.1, 1.8, 0, 0, Math.PI * 2);
         ctx.fill();
-        // 疲勞重時加第 3 顆
+        // 疲勞重時加第 3 顆中間
         if (intensity > 0.6) {
           ctx.beginPath();
-          ctx.ellipse(cx + wig * 0.5, headY - 2, 1, 1.6, 0, 0, Math.PI * 2);
+          ctx.ellipse(cx + wig * 0.5, headY + 2, 1, 1.5, 0, 0, Math.PI * 2);
           ctx.fill();
         }
       }
