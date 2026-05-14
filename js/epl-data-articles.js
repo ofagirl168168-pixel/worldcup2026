@@ -3215,9 +3215,9 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <table style="width:100%;border-collapse:collapse;margin:12px 0">
 <tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">項目</th><th style="padding:8px">曼城</th><th style="padding:8px">水晶宮</th></tr>
-<tr style="background:#f8f8f8"><td style="padding:8px">控球率</td><td style="padding:8px">68%</td><td style="padding:8px">32%</td></tr>
-<tr><td style="padding:8px">射門（射正）</td><td style="padding:8px">15（7）</td><td style="padding:8px">4（1）</td></tr>
-<tr style="background:#f8f8f8"><td style="padding:8px">預期進球 xG</td><td style="padding:8px">2.4</td><td style="padding:8px">0.3</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">控球率</td><td style="padding:8px">72%</td><td style="padding:8px">28%</td></tr>
+<tr><td style="padding:8px">射門（射正）</td><td style="padding:8px">15（4）</td><td style="padding:8px">6（2）</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">預期進球 xG</td><td style="padding:8px">2.03</td><td style="padding:8px">0.39</td></tr>
 </table>
 
 <h3>Foden 的百場里程碑</h3>
@@ -3236,7 +3236,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>水晶宮：無心戀戰</h3>
 
-<p>水晶宮的比賽強度明顯不高——Glasner 也做了大量輪換，因為他們月底還有<b>歐協聯決賽</b>要踢。Palace 本季英超排名第 15，保級已無憂但歐戰也無望，歐協聯才是他們的重心。全場僅 1 次射正說明了一切。</p>
+<p>水晶宮的比賽強度明顯不高——Glasner 也做了大量輪換，因為他們月底還有<b>歐協聯決賽</b>要踢。Palace 本季英超排名第 15，保級已無憂但歐戰也無望，歐協聯才是他們的重心。全場僅 2 次射正說明了一切。</p>
 
 <h3>下一場</h3>
 
