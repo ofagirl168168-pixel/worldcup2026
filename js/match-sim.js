@@ -414,13 +414,14 @@
         ctx.fill();
       }
 
-      // 體力疲勞表現：用 gameTimeFrac × stamina 算當前疲勞度
+      // 體力疲勞表現：gameTimeFrac × stamina 算當前疲勞度 + 鏟球額外消耗
       const gtf = state.frame / TOTAL_FRAMES;
       const pStamina = p.stats?.stamina ?? 75;
-      const fatigue = gtf * Math.max(0.1, 0.55 - pStamina / 250);
+      const fatigue = gtf * Math.max(0.1, 0.55 - pStamina / 250) + (p._tackleFatigue || 0);
 
-      // 持球者：頭頂體力條
-      if (isPos && p.role !== 'GK') {
+      // 頭頂體力條：持球者 + 正在鏟球的人都顯示
+      const showStaminaBar = (isPos || tackleActive) && p.role !== 'GK';
+      if (showStaminaBar) {
         const remaining = Math.max(0, Math.min(1, 1 - fatigue));
         const barW = 18, barH = 3;
         const bx = cx - barW / 2;
@@ -432,25 +433,27 @@
         ctx.fillRect(bx, by, barW * remaining, barH);
       }
 
-      // 疲勞汗珠：fatigue > 0.18 起、依疲勞度漸進 1→2→3 滴、全部在右額（同一側）
+      // 疲勞汗珠：fatigue > 0.18 起、依疲勞度漸進 1→2→3 滴
+      // 顯示在「頭髮側」= 跟進攻方向相反那側（home 攻右、髮在左 → sweat 左）
       if (fatigue > 0.18 && p.role !== 'GK') {
+        const sweatSign = p.team === 'h' ? -1 : 1;  // -1 = 左側、+1 = 右側
         ctx.fillStyle = `rgba(140,200,255,${0.85})`;
         const headY = cy - SPRITE_DRAW_H / 2 + 7;
         const wig = Math.sin((state.frame + i * 7) / 8) * 0.8;
-        // 第 1 滴（fatigue > 0.18）：右額正下
+        // 第 1 滴
         ctx.beginPath();
-        ctx.ellipse(cx + 4 + wig, headY + 2, 1.1, 1.8, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx + sweatSign * 4 + wig * sweatSign, headY + 2, 1.1, 1.8, 0, 0, Math.PI * 2);
         ctx.fill();
-        // 第 2 滴（fatigue > 0.32）：右額上方
+        // 第 2 滴（fatigue > 0.32）
         if (fatigue > 0.32) {
           ctx.beginPath();
-          ctx.ellipse(cx + 5 + wig * 0.7, headY - 2, 1, 1.6, 0, 0, Math.PI * 2);
+          ctx.ellipse(cx + sweatSign * 5 + wig * 0.7 * sweatSign, headY - 2, 1, 1.6, 0, 0, Math.PI * 2);
           ctx.fill();
         }
-        // 第 3 滴（fatigue > 0.48）：再上方更小
+        // 第 3 滴（fatigue > 0.48）
         if (fatigue > 0.48) {
           ctx.beginPath();
-          ctx.ellipse(cx + 6 + wig * 0.4, headY - 6, 0.9, 1.4, 0, 0, Math.PI * 2);
+          ctx.ellipse(cx + sweatSign * 6 + wig * 0.4 * sweatSign, headY - 6, 0.9, 1.4, 0, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -1010,11 +1013,12 @@
           const indDef = near.player.stats?.defense ?? defStats.defense;
           const indMid = pos.stats?.midfield ?? atkStats.midfield;
           const indSpd = near.player.stats?.speed ?? defStats.speed ?? 70;
-          // 體力疲勞影響：後半場 stamina 低的後衛 defense 效力下降
+          // 體力疲勞影響：後半場 stamina 低的後衛 defense 效力下降 + 鏟過球的人更累
           const gtf = state.frame / TOTAL_FRAMES;
           const tStamina = near.player.stats?.stamina ?? 75;
-          const tackleFatigue = 1 - gtf * Math.max(0.1, 0.4 - tStamina / 250);
-          let tackleChance = ((indDef / 100) * 0.04 - (indMid / 100) * 0.02 + (indSpd / 100) * 0.012) * tackleFatigue;
+          const tackleFatigueMult = Math.max(0.55,
+            1 - gtf * Math.max(0.1, 0.4 - tStamina / 250) - (near.player._tackleFatigue || 0));
+          let tackleChance = ((indDef / 100) * 0.04 - (indMid / 100) * 0.02 + (indSpd / 100) * 0.012) * tackleFatigueMult;
           if (distToGoal < 0.22) tackleChance *= 1.3;
           tackleChance = Math.max(0.005, Math.min(0.09, tackleChance));
           if (rng() < tackleChance) {
@@ -1023,7 +1027,6 @@
             state.phase = 'dribble';
             state.lastActionFrame = state.frame;
             // 鏟球視覺：用 row 7（thrust）24 幀（~0.8 秒、明顯一點）
-            // 記錄滑行方向：朝持球者方向、視覺上往那邊滑
             near.player._tackleStart = state.frame;
             near.player._tackleVisualUntil = state.frame + 24;
             near.player._tackleDirX = pos.x - near.player.x;
@@ -1031,6 +1034,8 @@
             const tMag = Math.hypot(near.player._tackleDirX, near.player._tackleDirY) || 1;
             near.player._tackleDirX /= tMag;
             near.player._tackleDirY /= tMag;
+            // 鏟球額外消耗體力（每次 +0.05、stamina 越差影響越久）
+            near.player._tackleFatigue = (near.player._tackleFatigue || 0) + 0.05;
             // 換邊 → 清最近經手傳球者記錄、記錄換邊時機讓 movePlayers 降速
             state.recentPassers = [];
             state.recentPassersSet = new Set();
@@ -1081,19 +1086,14 @@
       const ATK_LIMIT_A = 0.12;
 
       // ★ 核心：tx/ty 不再是「絕對目標」，而是「每幀只能往理想位置走 naturalStep 距離」
-      // 這樣無論理想位置怎麼跳（陣型變、攻防換、ball 移動），tx 永遠靠近 p.x，
-      // movePlayers 不會偵測到大距離 → 不會 max-step 暴衝
       // sprintMult：rare 情況才用 — 散球追球 1.3、持球者 role.sprint × 1.1
-      // 體力疲勞：後半場依個人 stamina 拉低速度（stamina 95 → 後半場慢 7%、
-      //   stamina 60 → 後半場慢 25%、stamina 30 → 後半場慢 38%）
+      // 體力疲勞：後半場依個人 stamina 拉低速度 + 鏟球額外消耗
       const gameTimeFrac = Math.min(1, state.frame / TOTAL_FRAMES);
       const setIdealTarget = (p, idealTx, idealTy, sprintMult = 1) => {
         const speedMult = (p.role !== 'GK' && p.stats?.speed) ? p.stats.speed / 80 : 1;
-        // 疲勞 fatigueMult：(0~1) × max(0.4, 0.55 + stamina/220)
-        //   stamina 99 → fatigue 0~0.55 → mult 1.0~0.45
-        //   stamina 50 → fatigue 0~0.77 → mult 1.0~0.23
         const staminaScore = (p.stats?.stamina ?? 75);
-        const fatigueImpact = gameTimeFrac * Math.max(0.1, 0.55 - staminaScore / 250);
+        const fatigueImpact = gameTimeFrac * Math.max(0.1, 0.55 - staminaScore / 250)
+                            + (p._tackleFatigue || 0);
         const fatigueMult = Math.max(0.55, 1 - fatigueImpact);
         const naturalStep = 0.011 * speedMult * sprintMult * fatigueMult;
         const dxToIdeal = idealTx - p.x;
