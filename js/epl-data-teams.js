@@ -47,7 +47,7 @@ const EPL_TEAMS = {
     style:'高強度壓迫，快速轉換，邊路推進',
     strengths:['Salah持續高效輸出','Slot體系穩定成熟','中場跑動覆蓋全場'],
     weaknesses:['Salah年齡漸長','傷兵時輪換選擇有限','對陣低位防守隊時偶有困難'],
-    recentForm:['D','L','W','W','L'],
+    recentForm:['D','L','W','W','W'],
     history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍',
     injuries:[
       {name:'Mohamed Salah',pos:'右翼',status:'腿後肌傷恢復中，已回歸訓練但僅能上場幾分鐘',returnDate:'MW37 替補待命'},
@@ -191,7 +191,7 @@ const EPL_TEAMS = {
     style:'Emery體系，緊湊防守反擊，定位球威脅大',
     strengths:['Watkins全面的前鋒能力','Emery歐戰經驗豐富','團隊凝聚力強'],
     weaknesses:['頂級球星不足','多線作戰體能考驗','客場表現波動'],
-    recentForm:['D','L','W','L','L'],
+    recentForm:['D','L','L','W','D'],
     history:'7次英格蘭頂級聯賽冠軍，1982年歐冠冠軍',
     injuries:[
       {name:'Boubacar Kamara',pos:'防守中場',status:'膝傷長期缺陣',returnDate:'賽季報銷'},

@@ -3250,7 +3250,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
     date: '2026-05-15',
     category: '賽前深度分析',
     summary: '英超第37輪焦點戰——同積59分的阿斯頓維拉與利物浦在Villa Park正面交鋒，勝者幾乎鎖定歐冠席位。維拉主帥 Emery 少了 Onana 與 Kamara，利物浦 Salah 僅能替補、Wirtz 因腸胃炎存疑，這場「歐冠資格決賽」誰能勝出？',
-    content: `<h2>阿斯頓維拉 vs 利物浦｜英超第37輪・5/16（五）03:00 台灣時間・Villa Park</h2>
+    content: `<h2>阿斯頓維拉 vs 利物浦｜英超第37輪・5/16（六）03:00 台灣時間・Villa Park</h2>
 
 <h3>積分形勢：同分對決</h3>
 
@@ -3282,13 +3282,13 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>阿斯頓維拉近況：歐霸決賽在即，聯賽分心？</h3>
 
-<p>Unai Emery 的球隊近 5 場聯賽僅贏 1 場（1W 1D 3L），形勢看似不妙——但那唯一的勝利正是歐霸聯半決賽的晉級之戰。維拉下週三就要出征伊斯坦堡踢<b>歐霸聯決賽</b>，Emery 勢必要在輪換與全力拼搶之間取得平衡。</p>
+<p>Unai Emery 的球隊近 5 場聯賽僅贏 1 場（1W 2D 2L），形勢看似不妙——但那唯一的勝利是主場 4-3 逆轉桑德蘭的驚天戰役。維拉下週三就要出征伊斯坦堡踢<b>歐霸聯決賽</b>，Emery 勢必要在輪換與全力拼搶之間取得平衡。</p>
 
-<p>主場是維拉的最大武器：本季 Villa Park 拿下 34 分（聯賽第 6），而且過去兩次在主場對利物浦保持不敗（3-3 及 2-2），打破了紅軍長期壓制的格局。</p>
+<p>主場是維拉的最大武器：Villa Park 向來氣氛火爆，而且過去兩次在主場對利物浦保持不敗（3-3 及 2-2），打破了紅軍長期壓制的格局。</p>
 
 <h3>利物浦近況：傷兵危機籠罩</h3>
 
-<p>Arne Slot 的利物浦近期表現不穩（近 5 輪僅 2 勝），更棘手的是傷兵名單長得嚇人：</p>
+<p>Arne Slot 的利物浦近 5 輪取得 3 勝 1 平 1 負（3-2 敗於曼聯是唯一敗仗），戰績不差但傷兵名單長得嚇人：</p>
 
 <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
 <tr style="border-bottom:2px solid rgba(255,255,255,0.3)">
@@ -3329,7 +3329,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>關鍵對決</h3>
 
-<p><b>Ollie Watkins vs Virgil van Dijk</b>：Watkins 本季英超攻入 14 球、助攻 8 次，是維拉的進攻引擎。Van Dijk 搭檔回歸的 Konaté 組成利物浦後防核心，能否鎖住 Watkins 將是勝負關鍵。</p>
+<p><b>Ollie Watkins vs Virgil van Dijk</b>：Watkins 本季英超攻入 12 球、助攻 2 次，是維拉的進攻引擎。Van Dijk 搭檔回歸的 Konaté 組成利物浦後防核心，能否鎖住 Watkins 將是勝負關鍵。</p>
 
 <p><b>Morgan Rogers vs Alexis Mac Allister</b>：Rogers 近期狀態火熱，在歐霸半決賽中表現亮眼。Mac Allister 需要在中場攻守兩端提供更多支援，特別是 Wirtz 可能缺陣的情況下。</p>
 
