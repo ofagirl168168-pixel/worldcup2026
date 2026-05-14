@@ -4007,7 +4007,7 @@
 /* 抽卡按鈕（疊在背景的木地板區域）*/
 .mt-gshop-buttons {
   position: absolute;
-  bottom: 18%;
+  bottom: 5%;
   left: 5%; right: 5%;
   display: flex;
   gap: 10px;

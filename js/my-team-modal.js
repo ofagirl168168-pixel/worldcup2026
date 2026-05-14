@@ -1591,20 +1591,20 @@
 
         <!-- 底部：抽教練（券 + 寶石雙費用、跟球員抽卡同樣式） -->
         <div class="mt-coach-actions">
-          <button class="mt-coach-draw-btn mt-coach-draw-1" data-count="1" ${(coachTickets < 1 && (team.gems || 0) < 200) ? 'disabled' : ''}>
+          <button class="mt-coach-draw-btn mt-coach-draw-1" data-count="1" ${(coachTickets < 1 && (team.gems || 0) < 20) ? 'disabled' : ''}>
             <div class="mt-coach-btn-label">抽 1 教練</div>
             <div class="mt-coach-btn-cost-dual">
               <span class="mt-coach-cost-pill ${coachTickets >= 1 ? 'is-active' : 'is-fade'}">🎫 <b>1</b></span>
               <span class="mt-coach-cost-or">/</span>
-              <span class="mt-coach-cost-pill ${coachTickets >= 1 ? 'is-fade' : 'is-active'}">💎 <b>200</b></span>
+              <span class="mt-coach-cost-pill ${coachTickets >= 1 ? 'is-fade' : 'is-active'}">💎 <b>20</b></span>
             </div>
           </button>
-          <button class="mt-coach-draw-btn mt-coach-draw-10" data-count="10" ${(coachTickets < 10 && (team.gems || 0) < 1800) ? 'disabled' : ''}>
+          <button class="mt-coach-draw-btn mt-coach-draw-10" data-count="10" ${(coachTickets < 10 && (team.gems || 0) < 180) ? 'disabled' : ''}>
             <div class="mt-coach-btn-label">10 連抽</div>
             <div class="mt-coach-btn-cost-dual">
               <span class="mt-coach-cost-pill ${coachTickets >= 10 ? 'is-active' : 'is-fade'}">🎫 <b>10</b></span>
               <span class="mt-coach-cost-or">/</span>
-              <span class="mt-coach-cost-pill ${coachTickets >= 10 ? 'is-fade' : 'is-active'}">💎 <b>1800</b></span>
+              <span class="mt-coach-cost-pill ${coachTickets >= 10 ? 'is-fade' : 'is-active'}">💎 <b>180</b></span>
             </div>
           </button>
         </div>
@@ -2740,8 +2740,8 @@
     const ssrSelect = team.ssr_select_tickets || 0;
     const has1Ticket = tickets >= 1;
     const has10Tickets = tickets >= 10;
-    const canAfford1 = has1Ticket || gems >= 50;
-    const canAfford10 = has10Tickets || gems >= 450;
+    const canAfford1 = has1Ticket || gems >= 5;
+    const canAfford10 = has10Tickets || gems >= 45;
 
     content.innerHTML = `
       <div class="mt-gacha-shop-fullscene" id="mt-gacha-fullshop">
@@ -2794,7 +2794,7 @@
             <div class="mt-gshop-btn-cost mt-gshop-btn-cost-dual">
               <span class="mt-gshop-cost-pill ${has1Ticket ? 'mt-gshop-cost-active' : 'mt-gshop-cost-fade'}">🎟️ <b>1</b></span>
               <span class="mt-gshop-cost-or">/</span>
-              <span class="mt-gshop-cost-pill ${has1Ticket ? 'mt-gshop-cost-fade' : 'mt-gshop-cost-active'}">💎 <b>50</b></span>
+              <span class="mt-gshop-cost-pill ${has1Ticket ? 'mt-gshop-cost-fade' : 'mt-gshop-cost-active'}">💎 <b>5</b></span>
             </div>
           </button>
           <button class="mt-gshop-btn mt-gshop-btn-10" id="mt-gacha-10" ${!canAfford10 ? 'disabled' : ''}>
@@ -2804,7 +2804,7 @@
             <div class="mt-gshop-btn-cost mt-gshop-btn-cost-dual">
               <span class="mt-gshop-cost-pill ${has10Tickets ? 'mt-gshop-cost-active' : 'mt-gshop-cost-fade'}">🎟️ <b>10</b></span>
               <span class="mt-gshop-cost-or">/</span>
-              <span class="mt-gshop-cost-pill ${has10Tickets ? 'mt-gshop-cost-fade' : 'mt-gshop-cost-active'}">💎 <b>450</b></span>
+              <span class="mt-gshop-cost-pill ${has10Tickets ? 'mt-gshop-cost-fade' : 'mt-gshop-cost-active'}">💎 <b>45</b></span>
             </div>
             <div class="mt-gshop-btn-sub">必得 <b>SR</b> 以上球員!</div>
           </button>
