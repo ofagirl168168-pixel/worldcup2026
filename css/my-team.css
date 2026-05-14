@@ -6245,100 +6245,169 @@
   color: #ffe680;
 }
 
-.mt-train-machines {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 14px;
-}
-.mt-train-machine {
-  background: linear-gradient(180deg, #555555 0%, #2a2a2a 100%);
-  border: 3px solid #1a1a1a;
-  border-radius: 8px;
-  padding: 8px 4px;
-  cursor: pointer;
-  color: #fff;
-  text-align: center;
-  position: relative;
-  box-shadow:
-    0 4px 8px rgba(0,0,0,0.5),
-    inset 0 2px 3px rgba(255,255,255,0.15),
-    inset 0 -2px 3px rgba(0,0,0,0.4);
-  transition: transform 0.12s;
-}
-.mt-train-machine:hover {
-  transform: translateY(-3px);
-  box-shadow:
-    0 6px 12px rgba(0,0,0,0.6),
-    inset 0 2px 3px rgba(255,255,255,0.2),
-    inset 0 -2px 3px rgba(0,0,0,0.4),
-    0 0 14px rgba(240,192,64,0.55);
-}
-.mt-train-machine:active { transform: translateY(0); }
-.mt-train-machine-icon {
-  width: 42px; height: 36px;
-  margin: 0 auto;
-}
-.mt-train-machine-icon svg { width: 100%; height: 100%; }
-.mt-train-machine-label {
-  font-size: 12px; font-weight: 900;
-  margin-top: 2px;
-  color: #ffe680;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.7);
-}
-.mt-train-machine-sub {
-  font-size: 9px; opacity: 0.75;
-}
-
-.mt-train-active-wrap {
-  background: rgba(0,0,0,0.4);
-  border: 2px solid rgba(255,255,255,0.15);
-  border-radius: 10px;
-  padding: 8px;
-}
-.mt-train-active-title {
-  font-size: 12px; font-weight: 800;
-  color: #f0c040;
-  margin-bottom: 6px;
-}
-.mt-train-active-list {
-  display: flex; flex-direction: column; gap: 6px;
-}
-.mt-train-active-empty {
-  text-align: center;
-  padding: 12px;
+/* 開羅式訓練 hint 文字 */
+.mt-train-gym-hint {
   font-size: 11px;
   color: rgba(255,255,255,0.5);
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
 }
-.mt-train-active-row {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,0.05);
-  border: 2px solid rgba(255,255,255,0.1);
+
+/* 開羅風像素地板：6 個機台 2 列 × 3 行 */
+.mt-train-floor {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  /* 木地板紋路 */
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(0,0,0,0) 0, rgba(0,0,0,0) 28px,
+      rgba(255,255,255,0.04) 28px, rgba(255,255,255,0.04) 30px),
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,0) 0, rgba(0,0,0,0) 56px,
+      rgba(0,0,0,0.15) 56px, rgba(0,0,0,0.15) 58px),
+    linear-gradient(180deg, #6b4628 0%, #4a2f1c 100%);
+  border: 3px solid #1a1a1a;
+  border-radius: 10px;
+  padding: 12px 10px;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.45), 0 4px 10px rgba(0,0,0,0.4);
+}
+
+/* 訓練機台（每格）*/
+.mt-train-station {
+  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%);
+  border: 2px solid rgba(255,255,255,0.18);
   border-radius: 8px;
-  padding: 6px 8px;
+  padding: 6px 4px 8px;
+  position: relative;
+  cursor: pointer;
   color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 134px;
+  transition: transform 0.12s, box-shadow 0.12s;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.15);
+  --station-color: #f0c040;
 }
-.mt-train-active-row.rarity-SSR { border-color: #f0c040; }
-.mt-train-active-row.rarity-SR  { border-color: #9b87f5; }
-.mt-train-active-row.ready { animation: mt-active-ready 1.4s ease-in-out infinite; }
-@keyframes mt-active-ready {
-  0%, 100% { background: rgba(76,175,80,0.18); }
-  50%      { background: rgba(76,175,80,0.35); }
+.mt-train-station:hover {
+  transform: translateY(-2px);
+  border-color: var(--station-color);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.55), 0 0 14px color-mix(in srgb, var(--station-color) 40%, transparent), inset 0 1px 0 rgba(255,255,255,0.2);
 }
-.mt-train-active-portrait {
-  width: 36px; height: 44px;
+.mt-train-station.is-busy {
+  border-color: color-mix(in srgb, var(--station-color) 70%, white 30%);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--station-color) 22%, transparent) 0%,
+    rgba(255,255,255,0.04) 100%);
+}
+.mt-train-station.is-ready {
+  animation: mt-station-ready 1.2s ease-in-out infinite;
+  border-color: #66bb6a;
+}
+@keyframes mt-station-ready {
+  0%, 100% { box-shadow: 0 3px 6px rgba(0,0,0,0.45), 0 0 0 rgba(102,187,106,0); }
+  50%      { box-shadow: 0 3px 6px rgba(0,0,0,0.45), 0 0 18px rgba(102,187,106,0.9); }
+}
+
+.mt-train-station-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--station-color);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+.mt-train-station-emoji { font-size: 12px; }
+.mt-train-station-count {
+  background: var(--station-color);
+  color: #1a1a1a;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 999px;
+  margin-left: 2px;
+}
+
+/* 機台像素 tile */
+.mt-train-station-tile {
+  width: 56px; height: 56px;
   flex-shrink: 0;
 }
-.mt-train-active-portrait img {
+.mt-train-station-tile svg {
   width: 100%; height: 100%;
   image-rendering: pixelated;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
 }
-.mt-train-active-info { flex: 1; min-width: 0; }
-.mt-train-active-name { font-size: 12px; font-weight: 800; }
-.mt-train-active-name small { opacity: 0.75; }
-.mt-train-active-time {
-  font-size: 11px; opacity: 0.85;
+
+/* 站在機台旁的球員 chibi */
+.mt-train-station-trainees {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  min-height: 50px;
+  margin-top: 2px;
+}
+.mt-train-trainee {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+}
+.mt-train-trainee img {
+  width: 30px;
+  height: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+}
+.mt-train-trainee-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(0,0,0,0.55);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.5);
+}
+.mt-train-trainee-bar > div {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd54a 0%, #f0c040 100%);
+  transition: width 0.4s linear;
+}
+.mt-train-trainee.is-ready .mt-train-trainee-bar > div {
+  background: linear-gradient(90deg, #66bb6a 0%, #2e7d32 100%);
+}
+.mt-train-trainee-time {
+  font-size: 9px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.85);
   font-family: monospace;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.7);
+}
+.mt-train-trainee-ready {
+  color: #66bb6a;
+  font-weight: 900;
+  animation: mt-trainee-ready-pulse 0.8s ease-in-out infinite;
+}
+@keyframes mt-trainee-ready-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.12); }
+}
+
+.mt-train-station-empty-hint {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.5px;
+  padding: 14px 0 4px;
 }
 
 /* 訓練機台選人彈窗 */

@@ -3256,103 +3256,133 @@
     }
 
     const ATTR_LABELS = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
-    const ATTR_ICONS = {
-      attack:   '<svg viewBox="0 0 60 40"><rect x="5" y="14" width="14" height="12" rx="2" fill="#404040" stroke="#202020" stroke-width="1.5"/><rect x="41" y="14" width="14" height="12" rx="2" fill="#404040" stroke="#202020" stroke-width="1.5"/><rect x="19" y="18" width="22" height="4" fill="#606060" stroke="#202020" stroke-width="1"/></svg>',
-      defense:  '<svg viewBox="0 0 40 50"><path d="M 20 4 L 36 12 L 36 28 Q 36 42 20 48 Q 4 42 4 28 L 4 12 Z" fill="#90caf9" stroke="#1976d2" stroke-width="2"/><path d="M 20 14 L 28 18 L 20 32 L 12 18 Z" fill="#1976d2"/></svg>',
-      speed:    '<svg viewBox="0 0 60 40"><rect x="5" y="20" width="50" height="14" rx="2" fill="#606060" stroke="#202020" stroke-width="1.5"/><rect x="8" y="22" width="44" height="2" fill="#a0a0a0"/><circle cx="14" cy="34" r="3" fill="#202020"/><circle cx="46" cy="34" r="3" fill="#202020"/><path d="M 25 14 L 35 14 L 32 6 L 28 6 Z" fill="#f0c040"/></svg>',
-      midfield: '<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#ffffff" stroke="#202020" stroke-width="2"/><polygon points="20,9 26,14 24,21 16,21 14,14" fill="#202020"/><line x1="20" y1="9" x2="20" y2="5" stroke="#202020" stroke-width="1"/><line x1="29" y1="17" x2="33" y2="14" stroke="#202020" stroke-width="1"/></svg>',
-      stamina:  '<svg viewBox="0 0 50 40"><path d="M 25 36 L 8 18 Q 4 14 8 10 Q 12 6 18 10 L 25 16 L 32 10 Q 38 6 42 10 Q 46 14 42 18 Z" fill="#e53935" stroke="#801010" stroke-width="2"/></svg>',
-      aura:     '<svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="14" fill="#f0c040" stroke="#805020" stroke-width="2"/><g stroke="#f0c040" stroke-width="2" stroke-linecap="round"><line x1="25" y1="2" x2="25" y2="9"/><line x1="25" y1="41" x2="25" y2="48"/><line x1="2" y1="25" x2="9" y2="25"/><line x1="41" y1="25" x2="48" y2="25"/><line x1="8" y1="8" x2="13" y2="13"/><line x1="37" y1="37" x2="42" y2="42"/><line x1="42" y1="8" x2="37" y2="13"/><line x1="13" y1="37" x2="8" y2="42"/></g></svg>'
+    const ATTR_EMOJI = { attack:'⚔️', defense:'🛡️', speed:'👟', midfield:'⚽', stamina:'❤️', aura:'✨' };
+    const ATTR_COLOR = {
+      attack:   '#ef5350',
+      defense:  '#42a5f5',
+      speed:    '#ffca28',
+      midfield: '#66bb6a',
+      stamina:  '#ec407a',
+      aura:     '#ab47bc',
+    };
+    // 開羅式像素機台（每個 attr 一張、含底座 + 設備 + 點綴）
+    const ATTR_TILES = {
+      attack:   '<svg viewBox="0 0 64 64"><rect x="6" y="42" width="52" height="14" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><rect x="10" y="46" width="44" height="2" fill="#7a4f30"/><rect x="14" y="20" width="36" height="6" rx="3" fill="#404040" stroke="#1a1a1a" stroke-width="1.5"/><rect x="6"  y="14" width="10" height="18" rx="2" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="1.5"/><rect x="48" y="14" width="10" height="18" rx="2" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="1.5"/><rect x="8"  y="17" width="6" height="12" fill="#5a5a5a"/><rect x="50" y="17" width="6" height="12" fill="#5a5a5a"/></svg>',
+      defense:  '<svg viewBox="0 0 64 64"><rect x="6" y="48" width="52" height="10" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><path d="M 32 6 L 52 14 L 52 32 Q 52 46 32 54 Q 12 46 12 32 L 12 14 Z" fill="#64b5f6" stroke="#0d47a1" stroke-width="2"/><path d="M 32 18 L 42 24 L 32 38 L 22 24 Z" fill="#1976d2"/><circle cx="32" cy="28" r="3" fill="#fff"/></svg>',
+      speed:    '<svg viewBox="0 0 64 64"><rect x="4" y="48" width="56" height="10" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><rect x="6" y="30" width="52" height="18" rx="2" fill="#606060" stroke="#1a1a1a" stroke-width="1.5"/><rect x="10" y="34" width="44" height="2" fill="#9e9e9e"/><rect x="10" y="38" width="44" height="2" fill="#9e9e9e"/><circle cx="16" cy="48" r="4" fill="#1a1a1a"/><circle cx="48" cy="48" r="4" fill="#1a1a1a"/><path d="M 26 22 L 38 22 L 34 10 L 30 10 Z" fill="#ffca28" stroke="#a67e00" stroke-width="1"/></svg>',
+      midfield: '<svg viewBox="0 0 64 64"><rect x="6" y="50" width="52" height="8" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><circle cx="32" cy="34" r="18" fill="#fff" stroke="#1a1a1a" stroke-width="2"/><polygon points="32,22 40,28 37,38 27,38 24,28" fill="#1a1a1a"/><line x1="32" y1="22" x2="32" y2="16" stroke="#1a1a1a" stroke-width="1.5"/><line x1="40" y1="28" x2="46" y2="24" stroke="#1a1a1a" stroke-width="1.5"/><line x1="37" y1="38" x2="42" y2="46" stroke="#1a1a1a" stroke-width="1.5"/><line x1="27" y1="38" x2="22" y2="46" stroke="#1a1a1a" stroke-width="1.5"/><line x1="24" y1="28" x2="18" y2="24" stroke="#1a1a1a" stroke-width="1.5"/></svg>',
+      stamina:  '<svg viewBox="0 0 64 64"><rect x="6" y="50" width="52" height="8" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><path d="M 32 48 L 12 28 Q 6 22 12 16 Q 18 10 26 16 L 32 22 L 38 16 Q 46 10 52 16 Q 58 22 52 28 Z" fill="#ef5350" stroke="#7f0000" stroke-width="2"/><ellipse cx="22" cy="22" rx="3" ry="2" fill="rgba(255,255,255,0.55)"/></svg>',
+      aura:     '<svg viewBox="0 0 64 64"><rect x="6" y="52" width="52" height="6" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><circle cx="32" cy="32" r="14" fill="#ffd54a" stroke="#a67e00" stroke-width="2"/><g stroke="#ffd54a" stroke-width="2.5" stroke-linecap="round"><line x1="32" y1="6"  x2="32" y2="14"/><line x1="32" y1="50" x2="32" y2="58"/><line x1="6"  y1="32" x2="14" y2="32"/><line x1="50" y1="32" x2="58" y2="32"/><line x1="13" y1="13" x2="18" y2="18"/><line x1="46" y1="46" x2="51" y2="51"/><line x1="51" y1="13" x2="46" y2="18"/><line x1="18" y1="46" x2="13" y2="51"/></g><circle cx="32" cy="32" r="5" fill="#fff" opacity="0.7"/></svg>',
     };
 
-    // 整理目前正在時間訓練的球員
-    const activeTrainings = players.filter(p => p.training_attr && p.training_finish_at)
-      .map(p => ({
-        p,
-        finishAt: new Date(p.training_finish_at),
-        remainSec: Math.max(0, Math.floor((new Date(p.training_finish_at) - new Date()) / 1000)),
-      }));
+    // 找正在訓練每個 attr 的球員（一個 attr 同時可有多人）
+    const activeByAttr = { attack:[], defense:[], speed:[], midfield:[], stamina:[], aura:[] };
+    players.forEach(p => {
+      if (p.training_attr && p.training_finish_at) {
+        activeByAttr[p.training_attr]?.push({
+          p,
+          finishAt: new Date(p.training_finish_at),
+          remainSec: Math.max(0, Math.floor((new Date(p.training_finish_at) - new Date()) / 1000)),
+        });
+      }
+    });
 
     content.innerHTML = `
       <div class="mt-train-gym">
         <div class="mt-train-gym-header">
           <span class="mt-train-gym-title">💪 訓練館</span>
           <div class="mt-train-rp-chips">
-            <span title="戰術 RP">🧠 ${team.rp_tactical}</span>
-            <span title="體能 RP">💪 ${team.rp_physical}</span>
-            <span title="心 RP">❤️ ${team.rp_heart}</span>
-            <span title="靈感 RP">💡 ${team.rp_idea}</span>
+            <span title="戰術點">🧠 ${team.rp_tactical || 0}</span>
+            <span title="體能點">💪 ${team.rp_physical || 0}</span>
+            <span title="鬥志點">❤️ ${team.rp_heart || 0}</span>
+            <span title="靈感點">💡 ${team.rp_idea || 0}</span>
           </div>
         </div>
 
-        <!-- 機台一排 -->
-        <div class="mt-train-machines">
-          ${Object.entries(ATTR_LABELS).map(([attr, label]) => `
-            <button class="mt-train-machine" data-machine="${attr}">
-              <div class="mt-train-machine-icon">${ATTR_ICONS[attr]}</div>
-              <div class="mt-train-machine-label">${label}</div>
-              <div class="mt-train-machine-sub">+1 / 點選</div>
-            </button>
-          `).join('')}
-        </div>
+        <div class="mt-train-gym-hint">點機台選球員 · 球員會站在機台旁訓練 · 完成可直接領取</div>
 
-        <!-- 進行中訓練 -->
-        <div class="mt-train-active-wrap">
-          <div class="mt-train-active-title">⏱️ 訓練中（${activeTrainings.length}）</div>
-          <div class="mt-train-active-list" id="mt-train-active-list">
-            ${activeTrainings.length ? '' : '<div class="mt-train-active-empty">點上方機台 → 選球員開始訓練</div>'}
-          </div>
+        <!-- 開羅式機台場景：6 個機台 + 球員 chibi -->
+        <div class="mt-train-floor">
+          ${Object.entries(ATTR_LABELS).map(([attr, label]) => {
+            const trainees = activeByAttr[attr] || [];
+            const hasReady = trainees.some(t => t.remainSec === 0);
+            const stationCls = [
+              'mt-train-station',
+              trainees.length ? 'is-busy' : 'is-empty',
+              hasReady ? 'is-ready' : '',
+            ].filter(Boolean).join(' ');
+            return `
+              <div class="${stationCls}" data-machine="${attr}" style="--station-color: ${ATTR_COLOR[attr]}">
+                <div class="mt-train-station-header">
+                  <span class="mt-train-station-emoji">${ATTR_EMOJI[attr]}</span>
+                  <span class="mt-train-station-label">${label}</span>
+                  ${trainees.length ? `<span class="mt-train-station-count">${trainees.length}</span>` : ''}
+                </div>
+                <div class="mt-train-station-tile">${ATTR_TILES[attr]}</div>
+                <div class="mt-train-station-trainees">
+                  ${trainees.slice(0, 3).map(t => {
+                    const isReady = t.remainSec === 0;
+                    const pid = t.p.id;
+                    const c = t.p.card || {};
+                    const total = Math.max(60, Math.floor(Math.pow((t.p['current_' + attr] || 0) / 25, 2.2) * 50));
+                    const pct = isReady ? 100 : Math.max(0, Math.min(100, ((total - t.remainSec) / total) * 100));
+                    return `
+                      <div class="mt-train-trainee ${isReady ? 'is-ready' : ''}" data-claim="${pid}">
+                        <img id="train-floor-${pid}" alt="${escapeHtml(c.name)}" />
+                        <div class="mt-train-trainee-bar"><div style="width:${pct}%"></div></div>
+                        <div class="mt-train-trainee-time">
+                          ${isReady ? '<span class="mt-train-trainee-ready">✋ 領取</span>'
+                                    : `<span class="mt-train-countdown" data-finish-at="${t.finishAt.toISOString()}" data-player="${pid}">${_formatRemain(t.remainSec)}</span>`}
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                  ${trainees.length === 0 ? '<div class="mt-train-station-empty-hint">＋ 點此選球員訓練</div>' : ''}
+                </div>
+              </div>
+            `;
+          }).join('')}
         </div>
       </div>
     `;
 
-    const activeList = content.querySelector('#mt-train-active-list');
-    activeTrainings.forEach(({ p, finishAt, remainSec }) => {
-      const c = p.card || {};
-      const isReady = remainSec === 0;
-      const row = document.createElement('div');
-      row.className = `mt-train-active-row rarity-${c.rarity || 'R'} ${isReady ? 'ready' : ''}`;
-      const imgId = `train-active-${p.id}`;
-      row.innerHTML = `
-        <div class="mt-train-active-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
-        <div class="mt-train-active-info">
-          <div class="mt-train-active-name">${escapeHtml(c.name)} <small>${ATTR_LABELS[p.training_attr]}</small></div>
-          <div class="mt-train-active-time">
-            <span class="mt-train-countdown" data-finish-at="${finishAt.toISOString()}" data-player="${p.id}">
-              ${isReady ? '已完成' : _formatRemain(remainSec)}
-            </span>
-          </div>
-        </div>
-        <button class="mt-train-claim-btn" data-claim="${p.id}" ${isReady ? '' : 'disabled'}>
-          ${isReady ? '✋ 領取' : '等候'}
-        </button>
-      `;
-      activeList.appendChild(row);
+    // 渲染所有 trainee portraits
+    Object.values(activeByAttr).flat().forEach(({ p }) => {
       const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
       if (look && window.LpcRenderer) {
         window.LpcRenderer.portrait(look).then(url => {
-          const img = document.getElementById(imgId);
+          const img = document.getElementById(`train-floor-${p.id}`);
           if (img && url) img.src = url;
         }).catch(() => {});
       }
     });
 
-    // 點機台 → 開球員選單
-    content.querySelectorAll('.mt-train-machine').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const attr = btn.dataset.machine;
+    // 用 activeList 名稱保留下方 countdown timer 邏輯
+    const activeList = content;
+
+    const allActive = Object.values(activeByAttr).flat();
+
+    // 點機台空白處 → 開選人選單
+    content.querySelectorAll('.mt-train-station').forEach(station => {
+      station.addEventListener('click', (e) => {
+        if (e.target.closest('.mt-train-trainee')) return;
+        const attr = station.dataset.machine;
         _openTrainPicker(attr, players, team);
       });
     });
 
     // 倒數計時器
-    if (activeTrainings.length) _refreshCountdowns(activeList);
+    if (allActive.length) _refreshCountdowns(activeList);
 
-    // ── 時間訓練：領取 ──
-    activeList.querySelectorAll('[data-claim]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const pid = btn.dataset.claim;
-        btn.disabled = true; btn.textContent = '領取中…';
+    // 點 trainee：is-ready → 領取
+    content.querySelectorAll('.mt-train-trainee').forEach(t => {
+      t.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!t.classList.contains('is-ready')) {
+          if (typeof showToast === 'function') showToast('⏱️ 還沒練好');
+          return;
+        }
+        const pid = t.dataset.claim;
         try {
           const res = await window.MyTeam.claimTimedTraining(pid);
           if (typeof showToast === 'function') {
@@ -3360,8 +3390,8 @@
             showToast(`✅ ${lbl} +${res.gain}！`);
           }
           renderTab();
-        } catch (e) {
-          alert('領取失敗：' + (e.message || e));
+        } catch (err) {
+          alert('領取失敗：' + (err.message || err));
         }
       });
     });
