@@ -25,10 +25,10 @@
     const count = opts.count || 1;
     const overlay = document.createElement('div');
     overlay.className = 'coach-ritual-overlay';
-    const titleTxt = count === 10 ? '✨ 10 連召喚儀式' : '✨ 教練召喚儀式';
+    const titleTxt = count === 10 ? '教練招募 ×10' : '教練招募';
     const subTxt = count === 10
-      ? '一個圓 → 10 位教練、圓度越高越多 SR/SSR'
-      : '以中心為圓心畫一個圓 — 越圓的圓召喚越強的教練';
+      ? '以中心為圓心畫一顆球，招募 10 位教練（標準機率）'
+      : '以中心為圓心畫一顆球，越圓的球招募到越強的教練';
     overlay.innerHTML = `
       <div class="coach-ritual-stage">
         <button class="coach-ritual-close" type="button" aria-label="關閉">×</button>
@@ -136,34 +136,21 @@
       return Math.hypot(points[0].x - CX, points[0].y - CY);
     }
 
-    // ── 圓度計算（第一點半徑當基準、平均相似度）──
+    // ── 圓度計算（第一點半徑當基準、純平均準確度、不乘角度覆蓋）──
+    // 畫好的時候會浮動在 92~98%、畫歪一段才會掉
     function computeRoundness(pts) {
       if (pts.length < 1) return 100;
       const refDist = Math.hypot(pts[0].x - CX, pts[0].y - CY);
       if (refDist < 30) return 0;  // 起點太靠近中心 = 沒繞夠
-      // 每點計算與基準的偏差、轉成相似度
       let totalSim = 0;
       for (let i = 0; i < pts.length; i++) {
         const d = Math.hypot(pts[i].x - CX, pts[i].y - CY);
         const dev = Math.abs(d - refDist) / refDist;
-        // dev 0 = 100% 相似、dev 0.5 = 0%（嚴格）
         const sim = Math.max(0, 1 - dev * 2);
         totalSim += sim;
       }
-      const avgSim = totalSim / pts.length;
-      // 角度覆蓋率（要繞夠）
-      if (pts.length < 5) return Math.round(avgSim * 100);
-      const angles = pts.map(p => Math.atan2(p.y - CY, p.x - CX));
-      let total = 0;
-      for (let i = 1; i < angles.length; i++) {
-        let d = angles[i] - angles[i-1];
-        if (d > Math.PI) d -= 2 * Math.PI;
-        if (d < -Math.PI) d += 2 * Math.PI;
-        total += d;
-      }
-      const angleCovered = Math.min(1, Math.abs(total) / (Math.PI * 2));
-      // 最終 = 平均相似度 × 角度覆蓋
-      return Math.round(avgSim * 100 * angleCovered);
+      // 純平均相似度（即時準確度）— 不乘角度覆蓋率
+      return Math.round(totalSim / pts.length * 100);
     }
 
     function isClosed(pts) {
@@ -297,7 +284,7 @@
 
     // ── 成功動畫：軌跡填滿 → 變足球 → 踢進螢幕 → 教練卡 ──
     async function runSuccessAnimation(score) {
-      hintEl.textContent = `✨ 圓度 ${score}% — 召喚中…`;
+      hintEl.textContent = `✨ 圓度 ${score}% — 招募中…`;
       hintEl.classList.add('is-success');
       // 1. 填滿圓（fade fill）
       let fillT = 0;
@@ -383,7 +370,7 @@
     }
 
     async function triggerSummonResult(score) {
-      hintEl.textContent = count === 10 ? '✨ 10 位教練降臨…' : '✨ 教練降臨…';
+      hintEl.textContent = count === 10 ? '✨ 招募 10 位教練中…' : '✨ 教練招募中…';
       try {
         const result = await window.MyTeam.drawCoachByCircle(score, count);
         // 自動指派到空 slot（沿用 my-team-modal 的 auto-assign 邏輯）
