@@ -5818,85 +5818,115 @@
   display: none;  /* AI 圖已含木地板、不再用 CSS 疊一層 */
 }
 
-/* 按鈕區：半透明 panel、位置剛好（不蓋桌子也不蓋助教）*/
+/* 按鈕區：透明、讓按鈕自己跳出來 */
 .mt-coach-actions {
   position: absolute;
   top: 85%;
   left: 4%; right: 4%;
-  display: flex; gap: 6px; align-items: center;
-  background: linear-gradient(180deg, rgba(60,38,18,0.88), rgba(40,25,10,0.92));
-  backdrop-filter: blur(2px);
-  border: 2px solid rgba(240,192,64,0.7);
-  border-radius: 10px;
-  padding: 5px 8px;
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.6),
-    0 0 10px rgba(240,192,64,0.3),
-    inset 0 1px 0 rgba(255,255,255,0.1);
+  display: flex; gap: 8px; align-items: stretch;
   z-index: 4;
 }
 .mt-coach-draw-btn {
   flex: 1;
-  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
-  border: 2px solid #fff;
-  color: #1a1a2e;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.45) 0%,
+      rgba(255,255,255,0.1) 8%,
+      rgba(255,255,255,0) 18%,
+      rgba(0,0,0,0) 60%,
+      rgba(0,0,0,0.25) 95%),
+    linear-gradient(180deg, #ffd92a 0%, #fbcd0c 25%, #d8a808 55%, #a07808 82%, #6b5106 100%);
+  border: 2.5px solid #ffffff;
+  color: #2a1505;
   font-weight: 900;
-  padding: 5px 6px;
-  border-radius: 8px;
+  padding: 8px 8px 10px;
+  border-radius: 12px;
   cursor: pointer;
-  text-shadow: 0 1px 1px rgba(255,255,255,0.4);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.7);
   box-shadow:
-    0 3px 6px rgba(240,192,64,0.5),
-    inset 0 1px 2px rgba(255,255,255,0.4);
+    0 0 0 2px #382308,
+    0 4px 0 #5a3a0a,
+    0 8px 20px rgba(55,30,5,0.7),
+    inset 0 2px 0 rgba(255,255,255,0.95),
+    inset 0 -3px 6px rgba(80,45,5,0.5);
   transition: transform 0.12s, box-shadow 0.15s;
-  animation: mt-draw-glow 2.4s ease-in-out infinite;
+  animation: mt-draw-glow 1.8s ease-in-out infinite;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
+  position: relative;
 }
 .mt-coach-btn-label {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 900;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   line-height: 1;
+  text-align: center;
 }
 .mt-coach-btn-cost-dual {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
 }
 .mt-coach-cost-pill {
-  background: rgba(0,0,0,0.28);
-  color: #2a1505;
+  background: rgba(0,0,0,0.35);
+  color: #fff;
   border-radius: 999px;
-  padding: 1px 7px;
-  font-size: 10px;
+  padding: 2px 8px;
+  font-size: 11px;
   line-height: 1.2;
   font-weight: 800;
   transition: opacity 0.15s;
 }
-.mt-coach-cost-pill b { font-size: 11px; margin-left: 1px; }
+.mt-coach-cost-pill b { font-size: 12px; margin-left: 1px; }
 .mt-coach-cost-pill.is-active { opacity: 1; }
 .mt-coach-cost-pill.is-fade   { opacity: 0.42; }
 .mt-coach-cost-or {
-  color: rgba(42,21,5,0.55);
-  font-size: 9px;
+  color: rgba(42,21,5,0.6);
+  font-size: 10px;
   font-weight: 700;
 }
 .mt-coach-draw-btn:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.04);
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+.mt-coach-draw-btn:active:not(:disabled) {
+  transform: translateY(2px);
   box-shadow:
-    0 6px 14px rgba(240,192,64,0.7),
-    inset 0 2px 3px rgba(255,255,255,0.4);
+    0 0 0 2px #382308,
+    0 0 0 #5a3a0a,
+    0 4px 12px rgba(55,30,5,0.6),
+    inset 0 2px 0 rgba(255,255,255,0.95),
+    inset 0 -3px 6px rgba(80,45,5,0.5);
 }
 .mt-coach-draw-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); animation: none; }
+
+/* 10 連抽：藍色（區分主按鈕、突顯划算）*/
 .mt-coach-draw-10 {
-  background: linear-gradient(135deg, #ffe680 0%, #f0c040 50%, #c08030 100%);
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.45) 0%,
+      rgba(255,255,255,0.1) 8%,
+      rgba(255,255,255,0) 18%,
+      rgba(0,0,0,0) 60%,
+      rgba(0,0,0,0.3) 95%),
+    linear-gradient(180deg, #2eaef2 0%, #1e9be8 25%, #1888d0 55%, #0e6aa5 82%, #053f6a 100%) !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  text-shadow: 0 2px 3px rgba(0,15,40,0.95) !important;
+  box-shadow:
+    0 0 0 2px #042746,
+    0 4px 0 #08355d,
+    0 8px 20px rgba(0,25,55,0.85),
+    inset 0 2px 0 rgba(255,255,255,0.9),
+    inset 0 -3px 6px rgba(0,20,45,0.6) !important;
 }
+.mt-coach-draw-10 .mt-coach-cost-or { color: rgba(255,255,255,0.7); }
+
 @keyframes mt-draw-glow {
-  0%, 100% { box-shadow: 0 4px 10px rgba(240,192,64,0.5), inset 0 2px 3px rgba(255,255,255,0.4); }
-  50%      { box-shadow: 0 4px 10px rgba(240,192,64,0.5), inset 0 2px 3px rgba(255,255,255,0.4), 0 0 18px rgba(240,192,64,0.9); }
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.08) drop-shadow(0 0 8px rgba(255,213,74,0.6)); }
 }
 
 /* 抽教練結果彈窗 */
