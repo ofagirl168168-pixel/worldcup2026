@@ -2788,8 +2788,9 @@
           </div>
         </div>
 
-        <!-- 開戰按鈕 + 對手資訊（左按鈕、右資訊） -->
+        <!-- 開戰按鈕 + 對手資訊（左按鈕、右資訊；第 N 關做成左上角 badge） -->
         <div class="mt-match-current">
+          <div class="mt-match-current-stage-badge">第 ${currentStage} 關</div>
           <div class="mt-match-current-left">
             <button class="mt-match-engage-btn" id="mt-match-start" ${team.stamina < 1 ? 'disabled' : ''}>
               <span class="mt-match-engage-sword">⚔</span>
@@ -2798,7 +2799,6 @@
             </button>
           </div>
           <div class="mt-match-current-right">
-            <div class="mt-match-current-next">第 ${currentStage} 關 · 下一關</div>
             <div class="mt-match-current-vs-label">VS</div>
             <div class="mt-match-current-opp-name">${escapeHtml(oppFlag)} ${escapeHtml(oppName)}</div>
             <div class="mt-match-current-opp-meta">

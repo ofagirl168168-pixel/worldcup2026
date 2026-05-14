@@ -5643,17 +5643,34 @@
 
 /* 當前關卡資訊面板：左按鈕 右對手資訊（緊湊版） */
 .mt-match-current {
+  position: relative;
   margin: 0 0 12px;
   background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.3));
   border: 2px solid rgba(240,192,64,0.55);
   border-radius: 12px;
-  padding: 8px 10px;
+  padding: 14px 10px 8px;
   color: #fff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.45);
   display: flex;
   gap: 10px;
   align-items: stretch;
   flex-wrap: wrap;
+}
+/* 左上角「第 N 關」徽章 */
+.mt-match-current-stage-badge {
+  position: absolute;
+  top: -10px; left: 12px;
+  background: linear-gradient(180deg, #ffe680 0%, #f0c040 50%, #c08030 100%);
+  color: #2a1505;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 3px 10px 3px 9px;
+  border-radius: 6px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.6);
+  border: 1.5px solid rgba(80,40,5,0.4);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+  z-index: 2;
 }
 .mt-match-current-left {
   flex: 1.2;
@@ -5687,12 +5704,11 @@
   letter-spacing: 0.5px;
 }
 .mt-match-current-vs-label {
-  font-size: 10px;
-  color: rgba(255,213,74,0.55);
+  font-size: 11px;
+  color: rgba(255,213,74,0.7);
   font-weight: 900;
   letter-spacing: 3px;
   line-height: 1;
-  margin-top: 2px;
 }
 .mt-match-current-opp-power {
   background: rgba(76,175,80,0.18);
