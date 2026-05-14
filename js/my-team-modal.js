@@ -2457,22 +2457,18 @@
           機率資訊 ›
         </button>
 
-        <!-- 抽卡按鈕：1 抽 + 10 抽（兩顆同高、必得 SR 小字在 10 抽下方）-->
+        <!-- 抽卡按鈕：1 抽 + 10 抽（同高、cost pill 內嵌、必得 SR 用絕對定位） -->
         <div class="mt-gshop-buttons">
-          <div class="mt-gshop-btn-wrap">
-            <button class="mt-gshop-btn mt-gshop-btn-1" id="mt-gacha-1" ${tickets < 1 ? 'disabled' : ''}>
-              <div class="mt-gshop-btn-label">1 抽</div>
-              <div class="mt-gshop-btn-cost">🎟️ <b>1</b></div>
-            </button>
-          </div>
-          <div class="mt-gshop-btn-wrap mt-gshop-btn-wrap-10">
+          <button class="mt-gshop-btn mt-gshop-btn-1" id="mt-gacha-1" ${tickets < 1 ? 'disabled' : ''}>
+            <div class="mt-gshop-btn-label">1 抽</div>
+            <div class="mt-gshop-btn-cost">🎟️ <b>1</b></div>
+          </button>
+          <button class="mt-gshop-btn mt-gshop-btn-10" id="mt-gacha-10" ${tickets < 10 ? 'disabled' : ''}>
             <span class="mt-gshop-btn-promo">優惠!</span>
-            <button class="mt-gshop-btn mt-gshop-btn-10" id="mt-gacha-10" ${tickets < 10 ? 'disabled' : ''}>
-              <div class="mt-gshop-btn-label">10 抽</div>
-              <div class="mt-gshop-btn-cost">🎟️ <b>10</b></div>
-            </button>
+            <div class="mt-gshop-btn-label">10 抽</div>
+            <div class="mt-gshop-btn-cost">🎟️ <b>10</b></div>
             <div class="mt-gshop-btn-sub">必得 <b>SR</b> 以上球員!</div>
-          </div>
+          </button>
         </div>
 
         ${ssrSelect > 0 ? `
