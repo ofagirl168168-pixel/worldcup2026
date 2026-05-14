@@ -1306,6 +1306,12 @@
     return el;
   }
 
+  // ── helper：判斷球員是否為當前隊長 ──
+  function _isCaptain(player) {
+    const team = window.MyTeam.getCached();
+    return team && player && team.captain_player_id === player.id;
+  }
+
   // ── helper：把 team_crest 渲染為 SVG（fallback emoji）──
   function _renderCrest(team) {
     if (!team || !window.TeamCrests) return '⚽';
@@ -1592,6 +1598,9 @@
           <button class="mt-profile-btn" data-act="toggle-start">
             ${p.in_starting_11 ? '🪑 撤下先發' : '⚽ 設為先發'}
           </button>
+          <button class="mt-profile-btn ${_isCaptain(p) ? 'mt-profile-btn-active' : ''}" data-act="captain">
+            ${_isCaptain(p) ? '👑 已是隊長' : '👑 設為隊長'}
+          </button>
           <button class="mt-profile-btn" data-act="train">⚙️ 訓練</button>
           ${isInjured ? '<button class="mt-profile-btn" data-act="heal">💊 用恢復包</button>' : ''}
         </div>
@@ -1633,6 +1642,22 @@
         alert('更新失敗：' + (e.message || e));
       }
     });
+    overlay.querySelector('[data-act="captain"]').addEventListener('click', async () => {
+      const isCap = _isCaptain(p);
+      try {
+        await window.DB.rpc('set_captain', { p_player_id: isCap ? null : p.id });
+        await window.MyTeam.refresh?.();
+        if (typeof showToast === 'function') {
+          showToast(isCap ? '👑 已撤銷隊長' : `👑 ${p.card?.name || ''} 已成為隊長`);
+        }
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.remove(), 200);
+        renderTab();
+      } catch (e) {
+        alert('設定隊長失敗：' + (e.message || e));
+      }
+    });
+
     overlay.querySelector('[data-act="train"]').addEventListener('click', () => {
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 200);
@@ -2353,8 +2378,14 @@
           </div>
         </div>
         <div class="mt-settings-section">
-          <div class="mt-settings-title">👁 預覽</div>
-          <div class="mt-settings-preview" id="mt-settings-preview-crest" style="width:120px;height:120px">${_renderCrest(team)}</div>
+          <div class="mt-settings-title">👁 預覽（隊徽 + 球員穿著）</div>
+          <div class="mt-settings-preview-wrap">
+            <div class="mt-settings-preview" id="mt-settings-preview-crest" style="width:110px;height:110px">${_renderCrest(team)}</div>
+            <div class="mt-settings-preview-player">
+              <div class="mt-settings-preview-label">隊長</div>
+              <img id="mt-settings-preview-sprite" alt="球員預覽" style="image-rendering:pixelated" />
+            </div>
+          </div>
         </div>
         <button class="mt-settings-action-btn mt-settings-save-btn" id="mt-settings-save">💾 儲存隊名 / 球衣 / 隊徽</button>
       </div>
@@ -2412,6 +2443,8 @@
     });
     content.querySelector('#mt-crest-primary').addEventListener('change', () => _settingsPreviewUpdate(content));
     content.querySelector('#mt-crest-accent').addEventListener('change', () => _settingsPreviewUpdate(content));
+    // 初次載入即跑一次預覽（讓 sprite 出現）
+    _settingsPreviewUpdate(content);
 
     // 儲存
     content.querySelector('#mt-settings-save').addEventListener('click', async () => {
@@ -2441,6 +2474,29 @@
       crest_accent:  content.querySelector('#mt-crest-accent').value };
     const preview = content.querySelector('#mt-settings-preview-crest');
     if (preview) preview.innerHTML = _renderCrest(teamSnap);
+
+    // 球員 sprite 預覽：用隊長 look，並套上 pending kit 顏色
+    const spriteImg = content.querySelector('#mt-settings-preview-sprite');
+    if (!spriteImg || !window.LpcRenderer) return;
+    _previewSprite(spriteImg, teamSnap);
+  }
+
+  async function _previewSprite(imgEl, teamSnap) {
+    const players = await window.MyTeam.fetchPlayers();
+    const captain = teamSnap.captain_player_id
+      ? (players || []).find(p => p.id === teamSnap.captain_player_id)
+      : (players || []).find(p => p.in_starting_11) || (players || [])[0];
+    if (!captain) return;
+    const look = window.LpcRenderer.resolveLook(captain);
+    const kit = {
+      shirtColor: teamSnap.kit_shirt_color || 'red',
+      pantsColor: teamSnap.kit_pants_color || 'white',
+      shoeColor:  teamSnap.kit_shoes_color || 'white',
+    };
+    try {
+      const url = await window.LpcRenderer.portrait(look, { scale: 4, kit });
+      if (url) imgEl.src = url;
+    } catch (e) {}
   }
 
   function _colorHex(name) {
@@ -2749,12 +2805,16 @@
       stages.push({ idx: i, isBossSlot, isPast, isNow, isLocked });
     }
 
-    // 找一個 SSR > SR > R 的先發球員當主角
+    // 主角：優先用隊長、其次 SSR > SR > R 先發
     const allPlayers = await window.MyTeam.fetchPlayers();
     const rarityRank = { SSR: 3, SR: 2, R: 1 };
-    const mascot = (allPlayers || [])
-      .filter(p => p.in_starting_11)
-      .sort((a,b) => (rarityRank[b.card?.rarity] || 0) - (rarityRank[a.card?.rarity] || 0))[0]
+    const captain = team.captain_player_id
+      ? (allPlayers || []).find(p => p.id === team.captain_player_id)
+      : null;
+    const mascot = captain
+      || (allPlayers || [])
+        .filter(p => p.in_starting_11)
+        .sort((a,b) => (rarityRank[b.card?.rarity] || 0) - (rarityRank[a.card?.rarity] || 0))[0]
       || allPlayers?.[0];
 
     // 預覽下一關對手（穩定種子）
