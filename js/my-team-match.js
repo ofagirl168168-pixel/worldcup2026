@@ -486,7 +486,10 @@
           try {
             const result = await _finalize(ctx.opponent, score.h, score.a, ctx.isBoss);
             await window.MyTeam.fetch();
-            _renderPostMatch(overlay, ctx, score, result);
+            // 先播結果 splash 動畫、再展示 post-match 結算頁
+            _playResultSplash(overlay, ctx, score, result.result, () => {
+              _renderPostMatch(overlay, ctx, score, result);
+            });
           } catch (err) {
             console.error('[my-team] finalize error', err);
             const msg = String(err.message || err);
@@ -495,6 +498,34 @@
         },
       }
     );
+  }
+
+  // ── 比賽結果 splash 動畫（覆蓋 modal stage、跟 GOAL 動畫同風格） ──
+  function _playResultSplash(overlay, ctx, score, result, onDone) {
+    const stage = overlay.querySelector('.mt-match-stage');
+    if (!stage) { onDone && onDone(); return; }
+    const label = ({ W: '勝 利', D: '平 手', L: '失 利' })[result] || '結 束';
+    const subText = ({
+      W: ctx.isBoss ? '擊敗真實隊伍 BOSS！' : '幹得好、繼續闖關',
+      D: '勢均力敵',
+      L: '下次再來',
+    })[result] || '';
+    const splash = document.createElement('div');
+    splash.className = 'mt-result-splash mt-result-' + (result || 'D');
+    splash.innerHTML = `
+      <div class="mt-result-splash-text">${label}</div>
+      <div class="mt-result-splash-score">${score.h} - ${score.a}</div>
+      <div class="mt-result-splash-sub">${escapeHtml(subText)}</div>
+    `;
+    stage.appendChild(splash);
+
+    setTimeout(() => {
+      splash.classList.add('exit');
+      setTimeout(() => {
+        if (splash.parentElement) splash.remove();
+        onDone && onDone();
+      }, 400);
+    }, 2200);
   }
 
   function _renderPostMatch(overlay, ctx, score, result) {
