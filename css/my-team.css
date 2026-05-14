@@ -3565,19 +3565,26 @@
 .mt-gacha-shop-fullscene {
   position: relative;
   width: 100%;
+  min-height: 100%;
   margin: -16px -20px -40px;
-  padding: 0 0 12px;
+  padding: 0;
   overflow: hidden;
   background: #1a0a14;
+  /* 撐滿父層 mt-hub-content 的可視高度 */
+  height: calc(100% + 56px);  /* +56 抵 padding 16+40 */
 }
 
-/* 背景圖（AI 生成的店面） */
+/* 背景圖（AI 生成的店面）— 撐滿視窗、必要時 cover crop */
 .mt-gshop-bg-img {
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   user-select: none;
   -webkit-user-drag: none;
+  display: block;
 }
 
 /* 頂部招牌：球員卡販售 */
@@ -3695,17 +3702,17 @@
   z-index: 5;
 }
 
-/* 黑板告示：每 10 抽必得 SR — 直式中央偏左下、黑板位置 */
+/* 黑板告示：對到背景的黑板位置（下方、獎盃右邊）*/
 .mt-gshop-chalk-overlay {
   position: absolute;
-  top: 65%;
-  left: 10%;
-  width: 22%;
+  top: 72%;
+  left: 18%;
+  width: 14%;
   text-align: center;
   font-family: 'Caveat','Comic Sans MS',cursive;
   color: #ffffff;
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 11px;
+  line-height: 1.3;
   text-shadow: 0 1px 2px rgba(0,0,0,0.9);
   z-index: 4;
   transform: rotate(-2deg);
@@ -3732,11 +3739,11 @@
 }
 .mt-gshop-rates-btn:hover { background: rgba(0,0,0,0.9); }
 
-/* 抽卡按鈕（疊在背景底部空白區域、不再外掛在外）*/
+/* 抽卡按鈕（疊在背景的木地板區域）*/
 .mt-gshop-buttons {
   position: absolute;
-  bottom: 3%;
-  left: 4%; right: 4%;
+  bottom: 4%;
+  left: 5%; right: 5%;
   display: flex;
   gap: 10px;
   z-index: 5;
@@ -3744,15 +3751,15 @@
 .mt-gshop-btn {
   flex: 1;
   position: relative;
-  padding: 14px 12px;
-  border-radius: 14px;
+  padding: 10px 8px;
+  border-radius: 12px;
   border: 3px solid #1a1a2e;
   color: #fff;
   font-weight: 900;
   cursor: pointer;
   box-shadow:
-    0 6px 12px rgba(0,0,0,0.55),
-    inset 0 2px 4px rgba(255,255,255,0.3),
+    0 4px 10px rgba(0,0,0,0.65),
+    inset 0 2px 3px rgba(255,255,255,0.3),
     inset 0 -3px 4px rgba(0,0,0,0.25);
   transition: transform 0.12s;
 }
@@ -3769,17 +3776,19 @@
   text-shadow: 0 1px 0 rgba(255,255,255,0.4);
 }
 .mt-gshop-btn-label {
-  font-size: 22px;
+  font-size: 18px;
   letter-spacing: 2px;
   text-align: center;
+  line-height: 1.1;
 }
 .mt-gshop-btn-cost {
   background: rgba(0,0,0,0.35);
-  border-radius: 6px;
-  padding: 3px 6px;
-  font-size: 13px;
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 11px;
   text-align: center;
-  margin-top: 4px;
+  margin-top: 3px;
+  line-height: 1.2;
 }
 .mt-gshop-btn-10 .mt-gshop-btn-cost { background: rgba(0,0,0,0.18); color: #2a1505; }
 .mt-gshop-btn-cost b { font-size: 15px; }
