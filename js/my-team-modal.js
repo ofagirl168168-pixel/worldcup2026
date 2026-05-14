@@ -2779,22 +2779,35 @@
           </div>
           <!-- 對手隊徽 + 隊名（右上、球門上方） -->
           <div class="mt-match-opp-label">
-            <div class="mt-match-opp-label-crest">${escapeHtml(oppFlag)}</div>
-            <div class="mt-match-opp-label-name">${escapeHtml(oppName)}${oppIsReal ? ' <span class="mt-match-opp-real">REAL</span>' : ''}</div>
+            <div class="mt-match-opp-label-tag">▶ 下一隊對手</div>
+            <div class="mt-match-opp-label-row">
+              <span class="mt-match-opp-label-crest">${escapeHtml(oppFlag)}</span>
+              <span class="mt-match-opp-label-name">${escapeHtml(oppName)}</span>
+              ${oppIsReal ? '<span class="mt-match-opp-real">REAL</span>' : ''}
+            </div>
           </div>
         </div>
 
-        <!-- 當前關卡資訊 + 開戰鈕（移到地圖上方、進 tab 就看到） -->
+        <!-- 當前關卡 + 開戰鈕（左：按鈕、右：對手資訊） -->
         <div class="mt-match-current">
-          <div class="mt-match-current-label">第 ${currentStage} 關 · 能力 ~${tierAvg}</div>
-          ${currentStage === 5 || currentStage === 10
-            ? '<div class="mt-match-current-boss">👑 BOSS 戰</div>'
-            : isBossLikely ? '<div class="mt-match-current-boss-hint">⭐ 可能是 Boss</div>' : ''}
-          <button class="mt-match-engage-btn" id="mt-match-start" ${team.stamina < 1 ? 'disabled' : ''}>
-            <span class="mt-match-engage-sword">⚔</span>
-            <span class="mt-match-engage-label">下一關</span>
-            <span class="mt-match-engage-cost">⚡ 1（剩 ${team.stamina}/${team.stamina_max}）</span>
-          </button>
+          <div class="mt-match-current-left">
+            <div class="mt-match-current-label">第 ${currentStage} 關 · 能力 ~${tierAvg}</div>
+            <button class="mt-match-engage-btn" id="mt-match-start" ${team.stamina < 1 ? 'disabled' : ''}>
+              <span class="mt-match-engage-sword">⚔</span>
+              <span class="mt-match-engage-label">下一關</span>
+              <span class="mt-match-engage-cost">⚡1</span>
+            </button>
+          </div>
+          <div class="mt-match-current-right">
+            <div class="mt-match-current-vs-label">VS</div>
+            <div class="mt-match-current-opp-name">${escapeHtml(oppFlag)} ${escapeHtml(oppName)}</div>
+            <div class="mt-match-current-opp-meta">
+              ${oppIsReal ? '<span class="mt-match-opp-real">REAL</span>' : '<span class="mt-match-opp-npc">NPC</span>'}
+              ${currentStage === 5 || currentStage === 10
+                ? '<span class="mt-match-current-boss-pill">👑 BOSS</span>'
+                : isBossLikely ? `<span class="mt-match-current-boss-pill mt-match-current-boss-pill--maybe">⭐ Boss ${Math.round(realRatio*100)}%</span>` : ''}
+            </div>
+          </div>
           ${team.stamina < 1 ? '<div class="mt-match-current-warn">⚡ 體力 0 — 預測比賽、看文章可賺體力</div>' : ''}
         </div>
 
@@ -2914,11 +2927,11 @@
     } catch (e) {}
     if (!heroSheetUrl) return;
 
-    // 守門員：固定不同 look（暗膚 + 黑髮，明顯跟主角不同）
+    // 守門員：固定 look（用合法的 body 值）
     const gkLook = {
-      body: 'dark',
-      eye_color: 'black',
-      hair_style: 'short',
+      body: 'brown',
+      eye_color: 'brown',
+      hair_style: 'buzzcut',
       hair_color: 'black',
     };
     let gkSheetUrl = null;
@@ -2927,11 +2940,12 @@
         shirtColor: 'black', pantsColor: 'green', shoeColor: 'black',
       });
       if (sheet) gkSheetUrl = sheet.canvas.toDataURL('image/png');
-    } catch (e) {}
+    } catch (e) { console.warn('[my-team] gk render fail', e); }
 
-    // 兩名對手球員（站在球門前、跟主角形成對比 — 紅衫黑褲）
-    const opp1Look = { body: 'light',  eye_color: 'brown', hair_style: 'plain', hair_color: 'brown'  };
-    const opp2Look = { body: 'orc',    eye_color: 'black', hair_style: 'short', hair_color: 'black'  };
+    // 兩名對手球員（站在球門前、依 matchIdx 種子隨機 look、紅衫黑褲）
+    const gen = window.LPC_SSR_LOOKS && window.LPC_SSR_LOOKS.generateRandomLook;
+    const opp1Look = gen ? gen(tier * 1000 + matchIdx + 1001) : { body: 'olive', eye_color: 'brown', hair_style: 'spiked', hair_color: 'black' };
+    const opp2Look = gen ? gen(tier * 1000 + matchIdx + 2002) : { body: 'bronze', eye_color: 'brown', hair_style: 'buzzcut', hair_color: 'black' };
     const oppKit = { shirtColor: 'red', pantsColor: 'black', shoeColor: 'white' };
     let opp1SheetUrl = null, opp2SheetUrl = null;
     try {
@@ -2941,7 +2955,7 @@
       ]);
       if (s1) opp1SheetUrl = s1.canvas.toDataURL('image/png');
       if (s2) opp2SheetUrl = s2.canvas.toDataURL('image/png');
-    } catch (e) {}
+    } catch (e) { console.warn('[my-team] opp render fail', e); }
 
     const SHEET_COLS = 3;
     const SHEET_ROWS = 8;
