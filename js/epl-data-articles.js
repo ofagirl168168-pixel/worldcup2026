@@ -3243,6 +3243,100 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 <p><b>曼城</b>：5/16（六）FA Cup 決賽 vs 切爾西（溫布利），然後 5/20 英超第 37 輪。<br>
 <b>水晶宮</b>：5/17（六）英超第 37 輪客場 vs 布倫特福德。</p>`,
     tags: ['賽後回顧', '曼城', '水晶宮', 'Foden', 'Semenyo', 'Marmoush', 'Savinho', '冠軍爭奪', '補賽']
+  },
+  {
+    id: 'epl-060',
+    title: '【賽前分析】阿斯頓維拉 vs 利物浦：59 分生死戰，歐冠門票一戰定生死',
+    date: '2026-05-15',
+    category: '賽前深度分析',
+    summary: '英超第37輪焦點戰——同積59分的阿斯頓維拉與利物浦在Villa Park正面交鋒，勝者幾乎鎖定歐冠席位。維拉主帥 Emery 少了 Onana 與 Kamara，利物浦 Salah 僅能替補、Wirtz 因腸胃炎存疑，這場「歐冠資格決賽」誰能勝出？',
+    content: `<h2>阿斯頓維拉 vs 利物浦｜英超第37輪・5/16（五）03:00 台灣時間・Villa Park</h2>
+
+<h3>積分形勢：同分對決</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:2px solid rgba(255,255,255,0.3)">
+<td style="padding:8px"><strong>排名</strong></td>
+<td style="padding:8px"><strong>球隊</strong></td>
+<td style="padding:8px"><strong>已賽</strong></td>
+<td style="padding:8px"><strong>積分</strong></td>
+<td style="padding:8px"><strong>淨勝球</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">4</td>
+<td style="padding:8px">利物浦</td>
+<td style="padding:8px">36</td>
+<td style="padding:8px">59</td>
+<td style="padding:8px">較高</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">5</td>
+<td style="padding:8px">阿斯頓維拉</td>
+<td style="padding:8px">36</td>
+<td style="padding:8px">59</td>
+<td style="padding:8px">較低</td>
+</tr>
+</table>
+
+<p>這是一場不折不扣的<b>「歐冠資格決賽」</b>——利物浦與阿斯頓維拉同積 59 分，僅靠淨勝球差距分出第 4 與第 5。本季英格蘭因 UEFA 俱樂部係數排名優異，第 5 名也能獲得下賽季歐冠資格，但兩隊都不想把命運交給別人——贏球就幾乎確定歐冠門票。</p>
+
+<h3>阿斯頓維拉近況：歐霸決賽在即，聯賽分心？</h3>
+
+<p>Unai Emery 的球隊近 5 場聯賽僅贏 1 場（1W 1D 3L），形勢看似不妙——但那唯一的勝利正是歐霸聯半決賽的晉級之戰。維拉下週三就要出征伊斯坦堡踢<b>歐霸聯決賽</b>，Emery 勢必要在輪換與全力拼搶之間取得平衡。</p>
+
+<p>主場是維拉的最大武器：本季 Villa Park 拿下 34 分（聯賽第 6），而且過去兩次在主場對利物浦保持不敗（3-3 及 2-2），打破了紅軍長期壓制的格局。</p>
+
+<h3>利物浦近況：傷兵危機籠罩</h3>
+
+<p>Arne Slot 的利物浦近期表現不穩（近 5 輪僅 2 勝），更棘手的是傷兵名單長得嚇人：</p>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:2px solid rgba(255,255,255,0.3)">
+<td style="padding:8px"><strong>球員</strong></td>
+<td style="padding:8px"><strong>狀態</strong></td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">Mohamed Salah</td>
+<td style="padding:8px">腿後肌恢復中，已回歸訓練但 Slot 表示「只能上幾分鐘」→ 預計替補</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">Florian Wirtz</td>
+<td style="padding:8px">腸胃炎（服用抗生素），出場成疑</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">Ibrahima Konaté</td>
+<td style="padding:8px">大腿傷（vs CHE 退場），待評估</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">Alisson</td>
+<td style="padding:8px">預計傷癒復出先發</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">Ekitike / Bradley / Endo / Leoni</td>
+<td style="padding:8px">全部賽季報銷</td>
+</tr>
+</table>
+
+<p>如果 Wirtz 無法出場，利物浦在進攻端將大幅削弱——Salah 只能短暫登場、Wirtz 又掛病號，意味著 <b>Szoboszlai</b> 和 <b>Diogo Jota</b> 必須扛起主要得分責任。好消息是 <b>Alisson</b> 預計回歸，門將位置終於穩定。</p>
+
+<h3>維拉傷兵</h3>
+
+<p><b>Boubacar Kamara</b>（膝傷，賽季報銷）、<b>Amadou Onana</b>（小腿傷）、<b>Alysson</b>（腹股溝傷）均確定缺席。中場少了 Kamara 和 Onana 兩大屏障，Emery 可能需要 <b>Youri Tielemans</b> 承擔更多防守任務。</p>
+
+<h3>歷史交鋒</h3>
+
+<p>利物浦在近 16 次英超對維拉中贏了 12 場，過去 11 次交手保持不敗（8W 3D）。但維拉主場最近兩次對利物浦都踢出了精彩的平局——3-3 和 2-2。Villa Park 的氛圍加上歐冠門票的壓力，今晚的比賽不會輕鬆。</p>
+
+<h3>關鍵對決</h3>
+
+<p><b>Ollie Watkins vs Virgil van Dijk</b>：Watkins 本季英超攻入 14 球、助攻 8 次，是維拉的進攻引擎。Van Dijk 能否在 Konaté 可能缺陣的情況下穩住後防，將是勝負關鍵。</p>
+
+<p><b>Morgan Rogers vs Alexis Mac Allister</b>：Rogers 近期狀態火熱，在歐霸半決賽中表現亮眼。Mac Allister 需要在中場攻守兩端提供更多支援，特別是 Wirtz 可能缺陣的情況下。</p>
+
+<h3>Soccer麥迪預測</h3>
+
+<p>維拉有主場優勢和歐冠資格的強烈動機，但歐霸決賽在即可能導致輪換。利物浦傷兵累累但陣容底蘊更深。預計雙方都不願冒險，<b>1-1</b> 平局可能性最高——但如果 Watkins 能把握住機會，維拉有機會在主場拿下關鍵 3 分。</p>`,
+    tags: ['賽前分析', '阿斯頓維拉', '利物浦', 'Watkins', 'Salah', 'Wirtz', '歐冠資格', '第37輪']
   }
 ];
 

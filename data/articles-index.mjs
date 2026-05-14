@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-060",
+    "tournament": "epl",
+    "title": "【賽前分析】阿斯頓維拉 vs 利物浦：59 分生死戰，歐冠門票一戰定生死",
+    "summary": "英超第37輪焦點戰——同積59分的阿斯頓維拉與利物浦在Villa Park正面交鋒，勝者幾乎鎖定歐冠席位。維拉主帥 Emery 少了 Onana 與 Kamara，利物浦 Salah 僅能替補、Wirtz 因腸胃炎存疑，這場「歐冠資格決賽」誰能勝出？",
+    "date": "2026-05-15",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-059",
     "tournament": "epl",
     "title": "【賽後回顧】曼城 3-0 水晶宮：Foden 主導進攻，Semenyo、Marmoush、Savinho 連線粉碎宮兵",
@@ -169,7 +179,7 @@ export default [
     "date": "2026-05-07",
     "category": "賽前深度分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-048",
@@ -179,7 +189,7 @@ export default [
     "date": "2026-05-07",
     "category": "賽前深度分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "ucl-023",
@@ -189,7 +199,7 @@ export default [
     "date": "2026-05-07",
     "category": "賽後回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-046",
