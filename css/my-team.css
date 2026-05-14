@@ -5828,14 +5828,9 @@
 }
 .mt-coach-draw-btn {
   flex: 1;
-  background:
-    linear-gradient(180deg,
-      rgba(255,255,255,0.45) 0%,
-      rgba(255,255,255,0.1) 8%,
-      rgba(255,255,255,0) 18%,
-      rgba(0,0,0,0) 60%,
-      rgba(0,0,0,0.25) 95%),
-    linear-gradient(180deg, #ffd92a 0%, #fbcd0c 25%, #d8a808 55%, #a07808 82%, #6b5106 100%);
+  /* 單層實心金漸層、無透明（讓按鈕一眼看出來能按）*/
+  background: linear-gradient(180deg, #ffd92a 0%, #fbcd0c 45%, #d4a008 100%) !important;
+  background-color: #fbcd0c !important;
   border: 2.5px solid #ffffff;
   color: #2a1505;
   font-weight: 900;
@@ -5846,16 +5841,16 @@
   box-shadow:
     0 0 0 2px #382308,
     0 4px 0 #5a3a0a,
-    0 8px 20px rgba(55,30,5,0.7),
-    inset 0 2px 0 rgba(255,255,255,0.95),
-    inset 0 -3px 6px rgba(80,45,5,0.5);
-  transition: transform 0.12s, box-shadow 0.15s;
+    0 8px 16px rgba(55,30,5,0.55),
+    inset 0 2px 0 rgba(255,255,255,0.85);
+  transition: transform 0.12s, filter 0.15s;
   animation: mt-draw-glow 1.8s ease-in-out infinite;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
   position: relative;
+  opacity: 1 !important;
 }
 .mt-coach-btn-label {
   font-size: 14px;
@@ -5902,25 +5897,18 @@
 }
 .mt-coach-draw-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); animation: none; }
 
-/* 10 連抽：藍色（區分主按鈕、突顯划算）*/
+/* 10 連抽：實心藍 */
 .mt-coach-draw-10 {
-  background:
-    linear-gradient(180deg,
-      rgba(255,255,255,0.45) 0%,
-      rgba(255,255,255,0.1) 8%,
-      rgba(255,255,255,0) 18%,
-      rgba(0,0,0,0) 60%,
-      rgba(0,0,0,0.3) 95%),
-    linear-gradient(180deg, #2eaef2 0%, #1e9be8 25%, #1888d0 55%, #0e6aa5 82%, #053f6a 100%) !important;
+  background: linear-gradient(180deg, #4ab8ff 0%, #1e9be8 45%, #1370b0 100%) !important;
+  background-color: #1e9be8 !important;
   border-color: #ffffff !important;
   color: #ffffff !important;
   text-shadow: 0 2px 3px rgba(0,15,40,0.95) !important;
   box-shadow:
     0 0 0 2px #042746,
     0 4px 0 #08355d,
-    0 8px 20px rgba(0,25,55,0.85),
-    inset 0 2px 0 rgba(255,255,255,0.9),
-    inset 0 -3px 6px rgba(0,20,45,0.6) !important;
+    0 8px 16px rgba(0,25,55,0.7),
+    inset 0 2px 0 rgba(255,255,255,0.85) !important;
 }
 .mt-coach-draw-10 .mt-coach-cost-or { color: rgba(255,255,255,0.7); }
 
