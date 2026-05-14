@@ -5795,6 +5795,16 @@
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   line-height: 1.2;
 }
+.mt-coach-slot-trait {
+  font-size: 8px;
+  color: #ffd54a;
+  margin-top: 1px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.2px;
+}
 .mt-coach-slot-rarity {
   position: absolute; top: 1px; left: 1px;
   font-size: 7px; font-weight: 900;

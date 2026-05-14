@@ -1405,6 +1405,7 @@
         ${badge ? `<span class="mt-coach-active-crown">${badge}</span>` : ''}
         <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
         <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
+        <div class="mt-coach-slot-trait">${escapeHtml(_traitShortLabel(c.trait, c.trait_value))}</div>
         <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
       `;
       grid.appendChild(slot);
@@ -1734,6 +1735,31 @@
     overlay.addEventListener('click', e => {
       if (e.target === overlay) overlay.querySelector('#mt-coach-result-close').click();
     });
+  }
+
+  // 簡短 trait 標籤（給小卡用、像 「攻 +10%」）
+  function _traitShortLabel(trait, value) {
+    if (!trait) return '';
+    // 屬性 + 數值
+    const ATTR_SHORT = { attack:'攻', defense:'防', speed:'速', midfield:'中', stamina:'體', aura:'氣' };
+    if (value && value.attr) {
+      return `${ATTR_SHORT[value.attr] || value.attr} +${Math.round(value.pct * 100)}%`;
+    }
+    // 主流 trait 對應顯示
+    const MAP = {
+      tactician:        '中 +8%',
+      offensive_master: '攻 +10%',
+      defensive_master: '防 +8%',
+      speed_coach:      '速 +8%',
+      tiki_taka:        '攻+10% 中+8%',
+      iron_wall:        '防 +8%',
+      gegen_press:      '速+5% 體+10%',
+      physio:           '體 +10%',
+      youth_developer:  '訓練 RP +25%',
+      champion_mentality:'抗翻盤 +30%',
+      veteran_handler:  '老將 +10%',
+    };
+    return MAP[trait] || trait;
   }
 
   function _traitLabel(trait, value) {
