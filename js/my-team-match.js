@@ -190,6 +190,14 @@
     return r ? _generateReal(tier, matchIdx) : _generateNPC(tier, matchIdx);
   }
 
+  // ── 預覽下一關對手（穩定種子、不消耗也不影響實際抽對手）──
+  function peekNextOpponent(tier, matchIdx) {
+    const realRatio = REAL_TEAM_RATIO[tier] || 0;
+    const r = _rng(tier * 9907 + matchIdx + 1);
+    const isReal = r() < realRatio;
+    return isReal ? _generateReal(tier, matchIdx) : _generateNPC(tier, matchIdx);
+  }
+
   // ── 結算 RPC ──
   async function _finalize(opponent, scoreH, scoreA, isBoss) {
     let data;
@@ -611,5 +619,6 @@
   if (window.MyTeam) {
     window.MyTeam.runMatch = runMatch;
     window.MyTeam.runPvpMatch = runPvpMatch;
+    window.MyTeam.peekNextOpponent = peekNextOpponent;
   }
 })();

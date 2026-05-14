@@ -405,10 +405,35 @@
 
     body.innerHTML = `
       <div class="mt-onboard">
-        <!-- 動態 hero 區（pixel 草地 + 跳動球 + 預覽卡）-->
-        <div class="mt-onboard-hero">
-          <div class="mt-onboard-hero-stars"></div>
-          <canvas class="mt-onboard-hero-scene" id="mt-onboard-scene" width="320" height="160"></canvas>
+        <!-- 動態 hero 區：天空 + 雲 + 草地球門（與比賽 tab banner 同風格） -->
+        <div class="mt-onboard-hero mt-match-banner">
+          <div class="mt-match-banner-scroll">
+            <div class="mt-match-banner-clouds">
+              <span class="mt-match-cloud c1"></span>
+              <span class="mt-match-cloud c2"></span>
+              <span class="mt-match-cloud c3"></span>
+            </div>
+            <div class="mt-match-banner-ground">
+              <!-- 球門 -->
+              <div class="mt-match-goal">
+                <svg viewBox="0 0 80 50" preserveAspectRatio="xMidYMax meet">
+                  <rect x="2" y="2" width="76" height="40" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+                  <line x1="2" y1="2"  x2="2"  y2="48" stroke="#cccccc" stroke-width="2"/>
+                  <line x1="78" y1="2" x2="78" y2="48" stroke="#cccccc" stroke-width="2"/>
+                  <line x1="2" y1="42" x2="78" y2="42" stroke="#ffffff" stroke-width="2.5"/>
+                  <line x1="14" y1="2" x2="14" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="26" y1="2" x2="26" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="40" y1="2" x2="40" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="54" y1="2" x2="54" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="66" y1="2" x2="66" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="2" y1="11" x2="78" y2="11" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="2" y1="22" x2="78" y2="22" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="2" y1="32" x2="78" y2="32" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <!-- 隊徽預覽（疊在 banner 上方） -->
           <div class="mt-onboard-hero-card" id="mt-onboard-preview">
             <div class="mt-onboard-hero-crest" id="mt-onboard-preview-crest">⚽</div>
             <div class="mt-onboard-hero-name" id="mt-onboard-preview-name">你的球隊</div>
@@ -448,9 +473,6 @@
 
     const previewCrest = body.querySelector('#mt-onboard-preview-crest');
     const previewName = body.querySelector('#mt-onboard-preview-name');
-
-    // ─── pixel art 場景動畫（草地 + 跳球 + 小 chibi 跑動）───
-    _startOnboardScene(body.querySelector('#mt-onboard-scene'));
 
     // 隊徽選擇 → 用 SVG TeamCrests（不再 emoji）
     const grid = body.querySelector('#mt-crest-grid');
@@ -2676,6 +2698,17 @@
       .sort((a,b) => (rarityRank[b.card?.rarity] || 0) - (rarityRank[a.card?.rarity] || 0))[0]
       || allPlayers?.[0];
 
+    // 預覽下一關對手（穩定種子）
+    let nextOpp = null;
+    try {
+      if (typeof window.MyTeam.peekNextOpponent === 'function') {
+        nextOpp = window.MyTeam.peekNextOpponent(tier, played);
+      }
+    } catch (e) { nextOpp = null; }
+    const oppName = nextOpp?.nameCN || '未知對手';
+    const oppFlag = nextOpp?.flag || '🏴';
+    const oppIsReal = !!nextOpp?._isReal;
+
     content.innerHTML = `
       <div class="mt-match-map">
         <!-- 頂部：主角踢球 2D 卷軸動畫 + tier 標題 -->
@@ -2687,27 +2720,32 @@
               <span class="mt-match-cloud c3"></span>
             </div>
             <div class="mt-match-banner-ground">
-              <!-- 球門（在右側、會固定位置等主角到達） -->
+              <!-- 球門（拉寬 ≈ 真實球門比例） -->
               <div class="mt-match-goal">
-                <svg viewBox="0 0 50 60" preserveAspectRatio="xMidYMax meet">
-                  <rect x="2" y="2" width="46" height="50" fill="none" stroke="#ffffff" stroke-width="3"/>
-                  <line x1="2" y1="50" x2="48" y2="50" stroke="#ffffff" stroke-width="3"/>
-                  <line x1="2" y1="2" x2="2" y2="52" stroke="#cccccc" stroke-width="2"/>
-                  <line x1="48" y1="2" x2="48" y2="52" stroke="#cccccc" stroke-width="2"/>
-                  <!-- 網格紋 -->
-                  <line x1="8"  y1="2" x2="8"  y2="50" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
-                  <line x1="16" y1="2" x2="16" y2="50" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
-                  <line x1="24" y1="2" x2="24" y2="50" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
-                  <line x1="32" y1="2" x2="32" y2="50" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
-                  <line x1="40" y1="2" x2="40" y2="50" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
-                  <line x1="2" y1="12" x2="48" y2="12" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
-                  <line x1="2" y1="22" x2="48" y2="22" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
-                  <line x1="2" y1="32" x2="48" y2="32" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
-                  <line x1="2" y1="42" x2="48" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
+                <svg viewBox="0 0 80 50" preserveAspectRatio="xMidYMax meet">
+                  <!-- 主框 -->
+                  <rect x="2" y="2" width="76" height="40" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+                  <!-- 側面 + 底邊（透視感） -->
+                  <line x1="2" y1="2"  x2="2"  y2="48" stroke="#cccccc" stroke-width="2"/>
+                  <line x1="78" y1="2" x2="78" y2="48" stroke="#cccccc" stroke-width="2"/>
+                  <line x1="2" y1="42" x2="78" y2="42" stroke="#ffffff" stroke-width="2.5"/>
+                  <!-- 網格紋（垂直） -->
+                  <line x1="14" y1="2" x2="14" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="26" y1="2" x2="26" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="40" y1="2" x2="40" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="54" y1="2" x2="54" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="66" y1="2" x2="66" y2="42" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <!-- 網格紋（水平） -->
+                  <line x1="2" y1="11" x2="78" y2="11" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="2" y1="22" x2="78" y2="22" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+                  <line x1="2" y1="32" x2="78" y2="32" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
                 </svg>
                 <!-- 守門員 sprite 預留 -->
                 <div class="mt-match-goalkeeper" id="mt-match-goalkeeper"></div>
               </div>
+              <!-- 對手球員 ×2（站在球門前） -->
+              <div class="mt-match-opp" id="mt-match-opp-1"></div>
+              <div class="mt-match-opp" id="mt-match-opp-2"></div>
               <!-- 主角 sprite -->
               <div class="mt-match-hero" id="mt-match-hero"></div>
               <!-- 球（主角腳下、會跟著一起跑、射門時飛走） -->
@@ -2739,46 +2777,14 @@
               ${isBossLikely ? `<span class="mt-match-boss-tag">⭐ Boss ${Math.round(realRatio*100)}%</span>` : ''}
             </div>
           </div>
-        </div>
-
-        <!-- 闖關路線（10 站） -->
-        <div class="mt-match-path">
-          <svg class="mt-match-path-line" viewBox="0 0 300 480" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M 150 456
-                     C 240 456, 230 400, 70 400
-                     C 30 400, 30 345, 150 345
-                     C 270 345, 270 290, 70 290
-                     C 30 290, 30 240, 150 240
-                     C 270 240, 270 187, 70 187
-                     C 30 187, 30 134, 150 134
-                     C 270 134, 270 82, 150 82
-                     C 90 82, 60 43, 234 14"
-              fill="none"
-              stroke="rgba(240,192,64,0.5)"
-              stroke-width="4"
-              stroke-linecap="round"
-              stroke-dasharray="3,6"/>
-          </svg>
-          <div class="mt-match-stages">
-            ${stages.map(s => {
-              const cls = [
-                'mt-match-stage-node',
-                s.isBossSlot ? 'is-boss' : '',
-                s.isPast ? 'is-past' : '',
-                s.isNow ? 'is-now' : '',
-                s.isLocked ? 'is-locked' : '',
-              ].filter(Boolean).join(' ');
-              return `
-                <button class="${cls}" data-stage="${s.idx}" ${s.isLocked ? 'disabled' : ''}>
-                  <span class="mt-match-stage-icon">${s.isBossSlot ? '👑' : (s.isPast ? '✓' : '⚽')}</span>
-                  <span class="mt-match-stage-num">${s.idx}</span>
-                </button>
-              `;
-            }).join('')}
+          <!-- 對手隊徽 + 隊名（右上、球門上方） -->
+          <div class="mt-match-opp-label">
+            <div class="mt-match-opp-label-crest">${escapeHtml(oppFlag)}</div>
+            <div class="mt-match-opp-label-name">${escapeHtml(oppName)}${oppIsReal ? ' <span class="mt-match-opp-real">REAL</span>' : ''}</div>
           </div>
         </div>
 
-        <!-- 當前關卡資訊 + 開戰鈕 -->
+        <!-- 當前關卡資訊 + 開戰鈕（移到地圖上方、進 tab 就看到） -->
         <div class="mt-match-current">
           <div class="mt-match-current-label">第 ${currentStage} 關 · 能力 ~${tierAvg}</div>
           ${currentStage === 5 || currentStage === 10
@@ -2792,6 +2798,45 @@
           ${team.stamina < 1 ? '<div class="mt-match-current-warn">⚡ 體力 0 — 預測比賽、看文章可賺體力</div>' : ''}
         </div>
 
+        <!-- 闖關路線（可滾、自動聚焦當前關） -->
+        <div class="mt-match-path-wrap" id="mt-match-path-wrap">
+          <div class="mt-match-path">
+            <svg class="mt-match-path-line" viewBox="0 0 300 480" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M 150 456
+                       C 240 456, 230 400, 70 400
+                       C 30 400, 30 345, 150 345
+                       C 270 345, 270 290, 70 290
+                       C 30 290, 30 240, 150 240
+                       C 270 240, 270 187, 70 187
+                       C 30 187, 30 134, 150 134
+                       C 270 134, 270 82, 150 82
+                       C 90 82, 60 43, 234 14"
+                fill="none"
+                stroke="rgba(240,192,64,0.5)"
+                stroke-width="4"
+                stroke-linecap="round"
+                stroke-dasharray="3,6"/>
+            </svg>
+            <div class="mt-match-stages">
+              ${stages.map(s => {
+                const cls = [
+                  'mt-match-stage-node',
+                  s.isBossSlot ? 'is-boss' : '',
+                  s.isPast ? 'is-past' : '',
+                  s.isNow ? 'is-now' : '',
+                  s.isLocked ? 'is-locked' : '',
+                ].filter(Boolean).join(' ');
+                return `
+                  <button class="${cls}" data-stage="${s.idx}" ${s.isLocked ? 'disabled' : ''}>
+                    <span class="mt-match-stage-icon">${s.isBossSlot ? '👑' : (s.isPast ? '✓' : '⚽')}</span>
+                    <span class="mt-match-stage-num">${s.idx}</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+
         <!-- PvP 招牌 -->
         <button class="mt-match-wall-sign mt-match-pvp-sign" id="mt-pvp-find" ${pvpDisabled ? 'disabled' : ''}>
           <div class="mt-match-wall-sign-icon">⚔️</div>
@@ -2801,8 +2846,20 @@
       </div>
     `;
 
-    // 渲染主角 sprite（LPC walking）+ 守門員（隨機 look）
-    _renderMatchBanner(content, mascot, team);
+    // 渲染主角 sprite（LPC walking）+ 守門員 + 兩名對手球員
+    _renderMatchBanner(content, mascot, team, played);
+
+    // 自動聚焦：進 tab 時把當前關卡 scroll 到可見區域中央
+    requestAnimationFrame(() => {
+      const wrap = content.querySelector('#mt-match-path-wrap');
+      const nowNode = content.querySelector('.mt-match-stage-node.is-now');
+      if (wrap && nowNode) {
+        const wrapRect = wrap.getBoundingClientRect();
+        const nodeRect = nowNode.getBoundingClientRect();
+        const offset = nodeRect.top - wrapRect.top - wrap.clientHeight / 2 + nodeRect.height / 2;
+        wrap.scrollTo({ top: wrap.scrollTop + offset, behavior: 'smooth' });
+      }
+    });
 
     content.querySelector('#mt-match-start')?.addEventListener('click', () => {
       if (typeof window.MyTeam.runMatch === 'function') {
@@ -2830,13 +2887,15 @@
   // ── 比賽 tab 卷軸：主角從左帶球到右、到球門 → 射門進球 → 重新循環 ──
   let _matchBannerLoop = null;
   let _matchGkLoop = null;
-  async function _renderMatchBanner(content, mascot, team) {
+  async function _renderMatchBanner(content, mascot, team, matchIdx = 0) {
     if (_matchBannerLoop) { clearTimeout(_matchBannerLoop); _matchBannerLoop = null; }
     if (_matchGkLoop) { clearInterval(_matchGkLoop); _matchGkLoop = null; }
     if (!mascot || !window.LpcRenderer) return;
 
     const heroEl = content.querySelector('#mt-match-hero');
     const goalkeeperEl = content.querySelector('#mt-match-goalkeeper');
+    const opp1El = content.querySelector('#mt-match-opp-1');
+    const opp2El = content.querySelector('#mt-match-opp-2');
     const ballEl = content.querySelector('#mt-match-ball');
     if (!heroEl || !ballEl || !goalkeeperEl) return;
 
@@ -2870,6 +2929,20 @@
       if (sheet) gkSheetUrl = sheet.canvas.toDataURL('image/png');
     } catch (e) {}
 
+    // 兩名對手球員（站在球門前、跟主角形成對比 — 紅衫黑褲）
+    const opp1Look = { body: 'light',  eye_color: 'brown', hair_style: 'plain', hair_color: 'brown'  };
+    const opp2Look = { body: 'orc',    eye_color: 'black', hair_style: 'short', hair_color: 'black'  };
+    const oppKit = { shirtColor: 'red', pantsColor: 'black', shoeColor: 'white' };
+    let opp1SheetUrl = null, opp2SheetUrl = null;
+    try {
+      const [s1, s2] = await Promise.all([
+        window.LpcRenderer.walkingFullBody(opp1Look, oppKit),
+        window.LpcRenderer.walkingFullBody(opp2Look, oppKit),
+      ]);
+      if (s1) opp1SheetUrl = s1.canvas.toDataURL('image/png');
+      if (s2) opp2SheetUrl = s2.canvas.toDataURL('image/png');
+    } catch (e) {}
+
     const SHEET_COLS = 3;
     const SHEET_ROWS = 8;
     const setupSprite = (el, sheetUrl) => {
@@ -2882,6 +2955,8 @@
     };
     setupSprite(heroEl, heroSheetUrl);
     if (gkSheetUrl) setupSprite(goalkeeperEl, gkSheetUrl);
+    if (opp1El && opp1SheetUrl) setupSprite(opp1El, opp1SheetUrl);
+    if (opp2El && opp2SheetUrl) setupSprite(opp2El, opp2SheetUrl);
 
     // 走向約定：依專案的 walkingFullBody — row 0=down, 1=left, 2=right, 3=up, 4=kick, 5=cheer, 6=hurt
     const ROW_WALK_RIGHT = 2;
@@ -2895,7 +2970,7 @@
     let frame = 1;
     let frameTick = 0;
     const bannerWidth = () => content.querySelector('.mt-match-banner')?.clientWidth || 320;
-    const goalX = () => bannerWidth() - 60;
+    const goalX = () => bannerWidth() - 90;
     const HERO_SPEED = 1.2;
 
     // 球初始狀態：在主角腳下、跟著主角移動（dribble）
@@ -2965,6 +3040,10 @@
       const f = gkPhase % SHEET_COLS;
       goalkeeperEl.style.backgroundPosition = `-${f * frameW}px -${row * frameH}px`;
     }, 320);
+
+    // 對手球員：定格在「面向左 idle」frame 0（看著主角衝過來、防守姿勢）
+    if (opp1El) opp1El.style.backgroundPosition = `-${1 * frameW}px -${ROW_WALK_LEFT * frameH}px`;
+    if (opp2El) opp2El.style.backgroundPosition = `-${1 * frameW}px -${ROW_WALK_LEFT * frameH}px`;
 
     tick();
   }

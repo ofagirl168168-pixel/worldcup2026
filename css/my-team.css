@@ -152,41 +152,22 @@
 }
 
 /* Hero 區 — 動態星空 + pixel 場景 + 預覽卡片 */
-.mt-onboard-hero {
-  position: relative;
+/* Onboarding hero：用 .mt-match-banner 樣式 + 隊徽預覽疊上 */
+.mt-onboard-hero.mt-match-banner {
   height: 180px;
   margin: -20px -24px 18px;
-  background: radial-gradient(ellipse at center, #2a1855 0%, #0d1224 100%);
-  overflow: hidden;
-  border-bottom: 1px solid rgba(240,192,64,0.2);
-}
-.mt-onboard-hero-scene {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  pointer-events: none;
-}
-.mt-onboard-hero-stars {
-  position: absolute; inset: 0;
-  background-image:
-    radial-gradient(1px 1px at 12% 30%, white, transparent 70%),
-    radial-gradient(1px 1px at 38% 70%, white, transparent 70%),
-    radial-gradient(2px 2px at 55% 25%, white, transparent 70%),
-    radial-gradient(1px 1px at 78% 60%, white, transparent 70%),
-    radial-gradient(1px 1px at 25% 85%, white, transparent 70%),
-    radial-gradient(2px 2px at 88% 15%, white, transparent 70%);
-  opacity: 0.6;
-  animation: mt-stars-drift 60s linear infinite;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-top: none;
 }
 .mt-onboard-hero-card {
-  position: relative;
-  z-index: 3;
-  padding-top: 20px;
+  position: absolute;
+  left: 0; right: 0; top: 14px;
+  z-index: 4;
+  text-align: center;
   animation: mt-onboard-hero-in 0.6s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  pointer-events: none;
 }
 @keyframes mt-onboard-hero-in {
   from { opacity: 0; transform: translateY(-20px); }
@@ -5406,27 +5387,80 @@
   z-index: 3;
   pointer-events: none;
 }
-/* 守門員 sprite */
+/* 守門員 sprite（站在球門中間） */
 .mt-match-goalkeeper {
   position: absolute;
-  right: 8px;
+  right: 32px;
   bottom: 2px;
   filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
   z-index: 2;
   pointer-events: none;
 }
-/* 球門 SVG */
+/* 球門 SVG（拉寬 ≈ 真實球門比例） */
 .mt-match-goal {
   position: absolute;
   right: 4px;
-  bottom: 18px;
-  width: 50px;
+  bottom: 16px;
+  width: 80px;
   height: 50px;
   z-index: 1;
 }
 .mt-match-goal svg {
   width: 100%; height: 100%;
   filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+}
+/* 對手球員 sprite ×2（站在球門前） */
+.mt-match-opp {
+  position: absolute;
+  bottom: 2px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+  z-index: 2;
+  pointer-events: none;
+  animation: mt-match-opp-bob 2.4s ease-in-out infinite;
+}
+#mt-match-opp-1 { right: 64px; }
+#mt-match-opp-2 { right: 8px; animation-delay: -1.2s; }
+@keyframes mt-match-opp-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+/* 對手隊徽 + 隊名（右上） */
+.mt-match-opp-label {
+  position: absolute;
+  right: 8px; top: 8px;
+  background: rgba(0,0,0,0.7);
+  border: 1.5px solid rgba(229,57,53,0.7);
+  border-radius: 8px;
+  padding: 3px 8px;
+  color: #fff;
+  display: flex; align-items: center; gap: 5px;
+  max-width: 60%;
+  z-index: 4;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+.mt-match-opp-label-crest {
+  font-size: 15px;
+  line-height: 1;
+}
+.mt-match-opp-label-name {
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffb0b0;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 110px;
+}
+.mt-match-opp-real {
+  background: linear-gradient(180deg, #ff7060, #c0231a);
+  color: #fff;
+  font-size: 8px;
+  padding: 0 4px;
+  border-radius: 4px;
+  margin-left: 3px;
+  letter-spacing: 0.5px;
+  vertical-align: 1px;
 }
 /* 足球（SVG）— 主角腳邊帶球、射門時飛走 */
 .mt-match-ball {
@@ -5469,6 +5503,23 @@
   50%      { box-shadow: 0 0 10px rgba(229,57,53,0.9); }
 }
 
+/* 路線地圖外框：可滾、自動聚焦當前關 */
+.mt-match-path-wrap {
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 0 0 12px;
+  padding: 4px 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(240,192,64,0.5) rgba(0,0,0,0.2);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.15));
+  box-shadow: inset 0 4px 6px -4px rgba(0,0,0,0.45), inset 0 -4px 6px -4px rgba(0,0,0,0.45);
+}
+.mt-match-path-wrap::-webkit-scrollbar { width: 6px; }
+.mt-match-path-wrap::-webkit-scrollbar-thumb { background: rgba(240,192,64,0.5); border-radius: 3px; }
+.mt-match-path-wrap::-webkit-scrollbar-track { background: rgba(0,0,0,0.15); }
 /* 路線地圖 */
 .mt-match-path {
   position: relative;
@@ -5568,9 +5619,9 @@
 .mt-match-stage-node[data-stage="9"]  { left: 50%; top:  9%; transform: translate(-50%, -50%); }
 .mt-match-stage-node[data-stage="10"] { left: 78%; top:  3%; transform: translate(-50%, -50%); }
 
-/* 當前關卡資訊面板（地圖下方） */
+/* 當前關卡資訊面板（移到地圖上方、進 tab 立刻看到） */
 .mt-match-current {
-  margin: 0 14px 12px;
+  margin: 0 0 12px;
   text-align: center;
   background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.3));
   border: 2px solid rgba(240,192,64,0.55);
