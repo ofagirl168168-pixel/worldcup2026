@@ -6,17 +6,22 @@ const DB = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 window.DB = DB; // 供其他 IIFE（例如 opinion-poll.js）取用
 
 let currentUser = null;
+// 暴露給其他 IIFE module（不用 window.currentUser 就直接 undefined、
+// 抓 user_coach 之類 query 會誤判沒登入直接 return []）
+window.currentUser = null;
 
 // ── 初始化（頁面載入時呼叫）─────────────────────────────────
 async function initAuth() {
   const { data: { session } } = await DB.auth.getSession();
   currentUser = session?.user ?? null;
+  window.currentUser = currentUser;
   updateAuthUI();
   if (currentUser) await handleUserLoggedIn(false);
 
   DB.auth.onAuthStateChange(async (_event, session) => {
     const prev = currentUser?.id;
     currentUser = session?.user ?? null;
+    window.currentUser = currentUser;
     updateAuthUI();
     if (currentUser && currentUser.id !== prev) {
       await handleUserLoggedIn(true);
@@ -43,6 +48,7 @@ function loginWithGoogle() {
 async function logout() {
   await DB.auth.signOut();
   currentUser = null;
+  window.currentUser = null;
   window.currentProfile = null;
   updateAuthUI();
   renderArena?.();
