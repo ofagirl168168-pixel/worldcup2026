@@ -5357,18 +5357,22 @@
 /* ═════════════════════════════════════════════════════════════
    📋 COACH TAB — 教練辦公室（黑板 + 教練站位）
    ═════════════════════════════════════════════════════════════ */
-/* AI 背景：3:4 portrait coach-bg.jpg */
+/* AI 背景：填滿父容器（不滑動）*/
 .mt-coach-office {
   position: relative;
   width: calc(100% + 40px);
+  height: calc(100% + 56px);    /* 補回父 hub-content 的 padding 16+40 */
   margin: -16px -20px -40px;
   padding: 0;
   overflow: hidden;
-  aspect-ratio: 3 / 4;
   background:
     url('../img/my-team/coach-bg.jpg') 0 0 / 100% 100% no-repeat,
     #2a1812;
   min-height: 0;
+}
+/* coach tab 不滾動（office 已填滿） */
+.mt-hub-content[data-tab="coach"] {
+  overflow: hidden !important;
 }
 .mt-coach-office-title {
   position: absolute;
@@ -5395,11 +5399,11 @@
   font-size: 11px;
 }
 
-/* 黑板：貼在 AI 圖中央米色牆面 */
+/* 黑板：貼在 AI 圖中央米色牆面（縮小、上移）*/
 .mt-coach-blackboard {
   position: absolute;
-  top: 18%; left: 28%;
-  width: 44%;
+  top: 16%; left: 30%;
+  width: 40%;
   aspect-ratio: 240/180;
   z-index: 3;
   filter: drop-shadow(0 6px 14px rgba(0,0,0,0.55));
@@ -5432,11 +5436,12 @@
 /* 教練團：1 大主教練 + 2 小助教（橫排）*/
 .mt-coach-team {
   position: absolute;
-  top: 53%;
+  top: 50%;
   left: 4%;
   right: 4%;
+  height: 18%;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: stretch;
   z-index: 3;
 }
@@ -5454,11 +5459,11 @@
 
 /* 主教練大格（含 portrait + name + trait + rarity）*/
 .mt-coach-team-head-slot {
-  width: 100%;
+  width: 100%; height: 100%;
   background: linear-gradient(180deg, rgba(240,192,64,0.18), rgba(0,0,0,0.5));
   border: 2.5px solid #f0c040;
   border-radius: 10px;
-  padding: 6px;
+  padding: 5px;
   color: #fff;
   cursor: pointer;
   position: relative;
@@ -5472,7 +5477,9 @@
 }
 .mt-coach-team-head-slot:hover { transform: translateY(-2px); }
 .mt-coach-team-head-portrait {
-  width: 46px; height: 46px;
+  width: 100%; height: 100%;
+  max-width: 50px;
+  aspect-ratio: 1;
   flex-shrink: 0;
   background: rgba(0,0,0,0.4);
   border-radius: 6px;
@@ -5490,17 +5497,18 @@
   gap: 1px;
 }
 .mt-coach-team-head-name {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 900;
   color: #ffe680;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.1;
 }
 .mt-coach-team-head-trait {
-  font-size: 9.5px;
+  font-size: 9px;
   color: rgba(255,255,255,0.78);
-  line-height: 1.25;
+  line-height: 1.2;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -5545,7 +5553,7 @@
 /* 展開所有教練按鈕 */
 .mt-coach-expand-btn {
   position: absolute;
-  bottom: 14%; left: 50%;
+  top: 78%; left: 50%;
   transform: translateX(-50%);
   background: rgba(0,0,0,0.7);
   border: 1.5px solid rgba(240,192,64,0.65);
@@ -5591,7 +5599,7 @@
 /* 羈絆狀態條 */
 .mt-coach-synergy {
   position: absolute;
-  bottom: 19%;
+  top: 70%;
   left: 4%;
   right: 4%;
   border-radius: 8px;
@@ -5807,18 +5815,17 @@
   display: none;  /* AI 圖已含木地板、不再用 CSS 疊一層 */
 }
 
-/* 按鈕區：半透明 panel 疊在桌子右側、靠右下角 */
+/* 按鈕區：半透明 panel、位置剛好（不蓋桌子也不蓋助教）*/
 .mt-coach-actions {
   position: absolute;
-  bottom: 4%;
-  right: 4%;
-  width: 55%;
+  top: 85%;
+  left: 4%; right: 4%;
   display: flex; gap: 6px; align-items: center;
-  background: linear-gradient(180deg, rgba(60,38,18,0.85), rgba(40,25,10,0.88));
+  background: linear-gradient(180deg, rgba(60,38,18,0.88), rgba(40,25,10,0.92));
   backdrop-filter: blur(2px);
   border: 2px solid rgba(240,192,64,0.7);
   border-radius: 10px;
-  padding: 6px 8px;
+  padding: 5px 8px;
   box-shadow:
     0 4px 12px rgba(0,0,0,0.6),
     0 0 10px rgba(240,192,64,0.3),
