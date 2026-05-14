@@ -583,7 +583,6 @@
         </div>
       </div>
       <div class="mt-hub-tabs">
-        <button class="mt-hub-tab ${_currentTab === 'lounge' ? 'active' : ''}" data-tab="lounge">🏠 休息室</button>
         <button class="mt-hub-tab ${_currentTab === 'home' ? 'active' : ''}" data-tab="home">🏟️ 主頁</button>
         <button class="mt-hub-tab ${_currentTab === 'roster' ? 'active' : ''}" data-tab="roster">球員</button>
         <button class="mt-hub-tab ${_currentTab === 'gacha' ? 'active' : ''}" data-tab="gacha">抽卡</button>
@@ -665,7 +664,6 @@
       _homeAnimId = null;
     }
     switch (_currentTab) {
-      case 'lounge':   return renderLoungeTab(content);
       case 'home':     return renderHomeTab(content);
       case 'roster':   return renderRosterTab(content);
       case 'gacha':    return renderGachaTab(content);
@@ -1306,44 +1304,6 @@
     }
     el.addEventListener('click', () => _openPlayerProfile(p));
     return el;
-  }
-
-  // ── 休息室 tab：Kenney 像素風場景 ──
-  async function renderLoungeTab(content) {
-    if (!window.LoungeScene) {
-      content.innerHTML = '<div style="padding:20px;text-align:center;opacity:0.6">休息室載入中…</div>';
-      return;
-    }
-    content.innerHTML = '<div id="mt-lounge-host" style="padding:12px"></div>';
-    const host = content.querySelector('#mt-lounge-host');
-
-    // 取隊長 sprite 給場景渲染
-    const team = window.MyTeam.getCached();
-    const players = await window.MyTeam.fetchPlayers();
-    const captain = team?.captain_player_id
-      ? (players || []).find(p => p.id === team.captain_player_id)
-      : (players || []).find(p => p.in_starting_11) || (players || [])[0];
-    let captainSprite = null;
-    if (captain && window.LpcRenderer) {
-      try {
-        const look = window.LpcRenderer.resolveLook(captain);
-        const kit = team ? { shirtColor: team.kit_shirt_color, pantsColor: team.kit_pants_color, shoeColor: team.kit_shoes_color } : null;
-        captainSprite = await window.LpcRenderer.walkingFullBody(look, kit);
-      } catch (e) {}
-    }
-
-    await window.LoungeScene.render(host, {
-      captainSprite,
-      onHotspotClick: (id) => {
-        // 跳到對應 tab
-        const tabMap = { gacha: 'gacha', train: 'train', match: 'match', roster: 'roster', gallery: 'dex' };
-        const targetTab = tabMap[id];
-        if (targetTab) {
-          _currentTab = targetTab;
-          document.querySelector(`.mt-hub-tab[data-tab="${targetTab}"]`)?.click();
-        }
-      },
-    });
   }
 
   // ── helper：判斷球員是否為當前隊長 ──
