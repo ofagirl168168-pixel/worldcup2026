@@ -1306,6 +1306,100 @@
     return el;
   }
 
+  // ── helper：計算 3 教練羈絆（跟 my-team-match 同步邏輯）──
+  function _computeSynergy(actives) {
+    if (!actives || actives.length < 3) return { label: null, effect: null };
+    const traits = actives.map(c => c.coach?.trait);
+    const rarities = actives.map(c => c.coach?.rarity);
+    const counts = {};
+    traits.forEach(t => { if (t) counts[t] = (counts[t] || 0) + 1; });
+    const fam = {
+      tactic:  (counts.tactician || 0) + (counts.tiki_taka || 0),
+      defense: (counts.defensive_master || 0) + (counts.iron_wall || 0),
+      attack:  (counts.offensive_master || 0) + (counts.tiki_taka || 0),
+      speed:   (counts.speed_coach || 0) + (counts.gegen_press || 0),
+      stamina: (counts.physio || 0) + (counts.gegen_press || 0),
+      youth:   counts.youth_developer || 0,
+    };
+    if (fam.tactic >= 3)  return { label: '🧠 戰術三人組', effect: '中場 +15%' };
+    if (fam.defense >= 3) return { label: '🛡️ 鋼鐵防線', effect: '防守 +15%' };
+    if (fam.attack >= 3)  return { label: '⚔️ 攻擊三叉戟', effect: '攻擊 +15%' };
+    if (fam.speed >= 3)   return { label: '⚡ 衝刺軍團', effect: '速度 +12%' };
+    if (fam.stamina >= 3) return { label: '❤️ 體能訓練營', effect: '體力 +20%' };
+    if (fam.youth >= 3)   return { label: '👶 青訓計畫', effect: '訓練 RP 效率 +50%' };
+    if (rarities.filter(r => r === 'SSR').length >= 3) {
+      return { label: '⭐ SSR 全明星', effect: '全屬性 +5%' };
+    }
+    return { label: null, effect: null };
+  }
+
+  // ── helper：角色指派選單（主/助1/助2/解除）──
+  function _openCoachRoleMenu(uc, onChange) {
+    const team = window.MyTeam.getCached();
+    const c = uc.coach || {};
+    const currentRole =
+      uc.id === team.active_coach_id ? 'head' :
+      uc.id === team.assist_coach_id_1 ? 'assist1' :
+      uc.id === team.assist_coach_id_2 ? 'assist2' : 'none';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-coach-role-menu';
+    overlay.innerHTML = `
+      <div class="mt-profile-card" style="max-width:340px">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <div class="mt-coach-role-title">${escapeHtml(c.name || '?')} <small>${c.rarity || 'R'}</small></div>
+        <div class="mt-coach-role-trait">${escapeHtml(_traitLabel(c.trait, c.trait_value))}</div>
+        <div class="mt-coach-role-list">
+          <button class="mt-coach-role-btn ${currentRole === 'head' ? 'is-current' : ''}" data-role="head">
+            <span class="mt-coach-role-icon">👑</span>
+            <span class="mt-coach-role-name">主教練</span>
+            <span class="mt-coach-role-info">100% buff</span>
+          </button>
+          <button class="mt-coach-role-btn ${currentRole === 'assist1' ? 'is-current' : ''}" data-role="assist1">
+            <span class="mt-coach-role-icon">①</span>
+            <span class="mt-coach-role-name">助教 1</span>
+            <span class="mt-coach-role-info">50% buff</span>
+          </button>
+          <button class="mt-coach-role-btn ${currentRole === 'assist2' ? 'is-current' : ''}" data-role="assist2">
+            <span class="mt-coach-role-icon">②</span>
+            <span class="mt-coach-role-name">助教 2</span>
+            <span class="mt-coach-role-info">50% buff</span>
+          </button>
+          ${currentRole !== 'none' ? `
+            <button class="mt-coach-role-btn mt-coach-role-btn-clear" data-role="unassign">
+              <span class="mt-coach-role-icon">✕</span>
+              <span class="mt-coach-role-name">解除指派</span>
+            </button>` : ''}
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    };
+    overlay.querySelector('.mt-profile-close').addEventListener('click', close);
+    overlay.querySelectorAll('.mt-coach-role-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (btn.classList.contains('is-current')) { close(); return; }
+        btn.disabled = true;
+        try {
+          await window.DB.rpc('assign_coach_role', {
+            p_user_coach_id: uc.id,
+            p_role: btn.dataset.role,
+          });
+          await window.MyTeam.refresh?.();
+          close();
+          if (typeof onChange === 'function') onChange();
+        } catch (e) {
+          alert('指派失敗：' + (e.message || e));
+          btn.disabled = false;
+        }
+      });
+    });
+  }
+
   // ── helper：判斷球員是否為當前隊長 ──
   function _isCaptain(player) {
     const team = window.MyTeam.getCached();
@@ -1329,9 +1423,13 @@
     const coachTickets = team.coach_tickets || 0;
     const coaches = await _fetchUserCoaches();
     const active = coaches.find(c => c.id === team.active_coach_id);
+    const assist1 = coaches.find(c => c.id === team.assist_coach_id_1);
+    const assist2 = coaches.find(c => c.id === team.assist_coach_id_2);
     const formation = team?.formation || '4-3-3';
     const positions = _formationPositions(formation);
     const SLOTS = 8;
+    // 計算羈絆（同步顯示）
+    const synergy = _computeSynergy([active, assist1, assist2].filter(Boolean));
 
     content.innerHTML = `
       <div class="mt-coach-office">
@@ -1358,6 +1456,20 @@
           ${active ? `<div class="mt-coach-board-trait">${escapeHtml(_traitLabel(active.coach?.trait, active.coach?.trait_value))}</div>` : ''}
         </div>
 
+        <!-- 助教 + 羈絆狀態 -->
+        <div class="mt-coach-staff-bar">
+          <div class="mt-coach-staff-slot ${assist1 ? '' : 'is-empty'}" data-role-target="assist1">
+            <span class="mt-coach-staff-role">⭐ 助教 1</span>
+            <span class="mt-coach-staff-name">${assist1 ? escapeHtml(assist1.coach?.name || '?') : '空缺'}</span>
+          </div>
+          <div class="mt-coach-staff-slot ${assist2 ? '' : 'is-empty'}" data-role-target="assist2">
+            <span class="mt-coach-staff-role">⭐ 助教 2</span>
+            <span class="mt-coach-staff-name">${assist2 ? escapeHtml(assist2.coach?.name || '?') : '空缺'}</span>
+          </div>
+        </div>
+        ${synergy.label ? `<div class="mt-coach-synergy mt-coach-synergy-on">🔗 ${synergy.label} · ${synergy.effect}</div>`
+                        : '<div class="mt-coach-synergy mt-coach-synergy-off">3 教練齊上 → 觸發羈絆（戰術三人組 / 鋼鐵防線 / 攻擊三叉戟 / SSR 全明星…）</div>'}
+
         <!-- 教練站位：左 4 / 右 4 -->
         <div class="mt-coach-line mt-coach-line-l" id="mt-coach-line-l"></div>
         <div class="mt-coach-line mt-coach-line-r" id="mt-coach-line-r"></div>
@@ -1381,15 +1493,20 @@
     // 安排教練到左右兩排（每邊最多 4 位、超過時溢出）
     const lineL = content.querySelector('#mt-coach-line-l');
     const lineR = content.querySelector('#mt-coach-line-r');
+    const roleOf = (uc) =>
+      uc.id === team.active_coach_id ? 'head' :
+      uc.id === team.assist_coach_id_1 ? 'assist1' :
+      uc.id === team.assist_coach_id_2 ? 'assist2' : 'none';
     const arrange = (uc, lineEl, idx) => {
       const c = uc.coach || {};
-      const isActive = uc.id === team.active_coach_id;
+      const role = roleOf(uc);
+      const badge = role === 'head' ? '👑' : role === 'assist1' ? '①' : role === 'assist2' ? '②' : '';
       const slotDiv = document.createElement('button');
-      slotDiv.className = `mt-coach-slot rarity-${c.rarity || 'R'}${isActive ? ' active' : ''}`;
+      slotDiv.className = `mt-coach-slot rarity-${c.rarity || 'R'}${role !== 'none' ? ' active' : ''} role-${role}`;
       slotDiv.dataset.ucid = uc.id;
       const imgId = `coach-portrait-${uc.id.slice(0,8)}`;
       slotDiv.innerHTML = `
-        ${isActive ? '<span class="mt-coach-active-crown">👑</span>' : ''}
+        ${badge ? `<span class="mt-coach-active-crown">${badge}</span>` : ''}
         <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
         <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
         <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
@@ -1420,20 +1537,12 @@
       ((ordered.length + i) % 2 === 0 ? lineL : lineR).appendChild(ghost);
     }
 
-    // 點教練 → 設為主教練
+    // 點教練 → 開角色選單（主教練 / 助教 1 / 助教 2 / 解除）
     content.querySelectorAll('.mt-coach-slot:not(.mt-coach-slot-ghost)').forEach(slot => {
-      slot.addEventListener('click', async () => {
+      slot.addEventListener('click', () => {
         const ucid = slot.dataset.ucid;
-        if (slot.classList.contains('active')) return;
-        slot.classList.add('mt-coach-setting');
-        try {
-          await window.DB.rpc('set_active_coach', { p_user_coach_id: ucid });
-          await window.MyTeam.refresh?.();
-          renderTab();
-        } catch (e) {
-          alert('設定失敗：' + (e.message || e));
-          slot.classList.remove('mt-coach-setting');
-        }
+        const uc = coaches.find(c => c.id === ucid);
+        if (uc) _openCoachRoleMenu(uc, () => renderTab());
       });
     });
 

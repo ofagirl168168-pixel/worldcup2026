@@ -5429,6 +5429,183 @@
   text-shadow: 0 1px 2px rgba(0,0,0,0.7);
 }
 
+/* 助教 bar：兩個助教 slot 並排（黑板下方） */
+.mt-coach-staff-bar {
+  position: absolute;
+  top: 47%;
+  left: 26%;
+  width: 48%;
+  display: flex;
+  gap: 4px;
+  z-index: 3;
+}
+.mt-coach-staff-slot {
+  flex: 1;
+  background: rgba(0,0,0,0.65);
+  border: 1.5px solid rgba(240,192,64,0.55);
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 9px;
+  color: #ffe680;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  line-height: 1.2;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.55);
+}
+.mt-coach-staff-slot.is-empty {
+  border-color: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.5);
+  border-style: dashed;
+}
+.mt-coach-staff-role {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.mt-coach-staff-name {
+  font-size: 10px;
+  font-weight: 900;
+  color: #fff;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.mt-coach-staff-slot.is-empty .mt-coach-staff-name { color: rgba(255,255,255,0.4); }
+
+/* 羈絆狀態條 */
+.mt-coach-synergy {
+  position: absolute;
+  top: 51.5%;
+  left: 4%;
+  right: 4%;
+  border-radius: 8px;
+  padding: 4px 8px;
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 800;
+  z-index: 3;
+  line-height: 1.3;
+}
+.mt-coach-synergy-on {
+  background: linear-gradient(135deg, rgba(76,175,80,0.85), rgba(46,125,50,0.85));
+  border: 1.5px solid #66bb6a;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(76,175,80,0.5);
+  animation: mt-synergy-pulse 1.8s ease-in-out infinite;
+}
+.mt-coach-synergy-off {
+  background: rgba(0,0,0,0.5);
+  border: 1px dashed rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.55);
+  font-size: 9px;
+  font-weight: 600;
+}
+@keyframes mt-synergy-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(76,175,80,0.4); }
+  50%      { box-shadow: 0 0 16px rgba(76,175,80,0.85); }
+}
+
+/* slot 角色 badge 顏色 */
+.mt-coach-slot.role-head    .mt-coach-active-crown { color: #ffd54a; font-size: 14px; }
+.mt-coach-slot.role-assist1 .mt-coach-active-crown,
+.mt-coach-slot.role-assist2 .mt-coach-active-crown {
+  background: rgba(76,175,80,0.95);
+  color: #fff;
+  border-radius: 50%;
+  width: 14px; height: 14px;
+  font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid #fff;
+}
+.mt-coach-slot.role-head    { border-color: #f0c040 !important; }
+.mt-coach-slot.role-assist1,
+.mt-coach-slot.role-assist2 { border-color: #66bb6a !important; }
+
+/* 角色選單 modal */
+.mt-coach-role-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: #ffe680;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.mt-coach-role-title small {
+  font-size: 11px;
+  background: rgba(240,192,64,0.25);
+  border: 1px solid #f0c040;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+.mt-coach-role-trait {
+  font-size: 11px;
+  color: rgba(255,255,255,0.75);
+  text-align: center;
+  margin-bottom: 12px;
+}
+.mt-coach-role-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mt-coach-role-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 2px solid rgba(255,255,255,0.18);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: all 0.12s;
+}
+.mt-coach-role-btn:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(240,192,64,0.65);
+  transform: translateX(2px);
+}
+.mt-coach-role-btn.is-current {
+  background: rgba(240,192,64,0.25);
+  border-color: #f0c040;
+  cursor: default;
+}
+.mt-coach-role-btn.is-current::after {
+  content: '✓';
+  color: #ffe680;
+  font-weight: 900;
+  margin-left: auto;
+  font-size: 18px;
+}
+.mt-coach-role-icon {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+.mt-coach-role-name {
+  font-size: 14px;
+  font-weight: 900;
+  flex: 1;
+}
+.mt-coach-role-info {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+}
+.mt-coach-role-btn-clear {
+  border-color: rgba(229,57,53,0.5);
+  color: #ef9a9a;
+}
+.mt-coach-role-btn-clear:hover {
+  background: rgba(229,57,53,0.15);
+  border-color: #e53935;
+}
+
 /* 教練站位列（兩排垂直、貼地毯左右）*/
 .mt-coach-line {
   position: absolute;

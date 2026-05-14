@@ -28,10 +28,9 @@
     };
   }
 
-  // ── 教練 trait → 隊伍 buff（簡化版：只處理屬性 buff、機制 trait 待 sim 內擴展）──
+  // ── 教練 trait → 隊伍 buff（屬性 buff、機制 trait 待 sim 內擴展）──
   function _coachBuff(coachTrait, traitValue) {
     if (!coachTrait) return null;
-    // 屬性 buff（attack_3 / defense_3 / speed_3 等 + 主流 trait）
     const ATTR_TRAITS = {
       tactician:        { midfield: 0.08 },
       offensive_master: { attack: 0.10 },
@@ -40,6 +39,8 @@
       tiki_taka:        { attack: 0.10, midfield: 0.08 },
       iron_wall:        { defense: 0.08 },
       gegen_press:      { speed: 0.05, stamina: 0.10 },
+      physio:           { stamina: 0.10 },
+      youth_developer:  { /* training-time effect, no match buff */ },
     };
     if (ATTR_TRAITS[coachTrait]) return ATTR_TRAITS[coachTrait];
     if (coachTrait.endsWith('_3') && traitValue && traitValue.attr) {
@@ -48,8 +49,62 @@
     return null;
   }
 
+  // ── 羈絆（synergy）：3 個 active 教練組合特定特質 → 額外 buff ──
+  function _synergyBonus(coachTraits, raritySet) {
+    if (!coachTraits || coachTraits.length < 3) return { buff: null, label: null };
+    const counts = {};
+    coachTraits.forEach(t => { if (t) counts[t] = (counts[t] || 0) + 1; });
+    // 同一系列特質（合併家族）
+    const fam = {
+      tactic: (counts.tactician || 0) + (counts.tiki_taka || 0),
+      defense: (counts.defensive_master || 0) + (counts.iron_wall || 0),
+      attack: (counts.offensive_master || 0) + (counts.tiki_taka || 0),
+      speed: (counts.speed_coach || 0) + (counts.gegen_press || 0),
+      stamina: (counts.physio || 0) + (counts.gegen_press || 0),
+      youth: counts.youth_developer || 0,
+    };
+    // 羈絆組合 — 優先級從高到低、取觸發的第一個
+    if (fam.tactic >= 3)  return { buff: { midfield: 0.15 }, label: '🧠 戰術三人組' };
+    if (fam.defense >= 3) return { buff: { defense: 0.15 },  label: '🛡️ 鋼鐵防線' };
+    if (fam.attack >= 3)  return { buff: { attack: 0.15 },   label: '⚔️ 攻擊三叉戟' };
+    if (fam.speed >= 3)   return { buff: { speed: 0.12 },    label: '⚡ 衝刺軍團' };
+    if (fam.stamina >= 3) return { buff: { stamina: 0.20 },  label: '❤️ 體能訓練營' };
+    if (fam.youth >= 3)   return { buff: { _trainingBonus: 0.5 }, label: '👶 青訓計畫' };
+    // SSR 全明星：3 個都是 SSR（不限特質）
+    if (raritySet && raritySet.filter(r => r === 'SSR').length >= 3) {
+      return { buff: { attack: 0.05, defense: 0.05, midfield: 0.05, speed: 0.05 }, label: '⭐ SSR 全明星' };
+    }
+    return { buff: null, label: null };
+  }
+
+  // 合併教練 buff：head 100% + assists 50% 各、再疊加 synergy
+  function _combineCoachBuffs(headCoach, assist1, assist2) {
+    const merge = (target, source, weight) => {
+      if (!source) return;
+      Object.keys(source).forEach(k => {
+        target[k] = (target[k] || 0) + (source[k] || 0) * weight;
+      });
+    };
+    const combined = {};
+    if (headCoach) merge(combined, _coachBuff(headCoach.coach?.trait, headCoach.coach?.trait_value), 1.0);
+    if (assist1)   merge(combined, _coachBuff(assist1.coach?.trait,   assist1.coach?.trait_value),   0.5);
+    if (assist2)   merge(combined, _coachBuff(assist2.coach?.trait,   assist2.coach?.trait_value),   0.5);
+    // 3 個都 active → 算 synergy
+    let synergy = null;
+    if (headCoach && assist1 && assist2) {
+      const traits = [headCoach.coach?.trait, assist1.coach?.trait, assist2.coach?.trait];
+      const rarities = [headCoach.coach?.rarity, assist1.coach?.rarity, assist2.coach?.rarity];
+      const syn = _synergyBonus(traits, rarities);
+      if (syn.buff) {
+        merge(combined, syn.buff, 1.0);
+        synergy = syn;
+      }
+    }
+    return { buff: combined, synergy };
+  }
+
   // ── 玩家球隊資料 → match-sim 的 home 格式 ──
-  function _buildMyTeamData(team, players, activeCoach) {
+  function _buildMyTeamData(team, players, headCoach, assist1, assist2) {
     const now = new Date();
     const healthy = players.filter(p => !p.injured_until || new Date(p.injured_until) <= now);
     let starters = healthy.filter(p => p.in_starting_11);
@@ -62,8 +117,8 @@
 
     const avg = (key) => Math.round(starters.reduce((s, p) => s + (p[key] || 0), 0) / starters.length);
 
-    // 套教練 buff（影響 radar 屬性、不改 team_player 真實值）
-    const buff = activeCoach ? _coachBuff(activeCoach.coach?.trait, activeCoach.coach?.trait_value) : null;
+    // 合併 head 100% + assists 50% + synergy buff
+    const { buff, synergy } = _combineCoachBuffs(headCoach, assist1, assist2);
     const applyBuff = (v, k) => buff && buff[k] ? Math.min(99, Math.round(v * (1 + buff[k]))) : v;
 
     // Kit 顏色從 team 取
@@ -78,7 +133,8 @@
       flag: team.team_crest,
       formation: team.formation || '4-3-3',
       kit,
-      coachName: activeCoach ? activeCoach.coach?.name : null,
+      coachName: headCoach ? headCoach.coach?.name : null,
+      synergy,  // 給 UI 顯示「⚔️ 攻擊三叉戟」之類
       keyPlayers: starters.slice(0, 11).map(p => ({
         name: p.card?.name || '?',
         pos: p.card?.position || 'MID',
@@ -275,16 +331,19 @@
       return;
     }
 
-    // 撈主教練（active_coach_id → user_coach + coach_pool join）
-    let activeCoach = null;
-    if (team.active_coach_id) {
-      const { data: coachData } = await window.DB.from('user_coach')
-        .select('*, coach:coach_pool(*)')
-        .eq('id', team.active_coach_id).maybeSingle();
-      activeCoach = coachData || null;
+    // 撈 3 個教練（主 + 2 助）一次撈完
+    const coachIds = [team.active_coach_id, team.assist_coach_id_1, team.assist_coach_id_2].filter(Boolean);
+    const coachMap = new Map();
+    if (coachIds.length > 0) {
+      const { data: coachRows } = await window.DB.from('user_coach')
+        .select('*, coach:coach_pool(*)').in('id', coachIds);
+      (coachRows || []).forEach(c => coachMap.set(c.id, c));
     }
+    const headCoach = team.active_coach_id ? (coachMap.get(team.active_coach_id) || null) : null;
+    const assist1 = team.assist_coach_id_1 ? (coachMap.get(team.assist_coach_id_1) || null) : null;
+    const assist2 = team.assist_coach_id_2 ? (coachMap.get(team.assist_coach_id_2) || null) : null;
 
-    const homeData = _buildMyTeamData(team, players, activeCoach);
+    const homeData = _buildMyTeamData(team, players, headCoach, assist1, assist2);
     if (!homeData) {
       if (typeof showToast === 'function') showToast('⚠️ 球員資料不足');
       return;
@@ -677,15 +736,18 @@
       return;
     }
 
-    // 主教練
-    let activeCoach = null;
-    if (team.active_coach_id) {
-      const { data: coachData } = await window.DB.from('user_coach')
-        .select('*, coach:coach_pool(*)')
-        .eq('id', team.active_coach_id).maybeSingle();
-      activeCoach = coachData || null;
+    // 3 個教練（主 + 2 助）
+    const coachIds = [team.active_coach_id, team.assist_coach_id_1, team.assist_coach_id_2].filter(Boolean);
+    const coachMap = new Map();
+    if (coachIds.length > 0) {
+      const { data: coachRows } = await window.DB.from('user_coach')
+        .select('*, coach:coach_pool(*)').in('id', coachIds);
+      (coachRows || []).forEach(c => coachMap.set(c.id, c));
     }
-    const homeData = _buildMyTeamData(team, players, activeCoach);
+    const headCoach = team.active_coach_id ? (coachMap.get(team.active_coach_id) || null) : null;
+    const assist1 = team.assist_coach_id_1 ? (coachMap.get(team.assist_coach_id_1) || null) : null;
+    const assist2 = team.assist_coach_id_2 ? (coachMap.get(team.assist_coach_id_2) || null) : null;
+    const homeData = _buildMyTeamData(team, players, headCoach, assist1, assist2);
     if (!homeData) {
       if (typeof showToast === 'function') showToast('⚠️ 球員資料不足');
       return;
