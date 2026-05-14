@@ -201,7 +201,7 @@
       [1, 4, 7],
       [1, 4, 7],
       [2, 4, 5],  // kick：slash-down 揮腿
-      [3, 5, 6],  // cheer：spellcast-down 舉手
+      [1, 3, 5],  // cheer：spellcast-down 舉手（frame 5 = LPC 雙手過頂最高點、最有戲）
       [1, 2, 3],  // frustration：hurt 站不穩→稍微跪下（不到最後 5 那種完全倒地）
       [3, 5, 7],  // tackle：thrust-right 伸腿撲擊（後半幀腿伸最長）
     ];

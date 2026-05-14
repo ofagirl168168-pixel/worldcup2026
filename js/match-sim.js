@@ -432,23 +432,25 @@
         ctx.fillRect(bx, by, barW * remaining, barH);
       }
 
-      // 疲勞汗珠：fatigue > 0.18 開始顯示、越累越多（直接蓋在額頭/頭頂上）
+      // 疲勞汗珠：fatigue > 0.18 起、依疲勞度漸進 1→2→3 滴、全部在右額（同一側）
       if (fatigue > 0.18 && p.role !== 'GK') {
-        const intensity = Math.min(1, (fatigue - 0.18) / 0.30);
-        ctx.fillStyle = `rgba(140,200,255,${0.7 + intensity * 0.3})`;
-        // 額頭位置：sprite top + 7px（直接在頭髮/額頭上、不懸空）
+        ctx.fillStyle = `rgba(140,200,255,${0.85})`;
         const headY = cy - SPRITE_DRAW_H / 2 + 7;
-        const wig = Math.sin((state.frame + i * 7) / 8) * 1.0;
+        const wig = Math.sin((state.frame + i * 7) / 8) * 0.8;
+        // 第 1 滴（fatigue > 0.18）：右額正下
         ctx.beginPath();
-        ctx.ellipse(cx - 4 + wig, headY, 1.1, 1.8, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx + 4 + wig, headY + 2, 1.1, 1.8, 0, 0, Math.PI * 2);
         ctx.fill();
-        ctx.beginPath();
-        ctx.ellipse(cx + 4 - wig, headY + 1, 1.1, 1.8, 0, 0, Math.PI * 2);
-        ctx.fill();
-        // 疲勞重時加第 3 顆中間
-        if (intensity > 0.6) {
+        // 第 2 滴（fatigue > 0.32）：右額上方
+        if (fatigue > 0.32) {
           ctx.beginPath();
-          ctx.ellipse(cx + wig * 0.5, headY + 2, 1, 1.5, 0, 0, Math.PI * 2);
+          ctx.ellipse(cx + 5 + wig * 0.7, headY - 2, 1, 1.6, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // 第 3 滴（fatigue > 0.48）：再上方更小
+        if (fatigue > 0.48) {
+          ctx.beginPath();
+          ctx.ellipse(cx + 6 + wig * 0.4, headY - 6, 0.9, 1.4, 0, 0, Math.PI * 2);
           ctx.fill();
         }
       }
