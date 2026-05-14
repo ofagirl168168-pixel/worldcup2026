@@ -52,8 +52,8 @@ const EPL_TEAMS = {
     injuries:[
       {name:'Mohamed Salah',pos:'右翼',status:'腿後肌傷恢復中，已回歸訓練但僅能上場幾分鐘',returnDate:'MW37 替補待命'},
       {name:'Florian Wirtz',pos:'攻擊中場',status:'腸胃炎（服用抗生素），出場成疑',returnDate:'5/15 AVL 待評估'},
-      {name:'Ibrahima Konaté',pos:'中後衛',status:'大腿傷（vs CHE 5/11 退場），出場成疑',returnDate:'5/15 AVL 待評估'},
-      {name:'Alisson',pos:'門將',status:'肌肉拉傷恢復，預計 vs AVL 回歸',returnDate:'5/15 可出場'},
+      {name:'Ibrahima Konaté',pos:'中後衛',status:'vs CHE（5/11）抽筋退場，Slot 確認已可出場',returnDate:'可出場'},
+      {name:'Alisson',pos:'門將',status:'已回歸訓練，出場待定',returnDate:'5/15 待評估'},
       {name:'Hugo Ekitike',pos:'前鋒',status:'阿基里斯腱斷裂（vs PSG受傷）',returnDate:'賽季報銷＋世界盃缺席'},
       {name:'Wataru Endo',pos:'中場',status:'足部手術',returnDate:'賽季報銷（目標世界盃）'},
       {name:'Conor Bradley',pos:'右後衛',status:'膝蓋重傷手術（1月起）',returnDate:'賽季報銷'},

@@ -3305,11 +3305,11 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px">Ibrahima Konaté</td>
-<td style="padding:8px">大腿傷（vs CHE 退場），待評估</td>
+<td style="padding:8px">vs CHE 抽筋退場，Slot 確認已可出場</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px">Alisson</td>
-<td style="padding:8px">預計傷癒復出先發</td>
+<td style="padding:8px">已回歸訓練，Slot 表示「明天看狀態」，出場待定</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px">Ekitike / Bradley / Endo / Leoni</td>
@@ -3317,7 +3317,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 </tr>
 </table>
 
-<p>如果 Wirtz 無法出場，利物浦在進攻端將大幅削弱——Salah 只能短暫登場、Wirtz 又掛病號，意味著 <b>Szoboszlai</b> 和 <b>Diogo Jota</b> 必須扛起主要得分責任。好消息是 <b>Alisson</b> 預計回歸，門將位置終於穩定。</p>
+<p>如果 Wirtz 無法出場，利物浦在進攻端將大幅削弱——Salah 只能短暫登場、Wirtz 又掛病號，意味著 <b>Szoboszlai</b> 和 <b>Cody Gakpo</b> 必須扛起主要得分責任。好消息是 <b>Alisson</b> 有望回歸，門將位置可望穩定。</p>
 
 <h3>維拉傷兵</h3>
 
@@ -3329,7 +3329,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>關鍵對決</h3>
 
-<p><b>Ollie Watkins vs Virgil van Dijk</b>：Watkins 本季英超攻入 14 球、助攻 8 次，是維拉的進攻引擎。Van Dijk 能否在 Konaté 可能缺陣的情況下穩住後防，將是勝負關鍵。</p>
+<p><b>Ollie Watkins vs Virgil van Dijk</b>：Watkins 本季英超攻入 14 球、助攻 8 次，是維拉的進攻引擎。Van Dijk 搭檔回歸的 Konaté 組成利物浦後防核心，能否鎖住 Watkins 將是勝負關鍵。</p>
 
 <p><b>Morgan Rogers vs Alexis Mac Allister</b>：Rogers 近期狀態火熱，在歐霸半決賽中表現亮眼。Mac Allister 需要在中場攻守兩端提供更多支援，特別是 Wirtz 可能缺陣的情況下。</p>
 
