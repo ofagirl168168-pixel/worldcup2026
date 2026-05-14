@@ -1777,11 +1777,23 @@
 
   async function _fetchUserCoaches() {
     if (!window.DB || !window.currentUser) return [];
-    const { data, error } = await window.DB.from('user_coach')
-      .select('*, coach:coach_pool(*)')
+    // explicit filter by user_id（不依賴 RLS）+ 容錯 join
+    const uid = window.currentUser.id;
+    // 先撈 user_coach（含 user_id filter）
+    const { data: rows, error: e1 } = await window.DB.from('user_coach')
+      .select('*')
+      .eq('user_id', uid)
       .order('hired_at', { ascending: false });
-    if (error) { console.warn('fetch coaches', error); return []; }
-    return data || [];
+    if (e1) { console.warn('fetch coaches (user_coach)', e1); return []; }
+    if (!rows || !rows.length) return [];
+    // 再批次撈 coach_pool（用 coach_id IN）
+    const coachIds = [...new Set(rows.map(r => r.coach_id))];
+    const { data: pool, error: e2 } = await window.DB.from('coach_pool')
+      .select('*').in('coach_id', coachIds);
+    if (e2) { console.warn('fetch coach_pool', e2); }
+    const poolMap = new Map((pool || []).map(c => [c.coach_id, c]));
+    // attach coach 物件
+    return rows.map(r => ({ ...r, coach: poolMap.get(r.coach_id) || null }));
   }
 
   // ─────────── 球員個人主頁 ───────────────────────────
