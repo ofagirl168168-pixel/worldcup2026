@@ -1333,6 +1333,99 @@
     return { label: null, effect: null };
   }
 
+  // ── helper：渲染教練 slot HTML（用於主教練大格 + 助教小格）──
+  function _renderCoachSlotHTML(uc, role, isHead) {
+    const c = uc.coach || {};
+    const badge = role === 'head' ? '👑' : role === 'assist1' ? '①' : role === 'assist2' ? '②' : '';
+    const imgId = `coach-portrait-${uc.id.slice(0,8)}`;
+    if (isHead) {
+      return `
+        <button class="mt-coach-team-slot mt-coach-team-head-slot rarity-${c.rarity || 'R'} role-head" data-ucid="${uc.id}">
+          <span class="mt-coach-active-crown">${badge}</span>
+          <div class="mt-coach-team-head-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
+          <div class="mt-coach-team-head-info">
+            <div class="mt-coach-team-head-name">${escapeHtml(c.name || '?')}</div>
+            <div class="mt-coach-team-head-trait">${escapeHtml(_traitLabel(c.trait, c.trait_value))}</div>
+            <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
+          </div>
+        </button>
+      `;
+    }
+    return `
+      <button class="mt-coach-team-slot mt-coach-slot rarity-${c.rarity || 'R'} active role-${role}" data-ucid="${uc.id}">
+        <span class="mt-coach-active-crown">${badge}</span>
+        <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
+        <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
+        <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
+      </button>
+    `;
+  }
+
+  // ── helper：展開所有教練 modal（網格列表、點教練開角色選單）──
+  function _openAllCoachesModal(coaches, onChange) {
+    const team = window.MyTeam.getCached();
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-coach-all-modal';
+    const roleOf = (uc) =>
+      uc.id === team.active_coach_id ? 'head' :
+      uc.id === team.assist_coach_id_1 ? 'assist1' :
+      uc.id === team.assist_coach_id_2 ? 'assist2' : 'none';
+    // 排序：head → assist1 → assist2 → 其他（SSR > SR > R）
+    const rarityRank = { SSR: 0, SR: 1, R: 2 };
+    const sorted = [...coaches].sort((a, b) => {
+      const ra = { head: -3, assist1: -2, assist2: -1 }[roleOf(a)] ?? 10;
+      const rb = { head: -3, assist1: -2, assist2: -1 }[roleOf(b)] ?? 10;
+      if (ra !== rb) return ra - rb;
+      return (rarityRank[a.coach?.rarity] || 9) - (rarityRank[b.coach?.rarity] || 9);
+    });
+    overlay.innerHTML = `
+      <div class="mt-profile-card" style="max-width:520px">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <div class="mt-coach-all-title">📋 所有教練 (${coaches.length})</div>
+        <div class="mt-coach-all-hint">點教練 → 指派為主教練 / 助教 1 / 助教 2</div>
+        <div class="mt-coach-all-grid" id="mt-coach-all-grid"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    overlay.querySelector('.mt-profile-close').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    });
+    const grid = overlay.querySelector('#mt-coach-all-grid');
+    sorted.forEach(uc => {
+      const c = uc.coach || {};
+      const role = roleOf(uc);
+      const badge = role === 'head' ? '👑' : role === 'assist1' ? '①' : role === 'assist2' ? '②' : '';
+      const slot = document.createElement('button');
+      slot.className = `mt-coach-slot rarity-${c.rarity || 'R'}${role !== 'none' ? ' active' : ''} role-${role}`;
+      slot.dataset.ucid = uc.id;
+      const imgId = `coach-all-portrait-${uc.id.slice(0,8)}`;
+      slot.innerHTML = `
+        ${badge ? `<span class="mt-coach-active-crown">${badge}</span>` : ''}
+        <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
+        <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
+        <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
+      `;
+      grid.appendChild(slot);
+      const look = uc.look_data || c.look_data;
+      if (look && window.LpcRenderer) {
+        window.LpcRenderer.portrait(look).then(url => {
+          const img = document.getElementById(imgId);
+          if (img && url) img.src = url;
+        }).catch(() => {});
+      }
+      slot.addEventListener('click', () => {
+        _openCoachRoleMenu(uc, () => {
+          // 先關 all modal、再 onChange 重畫 tab
+          overlay.classList.remove('open');
+          setTimeout(() => overlay.remove(), 200);
+          if (typeof onChange === 'function') onChange();
+        });
+      });
+    });
+  }
+
   // ── helper：角色指派選單（主/助1/助2/解除）──
   function _openCoachRoleMenu(uc, onChange) {
     const team = window.MyTeam.getCached();
@@ -1456,23 +1549,42 @@
           ${active ? `<div class="mt-coach-board-trait">${escapeHtml(_traitLabel(active.coach?.trait, active.coach?.trait_value))}</div>` : ''}
         </div>
 
-        <!-- 助教 + 羈絆狀態 -->
-        <div class="mt-coach-staff-bar">
-          <div class="mt-coach-staff-slot ${assist1 ? '' : 'is-empty'}" data-role-target="assist1">
-            <span class="mt-coach-staff-role">⭐ 助教 1</span>
-            <span class="mt-coach-staff-name">${assist1 ? escapeHtml(assist1.coach?.name || '?') : '空缺'}</span>
+        <!-- 教練團：1 大主教練 + 2 小助教 -->
+        <div class="mt-coach-team">
+          <div class="mt-coach-team-head" id="mt-coach-team-head">
+            ${active ? _renderCoachSlotHTML(active, 'head', true) : `
+              <div class="mt-coach-team-head-empty">
+                <div class="mt-coach-team-head-empty-icon">👑</div>
+                <div class="mt-coach-team-head-empty-text">尚未指派主教練</div>
+                <div class="mt-coach-team-head-empty-hint">點下方按鈕展開所有教練</div>
+              </div>
+            `}
           </div>
-          <div class="mt-coach-staff-slot ${assist2 ? '' : 'is-empty'}" data-role-target="assist2">
-            <span class="mt-coach-staff-role">⭐ 助教 2</span>
-            <span class="mt-coach-staff-name">${assist2 ? escapeHtml(assist2.coach?.name || '?') : '空缺'}</span>
+          <div class="mt-coach-team-assists" id="mt-coach-team-assists">
+            ${assist1 ? _renderCoachSlotHTML(assist1, 'assist1', false) : `
+              <div class="mt-coach-slot mt-coach-slot-ghost mt-coach-team-assist-empty" data-empty-role="assist1">
+                <span class="mt-coach-active-crown">①</span>
+                <div class="mt-coach-slot-portrait mt-coach-slot-portrait-ghost">+</div>
+                <div class="mt-coach-slot-name">助教 1</div>
+              </div>
+            `}
+            ${assist2 ? _renderCoachSlotHTML(assist2, 'assist2', false) : `
+              <div class="mt-coach-slot mt-coach-slot-ghost mt-coach-team-assist-empty" data-empty-role="assist2">
+                <span class="mt-coach-active-crown">②</span>
+                <div class="mt-coach-slot-portrait mt-coach-slot-portrait-ghost">+</div>
+                <div class="mt-coach-slot-name">助教 2</div>
+              </div>
+            `}
           </div>
         </div>
-        ${synergy.label ? `<div class="mt-coach-synergy mt-coach-synergy-on">🔗 ${synergy.label} · ${synergy.effect}</div>`
-                        : '<div class="mt-coach-synergy mt-coach-synergy-off">3 教練齊上 → 觸發羈絆（戰術三人組 / 鋼鐵防線 / 攻擊三叉戟 / SSR 全明星…）</div>'}
 
-        <!-- 教練站位：左 4 / 右 4 -->
-        <div class="mt-coach-line mt-coach-line-l" id="mt-coach-line-l"></div>
-        <div class="mt-coach-line mt-coach-line-r" id="mt-coach-line-r"></div>
+        ${synergy.label ? `<div class="mt-coach-synergy mt-coach-synergy-on">🔗 ${synergy.label} · ${synergy.effect}</div>`
+                        : '<div class="mt-coach-synergy mt-coach-synergy-off">3 教練齊上 → 觸發羈絆（戰術 / 防線 / 攻擊 / SSR 全明星）</div>'}
+
+        <!-- 展開所有教練按鈕 -->
+        <button class="mt-coach-expand-btn" id="mt-coach-expand">
+          📋 展開所有教練 (${coaches.length})
+        </button>
 
         <!-- 木地板 -->
         <div class="mt-coach-floor"></div>
@@ -1490,60 +1602,38 @@
       </div>
     `;
 
-    // 安排教練到左右兩排（每邊最多 4 位、超過時溢出）
-    const lineL = content.querySelector('#mt-coach-line-l');
-    const lineR = content.querySelector('#mt-coach-line-r');
-    const roleOf = (uc) =>
-      uc.id === team.active_coach_id ? 'head' :
-      uc.id === team.assist_coach_id_1 ? 'assist1' :
-      uc.id === team.assist_coach_id_2 ? 'assist2' : 'none';
-    const arrange = (uc, lineEl, idx) => {
-      const c = uc.coach || {};
-      const role = roleOf(uc);
-      const badge = role === 'head' ? '👑' : role === 'assist1' ? '①' : role === 'assist2' ? '②' : '';
-      const slotDiv = document.createElement('button');
-      slotDiv.className = `mt-coach-slot rarity-${c.rarity || 'R'}${role !== 'none' ? ' active' : ''} role-${role}`;
-      slotDiv.dataset.ucid = uc.id;
+    // 渲染教練 portrait（head 大圖 + assist 普通）
+    [active, assist1, assist2].forEach(uc => {
+      if (!uc) return;
+      const look = uc.look_data || uc.coach?.look_data;
       const imgId = `coach-portrait-${uc.id.slice(0,8)}`;
-      slotDiv.innerHTML = `
-        ${badge ? `<span class="mt-coach-active-crown">${badge}</span>` : ''}
-        <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
-        <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
-        <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
-      `;
-      lineEl.appendChild(slotDiv);
-      const look = uc.look_data || c.look_data;
       if (look && window.LpcRenderer) {
         window.LpcRenderer.portrait(look).then(url => {
           const img = document.getElementById(imgId);
           if (img && url) img.src = url;
         }).catch(() => {});
       }
-    };
+    });
 
-    // 把 active 教練放第一位（任一邊），剩下平均分配
-    const ordered = active ? [active, ...coaches.filter(c => c.id !== active.id)] : coaches;
-    ordered.forEach((uc, i) => arrange(uc, i % 2 === 0 ? lineL : lineR, i));
-
-    // 空位：剪影（未擁有）
-    const remaining = Math.max(0, SLOTS - ordered.length);
-    for (let i = 0; i < remaining; i++) {
-      const ghost = document.createElement('div');
-      ghost.className = 'mt-coach-slot mt-coach-slot-ghost';
-      ghost.innerHTML = `
-        <div class="mt-coach-slot-portrait mt-coach-slot-portrait-ghost">?</div>
-        <div class="mt-coach-slot-name">未聘任</div>
-      `;
-      ((ordered.length + i) % 2 === 0 ? lineL : lineR).appendChild(ghost);
-    }
-
-    // 點教練 → 開角色選單（主教練 / 助教 1 / 助教 2 / 解除）
-    content.querySelectorAll('.mt-coach-slot:not(.mt-coach-slot-ghost)').forEach(slot => {
+    // 點主/助教 slot → 開角色選單
+    content.querySelectorAll('.mt-coach-team-slot').forEach(slot => {
       slot.addEventListener('click', () => {
         const ucid = slot.dataset.ucid;
         const uc = coaches.find(c => c.id === ucid);
         if (uc) _openCoachRoleMenu(uc, () => renderTab());
       });
+    });
+
+    // 點空助教格子 → 開全部教練展開、自動 hint 指派該 role
+    content.querySelectorAll('.mt-coach-team-assist-empty, .mt-coach-team-head-empty').forEach(slot => {
+      slot.addEventListener('click', () => {
+        _openAllCoachesModal(coaches, () => renderTab());
+      });
+    });
+
+    // 「展開所有教練」按鈕
+    content.querySelector('#mt-coach-expand')?.addEventListener('click', () => {
+      _openAllCoachesModal(coaches, () => renderTab());
     });
 
     // 抽教練（有動畫 + 結果彈窗）
