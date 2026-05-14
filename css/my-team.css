@@ -5852,6 +5852,46 @@
   position: relative;
   opacity: 1 !important;
 }
+/* 左到右光影 sweep（教練按鈕用、同球員抽卡）*/
+.mt-coach-btn-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.mt-coach-btn-shine::before {
+  content: '';
+  position: absolute;
+  top: -20%; bottom: -20%;
+  left: -40%;
+  width: 35%;
+  background: linear-gradient(105deg,
+    transparent 0%,
+    rgba(255,255,255,0.15) 30%,
+    rgba(255,255,255,0.7) 50%,
+    rgba(255,255,255,0.15) 70%,
+    transparent 100%);
+  transform: skewX(-18deg);
+  animation: mt-coach-btn-shine 2.8s ease-in-out infinite;
+}
+.mt-coach-draw-10 .mt-coach-btn-shine::before {
+  animation-delay: 0.4s;
+}
+@keyframes mt-coach-btn-shine {
+  0%        { left: -40%; opacity: 0; }
+  10%       { opacity: 1; }
+  55%       { left: 120%; opacity: 1; }
+  60%, 100% { left: 120%; opacity: 0; }
+}
+/* 內容浮在 shine 之上 */
+.mt-coach-btn-label,
+.mt-coach-btn-cost-dual {
+  position: relative;
+  z-index: 2;
+}
+
 .mt-coach-btn-label {
   font-size: 14px;
   font-weight: 900;
