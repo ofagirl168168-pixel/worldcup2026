@@ -112,7 +112,7 @@ async function processFile(filePath) {
   );
 }
 
-// 背景圖只需要縮 + 壓縮（不去背）
+// 背景圖：縮 + JPEG 壓縮（不需透明、PNG 對複雜場景效率太差）
 async function processBackground(filePath, w, h) {
   const fullPath = path.join(__dirname, '..', filePath);
   if (!fs.existsSync(fullPath)) {
@@ -123,16 +123,17 @@ async function processBackground(filePath, w, h) {
   const img = await loadImage(fullPath);
   const canvas = createCanvas(w, h);
   const ctx = canvas.getContext('2d');
-  ctx.imageSmoothingEnabled = false;
+  ctx.imageSmoothingEnabled = true;   // JPEG 用一般 smoothing OK
   ctx.drawImage(img, 0, 0, w, h);
-  const buf = canvas.toBuffer('image/png', {
-    compressionLevel: 9,
-    filterType: 4,
-  });
-  fs.writeFileSync(fullPath, buf);
+  // JPEG quality 82 對複雜場景視覺幾乎無感、檔案小很多
+  const buf = canvas.toBuffer('image/jpeg', { quality: 82 });
+  // 寫成 .jpg、刪除原 .png
+  const jpgPath = fullPath.replace(/\.png$/i, '.jpg');
+  fs.writeFileSync(jpgPath, buf);
+  if (jpgPath !== fullPath && fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
   const ratio = Math.round((1 - buf.length / beforeSize) * 100);
   console.log(
-    `✅ ${path.basename(filePath)}: ${img.width}×${img.height} → ${w}×${h}, ` +
+    `✅ ${path.basename(jpgPath)}: ${img.width}×${img.height} → ${w}×${h}, ` +
     `${(beforeSize/1024).toFixed(0)}KB → ${(buf.length/1024).toFixed(0)}KB (-${ratio}%)`
   );
 }
@@ -144,7 +145,7 @@ async function processBackground(filePath, w, h) {
     catch (e) { console.error(`❌ ${f}: ${e.message}`); }
   }
   console.log('\n── 背景圖（縮 + 壓縮）──');
-  // 背景 1280×960（畫面 380×285 dpr=2 ~ 760×570 也夠）
-  await processBackground('img/my-team/gacha-bg.png', 1280, 960)
+  // 背景 960×720（畫面寬度頂多 380、dpr=2 = 760、960 還有餘裕）
+  await processBackground('img/my-team/gacha-bg.png', 960, 720)
     .catch(e => console.error(`❌ bg: ${e.message}`));
 })();

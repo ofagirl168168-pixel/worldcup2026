@@ -3560,9 +3560,274 @@
 }
 
 /* ═════════════════════════════════════════════════════════════
-   🎰 GACHA TAB — 全頁商店場景（無按鈕、純設計預覽）
+   🎰 GACHA TAB — AI 背景圖 + 卡包/按鈕/招牌 overlay
    ═════════════════════════════════════════════════════════════ */
 .mt-gacha-shop-fullscene {
+  position: relative;
+  width: 100%;
+  margin: -16px -20px -40px;
+  padding: 0 0 12px;
+  overflow: hidden;
+  background: #1a0a14;
+}
+
+/* 背景圖（AI 生成的店面） */
+.mt-gshop-bg-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 頂部招牌：球員卡販售 */
+.mt-gshop-marquee {
+  position: absolute;
+  top: 4%; left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #4a1c28 0%, #2a0e18 100%);
+  border: 3px solid #f0c040;
+  border-radius: 8px;
+  padding: 6px 22px;
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffe680;
+  letter-spacing: 4px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(240,192,64,0.7);
+  box-shadow:
+    0 0 16px rgba(240,192,64,0.6),
+    inset 0 0 8px rgba(240,192,64,0.3);
+  white-space: nowrap;
+  z-index: 5;
+}
+.mt-gshop-marquee-text { display: inline-block; }
+.mt-gshop-marquee-stars {
+  position: absolute;
+  inset: -8px -8px -8px -8px;
+  pointer-events: none;
+}
+.mt-gshop-marquee-stars .ns {
+  position: absolute;
+  font-size: 14px;
+  color: #ffe680;
+  text-shadow: 0 0 8px rgba(255,235,150,0.95);
+  animation: mt-marquee-twinkle 1.5s ease-in-out infinite alternate;
+}
+.mt-gshop-marquee-stars .ns1 { left: -6px;  top: -6px; }
+.mt-gshop-marquee-stars .ns2 { left: 50%;   top: -14px; transform: translateX(-50%); animation-delay: 0.3s; }
+.mt-gshop-marquee-stars .ns3 { right: -6px; top: -6px; animation-delay: 0.6s; }
+@keyframes mt-marquee-twinkle {
+  0%   { opacity: 0.4; transform: scale(0.9); }
+  100% { opacity: 1;   transform: scale(1.15); }
+}
+
+/* 副標：抽卡區 */
+.mt-gshop-subtitle {
+  position: absolute;
+  top: 14%; left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: #ffe680;
+  background: rgba(0,0,0,0.6);
+  border: 1.5px solid rgba(240,192,64,0.5);
+  border-radius: 4px;
+  padding: 2px 10px;
+  letter-spacing: 2px;
+  z-index: 5;
+}
+
+/* 4 卡包並排（玻璃櫃內） */
+.mt-gshop-packs {
+  position: absolute;
+  top: 22%;
+  left: 28%; right: 28%;
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5%;
+  z-index: 4;
+}
+.mt-gshop-pack {
+  flex: 1;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.18s ease;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.7));
+  position: relative;
+  animation: mt-pack-float 3s ease-in-out infinite;
+}
+.mt-gshop-pack:nth-child(2) { animation-delay: 0.3s; }
+.mt-gshop-pack:nth-child(3) { animation-delay: 0.6s; }
+.mt-gshop-pack:nth-child(4) { animation-delay: 0.9s; }
+.mt-gshop-pack img {
+  width: 100%;
+  height: auto;
+  display: block;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+.mt-gshop-pack:hover {
+  transform: translateY(-6px) scale(1.05);
+  filter: drop-shadow(0 8px 14px rgba(0,0,0,0.8)) brightness(1.1);
+}
+.mt-gshop-pack:active { transform: translateY(-2px) scale(0.98); }
+.mt-gshop-pack.pack-ssr {
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.7)) drop-shadow(0 0 8px rgba(240,192,64,0.5));
+}
+@keyframes mt-pack-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+/* 卡包說明 caption */
+.mt-gshop-packs-caption {
+  position: absolute;
+  top: 53%;
+  left: 30%; right: 30%;
+  text-align: center;
+  font-size: 11px;
+  color: #ffe680;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(240,192,64,0.4);
+  border-radius: 4px;
+  padding: 3px 8px;
+  z-index: 5;
+}
+
+/* 黑板告示：每 10 抽必得 SR */
+.mt-gshop-chalk-overlay {
+  position: absolute;
+  top: 50%;
+  left: 7%;
+  width: 14%;
+  text-align: center;
+  font-family: 'Caveat','Comic Sans MS',cursive;
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+  z-index: 4;
+  transform: rotate(-2deg);
+}
+.mt-gshop-chalk-overlay .mt-gshop-chalk-line1 { display: block; color: #ffe680; }
+.mt-gshop-chalk-overlay .mt-gshop-chalk-line2 { display: block; }
+.mt-gshop-chalk-overlay .mt-gshop-chalk-line3 { display: block; color: #ffe680; font-weight: 900; }
+
+/* 機率資訊按鈕（疊在右下） */
+.mt-gshop-rates-btn {
+  position: absolute;
+  bottom: 26%;
+  right: 4%;
+  background: rgba(0,0,0,0.65);
+  border: 1.5px solid #f0c040;
+  border-radius: 6px;
+  padding: 4px 10px;
+  color: #ffe680;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  z-index: 5;
+  box-shadow: 0 0 6px rgba(240,192,64,0.4);
+}
+.mt-gshop-rates-btn:hover { background: rgba(0,0,0,0.85); }
+
+/* 抽卡按鈕（底部、疊在背景櫃台下方） */
+.mt-gshop-buttons {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 0 16px;
+  margin-top: -6%;
+  z-index: 5;
+}
+.mt-gshop-btn {
+  flex: 1;
+  position: relative;
+  padding: 14px 12px;
+  border-radius: 14px;
+  border: 3px solid #1a1a2e;
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow:
+    0 6px 12px rgba(0,0,0,0.55),
+    inset 0 2px 4px rgba(255,255,255,0.3),
+    inset 0 -3px 4px rgba(0,0,0,0.25);
+  transition: transform 0.12s;
+}
+.mt-gshop-btn:hover:not(:disabled) { transform: translateY(-2px); }
+.mt-gshop-btn:active:not(:disabled) { transform: translateY(1px); }
+.mt-gshop-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
+.mt-gshop-btn-1 {
+  background: linear-gradient(180deg, #4a8fd8 0%, #2a5fa0 100%);
+  flex: 0 0 38%;
+}
+.mt-gshop-btn-10 {
+  background: linear-gradient(180deg, #ffd866 0%, #d49a30 100%);
+  color: #2a1505;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+}
+.mt-gshop-btn-label {
+  font-size: 22px;
+  letter-spacing: 2px;
+  text-align: center;
+}
+.mt-gshop-btn-cost {
+  background: rgba(0,0,0,0.35);
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 13px;
+  text-align: center;
+  margin-top: 4px;
+}
+.mt-gshop-btn-10 .mt-gshop-btn-cost { background: rgba(0,0,0,0.18); color: #2a1505; }
+.mt-gshop-btn-cost b { font-size: 15px; }
+.mt-gshop-btn-sub {
+  font-size: 10px;
+  text-align: center;
+  margin-top: 4px;
+  color: #4a1c28;
+  font-weight: 700;
+}
+.mt-gshop-btn-sub b { color: #c0392b; font-size: 12px; }
+.mt-gshop-btn-promo {
+  position: absolute;
+  top: -8px; right: -8px;
+  background: linear-gradient(135deg, #ff7060, #c0303a);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 12px;
+  transform: rotate(8deg);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  border: 2px solid #fff;
+}
+
+/* SSR 自選券（如果有） */
+.mt-gshop-ssr-ticket {
+  display: block;
+  margin: 10px 16px 0;
+  background: linear-gradient(135deg, #ffe680, #f0c040);
+  border: 3px solid #fff;
+  color: #2a1505;
+  font-weight: 900;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  width: calc(100% - 32px);
+  box-shadow: 0 4px 12px rgba(240,192,64,0.5);
+  animation: mt-pack-float 2.5s ease-in-out infinite;
+}
+
+/* ─── 以下舊 fullscene 元素（保留 class 但隱藏，因為 HTML 不再產生）─── */
+.mt-gshop-wall, .mt-gshop-floor, .mt-gshop-bunting,
+.mt-gshop-neon-sign, .mt-gshop-frames, .mt-gshop-shelf,
+.mt-gshop-chalkboard, .mt-gshop-counter, .mt-gshop-clerk-anchor,
+.mt-gshop-coins, .mt-gshop-sparkles { display: none !important; }
+.mt-gacha-shop-fullscene-OLD {
   position: relative;
   width: 100%;
   min-height: 100%;

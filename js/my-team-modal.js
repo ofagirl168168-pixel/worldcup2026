@@ -2416,137 +2416,86 @@
 
     content.innerHTML = `
       <div class="mt-gacha-shop-fullscene" id="mt-gacha-fullshop">
-        <!-- 背牆磚 + 木地板（場景底） -->
-        <div class="mt-gshop-wall"></div>
-        <div class="mt-gshop-floor"></div>
+        <!-- AI 生成背景圖（店面整個場景） -->
+        <img class="mt-gshop-bg-img" src="img/my-team/gacha-bg.jpg" alt="">
 
-        <!-- 天花板掛飾：旗幟串 -->
-        <div class="mt-gshop-bunting">
-          <span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span>
+        <!-- 頂部招牌：球員卡販售 -->
+        <div class="mt-gshop-marquee">
+          <span class="mt-gshop-marquee-text">球員卡販售</span>
+          <span class="mt-gshop-marquee-stars">
+            <span class="ns ns1">★</span><span class="ns ns2">⚽</span><span class="ns ns3">★</span>
+          </span>
         </div>
+        <div class="mt-gshop-subtitle">★ 抽卡區 ★</div>
 
-        <!-- 頂部霓虹招牌（含閃爍星星） -->
-        <div class="mt-gshop-neon-sign">
-          <span class="mt-gshop-neon-text">★ GACHA SHOP ★</span>
-          <div class="mt-gshop-neon-stars">
-            <span class="ns ns1">✦</span><span class="ns ns2">✧</span>
-            <span class="ns ns3">✦</span><span class="ns ns4">✧</span>
-          </div>
+        <!-- 4 個卡包並排（玻璃櫃內） -->
+        <div class="mt-gshop-packs">
+          <button class="mt-gshop-pack pack-n" data-rarity="N">
+            <img src="img/my-team/gacha-pack-n.png" alt="N">
+          </button>
+          <button class="mt-gshop-pack pack-r" data-rarity="R">
+            <img src="img/my-team/gacha-pack-r.png" alt="R">
+          </button>
+          <button class="mt-gshop-pack pack-sr" data-rarity="SR">
+            <img src="img/my-team/gacha-pack-sr.png" alt="SR">
+          </button>
+          <button class="mt-gshop-pack pack-ssr" data-rarity="SSR">
+            <img src="img/my-team/gacha-pack-ssr.png" alt="SSR">
+          </button>
         </div>
+        <div class="mt-gshop-packs-caption">收集最強球員卡！</div>
 
-        <!-- 左牆：卡牌展示掛畫框（3 張不同稀有度） -->
-        <div class="mt-gshop-frames">
-          <div class="mt-gshop-frame frame-ssr">
-            <div class="mt-gshop-frame-card"><span>★</span></div>
-            <div class="mt-gshop-frame-label">SSR</div>
-          </div>
-          <div class="mt-gshop-frame frame-sr">
-            <div class="mt-gshop-frame-card"><span>★</span></div>
-            <div class="mt-gshop-frame-label">SR</div>
-          </div>
-          <div class="mt-gshop-frame frame-r">
-            <div class="mt-gshop-frame-card"><span>★</span></div>
-            <div class="mt-gshop-frame-label">R</div>
-          </div>
-        </div>
-
-        <!-- 中央後方：兩層貨架（每層放盲盒卡牌包） -->
-        <div class="mt-gshop-shelf shelf-top">
-          <div class="mt-gshop-shelf-board"></div>
-          <div class="mt-gshop-shelf-items">
-            <div class="mt-gshop-box blindbox-ssr"><span class="mt-gshop-box-rarity">SSR</span></div>
-            <div class="mt-gshop-box blindbox-ssr"><span class="mt-gshop-box-rarity">SSR</span></div>
-            <div class="mt-gshop-box blindbox-sr"><span class="mt-gshop-box-rarity">SR</span></div>
-            <div class="mt-gshop-box blindbox-sr"><span class="mt-gshop-box-rarity">SR</span></div>
-            <div class="mt-gshop-box blindbox-sr"><span class="mt-gshop-box-rarity">SR</span></div>
-          </div>
-        </div>
-        <div class="mt-gshop-shelf shelf-mid">
-          <div class="mt-gshop-shelf-board"></div>
-          <div class="mt-gshop-shelf-items">
-            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
-            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
-            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
-            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
-            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
-            <div class="mt-gshop-box blindbox-r"><span class="mt-gshop-box-rarity">R</span></div>
-          </div>
+        <!-- 黑板告示牌（疊在背景的黑板上） -->
+        <div class="mt-gshop-chalk-overlay">
+          <span class="mt-gshop-chalk-line1">★ 每10抽</span>
+          <span class="mt-gshop-chalk-line2">必得</span>
+          <span class="mt-gshop-chalk-line3">SR 以上球員！</span>
         </div>
 
-        <!-- 黑板（價目表）掛在牆上 -->
-        <div class="mt-gshop-chalkboard">
-          <div class="mt-gshop-chalk-title">★ MENU ★</div>
-          <div class="mt-gshop-chalk-line">1 抽 ─── 🎟️ 1</div>
-          <div class="mt-gshop-chalk-line">10 連 ─ 🎟️ 10</div>
-          <div class="mt-gshop-chalk-line">寶石 ── 💎 50</div>
-          <div class="mt-gshop-chalk-divider"></div>
-          <div class="mt-gshop-chalk-rate">N 50% · R 30%</div>
-          <div class="mt-gshop-chalk-rate">SR 15% · SSR 5% · 30 保底</div>
+        <!-- 機率資訊按鈕（疊在背景右下相框上） -->
+        <button class="mt-gshop-rates-btn" id="mt-gshop-rates">
+          機率資訊 ›
+        </button>
+
+        <!-- 抽卡按鈕：1 抽 + 10 連抽（疊在背景櫃台下方）-->
+        <div class="mt-gshop-buttons">
+          <button class="mt-gshop-btn mt-gshop-btn-1" id="mt-gacha-1" ${tickets < 1 ? 'disabled' : ''}>
+            <div class="mt-gshop-btn-label">1 抽</div>
+            <div class="mt-gshop-btn-cost">🎟️ <b>1</b></div>
+          </button>
+          <button class="mt-gshop-btn mt-gshop-btn-10" id="mt-gacha-10" ${tickets < 10 ? 'disabled' : ''}>
+            <span class="mt-gshop-btn-promo">優惠!</span>
+            <div class="mt-gshop-btn-label">10 抽</div>
+            <div class="mt-gshop-btn-cost">🎟️ <b>10</b></div>
+            <div class="mt-gshop-btn-sub">必得 <b>SR</b> 以上球員！</div>
+          </button>
         </div>
 
-        <!-- 收銀台木櫃 + 帳本 + 電腦 -->
-        <div class="mt-gshop-counter">
-          <div class="mt-gshop-counter-top"></div>
-          <div class="mt-gshop-counter-face"></div>
-          <div class="mt-gshop-counter-screen">
-            <div class="mt-gshop-screen-line">🎟️ <b>${tickets}</b></div>
-            <div class="mt-gshop-screen-line">💎 <b>${gems}</b></div>
-            <div class="mt-gshop-screen-line mt-gshop-pity">🎯 ${pity}/30</div>
-          </div>
-          <div class="mt-gshop-counter-ledger"></div>
-        </div>
-
-        <!-- 收銀員（站在櫃台後）— 用 LPC chibi sprite 風格 SVG -->
-        <div class="mt-gshop-clerk-anchor">
-          <svg class="mt-gshop-clerk" viewBox="0 0 28 50" xmlns="http://www.w3.org/2000/svg">
-            <!-- 帽子 -->
-            <rect x="6" y="3" width="16" height="6" fill="#c0392b" stroke="#1a1a2e" stroke-width="1"/>
-            <rect x="4" y="8" width="20" height="3" fill="#1a1a2e"/>
-            <!-- 頭 -->
-            <rect x="8" y="11" width="12" height="10" fill="#f5d0a0" stroke="#1a1a2e" stroke-width="1"/>
-            <!-- 眼睛 -->
-            <rect x="11" y="15" width="2" height="2" fill="#1a1a2e"/>
-            <rect x="16" y="15" width="2" height="2" fill="#1a1a2e"/>
-            <!-- 笑嘴 -->
-            <rect x="12" y="18" width="4" height="1" fill="#a01020"/>
-            <!-- 領結 -->
-            <polygon points="11,22 17,22 14,24" fill="#f0c040" stroke="#1a1a2e" stroke-width="0.6"/>
-            <!-- 上衣 -->
-            <rect x="6" y="22" width="16" height="14" fill="#1976d2" stroke="#1a1a2e" stroke-width="1"/>
-            <!-- 圍裙 -->
-            <rect x="8" y="24" width="12" height="12" fill="#f0f0f0" stroke="#1a1a2e" stroke-width="0.8"/>
-            <!-- 圍裙口袋 -->
-            <rect x="10" y="28" width="3" height="3" fill="#d0d0d0" stroke="#1a1a2e" stroke-width="0.4"/>
-            <rect x="15" y="28" width="3" height="3" fill="#d0d0d0" stroke="#1a1a2e" stroke-width="0.4"/>
-            <!-- 手 -->
-            <rect x="3" y="22" width="3" height="9" fill="#1976d2" stroke="#1a1a2e" stroke-width="0.8"/>
-            <rect x="22" y="22" width="3" height="9" fill="#1976d2" stroke="#1a1a2e" stroke-width="0.8"/>
-          </svg>
-        </div>
-
-        <!-- 地板上散落的金幣（吸睛） -->
-        <div class="mt-gshop-coins">
-          <span class="mt-gshop-coin" style="left: 18%; bottom: 8px;"></span>
-          <span class="mt-gshop-coin" style="left: 78%; bottom: 12px;"></span>
-          <span class="mt-gshop-coin" style="left: 88%; bottom: 6px;"></span>
-        </div>
-
-        <!-- 粒子閃爍 -->
-        <div class="mt-gshop-sparkles" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-        </div>
+        ${ssrSelect > 0 ? `
+          <button class="mt-gshop-ssr-ticket" id="mt-ssr-select-open">
+            🌟 SSR 自選券 ×${ssrSelect}
+          </button>
+        ` : ''}
       </div>
+
+      <!-- 包進來補關閉的舊空 div（不影響）-->
+      <div style="display:none">
+        <svg viewBox="0 0 28 50" xmlns="http://www.w3.org/2000/svg">
       </div>
     `;
 
-    // 抽卡按鈕暫時拿掉、給設計預覽用。後續放回會綁回這些 handler
     content.querySelector('#mt-gacha-1')?.addEventListener('click', () => _runGacha(1));
     content.querySelector('#mt-gacha-10')?.addEventListener('click', () => _runGacha(10));
-    content.querySelector('#mt-gacha-gem-1')?.addEventListener('click', () => {
-      if (typeof showToast === 'function') showToast('💎 寶石抽卡 Phase 1.7 接 gems.js');
-    });
     content.querySelector('#mt-ssr-select-open')?.addEventListener('click', () => _openSSRSelect());
+    content.querySelector('#mt-gshop-rates')?.addEventListener('click', () => {
+      if (typeof showToast === 'function') {
+        showToast('📊 N 50% · R 30% · SR 15% · SSR 5%（30 抽保底 SSR）');
+      }
+    });
+    // 4 個卡包點擊 → 直接抽 1 抽（任何稀有度按鈕都一樣 — 機率系統決定中什麼）
+    content.querySelectorAll('.mt-gshop-pack').forEach(b => {
+      b.addEventListener('click', () => _runGacha(1));
+    });
   }
 
   // ── SSR 自選券：選 1 張 SSR ──
