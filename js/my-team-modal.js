@@ -2056,21 +2056,37 @@
   }
 
   // ─────────── 排行榜 tab ───────────────────────────────
+  let _rankMode = 'season'; // 'season' | 'pvp'
   async function renderRankTab(content) {
     content.innerHTML = `
       <div class="mt-rank-tab">
-        <div class="mt-settings-title" style="margin:8px 0 6px">🏆 我的球隊・賽季排行</div>
+        <div class="mt-rank-mode-tabs">
+          <button class="mt-rank-mode-tab ${_rankMode === 'season' ? 'active' : ''}" data-mode="season">🏆 賽季排行</button>
+          <button class="mt-rank-mode-tab ${_rankMode === 'pvp' ? 'active' : ''}" data-mode="pvp">⚔️ PvP ELO</button>
+        </div>
         <div class="mt-rank-list" id="mt-rank-list">載入中…</div>
       </div>
     `;
+    content.querySelectorAll('.mt-rank-mode-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        _rankMode = btn.dataset.mode;
+        renderRankTab(content);
+      });
+    });
+    _renderRankList(content);
+  }
+
+  async function _renderRankList(content) {
     const list = content.querySelector('#mt-rank-list');
     if (!window.DB) { list.innerHTML = '請登入'; return; }
     try {
-      const { data, error } = await window.DB.from('my_team_leaderboard')
-        .select('*')
-        .order('points', { ascending: false })
-        .order('goals_for', { ascending: false })
-        .limit(50);
+      let query = window.DB.from('my_team_leaderboard').select('*').limit(50);
+      if (_rankMode === 'pvp') {
+        query = query.order('pvp_elo', { ascending: false, nullsFirst: false });
+      } else {
+        query = query.order('points', { ascending: false }).order('goals_for', { ascending: false });
+      }
+      const { data, error } = await query;
       if (error) throw error;
       if (!data || !data.length) { list.innerHTML = '<div style="opacity:0.5">還沒有玩家上榜</div>'; return; }
       const me = window.currentUser?.id;
@@ -2080,17 +2096,25 @@
         ) : '⚽';
         const medal = ['🥇','🥈','🥉'][i] || (i + 1);
         const isMe = row.user_id === me;
+        const statsHtml = _rankMode === 'pvp'
+          ? `<div class="mt-rank-stats">
+               <div class="mt-rank-pt mt-rank-elo">${row.pvp_elo || 1000} <span>ELO</span></div>
+             </div>`
+          : `<div class="mt-rank-stats">
+               <div class="mt-rank-pt">${row.points || 0} <span>pt</span></div>
+               <div class="mt-rank-record">${row.wins || 0}-${row.draws || 0}-${row.losses || 0}</div>
+             </div>`;
+        const metaHtml = _rankMode === 'pvp'
+          ? `${escapeHtml(row.player_name)} · ${row.team_name ? 'S' + (row.season_num || 1) : ''}`
+          : `${escapeHtml(row.player_name)} · S${row.season_num || 1} · Tier ${row.current_tier || 1}`;
         return `<div class="mt-rank-row ${isMe ? 'me' : ''}" data-uid="${row.user_id}">
           <div class="mt-rank-pos">${medal}</div>
           <div class="mt-rank-crest">${crestSvg}</div>
           <div class="mt-rank-info">
             <div class="mt-rank-name">${escapeHtml(row.team_name || '')}</div>
-            <div class="mt-rank-meta">${escapeHtml(row.player_name)} · S${row.season_num || 1} · Tier ${row.current_tier || 1}</div>
+            <div class="mt-rank-meta">${metaHtml}</div>
           </div>
-          <div class="mt-rank-stats">
-            <div class="mt-rank-pt">${row.points || 0} <span>pt</span></div>
-            <div class="mt-rank-record">${row.wins || 0}-${row.draws || 0}-${row.losses || 0}</div>
-          </div>
+          ${statsHtml}
           ${!isMe ? `<button class="mt-rank-friend-btn" data-add="${row.user_id}" title="加好友">＋</button>` : ''}
         </div>`;
       }).join('');
