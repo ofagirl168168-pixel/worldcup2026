@@ -1552,9 +1552,10 @@
         <div class="mt-profile-radar">
           ${_radarBar('攻擊', p.current_attack)}
           ${_radarBar('防守', p.current_defense)}
+          ${c.position === 'GK' ? _radarBar('守門', Math.min(99, p.current_defense + 12)) : ''}
           ${_radarBar('速度', p.current_speed)}
           ${_radarBar('中場', p.current_midfield)}
-          ${_radarBar('體力', p.current_stamina)}
+          ${_radarBar('體力', p.current_stamina, '影響後半場耐疲勞度')}
           ${_radarBar('氣場', p.current_aura)}
         </div>
 
@@ -1765,11 +1766,11 @@
     pitch.addEventListener('pointerdown', onDown);
   }
 
-  function _radarBar(label, val) {
+  function _radarBar(label, val, tooltip) {
     const pct = Math.min(100, Math.max(0, val));
     const color = pct >= 85 ? '#f0c040' : pct >= 70 ? '#9b87f5' : pct >= 50 ? '#90caf9' : '#888';
     return `
-      <div class="mt-radar-row">
+      <div class="mt-radar-row"${tooltip ? ` title="${tooltip}"` : ''}>
         <span class="mt-radar-label">${label}</span>
         <div class="mt-radar-bar"><div style="width:${pct}%;background:${color}"></div></div>
         <span class="mt-radar-val">${val}</span>

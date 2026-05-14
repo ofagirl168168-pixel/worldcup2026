@@ -590,7 +590,7 @@
     // 每位球員的個人數據：優先用 keyPlayers[i].stats、否則從隊伍 radar + 角色 + jitter 推導
     // 角色加成：GK 守門加成大、DEF defense+、MID midfield+、FWD attack+
     function _statsFor(teamData, idx, role, isKeyStar) {
-      const radar = teamData.radar || { attack:70, defense:70, midfield:70, speed:70 };
+      const radar = teamData.radar || { attack:70, defense:70, midfield:70, speed:70, stamina:75 };
       const kp = teamData.keyPlayers && teamData.keyPlayers[idx];
       if (kp && kp.stats) return { ...kp.stats };
       // 角色基底
@@ -598,6 +598,7 @@
       let defense  = radar.defense;
       let midfield = radar.midfield;
       let speed    = radar.speed;
+      let stamina  = radar.stamina || 75;
       let goalkeeping = radar.defense;
       if (role === 'GK')  { goalkeeping = radar.defense + 12; defense += 8; attack -= 25; speed -= 10; }
       else if (role === 'DEF') { defense += 6; attack -= 10; midfield -= 3; }
@@ -605,7 +606,7 @@
       else if (role === 'AMC') { midfield += 4; attack += 6; }
       else if (role === 'FWD') { attack += 7; speed += 4; defense -= 8; }
       // 球星加成（keyPlayers 前 5 位視為球星）
-      if (isKeyStar) { attack += 4; defense += 2; midfield += 3; speed += 2; goalkeeping += 3; }
+      if (isKeyStar) { attack += 4; defense += 2; midfield += 3; speed += 2; goalkeeping += 3; stamina += 4; }
       // 個人差異 jitter（±5 以內、固定 seed = 隊名+idx）
       const seed = (teamData.nameCN || teamData.name || 't') + ':' + idx;
       let h = 0;
@@ -615,8 +616,9 @@
       defense  = Math.max(20, Math.min(99, Math.round(defense + jitter())));
       midfield = Math.max(20, Math.min(99, Math.round(midfield + jitter())));
       speed    = Math.max(20, Math.min(99, Math.round(speed + jitter())));
+      stamina  = Math.max(20, Math.min(99, Math.round(stamina + jitter())));
       goalkeeping = Math.max(20, Math.min(99, Math.round(goalkeeping + jitter())));
-      return { attack, defense, midfield, speed, goalkeeping };
+      return { attack, defense, midfield, speed, stamina, goalkeeping };
     }
     const players = [
       ...hF.map((p, i) => ({
@@ -962,9 +964,12 @@
           // 個人化：搶斷者個人 defense vs 持球者個人 midfield（控球能力）
           const indDef = near.player.stats?.defense ?? defStats.defense;
           const indMid = pos.stats?.midfield ?? atkStats.midfield;
-          // 速度也加成：腳程快的後衛更容易上身鏟到
           const indSpd = near.player.stats?.speed ?? defStats.speed ?? 70;
-          let tackleChance = (indDef / 100) * 0.04 - (indMid / 100) * 0.02 + (indSpd / 100) * 0.012;
+          // 體力疲勞影響：後半場 stamina 低的後衛 defense 效力下降
+          const gtf = state.frame / TOTAL_FRAMES;
+          const tStamina = near.player.stats?.stamina ?? 75;
+          const tackleFatigue = 1 - gtf * Math.max(0.1, 0.4 - tStamina / 250);
+          let tackleChance = ((indDef / 100) * 0.04 - (indMid / 100) * 0.02 + (indSpd / 100) * 0.012) * tackleFatigue;
           if (distToGoal < 0.22) tackleChance *= 1.3;
           tackleChance = Math.max(0.005, Math.min(0.09, tackleChance));
           if (rng() < tackleChance) {
@@ -1034,9 +1039,18 @@
       // 這樣無論理想位置怎麼跳（陣型變、攻防換、ball 移動），tx 永遠靠近 p.x，
       // movePlayers 不會偵測到大距離 → 不會 max-step 暴衝
       // sprintMult：rare 情況才用 — 散球追球 1.3、持球者 role.sprint × 1.1
+      // 體力疲勞：後半場依個人 stamina 拉低速度（stamina 95 → 後半場慢 7%、
+      //   stamina 60 → 後半場慢 25%、stamina 30 → 後半場慢 38%）
+      const gameTimeFrac = Math.min(1, state.frame / TOTAL_FRAMES);
       const setIdealTarget = (p, idealTx, idealTy, sprintMult = 1) => {
         const speedMult = (p.role !== 'GK' && p.stats?.speed) ? p.stats.speed / 80 : 1;
-        const naturalStep = 0.011 * speedMult * sprintMult;
+        // 疲勞 fatigueMult：(0~1) × max(0.4, 0.55 + stamina/220)
+        //   stamina 99 → fatigue 0~0.55 → mult 1.0~0.45
+        //   stamina 50 → fatigue 0~0.77 → mult 1.0~0.23
+        const staminaScore = (p.stats?.stamina ?? 75);
+        const fatigueImpact = gameTimeFrac * Math.max(0.1, 0.55 - staminaScore / 250);
+        const fatigueMult = Math.max(0.55, 1 - fatigueImpact);
+        const naturalStep = 0.011 * speedMult * sprintMult * fatigueMult;
         const dxToIdeal = idealTx - p.x;
         const dyToIdeal = idealTy - p.y;
         const distMag = Math.hypot(dxToIdeal, dyToIdeal);
