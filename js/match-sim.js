@@ -306,12 +306,15 @@
         // 24 幀分 3 段（0→1→2→2 hold）
         frame = Math.min(2, Math.floor(tackleAge / 8));
       } else if (state.phase === 'fulltime') {
-        // 全場結束：已 snap 到排隊位置、直接播慶祝/懊惱/站立
+        // 全場結束：先播動畫到最有戲的那格、然後停住（不要一直 loop）
         if (state.fulltimeWinner === 'd') {
           dirRow = 0; frame = 1;
         } else {
           dirRow = (p.team === state.fulltimeWinner) ? 5 : 6;
-          frame = Math.floor(_renderTick / 16) % 3;
+          // 0~700ms 播 0→1→2、之後 hold 在 frame 2（歡呼最高 / 跪地最低）
+          const elapsed = performance.now() - (state.fulltimeStart || performance.now());
+          if (elapsed < 700) frame = Math.min(2, Math.floor(elapsed / 240));
+          else frame = 2;
         }
       } else if (state.phase === 'celebrate' && state.pauseFrames > 0) {
         // 得分隊歡呼 (row 5)、敵隊懊惱 (row 6)
@@ -409,15 +412,53 @@
         ctx.fill();
       }
 
-      // 控球者：只在腳下加小白點（已在前面畫的白橢圓），不再加全身白圈
+      // 體力疲勞表現：用 gameTimeFrac × stamina 算當前疲勞度
+      const gtf = state.frame / TOTAL_FRAMES;
+      const pStamina = p.stats?.stamina ?? 75;
+      const fatigue = gtf * Math.max(0.1, 0.55 - pStamina / 250);
+
+      // 持球者：頭頂體力條
+      if (isPos && p.role !== 'GK') {
+        const remaining = Math.max(0, Math.min(1, 1 - fatigue));
+        const barW = 18, barH = 3;
+        const bx = cx - barW / 2;
+        const by = cy - SPRITE_DRAW_H / 2 - 7;
+        ctx.fillStyle = 'rgba(0,0,0,0.65)';
+        ctx.fillRect(bx - 1, by - 1, barW + 2, barH + 2);
+        ctx.fillStyle = remaining > 0.7 ? '#4caf50'
+                       : remaining > 0.45 ? '#ffc107' : '#e53935';
+        ctx.fillRect(bx, by, barW * remaining, barH);
+      }
+
+      // 疲勞汗珠：fatigue > 0.18 開始顯示、越累越多
+      if (fatigue > 0.18 && p.role !== 'GK') {
+        const intensity = Math.min(1, (fatigue - 0.18) / 0.30);
+        ctx.fillStyle = `rgba(140,200,255,${0.55 + intensity * 0.4})`;
+        const headY = cy - SPRITE_DRAW_H / 2 + 3;
+        // 2 顆汗珠左右各一、會微晃
+        const wig = Math.sin((state.frame + i * 7) / 8) * 1.2;
+        ctx.beginPath();
+        ctx.ellipse(cx - 5 + wig, headY, 1.1, 1.9, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(cx + 5 - wig, headY + 1, 1.1, 1.9, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // 疲勞重時加第 3 顆
+        if (intensity > 0.6) {
+          ctx.beginPath();
+          ctx.ellipse(cx + wig * 0.5, headY - 2, 1, 1.6, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
     });
 
-    // 球（帶陰影）
+    // 球（帶陰影）— 視覺 y offset 9px 讓球在球員腳邊（之前剛好在胸口）
+    const BALL_VISUAL_Y_OFFSET = 9;
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(0,0,0,0.45)';
     ctx.shadowBlur = 5;
     ctx.beginPath();
-    ctx.arc(ball.x * PITCH_W, ball.y * PITCH_H, 3, 0, Math.PI * 2);
+    ctx.arc(ball.x * PITCH_W, ball.y * PITCH_H + BALL_VISUAL_Y_OFFSET, 3, 0, Math.PI * 2);
     ctx.fill();
     ctx.shadowBlur = 0;
 
