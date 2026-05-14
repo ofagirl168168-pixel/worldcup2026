@@ -505,6 +505,20 @@
           <div class="msim-goal-banner-text">GOAL!</div>
           <div class="msim-goal-banner-team"></div>
         </div>
+        <!-- 全場結束 banner（在球員排隊定格時跳出）-->
+        <div class="msim-fulltime-banner" hidden>
+          <div class="msim-fulltime-label">全 場 結 束</div>
+          <div class="msim-fulltime-matchup">
+            <span class="msim-fulltime-home"></span>
+            <span class="msim-fulltime-score">
+              <span class="msim-fulltime-sh">0</span>
+              <span class="msim-fulltime-dash">-</span>
+              <span class="msim-fulltime-sa">0</span>
+            </span>
+            <span class="msim-fulltime-away"></span>
+          </div>
+          <div class="msim-fulltime-winner"></div>
+        </div>
         <div class="msim-confetti"></div>
       </div>
       <div class="msim-speed-bar">
@@ -529,6 +543,12 @@
       canvasWrap: container.querySelector('.msim-canvas-wrap'),
       goalBanner: container.querySelector('.msim-goal-banner'),
       goalBannerTeam: container.querySelector('.msim-goal-banner-team'),
+      fulltimeBanner: container.querySelector('.msim-fulltime-banner'),
+      fulltimeHome: container.querySelector('.msim-fulltime-home'),
+      fulltimeAway: container.querySelector('.msim-fulltime-away'),
+      fulltimeSh: container.querySelector('.msim-fulltime-sh'),
+      fulltimeSa: container.querySelector('.msim-fulltime-sa'),
+      fulltimeWinner: container.querySelector('.msim-fulltime-winner'),
       confetti: container.querySelector('.msim-confetti'),
       summary: container.querySelector('.msim-summary'),
       speedBtns: container.querySelectorAll('.msim-speed-btn'),
@@ -564,6 +584,46 @@
         c.style.background = color[i % color.length];
         c.style.animationDelay = (Math.random() * 0.3) + 's';
         c.style.animationDuration = (1.4 + Math.random() * 1.2) + 's';
+        c.style.transform = `rotate(${Math.random() * 360}deg)`;
+        ui.confetti.appendChild(c);
+      }
+    }
+  }
+
+  // 全場結束 banner（HomeTeam X-Y AwayTeam + 贏家標籤）— 跟 GOAL 同風格、in-canvas 顯示
+  function _triggerFulltimeBanner(ui, home, away, score, winner) {
+    if (!ui.fulltimeBanner) return;
+    ui.fulltimeHome.textContent = home.nameCN || home.name || 'HOME';
+    ui.fulltimeAway.textContent = away.nameCN || away.name || 'AWAY';
+    ui.fulltimeSh.textContent = String(score.h);
+    ui.fulltimeSa.textContent = String(score.a);
+    // 贏家文字 + 顏色
+    if (winner === 'h') {
+      ui.fulltimeWinner.textContent = `🏆 ${home.nameCN || 'HOME'} 勝`;
+      ui.fulltimeBanner.dataset.winner = 'h';
+    } else if (winner === 'a') {
+      ui.fulltimeWinner.textContent = `🏆 ${away.nameCN || 'AWAY'} 勝`;
+      ui.fulltimeBanner.dataset.winner = 'a';
+    } else {
+      ui.fulltimeWinner.textContent = '🤝 平 手';
+      ui.fulltimeBanner.dataset.winner = 'd';
+    }
+    ui.fulltimeBanner.hidden = false;
+    void ui.fulltimeBanner.offsetWidth;
+    ui.fulltimeBanner.classList.add('msim-ft-show');
+    // 彩花（用贏家顏色）
+    if (ui.confetti) {
+      const color = winner === 'h' ? ['#2196f3','#90caf9','#fff','#f0c040']
+                  : winner === 'a' ? ['#e53935','#ef9a9a','#fff','#f0c040']
+                  : ['#ffd54a','#fff','#ccc'];
+      ui.confetti.innerHTML = '';
+      for (let i = 0; i < 40; i++) {
+        const c = document.createElement('i');
+        c.className = 'msim-conf-piece';
+        c.style.left = (Math.random() * 100) + '%';
+        c.style.background = color[i % color.length];
+        c.style.animationDelay = (Math.random() * 0.6) + 's';
+        c.style.animationDuration = (1.6 + Math.random() * 1.4) + 's';
         c.style.transform = `rotate(${Math.random() * 360}deg)`;
         ui.confetti.appendChild(c);
       }
@@ -613,7 +673,7 @@
     canvas.width = VIEW_W * dpr;
     canvas.height = VIEW_H * dpr;
     canvas.style.width = '100%';
-    canvas.style.maxWidth = '380px';
+    canvas.style.maxWidth = '560px';
     canvas.style.aspectRatio = `${VIEW_W} / ${VIEW_H}`;
     canvas.style.borderRadius = '8px';
     canvas.style.display = 'block';
@@ -1387,6 +1447,10 @@
           state.fulltimeWinner = hScore > aScore ? 'h' : aScore > hScore ? 'a' : 'd';
           // 收掉進球放大殘留
           if (typeof _endGoalCelebration === 'function') _endGoalCelebration(ui);
+          // 觸發 in-canvas 全場結束 banner（球員排隊定格時跳出）
+          if (typeof _triggerFulltimeBanner === 'function') {
+            _triggerFulltimeBanner(ui, home, away, { h: hScore, a: aScore }, state.fulltimeWinner);
+          }
           // 全部 22 人「直接 snap」排成一橫列（不用走過去）
           // home 在 x 0.04~0.46（中線以左）、away 在 x 0.54~0.96（中線以右）、y = 0.5
           const homeP = players.filter(p => p.team === 'h');

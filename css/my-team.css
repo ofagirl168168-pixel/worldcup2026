@@ -2103,21 +2103,26 @@
   flex-direction: column;
   justify-content: center;   /* 內容垂直置中（pre-match / 短結算時）*/
 }
-/* 比賽 sim 進行時：拉滿可用高度、別讓 pitch 變太小 */
+/* 比賽 sim 進行時：拉滿可用高度、保持垂直置中 */
 .mt-match-stage:has(.mt-match-sim) {
-  justify-content: stretch;
   min-height: 90vh;
+  justify-content: center;
 }
 .mt-match-sim {
   padding: 4px;
   display: flex;
   flex-direction: column;
-  min-height: 78vh;     /* 球場儘量大、不擠在頂 */
+  justify-content: center;
+  width: 100%;
 }
 .mt-match-sim #mt-match-sim-host {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  width: 100%;
+}
+/* 比賽 modal 內：放寬 canvas 上限（外部 components.css 的預設 380px 在這裡撐大）*/
+.mt-match-sim .msim-canvas {
+  max-width: 100% !important;
 }
 
 /* ─── Pre-match v2 polish ─── */
