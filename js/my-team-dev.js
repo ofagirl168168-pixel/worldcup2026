@@ -7,6 +7,8 @@
  *                              // 之後可以再試「進站→投票→抽卡→建隊」整個新人流程
  *   MyTeamDev.resetLocalOnly() // 只清 localStorage（不動 DB）→ 試「進站第一次彈擂台」之類
  *   MyTeamDev.addTickets(n)    // 直接加 n 張抽券（測試抽卡 UI 用）
+ *   MyTeamDev.addCoachTickets(n) // 加 n 張教練券（測試抽教練）
+ *   MyTeamDev.addGems(n)       // 加 n 顆寶石（測試寶石抽）
  *   MyTeamDev.addRP(n)         // 直接加 RP 4 種各 n（測試訓練 UI）
  *   MyTeamDev.addStamina(n)    // 直接補滿體力
  *   MyTeamDev.simulateArenaVote()  // 模擬「擂台首投」flow，不用真投票
@@ -111,6 +113,35 @@
     console.log(ok ? `✓ +${n} 抽券` : '❌ 失敗（沒登入或沒建隊？）');
   }
 
+  async function addCoachTickets(n) {
+    n = parseInt(n) || 1;
+    const uid = _uid();
+    if (!uid) { console.error('❌ 沒登入'); return; }
+    const team = window.MyTeam.getCached();
+    if (!team || team === 'not_created') { console.error('❌ 還沒建隊'); return; }
+    const { error } = await window.DB.from('my_team')
+      .update({ coach_tickets: (team.coach_tickets || 0) + n }).eq('user_id', uid);
+    if (error) console.error('❌', error.message);
+    else { await window.MyTeam.fetch(); console.log(`✓ +${n} 教練券`); }
+  }
+
+  async function addGems(n) {
+    n = parseInt(n) || 100;
+    const uid = _uid();
+    if (!uid) { console.error('❌ 沒登入'); return; }
+    const { data: prof } = await window.DB.from('profiles').select('gems').eq('id', uid).maybeSingle();
+    const current = prof?.gems || 0;
+    const { error } = await window.DB.from('profiles')
+      .update({ gems: current + n }).eq('id', uid);
+    if (error) console.error('❌', error.message);
+    else {
+      if (window.Gems && typeof window.Gems.refresh === 'function') {
+        try { await window.Gems.refresh(); } catch (e) {}
+      }
+      console.log(`✓ +${n} 寶石（現在共 ${current + n}）`);
+    }
+  }
+
   async function addRP(n) {
     n = parseInt(n) || 50;
     const uid = _uid();
@@ -170,7 +201,7 @@
   window.MyTeamDev = {
     enable, disable, status,
     reset, resetLocalOnly,
-    addTickets, addRP, addStamina,
+    addTickets, addCoachTickets, addGems, addRP, addStamina,
     replayTutorial,
     simulateArenaVote, simulateDailyLogin, simulatePredict5,
   };
