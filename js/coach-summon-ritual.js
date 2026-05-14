@@ -15,20 +15,25 @@
 (function () {
   'use strict';
 
-  const TIMEOUT_MS = 15000;     // 15 秒沒畫完 → 重畫
-  const MIN_SCORE = 50;          // 50 分才算成功
-  const CLOSE_RADIUS_PCT = 0.10; // 終點離起點 < 10% 平均半徑才算封閉
+  const MIN_SCORE = 50;          // 每圈至少 50 分才算成功
   const MIN_ANGLE_COVERED = Math.PI * 1.6;  // 至少繞 290° 才算一圈
 
   function open(opts) {
     opts = opts || {};
-    const count = opts.count || 1;
+    const maxLoops = opts.count || 1;     // 1 抽 = 1 圈、10 連 = up to 10 圈
+    const TIMEOUT_MS = maxLoops === 10 ? 30000 : 15000;
     const overlay = document.createElement('div');
     overlay.className = 'coach-ritual-overlay';
-    const titleTxt = count === 10 ? '教練招募 ×10' : '教練招募';
-    const subTxt = count === 10
-      ? '以中心為圓心畫一顆球，招募 10 位教練（標準機率）'
+    const titleTxt = maxLoops === 10 ? '教練招募 · 連環圓 ×10' : '教練招募';
+    const subTxt = maxLoops === 10
+      ? '中心畫圓不停筆、每繞一圈招募一位教練（每圈獨立計分、最多 10 圈）'
       : '以中心為圓心畫一顆球，越圓的球招募到越強的教練';
+    const progressHTML = maxLoops === 10 ? `
+      <div class="coach-ritual-progress">
+        <div class="coach-ritual-progress-label">已招募 <span class="coach-ritual-progress-num">0</span> / 10</div>
+        <div class="coach-ritual-progress-pills" id="coach-ritual-progress-pills"></div>
+      </div>
+    ` : '';
     overlay.innerHTML = `
       <div class="coach-ritual-stage">
         <button class="coach-ritual-close" type="button" aria-label="關閉">×</button>
@@ -37,14 +42,15 @@
         <div class="coach-ritual-canvas-wrap">
           <canvas class="coach-ritual-canvas" width="320" height="320"></canvas>
           <div class="coach-ritual-score">圓度 <span class="coach-ritual-score-num is-ssr">100%</span></div>
-          <div class="coach-ritual-timer">剩餘 <span class="coach-ritual-timer-num">15</span> 秒</div>
+          <div class="coach-ritual-timer">剩餘 <span class="coach-ritual-timer-num">${TIMEOUT_MS/1000}</span> 秒</div>
         </div>
+        ${progressHTML}
         <div class="coach-ritual-rules">
           <span class="coach-ritual-rules-pill rule-r">50%+ R</span>
           <span class="coach-ritual-rules-pill rule-sr">85%+ SR</span>
           <span class="coach-ritual-rules-pill rule-ssr">95%+ SSR</span>
         </div>
-        <div class="coach-ritual-hint" id="coach-ritual-hint">準備好就在中心按下、開始畫圓</div>
+        <div class="coach-ritual-hint" id="coach-ritual-hint">${maxLoops === 10 ? '不停筆、連續畫圈 — 每圈算一個教練' : '準備好就在中心按下、開始畫圓'}</div>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -65,6 +71,12 @@
     let frozen = false;
     let rafId = null;
     let phaseRotation = 0;
+    // 連環圓狀態：累積角度 + 每圈分數 + 每圈起始索引
+    let totalAngle = 0;
+    let loopScores = [];       // 已完成的圈、各圈的分數
+    let loopStartIdx = 0;      // 當前圈在 points 陣列的起始 index
+    const progressNum = overlay.querySelector('.coach-ritual-progress-num');
+    const progressPills = overlay.querySelector('#coach-ritual-progress-pills');
 
     // 極簡背景：只有中心點 + 微弱暈
     function drawBackground() {
@@ -137,20 +149,24 @@
     }
 
     // ── 圓度計算（第一點半徑當基準、純平均準確度、不乘角度覆蓋）──
-    // 畫好的時候會浮動在 92~98%、畫歪一段才會掉
     function computeRoundness(pts) {
       if (pts.length < 1) return 100;
       const refDist = Math.hypot(pts[0].x - CX, pts[0].y - CY);
-      if (refDist < 30) return 0;  // 起點太靠近中心 = 沒繞夠
+      if (refDist < 30) return 0;
+      return computeLoopScore(pts, refDist);
+    }
+
+    // 單圈分數：給定 refDist（全域第一點半徑）計算該圈的平均相似度
+    function computeLoopScore(loopPts, refDist) {
+      if (!loopPts || loopPts.length < 1 || refDist < 1) return 0;
       let totalSim = 0;
-      for (let i = 0; i < pts.length; i++) {
-        const d = Math.hypot(pts[i].x - CX, pts[i].y - CY);
+      for (let i = 0; i < loopPts.length; i++) {
+        const d = Math.hypot(loopPts[i].x - CX, loopPts[i].y - CY);
         const dev = Math.abs(d - refDist) / refDist;
         const sim = Math.max(0, 1 - dev * 2);
         totalSim += sim;
       }
-      // 純平均相似度（即時準確度）— 不乘角度覆蓋率
-      return Math.round(totalSim / pts.length * 100);
+      return Math.round(totalSim / loopPts.length * 100);
     }
 
     function isClosed(pts) {
@@ -207,8 +223,13 @@
       const p = pos(e);
       drawing = true;
       points = [p];
+      totalAngle = 0;
+      loopScores = [];
+      loopStartIdx = 0;
+      if (progressNum) progressNum.textContent = '0';
+      if (progressPills) progressPills.innerHTML = '';
       startTime = performance.now();
-      hintEl.textContent = '畫到回原點 → 自動完成';
+      hintEl.textContent = maxLoops === 10 ? '繼續畫圈、每完成一圈算一個教練' : '畫到回原點 → 自動完成';
       startTimer();
     }
 
@@ -216,27 +237,72 @@
       if (!drawing || frozen) return;
       e.preventDefault();
       const p = pos(e);
-      // 太近就跳過（減少 jitter）
       const last = points[points.length - 1];
       if (Math.hypot(p.x - last.x, p.y - last.y) < 2) return;
       points.push(p);
+      // 累積角度
+      if (points.length >= 2) {
+        const prev = points[points.length - 2];
+        const angPrev = Math.atan2(prev.y - CY, prev.x - CX);
+        const angCurr = Math.atan2(p.y - CY, p.x - CX);
+        let d = angCurr - angPrev;
+        if (d > Math.PI) d -= 2 * Math.PI;
+        if (d < -Math.PI) d += 2 * Math.PI;
+        totalAngle += d;
+      }
       updateScoreLabel();
-      // 即時檢測封閉
-      if (isClosed(points)) {
-        finishDraw();
+      // 檢查是否完成一圈（累積角度 >= 2π * (已完成圈數 + 1)）
+      const targetAngle = (loopScores.length + 1) * Math.PI * 2;
+      if (Math.abs(totalAngle) >= targetAngle) {
+        completeLoop();
+        // 達到上限 → 自動完成
+        if (loopScores.length >= maxLoops) finishDraw();
       }
     }
 
     function pointerUp(e) {
       if (!drawing) return;
       drawing = false;
-      // 手放開 → 也檢查一次
-      if (isClosed(points)) {
+      if (loopScores.length >= 1) {
         finishDraw();
       } else {
-        // 鬆手但沒封閉 → 重畫
+        // 鬆手但沒完成任何一圈 → 重畫
         flashRedraw('沒畫完整圈、再來一次');
       }
+    }
+
+    // 完成一圈：計算該圈分數、記錄、UI 更新
+    function completeLoop() {
+      const loopPts = points.slice(loopStartIdx);
+      const refDist = getRefDist();
+      const score = computeLoopScore(loopPts, refDist);
+      loopScores.push(score);
+      loopStartIdx = points.length;   // 下一圈從這裡開始
+      // 進度 UI
+      if (progressNum) progressNum.textContent = loopScores.length;
+      if (progressPills) {
+        const pill = document.createElement('span');
+        const rarity = score >= 95 ? 'ssr' : score >= 85 ? 'sr' : score >= 50 ? 'r' : 'fail';
+        pill.className = `coach-ritual-progress-pill is-${rarity}`;
+        pill.textContent = score;
+        progressPills.appendChild(pill);
+      }
+      // 圈完成閃光
+      flashCircleComplete();
+    }
+
+    function flashCircleComplete() {
+      const refDist = getRefDist();
+      if (refDist < 1) return;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,200,0.95)';
+      ctx.lineWidth = 3;
+      ctx.shadowColor = '#ffe680';
+      ctx.shadowBlur = 16;
+      ctx.beginPath();
+      ctx.arc(CX, CY, refDist, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
     }
 
     function startTimer() {
@@ -271,20 +337,29 @@
 
     function finishDraw() {
       if (frozen) return;
-      const score = computeRoundness(points);
-      if (score < MIN_SCORE) {
-        flashRedraw(`圓度只有 ${score}% — 再來一次`);
+      // 沒完成任何一圈 → 重畫
+      if (loopScores.length === 0) {
+        flashRedraw('沒完成任何一圈、再來一次');
+        return;
+      }
+      // 過濾低於 50 的圈（保留 >= 50 的視為成功）
+      const validScores = loopScores.filter(s => s >= MIN_SCORE);
+      if (validScores.length === 0) {
+        flashRedraw(`圈都不夠圓（最高 ${Math.max(...loopScores)}%）— 再來一次`);
         return;
       }
       frozen = true;
       drawing = false;
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      runSuccessAnimation(score);
+      runSuccessAnimation(validScores);
     }
 
     // ── 成功動畫：軌跡填滿 → 變足球 → 踢進螢幕 → 教練卡 ──
-    async function runSuccessAnimation(score) {
-      hintEl.textContent = `✨ 圓度 ${score}% — 招募中…`;
+    async function runSuccessAnimation(scores) {
+      const avgScore = Math.round(scores.reduce((s,n)=>s+n,0) / scores.length);
+      hintEl.textContent = scores.length === 1
+        ? `✨ 圓度 ${scores[0]}% — 招募中…`
+        : `✨ ${scores.length} 圈完成（平均 ${avgScore}%）— 招募中…`;
       hintEl.classList.add('is-success');
       // 1. 填滿圓（fade fill）
       let fillT = 0;
@@ -362,17 +437,17 @@
           else {
             cancelAnimationFrame(rafId);
             // 召喚成功 → 呼叫 RPC + 返回結果
-            triggerSummonResult(score);
+            triggerSummonResult(scores);
           }
         };
         kickStep();
       }
     }
 
-    async function triggerSummonResult(score) {
-      hintEl.textContent = count === 10 ? '✨ 招募 10 位教練中…' : '✨ 教練招募中…';
+    async function triggerSummonResult(scores) {
+      hintEl.textContent = `✨ 招募 ${scores.length} 位教練中…`;
       try {
-        const result = await window.MyTeam.drawCoachByCircle(score, count);
+        const result = await window.MyTeam.drawCoachBySpiral(scores);
         // 自動指派到空 slot（沿用 my-team-modal 的 auto-assign 邏輯）
         if (typeof window._mtAutoAssignCoaches === 'function') {
           await window._mtAutoAssignCoaches(result.coaches || []);

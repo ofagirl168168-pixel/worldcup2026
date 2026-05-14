@@ -2537,6 +2537,54 @@
   0%, 100% { box-shadow: 0 0 0 rgba(255,213,74,0); }
   50%      { box-shadow: 0 0 14px rgba(255,213,74,0.7); }
 }
+/* 連環圓進度（10 連專用）*/
+.coach-ritual-progress {
+  margin: 6px 0 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.coach-ritual-progress-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 1px;
+  font-weight: 800;
+}
+.coach-ritual-progress-num {
+  color: #ffd54a;
+  font-size: 16px;
+  font-weight: 900;
+  font-family: 'Impact','Arial Black',sans-serif;
+  margin: 0 2px;
+}
+.coach-ritual-progress-pills {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 18px;
+}
+.coach-ritual-progress-pill {
+  font-size: 10px;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 999px;
+  min-width: 22px;
+  text-align: center;
+  animation: coach-pill-pop 0.4s cubic-bezier(0.34, 1.6, 0.64, 1);
+}
+.coach-ritual-progress-pill.is-r    { background: rgba(255,230,128,0.22); color: #ffe680; border: 1px solid rgba(255,230,128,0.45); }
+.coach-ritual-progress-pill.is-sr   { background: rgba(155,135,245,0.28); color: #c4b3ff; border: 1px solid rgba(155,135,245,0.55); }
+.coach-ritual-progress-pill.is-ssr  { background: rgba(255,213,74,0.35);  color: #ffd54a; border: 1px solid rgba(255,213,74,0.7);
+  box-shadow: 0 0 10px rgba(255,213,74,0.65); }
+.coach-ritual-progress-pill.is-fail { background: rgba(229,57,53,0.25);   color: #ef9a9a; border: 1px solid rgba(229,57,53,0.45); }
+@keyframes coach-pill-pop {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 .coach-ritual-hint {
   font-size: 11px;
   color: rgba(255,255,255,0.65);

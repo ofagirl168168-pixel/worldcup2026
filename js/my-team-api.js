@@ -214,11 +214,15 @@
     return data;
   }
 
-  // 召喚儀式：畫圓抽教練（score 50-100、count 1 或 10）
-  async function drawCoachByCircle(score, count = 1) {
+  // 連環圓招募教練：傳入每圈的分數陣列（1~10 個）
+  // 每圈 score 獨立決定該抽稀有度
+  async function drawCoachBySpiral(scores) {
     if (!window.DB) throw new Error('NOT_LOGGED_IN');
-    const { data, error } = await window.DB.rpc('coach_gacha_circle_draw', {
-      p_score: score, p_count: count,
+    if (!Array.isArray(scores) || scores.length < 1 || scores.length > 10) {
+      throw new Error('INVALID_COUNT');
+    }
+    const { data, error } = await window.DB.rpc('coach_gacha_circle_spiral', {
+      p_scores: scores,
     });
     if (error) throw error;
     await fetch_();
@@ -335,7 +339,7 @@
     trainPlayer,
     drawCoach,
     drawCoachWithGems,
-    drawCoachByCircle,
+    drawCoachBySpiral,
     startTimedTraining,
     claimTimedTraining,
     redeemSSRSelect,
