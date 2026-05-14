@@ -2515,6 +2515,10 @@
     const pity = team.pity_counter || 0;
     const pityRemaining = Math.max(0, 30 - pity);
     const ssrSelect = team.ssr_select_tickets || 0;
+    const has1Ticket = tickets >= 1;
+    const has10Tickets = tickets >= 10;
+    const canAfford1 = has1Ticket || gems >= 50;
+    const canAfford10 = has10Tickets || gems >= 450;
 
     content.innerHTML = `
       <div class="mt-gacha-shop-fullscene" id="mt-gacha-fullshop">
@@ -2561,16 +2565,24 @@
 
         <!-- 抽卡按鈕：1 抽 + 10 抽（同高、cost pill 內嵌、必得 SR 用絕對定位） -->
         <div class="mt-gshop-buttons">
-          <button class="mt-gshop-btn mt-gshop-btn-1" id="mt-gacha-1" ${tickets < 1 ? 'disabled' : ''}>
+          <button class="mt-gshop-btn mt-gshop-btn-1" id="mt-gacha-1" ${!canAfford1 ? 'disabled' : ''}>
             <span class="mt-gshop-btn-shine"></span>
             <div class="mt-gshop-btn-label">1 抽</div>
-            <div class="mt-gshop-btn-cost">🎟️ <b>1</b></div>
+            <div class="mt-gshop-btn-cost mt-gshop-btn-cost-dual">
+              <span class="mt-gshop-cost-pill ${has1Ticket ? 'mt-gshop-cost-active' : 'mt-gshop-cost-fade'}">🎟️ <b>1</b></span>
+              <span class="mt-gshop-cost-or">/</span>
+              <span class="mt-gshop-cost-pill ${has1Ticket ? 'mt-gshop-cost-fade' : 'mt-gshop-cost-active'}">💎 <b>50</b></span>
+            </div>
           </button>
-          <button class="mt-gshop-btn mt-gshop-btn-10" id="mt-gacha-10" ${tickets < 10 ? 'disabled' : ''}>
+          <button class="mt-gshop-btn mt-gshop-btn-10" id="mt-gacha-10" ${!canAfford10 ? 'disabled' : ''}>
             <span class="mt-gshop-btn-shine"></span>
             <span class="mt-gshop-btn-promo">優惠!</span>
             <div class="mt-gshop-btn-label">10 抽</div>
-            <div class="mt-gshop-btn-cost">🎟️ <b>10</b></div>
+            <div class="mt-gshop-btn-cost mt-gshop-btn-cost-dual">
+              <span class="mt-gshop-cost-pill ${has10Tickets ? 'mt-gshop-cost-active' : 'mt-gshop-cost-fade'}">🎟️ <b>10</b></span>
+              <span class="mt-gshop-cost-or">/</span>
+              <span class="mt-gshop-cost-pill ${has10Tickets ? 'mt-gshop-cost-fade' : 'mt-gshop-cost-active'}">💎 <b>450</b></span>
+            </div>
             <div class="mt-gshop-btn-sub">必得 <b>SR</b> 以上球員!</div>
           </button>
         </div>
@@ -2580,22 +2592,6 @@
             🌟 SSR 自選券 ×${ssrSelect}
           </button>
         ` : ''}
-
-        <!-- 寶石抽卡（沒券時用寶石）-->
-        <div class="mt-gshop-gem-row">
-          <div class="mt-gshop-gem-divider"><span>或用寶石直接抽</span></div>
-          <div class="mt-gshop-gem-btns">
-            <button class="mt-gshop-gem-btn" id="mt-gacha-gem-1">
-              <div class="mt-gshop-gem-btn-label">寶石 1 抽</div>
-              <div class="mt-gshop-gem-btn-cost">💎 <b>50</b></div>
-            </button>
-            <button class="mt-gshop-gem-btn mt-gshop-gem-btn-10" id="mt-gacha-gem-10">
-              <span class="mt-gshop-gem-btn-save">省 50</span>
-              <div class="mt-gshop-gem-btn-label">寶石 10 連</div>
-              <div class="mt-gshop-gem-btn-cost">💎 <b>450</b></div>
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- 包進來補關閉的舊空 div（不影響）-->
@@ -2604,16 +2600,22 @@
       </div>
     `;
 
-    content.querySelector('#mt-gacha-1')?.addEventListener('click', () => _runGacha(1));
-    content.querySelector('#mt-gacha-10')?.addEventListener('click', () => _runGacha(10));
-    content.querySelector('#mt-gacha-gem-1')?.addEventListener('click', () => _runGachaGem(1));
-    content.querySelector('#mt-gacha-gem-10')?.addEventListener('click', () => _runGachaGem(10));
+    // 點 1 抽 / 10 連：有券優先用券、沒券就用寶石
+    content.querySelector('#mt-gacha-1')?.addEventListener('click', () => _runGachaSmart(1));
+    content.querySelector('#mt-gacha-10')?.addEventListener('click', () => _runGachaSmart(10));
     content.querySelector('#mt-ssr-select-open')?.addEventListener('click', () => _openSSRSelect());
     content.querySelector('#mt-gshop-rates')?.addEventListener('click', () => _openRatesModal());
     // 4 個卡包點擊 → 直接抽 1 抽（任何稀有度按鈕都一樣 — 機率系統決定中什麼）
     content.querySelectorAll('.mt-gshop-pack').forEach(b => {
-      b.addEventListener('click', () => _runGacha(1));
+      b.addEventListener('click', () => _runGachaSmart(1));
     });
+  }
+
+  // 智能抽卡：有券優先用、沒券改用寶石
+  function _runGachaSmart(count) {
+    const team = window.MyTeam.getCached();
+    if ((team?.tickets || 0) >= count) return _runGacha(count);
+    return _runGachaGem(count);
   }
 
   // ── 機率資訊 modal ──
@@ -3370,23 +3372,31 @@
     const ATTR_LABELS = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
     const overlay = document.createElement('div');
     overlay.className = 'mt-profile-overlay mt-train-picker';
+    const rpBadges = `
+      <span class="mt-train-rp-pill" title="戰術點">🧠 ${team.rp_tactical || 0}</span>
+      <span class="mt-train-rp-pill" title="體能點">💪 ${team.rp_physical || 0}</span>
+      <span class="mt-train-rp-pill" title="鬥志點">❤️ ${team.rp_heart || 0}</span>
+      <span class="mt-train-rp-pill" title="靈感點">💡 ${team.rp_idea || 0}</span>
+    `;
     overlay.innerHTML = `
       <div class="mt-profile-card">
         <button class="mt-modal-close mt-profile-close" type="button">×</button>
         <div class="mt-train-picker-title">🏋️ ${ATTR_LABELS[attr]} 訓練站</div>
-        <div class="mt-train-picker-sub">選一位球員開始訓練</div>
+        <div class="mt-train-picker-rp">
+          <span class="mt-train-rp-label">你的點數：</span>${rpBadges}
+        </div>
         <div class="mt-train-picker-help">
           <div class="mt-train-help-row">
-            <span class="mt-train-help-tag">⏱️ 時間訓練</span>
-            <span class="mt-train-help-desc">免費等時間到 → <b>${ATTR_LABELS[attr]} +1</b>（不升等）</span>
+            <span class="mt-train-help-tag">⏱️ 慢慢練</span>
+            <span class="mt-train-help-desc">免費 → 等時間到拿 <b>${ATTR_LABELS[attr]} +1</b></span>
           </div>
           <div class="mt-train-help-row">
-            <span class="mt-train-help-tag">⚙️ RP 訓練</span>
-            <span class="mt-train-help-desc">耗 RP → <b>升 1 級 + 6 屬性各 +1~3</b>（一次抵 6 次時間訓練）</span>
+            <span class="mt-train-help-tag mt-train-help-tag-rp">⚡ 集訓升等</span>
+            <span class="mt-train-help-desc">耗點數 → <b>立刻升 1 級 + 6 屬性各 +1~3</b></span>
           </div>
           <div class="mt-train-help-row">
-            <span class="mt-train-help-tag mt-train-help-tag-premium">⭐ 精緻訓練</span>
-            <span class="mt-train-help-desc">耗更多 RP → <b>升 1 級 + 6 屬性各 +2~5</b></span>
+            <span class="mt-train-help-tag mt-train-help-tag-premium">⭐ 精英特訓</span>
+            <span class="mt-train-help-desc">耗更多點數 → <b>升 1 級 + 6 屬性各 +2~5</b></span>
           </div>
         </div>
         <div class="mt-train-picker-list" id="mt-train-picker-list"></div>
@@ -3404,12 +3414,23 @@
       const c = p.card || {};
       const isTraining = p.training_attr && p.training_finish_at;
       const isReady = isTraining && new Date(p.training_finish_at) <= new Date();
-      const estSec = Math.max(60, Math.floor(90 * Math.pow(p.level, 1.4)));
+      const currentAttrVal = p['current_' + attr] || 0;
+      const estSec = Math.max(60, Math.floor(Math.pow(currentAttrVal / 25, 2.2) * 50));
       const estLabel = estSec >= 3600 ? `${(estSec/3600).toFixed(1)} 小時`
         : estSec >= 60 ? `${Math.floor(estSec/60)} 分` : `${estSec} 秒`;
-      const canNormal = team.rp_tactical >= 10 && team.rp_physical >= 10 && p.level < 50;
-      const canPremium = team.rp_tactical >= 30 && team.rp_physical >= 30
-                        && team.rp_heart >= 10 && team.rp_idea >= 10 && p.level < 50;
+      const rpT = team.rp_tactical || 0;
+      const rpP = team.rp_physical || 0;
+      const rpH = team.rp_heart || 0;
+      const rpI = team.rp_idea || 0;
+      const isMaxLevel = p.level >= 50;
+      const canNormal = rpT >= 10 && rpP >= 10 && !isMaxLevel;
+      const canPremium = rpT >= 30 && rpP >= 30 && rpH >= 10 && rpI >= 10 && !isMaxLevel;
+      // 缺什麼？（顯示具體原因）
+      const missNormal = isMaxLevel ? '已滿級' :
+        (rpT < 10 ? `🧠不足` : rpP < 10 ? `💪不足` : '');
+      const missPremium = isMaxLevel ? '已滿級' :
+        (rpT < 30 ? `🧠不足` : rpP < 30 ? `💪不足` :
+         rpH < 10 ? `❤️不足` : rpI < 10 ? `💡不足` : '');
 
       const row = document.createElement('div');
       row.className = `mt-train-pick-row rarity-${c.rarity || 'R'}`;
@@ -3418,20 +3439,23 @@
         <div class="mt-train-pick-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
         <div class="mt-train-pick-info">
           <div class="mt-train-pick-name">${escapeHtml(c.name)} <small>${c.position || ''} Lv.${p.level}</small></div>
-          <div class="mt-train-pick-attr">當前 ${ATTR_LABELS[attr]}：<b>${p['current_' + attr]}</b></div>
+          <div class="mt-train-pick-attr">當前 ${ATTR_LABELS[attr]}：<b>${p['current_' + attr]}</b> / 99</div>
         </div>
         <div class="mt-train-pick-btns">
           ${isTraining ? `
             <span class="mt-train-pick-busy">${isReady ? '⏱️ 已完成' : '⏱️ 訓練中'}</span>
           ` : `
             <button class="mt-train-pick-btn mt-train-pick-timed" data-pid="${p.id}">
-              ⏱️ 等 ${estLabel}<br><small>+1 ${ATTR_LABELS[attr][0]}</small>
+              <div class="mt-train-btn-title">⏱️ 慢慢練</div>
+              <div class="mt-train-btn-sub">等 ${estLabel} → +1 ${ATTR_LABELS[attr][0]}</div>
             </button>
-            <button class="mt-train-pick-btn mt-train-pick-rp" data-pid="${p.id}" data-mode="normal" ${canNormal ? '' : 'disabled'}>
-              ⚙️ RP 訓練<br><small>戰10 體10</small>
+            <button class="mt-train-pick-btn mt-train-pick-rp" data-pid="${p.id}" data-mode="normal" ${canNormal ? '' : 'disabled'} title="${missNormal}">
+              <div class="mt-train-btn-title">⚡ 集訓升等</div>
+              <div class="mt-train-btn-sub">${canNormal ? '🧠10 💪10 → Lv+1' : (missNormal || '')}</div>
             </button>
-            <button class="mt-train-pick-btn mt-train-pick-rp" data-pid="${p.id}" data-mode="premium" ${canPremium ? '' : 'disabled'}>
-              ⚙️ 精緻訓練<br><small>30/30/10/10</small>
+            <button class="mt-train-pick-btn mt-train-pick-rp mt-train-btn-premium" data-pid="${p.id}" data-mode="premium" ${canPremium ? '' : 'disabled'} title="${missPremium}">
+              <div class="mt-train-btn-title">⭐ 精英特訓</div>
+              <div class="mt-train-btn-sub">${canPremium ? '🧠30 💪30 ❤️10 💡10' : (missPremium || '')}</div>
             </button>
           `}
         </div>
