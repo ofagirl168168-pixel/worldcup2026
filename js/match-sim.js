@@ -434,9 +434,14 @@
       }
 
       // 疲勞汗珠：fatigue > 0.18 起、依疲勞度漸進 1→2→3 滴
-      // 顯示在「頭髮側」= 跟進攻方向相反那側（home 攻右、髮在左 → sweat 左）
+      // 顯示在「頭髮側」= sprite 當前面向的反側
+      //   dirRow 1 (面左) → 髮在右 → sweat 右；dirRow 2 (面右) → sweat 左
+      //   dirRow 0/3 (面向上/下) → 用 team 預設（home 攻右、髮多在左）
       if (fatigue > 0.18 && p.role !== 'GK') {
-        const sweatSign = p.team === 'h' ? -1 : 1;  // -1 = 左側、+1 = 右側
+        let sweatSign;
+        if (dirRow === 1) sweatSign = +1;
+        else if (dirRow === 2) sweatSign = -1;
+        else sweatSign = p.team === 'h' ? -1 : 1;
         ctx.fillStyle = `rgba(140,200,255,${0.85})`;
         const headY = cy - SPRITE_DRAW_H / 2 + 7;
         const wig = Math.sin((state.frame + i * 7) / 8) * 0.8;
