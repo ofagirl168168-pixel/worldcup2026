@@ -3827,14 +3827,17 @@
 .mt-gacha-shop-fullscene {
   position: relative;
   width: calc(100% + 40px);
+  height: calc(100% + 56px);     /* 填滿父 hub-content + 補 padding */
   margin: -16px -20px -40px;
   padding: 0;
   overflow: hidden;
-  /* 鎖 3:4 比例（同 bg 圖）→ % 位置才準、不會被裁切偏移 */
-  aspect-ratio: 3 / 4;
   background:
     url('../img/my-team/gacha-bg.jpg') 0 0 / 100% 100% no-repeat,
     #1a0a14;
+}
+/* gacha tab 不滾動 */
+.mt-hub-content[data-tab="gacha"] {
+  overflow: hidden !important;
 }
 
 /* 背景圖：已改用 background-image、img 元素隱藏避免雙重渲染 */
@@ -5838,8 +5841,7 @@
   border: 2px solid #fff;
   color: #1a1a2e;
   font-weight: 900;
-  font-size: 11px;
-  padding: 7px 4px;
+  padding: 5px 6px;
   border-radius: 8px;
   cursor: pointer;
   text-shadow: 0 1px 1px rgba(255,255,255,0.4);
@@ -5848,7 +5850,39 @@
     inset 0 1px 2px rgba(255,255,255,0.4);
   transition: transform 0.12s, box-shadow 0.15s;
   animation: mt-draw-glow 2.4s ease-in-out infinite;
-  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.mt-coach-btn-label {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+.mt-coach-btn-cost-dual {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.mt-coach-cost-pill {
+  background: rgba(0,0,0,0.28);
+  color: #2a1505;
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 800;
+  transition: opacity 0.15s;
+}
+.mt-coach-cost-pill b { font-size: 11px; margin-left: 1px; }
+.mt-coach-cost-pill.is-active { opacity: 1; }
+.mt-coach-cost-pill.is-fade   { opacity: 0.42; }
+.mt-coach-cost-or {
+  color: rgba(42,21,5,0.55);
+  font-size: 9px;
+  font-weight: 700;
 }
 .mt-coach-draw-btn:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.04);

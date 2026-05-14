@@ -1589,14 +1589,23 @@
         <!-- 木地板 -->
         <div class="mt-coach-floor"></div>
 
-        <!-- 底部：抽教練 + 教練券 -->
+        <!-- 底部：抽教練（券 + 寶石雙費用、跟球員抽卡同樣式） -->
         <div class="mt-coach-actions">
-          <span class="mt-gacha-chip mt-gacha-chip-ticket">🎫 <b>${coachTickets}</b></span>
-          <button class="mt-coach-draw-btn mt-coach-draw-1" data-count="1" ${coachTickets < 1 ? 'disabled' : ''}>
-            🎫 抽 1 教練
+          <button class="mt-coach-draw-btn mt-coach-draw-1" data-count="1" ${(coachTickets < 1 && (team.gems || 0) < 200) ? 'disabled' : ''}>
+            <div class="mt-coach-btn-label">抽 1 教練</div>
+            <div class="mt-coach-btn-cost-dual">
+              <span class="mt-coach-cost-pill ${coachTickets >= 1 ? 'is-active' : 'is-fade'}">🎫 <b>1</b></span>
+              <span class="mt-coach-cost-or">/</span>
+              <span class="mt-coach-cost-pill ${coachTickets >= 1 ? 'is-fade' : 'is-active'}">💎 <b>200</b></span>
+            </div>
           </button>
-          <button class="mt-coach-draw-btn mt-coach-draw-10" data-count="10" ${coachTickets < 10 ? 'disabled' : ''}>
-            🎫 10 連抽
+          <button class="mt-coach-draw-btn mt-coach-draw-10" data-count="10" ${(coachTickets < 10 && (team.gems || 0) < 1800) ? 'disabled' : ''}>
+            <div class="mt-coach-btn-label">10 連抽</div>
+            <div class="mt-coach-btn-cost-dual">
+              <span class="mt-coach-cost-pill ${coachTickets >= 10 ? 'is-active' : 'is-fade'}">🎫 <b>10</b></span>
+              <span class="mt-coach-cost-or">/</span>
+              <span class="mt-coach-cost-pill ${coachTickets >= 10 ? 'is-fade' : 'is-active'}">💎 <b>1800</b></span>
+            </div>
           </button>
         </div>
       </div>
@@ -1636,7 +1645,7 @@
       _openAllCoachesModal(coaches, () => renderTab());
     });
 
-    // 抽教練（有動畫 + 結果彈窗）
+    // 抽教練（智能：有券優先用、沒券改用寶石）
     content.querySelectorAll('.mt-coach-draw-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const cnt = parseInt(btn.dataset.count, 10);
@@ -1644,14 +1653,18 @@
         const originalLabel = btn.innerHTML;
         btn.innerHTML = '⏳ 簽約中…';
         try {
-          const res = await window.MyTeam.drawCoach(cnt);
+          const teamNow = window.MyTeam.getCached();
+          const hasTickets = (teamNow?.coach_tickets || 0) >= cnt;
+          const res = hasTickets
+            ? await window.MyTeam.drawCoach(cnt)
+            : await window.MyTeam.drawCoachWithGems(cnt);
           await window.MyTeam.refresh?.();
-          // 抽完顯示結果動畫
           _showCoachDrawResult(res?.coaches || res || []);
         } catch (e) {
           const msg = String(e.message || e);
           let friendly = '抽教練失敗：' + msg;
           if (msg.includes('INSUFFICIENT_COACH_TICKETS')) friendly = '⚠️ 教練券不足';
+          else if (msg.includes('INSUFFICIENT_GEMS')) friendly = '💎 寶石不足';
           else if (msg.includes('NO_TEAM')) friendly = '⚠️ 請先建立球隊';
           if (typeof showToast === 'function') showToast(friendly);
           else alert(friendly);

@@ -202,6 +202,18 @@
     return data;
   }
 
+  async function drawCoachWithGems(count) {
+    if (!window.DB) throw new Error('NOT_LOGGED_IN');
+    if (count !== 1 && count !== 10) throw new Error('INVALID_COUNT');
+    const { data, error } = await window.DB.rpc('coach_gacha_draw_with_gems', { p_count: count });
+    if (error) throw error;
+    await fetch_();
+    if (window.Gems && typeof window.Gems.refresh === 'function') {
+      try { await window.Gems.refresh(); } catch (e) {}
+    }
+    return data;
+  }
+
   async function startTimedTraining(playerId, attr, tutorial = false) {
     if (!window.DB) throw new Error('NOT_LOGGED_IN');
     const { data, error } = await window.DB.rpc('start_timed_training', {
@@ -308,6 +320,7 @@
     awardSSRSelectTicket,
     trainPlayer,
     drawCoach,
+    drawCoachWithGems,
     startTimedTraining,
     claimTimedTraining,
     redeemSSRSelect,
