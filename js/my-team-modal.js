@@ -832,7 +832,8 @@
       return {
         player: p, sheetUrl, sheetW, sheetH,
         x: 0.1 + Math.random() * 0.8,
-        y: 0.2 + Math.random() * 0.7,    // 散在整個操場
+        // y 範圍從 0.32 起步（之前 0.2 會跟地平線球迷重疊）
+        y: 0.32 + Math.random() * 0.58,
         vx: 0, vy: 0,
         state: 'walk',           // 'walk' | 'idle' | 'kick' | 'stretch'
         stateUntil: performance.now() + 600 + Math.random() * 2400,
@@ -873,7 +874,8 @@
 
     // 動畫迴圈：H_LO 低一點讓球員可走到操場前端、頭蓋過建築（前景效果）
     const W_LO = 0.04, W_HI = 0.96;
-    const H_LO = 0.05, H_HI = 0.95;
+    // H_LO 從 0.05 → 0.30：避免球員走到地平線跟球迷重疊
+    const H_LO = 0.30, H_HI = 0.95;
     function tick(t) {
       for (const w of wanderers) {
         if (!w.el) continue;

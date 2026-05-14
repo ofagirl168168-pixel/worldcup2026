@@ -2948,30 +2948,34 @@
   fill: #f0c040 !important;
 }
 
-/* 球迷加油 NPC（看台上方飄出） */
+/* 球迷加油 NPC：站在地平線（distance 區底部）上、不再飄在空中 */
 .mt-home-fans {
   position: absolute;
-  left: 0; right: 0; top: -10px;
-  height: 24px;
+  left: 0; right: 0;
+  top: auto;
+  bottom: 0;          /* 對齊 distance 區底部 = 地平線 */
+  height: 36px;
   pointer-events: none;
   z-index: 4;
 }
 .mt-home-fan {
   position: absolute;
-  top: 0;
-  width: 14px;
-  height: 22px;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.55));
+  bottom: 0;          /* 腳站在地平線上 */
+  top: auto;
+  width: 22px;        /* 放大：14 → 22 */
+  height: 34px;       /* 放大：22 → 34 */
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6));
   animation: mt-fan-cheer 1.4s ease-in-out infinite;
   image-rendering: pixelated;
+  transform-origin: 50% 95%;   /* hinge 在腳、跳動時腳不離地 */
 }
 .mt-home-fan svg {
   width: 100%; height: 100%;
   display: block;
 }
 @keyframes mt-fan-cheer {
-  0%, 100% { transform: translateY(0)    rotate(-6deg); }
-  50%      { transform: translateY(-5px) rotate( 6deg); }
+  0%, 100% { transform: translateY(0)    rotate(-5deg); }
+  50%      { transform: translateY(-4px) rotate( 5deg); }
 }
 
 /* Pixel art 樹 — 純色塊 + 黑框 */
