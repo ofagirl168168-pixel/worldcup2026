@@ -1648,10 +1648,21 @@
       _openAllCoachesModal(coaches, () => renderTab());
     });
 
-    // 抽教練（智能：有券優先用、沒券改用寶石）
+    // 抽教練：1 抽 → 開召喚儀式（畫圓）；10 連 → 直接抽
     content.querySelectorAll('.mt-coach-draw-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const cnt = parseInt(btn.dataset.count, 10);
+        // 1 抽 → 召喚儀式（畫圓）
+        if (cnt === 1 && window.CoachSummonRitual) {
+          window.CoachSummonRitual.open({
+            onSuccess: async (res) => {
+              _showCoachDrawResult(res?.coaches || []);
+            },
+            onCancel: () => {},
+          });
+          return;
+        }
+        // 10 連 → 維持原本快抽
         btn.disabled = true;
         const originalLabel = btn.innerHTML;
         btn.innerHTML = '⏳ 簽約中…';
@@ -1773,6 +1784,8 @@
   }
 
   // 抽完教練 → 自動指派到空 slot（主教練優先 SSR > SR > R）
+  // 暴露給 coach-summon-ritual.js 用
+  window._mtAutoAssignCoaches = (...args) => _autoAssignNewCoaches(...args);
   async function _autoAssignNewCoaches(drawnCoaches) {
     if (!Array.isArray(drawnCoaches) || drawnCoaches.length === 0) return;
     const team = window.MyTeam.getCached();

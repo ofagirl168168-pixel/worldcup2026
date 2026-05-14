@@ -2411,6 +2411,149 @@
 
 /* （.mt-match-sim 主規則合併到上方 modal 區） */
 
+/* ══════════════════════════════════════════════
+   ✨ 教練召喚儀式（畫圓 mini-game）
+   ══════════════════════════════════════════════ */
+.coach-ritual-overlay {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(40,20,60,0.92) 0%, rgba(5,5,15,0.96) 70%);
+  backdrop-filter: blur(8px);
+  z-index: 12020;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.3s ease;
+  padding: 16px;
+}
+.coach-ritual-overlay.open { opacity: 1; }
+.coach-ritual-stage {
+  background: linear-gradient(180deg, rgba(30,15,50,0.95), rgba(15,5,30,0.95));
+  border: 2px solid rgba(240,192,64,0.6);
+  border-radius: 16px;
+  padding: 16px 18px 14px;
+  width: 100%;
+  max-width: 380px;
+  position: relative;
+  box-shadow:
+    0 0 40px rgba(240,192,64,0.3),
+    0 0 80px rgba(155,135,245,0.18),
+    0 10px 30px rgba(0,0,0,0.7);
+  text-align: center;
+}
+.coach-ritual-close {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(0,0,0,0.4);
+  color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.18);
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  font-size: 16px; line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+.coach-ritual-close:hover { background: rgba(255,255,255,0.15); color: #fff; }
+.coach-ritual-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #ffe680;
+  letter-spacing: 2px;
+  text-shadow: 0 0 12px rgba(255,230,128,0.7);
+  margin-bottom: 4px;
+}
+.coach-ritual-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+.coach-ritual-canvas-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  margin: 0 auto 8px;
+  max-width: 320px;
+}
+.coach-ritual-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  background: radial-gradient(ellipse at center, rgba(20,10,40,0.4), rgba(5,2,15,0.2));
+  cursor: crosshair;
+  touch-action: none;   /* 防止移動瀏覽器滾動 */
+  display: block;
+}
+.coach-ritual-score {
+  position: absolute;
+  top: 6px; left: 8px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.75);
+  background: rgba(0,0,0,0.55);
+  padding: 3px 9px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+}
+.coach-ritual-score-num {
+  font-weight: 900;
+  font-family: 'Impact','Arial Black',sans-serif;
+  letter-spacing: 1px;
+  margin-left: 2px;
+}
+.coach-ritual-score-num.is-low { color: #ef9a9a; }
+.coach-ritual-score-num.is-r   { color: #ffe680; }
+.coach-ritual-score-num.is-sr  { color: #b894ff; text-shadow: 0 0 8px rgba(155,135,245,0.7); }
+.coach-ritual-score-num.is-ssr { color: #ffd54a; text-shadow: 0 0 10px rgba(255,213,74,0.9); }
+.coach-ritual-timer {
+  position: absolute;
+  top: 6px; right: 8px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.75);
+  background: rgba(0,0,0,0.55);
+  padding: 3px 9px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+}
+.coach-ritual-timer-num {
+  font-weight: 900;
+  color: #f0c040;
+  margin: 0 2px;
+}
+.coach-ritual-rules {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.coach-ritual-rules-pill {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+}
+.coach-ritual-rules-pill.rule-r   { background: rgba(255,230,128,0.18); color: #ffe680; border: 1px solid rgba(255,230,128,0.4); }
+.coach-ritual-rules-pill.rule-sr  { background: rgba(155,135,245,0.2);  color: #c4b3ff; border: 1px solid rgba(155,135,245,0.5); }
+.coach-ritual-rules-pill.rule-ssr { background: rgba(255,213,74,0.22);  color: #ffd54a; border: 1px solid rgba(255,213,74,0.55); animation: coach-ritual-pulse 1.8s ease-in-out infinite; }
+@keyframes coach-ritual-pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(255,213,74,0); }
+  50%      { box-shadow: 0 0 14px rgba(255,213,74,0.7); }
+}
+.coach-ritual-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.5px;
+  min-height: 18px;
+  transition: color 0.2s;
+}
+.coach-ritual-hint.is-warn {
+  color: #ef9a9a;
+  font-weight: 800;
+}
+.coach-ritual-hint.is-success {
+  color: #ffd54a;
+  font-weight: 900;
+  text-shadow: 0 0 8px rgba(255,213,74,0.6);
+}
+
 /* ─── 比賽結果 splash 動畫（覆蓋整個 modal stage、跟 GOAL 動畫同風格） ─── */
 .mt-result-splash {
   position: absolute;
