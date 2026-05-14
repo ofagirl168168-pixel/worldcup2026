@@ -2788,21 +2788,22 @@
           </div>
         </div>
 
-        <!-- 當前關卡 + 開戰鈕（左：按鈕、右：對手資訊） -->
+        <!-- 開戰按鈕 + 對手資訊（左按鈕、右資訊） -->
         <div class="mt-match-current">
           <div class="mt-match-current-left">
-            <div class="mt-match-current-label">第 ${currentStage} 關 · 能力 ~${tierAvg}</div>
             <button class="mt-match-engage-btn" id="mt-match-start" ${team.stamina < 1 ? 'disabled' : ''}>
               <span class="mt-match-engage-sword">⚔</span>
-              <span class="mt-match-engage-label">下一關</span>
+              <span class="mt-match-engage-label">開始</span>
               <span class="mt-match-engage-cost">⚡1</span>
             </button>
           </div>
           <div class="mt-match-current-right">
+            <div class="mt-match-current-next">第 ${currentStage} 關 · 下一關</div>
             <div class="mt-match-current-vs-label">VS</div>
             <div class="mt-match-current-opp-name">${escapeHtml(oppFlag)} ${escapeHtml(oppName)}</div>
             <div class="mt-match-current-opp-meta">
               ${oppIsReal ? '<span class="mt-match-opp-real">REAL</span>' : '<span class="mt-match-opp-npc">NPC</span>'}
+              <span class="mt-match-current-opp-power">能力 ~${tierAvg}</span>
               ${currentStage === 5 || currentStage === 10
                 ? '<span class="mt-match-current-boss-pill">👑 BOSS</span>'
                 : isBossLikely ? `<span class="mt-match-current-boss-pill mt-match-current-boss-pill--maybe">⭐ Boss ${Math.round(realRatio*100)}%</span>` : ''}
@@ -2860,7 +2861,7 @@
     `;
 
     // 渲染主角 sprite（LPC walking）+ 守門員 + 兩名對手球員
-    _renderMatchBanner(content, mascot, team, played);
+    _renderMatchBanner(content, mascot, team, tier, played);
 
     // 自動聚焦：進 tab 時把當前關卡 scroll 到可見區域中央
     requestAnimationFrame(() => {
@@ -2900,7 +2901,7 @@
   // ── 比賽 tab 卷軸：主角從左帶球到右、到球門 → 射門進球 → 重新循環 ──
   let _matchBannerLoop = null;
   let _matchGkLoop = null;
-  async function _renderMatchBanner(content, mascot, team, matchIdx = 0) {
+  async function _renderMatchBanner(content, mascot, team, tier = 1, matchIdx = 0) {
     if (_matchBannerLoop) { clearTimeout(_matchBannerLoop); _matchBannerLoop = null; }
     if (_matchGkLoop) { clearInterval(_matchGkLoop); _matchGkLoop = null; }
     if (!mascot || !window.LpcRenderer) return;
