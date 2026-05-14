@@ -4086,6 +4086,66 @@
 }
 .mt-gshop-btn-cost b { font-size: 14px; margin-left: 2px; }
 
+/* 寶石抽卡區（券不夠時的替代）*/
+.mt-gshop-gem-row {
+  position: absolute;
+  left: 5%; right: 5%;
+  bottom: 2px;
+  z-index: 5;
+}
+.mt-gshop-gem-divider {
+  display: flex; align-items: center;
+  font-size: 9px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.mt-gshop-gem-divider::before,
+.mt-gshop-gem-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.18);
+}
+.mt-gshop-gem-divider span { padding: 0 6px; }
+.mt-gshop-gem-btns {
+  display: flex; gap: 6px;
+}
+.mt-gshop-gem-btn {
+  flex: 1;
+  background: linear-gradient(180deg, #6ee0a0 0%, #2eb96e 50%, #1a8a4a 100%);
+  border: 1.5px solid rgba(255,255,255,0.85);
+  border-radius: 8px;
+  padding: 4px 6px;
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+  text-shadow: 0 1px 2px rgba(0,30,15,0.7);
+  box-shadow: 0 2px 6px rgba(0,30,15,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+  position: relative;
+  transition: transform 0.12s;
+}
+.mt-gshop-gem-btn:hover { transform: translateY(-1px); }
+.mt-gshop-gem-btn:active { transform: translateY(1px); }
+.mt-gshop-gem-btn-label { font-size: 10px; line-height: 1.1; }
+.mt-gshop-gem-btn-cost  { font-size: 11px; line-height: 1.1; margin-top: 1px; }
+.mt-gshop-gem-btn-cost b { font-size: 12px; }
+.mt-gshop-gem-btn-10 {
+  background: linear-gradient(180deg, #b9e0ff 0%, #4aa3df 50%, #1e6db3 100%);
+}
+.mt-gshop-gem-btn-save {
+  position: absolute;
+  top: -6px; right: -4px;
+  background: #ff5252;
+  color: #fff;
+  font-size: 8px;
+  padding: 1px 4px;
+  border-radius: 6px;
+  font-weight: 900;
+  border: 1.5px solid #fff;
+  transform: rotate(8deg);
+}
+
 /* 必得 SR：底部深色 pill（白字 + 黃強調、可讀性大幅提升）*/
 .mt-gshop-btn-sub {
   position: absolute;
@@ -6250,7 +6310,42 @@
 /* 訓練機台選人彈窗 */
 .mt-train-picker .mt-profile-card { max-width: 420px; }
 .mt-train-picker-title { font-size: 16px; font-weight: 900; color: #f0c040; margin-bottom: 4px; }
-.mt-train-picker-sub { font-size: 11px; opacity: 0.7; margin-bottom: 10px; }
+.mt-train-picker-sub { font-size: 11px; opacity: 0.7; margin-bottom: 8px; }
+.mt-train-picker-help {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(240,192,64,0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mt-train-help-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+.mt-train-help-tag {
+  background: rgba(76,175,80,0.18);
+  color: #b9e8b3;
+  border: 1px solid rgba(76,175,80,0.35);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-weight: 800;
+  white-space: nowrap;
+  font-size: 10px;
+}
+.mt-train-help-tag-premium {
+  background: rgba(240,192,64,0.18);
+  color: #ffe680;
+  border-color: rgba(240,192,64,0.45);
+}
+.mt-train-help-desc {
+  color: rgba(255,255,255,0.78);
+  flex: 1;
+}
+.mt-train-help-desc b { color: #fff; }
 .mt-train-picker-list {
   display: flex; flex-direction: column; gap: 6px;
   max-height: 60vh; overflow-y: auto;

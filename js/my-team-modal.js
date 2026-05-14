@@ -2500,6 +2500,22 @@
             🌟 SSR 自選券 ×${ssrSelect}
           </button>
         ` : ''}
+
+        <!-- 寶石抽卡（沒券時用寶石）-->
+        <div class="mt-gshop-gem-row">
+          <div class="mt-gshop-gem-divider"><span>或用寶石直接抽</span></div>
+          <div class="mt-gshop-gem-btns">
+            <button class="mt-gshop-gem-btn" id="mt-gacha-gem-1">
+              <div class="mt-gshop-gem-btn-label">寶石 1 抽</div>
+              <div class="mt-gshop-gem-btn-cost">💎 <b>50</b></div>
+            </button>
+            <button class="mt-gshop-gem-btn mt-gshop-gem-btn-10" id="mt-gacha-gem-10">
+              <span class="mt-gshop-gem-btn-save">省 50</span>
+              <div class="mt-gshop-gem-btn-label">寶石 10 連</div>
+              <div class="mt-gshop-gem-btn-cost">💎 <b>450</b></div>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- 包進來補關閉的舊空 div（不影響）-->
@@ -2510,6 +2526,8 @@
 
     content.querySelector('#mt-gacha-1')?.addEventListener('click', () => _runGacha(1));
     content.querySelector('#mt-gacha-10')?.addEventListener('click', () => _runGacha(10));
+    content.querySelector('#mt-gacha-gem-1')?.addEventListener('click', () => _runGachaGem(1));
+    content.querySelector('#mt-gacha-gem-10')?.addEventListener('click', () => _runGachaGem(10));
     content.querySelector('#mt-ssr-select-open')?.addEventListener('click', () => _openSSRSelect());
     content.querySelector('#mt-gshop-rates')?.addEventListener('click', () => _openRatesModal());
     // 4 個卡包點擊 → 直接抽 1 抽（任何稀有度按鈕都一樣 — 機率系統決定中什麼）
@@ -2640,13 +2658,30 @@
     try {
       await window.MyTeam.gacha(count, { source: 'gacha-tab' });
       window.MyTeam.trackQuest?.('gacha_draw', count).catch(() => {});
-      // 動畫跑完 → 重畫 hub
       renderHub();
     } catch (err) {
       console.error('[my-team] gacha error', err);
       const msg = String(err.message || err);
       let friendly = '抽卡失敗：' + msg;
       if (msg.includes('INSUFFICIENT_TICKETS')) friendly = '⚠️ 抽券不足';
+      else if (msg.includes('NO_TEAM')) friendly = '⚠️ 請先建立球隊';
+      else if (msg.includes('NOT_LOGGED_IN')) friendly = '⚠️ 請先登入';
+      if (typeof showToast === 'function') showToast(friendly);
+      else alert(friendly);
+    }
+  }
+
+  // 寶石抽卡（1 抽 50 / 10 連 450）
+  async function _runGachaGem(count) {
+    try {
+      await window.MyTeam.gachaWithGems(count, { source: 'gacha-tab-gem' });
+      window.MyTeam.trackQuest?.('gacha_draw', count).catch(() => {});
+      renderHub();
+    } catch (err) {
+      console.error('[my-team] gem gacha error', err);
+      const msg = String(err.message || err);
+      let friendly = '抽卡失敗：' + msg;
+      if (msg.includes('INSUFFICIENT_GEMS')) friendly = '💎 寶石不足';
       else if (msg.includes('NO_TEAM')) friendly = '⚠️ 請先建立球隊';
       else if (msg.includes('NOT_LOGGED_IN')) friendly = '⚠️ 請先登入';
       if (typeof showToast === 'function') showToast(friendly);
@@ -2901,9 +2936,11 @@
   // ── 比賽 tab 卷軸：主角從左帶球到右、到球門 → 射門進球 → 重新循環 ──
   let _matchBannerLoop = null;
   let _matchGkLoop = null;
+  let _matchOppLoop = null;
   async function _renderMatchBanner(content, mascot, team, tier = 1, matchIdx = 0) {
     if (_matchBannerLoop) { clearTimeout(_matchBannerLoop); _matchBannerLoop = null; }
     if (_matchGkLoop) { clearInterval(_matchGkLoop); _matchGkLoop = null; }
+    if (_matchOppLoop) { clearInterval(_matchOppLoop); _matchOppLoop = null; }
     if (!mascot || !window.LpcRenderer) return;
 
     const heroEl = content.querySelector('#mt-match-hero');
@@ -3056,9 +3093,16 @@
       goalkeeperEl.style.backgroundPosition = `-${f * frameW}px -${row * frameH}px`;
     }, 320);
 
-    // 對手球員：定格在「面向左 idle」frame 0（看著主角衝過來、防守姿勢）
-    if (opp1El) opp1El.style.backgroundPosition = `-${1 * frameW}px -${ROW_WALK_LEFT * frameH}px`;
-    if (opp2El) opp2El.style.backgroundPosition = `-${1 * frameW}px -${ROW_WALK_LEFT * frameH}px`;
+    // 對手球員：拉筋暖身姿勢（cheer row 雙手過頂 + 兩 frame 交替模擬拉伸）
+    let oppStretchPhase = 0;
+    _matchOppLoop = setInterval(() => {
+      if (!opp1El && !opp2El) return;
+      oppStretchPhase = (oppStretchPhase + 1) % 2;
+      // ROW_CHEER frame 0 = 手舉起、frame 2 = 手再向上、交替像拉筋
+      const f = oppStretchPhase === 0 ? 0 : 2;
+      if (opp1El) opp1El.style.backgroundPosition = `-${f * frameW}px -${ROW_CHEER * frameH}px`;
+      if (opp2El) opp2El.style.backgroundPosition = `-${(2 - f) * frameW}px -${ROW_CHEER * frameH}px`;
+    }, 850);
 
     tick();
   }
@@ -3246,7 +3290,21 @@
       <div class="mt-profile-card">
         <button class="mt-modal-close mt-profile-close" type="button">×</button>
         <div class="mt-train-picker-title">🏋️ ${ATTR_LABELS[attr]} 訓練站</div>
-        <div class="mt-train-picker-sub">選一位球員開始訓練（時間到 +1）</div>
+        <div class="mt-train-picker-sub">選一位球員開始訓練</div>
+        <div class="mt-train-picker-help">
+          <div class="mt-train-help-row">
+            <span class="mt-train-help-tag">⏱️ 時間訓練</span>
+            <span class="mt-train-help-desc">免費等時間到 → <b>${ATTR_LABELS[attr]} +1</b>（不升等）</span>
+          </div>
+          <div class="mt-train-help-row">
+            <span class="mt-train-help-tag">⚙️ RP 訓練</span>
+            <span class="mt-train-help-desc">耗 RP → <b>升 1 級 + 6 屬性各 +1~3</b>（一次抵 6 次時間訓練）</span>
+          </div>
+          <div class="mt-train-help-row">
+            <span class="mt-train-help-tag mt-train-help-tag-premium">⭐ 精緻訓練</span>
+            <span class="mt-train-help-desc">耗更多 RP → <b>升 1 級 + 6 屬性各 +2~5</b></span>
+          </div>
+        </div>
         <div class="mt-train-picker-list" id="mt-train-picker-list"></div>
       </div>
     `;
@@ -3262,7 +3320,7 @@
       const c = p.card || {};
       const isTraining = p.training_attr && p.training_finish_at;
       const isReady = isTraining && new Date(p.training_finish_at) <= new Date();
-      const estSec = Math.max(30, Math.floor(60 * Math.pow(p.level, 1.4)));
+      const estSec = Math.max(60, Math.floor(90 * Math.pow(p.level, 1.4)));
       const estLabel = estSec >= 3600 ? `${(estSec/3600).toFixed(1)} 小時`
         : estSec >= 60 ? `${Math.floor(estSec/60)} 分` : `${estSec} 秒`;
       const canNormal = team.rp_tactical >= 10 && team.rp_physical >= 10 && p.level < 50;

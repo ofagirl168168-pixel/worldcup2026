@@ -37,6 +37,22 @@
     return result;
   }
 
+  // ── 寶石直接抽（1 抽 50、10 連 450）──
+  async function gachaWithGems(count, options) {
+    if (!window.MyTeam || typeof currentUser === 'undefined' || !currentUser) {
+      throw new Error('not logged in');
+    }
+    if (count !== 1 && count !== 10) throw new Error('INVALID_COUNT');
+    const { data, error } = await window.DB.rpc('gacha_draw_with_gems', { p_count: count });
+    if (error) throw error;
+    await window.MyTeam.fetch();
+    if (window.Gems && typeof window.Gems.refresh === 'function') {
+      try { await window.Gems.refresh(); } catch (e) {}
+    }
+    await openGachaAnimation(data.cards, { ...options, forced_ssr: data.cards.some(c => c.forced_ssr) });
+    return data;
+  }
+
   // ── 即時觸發（§5.6）— 站外動作獎勵 → 直接彈抽卡動畫 ──
   async function triggerInstantGacha(count, source) {
     // Feature flag：未啟用直接 skip（路人保護）
@@ -663,6 +679,7 @@
   // 掛到 MyTeam
   if (window.MyTeam) {
     window.MyTeam.gacha = gacha;
+    window.MyTeam.gachaWithGems = gachaWithGems;
     window.MyTeam.triggerInstantGacha = triggerInstantGacha;
     window.MyTeam.openGachaAnimation = openGachaAnimation;
   }
