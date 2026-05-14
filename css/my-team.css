@@ -3700,7 +3700,7 @@
 /* 黑板告示 */
 .mt-gshop-chalk-overlay {
   position: absolute;
-  top: 56%;
+  top: 57%;
   left: 14.5%;
   width: 11.5%;
   height: 8%;
@@ -3742,7 +3742,7 @@
 /* 抽卡按鈕（疊在背景的木地板區域）*/
 .mt-gshop-buttons {
   position: absolute;
-  bottom: 11%;
+  bottom: 18%;
   left: 5%; right: 5%;
   display: flex;
   gap: 10px;
@@ -3769,102 +3769,97 @@
 .mt-gshop-btn:hover:not(:disabled) { transform: translateY(-2px); }
 .mt-gshop-btn:active:not(:disabled) { transform: translateY(1px); }
 .mt-gshop-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
-/* 1 抽：藍色金屬感（多段反光 + 深陰影）*/
+/* 1 抽：鮮亮藍金屬感（搭配 10 抽 #fbcd0c 的同等飽和度）*/
 .mt-gshop-btn-1 {
-  background:
-    /* 頂部高光 */
-    linear-gradient(180deg,
-      rgba(255,255,255,0.7) 0%,
-      rgba(255,255,255,0.15) 8%,
-      rgba(255,255,255,0) 18%,
-      rgba(0,0,0,0) 60%,
-      rgba(0,0,0,0.25) 92%,
-      rgba(0,0,0,0.4) 100%),
-    /* 金屬主色：頂亮 → 中深 → 底更深 */
-    linear-gradient(180deg,
-      #6ebfe8 0%,
-      #4a9fd6 22%,
-      #2980b9 48%,
-      #1f5e8a 75%,
-      #0e3a5c 100%) !important;
-  background-color: #2980b9 !important;
-  border: 2.5px solid #ffffff !important;
-  color: #ffffff;
-  text-shadow:
-    0 1px 0 rgba(255,255,255,0.25),
-    0 2px 4px rgba(0,15,40,1),
-    0 -1px 1px rgba(0,20,50,0.7);
-  box-shadow:
-    /* 深色描邊 */
-    0 0 0 2px #051e36,
-    /* 外擴投影（更暗更實）*/
-    0 4px 0 #0a2d4a,
-    0 8px 18px rgba(0,20,45,0.85),
-    /* 內側頂部金屬亮邊 */
-    inset 0 2px 0 rgba(255,255,255,0.85),
-    inset 0 4px 6px rgba(255,255,255,0.25),
-    /* 內側底部深陰影 */
-    inset 0 -4px 8px rgba(0,15,40,0.55),
-    inset 0 -1px 0 rgba(0,10,30,0.7) !important;
-  opacity: 1 !important;
-}
-/* 10 抽：金色金屬感（對齊 SSR 卡包金）*/
-.mt-gshop-btn-10 {
   background:
     /* 頂部高光 + 底部暗影 */
     linear-gradient(180deg,
       rgba(255,255,255,0.75) 0%,
       rgba(255,255,255,0.18) 8%,
       rgba(255,255,255,0) 18%,
-      rgba(0,0,0,0) 55%,
-      rgba(70,30,5,0.25) 90%,
-      rgba(60,25,5,0.45) 100%),
-    /* 金屬金主色 */
+      rgba(0,0,0,0) 60%,
+      rgba(0,0,0,0.3) 92%,
+      rgba(0,0,0,0.5) 100%),
+    /* 金屬主色（#1e9be8）*/
     linear-gradient(180deg,
-      #fff2a8 0%,
-      #ffd860 20%,
-      #f0c040 45%,
-      #c0852e 75%,
-      #7a4810 100%) !important;
-  background-color: #f0c040 !important;
+      #8ed4f5 0%,
+      #38b2ed 22%,
+      #1e9be8 48%,
+      #1370a8 75%,
+      #073d68 100%) !important;
+  background-color: #1e9be8 !important;
+  border: 2.5px solid #ffffff !important;
+  color: #ffffff;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.3),
+    0 2px 4px rgba(0,20,45,1),
+    0 -1px 1px rgba(0,25,55,0.7);
+  box-shadow:
+    0 0 0 2px #042746,
+    0 4px 0 #08355d,
+    0 8px 20px rgba(0,25,55,0.9),
+    inset 0 2px 0 rgba(255,255,255,0.9),
+    inset 0 4px 6px rgba(255,255,255,0.3),
+    inset 0 -4px 8px rgba(0,20,45,0.6),
+    inset 0 -1px 0 rgba(0,15,35,0.8) !important;
+  opacity: 1 !important;
+}
+/* 10 抽：金屬金（主色 #fbcd0c）*/
+.mt-gshop-btn-10 {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.8) 0%,
+      rgba(255,255,255,0.2) 8%,
+      rgba(255,255,255,0) 18%,
+      rgba(0,0,0,0) 55%,
+      rgba(70,45,5,0.3) 90%,
+      rgba(55,35,5,0.55) 100%),
+    /* 金屬金主色（#fbcd0c）*/
+    linear-gradient(180deg,
+      #fff19a 0%,
+      #ffe04a 20%,
+      #fbcd0c 45%,
+      #b88a08 75%,
+      #6a4f05 100%) !important;
+  background-color: #fbcd0c !important;
   color: #2a1505;
   border: 2.5px solid #ffffff !important;
   text-shadow:
-    0 1px 0 rgba(255,255,255,0.85),
-    0 -1px 0 rgba(120,60,10,0.45);
+    0 1px 0 rgba(255,255,255,0.9),
+    0 -1px 0 rgba(120,60,10,0.5);
   box-shadow:
-    0 0 0 2px #3a1f08,
-    0 4px 0 #5a3010,
-    0 8px 20px rgba(60,25,5,0.85),
-    inset 0 2px 0 rgba(255,255,255,0.9),
-    inset 0 4px 6px rgba(255,255,255,0.35),
-    inset 0 -4px 8px rgba(80,35,5,0.55),
-    inset 0 -1px 0 rgba(50,20,0,0.8) !important;
+    0 0 0 2px #382308,
+    0 4px 0 #5a3a0a,
+    0 8px 20px rgba(55,30,5,0.85),
+    inset 0 2px 0 rgba(255,255,255,0.95),
+    inset 0 4px 6px rgba(255,255,255,0.4),
+    inset 0 -4px 8px rgba(80,45,5,0.55),
+    inset 0 -1px 0 rgba(45,25,0,0.85) !important;
   opacity: 1 !important;
   animation: mt-gshop-btn10-glow 1.6s ease-in-out infinite;
 }
 @keyframes mt-gshop-btn10-glow {
   0%, 100% {
     box-shadow:
-      0 0 0 2px #3a1f08,
-      0 4px 0 #5a3010,
-      0 8px 20px rgba(60,25,5,0.85),
-      0 0 18px rgba(255,200,60,0.45),
-      inset 0 2px 0 rgba(255,255,255,0.9),
-      inset 0 4px 6px rgba(255,255,255,0.35),
-      inset 0 -4px 8px rgba(80,35,5,0.55),
-      inset 0 -1px 0 rgba(50,20,0,0.8);
+      0 0 0 2px #382308,
+      0 4px 0 #5a3a0a,
+      0 8px 20px rgba(55,30,5,0.85),
+      0 0 18px rgba(251,205,12,0.5),
+      inset 0 2px 0 rgba(255,255,255,0.95),
+      inset 0 4px 6px rgba(255,255,255,0.4),
+      inset 0 -4px 8px rgba(80,45,5,0.55),
+      inset 0 -1px 0 rgba(45,25,0,0.85);
   }
   50% {
     box-shadow:
-      0 0 0 2px #3a1f08,
-      0 4px 0 #5a3010,
-      0 8px 22px rgba(60,25,5,0.9),
-      0 0 34px rgba(255,220,80,0.8),
+      0 0 0 2px #382308,
+      0 4px 0 #5a3a0a,
+      0 8px 22px rgba(55,30,5,0.9),
+      0 0 36px rgba(251,205,12,0.9),
       inset 0 2px 0 rgba(255,255,255,1),
-      inset 0 4px 6px rgba(255,255,255,0.5),
-      inset 0 -4px 8px rgba(80,35,5,0.55),
-      inset 0 -1px 0 rgba(50,20,0,0.8);
+      inset 0 4px 6px rgba(255,255,255,0.55),
+      inset 0 -4px 8px rgba(80,45,5,0.55),
+      inset 0 -1px 0 rgba(45,25,0,0.85);
   }
 }
 .mt-gshop-btn-label {
