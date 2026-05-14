@@ -5579,7 +5579,7 @@
   text-shadow: 0 1px 2px rgba(0,0,0,0.7);
 }
 
-/* 教練團：1 大主教練 + 2 小助教（橫排）*/
+/* 教練團：1 大主教練 + 2 小助教（橫排、主教練比助教大）*/
 .mt-coach-team {
   position: absolute;
   top: 50%;
@@ -5592,7 +5592,7 @@
   z-index: 3;
 }
 .mt-coach-team-head {
-  flex: 1.4;
+  flex: 1.8;       /* 主教練佔比加大（原 1.4） */
   min-width: 0;
 }
 .mt-coach-team-assists {
@@ -5624,13 +5624,15 @@
 .mt-coach-team-head-slot:hover { transform: translateY(-2px); }
 .mt-coach-team-head-portrait {
   width: 100%; height: 100%;
-  max-width: 50px;
+  max-width: 72px;      /* 主教練頭像加大（原 50px）*/
   aspect-ratio: 1;
   flex-shrink: 0;
-  background: rgba(0,0,0,0.4);
-  border-radius: 6px;
+  background: rgba(0,0,0,0.45);
+  border: 2px solid rgba(240,192,64,0.7);
+  border-radius: 8px;
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 10px rgba(240,192,64,0.45);
 }
 .mt-coach-team-head-portrait img {
   width: 100%; height: 100%;

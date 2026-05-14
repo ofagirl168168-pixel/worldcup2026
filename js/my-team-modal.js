@@ -1648,13 +1648,13 @@
       _openAllCoachesModal(coaches, () => renderTab());
     });
 
-    // 抽教練：1 抽 → 開召喚儀式（畫圓）；10 連 → 直接抽
+    // 抽教練：1 抽 + 10 連都用召喚儀式畫圓（10 連 = 1 圓 → 10 結果）
     content.querySelectorAll('.mt-coach-draw-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const cnt = parseInt(btn.dataset.count, 10);
-        // 1 抽 → 召喚儀式（畫圓）
-        if (cnt === 1 && window.CoachSummonRitual) {
+        if (window.CoachSummonRitual) {
           window.CoachSummonRitual.open({
+            count: cnt,
             onSuccess: async (res) => {
               _showCoachDrawResult(res?.coaches || []);
             },
@@ -1662,7 +1662,7 @@
           });
           return;
         }
-        // 10 連 → 維持原本快抽
+        // CoachSummonRitual 沒載入 → fallback 原快抽
         btn.disabled = true;
         const originalLabel = btn.innerHTML;
         btn.innerHTML = '⏳ 簽約中…';

@@ -22,16 +22,21 @@
 
   function open(opts) {
     opts = opts || {};
+    const count = opts.count || 1;
     const overlay = document.createElement('div');
     overlay.className = 'coach-ritual-overlay';
+    const titleTxt = count === 10 ? '✨ 10 連召喚儀式' : '✨ 教練召喚儀式';
+    const subTxt = count === 10
+      ? '一個圓 → 10 位教練、圓度越高越多 SR/SSR'
+      : '以中心為圓心畫一個圓 — 越圓的圓召喚越強的教練';
     overlay.innerHTML = `
       <div class="coach-ritual-stage">
         <button class="coach-ritual-close" type="button" aria-label="關閉">×</button>
-        <div class="coach-ritual-title">✨ 教練召喚儀式</div>
-        <div class="coach-ritual-sub">以中心為圓心畫一個圓 — 越圓的圓召喚越強的教練</div>
+        <div class="coach-ritual-title">${titleTxt}</div>
+        <div class="coach-ritual-sub">${subTxt}</div>
         <div class="coach-ritual-canvas-wrap">
           <canvas class="coach-ritual-canvas" width="320" height="320"></canvas>
-          <div class="coach-ritual-score">圓度 <span class="coach-ritual-score-num">0%</span></div>
+          <div class="coach-ritual-score">圓度 <span class="coach-ritual-score-num is-ssr">100%</span></div>
           <div class="coach-ritual-timer">剩餘 <span class="coach-ritual-timer-num">15</span> 秒</div>
         </div>
         <div class="coach-ritual-rules">
@@ -61,108 +66,94 @@
     let rafId = null;
     let phaseRotation = 0;
 
-    // 背景：召喚陣（旋轉法陣 + 中心發光球場 + 粒子）
+    // 極簡背景：只有中心點 + 微弱暈
     function drawBackground() {
       ctx.clearRect(0, 0, W, H);
-      // 外圈漸層暈
-      const grd = ctx.createRadialGradient(CX, CY, 30, CX, CY, 160);
-      grd.addColorStop(0, 'rgba(255,200,80,0.4)');
-      grd.addColorStop(0.4, 'rgba(120,60,180,0.18)');
+      // 中心微弱光暈（不要太搶戲）
+      const grd = ctx.createRadialGradient(CX, CY, 0, CX, CY, 120);
+      grd.addColorStop(0, 'rgba(255,200,80,0.18)');
       grd.addColorStop(1, 'rgba(10,5,20,0)');
       ctx.fillStyle = grd;
       ctx.fillRect(0, 0, W, H);
-      // 法陣三層（不同速度旋轉）
-      ctx.save();
-      ctx.translate(CX, CY);
-      // 第 1 圈：外圈虛線
-      ctx.rotate(phaseRotation);
-      ctx.strokeStyle = 'rgba(240,192,64,0.55)';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([8, 6]);
-      ctx.beginPath();
-      ctx.arc(0, 0, 130, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-      // 第 2 圈：8 角星
-      ctx.save();
-      ctx.translate(CX, CY);
-      ctx.rotate(-phaseRotation * 0.6);
-      ctx.strokeStyle = 'rgba(155,135,245,0.5)';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([]);
-      ctx.beginPath();
-      const star = 8;
-      for (let i = 0; i < star; i++) {
-        const a = (i / star) * Math.PI * 2;
-        const x = Math.cos(a) * 100;
-        const y = Math.sin(a) * 100;
-        ctx[i === 0 ? 'moveTo' : 'lineTo'](x, y);
-      }
-      ctx.closePath();
-      ctx.stroke();
-      ctx.restore();
-      // 第 3 圈：內圈實線
-      ctx.save();
-      ctx.translate(CX, CY);
-      ctx.rotate(phaseRotation * 1.4);
-      ctx.strokeStyle = 'rgba(255,213,74,0.7)';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.arc(0, 0, 70, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
       // 中心發光點（圓心參考）
-      const pulse = 0.7 + Math.sin(phaseRotation * 4) * 0.3;
+      const pulse = 0.75 + Math.sin(phaseRotation * 4) * 0.25;
       ctx.fillStyle = `rgba(255,220,100,${pulse})`;
       ctx.beginPath();
-      ctx.arc(CX, CY, 6, 0, Math.PI * 2);
+      ctx.arc(CX, CY, 7, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = `rgba(255,255,255,${pulse * 0.8})`;
+      ctx.fillStyle = `rgba(255,255,255,${pulse * 0.9})`;
       ctx.beginPath();
-      ctx.arc(CX, CY, 2.5, 0, Math.PI * 2);
+      ctx.arc(CX, CY, 3, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // 玩家筆跡（金黃漸層、發光）
+    // 每點偏差 → 顏色（綠 → 黃 → 紅）
+    function colorByDeviation(dev) {
+      // dev 0 → 綠、dev 0.15 → 黃、dev 0.35+ → 紅
+      const t = Math.min(1, dev / 0.35);
+      let r, g, b;
+      if (t < 0.5) {
+        const local = t * 2;
+        r = Math.round(80 + 175 * local);    // 80 → 255
+        g = 230;
+        b = Math.round(100 - 60 * local);
+      } else {
+        const local = (t - 0.5) * 2;
+        r = 255;
+        g = Math.round(230 - 180 * local);   // 230 → 50
+        b = Math.round(40 - 40 * local);
+      }
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // 玩家筆跡（依每點偏差變色）
     function drawTrail() {
       if (points.length < 2) return;
-      const score = computeRoundness(points);
-      const color = score >= 95 ? '#ffd54a' : score >= 85 ? '#b894ff' : score >= 50 ? '#ffe680' : '#fff';
-      ctx.strokeStyle = color;
+      const refDist = getRefDist();
+      if (refDist < 1) return;
       ctx.lineWidth = 4;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.shadowColor = color;
-      ctx.shadowBlur = 12;
-      ctx.beginPath();
-      ctx.moveTo(points[0].x, points[0].y);
       for (let i = 1; i < points.length; i++) {
-        ctx.lineTo(points[i].x, points[i].y);
+        const p = points[i];
+        const d = Math.hypot(p.x - CX, p.y - CY);
+        const dev = Math.abs(d - refDist) / refDist;
+        const col = colorByDeviation(dev);
+        ctx.strokeStyle = col;
+        ctx.shadowColor = col;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.moveTo(points[i-1].x, points[i-1].y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
       }
-      ctx.stroke();
       ctx.shadowBlur = 0;
     }
 
-    // ── 圓度計算 ──
+    // 第一點的距離 = 參考半徑（依使用者要求）
+    function getRefDist() {
+      if (points.length === 0) return 0;
+      return Math.hypot(points[0].x - CX, points[0].y - CY);
+    }
+
+    // ── 圓度計算（第一點半徑當基準、平均相似度）──
     function computeRoundness(pts) {
-      if (pts.length < 10) return 0;
-      // 用中心點當參考圓心
-      const cx = CX, cy = CY;
-      // 距離陣列
-      const dists = pts.map(p => Math.hypot(p.x - cx, p.y - cy));
-      const mean = dists.reduce((s, d) => s + d, 0) / dists.length;
-      // 半徑太小（< 30）→ 0 分（沒繞夠）
-      if (mean < 30) return 0;
-      // 標準差 / 平均 = 變異係數
-      const variance = dists.reduce((s, d) => s + Math.pow(d - mean, 2), 0) / dists.length;
-      const cv = Math.sqrt(variance) / mean;
-      // cv 越小越圓、轉成 0-100 分
-      // cv 0 → 100、cv 0.3 → 0
-      const radialScore = Math.max(0, Math.min(100, (1 - cv / 0.3) * 100));
-      // 還要看是否真的繞了一圈（角度覆蓋）
-      const angles = pts.map(p => Math.atan2(p.y - cy, p.x - cx));
-      let minA = Infinity, maxA = -Infinity;
-      // 用 unwrap 累積角度（避免 -π/+π 跳變）
+      if (pts.length < 1) return 100;
+      const refDist = Math.hypot(pts[0].x - CX, pts[0].y - CY);
+      if (refDist < 30) return 0;  // 起點太靠近中心 = 沒繞夠
+      // 每點計算與基準的偏差、轉成相似度
+      let totalSim = 0;
+      for (let i = 0; i < pts.length; i++) {
+        const d = Math.hypot(pts[i].x - CX, pts[i].y - CY);
+        const dev = Math.abs(d - refDist) / refDist;
+        // dev 0 = 100% 相似、dev 0.5 = 0%（嚴格）
+        const sim = Math.max(0, 1 - dev * 2);
+        totalSim += sim;
+      }
+      const avgSim = totalSim / pts.length;
+      // 角度覆蓋率（要繞夠）
+      if (pts.length < 5) return Math.round(avgSim * 100);
+      const angles = pts.map(p => Math.atan2(p.y - CY, p.x - CX));
       let total = 0;
       for (let i = 1; i < angles.length; i++) {
         let d = angles[i] - angles[i-1];
@@ -170,22 +161,21 @@
         if (d < -Math.PI) d += 2 * Math.PI;
         total += d;
       }
-      const angleCovered = Math.abs(total);
-      const angleScore = Math.min(1, angleCovered / (Math.PI * 2));
-      // 最終分數 = 半徑均勻度 × 角度覆蓋率
-      return Math.round(radialScore * angleScore);
+      const angleCovered = Math.min(1, Math.abs(total) / (Math.PI * 2));
+      // 最終 = 平均相似度 × 角度覆蓋
+      return Math.round(avgSim * 100 * angleCovered);
     }
 
     function isClosed(pts) {
       if (pts.length < 30) return false;
       const first = pts[0];
       const last = pts[pts.length - 1];
-      const dists = pts.map(p => Math.hypot(p.x - CX, p.y - CY));
-      const mean = dists.reduce((s, d) => s + d, 0) / dists.length;
+      // 用第一點的半徑當基準
+      const refDist = Math.hypot(first.x - CX, first.y - CY);
       const startEndDist = Math.hypot(first.x - last.x, first.y - last.y);
-      // 終點離起點 < 平均半徑的 12%（更寬鬆）
-      const closeOk = startEndDist < mean * 0.12;
-      // 也要繞夠 290°
+      // 終點離起點 < 基準半徑的 15%（更寬鬆）
+      const closeOk = startEndDist < refDist * 0.15;
+      // 繞夠 290°
       const angles = pts.map(p => Math.atan2(p.y - CY, p.x - CX));
       let total = 0;
       for (let i = 1; i < angles.length; i++) {
@@ -284,8 +274,8 @@
       drawing = false;
       points = [];
       timerNum.textContent = 15;
-      scoreNum.textContent = '0%';
-      scoreNum.className = 'coach-ritual-score-num';
+      scoreNum.textContent = '100%';
+      scoreNum.className = 'coach-ritual-score-num is-ssr';
       setTimeout(() => {
         hintEl.classList.remove('is-warn');
         hintEl.textContent = '準備好就在中心按下、開始畫圓';
@@ -393,9 +383,9 @@
     }
 
     async function triggerSummonResult(score) {
-      hintEl.textContent = '✨ 教練降臨…';
+      hintEl.textContent = count === 10 ? '✨ 10 位教練降臨…' : '✨ 教練降臨…';
       try {
-        const result = await window.MyTeam.drawCoachByCircle(score);
+        const result = await window.MyTeam.drawCoachByCircle(score, count);
         // 自動指派到空 slot（沿用 my-team-modal 的 auto-assign 邏輯）
         if (typeof window._mtAutoAssignCoaches === 'function') {
           await window._mtAutoAssignCoaches(result.coaches || []);

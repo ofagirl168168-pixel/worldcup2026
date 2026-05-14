@@ -214,10 +214,12 @@
     return data;
   }
 
-  // 召喚儀式：畫圓抽教練（score 50-100、依分數決定稀有度）
-  async function drawCoachByCircle(score) {
+  // 召喚儀式：畫圓抽教練（score 50-100、count 1 或 10）
+  async function drawCoachByCircle(score, count = 1) {
     if (!window.DB) throw new Error('NOT_LOGGED_IN');
-    const { data, error } = await window.DB.rpc('coach_gacha_circle_draw', { p_score: score });
+    const { data, error } = await window.DB.rpc('coach_gacha_circle_draw', {
+      p_score: score, p_count: count,
+    });
     if (error) throw error;
     await fetch_();
     if (window.Gems && typeof window.Gems.refresh === 'function') {
