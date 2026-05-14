@@ -2161,6 +2161,12 @@
   filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
 }
 .mt-pre-match-crest img { display: inline-block; }
+.mt-pre-match-crest-svg { font-size: 0; }  /* SVG 容器：取消 emoji 字體高度 */
+.mt-pre-match-crest-svg svg {
+  width: 64px;
+  height: 64px;
+  display: inline-block;
+}
 .mt-pre-match-name {
   font-size: 15px;
   font-weight: 900;
@@ -2269,6 +2275,47 @@
 }
 .mt-pre-match.is-boss .mt-pre-match-go:hover {
   box-shadow: 0 6px 28px rgba(255,128,48,0.75);
+}
+
+/* 倒數開賽（取代手動按鈕） */
+.mt-pre-match-countdown {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0 8px;
+  gap: 4px;
+  min-height: 70px;
+}
+.mt-pre-match-countdown-num {
+  font-size: 48px;
+  font-weight: 900;
+  color: #ffe680;
+  text-shadow: 0 0 24px rgba(255,230,128,0.85), 0 4px 8px rgba(0,0,0,0.6);
+  line-height: 1;
+  font-family: 'Impact','Arial Black',sans-serif;
+  letter-spacing: 2px;
+}
+.mt-pre-match-countdown-num.mt-cd-pulse {
+  animation: mt-cd-pulse 0.6s ease-out;
+}
+.mt-pre-match-countdown-num.mt-cd-go {
+  color: #ff5252;
+  text-shadow: 0 0 28px rgba(255,82,82,0.9), 0 4px 8px rgba(0,0,0,0.6);
+  font-size: 56px;
+  letter-spacing: 4px;
+}
+@keyframes mt-cd-pulse {
+  0%   { transform: scale(0.5); opacity: 0; }
+  50%  { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+.mt-pre-match-countdown-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 4px;
+  font-weight: 600;
 }
 
 .mt-match-sim { padding: 4px; }

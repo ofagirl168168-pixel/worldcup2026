@@ -338,6 +338,7 @@
     const aAvg = avgRadar(ctx.opponent.radar);
     const winProb = _estimateWinProb(hAvg, aAvg);
     const tierName = ({1:'新手聯賽',2:'業餘聯賽',3:'地區聯賽',4:'全國次級',5:'全國聯賽',6:'大陸盃',7:'歐洲菁英',8:'世界次級',9:'世界聯賽',10:'傳奇聯賽'})[ctx.tier];
+    const homeCrestSvg = _renderTeamCrest(ctx.team);
     content.innerHTML = `
       <div class="mt-pre-match ${ctx.isBoss ? 'is-boss' : ''}">
         <div class="mt-pre-match-tier">${tierName} · 第 ${ctx.matchIdx + 1}/10 場</div>
@@ -347,7 +348,7 @@
         <div class="mt-pre-match-arena">
           <div class="mt-pre-match-clash-rays"></div>
           <div class="mt-pre-match-side mt-pre-match-side-home">
-            <div class="mt-pre-match-crest">${ctx.team.team_crest}</div>
+            <div class="mt-pre-match-crest mt-pre-match-crest-svg">${homeCrestSvg}</div>
             <div class="mt-pre-match-name">${escapeHtml(ctx.team.team_name)}</div>
             <div class="mt-pre-match-radar">攻 <b>${ctx.homeData.radar.attack}</b> · 防 <b>${ctx.homeData.radar.defense}</b> · 速 <b>${ctx.homeData.radar.speed}</b></div>
             <div class="mt-pre-match-avg">綜合 <span data-count="${hAvg}">0</span></div>
@@ -377,14 +378,13 @@
           </div>
         </div>
 
-        <button class="mt-pre-match-go" id="mt-match-start">
-          <span class="mt-pre-match-go-icon">⚽</span>
-          <span>開始比賽</span>
-          <span class="mt-pre-match-go-cost">耗 1 ⚡</span>
-        </button>
+        <!-- 倒數開賽（取代手動按鈕） -->
+        <div class="mt-pre-match-countdown" id="mt-pre-match-countdown">
+          <span class="mt-pre-match-countdown-num">3</span>
+          <span class="mt-pre-match-countdown-label">即將開戰</span>
+        </div>
       </div>
     `;
-    overlay.querySelector('#mt-match-start').addEventListener('click', () => _runSim(overlay, ctx));
     // 動畫：count-up 數字 + 勝率條 fill
     setTimeout(() => {
       content.querySelectorAll('[data-count]').forEach(el => {
@@ -395,6 +395,42 @@
       if (homeBar) homeBar.style.width = homeBar.dataset.target + '%';
       if (awayBar) awayBar.style.width = awayBar.dataset.target + '%';
     }, 300);
+
+    // 倒數 3 → 2 → 1 → GO! → 自動開始
+    const cdEl = content.querySelector('#mt-pre-match-countdown');
+    const cdNum = cdEl?.querySelector('.mt-pre-match-countdown-num');
+    const cdLabel = cdEl?.querySelector('.mt-pre-match-countdown-label');
+    const ticks = [
+      { delay: 1300, n: '2', label: '即將開戰' },
+      { delay: 2100, n: '1', label: '即將開戰' },
+      { delay: 2900, n: 'GO!', label: '' },
+    ];
+    ticks.forEach(t => {
+      setTimeout(() => {
+        if (!cdNum || !overlay.isConnected) return;
+        cdNum.textContent = t.n;
+        cdNum.classList.remove('mt-cd-pulse');
+        void cdNum.offsetWidth;
+        cdNum.classList.add('mt-cd-pulse');
+        if (cdLabel) cdLabel.textContent = t.label;
+        if (t.n === 'GO!') cdNum.classList.add('mt-cd-go');
+      }, t.delay);
+    });
+    setTimeout(() => {
+      if (!overlay.isConnected) return;
+      _runSim(overlay, ctx);
+    }, 3400);
+  }
+
+  // ── 渲染玩家隊伍隊徽 SVG（fallback：emoji / 預設 SVG）──
+  function _renderTeamCrest(team) {
+    if (!team) return '⚽';
+    if (!window.TeamCrests) return team.team_crest || '⚽';
+    const list = window.TeamCrests.listCrests ? window.TeamCrests.listCrests() : [];
+    const id = team.team_crest && list.includes(team.team_crest) ? team.team_crest : 'football';
+    const primary = team.crest_primary || '#c0392b';
+    const accent  = team.crest_accent  || '#f1c40f';
+    return window.TeamCrests.getSvg(id, primary, accent);
   }
 
   function _countUp(el, target, duration) {
