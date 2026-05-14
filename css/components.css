@@ -5618,6 +5618,55 @@ body.opinion-open .btn-arena-float { display: none; }
 }
 .msim-canvas-wrap.msim-zoom-in { transform: scale(1.18); }
 
+/* ─── 狂熱模式 banner（氣場觸發、團隊 buff）─── */
+.msim-fever-banner {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 95;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255,100,30,0.95), rgba(220,40,40,0.95));
+  border: 2px solid #ffd54a;
+  box-shadow: 0 0 24px rgba(255,100,30,0.85), 0 4px 12px rgba(0,0,0,0.6);
+}
+.msim-fever-banner[data-side="h"] {
+  background: linear-gradient(135deg, rgba(30,150,255,0.95), rgba(20,60,180,0.95));
+  box-shadow: 0 0 24px rgba(30,150,255,0.85), 0 4px 12px rgba(0,0,0,0.6);
+}
+.msim-fever-banner.msim-fever-show {
+  animation: msim-fever-in 0.5s cubic-bezier(0.34, 1.8, 0.64, 1) forwards,
+             msim-fever-pulse 0.9s ease-in-out 0.5s infinite;
+}
+@keyframes msim-fever-in {
+  0%   { transform: translate(-50%, -50%) scale(0)   rotate(-12deg); opacity: 0; }
+  60%  { transform: translate(-50%, -50%) scale(1.2) rotate(4deg);   opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1)   rotate(0deg);   opacity: 1; }
+}
+@keyframes msim-fever-pulse {
+  0%, 100% { filter: brightness(1)   drop-shadow(0 0 8px rgba(255,255,255,0.4)); }
+  50%      { filter: brightness(1.2) drop-shadow(0 0 16px rgba(255,255,255,0.8)); }
+}
+.msim-fever-text {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 4px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+  font-family: 'Impact','Arial Black',sans-serif;
+}
+.msim-fever-team {
+  font-size: 11px;
+  color: rgba(255,255,255,0.95);
+  margin-top: 2px;
+  letter-spacing: 1px;
+  font-weight: 800;
+}
+
 /* ─── 全場結束 banner（in-canvas、跟 GOAL 同風格）─── */
 .msim-fulltime-banner {
   position: absolute;

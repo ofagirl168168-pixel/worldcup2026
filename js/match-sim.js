@@ -505,6 +505,11 @@
           <div class="msim-goal-banner-text">GOAL!</div>
           <div class="msim-goal-banner-team"></div>
         </div>
+        <!-- 狂熱模式 banner（氣場觸發、團隊 buff 10 秒）-->
+        <div class="msim-fever-banner" hidden>
+          <div class="msim-fever-text">🔥 狂 熱 模 式</div>
+          <div class="msim-fever-team"></div>
+        </div>
         <!-- 全場結束 banner（在球員排隊定格時跳出）-->
         <div class="msim-fulltime-banner" hidden>
           <div class="msim-fulltime-label">全 場 結 束</div>
@@ -543,6 +548,8 @@
       canvasWrap: container.querySelector('.msim-canvas-wrap'),
       goalBanner: container.querySelector('.msim-goal-banner'),
       goalBannerTeam: container.querySelector('.msim-goal-banner-team'),
+      feverBanner: container.querySelector('.msim-fever-banner'),
+      feverTeam: container.querySelector('.msim-fever-team'),
       fulltimeBanner: container.querySelector('.msim-fulltime-banner'),
       fulltimeHome: container.querySelector('.msim-fulltime-home'),
       fulltimeAway: container.querySelector('.msim-fulltime-away'),
@@ -588,6 +595,23 @@
         ui.confetti.appendChild(c);
       }
     }
+  }
+
+  // 狂熱模式 banner — 氣場觸發、團隊 buff 10 秒
+  function _triggerFeverBanner(ui, side, teamName) {
+    if (!ui.feverBanner) return;
+    ui.feverTeam.textContent = (teamName || (side === 'h' ? 'HOME' : 'AWAY')) + ' 進入狂熱';
+    ui.feverBanner.dataset.side = side;
+    ui.feverBanner.hidden = false;
+    void ui.feverBanner.offsetWidth;
+    ui.feverBanner.classList.add('msim-fever-show');
+    // 10 秒後自動 hide（跟 fever 持續時間同步）
+    setTimeout(() => {
+      if (ui.feverBanner) {
+        ui.feverBanner.classList.remove('msim-fever-show');
+        setTimeout(() => { if (ui.feverBanner) ui.feverBanner.hidden = true; }, 400);
+      }
+    }, 10000);
   }
 
   // 全場結束 banner（HomeTeam X-Y AwayTeam + 贏家標籤）— 跟 GOAL 同風格、in-canvas 顯示
@@ -813,6 +837,9 @@
       halftimeDone: false,
       lastActionFrame: 0,
       players, ball,
+      // 狂熱模式：氣場觸發、團隊全屬性 +15%、持續 600 frames (≈10s)
+      fever: { h: 0, a: 0 },   // > 0 表示該隊狂熱中，每幀 -1
+      feverCooldown: { h: 0, a: 0 },
       // 追焦鏡頭：起始置於球場中央，每 frame 朝球位置 lerp
       camera: { x: (PITCH_W - VIEW_W) / 2, y: (PITCH_H - VIEW_H) / 2 },
       get possessorIdx() { return this._possessorIdx; },
@@ -986,9 +1013,11 @@
       // 氣場加成：高氣場 = 大場面更穩 = 射門精準度提升（最多 +12%）
       const shooterAura = shooter?.stats?.aura ?? getTeam(state.possession).radar.aura ?? 50;
       const auraBonus  = (shooterAura - 50) / 100 * 0.12;
-      // 攻防差 → goalProb：射手強 + 守門弱 + 氣場高 → 高機率進球
-      const goalProb = Math.max(0.10, Math.min(0.78,
-        ((shooterAtk - gkSave * 0.55) / 100) * 0.78 + auraBonus
+      // 狂熱模式：進攻方狂熱 → 射門 +15%；防守方狂熱 → 對方射門 -10%
+      const feverBonus = (state.fever[state.possession] > 0 ? 0.15 : 0) -
+                         (state.fever[defTeam] > 0 ? 0.10 : 0);
+      const goalProb = Math.max(0.10, Math.min(0.88,
+        ((shooterAtk - gkSave * 0.55) / 100) * 0.78 + auraBonus + feverBonus
       ));
       const isGoal = rng() < goalProb;
       if (isGoal) {
@@ -1395,6 +1424,28 @@
         }
         // 進球暫停期間：所有東西凍結，讓球員在原地做歡呼/懊惱動作
         return;
+      }
+
+      // ── 狂熱模式倒計 + 觸發 ──
+      if (state.fever.h > 0) state.fever.h--;
+      if (state.fever.a > 0) state.fever.a--;
+      if (state.feverCooldown.h > 0) state.feverCooldown.h--;
+      if (state.feverCooldown.a > 0) state.feverCooldown.a--;
+      // 每 5 秒（300 frames）roll 一次氣場觸發狂熱
+      if (state.frame > 0 && state.frame % 300 === 0) {
+        ['h', 'a'].forEach(side => {
+          if (state.fever[side] > 0 || state.feverCooldown[side] > 0) return;
+          const aura = getTeam(side).radar.aura || 50;
+          // 50 氣場 5% 機率、80 氣場 17%、99 氣場 30%
+          const triggerProb = Math.max(0, (aura - 40) / 200);
+          if (rng() < triggerProb) {
+            state.fever[side] = Math.round(FPS * 10);   // 持續 10 秒
+            state.feverCooldown[side] = Math.round(FPS * 30);  // 30 秒 cd
+            if (typeof _triggerFeverBanner === 'function') {
+              _triggerFeverBanner(ui, side, getTeam(side).nameCN);
+            }
+          }
+        });
       }
 
       const gameMin = (state.frame / TOTAL_FRAMES) * MATCH_MINUTES;

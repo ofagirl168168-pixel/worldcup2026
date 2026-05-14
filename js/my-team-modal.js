@@ -3243,6 +3243,7 @@
     _trainCountdownTimer = setInterval(tick, 1000);
   }
 
+  let _trainSpriteAnim = [];
   async function renderTrainTab(content) {
     const team = window.MyTeam.getCached();
     if (!team) return;
@@ -3460,8 +3461,8 @@
                     const total = Math.max(60, Math.floor(Math.pow((t.p['current_' + attr] || 0) / 25, 2.2) * 50));
                     const pct = isReady ? 100 : Math.max(0, Math.min(100, ((total - t.remainSec) / total) * 100));
                     return `
-                      <div class="mt-train-trainee ${isReady ? 'is-ready' : ''}" data-claim="${pid}">
-                        <img id="train-floor-${pid}" alt="${escapeHtml(c.name)}" />
+                      <div class="mt-train-trainee ${isReady ? 'is-ready' : ''}" data-claim="${pid}" data-attr="${attr}">
+                        <div class="mt-train-trainee-sprite" id="train-floor-${pid}"></div>
                         <div class="mt-train-trainee-bar"><div style="width:${pct}%"></div></div>
                         <div class="mt-train-trainee-time">
                           ${isReady ? '<span class="mt-train-trainee-ready">✋ 領取</span>'
@@ -3477,57 +3478,86 @@
           }).join('')}
         </div>
 
-        <!-- 訓練點數面板（餵球員快速提升）-->
+        <!-- 餵球員快速訓練：2 大按鈕（集訓/精英）+ 4 種點數庫存顯示 -->
         <div class="mt-train-points-panel">
           <div class="mt-train-points-title">
             <span class="mt-train-points-emoji">💎</span>
-            <span class="mt-train-points-title-text">餵球員快速升等 ‧ 點按開啟選人</span>
+            <span class="mt-train-points-title-text">餵球員快速升等</span>
           </div>
-          <div class="mt-train-points-desc">用點數做「集訓升等」或「精英特訓」 → 立刻升 1 級 + 6 個屬性同時加 1~5（比慢慢練快 6 倍）</div>
-          <div class="mt-train-points-grid">
-            <button class="mt-train-point-card mt-train-point-tactical" data-feed="rp">
-              <div class="mt-train-point-icon">🧠</div>
-              <div class="mt-train-point-info">
-                <div class="mt-train-point-name">戰術</div>
-                <div class="mt-train-point-amount">${team.rp_tactical || 0}</div>
-              </div>
+          <div class="mt-train-feed-btns">
+            <button class="mt-train-feed-btn mt-train-feed-normal" data-feed-mode="normal">
+              <div class="mt-train-feed-btn-title">⚡ 集訓升等</div>
+              <div class="mt-train-feed-btn-benefit">Lv +1 · 6 屬性各 +1~3</div>
+              <div class="mt-train-feed-btn-cost">🧠 10  💪 10</div>
             </button>
-            <button class="mt-train-point-card mt-train-point-physical" data-feed="rp">
-              <div class="mt-train-point-icon">💪</div>
-              <div class="mt-train-point-info">
-                <div class="mt-train-point-name">體能</div>
-                <div class="mt-train-point-amount">${team.rp_physical || 0}</div>
-              </div>
+            <button class="mt-train-feed-btn mt-train-feed-premium" data-feed-mode="premium">
+              <div class="mt-train-feed-btn-title">⭐ 精英特訓</div>
+              <div class="mt-train-feed-btn-benefit">Lv +1 · 6 屬性各 +2~5</div>
+              <div class="mt-train-feed-btn-cost">🧠 30  💪 30  ❤️ 10  💡 10</div>
             </button>
-            <button class="mt-train-point-card mt-train-point-heart" data-feed="rp">
-              <div class="mt-train-point-icon">❤️</div>
-              <div class="mt-train-point-info">
-                <div class="mt-train-point-name">鬥志</div>
-                <div class="mt-train-point-amount">${team.rp_heart || 0}</div>
-              </div>
-            </button>
-            <button class="mt-train-point-card mt-train-point-idea" data-feed="rp">
-              <div class="mt-train-point-icon">💡</div>
-              <div class="mt-train-point-info">
-                <div class="mt-train-point-name">靈感</div>
-                <div class="mt-train-point-amount">${team.rp_idea || 0}</div>
-              </div>
-            </button>
+          </div>
+          <div class="mt-train-inventory">
+            <span class="mt-train-inv-label">點數庫存：</span>
+            <span class="mt-train-inv-chip" title="戰術點">🧠 ${team.rp_tactical || 0}</span>
+            <span class="mt-train-inv-chip" title="體能點">💪 ${team.rp_physical || 0}</span>
+            <span class="mt-train-inv-chip" title="鬥志點">❤️ ${team.rp_heart || 0}</span>
+            <span class="mt-train-inv-chip" title="靈感點">💡 ${team.rp_idea || 0}</span>
           </div>
           <div class="mt-train-points-source">📥 來源：比賽勝利、看比賽解讀文、任務獎勵</div>
         </div>
       </div>
     `;
 
-    // 渲染所有 trainee portraits
-    Object.values(activeByAttr).flat().forEach(({ p }) => {
-      const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
-      if (look && window.LpcRenderer) {
-        window.LpcRenderer.portrait(look).then(url => {
-          const img = document.getElementById(`train-floor-${p.id}`);
-          if (img && url) img.src = url;
+    // 清掉舊的動畫 interval
+    if (_trainSpriteAnim) {
+      _trainSpriteAnim.forEach(id => clearInterval(id));
+    }
+    _trainSpriteAnim = [];
+    // 渲染所有 trainee 全身 sprite + 動作動畫
+    Object.entries(activeByAttr).forEach(([attr, list]) => {
+      list.forEach(({ p }) => {
+        const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+        if (!look || !window.LpcRenderer) return;
+        const kit = { shirtColor: team.kit_shirt_color, pantsColor: team.kit_pants_color, shoeColor: team.kit_shoes_color };
+        window.LpcRenderer.walkingFullBody(look, kit).then(sheet => {
+          if (!sheet) return;
+          const el = document.getElementById(`train-floor-${p.id}`);
+          if (!el) return;
+          const fw = sheet.frameW, fh = sheet.frameH;
+          const scale = 1.4;   // 顯示大小
+          const url = sheet.canvas.toDataURL('image/png');
+          // 各 attr 對應的 LPC row 與動作循環
+          // row: 0=down, 1=left, 2=right, 3=up, 4=kick, 5=cheer, 6=hurt
+          const ATTR_ANIM = {
+            attack:   { row: 5, frames: [0, 1, 2], interval: 260 },   // 舉重：雙手過頂上下
+            defense:  { row: 4, frames: [0, 1, 2], interval: 220 },   // 撞擊：踢/推動作
+            speed:    { row: 5, frames: [1, 2],    interval: 180 },   // 跳繩：cheer 兩格快切
+            midfield: { row: 4, frames: [0, 1, 2], interval: 260 },   // 傳球：踢動作
+            stamina:  { row: 2, frames: [0, 1, 2], interval: 150 },   // 跑步機：右走快切
+            aura:     { row: 5, frames: [2],       interval: 0   },   // 鏡前：定格在 peak pose
+          };
+          const anim = ATTR_ANIM[attr] || { row: 0, frames: [1], interval: 0 };
+          el.style.width = (fw * scale) + 'px';
+          el.style.height = (fh * scale) + 'px';
+          el.style.backgroundImage = `url(${url})`;
+          el.style.backgroundSize = `${fw * 3 * scale}px ${fh * 8 * scale}px`;
+          el.style.backgroundRepeat = 'no-repeat';
+          el.style.imageRendering = 'pixelated';
+          let idx = 0;
+          const setFrame = () => {
+            const f = anim.frames[idx % anim.frames.length];
+            el.style.backgroundPosition = `-${f * fw * scale}px -${anim.row * fh * scale}px`;
+          };
+          setFrame();
+          if (anim.interval > 0 && anim.frames.length > 1) {
+            const id = setInterval(() => {
+              idx++;
+              setFrame();
+            }, anim.interval);
+            _trainSpriteAnim.push(id);
+          }
         }).catch(() => {});
-      }
+      });
     });
 
     // 用 activeList 名稱保留下方 countdown timer 邏輯
@@ -3544,10 +3574,10 @@
       });
     });
 
-    // 點 4 個點數卡片 → 開 RP 訓練選人選單（只有集訓/精英按鈕）
-    content.querySelectorAll('[data-feed="rp"]').forEach(card => {
-      card.addEventListener('click', () => {
-        _openRpFeedPicker(players, team);
+    // 點 2 個餵球員按鈕 → 開 RP 訓練選人選單（預選對應模式）
+    content.querySelectorAll('[data-feed-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        _openRpFeedPicker(players, team, btn.dataset.feedMode);
       });
     });
 
@@ -3572,7 +3602,7 @@
           const res = await window.MyTeam.claimTimedTraining(pid);
           if (typeof showToast === 'function') {
             const lbl = ({attack:'攻',defense:'防',speed:'速',midfield:'中',stamina:'體',aura:'氣'})[res.attr];
-            showToast(`✅ ${lbl} +${res.gain}！`);
+            showToast(`✅ Lv.${res.new_level || '?'} · ${lbl} +${res.gain}！`);
           }
           renderTab();
         } catch (err) {
@@ -3593,22 +3623,29 @@
 
         <div class="mt-train-info-section">
           <div class="mt-train-info-q">Lv. 等級是什麼？</div>
-          <div class="mt-train-info-a">球員的成長次數計數器，每次「集訓升等」或「精英特訓」+1。<b>Lv 上限 50</b>。等級本身不直接影響比賽 — 而是升等時會 <b>同時加 6 屬性</b>。</div>
+          <div class="mt-train-info-a">球員的累計訓練次數，<b>任何訓練 +1 級</b>（慢慢練、集訓、精英都會）。Lv 上限 50 — 等於每位球員最多訓練 50 次。</div>
         </div>
 
         <div class="mt-train-info-section">
-          <div class="mt-train-info-q">為什麼要升等？</div>
-          <div class="mt-train-info-a">每升 1 級 = <b>攻防速中體環 6 個屬性同時 +1~3（普通）/ +2~5（精英）</b>。相當於 6 次慢慢練的效率。</div>
-        </div>
-
-        <div class="mt-train-info-section">
-          <div class="mt-train-info-q">⏱️ 慢慢練 vs ⚡ 集訓升等？</div>
-          <div class="mt-train-info-a">慢慢練：<b>免費</b>、等時間到 → 指定屬性 +1。集訓升等：<b>耗點數</b>、立刻 6 屬性同升。兩者搭配使用、彼此不衝突。</div>
+          <div class="mt-train-info-q">⏱️ 慢慢練 vs ⚡ 集訓 vs ⭐ 精英？</div>
+          <div class="mt-train-info-a">
+            ⏱️ 慢慢練：<b>免費</b>、等時間到 → Lv+1 + <b>1 個屬性 +1</b><br>
+            ⚡ 集訓升等：耗點數 → Lv+1 + <b>6 個屬性各 +1~3</b><br>
+            ⭐ 精英特訓：耗更多點數 → Lv+1 + <b>6 個屬性各 +2~5</b><br>
+            三種都消耗等級配額、但效率天差地別 — 用集訓/精英才能拉開差距
+          </div>
         </div>
 
         <div class="mt-train-info-section">
           <div class="mt-train-info-q">✨ 氣場有什麼用？</div>
-          <div class="mt-train-info-a">射門時的「大場面穩定度」加成。氣場 80 的球員射門精準度比 50 的高約 +3.6%。Boss 戰 / PvP 更明顯。</div>
+          <div class="mt-train-info-a">
+            兩種加成：<br>
+            ① <b>射門穩定</b>：氣場 80 比 50 射門精準度多 +3.6%<br>
+            ② <b>🔥 狂熱模式</b>：氣場越高、比賽中越容易觸發「狂熱模式」<br>
+            &nbsp;&nbsp;&nbsp;氣場 50：5% 觸發機率 / 80：17% / 99：30%<br>
+            &nbsp;&nbsp;&nbsp;狂熱持續 10 秒、團隊射門 +15%、對方射門 -10%<br>
+            &nbsp;&nbsp;&nbsp;cd 30 秒、雙方獨立計算
+          </div>
         </div>
 
         <div class="mt-train-info-section">
@@ -3625,15 +3662,17 @@
     });
   }
 
-  // 餵點數選人 picker（只有 RP 訓練選項、無時間訓練）
-  function _openRpFeedPicker(players, team) {
+  // 餵點數選人 picker（preferred mode：normal | premium | both）
+  function _openRpFeedPicker(players, team, preferredMode) {
     const overlay = document.createElement('div');
     overlay.className = 'mt-profile-overlay mt-train-picker';
+    const titleEmoji = preferredMode === 'premium' ? '⭐ 精英特訓' :
+                       preferredMode === 'normal'  ? '⚡ 集訓升等' : '💎 餵球員升等';
     overlay.innerHTML = `
       <div class="mt-profile-card mt-train-picker-card">
         <button class="mt-modal-close mt-profile-close" type="button">×</button>
-        <div class="mt-train-picker-title">💎 餵球員升等</div>
-        <div class="mt-train-picker-sub">消耗點數立刻升 1 級 + 6 屬性同時加成</div>
+        <div class="mt-train-picker-title">${titleEmoji}</div>
+        <div class="mt-train-picker-sub">選一位球員消耗點數升等</div>
         <div class="mt-train-picker-list" id="mt-train-picker-list"></div>
       </div>
     `;
@@ -3668,15 +3707,19 @@
             <div class="mt-train-pick-attr">綜合 <b>${Math.round((p.current_attack + p.current_defense + p.current_speed + p.current_midfield + p.current_stamina + p.current_aura) / 6)}</b></div>
           </div>
         </div>
-        <div class="mt-train-pick-btns mt-train-pick-btns-2">
-          <button class="mt-train-pick-btn mt-train-pick-rp" data-pid="${p.id}" data-mode="normal" ${canNormal ? '' : 'disabled'}>
-            <div class="mt-train-btn-title">⚡ 集訓升等</div>
-            <div class="mt-train-btn-sub">${canNormal ? '🧠10 💪10 → Lv+1, 屬性+1~3' : missNormal}</div>
-          </button>
-          <button class="mt-train-pick-btn mt-train-pick-rp mt-train-btn-premium" data-pid="${p.id}" data-mode="premium" ${canPremium ? '' : 'disabled'}>
-            <div class="mt-train-btn-title">⭐ 精英特訓</div>
-            <div class="mt-train-btn-sub">${canPremium ? '🧠30 💪30 ❤️10 💡10 → 屬性+2~5' : missPremium}</div>
-          </button>
+        <div class="mt-train-pick-btns ${preferredMode ? 'mt-train-pick-btns-1' : 'mt-train-pick-btns-2'}">
+          ${(!preferredMode || preferredMode === 'normal') ? `
+            <button class="mt-train-pick-btn mt-train-pick-rp" data-pid="${p.id}" data-mode="normal" ${canNormal ? '' : 'disabled'}>
+              <div class="mt-train-btn-title">⚡ 集訓升等</div>
+              <div class="mt-train-btn-sub">${canNormal ? '🧠10 💪10 → Lv+1, 屬性+1~3' : missNormal}</div>
+            </button>
+          ` : ''}
+          ${(!preferredMode || preferredMode === 'premium') ? `
+            <button class="mt-train-pick-btn mt-train-pick-rp mt-train-btn-premium" data-pid="${p.id}" data-mode="premium" ${canPremium ? '' : 'disabled'}>
+              <div class="mt-train-btn-title">⭐ 精英特訓</div>
+              <div class="mt-train-btn-sub">${canPremium ? '🧠30 💪30 ❤️10 💡10 → 屬性+2~5' : missPremium}</div>
+            </button>
+          ` : ''}
         </div>
       `;
       list.appendChild(row);
