@@ -91,6 +91,7 @@
         defense:    applyBuff(avg('current_defense'), 'defense'),
         midfield:   applyBuff(avg('current_midfield'),'midfield'),
         speed:      applyBuff(avg('current_speed'),   'speed'),
+        aura:       applyBuff(avg('current_aura'),    'aura'),
         experience: Math.min(95, 50 + (team.stadium_level - 1) * 5),
       },
     };
@@ -131,6 +132,7 @@
         defense:    roll(baseAvg),
         midfield:   roll(baseAvg),
         speed:      roll(baseAvg),
+        aura:       roll(baseAvg - 3),
         experience: roll(baseAvg - 5),
       },
     };

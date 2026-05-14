@@ -2353,40 +2353,40 @@
             <button class="mt-settings-action-btn" id="mt-stadium-upgrade">🏟️ 升級到 Lv. ${lv+1}（${nextCost} 💎）</button>
           ` : '<div style="opacity:0.7">已達最高等級！</div>'}
         </div>
-        <div class="mt-settings-section">
-          <div class="mt-settings-title">👕 球衣顏色</div>
-          <div class="mt-settings-swatches">${swatchRow('kit_shirt_color', team.kit_shirt_color, KIT_COLORS)}</div>
-        </div>
-        <div class="mt-settings-section">
-          <div class="mt-settings-title">👖 球褲顏色</div>
-          <div class="mt-settings-swatches">${swatchRow('kit_pants_color', team.kit_pants_color, PANTS_COLORS)}</div>
-        </div>
-        <div class="mt-settings-section">
-          <div class="mt-settings-title">👟 球鞋顏色</div>
-          <div class="mt-settings-swatches">${swatchRow('kit_shoes_color', team.kit_shoes_color, SHOE_COLORS)}</div>
-        </div>
-        <div class="mt-settings-section">
-          <div class="mt-settings-title">🛡️ 隊徽圖案</div>
-          <div class="mt-settings-crests">${crestPicker}</div>
-        </div>
-        <div class="mt-settings-section">
-          <div class="mt-settings-title">🎨 隊徽配色</div>
-          <div class="mt-settings-presets" id="mt-crest-presets"></div>
-          <div style="margin-top:10px;display:flex;gap:10px;align-items:center;font-size:13px">
-            <label>主色 <input type="color" id="mt-crest-primary" value="${team.crest_primary || '#c0392b'}"></label>
-            <label>副色 <input type="color" id="mt-crest-accent"  value="${team.crest_accent  || '#f1c40f'}"></label>
+        <!-- 球衣 / 球褲 / 球鞋 + 即時全身預覽（並排） -->
+        <div class="mt-settings-section mt-settings-with-sprite">
+          <div class="mt-settings-kit-config">
+            <div class="mt-settings-title">👕 球衣顏色</div>
+            <div class="mt-settings-swatches">${swatchRow('kit_shirt_color', team.kit_shirt_color, KIT_COLORS)}</div>
+            <div class="mt-settings-title" style="margin-top:12px">👖 球褲顏色</div>
+            <div class="mt-settings-swatches">${swatchRow('kit_pants_color', team.kit_pants_color, PANTS_COLORS)}</div>
+            <div class="mt-settings-title" style="margin-top:12px">👟 球鞋顏色</div>
+            <div class="mt-settings-swatches">${swatchRow('kit_shoes_color', team.kit_shoes_color, SHOE_COLORS)}</div>
+          </div>
+          <div class="mt-settings-sprite-preview">
+            <div class="mt-settings-preview-label">隊長預覽</div>
+            <div class="mt-settings-sprite-box" id="mt-settings-sprite-box"></div>
           </div>
         </div>
-        <div class="mt-settings-section">
-          <div class="mt-settings-title">👁 預覽（隊徽 + 球員穿著）</div>
-          <div class="mt-settings-preview-wrap">
-            <div class="mt-settings-preview" id="mt-settings-preview-crest" style="width:110px;height:110px">${_renderCrest(team)}</div>
-            <div class="mt-settings-preview-player">
-              <div class="mt-settings-preview-label">隊長</div>
-              <img id="mt-settings-preview-sprite" alt="球員預覽" style="image-rendering:pixelated" />
+
+        <!-- 隊徽圖案 + 即時隊徽預覽 -->
+        <div class="mt-settings-section mt-settings-with-sprite">
+          <div class="mt-settings-kit-config">
+            <div class="mt-settings-title">🛡️ 隊徽圖案</div>
+            <div class="mt-settings-crests">${crestPicker}</div>
+            <div class="mt-settings-title" style="margin-top:12px">🎨 隊徽配色</div>
+            <div class="mt-settings-presets" id="mt-crest-presets"></div>
+            <div style="margin-top:10px;display:flex;gap:10px;align-items:center;font-size:13px;flex-wrap:wrap">
+              <label>主色 <input type="color" id="mt-crest-primary" value="${team.crest_primary || '#c0392b'}"></label>
+              <label>副色 <input type="color" id="mt-crest-accent"  value="${team.crest_accent  || '#f1c40f'}"></label>
             </div>
           </div>
+          <div class="mt-settings-sprite-preview">
+            <div class="mt-settings-preview-label">隊徽預覽</div>
+            <div class="mt-settings-preview" id="mt-settings-preview-crest">${_renderCrest(team)}</div>
+          </div>
         </div>
+
         <button class="mt-settings-action-btn mt-settings-save-btn" id="mt-settings-save">💾 儲存隊名 / 球衣 / 隊徽</button>
       </div>
     `;
@@ -2475,13 +2475,13 @@
     const preview = content.querySelector('#mt-settings-preview-crest');
     if (preview) preview.innerHTML = _renderCrest(teamSnap);
 
-    // 球員 sprite 預覽：用隊長 look，並套上 pending kit 顏色
-    const spriteImg = content.querySelector('#mt-settings-preview-sprite');
-    if (!spriteImg || !window.LpcRenderer) return;
-    _previewSprite(spriteImg, teamSnap);
+    // 球員全身 sprite 預覽
+    const spriteBox = content.querySelector('#mt-settings-sprite-box');
+    if (spriteBox) _previewFullBodySprite(spriteBox, teamSnap);
   }
 
-  async function _previewSprite(imgEl, teamSnap) {
+  async function _previewFullBodySprite(box, teamSnap) {
+    if (!window.LpcRenderer) return;
     const players = await window.MyTeam.fetchPlayers();
     const captain = teamSnap.captain_player_id
       ? (players || []).find(p => p.id === teamSnap.captain_player_id)
@@ -2494,8 +2494,19 @@
       shoeColor:  teamSnap.kit_shoes_color || 'white',
     };
     try {
-      const url = await window.LpcRenderer.portrait(look, { scale: 4, kit });
-      if (url) imgEl.src = url;
+      // walkingFullBody 回傳完整 sprite sheet（8 行、3 列）
+      const sheet = await window.LpcRenderer.walkingFullBody(look, kit);
+      if (!sheet) return;
+      const fw = sheet.frameW, fh = sheet.frameH;
+      const url = sheet.canvas.toDataURL('image/png');
+      // 取 row 0 (face down) frame 1 (idle) 當靜態預覽
+      box.style.width = (fw * 2.5) + 'px';
+      box.style.height = (fh * 2.5) + 'px';
+      box.style.backgroundImage = `url(${url})`;
+      box.style.backgroundSize = `${fw * 3 * 2.5}px ${fh * 8 * 2.5}px`;
+      box.style.backgroundPosition = `-${fw * 1 * 2.5}px 0px`;
+      box.style.backgroundRepeat = 'no-repeat';
+      box.style.imageRendering = 'pixelated';
     } catch (e) {}
   }
 
@@ -3256,7 +3267,7 @@
     }
 
     const ATTR_LABELS = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
-    const ATTR_EMOJI = { attack:'⚔️', defense:'🛡️', speed:'👟', midfield:'⚽', stamina:'❤️', aura:'✨' };
+    const ATTR_EMOJI = { attack:'⚔️', defense:'🛡️', speed:'⚡', midfield:'⚽', stamina:'❤️', aura:'✨' };
     const ATTR_COLOR = {
       attack:   '#ef5350',
       defense:  '#42a5f5',
@@ -3265,14 +3276,138 @@
       stamina:  '#ec407a',
       aura:     '#ab47bc',
     };
-    // 開羅式像素機台（每個 attr 一張、含底座 + 設備 + 點綴）
+    // 各機台對應的訓練動作（顯示在球員資訊區）
+    const ATTR_ACTIVITY = {
+      attack:   '舉重',
+      defense:  '撞擊假人',
+      speed:    '跳繩衝刺',
+      midfield: '傳球牆',
+      stamina:  '跑步機',
+      aura:     '鏡前姿態',
+    };
+    // 開羅式像素機台（重新設計、每個動作對應的器材）
     const ATTR_TILES = {
-      attack:   '<svg viewBox="0 0 64 64"><rect x="6" y="42" width="52" height="14" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><rect x="10" y="46" width="44" height="2" fill="#7a4f30"/><rect x="14" y="20" width="36" height="6" rx="3" fill="#404040" stroke="#1a1a1a" stroke-width="1.5"/><rect x="6"  y="14" width="10" height="18" rx="2" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="1.5"/><rect x="48" y="14" width="10" height="18" rx="2" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="1.5"/><rect x="8"  y="17" width="6" height="12" fill="#5a5a5a"/><rect x="50" y="17" width="6" height="12" fill="#5a5a5a"/></svg>',
-      defense:  '<svg viewBox="0 0 64 64"><rect x="6" y="48" width="52" height="10" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><path d="M 32 6 L 52 14 L 52 32 Q 52 46 32 54 Q 12 46 12 32 L 12 14 Z" fill="#64b5f6" stroke="#0d47a1" stroke-width="2"/><path d="M 32 18 L 42 24 L 32 38 L 22 24 Z" fill="#1976d2"/><circle cx="32" cy="28" r="3" fill="#fff"/></svg>',
-      speed:    '<svg viewBox="0 0 64 64"><rect x="4" y="48" width="56" height="10" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><rect x="6" y="30" width="52" height="18" rx="2" fill="#606060" stroke="#1a1a1a" stroke-width="1.5"/><rect x="10" y="34" width="44" height="2" fill="#9e9e9e"/><rect x="10" y="38" width="44" height="2" fill="#9e9e9e"/><circle cx="16" cy="48" r="4" fill="#1a1a1a"/><circle cx="48" cy="48" r="4" fill="#1a1a1a"/><path d="M 26 22 L 38 22 L 34 10 L 30 10 Z" fill="#ffca28" stroke="#a67e00" stroke-width="1"/></svg>',
-      midfield: '<svg viewBox="0 0 64 64"><rect x="6" y="50" width="52" height="8" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><circle cx="32" cy="34" r="18" fill="#fff" stroke="#1a1a1a" stroke-width="2"/><polygon points="32,22 40,28 37,38 27,38 24,28" fill="#1a1a1a"/><line x1="32" y1="22" x2="32" y2="16" stroke="#1a1a1a" stroke-width="1.5"/><line x1="40" y1="28" x2="46" y2="24" stroke="#1a1a1a" stroke-width="1.5"/><line x1="37" y1="38" x2="42" y2="46" stroke="#1a1a1a" stroke-width="1.5"/><line x1="27" y1="38" x2="22" y2="46" stroke="#1a1a1a" stroke-width="1.5"/><line x1="24" y1="28" x2="18" y2="24" stroke="#1a1a1a" stroke-width="1.5"/></svg>',
-      stamina:  '<svg viewBox="0 0 64 64"><rect x="6" y="50" width="52" height="8" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><path d="M 32 48 L 12 28 Q 6 22 12 16 Q 18 10 26 16 L 32 22 L 38 16 Q 46 10 52 16 Q 58 22 52 28 Z" fill="#ef5350" stroke="#7f0000" stroke-width="2"/><ellipse cx="22" cy="22" rx="3" ry="2" fill="rgba(255,255,255,0.55)"/></svg>',
-      aura:     '<svg viewBox="0 0 64 64"><rect x="6" y="52" width="52" height="6" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/><circle cx="32" cy="32" r="14" fill="#ffd54a" stroke="#a67e00" stroke-width="2"/><g stroke="#ffd54a" stroke-width="2.5" stroke-linecap="round"><line x1="32" y1="6"  x2="32" y2="14"/><line x1="32" y1="50" x2="32" y2="58"/><line x1="6"  y1="32" x2="14" y2="32"/><line x1="50" y1="32" x2="58" y2="32"/><line x1="13" y1="13" x2="18" y2="18"/><line x1="46" y1="46" x2="51" y2="51"/><line x1="51" y1="13" x2="46" y2="18"/><line x1="18" y1="46" x2="13" y2="51"/></g><circle cx="32" cy="32" r="5" fill="#fff" opacity="0.7"/></svg>',
+      // 攻擊：槓鈴架 + 重量片
+      attack: `<svg viewBox="0 0 64 64">
+        <rect x="6" y="48" width="52" height="10" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/>
+        <rect x="10" y="52" width="44" height="2" fill="#7a4f30"/>
+        <!-- 立架 -->
+        <rect x="12" y="22" width="4" height="28" fill="#404040" stroke="#1a1a1a" stroke-width="1.2"/>
+        <rect x="48" y="22" width="4" height="28" fill="#404040" stroke="#1a1a1a" stroke-width="1.2"/>
+        <rect x="11" y="20" width="6" height="3" fill="#202020"/>
+        <rect x="47" y="20" width="6" height="3" fill="#202020"/>
+        <!-- 槓桿 -->
+        <rect x="6" y="30" width="52" height="3" fill="#5a5a5a" stroke="#1a1a1a" stroke-width="1"/>
+        <!-- 左右重量片 -->
+        <rect x="4"  y="24" width="6" height="15" rx="1" fill="#1a1a1a" stroke="#000" stroke-width="1"/>
+        <rect x="54" y="24" width="6" height="15" rx="1" fill="#1a1a1a" stroke="#000" stroke-width="1"/>
+        <rect x="2"  y="27" width="3" height="9" rx="1" fill="#c0392b"/>
+        <rect x="59" y="27" width="3" height="9" rx="1" fill="#c0392b"/>
+      </svg>`,
+      // 防守：撞擊假人（沙袋假人 + 立座）
+      defense: `<svg viewBox="0 0 64 64">
+        <rect x="6" y="50" width="52" height="8" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/>
+        <!-- 假人圓形底座 -->
+        <ellipse cx="32" cy="50" rx="14" ry="4" fill="#2a2a2a" stroke="#000" stroke-width="1.5"/>
+        <!-- 立桿 -->
+        <rect x="30" y="42" width="4" height="10" fill="#3a3a3a"/>
+        <!-- 假人身體（圓筒）-->
+        <rect x="22" y="14" width="20" height="30" rx="8" fill="#90caf9" stroke="#0d47a1" stroke-width="2"/>
+        <!-- 假人頭 -->
+        <circle cx="32" cy="12" r="8" fill="#90caf9" stroke="#0d47a1" stroke-width="2"/>
+        <circle cx="29" cy="11" r="1.5" fill="#0d47a1"/>
+        <circle cx="35" cy="11" r="1.5" fill="#0d47a1"/>
+        <!-- 中央條紋（目標標記）-->
+        <line x1="22" y1="26" x2="42" y2="26" stroke="#fff" stroke-width="1"/>
+        <line x1="22" y1="34" x2="42" y2="34" stroke="#fff" stroke-width="1"/>
+        <circle cx="32" cy="30" r="3" fill="#e53935" stroke="#fff" stroke-width="1"/>
+      </svg>`,
+      // 速度：跳繩
+      speed: `<svg viewBox="0 0 64 64">
+        <rect x="6" y="54" width="52" height="6" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/>
+        <!-- 跳繩拋物線（兩條 — 動感）-->
+        <path d="M 12 30 Q 32 -2 52 30" fill="none" stroke="#ffd54a" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M 14 50 Q 32 64 50 50" fill="none" stroke="#ffd54a" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+        <!-- 握把 -->
+        <rect x="8" y="30" width="6" height="8" rx="2" fill="#c0392b" stroke="#7f0000" stroke-width="1.5"/>
+        <rect x="50" y="30" width="6" height="8" rx="2" fill="#c0392b" stroke="#7f0000" stroke-width="1.5"/>
+        <!-- 速度符號 -->
+        <path d="M 28 38 L 36 38 L 34 32 L 30 32 Z" fill="#ffca28" stroke="#a67e00" stroke-width="1"/>
+        <!-- 地上腳印 -->
+        <ellipse cx="20" cy="52" rx="2" ry="1" fill="#3a2010" opacity="0.5"/>
+        <ellipse cx="44" cy="52" rx="2" ry="1" fill="#3a2010" opacity="0.5"/>
+      </svg>`,
+      // 中場：傳球牆（牆 + 足球反彈）
+      midfield: `<svg viewBox="0 0 64 64">
+        <rect x="6" y="52" width="52" height="6" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/>
+        <!-- 傳球牆 -->
+        <rect x="10" y="14" width="44" height="40" fill="#bcaaa4" stroke="#3e2723" stroke-width="2"/>
+        <!-- 牆磚紋路 -->
+        <line x1="10" y1="22" x2="54" y2="22" stroke="#3e2723" stroke-width="1" opacity="0.7"/>
+        <line x1="10" y1="30" x2="54" y2="30" stroke="#3e2723" stroke-width="1" opacity="0.7"/>
+        <line x1="10" y1="38" x2="54" y2="38" stroke="#3e2723" stroke-width="1" opacity="0.7"/>
+        <line x1="10" y1="46" x2="54" y2="46" stroke="#3e2723" stroke-width="1" opacity="0.7"/>
+        <line x1="22" y1="14" x2="22" y2="22" stroke="#3e2723" stroke-width="1" opacity="0.5"/>
+        <line x1="34" y1="22" x2="34" y2="30" stroke="#3e2723" stroke-width="1" opacity="0.5"/>
+        <line x1="42" y1="30" x2="42" y2="38" stroke="#3e2723" stroke-width="1" opacity="0.5"/>
+        <line x1="28" y1="38" x2="28" y2="46" stroke="#3e2723" stroke-width="1" opacity="0.5"/>
+        <line x1="40" y1="46" x2="40" y2="54" stroke="#3e2723" stroke-width="1" opacity="0.5"/>
+        <!-- 靶心 -->
+        <circle cx="32" cy="32" r="6" fill="#fff" stroke="#e53935" stroke-width="1.5"/>
+        <circle cx="32" cy="32" r="2.5" fill="#e53935"/>
+        <!-- 足球 -->
+        <circle cx="50" cy="48" r="5" fill="#fff" stroke="#1a1a1a" stroke-width="1.5"/>
+        <polygon points="50,45 52,47 51,50 49,50 48,47" fill="#1a1a1a"/>
+      </svg>`,
+      // 體力：跑步機
+      stamina: `<svg viewBox="0 0 64 64">
+        <rect x="4" y="50" width="56" height="8" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/>
+        <!-- 跑帶 -->
+        <rect x="6" y="32" width="52" height="18" rx="3" fill="#404040" stroke="#1a1a1a" stroke-width="2"/>
+        <!-- 跑帶紋路 -->
+        <line x1="10" y1="36" x2="54" y2="36" stroke="#7a7a7a" stroke-width="0.8"/>
+        <line x1="10" y1="40" x2="54" y2="40" stroke="#7a7a7a" stroke-width="0.8"/>
+        <line x1="10" y1="44" x2="54" y2="44" stroke="#7a7a7a" stroke-width="0.8"/>
+        <line x1="10" y1="48" x2="54" y2="48" stroke="#7a7a7a" stroke-width="0.8"/>
+        <!-- 滾輪 -->
+        <circle cx="12" cy="50" r="3" fill="#1a1a1a"/>
+        <circle cx="52" cy="50" r="3" fill="#1a1a1a"/>
+        <!-- 把手柱 -->
+        <rect x="6" y="14" width="3" height="18" fill="#9e9e9e" stroke="#1a1a1a" stroke-width="1"/>
+        <rect x="55" y="14" width="3" height="18" fill="#9e9e9e" stroke="#1a1a1a" stroke-width="1"/>
+        <!-- 控制面板 -->
+        <rect x="9" y="10" width="46" height="8" rx="2" fill="#1565c0" stroke="#0d47a1" stroke-width="1.5"/>
+        <rect x="12" y="12" width="40" height="4" rx="1" fill="#90caf9"/>
+        <circle cx="16" cy="14" r="1" fill="#42a5f5"/>
+        <circle cx="48" cy="14" r="1" fill="#42a5f5"/>
+        <!-- 顯示數字（速度）-->
+        <text x="32" y="16" font-size="4" fill="#0d47a1" text-anchor="middle" font-weight="900">RUN</text>
+      </svg>`,
+      // 氣場：鏡子 + 燈光
+      aura: `<svg viewBox="0 0 64 64">
+        <rect x="6" y="54" width="52" height="6" fill="#5a3920" stroke="#2e1d10" stroke-width="1.5"/>
+        <!-- 鏡子外框（金色）-->
+        <rect x="16" y="8" width="32" height="46" rx="3" fill="#ffd54a" stroke="#a67e00" stroke-width="2"/>
+        <!-- 鏡面（藍紫色映像）-->
+        <rect x="20" y="12" width="24" height="38" rx="1" fill="url(#mirrorGrad)"/>
+        <defs>
+          <linearGradient id="mirrorGrad" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#e1bee7"/>
+            <stop offset="100%" stop-color="#7b1fa2"/>
+          </linearGradient>
+        </defs>
+        <!-- 鏡面亮光 -->
+        <line x1="23" y1="14" x2="29" y2="20" stroke="#fff" stroke-width="1.5" opacity="0.7"/>
+        <line x1="25" y1="14" x2="27" y2="16" stroke="#fff" stroke-width="1" opacity="0.5"/>
+        <!-- 上方燈球 -->
+        <circle cx="14" cy="14" r="3" fill="#fff8e0" stroke="#a67e00" stroke-width="1"/>
+        <circle cx="50" cy="14" r="3" fill="#fff8e0" stroke="#a67e00" stroke-width="1"/>
+        <!-- 光暈 -->
+        <circle cx="14" cy="14" r="5" fill="#ffd54a" opacity="0.3"/>
+        <circle cx="50" cy="14" r="5" fill="#ffd54a" opacity="0.3"/>
+        <!-- 底座 -->
+        <rect x="26" y="50" width="12" height="4" fill="#a67e00" stroke="#5a3010" stroke-width="1"/>
+      </svg>`,
     };
 
     // 找正在訓練每個 attr 的球員（一個 attr 同時可有多人）
@@ -3293,7 +3428,10 @@
           <span class="mt-train-gym-title">💪 訓練館</span>
         </div>
 
-        <div class="mt-train-gym-hint">點機台選球員 → 站旁邊訓練 → 完成領取</div>
+        <div class="mt-train-gym-hint">
+          <span>點機台選球員 → 站旁邊訓練 → 完成領取</span>
+          <button class="mt-train-info-btn" type="button">❓ 升等是什麼</button>
+        </div>
 
         <!-- 開羅式機台場景：6 個機台 + 球員 chibi -->
         <div class="mt-train-floor">
@@ -3312,6 +3450,7 @@
                   <span class="mt-train-station-label">${label}</span>
                   ${trainees.length ? `<span class="mt-train-station-count">${trainees.length}</span>` : ''}
                 </div>
+                <div class="mt-train-station-activity">${ATTR_ACTIVITY[attr]}</div>
                 <div class="mt-train-station-tile">${ATTR_TILES[attr]}</div>
                 <div class="mt-train-station-trainees">
                   ${trainees.slice(0, 3).map(t => {
@@ -3342,38 +3481,38 @@
         <div class="mt-train-points-panel">
           <div class="mt-train-points-title">
             <span class="mt-train-points-emoji">💎</span>
-            <span class="mt-train-points-title-text">餵給球員快速提升能力</span>
+            <span class="mt-train-points-title-text">餵球員快速升等 ‧ 點按開啟選人</span>
           </div>
-          <div class="mt-train-points-desc">在選人時用「⚡ 集訓升等 / ⭐ 精英特訓」消耗下面點數、立刻升 1 級並大量加屬性（比慢慢練快很多）</div>
+          <div class="mt-train-points-desc">用點數做「集訓升等」或「精英特訓」 → 立刻升 1 級 + 6 個屬性同時加 1~5（比慢慢練快 6 倍）</div>
           <div class="mt-train-points-grid">
-            <div class="mt-train-point-card mt-train-point-tactical">
+            <button class="mt-train-point-card mt-train-point-tactical" data-feed="rp">
               <div class="mt-train-point-icon">🧠</div>
               <div class="mt-train-point-info">
                 <div class="mt-train-point-name">戰術</div>
                 <div class="mt-train-point-amount">${team.rp_tactical || 0}</div>
               </div>
-            </div>
-            <div class="mt-train-point-card mt-train-point-physical">
+            </button>
+            <button class="mt-train-point-card mt-train-point-physical" data-feed="rp">
               <div class="mt-train-point-icon">💪</div>
               <div class="mt-train-point-info">
                 <div class="mt-train-point-name">體能</div>
                 <div class="mt-train-point-amount">${team.rp_physical || 0}</div>
               </div>
-            </div>
-            <div class="mt-train-point-card mt-train-point-heart">
+            </button>
+            <button class="mt-train-point-card mt-train-point-heart" data-feed="rp">
               <div class="mt-train-point-icon">❤️</div>
               <div class="mt-train-point-info">
                 <div class="mt-train-point-name">鬥志</div>
                 <div class="mt-train-point-amount">${team.rp_heart || 0}</div>
               </div>
-            </div>
-            <div class="mt-train-point-card mt-train-point-idea">
+            </button>
+            <button class="mt-train-point-card mt-train-point-idea" data-feed="rp">
               <div class="mt-train-point-icon">💡</div>
               <div class="mt-train-point-info">
                 <div class="mt-train-point-name">靈感</div>
                 <div class="mt-train-point-amount">${team.rp_idea || 0}</div>
               </div>
-            </div>
+            </button>
           </div>
           <div class="mt-train-points-source">📥 來源：比賽勝利、看比賽解讀文、任務獎勵</div>
         </div>
@@ -3405,6 +3544,18 @@
       });
     });
 
+    // 點 4 個點數卡片 → 開 RP 訓練選人選單（只有集訓/精英按鈕）
+    content.querySelectorAll('[data-feed="rp"]').forEach(card => {
+      card.addEventListener('click', () => {
+        _openRpFeedPicker(players, team);
+      });
+    });
+
+    // ❓ 升等是什麼 → 開說明 modal
+    content.querySelector('.mt-train-info-btn')?.addEventListener('click', () => {
+      _openTrainInfoModal();
+    });
+
     // 倒數計時器
     if (allActive.length) _refreshCountdowns(activeList);
 
@@ -3426,6 +3577,139 @@
           renderTab();
         } catch (err) {
           alert('領取失敗：' + (err.message || err));
+        }
+      });
+    });
+  }
+
+  // 訓練系統說明 modal
+  function _openTrainInfoModal() {
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-train-info-modal';
+    overlay.innerHTML = `
+      <div class="mt-profile-card">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <div class="mt-train-info-title">📖 訓練系統 FAQ</div>
+
+        <div class="mt-train-info-section">
+          <div class="mt-train-info-q">Lv. 等級是什麼？</div>
+          <div class="mt-train-info-a">球員的成長次數計數器，每次「集訓升等」或「精英特訓」+1。<b>Lv 上限 50</b>。等級本身不直接影響比賽 — 而是升等時會 <b>同時加 6 屬性</b>。</div>
+        </div>
+
+        <div class="mt-train-info-section">
+          <div class="mt-train-info-q">為什麼要升等？</div>
+          <div class="mt-train-info-a">每升 1 級 = <b>攻防速中體環 6 個屬性同時 +1~3（普通）/ +2~5（精英）</b>。相當於 6 次慢慢練的效率。</div>
+        </div>
+
+        <div class="mt-train-info-section">
+          <div class="mt-train-info-q">⏱️ 慢慢練 vs ⚡ 集訓升等？</div>
+          <div class="mt-train-info-a">慢慢練：<b>免費</b>、等時間到 → 指定屬性 +1。集訓升等：<b>耗點數</b>、立刻 6 屬性同升。兩者搭配使用、彼此不衝突。</div>
+        </div>
+
+        <div class="mt-train-info-section">
+          <div class="mt-train-info-q">✨ 氣場有什麼用？</div>
+          <div class="mt-train-info-a">射門時的「大場面穩定度」加成。氣場 80 的球員射門精準度比 50 的高約 +3.6%。Boss 戰 / PvP 更明顯。</div>
+        </div>
+
+        <div class="mt-train-info-section">
+          <div class="mt-train-info-q">屬性上限到多少？</div>
+          <div class="mt-train-info-a">每個屬性最高 <b>99</b>，個別 cap = 球員 base + 15 + 緣分(★) × 5。緣分 5★ = 多 +25 上限。</div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    overlay.querySelector('.mt-profile-close').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    });
+  }
+
+  // 餵點數選人 picker（只有 RP 訓練選項、無時間訓練）
+  function _openRpFeedPicker(players, team) {
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-train-picker';
+    overlay.innerHTML = `
+      <div class="mt-profile-card mt-train-picker-card">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <div class="mt-train-picker-title">💎 餵球員升等</div>
+        <div class="mt-train-picker-sub">消耗點數立刻升 1 級 + 6 屬性同時加成</div>
+        <div class="mt-train-picker-list" id="mt-train-picker-list"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    overlay.querySelector('.mt-profile-close').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    });
+
+    const list = overlay.querySelector('#mt-train-picker-list');
+    const rpT = team.rp_tactical || 0;
+    const rpP = team.rp_physical || 0;
+    const rpH = team.rp_heart || 0;
+    const rpI = team.rp_idea || 0;
+
+    players.forEach(p => {
+      const c = p.card || {};
+      const isMaxLevel = p.level >= 50;
+      const canNormal = rpT >= 10 && rpP >= 10 && !isMaxLevel;
+      const canPremium = rpT >= 30 && rpP >= 30 && rpH >= 10 && rpI >= 10 && !isMaxLevel;
+      const missNormal = isMaxLevel ? '已滿級' : (rpT < 10 ? '🧠不足' : rpP < 10 ? '💪不足' : '');
+      const missPremium = isMaxLevel ? '已滿級' : (rpT < 30 ? '🧠不足' : rpP < 30 ? '💪不足' : rpH < 10 ? '❤️不足' : rpI < 10 ? '💡不足' : '');
+      const row = document.createElement('div');
+      row.className = `mt-train-pick-row rarity-${c.rarity || 'R'}`;
+      const imgId = `train-feed-${p.id}`;
+      row.innerHTML = `
+        <div class="mt-train-pick-head">
+          <div class="mt-train-pick-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
+          <div class="mt-train-pick-info">
+            <div class="mt-train-pick-name">${escapeHtml(c.name)} <small>${c.position || ''} · Lv.${p.level}</small></div>
+            <div class="mt-train-pick-attr">綜合 <b>${Math.round((p.current_attack + p.current_defense + p.current_speed + p.current_midfield + p.current_stamina + p.current_aura) / 6)}</b></div>
+          </div>
+        </div>
+        <div class="mt-train-pick-btns mt-train-pick-btns-2">
+          <button class="mt-train-pick-btn mt-train-pick-rp" data-pid="${p.id}" data-mode="normal" ${canNormal ? '' : 'disabled'}>
+            <div class="mt-train-btn-title">⚡ 集訓升等</div>
+            <div class="mt-train-btn-sub">${canNormal ? '🧠10 💪10 → Lv+1, 屬性+1~3' : missNormal}</div>
+          </button>
+          <button class="mt-train-pick-btn mt-train-pick-rp mt-train-btn-premium" data-pid="${p.id}" data-mode="premium" ${canPremium ? '' : 'disabled'}>
+            <div class="mt-train-btn-title">⭐ 精英特訓</div>
+            <div class="mt-train-btn-sub">${canPremium ? '🧠30 💪30 ❤️10 💡10 → 屬性+2~5' : missPremium}</div>
+          </button>
+        </div>
+      `;
+      list.appendChild(row);
+      const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+      if (look && window.LpcRenderer) {
+        window.LpcRenderer.portrait(look).then(url => {
+          const img = document.getElementById(imgId);
+          if (img && url) img.src = url;
+        }).catch(() => {});
+      }
+    });
+
+    overlay.querySelectorAll('.mt-train-pick-rp').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const pid = btn.dataset.pid;
+        const mode = btn.dataset.mode;
+        overlay.querySelectorAll('.mt-train-pick-rp').forEach(b => b.disabled = true);
+        try {
+          const result = await window.MyTeam.trainPlayer(pid, mode);
+          window.MyTeam.trackQuest?.('train', 1).catch(() => {});
+          const g = result.gains;
+          if (typeof showToast === 'function') {
+            showToast(`💪 Lv.${result.level_after}！攻+${g.attack} 防+${g.defense} 速+${g.speed} 中+${g.midfield} 體+${g.stamina} 環+${g.aura}`);
+          }
+          overlay.classList.remove('open');
+          setTimeout(() => overlay.remove(), 200);
+          renderHub();
+        } catch (err) {
+          const msg = String(err.message || err);
+          let friendly = '訓練失敗：' + msg;
+          if (msg.includes('INSUFFICIENT_RP')) friendly = '⚠️ 點數不足';
+          else if (msg.includes('MAX_LEVEL')) friendly = '⚠️ 已滿級';
+          if (typeof showToast === 'function') showToast(friendly);
         }
       });
     });

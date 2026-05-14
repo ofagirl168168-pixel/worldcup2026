@@ -983,9 +983,12 @@
       const gk = players.find(p => p.team === defTeam && p.role === 'GK');
       const shooterAtk = shooter?.stats?.attack ?? getTeam(state.possession).radar.attack;
       const gkSave     = gk?.stats?.goalkeeping ?? getTeam(defTeam).radar.defense;
-      // 攻防差 → goalProb：射手強 + 守門弱 → 高機率進球
-      const goalProb = Math.max(0.10, Math.min(0.72,
-        ((shooterAtk - gkSave * 0.55) / 100) * 0.78
+      // 氣場加成：高氣場 = 大場面更穩 = 射門精準度提升（最多 +12%）
+      const shooterAura = shooter?.stats?.aura ?? getTeam(state.possession).radar.aura ?? 50;
+      const auraBonus  = (shooterAura - 50) / 100 * 0.12;
+      // 攻防差 → goalProb：射手強 + 守門弱 + 氣場高 → 高機率進球
+      const goalProb = Math.max(0.10, Math.min(0.78,
+        ((shooterAtk - gkSave * 0.55) / 100) * 0.78 + auraBonus
       ));
       const isGoal = rng() < goalProb;
       if (isGoal) {
