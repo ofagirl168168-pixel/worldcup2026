@@ -3636,11 +3636,11 @@
   z-index: 5;
 }
 
-/* 4 卡包並排（玻璃櫃內） */
+/* 4 卡包並排（玻璃櫃內 — 直式背景的中上段）*/
 .mt-gshop-packs {
   position: absolute;
-  top: 22%;
-  left: 28%; right: 28%;
+  top: 24%;
+  left: 8%; right: 8%;
   display: flex;
   justify-content: space-between;
   gap: 1.5%;
@@ -3680,31 +3680,31 @@
   50%      { transform: translateY(-3px); }
 }
 
-/* 卡包說明 caption */
+/* 卡包說明 caption（卡包下方）*/
 .mt-gshop-packs-caption {
   position: absolute;
-  top: 53%;
-  left: 30%; right: 30%;
+  top: 47%;
+  left: 16%; right: 16%;
   text-align: center;
-  font-size: 11px;
+  font-size: 12px;
   color: #ffe680;
-  background: rgba(0,0,0,0.55);
-  border: 1px solid rgba(240,192,64,0.4);
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(240,192,64,0.5);
   border-radius: 4px;
-  padding: 3px 8px;
+  padding: 4px 10px;
   z-index: 5;
 }
 
-/* 黑板告示：每 10 抽必得 SR */
+/* 黑板告示：每 10 抽必得 SR — 直式中央偏左下、黑板位置 */
 .mt-gshop-chalk-overlay {
   position: absolute;
-  top: 50%;
-  left: 7%;
-  width: 14%;
+  top: 65%;
+  left: 10%;
+  width: 22%;
   text-align: center;
   font-family: 'Caveat','Comic Sans MS',cursive;
   color: #ffffff;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.4;
   text-shadow: 0 1px 2px rgba(0,0,0,0.9);
   z-index: 4;
@@ -3714,31 +3714,31 @@
 .mt-gshop-chalk-overlay .mt-gshop-chalk-line2 { display: block; }
 .mt-gshop-chalk-overlay .mt-gshop-chalk-line3 { display: block; color: #ffe680; font-weight: 900; }
 
-/* 機率資訊按鈕（疊在右下） */
+/* 機率資訊按鈕（疊在右下書架/相框位置） */
 .mt-gshop-rates-btn {
   position: absolute;
-  bottom: 26%;
-  right: 4%;
-  background: rgba(0,0,0,0.65);
+  top: 67%;
+  right: 6%;
+  background: rgba(0,0,0,0.7);
   border: 1.5px solid #f0c040;
   border-radius: 6px;
   padding: 4px 10px;
   color: #ffe680;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   z-index: 5;
-  box-shadow: 0 0 6px rgba(240,192,64,0.4);
+  box-shadow: 0 0 8px rgba(240,192,64,0.5);
 }
-.mt-gshop-rates-btn:hover { background: rgba(0,0,0,0.85); }
+.mt-gshop-rates-btn:hover { background: rgba(0,0,0,0.9); }
 
-/* 抽卡按鈕（底部、疊在背景櫃台下方） */
+/* 抽卡按鈕（疊在背景底部空白區域、不再外掛在外）*/
 .mt-gshop-buttons {
-  position: relative;
+  position: absolute;
+  bottom: 3%;
+  left: 4%; right: 4%;
   display: flex;
-  gap: 12px;
-  padding: 0 16px;
-  margin-top: -6%;
+  gap: 10px;
   z-index: 5;
 }
 .mt-gshop-btn {
@@ -3805,21 +3805,22 @@
   border: 2px solid #fff;
 }
 
-/* SSR 自選券（如果有） */
+/* SSR 自選券（疊在背景頂部右上、有的話）*/
 .mt-gshop-ssr-ticket {
-  display: block;
-  margin: 10px 16px 0;
+  position: absolute;
+  top: 12%;
+  right: 4%;
   background: linear-gradient(135deg, #ffe680, #f0c040);
-  border: 3px solid #fff;
+  border: 2.5px solid #fff;
   color: #2a1505;
   font-weight: 900;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 6px 10px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 14px;
-  width: calc(100% - 32px);
-  box-shadow: 0 4px 12px rgba(240,192,64,0.5);
+  font-size: 11px;
+  box-shadow: 0 3px 8px rgba(240,192,64,0.55);
   animation: mt-pack-float 2.5s ease-in-out infinite;
+  z-index: 6;
 }
 
 /* ─── 以下舊 fullscene 元素（保留 class 但隱藏，因為 HTML 不再產生）─── */

@@ -145,7 +145,7 @@ async function processBackground(filePath, w, h) {
     catch (e) { console.error(`❌ ${f}: ${e.message}`); }
   }
   console.log('\n── 背景圖（縮 + 壓縮）──');
-  // 背景 960×720（畫面寬度頂多 380、dpr=2 = 760、960 還有餘裕）
-  await processBackground('img/my-team/gacha-bg.png', 960, 720)
+  // 背景改 3:4 直式 720×960（modal 是直式、畫面更貼合）
+  await processBackground('img/my-team/gacha-bg.png', 720, 960)
     .catch(e => console.error(`❌ bg: ${e.message}`));
 })();
