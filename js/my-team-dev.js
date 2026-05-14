@@ -125,6 +125,24 @@
     else { await window.MyTeam.fetch(); console.log(`✓ +${n} 教練券`); }
   }
 
+  async function debugCoaches() {
+    const uid = _uid();
+    if (!uid) { console.error('❌ 沒登入'); return; }
+    console.log('📋 Debug: my user id =', uid);
+    // 直接撈 user_coach 表（不 join）
+    const { data: raw, error: e1 } = await window.DB.from('user_coach').select('*');
+    console.log('1️⃣ user_coach raw 全部:', raw, 'error:', e1);
+    // 撈現在 user 的
+    const { data: mine, error: e2 } = await window.DB.from('user_coach').select('*').eq('user_id', uid);
+    console.log('2️⃣ user_coach 我的:', mine, 'error:', e2);
+    // join 教練池
+    const { data: joined, error: e3 } = await window.DB.from('user_coach').select('*, coach:coach_pool(*)');
+    console.log('3️⃣ user_coach + coach_pool join:', joined, 'error:', e3);
+    // my_team coach_tickets
+    const { data: team, error: e4 } = await window.DB.from('my_team').select('coach_tickets, active_coach_id, assist_coach_id_1, assist_coach_id_2').eq('user_id', uid).maybeSingle();
+    console.log('4️⃣ my_team coach 欄位:', team, 'error:', e4);
+  }
+
   async function addGems(n) {
     n = parseInt(n) || 100;
     const uid = _uid();
@@ -201,7 +219,7 @@
   window.MyTeamDev = {
     enable, disable, status,
     reset, resetLocalOnly,
-    addTickets, addCoachTickets, addGems, addRP, addStamina,
+    addTickets, addCoachTickets, addGems, addRP, addStamina, debugCoaches,
     replayTutorial,
     simulateArenaVote, simulateDailyLogin, simulatePredict5,
   };
