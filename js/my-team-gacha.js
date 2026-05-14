@@ -236,9 +236,11 @@
           <!-- 紙袋包裝（上半 + 下半 + 撕線）-->
           <div class="mt-gacha-pack-wrap" id="mt-gacha-pack-wrap">
             <div class="mt-gacha-pack-top">
-              <div class="mt-gacha-pack-logo">⚽</div>
-              <div class="mt-gacha-pack-stripe"></div>
-              <div class="mt-gacha-pack-shine"></div>
+              <div class="mt-gacha-pack-top-fold">
+                <div class="mt-gacha-pack-logo">⚽</div>
+                <div class="mt-gacha-pack-stripe"></div>
+                <div class="mt-gacha-pack-shine"></div>
+              </div>
             </div>
             <div class="mt-gacha-pack-perforation">
               <span></span><span></span><span></span><span></span><span></span>
