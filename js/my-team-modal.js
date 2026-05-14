@@ -2487,15 +2487,56 @@
     content.querySelector('#mt-gacha-1')?.addEventListener('click', () => _runGacha(1));
     content.querySelector('#mt-gacha-10')?.addEventListener('click', () => _runGacha(10));
     content.querySelector('#mt-ssr-select-open')?.addEventListener('click', () => _openSSRSelect());
-    content.querySelector('#mt-gshop-rates')?.addEventListener('click', () => {
-      if (typeof showToast === 'function') {
-        showToast('📊 N 50% · R 30% · SR 15% · SSR 5%（30 抽保底 SSR）');
-      }
-    });
+    content.querySelector('#mt-gshop-rates')?.addEventListener('click', () => _openRatesModal());
     // 4 個卡包點擊 → 直接抽 1 抽（任何稀有度按鈕都一樣 — 機率系統決定中什麼）
     content.querySelectorAll('.mt-gshop-pack').forEach(b => {
       b.addEventListener('click', () => _runGacha(1));
     });
+  }
+
+  // ── 機率資訊 modal ──
+  function _openRatesModal() {
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-rates-overlay';
+    overlay.innerHTML = `
+      <div class="mt-rates-modal">
+        <div class="mt-rates-title">📊 抽卡機率</div>
+        <button class="mt-modal-close mt-rates-close" type="button">×</button>
+        <div class="mt-rates-row mt-rates-n">
+          <span class="mt-rates-rarity">N</span>
+          <span class="mt-rates-bar"><span style="width:50%;background:#7d8590"></span></span>
+          <span class="mt-rates-pct">50%</span>
+        </div>
+        <div class="mt-rates-row mt-rates-r">
+          <span class="mt-rates-rarity">R</span>
+          <span class="mt-rates-bar"><span style="width:30%;background:#43a047"></span></span>
+          <span class="mt-rates-pct">30%</span>
+        </div>
+        <div class="mt-rates-row mt-rates-sr">
+          <span class="mt-rates-rarity">SR</span>
+          <span class="mt-rates-bar"><span style="width:15%;background:#9b87f5"></span></span>
+          <span class="mt-rates-pct">15%</span>
+        </div>
+        <div class="mt-rates-row mt-rates-ssr">
+          <span class="mt-rates-rarity">SSR</span>
+          <span class="mt-rates-bar"><span style="width:5%;background:#f0c040"></span></span>
+          <span class="mt-rates-pct">5%</span>
+        </div>
+        <div class="mt-rates-note">
+          🎯 連續 30 抽未中 SSR → <b style="color:#ffe680">下一抽必中 SSR</b><br>
+          🎴 10 連抽最後一張 → <b style="color:#9b87f5">保證 SR 起步</b><br>
+          ⭐ 重複球員 → ★+1（最高 ★5、提升上限）
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    };
+    overlay.querySelector('.mt-rates-close').addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
   }
 
   // ── SSR 自選券：選 1 張 SSR ──

@@ -3699,18 +3699,23 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.6);
 }
 
-/* 黑板告示：對到背景的黑板位置（獎盃右邊小黑板） */
+/* 黑板告示：對到背景的黑板位置（獎盃右側、地板上的小木架黑板） */
+/* 根據你的截圖估算：背景黑板區大約 x 16~26%、y 64~74% */
 .mt-gshop-chalk-overlay {
   position: absolute;
-  top: 75%;
-  left: 23%;
-  width: 13%;
+  top: 64%;
+  left: 16%;
+  width: 12%;
+  height: 10%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: center;
   font-family: 'Caveat','Comic Sans MS',cursive;
   color: #ffffff;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.15;
   text-shadow: 0 1px 1px rgba(0,0,0,0.95);
   z-index: 4;
   transform: rotate(-2deg);
@@ -3765,31 +3770,34 @@
 .mt-gshop-btn:active:not(:disabled) { transform: translateY(1px); }
 .mt-gshop-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
 .mt-gshop-btn-1 {
-  background: linear-gradient(180deg, #5ab4ff 0%, #1976d2 50%, #0d4a8a 100%);
+  background: linear-gradient(180deg, #5ec5ff, #1e88e5 40%, #0d47a1) !important;
   flex: 0 0 38%;
-  border-color: #0d4a8a;
-  text-shadow: 0 2px 3px rgba(0,0,0,0.6);
+  border-color: #002171;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.75);
   box-shadow:
-    0 4px 12px rgba(33,150,243,0.55),
-    0 0 14px rgba(90,180,255,0.3),
-    inset 0 2px 3px rgba(255,255,255,0.45),
-    inset 0 -3px 4px rgba(0,0,0,0.3);
+    0 5px 14px rgba(13,71,161,0.7),
+    0 0 18px rgba(94,197,255,0.45),
+    inset 0 3px 4px rgba(255,255,255,0.6),
+    inset 0 -4px 5px rgba(0,0,0,0.4);
+  opacity: 1;
 }
 .mt-gshop-btn-10 {
-  background: linear-gradient(180deg, #ffe680 0%, #ffc040 30%, #ff8a2b 80%, #c0501a 100%);
-  color: #2a1505;
-  border-color: #5a2010;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.55);
+  background: linear-gradient(180deg, #ffeb3b, #ff9800 35%, #e64a19 85%, #bf360c) !important;
+  color: #1a0a00;
+  border-color: #3e2723;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.7);
   box-shadow:
-    0 4px 14px rgba(240,160,40,0.7),
-    0 0 18px rgba(255,200,60,0.4),
-    inset 0 2px 3px rgba(255,255,255,0.6),
-    inset 0 -3px 4px rgba(0,0,0,0.25);
+    0 5px 16px rgba(255,152,0,0.7),
+    0 0 22px rgba(255,235,59,0.55),
+    inset 0 3px 4px rgba(255,255,255,0.7),
+    inset 0 -4px 5px rgba(0,0,0,0.3);
+  opacity: 1;
   animation: mt-gshop-btn10-glow 1.6s ease-in-out infinite;
 }
 @keyframes mt-gshop-btn10-glow {
-  0%, 100% { box-shadow: 0 4px 14px rgba(240,160,40,0.7), 0 0 18px rgba(255,200,60,0.4), inset 0 2px 3px rgba(255,255,255,0.6), inset 0 -3px 4px rgba(0,0,0,0.25); }
-  50%      { box-shadow: 0 4px 14px rgba(240,160,40,0.85), 0 0 28px rgba(255,200,60,0.7), inset 0 2px 3px rgba(255,255,255,0.7), inset 0 -3px 4px rgba(0,0,0,0.25); }
+  0%, 100% { box-shadow: 0 5px 16px rgba(255,152,0,0.7),  0 0 22px rgba(255,235,59,0.55), inset 0 3px 4px rgba(255,255,255,0.7), inset 0 -4px 5px rgba(0,0,0,0.3); }
+  50%      { box-shadow: 0 5px 16px rgba(255,152,0,0.95), 0 0 36px rgba(255,235,59,0.85), inset 0 3px 4px rgba(255,255,255,0.85), inset 0 -4px 5px rgba(0,0,0,0.3); }
 }
 .mt-gshop-btn-label {
   font-size: 18px;
@@ -3846,6 +3854,88 @@
   box-shadow: 0 3px 8px rgba(240,192,64,0.55);
   animation: mt-pack-float 2.5s ease-in-out infinite;
   z-index: 6;
+}
+
+/* 機率資訊 modal */
+.mt-rates-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 12020;
+  opacity: 0; transition: opacity 0.2s;
+  padding: 20px;
+}
+.mt-rates-overlay.open { opacity: 1; }
+.mt-rates-modal {
+  background: linear-gradient(180deg, #2a1810 0%, #1a0d08 100%);
+  border: 3px solid #f0c040;
+  border-radius: 14px;
+  padding: 22px 20px;
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.7), 0 0 24px rgba(240,192,64,0.4);
+  color: #fff;
+}
+.mt-rates-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #ffe680;
+  text-align: center;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+}
+.mt-rates-close {
+  position: absolute;
+  top: 6px; right: 8px;
+  background: none; border: 0;
+  color: #fff; font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+}
+.mt-rates-row {
+  display: flex; align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  font-size: 14px;
+}
+.mt-rates-rarity {
+  flex: 0 0 38px;
+  font-weight: 900;
+  font-size: 13px;
+}
+.mt-rates-n   .mt-rates-rarity { color: #b0b8c0; }
+.mt-rates-r   .mt-rates-rarity { color: #6cdc8a; }
+.mt-rates-sr  .mt-rates-rarity { color: #c0b0ff; }
+.mt-rates-ssr .mt-rates-rarity { color: #ffe680; }
+.mt-rates-bar {
+  flex: 1;
+  height: 14px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.mt-rates-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 7px;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.3);
+}
+.mt-rates-pct {
+  flex: 0 0 46px;
+  text-align: right;
+  font-weight: 800;
+  font-family: monospace;
+}
+.mt-rates-note {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(240,192,64,0.25);
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.85);
 }
 
 /* ─── 以下舊 fullscene 元素（保留 class 但隱藏，因為 HTML 不再產生）─── */
