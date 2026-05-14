@@ -362,6 +362,28 @@
                      cy - (p._tackleDirY || 0) * (lineLen + 6) + offY);
           ctx.stroke();
         }
+        // 「鏟球」字向上飄（紅底白字、視覺最搶眼）
+        const labelY = cy - SPRITE_DRAW_H / 2 - 8 - tNorm * 8;
+        const labelOpacity = 1 - tNorm * 0.5;
+        ctx.save();
+        ctx.globalAlpha = labelOpacity;
+        ctx.fillStyle = '#c0231a';
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        const labelW = 28, labelH = 13;
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(cx - labelW/2, labelY - labelH/2, labelW, labelH, 4)
+                      : ctx.rect(cx - labelW/2, labelY - labelH/2, labelW, labelH);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 9px "Microsoft JhengHei", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('鏟球', cx, labelY);
+        ctx.restore();
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
       }
       // 個人狂熱光環（球員腳下發光 + 上方光暈）
       if (p.fever > 0) {
@@ -437,9 +459,11 @@
       }
 
       // 體力疲勞表現：gameTimeFrac × stamina 算當前疲勞度 + 鏟球額外消耗
+      // 官方比賽（opts.disableTeamMechanics）關閉體力影響
       const gtf = state.frame / TOTAL_FRAMES;
       const pStamina = p.stats?.stamina ?? 75;
-      const fatigue = gtf * Math.max(0.1, 0.55 - pStamina / 250) + (p._tackleFatigue || 0);
+      const fatigue = opts.disableTeamMechanics ? 0
+        : (gtf * Math.max(0.1, 0.55 - pStamina / 250) + (p._tackleFatigue || 0));
 
       // 頭頂體力條：持球者 + 正在鏟球的人都顯示
       const showStaminaBar = (isPos || tackleActive) && p.role !== 'GK';
@@ -856,6 +880,14 @@
       goalkeeping = Math.max(20, Math.min(99, Math.round(goalkeeping + jitter())));
       return { attack, defense, midfield, speed, stamina, goalkeeping };
     }
+    // 個人狂熱：accumGauge 從外部讀（跨場次保存）、個性 personality 賦予差異
+    const initialGauges = opts.feverGauges || {};   // { card_id: number 0~100 }
+    const makeFeverInit = (cardId) => ({
+      feverGauge: Math.max(0, Math.min(100, initialGauges[cardId] || 0)),
+      fever: 0,
+      feverCooldown: 0,
+      _feverPersonality: 0.7 + rng() * 0.6,    // 0.7~1.3 變異、避免大家同時爆
+    });
     const players = [
       ...hF.map((p, i) => ({
         ...p, team: 'h',
@@ -863,6 +895,7 @@
         flair: makeFlair(),
         card_id: _cardIdFor(home, i),
         stats: _statsFor(home, i, p.role, i < 5),
+        ...makeFeverInit(_cardIdFor(home, i)),
       })),
       ...aF.map((p, i) => ({
         ...p, team: 'a',
@@ -870,6 +903,7 @@
         flair: makeFlair(),
         card_id: _cardIdFor(away, i),
         stats: _statsFor(away, i, p.role, i < 5),
+        ...makeFeverInit(_cardIdFor(away, i)),
       })),
     ];
 
@@ -1220,7 +1254,8 @@
           // 體力疲勞影響：後半場 stamina 低的後衛 defense 效力下降 + 鏟過球的人更累
           const gtf = state.frame / TOTAL_FRAMES;
           const tStamina = near.player.stats?.stamina ?? 75;
-          const tackleFatigueMult = Math.max(0.55,
+          // 官方比賽關閉體力影響（疲勞 multiplier = 1）
+          const tackleFatigueMult = opts.disableTeamMechanics ? 1 : Math.max(0.55,
             1 - gtf * Math.max(0.1, 0.4 - tStamina / 250) - (near.player._tackleFatigue || 0));
           let tackleChance = ((indDef / 100) * 0.04 - (indMid / 100) * 0.02 + (indSpd / 100) * 0.012) * tackleFatigueMult;
           if (distToGoal < 0.22) tackleChance *= 1.3;
@@ -1553,33 +1588,41 @@
       }
 
       // ── 個人狂熱模式：每球員氣場累積 gauge、滿了進個人狂熱 ──
-      const FEVER_DURATION = Math.round(FPS * 10);  // 10 秒
-      const FEVER_BASE_FILL = 0.05;                 // 每幀基礎累積（aura 50 約 50 秒滿）
-      players.forEach((p, i) => {
-        if (p.fever > 0) {
-          p.fever--;
-          // 狂熱結束 → gauge 歸 0、進入 cooldown（避免立刻又滿）
-          if (p.fever === 0) {
-            p.feverGauge = 0;
-            p.feverCooldown = Math.round(FPS * 25);
-          }
-        } else if (p.feverCooldown > 0) {
-          p.feverCooldown--;
-        } else {
-          // 累積 gauge：aura 越高累積越快（50→1×、80→1.6×、99→2.0×）
-          const pAura = p.stats?.aura ?? 50;
-          const auraSpeed = 0.4 + (pAura / 100) * 1.2;
-          p.feverGauge = Math.min(100, (p.feverGauge || 0) + FEVER_BASE_FILL * auraSpeed);
-          // 滿了 → 進狂熱
-          if (p.feverGauge >= 100) {
-            p.fever = FEVER_DURATION;
-            p.feverShownAt = state.frame;
-            if (typeof _triggerFeverBanner === 'function') {
-              _triggerFeverBanner(ui, p.team, p.name || (p.team === 'h' ? '我方球員' : '對方球員'));
+      // 官方比賽（真實賽事模擬、朋友直播房）關閉狂熱 + 體力 — opts.disableTeamMechanics
+      if (!opts.disableTeamMechanics) {
+        const FEVER_DURATION = Math.round(FPS * 18);  // 18 秒（更長、影響更明顯）
+        const FEVER_BASE_FILL = 0.04;
+        players.forEach((p, i) => {
+          if (p.fever > 0) {
+            p.fever--;
+            if (p.fever === 0) {
+              // 狂熱結束 → gauge 歸 0、cd 30 秒（比較難連發）
+              p.feverGauge = 0;
+              p.feverCooldown = Math.round(FPS * 30);
+            }
+          } else if (p.feverCooldown > 0) {
+            p.feverCooldown--;
+          } else {
+            // 累積：aura 影響更誇張（50→0.5×、80→1.8×、99→3.0×）
+            // 加入個人 _feverPersonality 變異（0.7~1.3、init 時隨機）避免大家同時爆
+            const pAura = p.stats?.aura ?? 50;
+            const auraSpeed = Math.pow(pAura / 50, 1.8);
+            const personality = p._feverPersonality || 1;
+            p.feverGauge = Math.min(100, (p.feverGauge || 0) + FEVER_BASE_FILL * auraSpeed * personality);
+            if (p.feverGauge >= 100) {
+              p.fever = FEVER_DURATION;
+              p.feverShownAt = state.frame;
+              if (typeof _triggerFeverBanner === 'function') {
+                _triggerFeverBanner(ui, p.team, p.name || (p.team === 'h' ? '我方球員' : '對方球員'));
+              }
+              // 我方球員 → 把當前 gauge 狀態 push 給外層保存（跨場次）
+              if (p.team === 'h' && typeof opts.onFeverGaugeChange === 'function') {
+                opts.onFeverGaugeChange(p.card_id, 0);
+              }
             }
           }
-        }
-      });
+        });
+      }
 
       const gameMin = (state.frame / TOTAL_FRAMES) * MATCH_MINUTES;
       const gameMinInt = Math.floor(gameMin);
@@ -1733,7 +1776,12 @@
       `;
       // 朋友直播房用：sim 跑完通知外層算結果
       if (typeof opts.onEnd === 'function') {
-        try { opts.onEnd({ h: state.score.h, a: state.score.a }); } catch (e) { console.warn('[MatchSim] onEnd threw', e); }
+        // 收集所有 home 球員的最終 fever gauge（傳給外層保存到 DB）
+        const finalGauges = {};
+        players.filter(p => p.team === 'h').forEach(p => {
+          if (p.card_id) finalGauges[p.card_id] = Number((p.feverGauge || 0).toFixed(2));
+        });
+        try { opts.onEnd({ h: state.score.h, a: state.score.a, finalGauges }); } catch (e) { console.warn('[MatchSim] onEnd threw', e); }
       }
     }
 
@@ -1746,6 +1794,8 @@
   window.MatchSim = {
     // opts.seed: 給朋友直播房用的 seed，相同 seed 產出完全相同的比賽
     run(matchId, opts = {}) {
+      // 從賽程資料庫跑的官方比賽 — 預設關閉狂熱 + 體力（真實比賽不該有遊戲機制）
+      if (opts.disableTeamMechanics === undefined) opts.disableTeamMechanics = true;
       const containerId = `sim-wrap-${matchId}`;
       const container = document.getElementById(containerId);
       if (!container) { console.warn('[MatchSim] container not found:', containerId); return; }

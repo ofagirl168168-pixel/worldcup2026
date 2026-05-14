@@ -3526,27 +3526,41 @@
           const fw = sheet.frameW, fh = sheet.frameH;
           const scale = 1.4;   // 顯示大小
           const url = sheet.canvas.toDataURL('image/png');
-          // 各 attr 對應的 LPC row 與動作循環
-          // row: 0=down, 1=left, 2=right, 3=up, 4=kick, 5=cheer, 6=hurt
+          // 各 attr 對應的 LPC row + frame + bob 動作
+          // row: 0=down, 1=left, 2=right, 3=up, 4=kick, 5=cheer, 6=hurt, 7=thrust
+          // bob: 'jump'(垂直上下), 'shake'(左右抖), 'lean'(微傾斜), null
           const ATTR_ANIM = {
-            attack:   { row: 5, frames: [0, 1, 2], interval: 260 },   // 舉重：雙手過頂上下
-            defense:  { row: 4, frames: [0, 1, 2], interval: 220 },   // 撞擊：踢/推動作
-            speed:    { row: 5, frames: [1, 2],    interval: 180 },   // 跳繩：cheer 兩格快切
-            midfield: { row: 4, frames: [0, 1, 2], interval: 260 },   // 傳球：踢動作
-            stamina:  { row: 2, frames: [0, 1, 2], interval: 150 },   // 跑步機：右走快切
-            aura:     { row: 5, frames: [2],       interval: 0   },   // 鏡前：定格在 peak pose
+            attack:   { row: 5, frames: [0, 1, 2, 1], interval: 220, bob: 'lift' },    // 舉重：雙手過頂 + 微下蹲循環
+            defense:  { row: 7, frames: [0, 1, 2], interval: 180, bob: 'shake' },      // 撞擊：thrust + 前後抖
+            speed:    { row: 5, frames: [1, 2],    interval: 130, bob: 'jump' },       // 跳繩：cheer + 垂直上下
+            midfield: { row: 4, frames: [0, 1, 2], interval: 230, bob: null },         // 傳球：踢動作
+            stamina:  { row: 2, frames: [0, 1, 2], interval: 120, bob: 'run' },        // 跑步機：右走快切 + 輕微上下
+            aura:     { row: 5, frames: [2],       interval: 600, bob: 'pose' },       // 鏡前：peak pose + 緩慢呼吸
           };
-          const anim = ATTR_ANIM[attr] || { row: 0, frames: [1], interval: 0 };
+          const anim = ATTR_ANIM[attr] || { row: 0, frames: [1], interval: 0, bob: null };
           el.style.width = (fw * scale) + 'px';
           el.style.height = (fh * scale) + 'px';
           el.style.backgroundImage = `url(${url})`;
           el.style.backgroundSize = `${fw * 3 * scale}px ${fh * 8 * scale}px`;
           el.style.backgroundRepeat = 'no-repeat';
           el.style.imageRendering = 'pixelated';
+          el.style.transition = 'transform 0.1s linear';
           let idx = 0;
           const setFrame = () => {
             const f = anim.frames[idx % anim.frames.length];
             el.style.backgroundPosition = `-${f * fw * scale}px -${anim.row * fh * scale}px`;
+            // bob 動作
+            if (anim.bob === 'jump') {
+              el.style.transform = `translateY(${idx % 2 === 0 ? '-4px' : '0'})`;
+            } else if (anim.bob === 'run') {
+              el.style.transform = `translateY(${idx % 2 === 0 ? '-1px' : '1px'})`;
+            } else if (anim.bob === 'shake') {
+              el.style.transform = `translateX(${idx % 2 === 0 ? '-2px' : '2px'})`;
+            } else if (anim.bob === 'lift') {
+              el.style.transform = `translateY(${idx % 2 === 0 ? '0' : '2px'}) scaleX(${idx % 2 === 0 ? '1.05' : '1'})`;
+            } else if (anim.bob === 'pose') {
+              el.style.transform = `scale(${idx % 2 === 0 ? '1.04' : '1'})`;
+            }
           };
           setFrame();
           if (anim.interval > 0 && anim.frames.length > 1) {
@@ -3554,6 +3568,10 @@
               idx++;
               setFrame();
             }, anim.interval);
+            _trainSpriteAnim.push(id);
+          } else if (anim.bob === 'pose') {
+            // 純呼吸（無 frame 切換）
+            const id = setInterval(() => { idx++; setFrame(); }, 800);
             _trainSpriteAnim.push(id);
           }
         }).catch(() => {});

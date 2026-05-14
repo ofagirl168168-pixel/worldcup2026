@@ -464,7 +464,7 @@
     return Math.max(5, Math.min(95, Math.round(50 + diff * 1.5)));
   }
 
-  function _runSim(overlay, ctx) {
+  async function _runSim(overlay, ctx) {
     const content = overlay.querySelector('#mt-match-content');
     content.innerHTML = `
       <div class="mt-match-sim">
@@ -475,6 +475,19 @@
       content.innerHTML = '<div style="color:#ef9a9a;padding:20px;text-align:center">⚠️ match-sim 未載入</div>';
       return;
     }
+    // 載入我方球員的 fever_gauge（跨場次保存）
+    const feverGauges = {};
+    if (window.DB && !ctx.isPvp) {
+      try {
+        const team = window.MyTeam.getCached();
+        const players = await window.MyTeam.fetchPlayers();
+        (players || []).forEach(p => {
+          if (p.card_id) feverGauges[p.card_id] = Number(p.fever_gauge || 0);
+        });
+      } catch (e) {}
+    }
+    // 追蹤本場每個球員的當前 gauge（在 match-sim 內每次達 100 觸發狂熱會 push 0 回來）
+    const liveGauges = { ...feverGauges };
     window.MatchSim.runDirect(
       content.querySelector('#mt-match-sim-host'),
       ctx.homeData,
@@ -483,10 +496,20 @@
         matchId: 'mt-' + Date.now(),
         seed: Date.now(),
         hideReplay: true,
+        feverGauges,
+        onFeverGaugeChange: (cardId, val) => { liveGauges[cardId] = val; },
         onEnd: async (score) => {
           // 結算
           try {
             const result = await _finalize(ctx.opponent, score.h, score.a, ctx.isBoss);
+            // 保存當前 fever gauges 到 DB（跨場次累積）
+            // 用 match-sim onEnd 回傳的 finalGauges（最終狀態）
+            const gaugesToSave = score.finalGauges || liveGauges;
+            if (window.DB && !ctx.isPvp && Object.keys(gaugesToSave).length) {
+              try {
+                await window.DB.rpc('update_fever_gauges', { p_gauges: gaugesToSave });
+              } catch (e) { console.warn('[my-team] save fever gauges failed', e); }
+            }
             await window.MyTeam.fetch();
             // 先播結果 splash 動畫、再展示 post-match 結算頁
             _playResultSplash(overlay, ctx, score, result.result, () => {

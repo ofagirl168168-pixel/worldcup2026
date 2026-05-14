@@ -1402,6 +1402,7 @@
       seed: state.room.seed,           // 房號當 seed → 所有人結果一致
       hideReplay: true,                // 朋友局不要「再跑一次」
       hideSpeed: true,                 // 強制 1x 同步（速度鍵會破壞「同時看到一樣畫面」的體驗）
+      disableTeamMechanics: true,      // 官方挑戰賽：關閉狂熱 + 體力影響（純球員 stats vs stats）
       matchId,
       onEnd: (score) => _onSimEnd(state, score),
     });
