@@ -5357,17 +5357,33 @@
 /* ═════════════════════════════════════════════════════════════
    📋 COACH TAB — 教練辦公室（黑板 + 教練站位）
    ═════════════════════════════════════════════════════════════ */
+/* AI 背景：3:4 portrait coach-bg.jpg */
 .mt-coach-office {
   position: relative;
-  padding: 8px 6px 100px;
-  min-height: 100%;
+  width: calc(100% + 40px);
+  margin: -16px -20px -40px;
+  padding: 0;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  background:
+    url('../img/my-team/coach-bg.jpg') 0 0 / 100% 100% no-repeat,
+    #2a1812;
+  min-height: 0;
 }
 .mt-coach-office-title {
+  position: absolute;
+  top: 1.5%; left: 50%; transform: translateX(-50%);
+  z-index: 4;
   text-align: center;
-  font-size: 14px; font-weight: 900;
-  color: #f0c040;
-  margin-bottom: 8px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  font-size: 13px; font-weight: 900;
+  color: #ffe680;
+  background: rgba(0,0,0,0.55);
+  border: 1.5px solid rgba(240,192,64,0.55);
+  border-radius: 999px;
+  padding: 3px 12px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+  white-space: nowrap;
+  display: none;  /* 圖內已有滿滿裝飾、頂部標題反而擋住、預設隱藏 */
 }
 .mt-coach-office-formation {
   display: inline-block;
@@ -5379,11 +5395,13 @@
   font-size: 11px;
 }
 
+/* 黑板：貼在 AI 圖中央米色牆面 */
 .mt-coach-blackboard {
-  position: relative;
-  width: 75%; max-width: 280px;
+  position: absolute;
+  top: 18%; left: 28%;
+  width: 44%;
   aspect-ratio: 240/180;
-  margin: 0 auto 6px;
+  z-index: 3;
   filter: drop-shadow(0 6px 14px rgba(0,0,0,0.55));
 }
 .mt-coach-blackboard-svg {
@@ -5393,10 +5411,10 @@
 .mt-coach-board-label {
   position: absolute;
   left: 0; right: 0;
-  bottom: 8px;
+  bottom: 6%;
   text-align: center;
   color: #f0c040;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
   text-shadow: 0 1px 2px rgba(0,0,0,0.7);
   font-family: 'Caveat','Comic Sans MS',cursive;
@@ -5404,35 +5422,43 @@
 .mt-coach-board-trait {
   position: absolute;
   left: 0; right: 0;
-  bottom: -18px;
+  bottom: -14px;
   text-align: center;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.85);
   font-size: 10px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
 }
 
-/* 教練站位列 */
+/* 教練站位列（兩排垂直、貼地毯左右）*/
 .mt-coach-line {
   position: absolute;
-  top: 40px;
-  width: 12%;
+  top: 53%;
+  bottom: 17%;       /* 留 17% 給底部桌子 + 按鈕區 */
+  width: 13%;
   display: flex; flex-direction: column;
-  gap: 6px;
-  padding: 0 4px;
+  gap: 3px;
+  padding: 2px;
+  z-index: 3;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
-.mt-coach-line-l { left: 0; }
-.mt-coach-line-r { right: 0; }
+.mt-coach-line::-webkit-scrollbar { width: 4px; }
+.mt-coach-line::-webkit-scrollbar-thumb { background: rgba(240,192,64,0.5); border-radius: 2px; }
+.mt-coach-line-l { left: 2%; }
+.mt-coach-line-r { right: 2%; }
 
 .mt-coach-slot {
-  background: rgba(0,0,0,0.35);
-  border: 2px solid rgba(255,255,255,0.15);
-  border-radius: 8px;
-  padding: 4px;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,255,255,0.18);
+  border-radius: 7px;
+  padding: 3px;
   width: 100%;
   cursor: pointer;
   position: relative;
   color: #fff;
   text-align: center;
   transition: transform 0.12s, border-color 0.15s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.55);
 }
 .mt-coach-slot:hover:not(.mt-coach-slot-ghost) {
   transform: scale(1.06);
@@ -5464,15 +5490,16 @@
   border-radius: 6px;
 }
 .mt-coach-slot-name {
-  font-size: 9px; font-weight: 800;
-  margin-top: 2px;
+  font-size: 8px; font-weight: 800;
+  margin-top: 1px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.2;
 }
 .mt-coach-slot-rarity {
-  position: absolute; top: 2px; left: 2px;
-  font-size: 8px; font-weight: 900;
-  padding: 0 3px; border-radius: 3px;
-  background: rgba(0,0,0,0.6); color: #fff;
+  position: absolute; top: 1px; left: 1px;
+  font-size: 7px; font-weight: 900;
+  padding: 0 2px; border-radius: 2px;
+  background: rgba(0,0,0,0.7); color: #fff;
 }
 .mt-coach-slot-rarity.rarity-SSR { background: #f0c040; color: #5a3010; }
 .mt-coach-slot-rarity.rarity-SR  { background: #9b87f5; color: #2a1850; }
@@ -5488,41 +5515,44 @@
 }
 
 .mt-coach-floor {
-  position: absolute;
-  left: 0; right: 0; bottom: 70px;
-  height: 30px;
-  background: linear-gradient(180deg, transparent 0%, rgba(120,70,30,0.3) 50%, rgba(80,50,20,0.5) 100%);
-  pointer-events: none;
+  display: none;  /* AI 圖已含木地板、不再用 CSS 疊一層 */
 }
 
+/* 按鈕區：半透明 panel 疊在桌子右側、靠右下角 */
 .mt-coach-actions {
   position: absolute;
-  bottom: 12px; left: 8px; right: 8px;
-  display: flex; gap: 8px; align-items: center;
-  background: linear-gradient(135deg, rgba(80,50,20,0.92), rgba(40,25,10,0.92));
-  border: 3px solid #f0c040;
-  border-radius: 12px;
-  padding: 10px;
+  bottom: 4%;
+  right: 4%;
+  width: 55%;
+  display: flex; gap: 6px; align-items: center;
+  background: linear-gradient(180deg, rgba(60,38,18,0.85), rgba(40,25,10,0.88));
+  backdrop-filter: blur(2px);
+  border: 2px solid rgba(240,192,64,0.7);
+  border-radius: 10px;
+  padding: 6px 8px;
   box-shadow:
-    0 6px 14px rgba(0,0,0,0.55),
-    0 0 12px rgba(240,192,64,0.35);
+    0 4px 12px rgba(0,0,0,0.6),
+    0 0 10px rgba(240,192,64,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  z-index: 4;
 }
 .mt-coach-draw-btn {
   flex: 1;
   background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
-  border: 2.5px solid #fff;
+  border: 2px solid #fff;
   color: #1a1a2e;
   font-weight: 900;
-  font-size: 13px;
-  padding: 12px 6px;
-  border-radius: 10px;
+  font-size: 11px;
+  padding: 7px 4px;
+  border-radius: 8px;
   cursor: pointer;
   text-shadow: 0 1px 1px rgba(255,255,255,0.4);
   box-shadow:
-    0 4px 10px rgba(240,192,64,0.5),
-    inset 0 2px 3px rgba(255,255,255,0.4);
+    0 3px 6px rgba(240,192,64,0.5),
+    inset 0 1px 2px rgba(255,255,255,0.4);
   transition: transform 0.12s, box-shadow 0.15s;
   animation: mt-draw-glow 2.4s ease-in-out infinite;
+  white-space: nowrap;
 }
 .mt-coach-draw-btn:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.04);
