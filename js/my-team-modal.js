@@ -3291,15 +3291,9 @@
       <div class="mt-train-gym">
         <div class="mt-train-gym-header">
           <span class="mt-train-gym-title">💪 訓練館</span>
-          <div class="mt-train-rp-chips">
-            <span title="戰術點">🧠 ${team.rp_tactical || 0}</span>
-            <span title="體能點">💪 ${team.rp_physical || 0}</span>
-            <span title="鬥志點">❤️ ${team.rp_heart || 0}</span>
-            <span title="靈感點">💡 ${team.rp_idea || 0}</span>
-          </div>
         </div>
 
-        <div class="mt-train-gym-hint">點機台選球員 · 球員會站在機台旁訓練 · 完成可直接領取</div>
+        <div class="mt-train-gym-hint">點機台選球員 → 站旁邊訓練 → 完成領取</div>
 
         <!-- 開羅式機台場景：6 個機台 + 球員 chibi -->
         <div class="mt-train-floor">
@@ -3342,6 +3336,46 @@
               </div>
             `;
           }).join('')}
+        </div>
+
+        <!-- 訓練點數面板（餵球員快速提升）-->
+        <div class="mt-train-points-panel">
+          <div class="mt-train-points-title">
+            <span class="mt-train-points-emoji">💎</span>
+            <span class="mt-train-points-title-text">餵給球員快速提升能力</span>
+          </div>
+          <div class="mt-train-points-desc">在選人時用「⚡ 集訓升等 / ⭐ 精英特訓」消耗下面點數、立刻升 1 級並大量加屬性（比慢慢練快很多）</div>
+          <div class="mt-train-points-grid">
+            <div class="mt-train-point-card mt-train-point-tactical">
+              <div class="mt-train-point-icon">🧠</div>
+              <div class="mt-train-point-info">
+                <div class="mt-train-point-name">戰術</div>
+                <div class="mt-train-point-amount">${team.rp_tactical || 0}</div>
+              </div>
+            </div>
+            <div class="mt-train-point-card mt-train-point-physical">
+              <div class="mt-train-point-icon">💪</div>
+              <div class="mt-train-point-info">
+                <div class="mt-train-point-name">體能</div>
+                <div class="mt-train-point-amount">${team.rp_physical || 0}</div>
+              </div>
+            </div>
+            <div class="mt-train-point-card mt-train-point-heart">
+              <div class="mt-train-point-icon">❤️</div>
+              <div class="mt-train-point-info">
+                <div class="mt-train-point-name">鬥志</div>
+                <div class="mt-train-point-amount">${team.rp_heart || 0}</div>
+              </div>
+            </div>
+            <div class="mt-train-point-card mt-train-point-idea">
+              <div class="mt-train-point-icon">💡</div>
+              <div class="mt-train-point-info">
+                <div class="mt-train-point-name">靈感</div>
+                <div class="mt-train-point-amount">${team.rp_idea || 0}</div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-train-points-source">📥 來源：比賽勝利、看比賽解讀文、任務獎勵</div>
         </div>
       </div>
     `;
@@ -3402,33 +3436,11 @@
     const ATTR_LABELS = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
     const overlay = document.createElement('div');
     overlay.className = 'mt-profile-overlay mt-train-picker';
-    const rpBadges = `
-      <span class="mt-train-rp-pill" title="戰術點">🧠 ${team.rp_tactical || 0}</span>
-      <span class="mt-train-rp-pill" title="體能點">💪 ${team.rp_physical || 0}</span>
-      <span class="mt-train-rp-pill" title="鬥志點">❤️ ${team.rp_heart || 0}</span>
-      <span class="mt-train-rp-pill" title="靈感點">💡 ${team.rp_idea || 0}</span>
-    `;
     overlay.innerHTML = `
-      <div class="mt-profile-card">
+      <div class="mt-profile-card mt-train-picker-card">
         <button class="mt-modal-close mt-profile-close" type="button">×</button>
         <div class="mt-train-picker-title">🏋️ ${ATTR_LABELS[attr]} 訓練站</div>
-        <div class="mt-train-picker-rp">
-          <span class="mt-train-rp-label">你的點數：</span>${rpBadges}
-        </div>
-        <div class="mt-train-picker-help">
-          <div class="mt-train-help-row">
-            <span class="mt-train-help-tag">⏱️ 慢慢練</span>
-            <span class="mt-train-help-desc">免費 → 等時間到拿 <b>${ATTR_LABELS[attr]} +1</b></span>
-          </div>
-          <div class="mt-train-help-row">
-            <span class="mt-train-help-tag mt-train-help-tag-rp">⚡ 集訓升等</span>
-            <span class="mt-train-help-desc">耗點數 → <b>立刻升 1 級 + 6 屬性各 +1~3</b></span>
-          </div>
-          <div class="mt-train-help-row">
-            <span class="mt-train-help-tag mt-train-help-tag-premium">⭐ 精英特訓</span>
-            <span class="mt-train-help-desc">耗更多點數 → <b>升 1 級 + 6 屬性各 +2~5</b></span>
-          </div>
-        </div>
+        <div class="mt-train-picker-sub">選一位球員拉上機台</div>
         <div class="mt-train-picker-list" id="mt-train-picker-list"></div>
       </div>
     `;
@@ -3466,18 +3478,20 @@
       row.className = `mt-train-pick-row rarity-${c.rarity || 'R'}`;
       const imgId = `train-pick-${p.id}`;
       row.innerHTML = `
-        <div class="mt-train-pick-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
-        <div class="mt-train-pick-info">
-          <div class="mt-train-pick-name">${escapeHtml(c.name)} <small>${c.position || ''} Lv.${p.level}</small></div>
-          <div class="mt-train-pick-attr">當前 ${ATTR_LABELS[attr]}：<b>${p['current_' + attr]}</b> / 99</div>
+        <div class="mt-train-pick-head">
+          <div class="mt-train-pick-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
+          <div class="mt-train-pick-info">
+            <div class="mt-train-pick-name">${escapeHtml(c.name)} <small>${c.position || ''} · Lv.${p.level}</small></div>
+            <div class="mt-train-pick-attr">${ATTR_LABELS[attr]} <b>${p['current_' + attr]}</b> / 99</div>
+          </div>
         </div>
         <div class="mt-train-pick-btns">
           ${isTraining ? `
-            <span class="mt-train-pick-busy">${isReady ? '⏱️ 已完成' : '⏱️ 訓練中'}</span>
+            <div class="mt-train-pick-busy">${isReady ? '⏱️ 訓練已完成（回主畫面領取）' : '⏱️ 此球員訓練中'}</div>
           ` : `
             <button class="mt-train-pick-btn mt-train-pick-timed" data-pid="${p.id}">
               <div class="mt-train-btn-title">⏱️ 慢慢練</div>
-              <div class="mt-train-btn-sub">等 ${estLabel} → +1 ${ATTR_LABELS[attr][0]}</div>
+              <div class="mt-train-btn-sub">等 ${estLabel} → +1</div>
             </button>
             <button class="mt-train-pick-btn mt-train-pick-rp" data-pid="${p.id}" data-mode="normal" ${canNormal ? '' : 'disabled'} title="${missNormal}">
               <div class="mt-train-btn-title">⚡ 集訓升等</div>

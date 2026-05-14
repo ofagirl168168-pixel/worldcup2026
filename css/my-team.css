@@ -6410,6 +6410,87 @@
   padding: 14px 0 4px;
 }
 
+/* 訓練點數面板（地板下方）*/
+.mt-train-points-panel {
+  margin-top: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.25) 100%);
+  border: 2px solid rgba(240,192,64,0.4);
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+}
+.mt-train-points-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 900;
+  color: #f0c040;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  margin-bottom: 3px;
+}
+.mt-train-points-emoji { font-size: 16px; }
+.mt-train-points-desc {
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.mt-train-points-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.mt-train-point-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.32);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 6px 10px;
+  transition: transform 0.12s;
+}
+.mt-train-point-icon {
+  font-size: 22px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.mt-train-point-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.mt-train-point-name {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+.mt-train-point-amount {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  letter-spacing: 1px;
+}
+.mt-train-point-tactical { border-color: rgba(120,180,255,0.45); }
+.mt-train-point-tactical .mt-train-point-amount { color: #90caf9; }
+.mt-train-point-physical { border-color: rgba(102,187,106,0.45); }
+.mt-train-point-physical .mt-train-point-amount { color: #a5d6a7; }
+.mt-train-point-heart    { border-color: rgba(236,64,122,0.45); }
+.mt-train-point-heart    .mt-train-point-amount { color: #f48fb1; }
+.mt-train-point-idea     { border-color: rgba(255,213,74,0.45); }
+.mt-train-point-idea     .mt-train-point-amount { color: #ffe680; }
+.mt-train-points-source {
+  margin-top: 8px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.5px;
+}
+
 /* 訓練機台選人彈窗 */
 .mt-train-picker .mt-profile-card { max-width: 420px; }
 .mt-train-picker-title { font-size: 16px; font-weight: 900; color: #f0c040; margin-bottom: 4px; }
@@ -6510,38 +6591,117 @@
   display: flex; flex-direction: column; gap: 6px;
   max-height: 60vh; overflow-y: auto;
 }
+/* 選人 popup：球員 row 改成上下兩層（header + 按鈕一排）→ 不會跑版 */
+.mt-train-picker-card { max-width: 480px; }
 .mt-train-pick-row {
-  display: flex; align-items: center; gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   background: rgba(255,255,255,0.04);
   border: 2px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  padding: 6px;
+  border-radius: 10px;
+  padding: 8px 10px;
   color: #fff;
 }
 .mt-train-pick-row.rarity-SSR { border-color: #f0c040; }
 .mt-train-pick-row.rarity-SR  { border-color: #9b87f5; }
-.mt-train-pick-portrait { width: 36px; height: 44px; flex-shrink: 0; }
-.mt-train-pick-portrait img { width: 100%; height: 100%; image-rendering: pixelated; }
-.mt-train-pick-info { flex: 1; min-width: 0; }
-.mt-train-pick-name { font-size: 12px; font-weight: 800; }
-.mt-train-pick-name small { opacity: 0.7; font-weight: 600; }
-.mt-train-pick-attr { font-size: 11px; opacity: 0.85; margin-top: 2px; }
-.mt-train-pick-attr b { color: #ffe680; }
-.mt-train-pick-btns { display: flex; gap: 4px; flex-shrink: 0; }
-.mt-train-pick-btn {
-  background: linear-gradient(135deg, #43a047 0%, #1f6024 100%);
-  border: 1.5px solid #1a4d1f;
-  color: #fff; font-size: 10px; font-weight: 800;
-  padding: 4px 8px; border-radius: 6px;
-  cursor: pointer; text-align: center;
+.mt-train-pick-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.mt-train-pick-btn small { font-size: 9px; opacity: 0.85; font-weight: 600; }
-.mt-train-pick-rp { background: linear-gradient(135deg, #f0c040 0%, #c08030 100%); border-color: #5a3010; color: #2a1505; }
-.mt-train-pick-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
+.mt-train-pick-portrait {
+  width: 42px;
+  height: 50px;
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.25);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mt-train-pick-portrait img {
+  width: 100%; height: 100%;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+.mt-train-pick-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mt-train-pick-name {
+  font-size: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.5px;
+}
+.mt-train-pick-name small {
+  opacity: 0.7;
+  font-weight: 600;
+  font-size: 11px;
+  margin-left: 4px;
+}
+.mt-train-pick-attr {
+  font-size: 12px;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+.mt-train-pick-attr b {
+  color: #ffe680;
+  font-size: 13px;
+  margin: 0 2px;
+}
+.mt-train-pick-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+.mt-train-pick-btn {
+  background: linear-gradient(180deg, #43a047 0%, #1f6024 100%);
+  border: 1.5px solid #1a4d1f;
+  color: #fff;
+  padding: 6px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  min-height: 42px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: transform 0.12s;
+}
+.mt-train-pick-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.mt-train-pick-rp {
+  background: linear-gradient(180deg, #42a5f5 0%, #1565c0 100%);
+  border-color: #0d47a1;
+  color: #fff;
+}
+.mt-train-btn-premium {
+  background: linear-gradient(180deg, #ffe680 0%, #c08030 100%) !important;
+  border-color: #5a3010 !important;
+  color: #2a1505 !important;
+}
+.mt-train-pick-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+}
 .mt-train-pick-busy {
-  font-size: 11px; opacity: 0.7;
-  padding: 4px 8px;
-  color: #f0c040;
+  font-size: 12px;
+  text-align: center;
+  padding: 8px;
+  color: #ffe680;
+  background: rgba(240,192,64,0.12);
+  border-radius: 8px;
+  font-weight: 800;
 }
 
 /* Coach tab + Match tab + Train tab：移除背景 SVG（場景由內部 DOM 渲染） */
