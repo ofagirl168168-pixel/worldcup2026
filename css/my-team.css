@@ -829,7 +829,11 @@
 }
 .mt-player-card.rarity-SSR .mt-player-card-rarity { background: #f0c040; color: #1a1a2e; }
 .mt-player-card.rarity-SR .mt-player-card-rarity { background: #9b87f5; color: #fff; }
-.mt-player-card.rarity-R .mt-player-card-rarity { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+.mt-player-card.rarity-R .mt-player-card-rarity { background: #43a047; color: #fff; }
+.mt-player-card.rarity-N .mt-player-card-rarity { background: rgba(120,128,140,0.7); color: rgba(255,255,255,0.85); }
+/* N 級球員的整體配色（板凳/場上）— 灰系、不發光 */
+.mt-bench-player.rarity-N { border-color: rgba(120,128,140,0.5); }
+.mt-pitch-player.rarity-N .mt-pitch-player-portrait { filter: none; }
 
 .mt-player-name {
   font-size: 13px;

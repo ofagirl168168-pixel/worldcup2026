@@ -2481,8 +2481,8 @@
           <div class="mt-gshop-chalk-line">10 連 ─ 🎟️ 10</div>
           <div class="mt-gshop-chalk-line">寶石 ── 💎 50</div>
           <div class="mt-gshop-chalk-divider"></div>
-          <div class="mt-gshop-chalk-rate">R 75% · SR 20%</div>
-          <div class="mt-gshop-chalk-rate">SSR 5% · 30 保底</div>
+          <div class="mt-gshop-chalk-rate">N 50% · R 30%</div>
+          <div class="mt-gshop-chalk-rate">SR 15% · SSR 5% · 30 保底</div>
         </div>
 
         <!-- 收銀台木櫃 + 帳本 + 電腦 -->
