@@ -1709,7 +1709,9 @@
 .mt-gacha-stage > .mt-gacha-banner {
   position: absolute;
   top: 16px; left: 50%; transform: translateX(-50%);
-  max-width: 360px;
+  width: max-content;            /* 避免被擠成 1 字寬導致中文直書 */
+  max-width: 90vw;
+  white-space: nowrap;
   margin: 0 !important;
 }
 .mt-gacha-stage > .mt-gacha-cards-wrap {
@@ -1723,10 +1725,17 @@
 .mt-gacha-stage > .mt-gacha-rarity-hint {
   position: absolute;
   top: calc(50% + 220px); left: 50%; transform: translateX(-50%);
+  white-space: nowrap;
 }
 .mt-gacha-stage > .mt-gacha-actions {
   position: absolute;
   bottom: 30px; left: 50%; transform: translateX(-50%);
+  width: max-content;            /* 同樣避免直書 */
+  max-width: 90vw;
+  white-space: nowrap;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
 }
 
 .mt-gacha-skip {
@@ -1811,32 +1820,27 @@
   to   { opacity: 1; transform: translateY(0) scale(1) rotateZ(0deg); }
 }
 
-/* 從卡包飛出：用 .mt-card-pending 起始態 + transition 過渡到最終位置
-   起始：超小 + 從下方 200px 飛出（強烈視覺、看得到「從卡包噴出」感）
-   結束：每張卡的 stack-idx 位置（看得出是一疊）*/
+/* 從卡包飛出：起始 = 卡包中心位置（卡片極小）→ 漸放大到最終位置
+   配合 JS 卡包不立即消失、看得到「卡片從卡包噴出來」*/
 .mt-gacha-card3d.mt-card-pending {
   opacity: 0;
-  transform: translateY(200px) scale(0.05) rotateZ(0deg) !important;
+  transform: scale(0.08) rotateZ(0deg) !important;   /* 從原位 scale 起、不平移 */
 }
 .mt-cards-fly-out .mt-gacha-card3d {
   transition: opacity 0.5s ease-out,
-              transform 0.75s cubic-bezier(0.34, 1.56, 0.64, 1);
+              transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
 }
 
-/* ─── 多抽 stack 模式：10 張疊一疊、只有最上面可點翻 ─── */
+/* ─── 多抽 stack 模式：10 張疊一疊、只有最上面可點翻
+   stack 模式不縮小、卡片跟 1 抽一樣大 200x300、看得清角色 portrait */
 .mt-gacha-cards[data-mode="stack"] {
   position: relative;
   width: 200px;
   height: 300px;
 }
-.mt-gacha-cards[data-mode="stack"][data-count="4"],
-.mt-gacha-cards[data-mode="stack"][data-count="5"],
-.mt-gacha-cards[data-mode="stack"][data-count="6"] { width: 150px; height: 225px; }
-.mt-gacha-cards[data-mode="stack"][data-count="7"],
-.mt-gacha-cards[data-mode="stack"][data-count="8"],
-.mt-gacha-cards[data-mode="stack"][data-count="9"],
-.mt-gacha-cards[data-mode="stack"][data-count="10"] { width: 160px; height: 240px; }
+/* stack 模式覆蓋舊的 auto-resize 規則（讓 7~10 連也用 200x300）*/
+.mt-gacha-cards[data-mode="stack"] .mt-gacha-card3d { width: 200px !important; height: 300px !important; }
 
 .mt-gacha-cards[data-mode="stack"] .mt-gacha-card3d {
   position: absolute;
@@ -1862,6 +1866,41 @@
 @keyframes mt-card-slid-off {
   0%   { opacity: 1; }
   100% { opacity: 0; transform: translate(140%, -40%) rotateZ(20deg) scale(0.85); }
+}
+
+/* 全部翻完 → 切到 grid layout 展示所有卡 */
+.mt-gacha-cards.all-revealed {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  max-width: min(90vw, 720px);
+  /* 取消 cards-wrap fixed 中央定位的限制 */
+}
+/* cards-wrap 在 all-revealed 模式下放大 */
+.mt-gacha-cards-wrap:has(.mt-gacha-cards.all-revealed) {
+  width: min(90vw, 720px);
+  height: auto;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.mt-gacha-cards.all-revealed .mt-gacha-card3d {
+  position: relative !important;
+  top: auto !important; left: auto !important;
+  transform: none !important;
+  width: 130px !important;
+  height: 195px !important;
+  animation: none !important;
+  opacity: 1 !important;
+  margin: 0;
+  cursor: default;
+  transition: transform 0.3s;
+}
+.mt-gacha-cards.all-revealed .mt-gacha-card3d:hover {
+  transform: translateY(-4px) !important;
 }
 
 /* 底部「一鍵翻全部」按鈕 */

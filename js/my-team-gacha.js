@@ -454,12 +454,19 @@
             const rect = pack3D.getBoundingClientRect();
             emitSpark(rect.width / 2, rect.height / 2);
           }
+          // 卡包保留可見（撕完只剩下半 + perforation 淡出）→ 立刻顯示 stage
+          // 卡片從卡包位置飛出後，再淡出卡包
           setTimeout(() => {
-            pack.style.display = 'none';
             beam.hidden = false;
             stage.hidden = false;
             startStage1();
-          }, 900);
+            // 卡片飛出後 1.3 秒淡出卡包（給玩家看到從卡包噴出的感覺）
+            setTimeout(() => {
+              pack.style.transition = 'opacity 0.7s ease-out';
+              pack.style.opacity = '0';
+              setTimeout(() => { pack.style.display = 'none'; }, 800);
+            }, 1300);
+          }, 700);
         } else {
           // 撕力不夠、snap back
           setProgress(0);
@@ -571,8 +578,24 @@
         stackTopIdx++;
         if (stackTopIdx >= cards.length) {
           allRevealed = true;
-          setTimeout(showCTAs, 400);
+          setTimeout(showAllRevealedGrid, 500);
         }
+      }
+
+      // 全部翻完 → 把所有卡片排成 grid 展示（取代 stack 模式）
+      function showAllRevealedGrid() {
+        const cardsEl = overlay.querySelector('#mt-gacha-cards');
+        // 移除 slid-off 把飛走的拉回來、加 .all-revealed 切到 grid layout
+        cardsEl.querySelectorAll('.mt-gacha-card3d').forEach(el => {
+          el.classList.remove('slid-off');
+          // 確保每張都是翻過的
+          if (!el.classList.contains('flipped')) {
+            el.classList.add('flipped');
+          }
+        });
+        cardsEl.classList.add('all-revealed');
+        // 等 grid 重排動畫過完再開 CTA
+        setTimeout(showCTAs, 600);
       }
 
       function showCTAs() {
@@ -610,14 +633,18 @@
             _emitParticles(cardEl, c.rarity, instant);
             if (!instant) _animateCounts(cardEl, c);
           }
-          // 多抽：每張間隔 100ms 連翻
+          // 多抽：每張間隔連翻
           await _sleep(instant ? 0 : (c.rarity === 'SSR' ? 250 : 100));
         }
-        // 全部展開後一起淡淡展示，不再 slide-off
         stackTopIdx = cards.length;
         allRevealed = true;
-        await _sleep(instant ? 0 : 400);
-        showCTAs();
+        await _sleep(instant ? 0 : 300);
+        // 多抽 → 展示所有卡 grid；1 抽 → 直接 CTA
+        if (cards.length > 1) {
+          showAllRevealedGrid();
+        } else {
+          showCTAs();
+        }
       }
 
       // 按鈕：用 delegation
