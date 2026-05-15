@@ -24,13 +24,26 @@
     fab.className = 'mt-fab';
     fab.type = 'button';
     fab.setAttribute('aria-label', '開啟我的球隊');
-    // body 是 display:flex column，FAB 必須 position:fixed 才能脫離 flex 流（否則被拉成全寬）
-    // 萬一 .mt-fab CSS 沒套到（cache / load order / 被覆蓋）也至少 inline 守住關鍵定位
-    fab.style.cssText = 'position:fixed;right:16px;bottom:80px;width:64px;height:76px;z-index:9000;';
+    // body 是 display:flex column → FAB 必須 position:fixed 才能脫離 flex 流
+    // 不依賴 .mt-fab CSS rule（怕 cache/load order/被覆蓋），inline 守住完整外觀
+    fab.style.cssText = [
+      'position:fixed','right:16px','bottom:80px',
+      'width:64px','height:76px','z-index:9000',
+      'display:flex','flex-direction:column','align-items:center','justify-content:flex-start',
+      'padding:6px 4px 4px','gap:1px','box-sizing:border-box',
+      'background:linear-gradient(180deg,#f0c040 0%,#e07020 100%)',
+      'border:2.5px solid rgba(255,255,255,0.45)','border-radius:16px',
+      'cursor:pointer','overflow:visible',
+      'box-shadow:0 6px 18px rgba(240,192,64,0.45),0 3px 10px rgba(0,0,0,0.35)',
+      'font-family:inherit'
+    ].join(';');
     fab.innerHTML = `
-      <span class="mt-fab-crest" id="mt-fab-crest">⚽</span>
-      <span class="mt-fab-label">我的隊伍</span>
-      <span class="mt-fab-badge" id="mt-fab-badge" hidden>0</span>
+      <span class="mt-fab-crest" id="mt-fab-crest"
+        style="pointer-events:none;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;font-size:26px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));">⚽</span>
+      <span class="mt-fab-label"
+        style="pointer-events:none;font-size:11px;font-weight:900;color:#2a1505;letter-spacing:1px;line-height:1.1;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,0.55);">我的隊伍</span>
+      <span class="mt-fab-badge" id="mt-fab-badge" hidden
+        style="position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#ff3030;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #1a1a2e;pointer-events:none;">0</span>
     `;
     fab.addEventListener('click', onClick);
     document.body.appendChild(fab);
@@ -86,6 +99,8 @@
       window.openMyTeamModal();
     } else {
       console.error('[my-team-fab] openMyTeamModal not loaded');
+      if (typeof showToast === 'function') showToast('⚠️ 我的球隊載入失敗，請重整頁面');
+      else alert('我的球隊載入失敗，請重整頁面');
     }
   }
 
