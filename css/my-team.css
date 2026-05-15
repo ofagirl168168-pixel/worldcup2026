@@ -1705,13 +1705,14 @@
   text-align: center;
   z-index: 5;
   pointer-events: none;
-  /* grid 4 rows：banner / cards-wrap / rarity-hint / actions */
   display: grid;
   grid-template-rows: auto 1fr auto auto;
-  justify-items: center;    /* 所有 children 水平置中（不受 animation transform 影響）*/
+  justify-items: center;
   align-items: center;
   gap: 16px;
 }
+/* 重要：grid display 會蓋掉 [hidden] 的 display:none、要顯式還原 */
+.mt-gacha-stage[hidden] { display: none !important; }
 .mt-gacha-stage > * { pointer-events: auto; }
 .mt-gacha-stage > .mt-gacha-banner {
   grid-row: 1;
@@ -1725,9 +1726,13 @@
   opacity: 1 !important;
   transform: none !important;
 }
+/* cards-wrap 跳出 grid 用絕對視窗中央 — 跟卡包同位置才看得到「從卡包飛出」 */
 .mt-gacha-stage > .mt-gacha-cards-wrap {
-  grid-row: 2;
-  align-self: center;   /* 垂直置中於 1fr 區段 */
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  grid-row: unset;
   padding: 0;
   max-height: none;
 }
