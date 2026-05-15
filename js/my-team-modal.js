@@ -1321,41 +1321,120 @@
       stamina: (counts.physio || 0) + (counts.gegen_press || 0),
       youth:   counts.youth_developer || 0,
     };
-    if (fam.tactic >= 3)  return { label: '🧠 戰術三人組', effect: '中場 +15%' };
-    if (fam.defense >= 3) return { label: '🛡️ 鋼鐵防線', effect: '防守 +15%' };
-    if (fam.attack >= 3)  return { label: '⚔️ 攻擊三叉戟', effect: '攻擊 +15%' };
-    if (fam.speed >= 3)   return { label: '⚡ 衝刺軍團', effect: '速度 +12%' };
-    if (fam.stamina >= 3) return { label: '❤️ 體能訓練營', effect: '體力 +20%' };
-    if (fam.youth >= 3)   return { label: '👶 青訓計畫', effect: '訓練 RP 效率 +50%' };
+    if (fam.tactic >= 3)  return { label: '🧠 戰術三人組', effect: '中場 +15%', buff: { midfield: 0.15 } };
+    if (fam.defense >= 3) return { label: '🛡️ 鋼鐵防線', effect: '防守 +15%', buff: { defense: 0.15 } };
+    if (fam.attack >= 3)  return { label: '⚔️ 攻擊三叉戟', effect: '攻擊 +15%', buff: { attack: 0.15 } };
+    if (fam.speed >= 3)   return { label: '⚡ 衝刺軍團', effect: '速度 +12%', buff: { speed: 0.12 } };
+    if (fam.stamina >= 3) return { label: '❤️ 體能訓練營', effect: '體力 +20%', buff: { stamina: 0.20 } };
+    if (fam.youth >= 3)   return { label: '👶 青訓計畫', effect: '訓練 RP 效率 +50%', buff: null };
     if (rarities.filter(r => r === 'SSR').length >= 3) {
-      return { label: '⭐ SSR 全明星', effect: '全屬性 +5%' };
+      return { label: '⭐ SSR 全明星', effect: '全屬性 +5%',
+        buff: { attack: 0.05, defense: 0.05, speed: 0.05, midfield: 0.05, stamina: 0.05, aura: 0.05 } };
     }
-    return { label: null, effect: null };
+    return { label: null, effect: null, buff: null };
+  }
+
+  // ── helper：把 trait_value/trait 轉成 { 屬性: 比例 } map（給合計用）──
+  function _coachBuffMap(coach) {
+    if (!coach || !coach.trait) return null;
+    const t = coach.trait;
+    const v = coach.trait_value;
+    if (v && v.attr) return { [v.attr]: v.pct || 0 };
+    const MAP = {
+      tactician:        { midfield: 0.08 },
+      offensive_master: { attack: 0.10 },
+      defensive_master: { defense: 0.08 },
+      speed_coach:      { speed: 0.08 },
+      tiki_taka:        { attack: 0.10, midfield: 0.08 },
+      iron_wall:        { defense: 0.08 },
+      gegen_press:      { speed: 0.05, stamina: 0.10 },
+      physio:           { stamina: 0.10 },
+    };
+    return MAP[t] || null;
+  }
+
+  // ── helper：合計 buff（主 100% + 2 助教 50% + 羈絆）──
+  function _computeCombinedBuff(head, a1, a2, synergy) {
+    const combined = {};
+    const merge = (src, w) => {
+      if (!src) return;
+      Object.keys(src).forEach(k => {
+        combined[k] = (combined[k] || 0) + (src[k] || 0) * w;
+      });
+    };
+    merge(_coachBuffMap(head?.coach), 1.0);
+    merge(_coachBuffMap(a1?.coach), 0.5);
+    merge(_coachBuffMap(a2?.coach), 0.5);
+    // 羈絆額外 buff
+    if (synergy && synergy.buff) merge(synergy.buff, 1.0);
+    return combined;
+  }
+
+  // ── helper：合計 buff 顯示 HTML ──
+  function _renderCombinedBuffHtml(buff) {
+    if (!buff || Object.keys(buff).length === 0) {
+      return '<div class="mt-coach-total-buff mt-coach-total-buff-empty">尚未指派任何教練 — 沒有加成</div>';
+    }
+    const ATTR_LBL = {
+      attack: '攻擊', defense: '防守', speed: '速度',
+      midfield: '中場', stamina: '體力', aura: '氣場',
+    };
+    const ORDER = ['attack','defense','speed','midfield','stamina','aura'];
+    const pills = ORDER
+      .filter(k => buff[k] && buff[k] > 0)
+      .map(k => `<span class="mt-coach-buff-pill">${ATTR_LBL[k]} +${Math.round(buff[k] * 100)}%</span>`)
+      .join('');
+    return `
+      <div class="mt-coach-total-buff">
+        <span class="mt-coach-total-buff-label">🎯 合計加成</span>
+        <div class="mt-coach-total-buff-pills">${pills || '<span class="mt-coach-buff-empty">無</span>'}</div>
+      </div>
+    `;
+  }
+
+  // ── helper：取得教練的陣型（SSR/SR 用 unlocks_formation、R 用 preferred_formation）──
+  function _coachFormation(coach) {
+    if (!coach || !coach.trait_value) return null;
+    return coach.trait_value.unlocks_formation || coach.trait_value.preferred_formation || null;
+  }
+
+  // ── helper：簡短主流 trait 文字（主教練卡用、含 trait 描述）──
+  function _coachDesc(coach) {
+    if (!coach) return '';
+    return coach.trait_value?.description || _traitLabel(coach.trait, coach.trait_value) || '';
   }
 
   // ── helper：渲染教練 slot HTML（用於主教練大格 + 助教小格）──
   function _renderCoachSlotHTML(uc, role, isHead) {
     const c = uc.coach || {};
-    const badge = role === 'head' ? '👑' : role === 'assist1' ? '①' : role === 'assist2' ? '②' : '';
+    const badge = role === 'head' ? '👑 主教練' : role === 'assist1' ? '① 助教' : role === 'assist2' ? '② 助教' : '';
     const imgId = `coach-portrait-${uc.id.slice(0,8)}`;
+    const formation = _coachFormation(c);
     if (isHead) {
       return `
         <button class="mt-coach-team-slot mt-coach-team-head-slot rarity-${c.rarity || 'R'} role-head" data-ucid="${uc.id}">
-          <span class="mt-coach-active-crown">${badge}</span>
+          <span class="mt-coach-head-role-badge">${badge}</span>
           <div class="mt-coach-team-head-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
           <div class="mt-coach-team-head-info">
-            <div class="mt-coach-team-head-name">${escapeHtml(c.name || '?')}</div>
-            <div class="mt-coach-team-head-trait">${escapeHtml(_traitLabel(c.trait, c.trait_value))}</div>
-            <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
+            <div class="mt-coach-team-head-name-row">
+              <span class="mt-coach-team-head-name">${escapeHtml(c.name || '?')}</span>
+              <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
+            </div>
+            ${c.nickname ? `<div class="mt-coach-team-head-nickname">${escapeHtml(c.nickname)}</div>` : ''}
+            <div class="mt-coach-team-head-trait">⚡ ${escapeHtml(_traitShortLabel(c.trait, c.trait_value))}</div>
+            ${formation ? `<div class="mt-coach-team-head-formation">📋 推薦陣型 <b>${formation}</b></div>` : ''}
           </div>
         </button>
       `;
     }
+    // 助教小卡：portrait + name + 簡短 buff（50% trait）
+    const assistBuff = _traitShortLabel(c.trait, c.trait_value, 0.5);
     return `
       <button class="mt-coach-team-slot mt-coach-slot rarity-${c.rarity || 'R'} active role-${role}" data-ucid="${uc.id}">
-        <span class="mt-coach-active-crown">${badge}</span>
+        <span class="mt-coach-active-crown">${role === 'assist1' ? '①' : '②'}</span>
         <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
         <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
+        <div class="mt-coach-slot-trait">${escapeHtml(assistBuff)}</div>
         <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
       </button>
     `;
@@ -1524,6 +1603,9 @@
     const SLOTS = 8;
     // 計算羈絆（同步顯示）
     const synergy = _computeSynergy([active, assist1, assist2].filter(Boolean));
+    // 計算合計加成（主 100% + 助教 50% × 2 + 羈絆 buff）
+    const combinedBuff = _computeCombinedBuff(active, assist1, assist2, synergy);
+    const combinedHtml = _renderCombinedBuffHtml(combinedBuff);
 
     content.innerHTML = `
       <div class="mt-coach-office">
@@ -1546,7 +1628,7 @@
             <path d="M 60 110 Q 90 90 120 100" stroke="#f0c040" fill="none" stroke-width="1.5" stroke-dasharray="2,2"/>
             <path d="M 150 80 Q 180 60 200 70" stroke="#f0c040" fill="none" stroke-width="1.5" stroke-dasharray="2,2"/>
           </svg>
-          <div class="mt-coach-board-label">${escapeHtml(active?.coach?.name || '尚未指派主教練')}</div>
+          <div class="mt-coach-board-label">主教練：${escapeHtml(active?.coach?.name || '尚未指派')}</div>
           ${active ? `<div class="mt-coach-board-trait">${escapeHtml(_traitLabel(active.coach?.trait, active.coach?.trait_value))}</div>` : ''}
         </div>
 
@@ -1579,6 +1661,7 @@
           </div>
         </div>
 
+        ${combinedHtml}
         ${synergy.label ? `<div class="mt-coach-synergy mt-coach-synergy-on">🔗 ${synergy.label} · ${synergy.effect}</div>`
                         : '<div class="mt-coach-synergy mt-coach-synergy-off">3 教練齊上 → 觸發羈絆（戰術 / 防線 / 攻擊 / SSR 全明星）</div>'}
 
@@ -1748,29 +1831,34 @@
     });
   }
 
-  // 簡短 trait 標籤（給小卡用、像 「攻 +10%」）
-  function _traitShortLabel(trait, value) {
+  // 簡短 trait 標籤（給小卡用、像 「攻 +10%」；weight = 0.5 = 助教 50% buff）
+  function _traitShortLabel(trait, value, weight) {
     if (!trait) return '';
-    // 屬性 + 數值
+    weight = weight === undefined ? 1 : weight;
     const ATTR_SHORT = { attack:'攻', defense:'防', speed:'速', midfield:'中', stamina:'體', aura:'氣' };
+    // 屬性 + 數值（含 _N 系列、如 attack_3 → attr/pct）
     if (value && value.attr) {
-      return `${ATTR_SHORT[value.attr] || value.attr} +${Math.round(value.pct * 100)}%`;
+      return `${ATTR_SHORT[value.attr] || value.attr} +${Math.round(value.pct * 100 * weight)}%`;
     }
-    // 主流 trait 對應顯示
-    const MAP = {
-      tactician:        '中 +8%',
-      offensive_master: '攻 +10%',
-      defensive_master: '防 +8%',
-      speed_coach:      '速 +8%',
-      tiki_taka:        '攻+10% 中+8%',
-      iron_wall:        '防 +8%',
-      gegen_press:      '速+5% 體+10%',
-      physio:           '體 +10%',
-      youth_developer:  '訓練 RP +25%',
-      champion_mentality:'抗翻盤 +30%',
-      veteran_handler:  '老將 +10%',
+    // 主流 trait 數據（× weight）
+    const STATS = {
+      tactician:        [{ k: '中', v: 0.08 }],
+      offensive_master: [{ k: '攻', v: 0.10 }],
+      defensive_master: [{ k: '防', v: 0.08 }],
+      speed_coach:      [{ k: '速', v: 0.08 }],
+      tiki_taka:        [{ k: '攻', v: 0.10 }, { k: '中', v: 0.08 }],
+      iron_wall:        [{ k: '防', v: 0.08 }],
+      gegen_press:      [{ k: '速', v: 0.05 }, { k: '體', v: 0.10 }],
+      physio:           [{ k: '體', v: 0.10 }],
+      youth_developer:  [{ k: '訓練 RP', v: 0.25 }],
+      champion_mentality:[{ k: '抗翻盤', v: 0.30 }],
+      veteran_handler:  [{ k: '老將', v: 0.10 }],
     };
-    return MAP[trait] || trait;
+    const arr = STATS[trait];
+    if (arr) {
+      return arr.map(s => `${s.k} +${Math.round(s.v * 100 * weight)}%`).join(' / ');
+    }
+    return trait;
   }
 
   function _traitLabel(trait, value) {

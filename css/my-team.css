@@ -5630,10 +5630,10 @@
 /* 教練團：1 大主教練 + 2 小助教（橫排、主教練比助教大）*/
 .mt-coach-team {
   position: absolute;
-  top: 50%;
+  top: 49%;
   left: 4%;
   right: 4%;
-  height: 18%;
+  height: 16%;
   display: flex;
   gap: 6px;
   align-items: stretch;
@@ -5692,8 +5692,14 @@
   display: flex; flex-direction: column;
   gap: 1px;
 }
+.mt-coach-team-head-name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
 .mt-coach-team-head-name {
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 900;
   color: #ffe680;
   white-space: nowrap;
@@ -5701,14 +5707,43 @@
   text-overflow: ellipsis;
   line-height: 1.1;
 }
-.mt-coach-team-head-trait {
+.mt-coach-team-head-name-row .mt-coach-slot-rarity {
+  position: static;
   font-size: 9px;
-  color: rgba(255,255,255,0.78);
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+.mt-coach-team-head-nickname {
+  font-size: 9.5px;
+  color: rgba(255,255,255,0.5);
+  font-style: italic;
+  line-height: 1.1;
+}
+.mt-coach-team-head-trait {
+  font-size: 10px;
+  color: #b9e8b3;
   line-height: 1.2;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-weight: 800;
+}
+.mt-coach-team-head-formation {
+  font-size: 9.5px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.2;
+}
+.mt-coach-team-head-formation b { color: #90caf9; }
+.mt-coach-head-role-badge {
+  position: absolute;
+  top: -8px; left: 8px;
+  background: linear-gradient(180deg, #ffe680, #c08030);
+  color: #2a1505;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1.5px solid #fff;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  z-index: 2;
 }
 .mt-coach-team-head-slot .mt-coach-slot-rarity {
   position: absolute;
@@ -5749,7 +5784,7 @@
 /* 展開所有教練按鈕 */
 .mt-coach-expand-btn {
   position: absolute;
-  top: 78%; left: 50%;
+  top: 79%; left: 50%;
   transform: translateX(-50%);
   background: rgba(0,0,0,0.7);
   border: 1.5px solid rgba(240,192,64,0.65);
@@ -5792,10 +5827,62 @@
   padding: 4px;
 }
 
+/* 合計加成面板（主 100% + 助教 50% × 2 + 羈絆）*/
+.mt-coach-total-buff {
+  position: absolute;
+  top: 66%;
+  left: 4%;
+  right: 4%;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.5));
+  border: 1.5px solid rgba(76,175,80,0.55);
+  border-radius: 8px;
+  padding: 4px 8px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+}
+.mt-coach-total-buff-empty {
+  color: rgba(255,255,255,0.4);
+  font-style: italic;
+  font-weight: 700;
+  border-color: rgba(255,255,255,0.12);
+  display: block;
+  text-align: center;
+}
+.mt-coach-total-buff-label {
+  font-size: 11px;
+  font-weight: 900;
+  color: #b9e8b3;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.mt-coach-total-buff-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  flex: 1;
+}
+.mt-coach-buff-pill {
+  background: rgba(76,175,80,0.22);
+  color: #fff;
+  border: 1px solid rgba(76,175,80,0.5);
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.mt-coach-buff-empty {
+  color: rgba(255,255,255,0.45);
+  font-size: 10px;
+}
+
 /* 羈絆狀態條 */
 .mt-coach-synergy {
   position: absolute;
-  top: 70%;
+  top: 74%;
   left: 4%;
   right: 4%;
   border-radius: 8px;
