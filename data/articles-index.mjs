@@ -2,6 +2,36 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-061",
+    "tournament": "epl",
+    "title": "【賽後回顧】阿斯頓維拉 4-2 利物浦：Watkins 梅開二度，維拉鎖定歐冠席位",
+    "summary": "英超第37輪——阿斯頓維拉在 Villa Park 以 4-2 大勝利物浦，Ollie Watkins 梅開二度、Morgan Rogers 與 John McGinn 各進一球。Van Dijk 兩度頭鎚扳回顏面但無力回天，維拉升上第四鎖定歐冠資格，利物浦跌至第五前景黯淡。",
+    "date": "2026-05-16",
+    "category": "賽後深度回顧",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-062",
+    "tournament": "epl",
+    "title": "【賽前分析】兵工廠 vs 伯恩利：冠軍爭奪戰最終章，Arteta 能否在主場封王？",
+    "summary": "英超第37輪——榜首兵工廠（79分）主場迎戰已降級的伯恩利（21分），贏球就給曼城施壓。Ødegaard 有望回歸先發，Saka 狀態火熱——但越是「必勝」的比賽，越容易出問題？",
+    "date": "2026-05-16",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-063",
+    "tournament": "epl",
+    "title": "【賽前分析】切爾西 vs 熱刺：倫敦德比生死戰，Spurs 的保級命運在此一搏",
+    "summary": "英超第37輪——切爾西（第9・49分）在 Stamford Bridge 迎戰瀕臨降級的熱刺（第17・38分）。切爾西聯賽 7 場不勝、熱刺 4 場不敗——這場倫敦德比的劇本完全翻轉了。",
+    "date": "2026-05-16",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-060",
     "tournament": "epl",
     "title": "【賽前分析】阿斯頓維拉 vs 利物浦：59 分生死戰，歐冠門票一戰定生死",
@@ -139,7 +169,7 @@ export default [
     "date": "2026-05-08",
     "category": "規則解析",
     "readTime": "8分鐘",
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-050",
@@ -149,7 +179,7 @@ export default [
     "date": "2026-05-08",
     "category": "賽前深度分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-051",
@@ -159,7 +189,7 @@ export default [
     "date": "2026-05-08",
     "category": "賽前深度分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-049",
@@ -169,7 +199,7 @@ export default [
     "date": "2026-05-08",
     "category": "賽前分析",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-047",

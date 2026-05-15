@@ -3337,6 +3337,183 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p>維拉有主場優勢和歐冠資格的強烈動機，但歐霸決賽在即可能導致輪換。利物浦傷兵累累但陣容底蘊更深。預計雙方都不願冒險，<b>1-1</b> 平局可能性最高——但如果 Watkins 能把握住機會，維拉有機會在主場拿下關鍵 3 分。</p>`,
     tags: ['賽前分析', '阿斯頓維拉', '利物浦', 'Watkins', 'Salah', 'Wirtz', '歐冠資格', '第37輪']
+  },
+  {
+    id: 'epl-061',
+    title: '【賽後回顧】阿斯頓維拉 4-2 利物浦：Watkins 梅開二度，維拉鎖定歐冠席位',
+    date: '2026-05-16',
+    category: '賽後深度回顧',
+    summary: '英超第37輪——阿斯頓維拉在 Villa Park 以 4-2 大勝利物浦，Ollie Watkins 梅開二度、Morgan Rogers 與 John McGinn 各進一球。Van Dijk 兩度頭鎚扳回顏面但無力回天，維拉升上第四鎖定歐冠資格，利物浦跌至第五前景黯淡。',
+    content: `<h2>阿斯頓維拉 4-2 利物浦｜第37輪・Villa Park・2026/05/16 03:00 台灣時間</h2>
+
+<h3>比分與進球</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px;width:60px;white-space:nowrap">42' ⚽</td>
+<td style="padding:8px"><strong>Morgan Rogers（維拉）</strong> — 定位球配合後禁區內弧線球破門，打破僵局</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">52' ⚽</td>
+<td style="padding:8px"><strong>Virgil van Dijk（利物浦）</strong> — 自由球傳中後頭鎚頂入，扳平比分</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">57' ⚽</td>
+<td style="padding:8px"><strong>Ollie Watkins（維拉）</strong> — Szoboszlai 後場滑倒失誤，Watkins 搶斷後冷靜推射入網</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">73' ⚽</td>
+<td style="padding:8px"><strong>Ollie Watkins（維拉）</strong> — 角球配合，Watkins 近距離頭鎚破門梅開二度</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">89' ⚽</td>
+<td style="padding:8px"><strong>John McGinn（維拉）</strong> — 禁區外左腳弧線遠射，皮球飛入遠角，全場起立鼓掌</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">90+2' ⚽</td>
+<td style="padding:8px"><strong>Virgil van Dijk（利物浦）</strong> — 補時再度頭鎚入網，聊作安慰</td>
+</tr>
+</table>
+
+<h3>比賽分析</h3>
+
+<p>Villa Park 在這場「歐冠門票決戰」中成了利物浦的噩夢。上半場雙方互有攻守，但 <b>Rogers</b> 在 42 分鐘的弧線球破門讓全場沸騰。下半場 Van Dijk 迅速扳平，但利物浦的希望僅維持了 5 分鐘—— <b>Szoboszlai</b> 在後場致命滑倒，Watkins 不費吹灰之力搶斷得手，冷靜推射再度領先。</p>
+
+<p>73 分鐘 Watkins 頭鎚梅開二度讓比賽大勢已定，89 分鐘 <b>McGinn</b> 一記技驚四座的遠射為 Villa Park 帶來狂歡。Van Dijk 補時第二度頭鎚入網只是聊作安慰——利物浦的歐冠夢正式進入加護病房。</p>
+
+<h3>關鍵人物</h3>
+
+<p><b>Ollie Watkins（維拉）</b>：2 球 1 助攻，全場最佳。他的跑位意識和臨門冷靜是利物浦後防無法解決的課題。本季英超已進 14 球，用表現回應了所有質疑。</p>
+
+<p><b>Morgan Rogers（維拉）</b>：打破僵局的進球展現了他日益成熟的射門技術。Austin MacPhee 設計的定位球套路完美執行，Rogers 在禁區內的弧線球無懈可擊。</p>
+
+<p><b>Virgil van Dijk（利物浦）</b>：兩度頭鎚入網，但獨木難支。在隊友頻頻犯錯的情況下，Van Dijk 是利物浦唯一保持水準的球員。</p>
+
+<h3>積分影響</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15);font-weight:bold">
+<td style="padding:8px">排名</td><td style="padding:8px">球隊</td><td style="padding:8px">場次</td><td style="padding:8px">積分</td><td style="padding:8px">備註</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">4</td><td style="padding:8px">阿斯頓維拉</td><td style="padding:8px">37</td><td style="padding:8px">62</td><td style="padding:8px">鎖定歐冠席位 + 歐霸決賽 5/20</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">5</td><td style="padding:8px">利物浦</td><td style="padding:8px">37</td><td style="padding:8px">59</td><td style="padding:8px">落後維拉 3 分，末輪需贏球 + 看結果</td>
+</tr>
+</table>
+
+<p>維拉拿下 3 分後升至第四名（62 分），無論歐霸決賽結果如何都已確保歐冠參賽資格。利物浦跌至第五（59 分），末輪必須擊敗布倫特福德，並期望維拉在最後一輪曼城客場失分——但考慮到維拉已無壓力，利物浦的處境非常被動。</p>
+
+<h3>賽後聲音</h3>
+
+<p><b>Arne Slot（利物浦主帥）</b>：「我們承受著巨大壓力⋯⋯現在唯一能做的就是好好準備這一週，全力以赴迎接最後一場比賽。」Slot 承認球隊在關鍵時刻的失誤讓他失望，但拒絕點名批評個別球員。</p>
+
+<p><b>Unai Emery（維拉主帥）</b>：帶領維拉連續兩季打入歐洲賽事，今晚的勝利更讓維拉鎖定下賽季歐冠資格。4 天後的歐霸決賽（vs 弗賴堡）是 Emery 本季的終極目標——如果拿下歐霸冠軍，這將是維拉歷史上最成功的賽季之一。</p>
+
+<h3>接下來</h3>
+
+<p><b>維拉</b>：5/20 歐霸聯賽決賽 vs 弗賴堡（伊斯坦堡）→ 5/25 英超末輪客場 vs 曼城。<br>
+<b>利物浦</b>：5/25 英超末輪主場 vs 布倫特福德——必須全取 3 分並寄望其他結果配合。</p>`,
+    tags: ['賽後回顧', '阿斯頓維拉', '利物浦', 'Watkins', 'Van Dijk', 'Rogers', 'McGinn', '歐冠資格', '第37輪']
+  },
+  {
+    id: 'epl-062',
+    title: '【賽前分析】兵工廠 vs 伯恩利：冠軍爭奪戰最終章，Arteta 能否在主場封王？',
+    date: '2026-05-16',
+    category: '賽前深度分析',
+    summary: '英超第37輪——榜首兵工廠（79分）主場迎戰已降級的伯恩利（21分），贏球就給曼城施壓。Ødegaard 有望回歸先發，Saka 狀態火熱——但越是「必勝」的比賽，越容易出問題？',
+    content: `<h2>兵工廠 vs 伯恩利｜英超第37輪・5/19（一）03:00 台灣時間・酋長球場</h2>
+
+<h3>聯賽形勢</h3>
+
+<p>兵工廠以 <b>79 分</b>領先曼城 2 分，剩餘兩輪比賽。如果今晚拿下 3 分，兵工廠將迫使曼城必須在客場擊敗伯恩茅斯才能把冠軍懸念留到最後一輪。對 Arteta 來說，這是在主場球迷面前宣示冠軍決心的最佳機會。</p>
+
+<p>伯恩利已確定降級（21 分，第 19 名），是本季英超最早降級的球隊之一。但降級隊伍往往在賽季末沒有壓力的情況下踢出解放式足球——兵工廠不能掉以輕心。</p>
+
+<h3>兵工廠傷兵與陣容</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15);font-weight:bold">
+<td style="padding:8px">球員</td><td style="padding:8px">狀態</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">Martin Ødegaard</td>
+<td style="padding:8px">膝傷恢復中，爭取回歸先發——主場最後一戰的動力十足</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">Bukayo Saka</td>
+<td style="padding:8px">已完全復出，歐冠半決賽決殺 Atlético 後狀態火熱</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">Ben White</td>
+<td style="padding:8px">嚴重膝傷，賽季報銷</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">Mikel Merino</td>
+<td style="padding:8px">賽季報銷</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
+<td style="padding:8px">Jurrien Timber</td>
+<td style="padding:8px">腹股溝傷，賽季末復出待評估</td>
+</tr>
+</table>
+
+<p>預計先發：Raya；Mosquera、Saliba、Gabriel、Calafiori；Rice、Lewis-Skelly；Saka、Ødegaard、Trossard；Gyökeres</p>
+
+<h3>伯恩利狀態</h3>
+
+<p>伯恩利的傷兵名單終於縮短——僅剩 <b>Jordan Beyer</b>（賽季報銷）、<b>Josh Cullen</b> 和 <b>Connor Roberts</b> 缺陣。降級的事實讓陣中年輕球員有了展示自己的舞台，他們會用拚勁回報 Turf Moor 球迷整季的支持。</p>
+
+<h3>關鍵看點</h3>
+
+<p><b>Gyökeres 需要進球</b>：冬窗從 Sporting 加盟後，Viktor Gyökeres 的英超進球效率不如在葡超時期。兵工廠需要他在冠軍衝刺階段站出來——面對英超最弱的後防線，這是重拾信心的最佳時機。</p>
+
+<p><b>Ødegaard 的回歸</b>：如果 Ødegaard 能先發，兵工廠的中場創造力將大幅提升。他與 Saka 的右路連線是英超最具威脅的進攻組合之一。</p>
+
+<h3>Soccer麥迪預測</h3>
+
+<p>兵工廠主場面對已降級對手，在冠軍壓力下應該能拿下三分。預計 <b>3-0</b>——Gyökeres、Saka 各進一球，加上一個定位球得分。酋長球場將在賽季倒數第二個主場比賽日迎來一場勝利慶典。</p>`,
+    tags: ['賽前分析', '兵工廠', '伯恩利', 'Gyökeres', 'Saka', 'Ødegaard', 'Arteta', '冠軍爭奪', '第37輪']
+  },
+  {
+    id: 'epl-063',
+    title: '【賽前分析】切爾西 vs 熱刺：倫敦德比生死戰，Spurs 的保級命運在此一搏',
+    date: '2026-05-16',
+    category: '賽前深度分析',
+    summary: '英超第37輪——切爾西（第9・49分）在 Stamford Bridge 迎戰瀕臨降級的熱刺（第17・38分）。切爾西聯賽 7 場不勝、熱刺 4 場不敗——這場倫敦德比的劇本完全翻轉了。',
+    content: `<h2>切爾西 vs 熱刺｜英超第37輪・5/20（二）03:15 台灣時間・Stamford Bridge</h2>
+
+<h3>局勢分析</h3>
+
+<p>這場倫敦德比的劇本令人難以置信：<b>切爾西</b>（第 9 名・49 分）聯賽已經 <b>7 場不勝</b>，過去 21 分只拿到 1 分，從歐戰爭奪者跌到中游；<b>熱刺</b>（第 17 名・38 分）則在降級邊緣掙扎，但近 4 場保持不敗，正處於求生模式的最佳狀態。</p>
+
+<p>熱刺目前只領先降級區 2 分（西漢姆 36 分），一旦輸球加上西漢姆在紐卡索取分，Spurs 就可能被拖入最後一輪的降級死戰。對 De Zerbi 來說，這 90 分鐘可能決定他在白鹿巷的未來。</p>
+
+<h3>切爾西近況</h3>
+
+<p>切爾西的崩盤堪稱本季英超最大跌勢。自 3/4 客場 4-1 大勝維拉後就沒在聯賽贏過球。代理主帥 <b>Calum McFarlane</b> 接手後未能扭轉頹勢，球隊缺乏明確的進攻套路。</p>
+
+<p>傷兵方面：<b>Estevao</b>（嚴重腿後肌傷，賽季報銷）和 <b>Robert Sánchez</b>（門將傷缺）是最大損失。<b>Reece James</b> 和 <b>Levi Colwill</b> 已回歸訓練。如果切爾西在足總盃決賽（vs 曼城）耗盡體能，週二對熱刺的狀態令人擔憂。</p>
+
+<h3>熱刺近況</h3>
+
+<p>De Zerbi 的保級作戰出乎意料地有效——4 場不敗（2W 2D）讓熱刺暫時逃離降級區。<b>Mathys Tel</b> 已復出並提供即戰力，但核心傷兵依然嚴重：<b>Xavi Simons</b>（前十字韌帶，賽季報銷）、<b>James Maddison</b>（前十字韌帶，賽季報銷）、<b>Cristian Romero</b>（膝傷，賽季報銷但世界盃仍有希望）。<b>Dominic Solanke</b> 的出場狀態仍是問號。</p>
+
+<h3>歷史交鋒</h3>
+
+<p>切爾西在近 10 次英超倫敦德比中贏了 8 場，但本季 11 月的反向對決熱刺在主場取勝。切爾西的主場優勢在近期已不復存在——Stamford Bridge 從堡壘變成了漏洞。</p>
+
+<h3>關鍵對決</h3>
+
+<p><b>Cole Palmer vs Mathys Tel</b>：兩位年輕天才的對決。Palmer 是切爾西低迷期唯一保持水準的球員，Tel 則在保級壓力下展現了超齡的冷靜。</p>
+
+<p><b>Enzo Fernández vs Yves Bissouma</b>：中場的控制權將決定比賽走勢。Fernández 近期狀態下滑，而 Bissouma 在保級壓力下反而踢出了本季最穩定的表現。</p>
+
+<h3>Soccer麥迪預測</h3>
+
+<p>通常切爾西主場對熱刺是壓倒性優勢，但今季的切爾西是不正常的切爾西。考慮到切爾西前一天剛踢完足總盃決賽（體能劣勢），加上熱刺求生的動力——預計 <b>1-1</b> 平局。Palmer 為切爾西破門，但熱刺在下半場利用切爾西體能下降扳平。熱刺拿到寶貴 1 分，保級懸念延續到最後一輪。</p>`,
+    tags: ['賽前分析', '切爾西', '熱刺', 'Palmer', 'De Zerbi', '倫敦德比', '保級', '第37輪']
   }
 ];
 

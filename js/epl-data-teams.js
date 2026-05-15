@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-05-15 日更）
+   資料截止：2025/26 賽季（2026-05-16 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -35,7 +35,7 @@ const EPL_TEAMS = {
   },
   'LIV': {
     name:'Liverpool', nameCN:'利物浦', flag:'https://crests.football-data.org/64.png',
-    league:'Premier League', eplRank:4, coach:'Arne Slot', formation:'4-3-3',
+    league:'Premier League', eplRank:5, coach:'Arne Slot', formation:'4-3-3',
     keyPlayers:[
       {name:'Mohamed Salah',pos:'右翼',club:'利物浦'},
       {name:'Virgil van Dijk',pos:'中後衛',club:'利物浦'},
@@ -47,13 +47,13 @@ const EPL_TEAMS = {
     style:'高強度壓迫，快速轉換，邊路推進',
     strengths:['Salah持續高效輸出','Slot體系穩定成熟','中場跑動覆蓋全場'],
     weaknesses:['Salah年齡漸長','傷兵時輪換選擇有限','對陣低位防守隊時偶有困難'],
-    recentForm:['D','L','W','W','W'],
+    recentForm:['L','D','L','W','W'],
     history:'19次英格蘭頂級聯賽冠軍，6次歐冠冠軍',
     injuries:[
-      {name:'Mohamed Salah',pos:'右翼',status:'腿後肌傷恢復中，已回歸訓練但僅能上場幾分鐘',returnDate:'MW37 替補待命'},
-      {name:'Florian Wirtz',pos:'攻擊中場',status:'腸胃炎（服用抗生素），出場成疑',returnDate:'5/15 AVL 待評估'},
-      {name:'Ibrahima Konaté',pos:'中後衛',status:'vs CHE（5/11）抽筋退場，Slot 確認已可出場',returnDate:'可出場'},
-      {name:'Alisson',pos:'門將',status:'已回歸訓練，出場待定',returnDate:'5/15 待評估'},
+      {name:'Mohamed Salah',pos:'右翼',status:'腿後肌傷恢復中，vs AVL 替補上陣',returnDate:'MW38 可能先發'},
+      {name:'Florian Wirtz',pos:'攻擊中場',status:'腸胃炎恢復中，vs AVL 缺陣',returnDate:'MW38 評估中'},
+      {name:'Ibrahima Konaté',pos:'中後衛',status:'已復出，vs AVL 先發',returnDate:'可出場'},
+      {name:'Alisson',pos:'門將',status:'已復出',returnDate:'可出場'},
       {name:'Hugo Ekitike',pos:'前鋒',status:'阿基里斯腱斷裂（vs PSG受傷）',returnDate:'賽季報銷＋世界盃缺席'},
       {name:'Wataru Endo',pos:'中場',status:'足部手術',returnDate:'賽季報銷（目標世界盃）'},
       {name:'Conor Bradley',pos:'右後衛',status:'膝蓋重傷手術（1月起）',returnDate:'賽季報銷'},
@@ -179,7 +179,7 @@ const EPL_TEAMS = {
   },
   'AVL': {
     name:'Aston Villa', nameCN:'阿斯頓維拉', flag:'https://crests.football-data.org/58.png',
-    league:'Premier League', eplRank:5, coach:'Unai Emery', formation:'4-2-3-1',
+    league:'Premier League', eplRank:4, coach:'Unai Emery', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Ollie Watkins',pos:'前鋒',club:'阿斯頓維拉'},
       {name:'Morgan Rogers',pos:'攻擊中場',club:'阿斯頓維拉'},
@@ -191,19 +191,19 @@ const EPL_TEAMS = {
     style:'Emery體系，緊湊防守反擊，定位球威脅大',
     strengths:['Watkins全面的前鋒能力','Emery歐戰經驗豐富','團隊凝聚力強'],
     weaknesses:['頂級球星不足','多線作戰體能考驗','客場表現波動'],
-    recentForm:['D','L','L','W','D'],
+    recentForm:['W','D','L','L','W'],
     history:'7次英格蘭頂級聯賽冠軍，1982年歐冠冠軍',
     injuries:[
       {name:'Boubacar Kamara',pos:'防守中場',status:'膝傷長期缺陣',returnDate:'賽季報銷'},
-      {name:'Amadou Onana',pos:'中場',status:'小腿傷',returnDate:'缺席 vs LIV'},
-      {name:'Alysson',pos:'門將',status:'腹股溝傷',returnDate:'缺席 vs LIV'}
+      {name:'Amadou Onana',pos:'中場',status:'小腿傷（vs LIV 缺陣）',returnDate:'歐霸決賽評估中'},
+      {name:'Alysson',pos:'門將',status:'腹股溝傷（vs LIV 缺陣）',returnDate:'評估中'}
     ]
   },
 
   // ===== 中游球隊 =====
   'BHA': {
     name:'Brighton & Hove Albion', nameCN:'布萊頓', flag:'https://crests.football-data.org/397.png',
-    league:'Premier League', eplRank:6, coach:'Fabian Hürzeler', formation:'4-2-3-1',
+    league:'Premier League', eplRank:7, coach:'Fabian Hürzeler', formation:'4-2-3-1',
     keyPlayers:[
       {name:'Kaoru Mitoma',pos:'左翼',club:'布萊頓'},
       {name:'Carlos Baleba',pos:'中場',club:'布萊頓'},
@@ -216,11 +216,14 @@ const EPL_TEAMS = {
     strengths:['球探系統發掘天才','戰術執行力高','年輕球員發展好'],
     weaknesses:['關鍵球員被挖角風險','經驗不足','進攻終結效率偶有波動'],
     recentForm:['L','W','D','D','W'],
-    history:'近年從英甲升至英超穩定中游，數據化管理典範'
+    history:'近年從英甲升至英超穩定中游，數據化管理典範',
+    injuries:[
+      {name:'Kaoru Mitoma',pos:'左翼',status:'腿後肌拉傷，確定缺席最後兩輪',returnDate:'賽季報銷，世界盃存疑'}
+    ]
   },
   'BOU': {
     name:'AFC Bournemouth', nameCN:'伯恩茅斯', flag:'https://crests.football-data.org/1044.png',
-    league:'Premier League', eplRank:8, coach:'Andoni Iraola', formation:'4-3-3',
+    league:'Premier League', eplRank:6, coach:'Andoni Iraola', formation:'4-3-3',
     keyPlayers:[
       {name:'Evanilson',pos:'前鋒',club:'伯恩茅斯'},
       {name:'Justin Kluivert',pos:'翼鋒',club:'伯恩茅斯'},
@@ -853,7 +856,15 @@ window.EPL_MATCHES = [
   // ===== 第 37 輪 (2026-05-15 ~ 05-20 台灣時間) =====
 
   // 阿斯頓維拉 vs 利物浦 | 05/16 03:00 台灣時間 (05/15 20:00 BST)
-  {id:'EPL-MW37-AVL-LIV', matchday:37, date:'2026-05-16', time:'03:00', home:'AVL', away:'LIV', stage:'league', status:'upcoming'},
+  {id:'EPL-MW37-AVL-LIV', matchday:37, date:'2026-05-16', time:'03:00', home:'AVL', away:'LIV', stage:'league', status:'played',
+   homeScore:4, awayScore:2, goals:[
+     {min:'42',player:'Rogers',side:'h'},
+     {min:'52',player:'Van Dijk',side:'a'},
+     {min:'57',player:'Watkins',side:'h'},
+     {min:'73',player:'Watkins',side:'h'},
+     {min:'89',player:'McGinn',side:'h'},
+     {min:'90+2',player:'Van Dijk',side:'a'}
+   ]},
 
   // 曼聯 vs 諾丁漢森林 | 05/17 19:30 台灣時間 (05/17 12:30 BST)
   {id:'EPL-MW37-MUN-NFO', matchday:37, date:'2026-05-17', time:'19:30', home:'MUN', away:'NFO', stage:'league', status:'upcoming'},
