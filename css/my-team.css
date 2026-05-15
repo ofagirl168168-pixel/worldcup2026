@@ -7413,6 +7413,45 @@ button.mt-train-point-card:active { transform: translateY(0); }
   gap: 2px;
   cursor: pointer;
 }
+/* 時長 chip — 機台上每位 trainee 頭頂 */
+.mt-train-trainee-tier {
+  position: absolute;
+  top: -7px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.75);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #ffe680;
+  white-space: nowrap;
+  z-index: 2;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.mt-train-trainee.tier-24h .mt-train-trainee-tier {
+  border-color: #ff6b9d;
+  color: #ffbacf;
+  background: rgba(60,15,40,0.85);
+  box-shadow: 0 0 6px rgba(255,107,157,0.55);
+}
+.mt-train-trainee.tier-8h .mt-train-trainee-tier {
+  border-color: #42a5f5;
+  color: #bcdfff;
+  background: rgba(15,40,80,0.85);
+}
+.mt-train-trainee.tier-2h .mt-train-trainee-tier {
+  border-color: #66bb6a;
+  color: #c1ecc4;
+  background: rgba(20,60,30,0.85);
+}
+.mt-train-trainee.is-ready .mt-train-trainee-tier {
+  animation: mt-trainee-tier-glow 1.2s ease-in-out infinite;
+}
+@keyframes mt-trainee-tier-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(255,213,74,0.5); }
+  50%      { box-shadow: 0 0 14px rgba(255,213,74,1); }
+}
 .mt-train-trainee img {
   width: 30px;
   height: auto;

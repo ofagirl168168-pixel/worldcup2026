@@ -4042,14 +4042,24 @@
                     const isReady = t.remainSec === 0;
                     const pid = t.p.id;
                     const c = t.p.card || {};
-                    const total = Math.max(60, Math.floor(Math.pow((t.p['current_' + attr] || 0) / 25, 2.2) * 50));
+                    // 用 training_tier 算總時長（新邏輯）→ 進度條準確
+                    const TIER_SEC = { tutorial: 3, '30m': 30*60, '2h': 2*3600, '8h': 8*3600, '24h': 24*3600 };
+                    const TIER_LBL = { tutorial: '教學', '30m': '30 分', '2h': '2 時', '8h': '8 時', '24h': '24 時' };
+                    const TIER_GAIN_INFO = {
+                      tutorial: '+1', '30m': '+1', '2h': '+2',
+                      '8h':  '+4 · Lv+1',
+                      '24h': '+7 · Lv+1 · ✨5%',
+                    };
+                    const tier = t.p.training_tier || '30m';
+                    const total = TIER_SEC[tier] || 30 * 60;
                     const pct = isReady ? 100 : Math.max(0, Math.min(100, ((total - t.remainSec) / total) * 100));
                     return `
-                      <div class="mt-train-trainee ${isReady ? 'is-ready' : ''}" data-claim="${pid}" data-attr="${attr}">
+                      <div class="mt-train-trainee ${isReady ? 'is-ready' : ''} tier-${tier}" data-claim="${pid}" data-attr="${attr}">
+                        <span class="mt-train-trainee-tier">${TIER_LBL[tier]}</span>
                         <div class="mt-train-trainee-sprite" id="train-floor-${pid}"></div>
                         <div class="mt-train-trainee-bar"><div style="width:${pct}%"></div></div>
                         <div class="mt-train-trainee-time">
-                          ${isReady ? '<span class="mt-train-trainee-ready">✋ 領取</span>'
+                          ${isReady ? `<span class="mt-train-trainee-ready">✋ 領取 ${TIER_GAIN_INFO[tier]}</span>`
                                     : `<span class="mt-train-countdown" data-finish-at="${t.finishAt.toISOString()}" data-player="${pid}">${_formatRemain(t.remainSec)}</span>`}
                         </div>
                       </div>
@@ -4220,10 +4230,12 @@
     }
     const c = p.card || {};
     const ATTR_LBL = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
+    const TIER_LBL = { tutorial: '教學體驗', '30m': '30 分集訓營', '2h': '2 小時集訓營', '8h': '8 小時集訓營', '24h': '24 小時集訓營' };
     const attr = res.attr;
     const gain = res.gain || 1;
-    const newLevel = res.new_level || (p.level + 1);
-    // 完成後當前值（用 RPC 給的或回推）
+    const lvUp = !!res.lv_up;
+    const newLevel = res.new_level || p.level;
+    const tierLabel = TIER_LBL[res.tier] || '集訓營';
     const newVal = Math.min(99, (p['current_' + attr] || 0) + gain);
     const beforeVal = newVal - gain;
 
@@ -4235,7 +4247,7 @@
         <div class="mt-claim-result-burst">
           ${Array.from({length: 12}).map((_, i) => `<span class="mt-claim-spark" style="--ang:${i * 30}deg"></span>`).join('')}
         </div>
-        <div class="mt-claim-result-title">🎉 訓練完成！</div>
+        <div class="mt-claim-result-title">🎉 ${tierLabel} 完成！</div>
         <div class="mt-claim-result-hero">
           <img id="${portraitId}" alt="${escapeHtml(c.name)}"
             src="${(typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id, c.rarity) : ''}"
@@ -4243,9 +4255,9 @@
           <div class="mt-claim-result-meta">
             <div class="mt-claim-result-name">${escapeHtml(c.name || '?')}</div>
             <div class="mt-claim-result-lvup">
-              <span class="mt-claim-result-lv-old">Lv.${p.level}</span>
+              ${lvUp ? `<span class="mt-claim-result-lv-old">Lv.${p.level}</span>
               <span class="mt-claim-result-arrow">→</span>
-              <span class="mt-claim-result-lv-new">Lv.${newLevel}</span>
+              <span class="mt-claim-result-lv-new">Lv.${newLevel}</span>` : ''}
             </div>
           </div>
         </div>
