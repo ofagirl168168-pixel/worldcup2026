@@ -4262,39 +4262,40 @@
 .mt-gshop-btn:hover:not(:disabled) { transform: translateY(-2px); }
 .mt-gshop-btn:active:not(:disabled) { transform: translateY(1px); }
 .mt-gshop-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
-/* 1 抽：明亮藍金屬感（提高頂部反光佔比、降低底部死黑、與 10 抽同等明亮度）*/
+/* 1 抽：鮮亮藍綠（cyan-blue）— 與 10 抽金色同明亮度
+   原本太暗是因為藍色感知亮度本來就低於金色，所以這版用更亮的青藍 + 更淺底色 */
 .mt-gshop-btn-1 {
   background:
-    /* 頂部寬高光（從 0% 一路漸淡到 35%）*/
+    /* 頂部高光（與 10 抽同手法）*/
     linear-gradient(180deg,
       rgba(255,255,255,0.55) 0%,
-      rgba(255,255,255,0.18) 12%,
-      rgba(255,255,255,0) 25%,
+      rgba(255,255,255,0.15) 8%,
+      rgba(255,255,255,0) 16%,
       rgba(0,0,0,0) 70%,
-      rgba(0,0,0,0.18) 95%,
-      rgba(0,0,0,0.32) 100%),
-    /* 主色 — 整體拉亮 1~2 階，最深色不再是接近黑的 #053f6a */
+      rgba(0,0,0,0.1) 95%,
+      rgba(0,0,0,0.18) 100%),
+    /* 主色 — 鮮亮 cyan-blue，整體拉亮 2~3 階 */
     linear-gradient(180deg,
-      #5dc8ff 0%,
-      #3ab8f5 25%,
-      #1e9be8 55%,
-      #1581c4 82%,
-      #0e6aa5 100%) !important;
-  background-color: #1e9be8 !important;
+      #80e0ff 0%,
+      #4cc8ff 22%,
+      #2bb0f0 52%,
+      #1f95d8 80%,
+      #1779b8 100%) !important;
+  background-color: #4cc8ff !important;
   border: 2.5px solid #ffffff !important;
   color: #ffffff;
   text-shadow:
     0 1px 0 rgba(255,255,255,0.55),
-    0 2px 4px rgba(0,40,80,0.85),
-    0 -1px 1px rgba(0,40,90,0.5);
+    0 2px 3px rgba(0,60,120,0.75),
+    0 -1px 1px rgba(0,60,130,0.4);
   box-shadow:
-    0 0 0 2px #042746,
-    0 4px 0 #08355d,
-    0 8px 20px rgba(0,25,55,0.9),
+    0 0 0 2px #07355c,
+    0 4px 0 #0d4d82,
+    0 8px 20px rgba(0,60,120,0.7),
     inset 0 2px 0 rgba(255,255,255,0.95),
-    inset 0 4px 6px rgba(255,255,255,0.45),
-    inset 0 -4px 8px rgba(0,20,45,0.5),
-    inset 0 -1px 0 rgba(0,15,35,0.7) !important;
+    inset 0 4px 6px rgba(255,255,255,0.5),
+    inset 0 -4px 8px rgba(0,60,130,0.35),
+    inset 0 -1px 0 rgba(0,50,110,0.55) !important;
   opacity: 1 !important;
 }
 /* 10 抽：金屬金（主色 #fbcd0c）*/
@@ -5627,10 +5628,10 @@
 /* 教練團：1 大主教練 + 2 小助教（橫排、主教練比助教大）*/
 .mt-coach-team {
   position: absolute;
-  top: 49%;
+  top: 47%;
   left: 4%;
   right: 4%;
-  height: 16%;
+  height: 19%;   /* 加高一點讓主教練的「推薦陣型」chip 不會被下方面板蓋住 */
   display: flex;
   gap: 6px;
   align-items: stretch;
@@ -5722,26 +5723,26 @@
   line-height: 1.2;
   font-weight: 800;
 }
-/* 主教練卡的推薦陣型 — 不能再小到看不到，做成藍底邊框的 chip */
+/* 主教練卡的推薦陣型 — 藍底邊框 chip、align-self:flex-start 不撐滿 */
 .mt-coach-team-head-formation {
-  display: inline-block;
-  font-size: 11px;
+  align-self: flex-start;
+  font-size: 10.5px;
   font-weight: 900;
   color: #fff;
-  line-height: 1.25;
-  background: linear-gradient(180deg, rgba(33,150,243,0.35), rgba(13,71,161,0.45));
+  line-height: 1.2;
+  background: linear-gradient(180deg, rgba(33,150,243,0.4), rgba(13,71,161,0.55));
   border: 1.5px solid #42a5f5;
   border-radius: 999px;
-  padding: 2px 10px 2px 8px;
-  margin-top: 3px;
+  padding: 1px 9px 1px 7px;
+  margin-top: 2px;
   letter-spacing: 0.5px;
-  box-shadow: 0 0 8px rgba(66,165,245,0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+  box-shadow: 0 0 8px rgba(66,165,245,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
   white-space: nowrap;
 }
 .mt-coach-team-head-formation b {
   color: #ffe680;
   font-weight: 900;
-  font-size: 12.5px;
+  font-size: 11.5px;
   text-shadow: 0 1px 2px rgba(0,0,0,0.6);
   margin-left: 2px;
 }
@@ -5918,7 +5919,7 @@
 /* 合計加成面板（主 100% + 助教 50% × 2 + 羈絆）*/
 .mt-coach-total-buff {
   position: absolute;
-  top: 66%;
+  top: 67%;
   left: 4%;
   right: 4%;
   background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.5));
@@ -7729,6 +7730,178 @@ button.mt-train-point-card:active { transform: translateY(0); }
   color: #ffab91;
   font-weight: 900;
 }
+
+/* ─── 時間訓練領取慶祝彈窗 ─── */
+.mt-claim-result-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 12005;
+  opacity: 0; transition: opacity 0.2s;
+  backdrop-filter: blur(6px);
+  padding: 16px;
+}
+.mt-claim-result-overlay.open { opacity: 1; }
+.mt-claim-result-card {
+  background: linear-gradient(180deg, #2a1a4e 0%, #0d1224 100%);
+  border: 3px solid #f0c040;
+  border-radius: 16px;
+  padding: 18px 20px 16px;
+  width: 100%;
+  max-width: 360px;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 0 40px rgba(240,192,64,0.6), 0 20px 40px rgba(0,0,0,0.6);
+  animation: mt-claim-result-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.mt-claim-result-card.rarity-SSR { border-color: #f0c040; box-shadow: 0 0 50px rgba(240,192,64,0.7); }
+.mt-claim-result-card.rarity-SR  { border-color: #9b87f5; box-shadow: 0 0 40px rgba(155,135,245,0.55); }
+.mt-claim-result-card.rarity-R   { border-color: #66bb6a; box-shadow: 0 0 30px rgba(102,187,106,0.45); }
+@keyframes mt-claim-result-pop {
+  0%   { transform: scale(0.4) rotate(-8deg); opacity: 0; }
+  60%  { transform: scale(1.08) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* 12 顆四散星花 */
+.mt-claim-result-burst {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.mt-claim-spark {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #ffd54a;
+  box-shadow: 0 0 8px #ffe680;
+  transform-origin: 0 0;
+  opacity: 0;
+  animation: mt-claim-spark-shoot 0.9s ease-out forwards;
+  animation-delay: 0.1s;
+}
+@keyframes mt-claim-spark-shoot {
+  0%   { transform: rotate(var(--ang)) translateX(0) scale(0); opacity: 1; }
+  60%  { opacity: 1; }
+  100% { transform: rotate(var(--ang)) translateX(140px) scale(1.2); opacity: 0; }
+}
+
+.mt-claim-result-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #ffe680;
+  letter-spacing: 2px;
+  text-shadow: 0 0 12px rgba(240,192,64,0.7);
+  margin-bottom: 12px;
+}
+.mt-claim-result-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.mt-claim-result-hero img {
+  width: 64px; height: 80px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+.mt-claim-result-meta { text-align: left; flex: 1; }
+.mt-claim-result-name { font-size: 16px; font-weight: 900; color: #ffe680; }
+.mt-claim-result-lvup {
+  font-size: 14px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+.mt-claim-result-lv-old { color: rgba(255,255,255,0.55); }
+.mt-claim-result-lv-new {
+  color: #66bb6a;
+  font-size: 16px;
+  text-shadow: 0 0 8px rgba(102,187,106,0.7);
+}
+.mt-claim-result-arrow { color: rgba(255,255,255,0.6); font-size: 12px; }
+
+.mt-claim-result-bar-row {
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 14px;
+}
+.mt-claim-result-bar-row .mt-claim-result-bar-label {
+  font-size: 13px;
+  font-weight: 900;
+  color: #cfd8dc;
+  grid-row: span 2;
+  text-align: right;
+}
+.mt-claim-result-bar {
+  position: relative;
+  height: 14px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.mt-claim-result-bar-old {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  background: linear-gradient(180deg, #90caf9 0%, #5d9cdb 100%);
+}
+.mt-claim-result-bar-new {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  background: linear-gradient(90deg, #66bb6a 0%, #43a047 100%);
+  width: 0;
+  animation: mt-claim-bar-grow 0.9s 0.3s cubic-bezier(0.34, 1.3, 0.64, 1) forwards;
+  box-shadow: 0 0 8px rgba(102,187,106,0.6);
+}
+@keyframes mt-claim-bar-grow {
+  to { width: var(--target, 100%); }
+}
+.mt-claim-result-val {
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
+}
+.mt-claim-result-val-old { color: rgba(255,255,255,0.55); }
+.mt-claim-result-val-new { color: #66bb6a; font-size: 14px; }
+.mt-claim-result-gain {
+  background: rgba(76,175,80,0.25);
+  border: 1px solid rgba(76,175,80,0.6);
+  color: #b9e8b3;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+.mt-claim-result-confirm {
+  background: linear-gradient(180deg, #f0c040 0%, #c08030 100%);
+  border: 2px solid #fff;
+  color: #2a1505;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  padding: 9px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+}
+.mt-claim-result-confirm:hover { filter: brightness(1.1); }
 
 /* ─── 訓練預覽 modal (能力卡 + 增量條) ─── */
 .mt-train-preview-overlay { z-index: 12003; }

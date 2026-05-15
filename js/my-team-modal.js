@@ -1474,9 +1474,13 @@
   }
 
   // ── helper：取得教練的陣型（SSR/SR 用 unlocks_formation、R 用 preferred_formation）──
+  // 若教練本身沒設定（資料缺漏），主教練 fallback 顯示 4-3-3 表示無特殊偏好
   function _coachFormation(coach) {
     if (!coach || !coach.trait_value) return null;
     return coach.trait_value.unlocks_formation || coach.trait_value.preferred_formation || null;
+  }
+  function _coachFormationOrDefault(coach) {
+    return _coachFormation(coach) || '4-3-3';
   }
 
   // ── helper：渲染教練派系標籤 chip（卡片右上角）──
@@ -1512,9 +1516,10 @@
     const c = uc.coach || {};
     const badge = role === 'head' ? '👑 主教練' : role === 'assist1' ? '① 助教' : role === 'assist2' ? '② 助教' : '';
     const imgId = `coach-portrait-${uc.id.slice(0,8)}`;
-    const formation = _coachFormation(c);
     const familyChip = _renderFamilyChipHtml(c);
     if (isHead) {
+      // 主教練一定顯示陣型（沒資料就 fallback 4-3-3）
+      const formation = _coachFormationOrDefault(c);
       return `
         <button class="mt-coach-team-slot mt-coach-team-head-slot rarity-${c.rarity || 'R'} role-head" data-ucid="${uc.id}">
           <span class="mt-coach-head-role-badge">${badge}</span>
@@ -1527,12 +1532,12 @@
             </div>
             ${c.nickname ? `<div class="mt-coach-team-head-nickname">${escapeHtml(c.nickname)}</div>` : ''}
             <div class="mt-coach-team-head-trait">⚡ ${escapeHtml(_traitShortLabel(c.trait, c.trait_value))}</div>
-            ${formation ? `<div class="mt-coach-team-head-formation">📋 推薦陣型 <b>${formation}</b></div>` : ''}
+            <div class="mt-coach-team-head-formation">📋 推薦陣型 <b>${formation}</b></div>
           </div>
         </button>
       `;
     }
-    // 助教小卡：portrait + name + 簡短 buff（50% trait）+ 陣型 + 派系 icon
+    // 助教小卡：portrait + name + 簡短 buff（50% trait）+ 派系 chip（不再顯示陣型）
     const assistBuff = _traitShortLabel(c.trait, c.trait_value, 0.5);
     return `
       <button class="mt-coach-team-slot mt-coach-slot rarity-${c.rarity || 'R'} active role-${role}" data-ucid="${uc.id}">
@@ -1541,7 +1546,6 @@
         <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
         <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
         <div class="mt-coach-slot-trait">${escapeHtml(assistBuff)}</div>
-        ${formation ? `<div class="mt-coach-slot-formation">📋 ${formation}</div>` : ''}
         <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
       </button>
     `;
@@ -1772,10 +1776,10 @@
           <span class="mt-coach-office-formation">${formation}</span>
         </div>
 
-        <!-- 右上角持券 pill：教練券 + 寶石 -->
+        <!-- 右上角持券 pill：教練券 + 寶石（寶石 async fetch）-->
         <div class="mt-gacha-tab-wallet">
           <span class="mt-gacha-tab-pill"><span class="mt-gacha-tab-pill-icon">👔</span><b>${coachTickets}</b></span>
-          <span class="mt-gacha-tab-pill"><span class="mt-gacha-tab-pill-icon">💎</span><b>${team.gems || 0}</b></span>
+          <span class="mt-gacha-tab-pill" id="mt-coach-tab-pill-gem"><span class="mt-gacha-tab-pill-icon">💎</span><b id="mt-coach-tab-pill-gem-val">—</b></span>
         </div>
 
         <!-- 中央黑板：畫陣型 + X/O 戰術 -->
@@ -1940,6 +1944,14 @@
         }
       });
     });
+
+    // 右上角寶石 pill：async fetch（不在 team table、走 gem_balance view）
+    if (typeof window.fetchGemBalance === 'function') {
+      window.fetchGemBalance().then(bal => {
+        const el = content.querySelector('#mt-coach-tab-pill-gem-val');
+        if (el) el.textContent = (bal != null ? bal : 0);
+      }).catch(() => {});
+    }
   }
 
   // 教練抽卡結果動畫：彈出大卡 + 揭曉動畫
@@ -3074,7 +3086,9 @@
     const team = window.MyTeam.getCached();
     if (!team || team === 'not_created') return;
     const tickets = team.tickets || 0;
-    const gems = team.gems || 0;
+    // 寶石不在 team table（gem_balance view），先設假高值避免按鈕被 disabled / grayscale
+    // 真正餘額由下方 fetchGemBalance() async 更新；click 時也會檢查
+    const gems = 9999;
     const pity = team.pity_counter || 0;
     const pityRemaining = Math.max(0, 30 - pity);
     const ssrSelect = team.ssr_select_tickets || 0;
@@ -3088,10 +3102,10 @@
         <!-- AI 生成背景圖（店面整個場景） -->
         <img class="mt-gshop-bg-img" src="img/my-team/gacha-bg.jpg" alt="">
 
-        <!-- 右上角持券 pill：抽券 + 寶石 -->
+        <!-- 右上角持券 pill：抽券 + 寶石（寶石 async fetch）-->
         <div class="mt-gacha-tab-wallet">
           <span class="mt-gacha-tab-pill"><span class="mt-gacha-tab-pill-icon">🎟️</span><b>${tickets}</b></span>
-          <span class="mt-gacha-tab-pill"><span class="mt-gacha-tab-pill-icon">💎</span><b>${gems}</b></span>
+          <span class="mt-gacha-tab-pill" id="mt-gacha-tab-pill-gem"><span class="mt-gacha-tab-pill-icon">💎</span><b id="mt-gacha-tab-pill-gem-val">—</b></span>
         </div>
 
         <!-- 頂部招牌：球員卡販售 -->
@@ -3178,6 +3192,18 @@
     content.querySelectorAll('.mt-gshop-pack').forEach(b => {
       b.addEventListener('click', () => _runGachaSmart(1));
     });
+    // 右上角寶石 pill + 同步更新抽卡按鈕 disabled（不在 team table、走 gem_balance view）
+    if (typeof window.fetchGemBalance === 'function') {
+      window.fetchGemBalance().then(bal => {
+        const realGems = bal != null ? bal : 0;
+        const el = content.querySelector('#mt-gacha-tab-pill-gem-val');
+        if (el) el.textContent = realGems;
+        const btn1 = content.querySelector('#mt-gacha-1');
+        const btn10 = content.querySelector('#mt-gacha-10');
+        if (btn1)  btn1.disabled  = !(tickets >= 1  || realGems >= 5);
+        if (btn10) btn10.disabled = !(tickets >= 10 || realGems >= 45);
+      }).catch(() => {});
+    }
   }
 
   // 智能抽卡：有券優先用、沒券改用寶石
@@ -4165,7 +4191,7 @@
     // 倒數計時器
     if (allActive.length) _refreshCountdowns(activeList);
 
-    // 點 trainee：is-ready → 領取
+    // 點 trainee：is-ready → 領取（顯示慶祝彈窗）
     content.querySelectorAll('.mt-train-trainee').forEach(t => {
       t.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -4174,18 +4200,89 @@
           return;
         }
         const pid = t.dataset.claim;
+        const player = players.find(p => p.id === pid);
         try {
           const res = await window.MyTeam.claimTimedTraining(pid);
-          if (typeof showToast === 'function') {
-            const lbl = ({attack:'攻',defense:'防',speed:'速',midfield:'中',stamina:'體',aura:'氣'})[res.attr];
-            showToast(`✅ Lv.${res.new_level || '?'} · ${lbl} +${res.gain}！`);
-          }
+          _showTimedClaimResult(player, res);
           renderTab();
         } catch (err) {
           alert('領取失敗：' + (err.message || err));
         }
       });
     });
+  }
+
+  // ── 時間訓練領取慶祝彈窗：portrait + 屬性條動畫 + 確認 ──
+  function _showTimedClaimResult(p, res) {
+    if (!p || !res) {
+      if (typeof showToast === 'function') showToast(`✅ Lv.${res?.new_level || '?'} · +${res?.gain || 1}！`);
+      return;
+    }
+    const c = p.card || {};
+    const ATTR_LBL = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
+    const attr = res.attr;
+    const gain = res.gain || 1;
+    const newLevel = res.new_level || (p.level + 1);
+    // 完成後當前值（用 RPC 給的或回推）
+    const newVal = Math.min(99, (p['current_' + attr] || 0) + gain);
+    const beforeVal = newVal - gain;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-claim-result-overlay';
+    const portraitId = `claim-portrait-${p.id}`;
+    overlay.innerHTML = `
+      <div class="mt-claim-result-card rarity-${c.rarity || 'R'}">
+        <div class="mt-claim-result-burst">
+          ${Array.from({length: 12}).map((_, i) => `<span class="mt-claim-spark" style="--ang:${i * 30}deg"></span>`).join('')}
+        </div>
+        <div class="mt-claim-result-title">🎉 訓練完成！</div>
+        <div class="mt-claim-result-hero">
+          <img id="${portraitId}" alt="${escapeHtml(c.name)}"
+            src="${(typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id, c.rarity) : ''}"
+            onerror="this.style.display='none'">
+          <div class="mt-claim-result-meta">
+            <div class="mt-claim-result-name">${escapeHtml(c.name || '?')}</div>
+            <div class="mt-claim-result-lvup">
+              <span class="mt-claim-result-lv-old">Lv.${p.level}</span>
+              <span class="mt-claim-result-arrow">→</span>
+              <span class="mt-claim-result-lv-new">Lv.${newLevel}</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-claim-result-bar-row">
+          <span class="mt-claim-result-bar-label">${ATTR_LBL[attr]}</span>
+          <div class="mt-claim-result-bar">
+            <div class="mt-claim-result-bar-old" style="width:${beforeVal}%"></div>
+            <div class="mt-claim-result-bar-new" style="--target:${newVal}%"></div>
+          </div>
+          <div class="mt-claim-result-val">
+            <span class="mt-claim-result-val-old">${beforeVal}</span>
+            <span class="mt-claim-result-arrow">→</span>
+            <span class="mt-claim-result-val-new">${newVal}</span>
+            <span class="mt-claim-result-gain">+${gain}</span>
+          </div>
+        </div>
+        <button class="mt-claim-result-confirm" type="button">確認</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+    if (look && window.LpcRenderer) {
+      const team = window.MyTeam.getCached();
+      const kit = team ? { shirtColor: team.kit_shirt_color, pantsColor: team.kit_pants_color } : null;
+      window.LpcRenderer.portrait(look, { scale: 6, kit }).then(url => {
+        const img = document.getElementById(portraitId);
+        if (img && url) img.src = url;
+      }).catch(() => {});
+    }
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    };
+    overlay.querySelector('.mt-claim-result-confirm').addEventListener('click', close);
+    setTimeout(close, 4500); // 自動關閉
   }
 
   // 訓練系統說明 modal
@@ -4267,21 +4364,34 @@
     const rpH = team.rp_heart || 0;
     const rpI = team.rp_idea || 0;
 
-    players.forEach(p => {
+    // 先發排前 → 板凳；組內依綜合屬性 desc
+    const sortedPlayers = [...players].sort((a, b) => {
+      const sa = a.in_starting_11 ? 0 : 1;
+      const sb = b.in_starting_11 ? 0 : 1;
+      if (sa !== sb) return sa - sb;
+      const sum = (p) => (p.current_attack||0) + (p.current_defense||0) + (p.current_speed||0)
+        + (p.current_midfield||0) + (p.current_stamina||0) + (p.current_aura||0);
+      return sum(b) - sum(a);
+    });
+    sortedPlayers.forEach(p => {
       const c = p.card || {};
+      const isStarter = !!p.in_starting_11;
       const isMaxLevel = p.level >= 50;
       const canNormal = rpT >= 10 && rpP >= 10 && !isMaxLevel;
       const canPremium = rpT >= 30 && rpP >= 30 && rpH >= 10 && rpI >= 10 && !isMaxLevel;
       const missNormal = isMaxLevel ? '已滿級' : (rpT < 10 ? '🧠不足' : rpP < 10 ? '💪不足' : '');
       const missPremium = isMaxLevel ? '已滿級' : (rpT < 30 ? '🧠不足' : rpP < 30 ? '💪不足' : rpH < 10 ? '❤️不足' : rpI < 10 ? '💡不足' : '');
       const row = document.createElement('div');
-      row.className = `mt-train-pick-row rarity-${c.rarity || 'R'}`;
+      row.className = `mt-train-pick-row rarity-${c.rarity || 'R'}${isStarter ? ' is-starter' : ''}`;
       const imgId = `train-feed-${p.id}`;
       row.innerHTML = `
         <div class="mt-train-pick-head">
           <div class="mt-train-pick-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
           <div class="mt-train-pick-info">
-            <div class="mt-train-pick-name">${escapeHtml(c.name)} <small>${c.position || ''} · Lv.${p.level}</small></div>
+            <div class="mt-train-pick-name">
+              ${isStarter ? '<span class="mt-train-pick-starter-badge">先發</span>' : ''}
+              ${escapeHtml(c.name)} <small>${c.position || ''} · Lv.${p.level}</small>
+            </div>
             <div class="mt-train-pick-attr">綜合 <b>${Math.round((p.current_attack + p.current_defense + p.current_speed + p.current_midfield + p.current_stamina + p.current_aura) / 6)}</b></div>
           </div>
         </div>
