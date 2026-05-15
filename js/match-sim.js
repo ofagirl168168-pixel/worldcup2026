@@ -459,10 +459,11 @@
       }
 
       // 體力疲勞表現：gameTimeFrac × stamina 算當前疲勞度 + 鏟球額外消耗
-      // 官方比賽（opts.disableTeamMechanics）關閉體力影響
+      // 官方比賽（state.disableTeamMechanics）關閉體力影響
+      // 注意：render() 是 IIFE 頂層函式、看不到 runSim 的 opts，只能從 state 拿
       const gtf = state.frame / TOTAL_FRAMES;
       const pStamina = p.stats?.stamina ?? 75;
-      const fatigue = opts.disableTeamMechanics ? 0
+      const fatigue = state.disableTeamMechanics ? 0
         : (gtf * Math.max(0.1, 0.55 - pStamina / 250) + (p._tackleFatigue || 0));
 
       // 頭頂體力條：持球者 + 正在鏟球的人都顯示
@@ -956,6 +957,8 @@
     // 比賽狀態
     const state = {
       spriteCache: _matchSpriteCache,  // Phase 2.2+：每球員的 PIPOYA sprite
+      // render() 是 IIFE 頂層函式、看不到 runSim 的 opts，把需要的旗標掛到 state
+      disableTeamMechanics: !!opts.disableTeamMechanics,
       possession: 'h',       // 'h' | 'a'
       possessorIdx: -1,      // index into players[]
       phase: 'kickoff',      // 'kickoff' | 'dribble' | 'pass' | 'shoot' | 'celebrate' | 'halftime'
