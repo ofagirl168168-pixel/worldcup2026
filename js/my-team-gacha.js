@@ -454,19 +454,17 @@
             const rect = pack3D.getBoundingClientRect();
             emitSpark(rect.width / 2, rect.height / 2);
           }
-          // 卡包保留可見、卡片從開口位置飛出後再淡出
+          // 立刻顯示 stage + spawn 卡片（不等卡包頂飛走、要同時 happening）
+          beam.hidden = false;
+          stage.hidden = false;
+          startStage1();
+          // 卡片全部飛完後再淡出卡包
+          const packFadeDelay = cards.length > 1 ? (1000 + cards.length * 180) : 1500;
           setTimeout(() => {
-            beam.hidden = false;
-            stage.hidden = false;
-            startStage1();
-            // 卡片全部飛完後再淡出卡包（讓玩家看到所有卡片從卡包噴出來）
-            const packFadeDelay = cards.length > 1 ? (1500 + cards.length * 200) : 2200;
-            setTimeout(() => {
-              pack.style.transition = 'opacity 1.2s ease-out';
-              pack.style.opacity = '0';
-              setTimeout(() => { pack.style.display = 'none'; }, 1300);
-            }, packFadeDelay);
-          }, 700);
+            pack.style.transition = 'opacity 1.2s ease-out';
+            pack.style.opacity = '0';
+            setTimeout(() => { pack.style.display = 'none'; }, 1300);
+          }, packFadeDelay);
         } else {
           // 撕力不夠、snap back
           setProgress(0);
@@ -485,54 +483,47 @@
       let allRevealed = false;
 
       async function startStage1() {
-        // 200ms 後顯示 skip
-        await _sleep(skipped ? 0 : 250);
-        skipBtn.hidden = false;
-
-        // 900ms 等光柱漲起來
-        await _sleep(skipped ? 0 : 850);
-
-        if (peakRarity === 'SSR' && !skipped) {
-          overlay.querySelector('#mt-gacha-flash').classList.add('mt-flash-active');
-          overlay.querySelector('.mt-gacha-rays').hidden = false;
-          stage.classList.add('mt-shake');
-          await _sleep(skipped ? 0 : 500);
-          stage.classList.remove('mt-shake');
-        } else if (peakRarity === 'SR' && !skipped) {
-          stage.classList.add('mt-pulse-sr');
-          await _sleep(skipped ? 0 : 250);
-        }
-
-        // Stage 2：卡片從卡包飛出 → 落到堆疊位置（或單張中央）
-        // 起始態為 .mt-card-pending（scale 0.15、opacity 0、translateY 60）
-        // 用 cascading setTimeout 一張一張移除 pending、transition 飛到最終位置
+        // 立刻建好卡片（pending 狀態）— 不等 beam / skip 等延遲、要跟卡包頂飛走同時發生
         const cardsEl = overlay.querySelector('#mt-gacha-cards');
         cardsEl.classList.add('mt-cards-fly-out');
         for (let i = 0; i < cards.length; i++) {
           const cardEl = _buildCard3D(cards[i], i);
           cardEl.dataset.cardIdx = i;
-          cardEl.dataset.stackIdx = i;        // 初始 stack 順位
+          cardEl.dataset.stackIdx = i;
           cardEl.classList.add('mt-card-pending');
           cardsEl.appendChild(cardEl);
-          // 延遲移除 pending → 觸發 transition 飛到最終位置
-          // 一張一張間隔 200ms（10 連約 2 秒全部飛出、看得到一張一張噴出來）
+          // 第一張在 120ms 後飛（卡包頂剛剛開始旋轉、撕線開口出現的當下）
+          // 後續每張間隔 180ms
           setTimeout(() => cardEl.classList.remove('mt-card-pending'),
-            150 + (skipped ? 0 : i * 200));
+            120 + (skipped ? 0 : i * 180));
         }
-        // 等飛出動畫播完（transition 1.2s + 最後一張延遲）
-        await _sleep(skipped ? 0 : Math.min(3500, 800 + cards.length * 200));
+
+        // skip 按鈕短延遲後出現（不阻塞）
+        setTimeout(() => { skipBtn.hidden = false; }, skipped ? 0 : 250);
+
+        // SSR / SR 特效：併發、不阻塞卡片飛出
+        if (peakRarity === 'SSR' && !skipped) {
+          setTimeout(() => {
+            overlay.querySelector('#mt-gacha-flash').classList.add('mt-flash-active');
+            overlay.querySelector('.mt-gacha-rays').hidden = false;
+            stage.classList.add('mt-shake');
+            setTimeout(() => stage.classList.remove('mt-shake'), 500);
+          }, 700);
+        } else if (peakRarity === 'SR' && !skipped) {
+          setTimeout(() => stage.classList.add('mt-pulse-sr'), 400);
+        }
+
+        // 等所有卡片飛完
+        await _sleep(skipped ? 0 : Math.min(3500, 700 + cards.length * 180));
 
         if (skipped) {
           revealAll(true);
           return;
         }
 
-        // Stage 2.5：綁定卡片點擊事件（一張一張翻）
         bindCardClicks();
-        // 顯示底部「一鍵翻全部」按鈕（多抽才有）
         const flipAllBtn = overlay.querySelector('#mt-gacha-flip-all-btn');
         if (flipAllBtn) flipAllBtn.hidden = false;
-        // 提示「點卡片翻開」
         flipPrompt.hidden = false;
       }
 
