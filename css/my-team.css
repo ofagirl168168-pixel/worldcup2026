@@ -1698,12 +1698,35 @@
 
 /* ─── 主舞台 ─── */
 .mt-gacha-stage {
-  position: relative;
-  width: 100%;
-  max-width: 560px;
+  position: fixed;
+  inset: 0;
   padding: 20px;
   text-align: center;
   z-index: 5;
+  pointer-events: none;   /* 容器不擋滑鼠、讓內部各 element 各自 enable */
+}
+.mt-gacha-stage > * { pointer-events: auto; }
+.mt-gacha-stage > .mt-gacha-banner {
+  position: absolute;
+  top: 16px; left: 50%; transform: translateX(-50%);
+  max-width: 360px;
+  margin: 0 !important;
+}
+.mt-gacha-stage > .mt-gacha-cards-wrap {
+  /* 卡片放到視窗正中央（原卡包的位置）*/
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0;
+  max-height: none;
+}
+.mt-gacha-stage > .mt-gacha-rarity-hint {
+  position: absolute;
+  top: calc(50% + 220px); left: 50%; transform: translateX(-50%);
+}
+.mt-gacha-stage > .mt-gacha-actions {
+  position: absolute;
+  bottom: 30px; left: 50%; transform: translateX(-50%);
 }
 
 .mt-gacha-skip {
@@ -1788,14 +1811,16 @@
   to   { opacity: 1; transform: translateY(0) scale(1) rotateZ(0deg); }
 }
 
-/* 從卡包飛出：用 .mt-card-pending 起始態 + transition 過渡到最終位置 */
+/* 從卡包飛出：用 .mt-card-pending 起始態 + transition 過渡到最終位置
+   起始：超小 + 從下方 200px 飛出（強烈視覺、看得到「從卡包噴出」感）
+   結束：每張卡的 stack-idx 位置（看得出是一疊）*/
 .mt-gacha-card3d.mt-card-pending {
   opacity: 0;
-  transform: translateY(60px) scale(0.15) rotateZ(0deg) !important;
+  transform: translateY(200px) scale(0.05) rotateZ(0deg) !important;
 }
 .mt-cards-fly-out .mt-gacha-card3d {
-  transition: opacity 0.4s ease-out,
-              transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.5s ease-out,
+              transform 0.75s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
 }
 

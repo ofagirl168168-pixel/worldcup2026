@@ -508,11 +508,12 @@
           cardEl.classList.add('mt-card-pending');
           cardsEl.appendChild(cardEl);
           // 延遲移除 pending → 觸發 transition 飛到最終位置
+          // 一張一張間隔 90ms（10 連約 810ms 全部飛出）
           setTimeout(() => cardEl.classList.remove('mt-card-pending'),
-            50 + (skipped ? 0 : i * 70));
+            100 + (skipped ? 0 : i * 90));
         }
-        // 等飛出動畫播完
-        await _sleep(skipped ? 0 : Math.min(900, 300 + cards.length * 70));
+        // 等飛出動畫播完（transition 0.75s + 最後一張延遲）
+        await _sleep(skipped ? 0 : Math.min(1400, 400 + cards.length * 90));
 
         if (skipped) {
           revealAll(true);
