@@ -1106,7 +1106,8 @@
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   z-index: 5;
-  perspective: 1200px;
+  /* 700px = 比 1200 更近、3D 旋轉視覺更明顯（不會像隔很遠看一塊翻牌）*/
+  perspective: 700px;
   perspective-origin: 50% 60%;
   /* idle 時夾住內部 shine 光影、避免跑到包裝外 */
   overflow: hidden;
@@ -1168,20 +1169,21 @@
   pointer-events: none;
 }
 
-/* 上半（curl）：鉸鏈在 fold 中線、帶鋸齒熱封邊 — compound 旋轉 = 紙真正在彎 */
+/* 上半（curl）：鉸鏈在 fold 中線、帶鋸齒熱封邊 — compound 旋轉 = 紙真正在彎
+   curl 拉大到 75%，base 留 25% — 讓鋸齒齒深度有空間、compound 視覺差距明顯 */
 .mt-gacha-pack-top-curl {
   position: absolute;
   left: 0; right: 0; top: 0;
-  height: 55%;                              /* fold 的上 55% */
-  transform-origin: 50% 100%;               /* 自己的 bottom = fold 中線 */
+  height: 75%;
+  transform-origin: 50% 100%;               /* 自己 bottom = fold 上 3/4 處 */
   transform-style: preserve-3d;
   backface-visibility: hidden;
   display: flex; align-items: center; justify-content: center;
   background:
-    /* 中線陰影（curl 自己 bottom 處 + 強化「在這裡又折一次」）*/
+    /* curl 自己 bottom 處的陰影（= 紙的第二折線）*/
     linear-gradient(180deg,
-      transparent 0%, transparent 78%,
-      rgba(0,0,0,0.2) 92%, rgba(0,0,0,0.3) 100%),
+      transparent 0%, transparent 80%,
+      rgba(0,0,0,0.25) 93%, rgba(0,0,0,0.4) 100%),
     radial-gradient(ellipse 60% 200% at 50% 50%,
       rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 30%, transparent 60%),
     radial-gradient(ellipse 35% 150% at 0% 50%,
@@ -1189,11 +1191,11 @@
     radial-gradient(ellipse 35% 150% at 100% 50%,
       rgba(0,0,0,0.4) 0%, transparent 70%),
     linear-gradient(150deg, #d44b3a 0%, #c0392b 50%, #8a2a1f 100%);
-  /* 鋸齒熱封邊在 curl 頂部（pack 整體的視覺最上緣）*/
+  /* 鋸齒熱封邊：齒深 40%（curl 75% × 40% ≈ 包裝高度 6.6% ≈ 13px、明顯可見）*/
   clip-path: polygon(
-    0% 24%, 5% 0%, 10% 24%, 15% 0%, 20% 24%, 25% 0%, 30% 24%, 35% 0%,
-    40% 24%, 45% 0%, 50% 24%, 55% 0%, 60% 24%, 65% 0%, 70% 24%, 75% 0%,
-    80% 24%, 85% 0%, 90% 24%, 95% 0%, 100% 24%,
+    0% 40%, 5% 0%, 10% 40%, 15% 0%, 20% 40%, 25% 0%, 30% 40%, 35% 0%,
+    40% 40%, 45% 0%, 50% 40%, 55% 0%, 60% 40%, 65% 0%, 70% 40%, 75% 0%,
+    80% 40%, 85% 0%, 90% 40%, 95% 0%, 100% 40%,
     100% 100%, 0% 100%
   );
 }
@@ -1206,9 +1208,9 @@
       rgba(0,0,0,0.35) 0%, transparent 60%),
     linear-gradient(180deg, #5a1810 0%, #3a0e08 100%);
   clip-path: polygon(
-    0% 24%, 5% 0%, 10% 24%, 15% 0%, 20% 24%, 25% 0%, 30% 24%, 35% 0%,
-    40% 24%, 45% 0%, 50% 24%, 55% 0%, 60% 24%, 65% 0%, 70% 24%, 75% 0%,
-    80% 24%, 85% 0%, 90% 24%, 95% 0%, 100% 24%,
+    0% 40%, 5% 0%, 10% 40%, 15% 0%, 20% 40%, 25% 0%, 30% 40%, 35% 0%,
+    40% 40%, 45% 0%, 50% 40%, 55% 0%, 60% 40%, 65% 0%, 70% 40%, 75% 0%,
+    80% 40%, 85% 0%, 90% 40%, 95% 0%, 100% 40%,
     100% 100%, 0% 100%
   );
   transform: rotateX(180deg);
@@ -1365,17 +1367,17 @@
   transform-origin: 50% 100%;
 }
 .mt-gacha-pack-top-fold {
-  /* 下半：以撕線為支點，rotateX 較小（最多 ~65deg）*/
-  transform: rotateX(calc(var(--tear-progress, 0) * 65deg));
+  /* 下半（base 25%）：以撕線為支點，rotateX 小（30deg）— 只是輕微翹 */
+  transform: rotateX(calc(var(--tear-progress, 0) * 30deg));
   transition: transform 0.18s ease-out, filter 0.18s ease-out;
-  filter: brightness(calc(1 - var(--tear-progress, 0) * 0.1));
+  filter: brightness(calc(1 - var(--tear-progress, 0) * 0.08));
 }
 .mt-gacha-pack-top-curl {
-  /* 上半：以 fold 中線為支點，rotateX 較大（最多 ~80deg）
-     compound = fold 65 + curl 80 = 145deg 看起來是兩段彎的紙、不再是硬板 */
-  transform: rotateX(calc(var(--tear-progress, 0) * 80deg));
+  /* 上半（curl 75%）：以 fold 上 3/4 處為支點，rotateX 大（110deg）
+     compound = 30 + 110 = 140deg 強烈彎曲、像紙真的在折 */
+  transform: rotateX(calc(var(--tear-progress, 0) * 110deg));
   transition: transform 0.18s ease-out, filter 0.18s ease-out;
-  filter: brightness(calc(1 - var(--tear-progress, 0) * 0.15));
+  filter: brightness(calc(1 - var(--tear-progress, 0) * 0.2));
 }
 .mt-gacha-pack-bottom {
   transform: none;
@@ -1416,21 +1418,21 @@
   0%, 100% { transform: none; }
 }
 
-/* base：以撕線為支點翻過去（最多 ~110deg、不必全翻、curl 會繼續疊）*/
+/* base：撕線處小角度翹起（最多 50deg）*/
 @keyframes mt-pack-tear-fold-base {
   0%   { transform: rotateX(0); filter: brightness(1); }
-  35%  { transform: rotateX(40deg) translateY(-1px); filter: brightness(0.95); }
-  70%  { transform: rotateX(85deg) translateY(-2px); filter: brightness(0.85); }
-  100% { transform: rotateX(110deg) translateY(-2px); filter: brightness(0.78); }
+  35%  { transform: rotateX(20deg) translateY(-1px); filter: brightness(0.95); }
+  70%  { transform: rotateX(40deg) translateY(-2px); filter: brightness(0.88); }
+  100% { transform: rotateX(50deg) translateY(-2px); filter: brightness(0.82); }
 }
 
-/* curl：以 fold 中線為支點再彎一段（最多 ~75deg）
-   compound 末態 ≈ 110 + 75 = 185deg → 整個上半完全翻到背後、看起來像紙真的捲過去 */
+/* curl：fold 上 3/4 處猛折回去（最多 140deg）
+   compound 末態 ≈ 50 + 140 = 190deg → 整個上半完全翻到背後、紙真的彎了一大段 */
 @keyframes mt-pack-tear-fold-curl {
   0%   { transform: rotateX(0); filter: brightness(1); }
-  35%  { transform: rotateX(28deg); filter: brightness(0.95); }
-  70%  { transform: rotateX(55deg); filter: brightness(0.85); }
-  100% { transform: rotateX(75deg); filter: brightness(0.75); }
+  35%  { transform: rotateX(50deg); filter: brightness(0.92); }
+  70%  { transform: rotateX(105deg); filter: brightness(0.82); }
+  100% { transform: rotateX(140deg); filter: brightness(0.72); }
 }
 @keyframes mt-pack-perforation-fade {
   to { opacity: 0; transform: scaleY(0.2); }
