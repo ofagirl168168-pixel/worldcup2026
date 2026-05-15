@@ -252,9 +252,13 @@
           <!-- 紙袋包裝（上半 + 下半 + 撕線）-->
           <div class="mt-gacha-pack-wrap" id="mt-gacha-pack-wrap">
             <div class="mt-gacha-pack-top">
+              <!-- 2 hinge curl：fold = 下半（鉸鏈在撕線）；curl = 上半（鉸鏈在 fold 中線）
+                   compound rotateX → 看起來是真的紙在彎、不再是硬板 -->
               <div class="mt-gacha-pack-top-fold">
-                <div class="mt-gacha-pack-logo">⚽</div>
-                <div class="mt-gacha-pack-stripe"></div>
+                <div class="mt-gacha-pack-top-curl">
+                  <div class="mt-gacha-pack-logo">⚽</div>
+                  <div class="mt-gacha-pack-stripe"></div>
+                </div>
               </div>
             </div>
             <div class="mt-gacha-pack-perforation">
