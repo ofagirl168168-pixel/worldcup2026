@@ -454,18 +454,18 @@
             const rect = pack3D.getBoundingClientRect();
             emitSpark(rect.width / 2, rect.height / 2);
           }
-          // 卡包保留可見（撕完只剩下半 + perforation 淡出）→ 立刻顯示 stage
-          // 卡片從卡包位置飛出後，再淡出卡包
+          // 卡包保留可見、卡片從開口位置飛出後再淡出
           setTimeout(() => {
             beam.hidden = false;
             stage.hidden = false;
             startStage1();
-            // 卡片飛出後 1.3 秒淡出卡包（給玩家看到從卡包噴出的感覺）
+            // 卡片飛出 2 秒後再淡出卡包（多張連抽要更久）
+            const packFadeDelay = cards.length > 1 ? 2600 : 1800;
             setTimeout(() => {
-              pack.style.transition = 'opacity 0.7s ease-out';
+              pack.style.transition = 'opacity 1s ease-out';
               pack.style.opacity = '0';
-              setTimeout(() => { pack.style.display = 'none'; }, 800);
-            }, 1300);
+              setTimeout(() => { pack.style.display = 'none'; }, 1100);
+            }, packFadeDelay);
           }, 700);
         } else {
           // 撕力不夠、snap back
@@ -515,12 +515,12 @@
           cardEl.classList.add('mt-card-pending');
           cardsEl.appendChild(cardEl);
           // 延遲移除 pending → 觸發 transition 飛到最終位置
-          // 一張一張間隔 90ms（10 連約 810ms 全部飛出）
+          // 一張一張間隔 150ms（10 連約 1.5s 全部飛出）
           setTimeout(() => cardEl.classList.remove('mt-card-pending'),
-            100 + (skipped ? 0 : i * 90));
+            100 + (skipped ? 0 : i * 150));
         }
-        // 等飛出動畫播完（transition 0.75s + 最後一張延遲）
-        await _sleep(skipped ? 0 : Math.min(1400, 400 + cards.length * 90));
+        // 等飛出動畫播完（transition 1s + 最後一張延遲）
+        await _sleep(skipped ? 0 : Math.min(2400, 600 + cards.length * 150));
 
         if (skipped) {
           revealAll(true);

@@ -1706,31 +1706,39 @@
   pointer-events: none;   /* 容器不擋滑鼠、讓內部各 element 各自 enable */
 }
 .mt-gacha-stage > * { pointer-events: auto; }
+/* 改用 left:0;right:0;margin:0 auto 取代 translateX(-50%)
+   避免 body scrollbar 讓 left:50% 視覺偏右 */
 .mt-gacha-stage > .mt-gacha-banner {
   position: absolute;
-  top: 16px; left: 50%; transform: translateX(-50%);
-  width: max-content;            /* 避免被擠成 1 字寬導致中文直書 */
+  top: 16px; left: 0; right: 0;
+  margin: 0 auto !important;
+  width: max-content;
   max-width: 90vw;
   white-space: nowrap;
-  margin: 0 !important;
 }
 .mt-gacha-stage > .mt-gacha-cards-wrap {
-  /* 卡片放到視窗正中央（原卡包的位置）*/
+  /* cards-wrap：水平 left:0/right:0/margin:auto、垂直 transform:translateY(-50%) */
   position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
+  top: 50%; left: 0; right: 0;
+  margin: 0 auto;
+  width: max-content;
+  height: max-content;
+  transform: translateY(-50%);
   padding: 0;
   max-height: none;
 }
 .mt-gacha-stage > .mt-gacha-rarity-hint {
   position: absolute;
-  top: calc(50% + 220px); left: 50%; transform: translateX(-50%);
+  top: calc(50% + 220px); left: 0; right: 0;
+  margin: 0 auto;
+  width: max-content;
   white-space: nowrap;
 }
 .mt-gacha-stage > .mt-gacha-actions {
   position: absolute;
-  bottom: 30px; left: 50%; transform: translateX(-50%);
-  width: max-content;            /* 同樣避免直書 */
+  bottom: 30px; left: 0; right: 0;
+  margin: 0 auto;
+  width: max-content;
   max-width: 90vw;
   white-space: nowrap;
   display: flex;
@@ -1779,10 +1787,9 @@
 /* ─── 卡片區 ─── */
 .mt-gacha-cards-wrap {
   perspective: 1200px;
-  max-height: 64vh;            /* 不會把翻牌按鈕擠出去 */
-  overflow-y: auto;
   display: flex; align-items: center; justify-content: center;
-  padding: 16px 8px 80px;       /* 底下留位給浮動翻牌按鈕 */
+  /* 不再 overflow:auto（scrollbar 會跑出綠色長條干擾畫面）
+     all-revealed grid 模式如果太多卡，靠 cards 自己 wrap 換行處理 */
 }
 .mt-gacha-cards {
   display: flex;
@@ -1820,15 +1827,15 @@
   to   { opacity: 1; transform: translateY(0) scale(1) rotateZ(0deg); }
 }
 
-/* 從卡包飛出：起始 = 卡包中心位置（卡片極小）→ 漸放大到最終位置
-   配合 JS 卡包不立即消失、看得到「卡片從卡包噴出來」*/
+/* 從卡包飛出：起始位置 = 卡包開口處（撕線位置、約 viewport center - 30px）
+   起始小 + 略往下 → 動畫向上長大到最終位置 → 像從卡包頂飛出來 */
 .mt-gacha-card3d.mt-card-pending {
   opacity: 0;
-  transform: scale(0.08) rotateZ(0deg) !important;   /* 從原位 scale 起、不平移 */
+  transform: translateY(40px) scale(0.12) rotateZ(0deg) !important;
 }
 .mt-cards-fly-out .mt-gacha-card3d {
-  transition: opacity 0.5s ease-out,
-              transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.6s ease-out,
+              transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
 }
 
@@ -1877,22 +1884,21 @@
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
-  max-width: min(90vw, 720px);
-  /* 取消 cards-wrap fixed 中央定位的限制 */
+  max-width: min(94vw, 820px);
 }
-/* cards-wrap 在 all-revealed 模式下放大 */
-.mt-gacha-cards-wrap:has(.mt-gacha-cards.all-revealed) {
-  width: min(90vw, 720px);
-  height: auto;
+/* cards-wrap 在 all-revealed 模式下放大、覆蓋外層 stack 固定 200x300 限制 */
+.mt-gacha-stage > .mt-gacha-cards-wrap:has(.mt-gacha-cards.all-revealed) {
+  width: min(94vw, 820px) !important;
+  height: max-content !important;
   max-height: 80vh;
-  overflow-y: auto;
+  /* 多卡溢出時讓內部捲、不要 body 捲 */
 }
 .mt-gacha-cards.all-revealed .mt-gacha-card3d {
   position: relative !important;
   top: auto !important; left: auto !important;
   transform: none !important;
-  width: 130px !important;
-  height: 195px !important;
+  width: 150px !important;
+  height: 225px !important;
   animation: none !important;
   opacity: 1 !important;
   margin: 0;
@@ -1902,6 +1908,34 @@
 .mt-gacha-cards.all-revealed .mt-gacha-card3d:hover {
   transform: translateY(-4px) !important;
 }
+
+/* grid view 內 portrait + 文字也要等比縮小、不然 portrait 160 在 150 卡裡會被剪成條紋 */
+.mt-gacha-cards.all-revealed .mt-gacha-card3d-back,
+.mt-gacha-cards.all-revealed .mt-gacha-card3d-front {
+  padding: 8px 6px !important;
+}
+.mt-gacha-cards.all-revealed .mt-gacha-front-portrait {
+  width: 105px !important;
+  height: 105px !important;
+  margin: 2px auto 4px !important;
+  border-width: 2px !important;
+}
+.mt-gacha-cards.all-revealed .mt-gacha-front-portrait-pos {
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 12px !important;
+}
+.mt-gacha-cards.all-revealed .mt-gacha-front-rarity-badge { font-size: 9px !important; padding: 1px 5px !important; }
+.mt-gacha-cards.all-revealed .mt-gacha-front-stars { font-size: 10px !important; }
+.mt-gacha-cards.all-revealed .mt-gacha-front-name { font-size: 12px !important; margin-top: 2px !important; }
+.mt-gacha-cards.all-revealed .mt-gacha-front-nick { font-size: 9px !important; }
+.mt-gacha-cards.all-revealed .mt-gacha-front-pos { font-size: 10px !important; }
+.mt-gacha-cards.all-revealed .mt-gacha-front-stats { font-size: 9px !important; gap: 1px 4px !important; margin-top: 2px !important; }
+.mt-gacha-cards.all-revealed .mt-gacha-front-stats > div { padding: 0 !important; }
+.mt-gacha-cards.all-revealed .mt-gacha-talent,
+.mt-gacha-cards.all-revealed .mt-gacha-dup,
+.mt-gacha-cards.all-revealed .mt-gacha-pity { font-size: 8.5px !important; padding: 1px 4px !important; margin-top: 2px !important; }
+.mt-gacha-cards.all-revealed .mt-gacha-back-emblem { font-size: 56px !important; }
 
 /* 底部「一鍵翻全部」按鈕 */
 .mt-gacha-flip-all-btn {
