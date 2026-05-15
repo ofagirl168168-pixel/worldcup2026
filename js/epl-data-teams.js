@@ -893,7 +893,7 @@ window.EPL_MATCHES = [
   // 切爾西 vs 熱刺 | 05/20 03:15 台灣時間 (05/19 20:15 BST，因足總盃決賽延期)
   {id:'EPL-MW37-CHE-TOT', matchday:37, date:'2026-05-20', time:'03:15', home:'CHE', away:'TOT', stage:'league', status:'upcoming'},
 
-  // ===== 第 38 輪 (2026-05-25 00:00 台灣時間，全場同時開球 05/24 17:00 BST) =====
+  // ===== 第 38 輪 (05/24 17:00 BST = 05/25 00:00 台灣時間，全場同時開球) =====
 
   // 布萊頓 vs 曼聯 | 05/25 00:00 台灣時間
   {id:'EPL-MW38-BHA-MUN', matchday:38, date:'2026-05-25', time:'00:00', home:'BHA', away:'MUN', stage:'league', status:'upcoming'},
