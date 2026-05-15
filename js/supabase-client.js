@@ -439,13 +439,14 @@ async function fetchChampionVotes() {
   } catch(e) { return { counts: {}, total: 0 } }
 }
 
-// ── 取得排行榜資料 ────────────────────────────────────────
+// ── 取得排行榜資料（top 100、附總人數）──────────────────────
 async function fetchLeaderboard() {
-  const { data, error } = await DB.from('leaderboard')
-    .select('*')
-    .order('xp', { ascending: false }).limit(50);
-  if (error) { console.error('排行榜錯誤:', error); return []; }
-  return data ?? [];
+  // count: 'exact' 讓 supabase 回傳符合條件的總筆數（不受 limit 影響）
+  const { data, error, count } = await DB.from('leaderboard')
+    .select('*', { count: 'exact' })
+    .order('xp', { ascending: false }).limit(100);
+  if (error) { console.error('排行榜錯誤:', error); return { rows: [], total: 0 }; }
+  return { rows: data ?? [], total: count ?? 0 };
 }
 
 // ── 渲染排行榜（插入 arena 區塊後方）────────────────────────
@@ -492,7 +493,19 @@ async function renderLeaderboard(containerId) {
 
   el.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-muted)">載入中...</div>`;
 
-  const rows = await fetchLeaderboard();
+  const { rows, total } = await fetchLeaderboard();
+
+  // 顯示「共 N 人」總數於 leaderboard 標題旁（找 section-header h2）
+  const headerEl = el.closest('div')?.querySelector('.section-header h2');
+  if (headerEl && total > 0) {
+    // 移除舊的 chip 避免重複
+    headerEl.querySelector('.lb-total-chip')?.remove();
+    const chip = document.createElement('span');
+    chip.className = 'lb-total-chip';
+    chip.style.cssText = 'font-size:13px;font-weight:600;color:var(--text-muted);margin-left:10px;background:rgba(255,255,255,0.06);padding:2px 9px;border-radius:999px;letter-spacing:0.3px';
+    chip.textContent = `共 ${total} 人`;
+    headerEl.appendChild(chip);
+  }
 
   if (rows.length === 0) {
     el.innerHTML = `
