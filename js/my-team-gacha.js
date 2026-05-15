@@ -332,6 +332,9 @@
       <div class="mt-gacha-flash" id="mt-gacha-flash"></div>
     `;
     document.body.appendChild(overlay);
+    // 鎖 body scroll、避免 gacha 過程 scrollbar 出現/消失導致 stage-frame 偏移
+    const _bodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     requestAnimationFrame(() => overlay.classList.add('open'));
 
     return new Promise(resolve => {
@@ -340,6 +343,7 @@
       const cleanup = () => {
         if (resolved) return;
         resolved = true;
+        document.body.style.overflow = _bodyOverflow;   // 還原 body scroll
         overlay.classList.remove('open');
         setTimeout(() => overlay.remove(), 350);
         resolve();
@@ -581,20 +585,52 @@
         }
       }
 
-      // 全部翻完 → 把所有卡片排成 grid 展示（取代 stack 模式）
+      // 全部翻完 → 把所有卡片排成 grid 展示（用 FLIP 技巧平滑過渡）
+      // FLIP = First-Last-Invert-Play：先量舊位置 → 套新 layout → 反向 transform 拉回舊位置 → 移除 transform 動畫到新位置
       function showAllRevealedGrid() {
         const cardsEl = overlay.querySelector('#mt-gacha-cards');
-        // 移除 slid-off 把飛走的拉回來、加 .all-revealed 切到 grid layout
-        cardsEl.querySelectorAll('.mt-gacha-card3d').forEach(el => {
+        const cardEls = Array.from(cardsEl.querySelectorAll('.mt-gacha-card3d'));
+
+        // 1. FIRST：量每張卡當前 viewport 位置（stack 狀態 / slid-off 狀態）
+        const firstRects = cardEls.map(el => el.getBoundingClientRect());
+
+        // 2. 套上 all-revealed 切到 grid layout（瞬間 teleport）
+        cardEls.forEach(el => {
           el.classList.remove('slid-off');
-          // 確保每張都是翻過的
-          if (!el.classList.contains('flipped')) {
-            el.classList.add('flipped');
-          }
+          if (!el.classList.contains('flipped')) el.classList.add('flipped');
         });
         cardsEl.classList.add('all-revealed');
-        // 等 grid 重排動畫過完再開 CTA
-        setTimeout(showCTAs, 600);
+
+        // 3. LAST：量每張卡新 grid 位置
+        const lastRects = cardEls.map(el => el.getBoundingClientRect());
+
+        // 4. INVERT：對每張卡套 inverse transform 視覺上拉回原位
+        // 注意：all-revealed CSS rule 有 transform:none !important、要用 setProperty 帶 important
+        cardEls.forEach((el, i) => {
+          const dx = firstRects[i].left - lastRects[i].left;
+          const dy = firstRects[i].top - lastRects[i].top;
+          el.style.setProperty('transition', 'none', 'important');
+          el.style.setProperty('transform', `translate(${dx}px, ${dy}px)`, 'important');
+        });
+
+        // 5. PLAY：force reflow 後下一 frame 解除 transform、transition 平滑到 grid 位置
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            cardEls.forEach(el => {
+              el.style.setProperty('transition', 'transform 0.6s cubic-bezier(0.34, 1.2, 0.64, 1)', 'important');
+              el.style.setProperty('transform', 'translate(0px, 0px)', 'important');
+            });
+          });
+        });
+
+        // 動畫結束清理 inline style + 顯示 CTA
+        setTimeout(() => {
+          cardEls.forEach(el => {
+            el.style.removeProperty('transition');
+            el.style.removeProperty('transform');
+          });
+          showCTAs();
+        }, 750);
       }
 
       function showCTAs() {
