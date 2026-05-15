@@ -338,7 +338,7 @@
     const cta = overlay.querySelector('#mt-tut-train-cta');
 
     try {
-      const res = await window.MyTeam.startTimedTraining(target.id, 'speed', true);
+      const res = await window.MyTeam.startTimedTraining(target.id, 'speed', 'tutorial');
       const duration = res.duration_sec || 3;
       status.textContent = `⏱️ ${duration} 秒後可領取`;
       const start = Date.now();
@@ -4468,27 +4468,18 @@
       const isTraining = p.training_attr && p.training_finish_at;
       const isReady = isTraining && new Date(p.training_finish_at) <= new Date();
       const isStarter = !!p.in_starting_11;
-      const currentAttrVal = p['current_' + attr] || 0;
-      const estSec = Math.max(60, Math.floor(Math.pow(currentAttrVal / 25, 2.2) * 50));
-      const estLabel = estSec >= 3600 ? `${(estSec/3600).toFixed(1)} 小時`
-        : estSec >= 60 ? `${Math.floor(estSec/60)} 分` : `${estSec} 秒`;
-      const rpT = team.rp_tactical || 0;
-      const rpP = team.rp_physical || 0;
-      const rpH = team.rp_heart || 0;
-      const rpI = team.rp_idea || 0;
       const isMaxLevel = p.level >= 50;
-      const canNormal = rpT >= 10 && rpP >= 10 && !isMaxLevel;
-      const canPremium = rpT >= 30 && rpP >= 30 && rpH >= 10 && rpI >= 10 && !isMaxLevel;
-      // 缺什麼？（顯示具體原因）
-      const missNormal = isMaxLevel ? '已滿級' :
-        (rpT < 10 ? `🧠不足` : rpP < 10 ? `💪不足` : '');
-      const missPremium = isMaxLevel ? '已滿級' :
-        (rpT < 30 ? `🧠不足` : rpP < 30 ? `💪不足` :
-         rpH < 10 ? `❤️不足` : rpI < 10 ? `💡不足` : '');
 
-      const row = document.createElement('div');
-      row.className = `mt-train-pick-row rarity-${c.rarity || 'R'}${isStarter ? ' is-starter' : ''}`;
+      const row = document.createElement('button');
+      row.type = 'button';
+      row.className = `mt-train-pick-row mt-train-pick-row-clickable rarity-${c.rarity || 'R'}${isStarter ? ' is-starter' : ''}${isTraining ? ' is-busy' : ''}${isMaxLevel ? ' is-max' : ''}`;
+      row.dataset.pid = p.id;
       const imgId = `train-pick-${p.id}`;
+      const statusHint = isTraining
+        ? (isReady ? '<span class="mt-train-pick-status ready">✋ 已完成 → 主畫面領取</span>'
+                   : '<span class="mt-train-pick-status busy">⏱️ 訓練中</span>')
+        : isMaxLevel ? '<span class="mt-train-pick-status max">Lv.50 滿級</span>'
+        : '<span class="mt-train-pick-hint">→ 點選 → 選時長</span>';
       row.innerHTML = `
         <div class="mt-train-pick-head">
           <div class="mt-train-pick-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
@@ -4498,25 +4489,8 @@
               ${escapeHtml(c.name)} <small>${c.position || ''} · Lv.${p.level}</small>
             </div>
             <div class="mt-train-pick-attr">${ATTR_LABELS[attr]} <b>${p['current_' + attr]}</b> / 99</div>
+            ${statusHint}
           </div>
-        </div>
-        <div class="mt-train-pick-btns">
-          ${isTraining ? `
-            <div class="mt-train-pick-busy">${isReady ? '⏱️ 訓練已完成（回主畫面領取）' : '⏱️ 此球員訓練中'}</div>
-          ` : `
-            <button class="mt-train-pick-btn mt-train-pick-timed" data-pid="${p.id}">
-              <div class="mt-train-btn-title">⏱️ 慢慢練</div>
-              <div class="mt-train-btn-sub">等 ${estLabel} → +1</div>
-            </button>
-            <button class="mt-train-pick-btn mt-train-pick-rp ${canNormal ? '' : 'is-unaffordable'}" data-pid="${p.id}" data-mode="normal" title="${missNormal}">
-              <div class="mt-train-btn-title">⚡ 集訓升等</div>
-              <div class="mt-train-btn-sub">${canNormal ? '🧠10 💪10 → Lv+1' : '⚠️ ' + (missNormal || '')}</div>
-            </button>
-            <button class="mt-train-pick-btn mt-train-pick-rp mt-train-btn-premium ${canPremium ? '' : 'is-unaffordable'}" data-pid="${p.id}" data-mode="premium" title="${missPremium}">
-              <div class="mt-train-btn-title">⭐ 精英特訓</div>
-              <div class="mt-train-btn-sub">${canPremium ? '🧠30 💪30 ❤️10 💡10' : '⚠️ ' + (missPremium || '')}</div>
-            </button>
-          `}
         </div>
       `;
       list.appendChild(row);
@@ -4527,43 +4501,161 @@
           if (img && url) img.src = url;
         }).catch(() => {});
       }
-    });
-
-    // 時間訓練
-    overlay.querySelectorAll('.mt-train-pick-timed').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const pid = btn.dataset.pid;
-        btn.disabled = true; btn.innerHTML = '開始中…';
-        try {
-          await window.MyTeam.startTimedTraining(pid, attr);
-          overlay.classList.remove('open');
-          setTimeout(() => overlay.remove(), 200);
-          renderTab();
-        } catch (e) {
-          const msg = String(e.message || e);
-          if (typeof showToast === 'function') {
-            showToast(msg.includes('ALREADY_TRAINING') ? '⚠️ 該球員已在訓練' : '開始訓練失敗：' + msg);
-          }
-          btn.disabled = false;
-          renderTab();
-        }
-      });
-    });
-
-    // RP 訓練 → 開預覽頁（不直接練）
-    overlay.querySelectorAll('.mt-train-pick-rp').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const pid = btn.dataset.pid;
-        const mode = btn.dataset.mode;
-        const player = players.find(pp => pp.id === pid);
-        if (!player) return;
-        _openTrainPreview(player, mode, team, () => {
-          // 訓練成功後 → 關掉這個 picker
-          overlay.classList.remove('open');
-          setTimeout(() => overlay.remove(), 200);
-          renderHub();
+      // 點 row → 開 4 時長集訓營 preview
+      if (!isTraining && !isMaxLevel) {
+        row.addEventListener('click', () => {
+          _openFocusTrainPreview(p, attr, () => {
+            overlay.classList.remove('open');
+            setTimeout(() => overlay.remove(), 200);
+            renderTab();
+          });
         });
+      }
+    });
+  }
+
+  // ─── 集訓營 preview：選 4 個時長之一 + 顯示能力條增量 ───
+  function _openFocusTrainPreview(p, attr, onSuccess) {
+    const c = p.card || {};
+    const ATTR_KEYS = ['attack','defense','speed','midfield','stamina','aura'];
+    const ATTR_LABELS = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
+
+    // 4 時長卡片資料
+    const TIERS = [
+      { id: '30m', label: '30 分', dur: 30 * 60,       gain: 1, lvUp: false, talent: 0 },
+      { id: '2h',  label: '2 小時', dur: 2 * 3600,     gain: 2, lvUp: false, talent: 0 },
+      { id: '8h',  label: '8 小時', dur: 8 * 3600,     gain: 4, lvUp: true,  talent: 0 },
+      { id: '24h', label: '24 小時', dur: 24 * 3600,   gain: 7, lvUp: true,  talent: 5 },
+    ];
+    let selectedTier = '8h';   // 預設
+
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-focus-preview-overlay';
+    const portraitId = `focus-portrait-${p.id}`;
+    const rarityClass = `rarity-${c.rarity || 'R'}`;
+    overlay.innerHTML = `
+      <div class="mt-profile-card mt-focus-preview-card ${rarityClass}">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <div class="mt-focus-preview-title">🏋️ ${ATTR_LABELS[attr]} 集訓營</div>
+        <div class="mt-focus-preview-sub">鎖人練單一屬性 — 完成前不能上場、不能再訓練</div>
+
+        <div class="mt-profile-hero">
+          <div class="mt-profile-portrait-wrap">
+            <img id="${portraitId}" class="mt-profile-portrait" alt="${escapeHtml(c.name)}"
+              src="${(typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id, c.rarity) : ''}"
+              onerror="this.style.display='none'">
+            <span class="mt-profile-rarity">${c.rarity || 'R'}</span>
+          </div>
+          <div class="mt-profile-meta">
+            <div class="mt-profile-name">${escapeHtml(c.name || '?')}</div>
+            <div class="mt-profile-pos">${c.position}・Lv.${p.level}</div>
+          </div>
+        </div>
+
+        <div class="mt-focus-preview-bars" id="mt-focus-preview-bars"></div>
+
+        <div class="mt-focus-tier-grid">
+          ${TIERS.map(t => `
+            <button type="button" class="mt-focus-tier-card${t.id === selectedTier ? ' is-selected' : ''}${t.id === '24h' ? ' is-premium' : ''}" data-tier="${t.id}">
+              <div class="mt-focus-tier-label">${t.label}</div>
+              <div class="mt-focus-tier-gain">${ATTR_LABELS[attr]} <b>+${t.gain}</b></div>
+              ${t.lvUp ? '<div class="mt-focus-tier-extra">Lv +1</div>' : '<div class="mt-focus-tier-extra-empty">&nbsp;</div>'}
+              ${t.talent ? `<div class="mt-focus-tier-talent">✨ ${t.talent}% 覺醒</div>` : '<div class="mt-focus-tier-extra-empty">&nbsp;</div>'}
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="mt-focus-tier-finish" id="mt-focus-tier-finish"></div>
+
+        <div class="mt-train-preview-actions">
+          <button class="mt-train-preview-cancel" type="button">取消</button>
+          <button class="mt-train-preview-confirm" type="button">✅ 開始集訓營</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+    if (look && window.LpcRenderer) {
+      const team = window.MyTeam.getCached();
+      const kit = team ? { shirtColor: team.kit_shirt_color, pantsColor: team.kit_pants_color } : null;
+      window.LpcRenderer.portrait(look, { scale: 6, kit }).then(url => {
+        const img = document.getElementById(portraitId);
+        if (img && url) img.src = url;
+      }).catch(() => {});
+    }
+
+    // 渲染屬性條（被選的 attr 顯示增量）
+    function renderBars() {
+      const tier = TIERS.find(t => t.id === selectedTier);
+      const gain = tier?.gain || 0;
+      const barsHost = overlay.querySelector('#mt-focus-preview-bars');
+      barsHost.innerHTML = ATTR_KEYS.map(k => {
+        const cur = p['current_' + k] || 0;
+        const isTarget = k === attr;
+        const projVal = isTarget ? Math.min(99, cur + gain) : cur;
+        const gainW = Math.max(0, projVal - cur);
+        return `
+          <div class="mt-train-preview-row ${isTarget ? 'is-target' : ''}">
+            <span class="mt-train-preview-label">${ATTR_LABELS[k]}</span>
+            <div class="mt-train-preview-bar">
+              <div class="mt-train-preview-bar-cur" style="width:${cur}%"></div>
+              ${isTarget && gainW > 0 ? `<div class="mt-train-preview-bar-gain" style="left:${cur}%; width:${gainW}%"></div>` : ''}
+            </div>
+            <span class="mt-train-preview-val">
+              <span class="mt-train-preview-val-cur">${cur}</span>
+              ${isTarget && gain > 0 ? `<span class="mt-train-preview-val-gain">+${gain}</span>` : ''}
+            </span>
+          </div>
+        `;
+      }).join('');
+      // 完成時間顯示
+      const finish = new Date(Date.now() + tier.dur * 1000);
+      const today = new Date();
+      const sameDay = finish.toDateString() === today.toDateString();
+      const fmt = (d) => `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      const dayLabel = sameDay ? '今天' : finish.getDate() === today.getDate() + 1 ? '明天' : `${finish.getMonth() + 1}/${finish.getDate()}`;
+      overlay.querySelector('#mt-focus-tier-finish').textContent = `⏰ 完成時間：${dayLabel} ${fmt(finish)}`;
+    }
+    renderBars();
+
+    overlay.querySelectorAll('.mt-focus-tier-card').forEach(card => {
+      card.addEventListener('click', () => {
+        overlay.querySelectorAll('.mt-focus-tier-card').forEach(c => c.classList.remove('is-selected'));
+        card.classList.add('is-selected');
+        selectedTier = card.dataset.tier;
+        renderBars();
       });
+    });
+
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    };
+    overlay.querySelector('.mt-profile-close').addEventListener('click', close);
+    overlay.querySelector('.mt-train-preview-cancel').addEventListener('click', close);
+
+    overlay.querySelector('.mt-train-preview-confirm').addEventListener('click', async () => {
+      const btn = overlay.querySelector('.mt-train-preview-confirm');
+      btn.disabled = true; btn.textContent = '開始中…';
+      try {
+        await window.MyTeam.startTimedTraining(p.id, attr, selectedTier);
+        if (typeof showToast === 'function') {
+          const tier = TIERS.find(t => t.id === selectedTier);
+          showToast(`🏋️ ${c.name} 進入 ${tier.label} ${ATTR_LABELS[attr]} 集訓營！`);
+        }
+        close();
+        if (typeof onSuccess === 'function') onSuccess();
+      } catch (e) {
+        const msg = String(e.message || e);
+        let friendly = '開始訓練失敗：' + msg;
+        if (msg.includes('ALREADY_TRAINING')) friendly = '⚠️ 該球員已在訓練';
+        else if (msg.includes('MAX_LEVEL'))   friendly = '⚠️ 已滿級';
+        if (typeof showToast === 'function') showToast(friendly);
+        btn.disabled = false;
+        btn.textContent = '✅ 開始集訓營';
+      }
     });
   }
 

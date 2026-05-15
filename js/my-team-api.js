@@ -232,12 +232,14 @@
     return data;
   }
 
-  async function startTimedTraining(playerId, attr, tutorial = false) {
+  // tier: '30m' | '2h' | '8h' | '24h'
+  async function startTimedTraining(playerId, attr, tier = '30m') {
     if (!window.DB) throw new Error('NOT_LOGGED_IN');
     const { data, error } = await window.DB.rpc('start_timed_training', {
-      p_player_id: playerId, p_attr: attr, p_tutorial: !!tutorial,
+      p_player_id: playerId, p_attr: attr, p_tier: tier,
     });
     if (error) throw error;
+    await fetch_();
     return data;
   }
   async function claimTimedTraining(playerId) {

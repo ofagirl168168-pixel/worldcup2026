@@ -7720,6 +7720,56 @@ button.mt-train-point-card:active { transform: translateY(0); }
   cursor: not-allowed;
   filter: grayscale(0.6);
 }
+/* 集訓營 picker row（整列可點、不再 per-row 3 buttons）*/
+.mt-train-pick-row-clickable {
+  cursor: pointer;
+  width: 100%;
+  border-width: 2px;
+  text-align: left;
+  font-family: inherit;
+  color: #fff;
+  transition: transform 0.12s, border-color 0.15s, background 0.15s;
+}
+.mt-train-pick-row-clickable:hover:not(.is-busy):not(.is-max) {
+  transform: translateY(-1px);
+  border-color: #f0c040;
+  background: rgba(240,192,64,0.08);
+}
+.mt-train-pick-row-clickable.is-busy,
+.mt-train-pick-row-clickable.is-max {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.mt-train-pick-status {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 999px;
+  margin-top: 3px;
+}
+.mt-train-pick-status.ready {
+  background: rgba(76,175,80,0.25);
+  border: 1px solid rgba(76,175,80,0.6);
+  color: #b9e8b3;
+}
+.mt-train-pick-status.busy {
+  background: rgba(33,150,243,0.2);
+  border: 1px solid rgba(33,150,243,0.55);
+  color: #90caf9;
+}
+.mt-train-pick-status.max {
+  background: rgba(240,192,64,0.18);
+  border: 1px solid rgba(240,192,64,0.55);
+  color: #ffe680;
+}
+.mt-train-pick-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  display: inline-block;
+  margin-top: 3px;
+}
+
 /* RP 不足但保持可點 — click 後預覽彈窗會說明 */
 .mt-train-pick-btn.is-unaffordable {
   opacity: 0.55;
@@ -7902,6 +7952,112 @@ button.mt-train-point-card:active { transform: translateY(0); }
   box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
 }
 .mt-claim-result-confirm:hover { filter: brightness(1.1); }
+
+/* ─── 集訓營 preview modal (4 時長卡 + 能力條增量) ─── */
+.mt-focus-preview-overlay { z-index: 12003; }
+.mt-focus-preview-card { max-width: 460px; }
+.mt-focus-preview-title {
+  font-size: 19px;
+  font-weight: 900;
+  color: #ffe680;
+  text-align: center;
+  letter-spacing: 1.5px;
+  margin-bottom: 2px;
+}
+.mt-focus-preview-sub {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.65);
+  text-align: center;
+  margin-bottom: 14px;
+}
+.mt-focus-preview-bars {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 9px 12px;
+  margin: 6px 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mt-focus-preview-bars .mt-train-preview-row.is-target .mt-train-preview-label {
+  color: #ffe680;
+  font-weight: 900;
+}
+
+/* 4 時長卡片 — 4 等分 grid */
+.mt-focus-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.mt-focus-tier-card {
+  background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 8px 4px;
+  color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: transform 0.1s, border-color 0.12s, background 0.12s;
+}
+.mt-focus-tier-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(240,192,64,0.6);
+  background: rgba(240,192,64,0.08);
+}
+.mt-focus-tier-card.is-selected {
+  border-color: #f0c040;
+  background: linear-gradient(180deg, rgba(240,192,64,0.25), rgba(240,192,64,0.08));
+  box-shadow: 0 0 12px rgba(240,192,64,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.mt-focus-tier-card.is-premium {
+  border-color: rgba(255,107,157,0.5);
+}
+.mt-focus-tier-card.is-premium.is-selected {
+  border-color: #ff6b9d;
+  background: linear-gradient(180deg, rgba(255,107,157,0.25), rgba(155,135,245,0.12));
+  box-shadow: 0 0 14px rgba(255,107,157,0.55), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.mt-focus-tier-label {
+  font-size: 13px;
+  font-weight: 900;
+  color: #ffe680;
+  letter-spacing: 0.5px;
+}
+.mt-focus-tier-gain {
+  font-size: 10px;
+  color: rgba(255,255,255,0.8);
+}
+.mt-focus-tier-gain b { color: #b9e8b3; font-size: 14px; }
+.mt-focus-tier-extra {
+  font-size: 10px;
+  font-weight: 800;
+  color: #90caf9;
+}
+.mt-focus-tier-extra-empty { font-size: 10px; opacity: 0; user-select: none; }
+.mt-focus-tier-talent {
+  font-size: 9.5px;
+  font-weight: 900;
+  color: #ff6b9d;
+  text-shadow: 0 0 6px rgba(255,107,157,0.5);
+  letter-spacing: 0.3px;
+}
+.mt-focus-tier-finish {
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 8px;
+  background: rgba(0,0,0,0.25);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
 
 /* ─── 訓練預覽 modal (能力卡 + 增量條) ─── */
 .mt-train-preview-overlay { z-index: 12003; }
