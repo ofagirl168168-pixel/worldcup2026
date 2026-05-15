@@ -1242,7 +1242,7 @@
     el.innerHTML = `
       <div class="mt-pitch-player-portrait">
         <img id="${imgId}" alt="${escapeHtml(c.name || '')}" loading="lazy" src="${fallback}" onerror="this.style.opacity='0.3'">
-        ${isInjured ? '<span class="mt-pitch-injury">🏥</span>' : ''}
+        ${isInjured ? '<span class="mt-pitch-injury">🏥 傷</span>' : ''}
         <span class="mt-pitch-player-pos pos-${c.position || ''}">${c.position || ''}</span>
         ${warnBubble}
       </div>
@@ -1286,7 +1286,7 @@
     const isInjured = p.injured_until && new Date(p.injured_until) > new Date();
     const fallback = (typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id, c.rarity) : '';
     el.innerHTML = `
-      ${isInjured ? '<span class="mt-bench-injury">🏥</span>' : ''}
+      ${isInjured ? '<span class="mt-bench-injury">🏥 傷</span>' : ''}
       <span class="mt-bench-rarity">${c.rarity || 'R'}</span>
       <span class="mt-bench-position pos-${c.position || ''}">${c.position || ''}</span>
       <img id="${imgId}" alt="${escapeHtml(c.name || '')}" src="${fallback}" onerror="this.style.opacity='0.3'">
@@ -1353,6 +1353,21 @@
     return MAP[t] || null;
   }
 
+  // ── helper：場外加成（訓練 RP、抗翻盤、老將 — 不算比賽屬性 buff）──
+  // 回傳 [{ icon, label, pct, weighted }, ...]
+  function _coachOffMatchBuffs(coach, weight) {
+    if (!coach || !coach.trait) return [];
+    const w = weight === undefined ? 1 : weight;
+    const MAP = {
+      youth_developer:    { icon: '📚', label: '訓練 RP', pct: 0.25, scope: '訓練' },
+      champion_mentality: { icon: '🏆', label: '抗翻盤',   pct: 0.30, scope: '比賽 · 不疊加' },
+      veteran_handler:    { icon: '🧓', label: '老將',     pct: 0.10, scope: '老將屬性' },
+    };
+    const m = MAP[coach.trait];
+    if (!m) return [];
+    return [{ ...m, weighted: m.pct * w }];
+  }
+
   // ── helper：合計 buff（主 100% + 2 助教 50% + 羈絆）──
   function _computeCombinedBuff(head, a1, a2, synergy) {
     const combined = {};
@@ -1365,29 +1380,59 @@
     merge(_coachBuffMap(head?.coach), 1.0);
     merge(_coachBuffMap(a1?.coach), 0.5);
     merge(_coachBuffMap(a2?.coach), 0.5);
-    // 羈絆額外 buff
     if (synergy && synergy.buff) merge(synergy.buff, 1.0);
     return combined;
   }
 
-  // ── helper：合計 buff 顯示 HTML ──
-  function _renderCombinedBuffHtml(buff) {
-    if (!buff || Object.keys(buff).length === 0) {
-      return '<div class="mt-coach-total-buff mt-coach-total-buff-empty">尚未指派任何教練 — 沒有加成</div>';
+  // ── helper：合計場外加成（訓練 / 抗翻盤 / 老將）──
+  // 加上羈絆「青訓計畫」的訓練 RP +50%（synergy.buff 為 null 但 effect 文字裡）
+  function _computeOffMatchBuffs(head, a1, a2, synergy) {
+    const merged = {}; // key → { icon, label, pct, scope }
+    const add = (arr) => {
+      arr.forEach(b => {
+        const key = b.label;
+        if (!merged[key]) merged[key] = { icon: b.icon, label: b.label, pct: 0, scope: b.scope };
+        merged[key].pct += b.weighted;
+      });
+    };
+    add(_coachOffMatchBuffs(head?.coach, 1.0));
+    add(_coachOffMatchBuffs(a1?.coach, 0.5));
+    add(_coachOffMatchBuffs(a2?.coach, 0.5));
+    // 青訓羈絆 → 訓練 RP +50%
+    if (synergy && /青訓/.test(synergy.label || '')) {
+      if (!merged['訓練 RP']) merged['訓練 RP'] = { icon: '📚', label: '訓練 RP', pct: 0, scope: '訓練' };
+      merged['訓練 RP'].pct += 0.50;
     }
+    return Object.values(merged).filter(b => b.pct > 0);
+  }
+
+  // ── helper：合計 buff 顯示 HTML（含場外加成 row）──
+  function _renderCombinedBuffHtml(buff, offMatch) {
     const ATTR_LBL = {
       attack: '攻擊', defense: '防守', speed: '速度',
       midfield: '中場', stamina: '體力', aura: '氣場',
     };
     const ORDER = ['attack','defense','speed','midfield','stamina','aura'];
+    const hasMatch = buff && Object.keys(buff).some(k => buff[k] > 0);
+    const hasOff = offMatch && offMatch.length > 0;
+    if (!hasMatch && !hasOff) {
+      return '<div class="mt-coach-total-buff mt-coach-total-buff-empty">尚未指派任何教練 — 沒有加成</div>';
+    }
     const pills = ORDER
-      .filter(k => buff[k] && buff[k] > 0)
+      .filter(k => buff && buff[k] > 0)
       .map(k => `<span class="mt-coach-buff-pill">${ATTR_LBL[k]} +${Math.round(buff[k] * 100)}%</span>`)
+      .join('');
+    const offPills = (offMatch || [])
+      .map(b => `<span class="mt-coach-buff-pill mt-coach-buff-pill-off" title="${escapeHtml(b.scope)}">${b.icon} ${escapeHtml(b.label)} +${Math.round(b.pct * 100)}%</span>`)
       .join('');
     return `
       <div class="mt-coach-total-buff">
         <span class="mt-coach-total-buff-label">🎯 合計加成</span>
-        <div class="mt-coach-total-buff-pills">${pills || '<span class="mt-coach-buff-empty">無</span>'}</div>
+        <div class="mt-coach-total-buff-pills">
+          ${pills || ''}
+          ${offPills}
+          ${(!pills && !offPills) ? '<span class="mt-coach-buff-empty">無</span>' : ''}
+        </div>
       </div>
     `;
   }
@@ -1440,6 +1485,33 @@
     `;
   }
 
+  // ── helper：把 trait 對應到「羈絆派系」（與 _computeSynergy 同步）──
+  // 回傳該 trait 屬於哪些 family（多重歸屬：tiki_taka ∈ tactic+attack；gegen_press ∈ speed+stamina）
+  function _coachFamilies(trait) {
+    const F = {
+      tactician:        ['tactic'],
+      tiki_taka:        ['tactic', 'attack'],
+      offensive_master: ['attack'],
+      defensive_master: ['defense'],
+      iron_wall:        ['defense'],
+      speed_coach:      ['speed'],
+      gegen_press:      ['speed', 'stamina'],
+      physio:           ['stamina'],
+      youth_developer:  ['youth'],
+    };
+    return F[trait] || [];
+  }
+  const FAMILY_META = {
+    tactic:  { icon: '🧠', label: '戰術派',  synergy: '🧠 戰術三人組',  effect: '中場 +15%' },
+    attack:  { icon: '⚔️', label: '攻擊派',  synergy: '⚔️ 攻擊三叉戟',  effect: '攻擊 +15%' },
+    defense: { icon: '🛡️', label: '防線派',  synergy: '🛡️ 鋼鐵防線',    effect: '防守 +15%' },
+    speed:   { icon: '⚡', label: '速度派',  synergy: '⚡ 衝刺軍團',    effect: '速度 +12%' },
+    stamina: { icon: '❤️', label: '體能派',  synergy: '❤️ 體能訓練營',  effect: '體力 +20%' },
+    youth:   { icon: '👶', label: '青訓派',  synergy: '👶 青訓計畫',    effect: '訓練 RP +50%' },
+    other:   { icon: '🎓', label: '其他',    synergy: null,            effect: null },
+  };
+  const FAMILY_ORDER = ['tactic','attack','defense','speed','stamina','youth','other'];
+
   // ── helper：展開所有教練 modal（網格列表、點教練開角色選單）──
   function _openAllCoachesModal(coaches, onChange) {
     const team = window.MyTeam.getCached();
@@ -1449,20 +1521,41 @@
       uc.id === team.active_coach_id ? 'head' :
       uc.id === team.assist_coach_id_1 ? 'assist1' :
       uc.id === team.assist_coach_id_2 ? 'assist2' : 'none';
-    // 排序：head → assist1 → assist2 → 其他（SSR > SR > R）
+
+    // 計算每個 family 的擁有人數（重複歸屬都算）
+    const familyCount = {};
+    coaches.forEach(uc => {
+      const fams = _coachFamilies(uc.coach?.trait);
+      if (fams.length === 0) {
+        familyCount.other = (familyCount.other || 0) + 1;
+      } else {
+        fams.forEach(f => { familyCount[f] = (familyCount[f] || 0) + 1; });
+      }
+    });
+    // 教練分組（每個教練只放到主家族；多家族的會在 chip 顯示副家族）
+    const grouped = { tactic:[], attack:[], defense:[], speed:[], stamina:[], youth:[], other:[] };
+    coaches.forEach(uc => {
+      const fams = _coachFamilies(uc.coach?.trait);
+      const primary = fams[0] || 'other';
+      grouped[primary].push(uc);
+    });
+
+    // 每組內排序：head → assist1 → assist2 → SSR → SR → R
     const rarityRank = { SSR: 0, SR: 1, R: 2 };
-    const sorted = [...coaches].sort((a, b) => {
+    const sortFn = (a, b) => {
       const ra = { head: -3, assist1: -2, assist2: -1 }[roleOf(a)] ?? 10;
       const rb = { head: -3, assist1: -2, assist2: -1 }[roleOf(b)] ?? 10;
       if (ra !== rb) return ra - rb;
       return (rarityRank[a.coach?.rarity] || 9) - (rarityRank[b.coach?.rarity] || 9);
-    });
+    };
+    FAMILY_ORDER.forEach(f => grouped[f].sort(sortFn));
+
     overlay.innerHTML = `
       <div class="mt-profile-card" style="max-width:520px">
         <button class="mt-modal-close mt-profile-close" type="button">×</button>
         <div class="mt-coach-all-title">📋 所有教練 (${coaches.length})</div>
-        <div class="mt-coach-all-hint">點教練 → 指派為主教練 / 助教 1 / 助教 2</div>
-        <div class="mt-coach-all-grid" id="mt-coach-all-grid"></div>
+        <div class="mt-coach-all-hint">點教練 → 指派為主教練 / 助教 1 / 助教 2．同派系 3 人齊上 → 觸發羈絆</div>
+        <div class="mt-coach-all-sections" id="mt-coach-all-sections"></div>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -1471,36 +1564,64 @@
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 200);
     });
-    const grid = overlay.querySelector('#mt-coach-all-grid');
-    sorted.forEach(uc => {
-      const c = uc.coach || {};
-      const role = roleOf(uc);
-      const badge = role === 'head' ? '👑' : role === 'assist1' ? '①' : role === 'assist2' ? '②' : '';
-      const slot = document.createElement('button');
-      slot.className = `mt-coach-slot rarity-${c.rarity || 'R'}${role !== 'none' ? ' active' : ''} role-${role}`;
-      slot.dataset.ucid = uc.id;
-      const imgId = `coach-all-portrait-${uc.id.slice(0,8)}`;
-      slot.innerHTML = `
-        ${badge ? `<span class="mt-coach-active-crown">${badge}</span>` : ''}
-        <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
-        <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
-        <div class="mt-coach-slot-trait">${escapeHtml(_traitShortLabel(c.trait, c.trait_value))}</div>
-        <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
+    const sectionsHost = overlay.querySelector('#mt-coach-all-sections');
+
+    FAMILY_ORDER.forEach(fam => {
+      const arr = grouped[fam];
+      if (!arr || arr.length === 0) return;
+      const meta = FAMILY_META[fam];
+      const count = familyCount[fam] || 0; // 跨家族總計
+      const reachable = count >= 3;
+      const stateLabel = fam === 'other' ? '' :
+        reachable ? `<span class="mt-coach-family-state ready">✅ 可組「${meta.synergy}」</span>` :
+                    `<span class="mt-coach-family-state need">差 ${3 - count} 人組「${meta.synergy}」</span>`;
+      const section = document.createElement('div');
+      section.className = `mt-coach-family-section family-${fam}`;
+      section.innerHTML = `
+        <div class="mt-coach-family-header">
+          <span class="mt-coach-family-icon">${meta.icon}</span>
+          <span class="mt-coach-family-name">${meta.label}</span>
+          <span class="mt-coach-family-count">(${arr.length})</span>
+          ${stateLabel}
+        </div>
+        <div class="mt-coach-family-grid"></div>
       `;
-      grid.appendChild(slot);
-      const look = uc.look_data || c.look_data;
-      if (look && window.LpcRenderer) {
-        window.LpcRenderer.portrait(look).then(url => {
-          const img = document.getElementById(imgId);
-          if (img && url) img.src = url;
-        }).catch(() => {});
-      }
-      slot.addEventListener('click', () => {
-        _openCoachRoleMenu(uc, () => {
-          // 先關 all modal、再 onChange 重畫 tab
-          overlay.classList.remove('open');
-          setTimeout(() => overlay.remove(), 200);
-          if (typeof onChange === 'function') onChange();
+      sectionsHost.appendChild(section);
+      const grid = section.querySelector('.mt-coach-family-grid');
+      arr.forEach(uc => {
+        const c = uc.coach || {};
+        const role = roleOf(uc);
+        const badge = role === 'head' ? '👑' : role === 'assist1' ? '①' : role === 'assist2' ? '②' : '';
+        const fams = _coachFamilies(c.trait);
+        const subFamChip = fams.length > 1
+          ? `<span class="mt-coach-slot-subfam" title="也算 ${FAMILY_META[fams[1]].label}">+${FAMILY_META[fams[1]].icon}</span>`
+          : '';
+        const slot = document.createElement('button');
+        slot.className = `mt-coach-slot rarity-${c.rarity || 'R'}${role !== 'none' ? ' active' : ''} role-${role}`;
+        slot.dataset.ucid = uc.id;
+        const imgId = `coach-all-portrait-${uc.id.slice(0,8)}`;
+        slot.innerHTML = `
+          ${badge ? `<span class="mt-coach-active-crown">${badge}</span>` : ''}
+          ${subFamChip}
+          <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
+          <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
+          <div class="mt-coach-slot-trait">${escapeHtml(_traitShortLabel(c.trait, c.trait_value))}</div>
+          <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
+        `;
+        grid.appendChild(slot);
+        const look = uc.look_data || c.look_data;
+        if (look && window.LpcRenderer) {
+          window.LpcRenderer.portrait(look).then(url => {
+            const img = document.getElementById(imgId);
+            if (img && url) img.src = url;
+          }).catch(() => {});
+        }
+        slot.addEventListener('click', () => {
+          _openCoachRoleMenu(uc, () => {
+            overlay.classList.remove('open');
+            setTimeout(() => overlay.remove(), 200);
+            if (typeof onChange === 'function') onChange();
+          });
         });
       });
     });
@@ -1605,7 +1726,8 @@
     const synergy = _computeSynergy([active, assist1, assist2].filter(Boolean));
     // 計算合計加成（主 100% + 助教 50% × 2 + 羈絆 buff）
     const combinedBuff = _computeCombinedBuff(active, assist1, assist2, synergy);
-    const combinedHtml = _renderCombinedBuffHtml(combinedBuff);
+    const offMatchBuffs = _computeOffMatchBuffs(active, assist1, assist2, synergy);
+    const combinedHtml = _renderCombinedBuffHtml(combinedBuff, offMatchBuffs);
 
     content.innerHTML = `
       <div class="mt-coach-office">
@@ -1672,6 +1794,13 @@
 
         <!-- 木地板 -->
         <div class="mt-coach-floor"></div>
+
+        <!-- 持券資訊（教練券 / 寶石） -->
+        <div class="mt-coach-wallet">
+          <span class="mt-coach-wallet-pill"><span class="mt-coach-wallet-icon">🎫</span><b>${coachTickets}</b> 教練券</span>
+          <span class="mt-coach-wallet-pill"><span class="mt-coach-wallet-icon">💎</span><b>${team.gems || 0}</b> 寶石</span>
+          <span class="mt-coach-wallet-pill mt-coach-wallet-soon" title="預計近期：SSR 自選券 — 任選 1 張 SSR 教練">🌟 SSR 教練券 <i>規劃中</i></span>
+        </div>
 
         <!-- 底部：抽教練（券 + 寶石雙費用、跟球員抽卡同樣式） -->
         <div class="mt-coach-actions">
@@ -4183,10 +4312,18 @@
     });
 
     const list = overlay.querySelector('#mt-train-picker-list');
-    players.forEach(p => {
+    // 排序：先發 → 板凳；組內依該屬性當前值 desc
+    const sortedPlayers = [...players].sort((a, b) => {
+      const sa = a.in_starting_11 ? 0 : 1;
+      const sb = b.in_starting_11 ? 0 : 1;
+      if (sa !== sb) return sa - sb;
+      return (b['current_' + attr] || 0) - (a['current_' + attr] || 0);
+    });
+    sortedPlayers.forEach(p => {
       const c = p.card || {};
       const isTraining = p.training_attr && p.training_finish_at;
       const isReady = isTraining && new Date(p.training_finish_at) <= new Date();
+      const isStarter = !!p.in_starting_11;
       const currentAttrVal = p['current_' + attr] || 0;
       const estSec = Math.max(60, Math.floor(Math.pow(currentAttrVal / 25, 2.2) * 50));
       const estLabel = estSec >= 3600 ? `${(estSec/3600).toFixed(1)} 小時`
@@ -4206,13 +4343,16 @@
          rpH < 10 ? `❤️不足` : rpI < 10 ? `💡不足` : '');
 
       const row = document.createElement('div');
-      row.className = `mt-train-pick-row rarity-${c.rarity || 'R'}`;
+      row.className = `mt-train-pick-row rarity-${c.rarity || 'R'}${isStarter ? ' is-starter' : ''}`;
       const imgId = `train-pick-${p.id}`;
       row.innerHTML = `
         <div class="mt-train-pick-head">
           <div class="mt-train-pick-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" onerror="this.style.opacity='0.3'"></div>
           <div class="mt-train-pick-info">
-            <div class="mt-train-pick-name">${escapeHtml(c.name)} <small>${c.position || ''} · Lv.${p.level}</small></div>
+            <div class="mt-train-pick-name">
+              ${isStarter ? '<span class="mt-train-pick-starter-badge">先發</span>' : ''}
+              ${escapeHtml(c.name)} <small>${c.position || ''} · Lv.${p.level}</small>
+            </div>
             <div class="mt-train-pick-attr">${ATTR_LABELS[attr]} <b>${p['current_' + attr]}</b> / 99</div>
           </div>
         </div>
