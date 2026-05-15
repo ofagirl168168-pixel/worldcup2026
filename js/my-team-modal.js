@@ -566,14 +566,17 @@
             <div class="mt-hub-stat-label">抽券</div>
           </div>
           <div class="mt-hub-stat">
+            <div class="mt-hub-stat-icon">👔</div>
+            <div class="mt-hub-stat-val" id="mt-hub-coach-tickets">${team.coach_tickets || 0}</div>
+            <div class="mt-hub-stat-label">教練券</div>
+            ${(team.ssr_select_tickets || 0) > 0
+              ? `<span class="mt-hub-ssr-badge" id="mt-hub-ssr-badge" title="SSR 自選券（賽季冠軍）→ 寶石商店兌換">⭐${team.ssr_select_tickets}</span>`
+              : ''}
+          </div>
+          <div class="mt-hub-stat">
             <div class="mt-hub-stat-icon">⚡</div>
             <div class="mt-hub-stat-val" id="mt-hub-stamina">${team.stamina || 0}/${team.stamina_max || 5}</div>
             <div class="mt-hub-stat-label">體力<span class="mt-hub-stamina-countdown" id="mt-hub-stamina-countdown"></span></div>
-          </div>
-          <div class="mt-hub-stat">
-            <div class="mt-hub-stat-icon">⭐</div>
-            <div class="mt-hub-stat-val" id="mt-hub-ssr">${team.ssr_select_tickets || 0}</div>
-            <div class="mt-hub-stat-label">SSR券</div>
           </div>
           <div class="mt-hub-stat">
             <div class="mt-hub-stat-icon">💎</div>
@@ -1443,6 +1446,34 @@
     return coach.trait_value.unlocks_formation || coach.trait_value.preferred_formation || null;
   }
 
+  // ── helper：渲染教練派系標籤 chip（卡片右上角）──
+  // mode: 'big'（含派系名）/ 'icon'（只 icon、給助教/modal 小卡用）
+  function _renderFamilyChipHtml(coach, mode) {
+    if (!coach || !coach.trait) return '';
+    const fams = _coachFamilies(coach.trait);
+    if (fams.length === 0) return '';
+    const primary = fams[0];
+    const meta = FAMILY_META[primary];
+    if (!meta) return '';
+    const subIcon = fams.length > 1 ? FAMILY_META[fams[1]].icon : '';
+    const subTitle = fams.length > 1 ? ` / ${FAMILY_META[fams[1]].label}` : '';
+    if (mode === 'big') {
+      return `<span class="mt-coach-family-chip family-${primary}" title="${meta.label}${subTitle} → ${meta.synergy || ''} (${meta.effect || ''})">
+        ${meta.icon}<small>${meta.label}</small>${subIcon ? `<span class="mt-coach-family-chip-sub">${subIcon}</span>` : ''}
+      </span>`;
+    }
+    return `<span class="mt-coach-family-chip family-${primary} mt-coach-family-chip-icon" title="${meta.label}${subTitle} → ${meta.synergy || ''}">
+      ${meta.icon}${subIcon ? `<span class="mt-coach-family-chip-sub">${subIcon}</span>` : ''}
+    </span>`;
+  }
+
+  // ── helper：渲染陣型 chip（卡片底部）──
+  function _renderFormationChipHtml(coach) {
+    const f = _coachFormation(coach);
+    if (!f) return '';
+    return `<span class="mt-coach-slot-formation">📋 ${f}</span>`;
+  }
+
   // ── helper：簡短主流 trait 文字（主教練卡用、含 trait 描述）──
   function _coachDesc(coach) {
     if (!coach) return '';
@@ -1455,10 +1486,13 @@
     const badge = role === 'head' ? '👑 主教練' : role === 'assist1' ? '① 助教' : role === 'assist2' ? '② 助教' : '';
     const imgId = `coach-portrait-${uc.id.slice(0,8)}`;
     const formation = _coachFormation(c);
+    const familyChipBig = _renderFamilyChipHtml(c, 'big');
+    const familyChipIcon = _renderFamilyChipHtml(c, 'icon');
     if (isHead) {
       return `
         <button class="mt-coach-team-slot mt-coach-team-head-slot rarity-${c.rarity || 'R'} role-head" data-ucid="${uc.id}">
           <span class="mt-coach-head-role-badge">${badge}</span>
+          ${familyChipBig}
           <div class="mt-coach-team-head-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
           <div class="mt-coach-team-head-info">
             <div class="mt-coach-team-head-name-row">
@@ -1472,14 +1506,16 @@
         </button>
       `;
     }
-    // 助教小卡：portrait + name + 簡短 buff（50% trait）
+    // 助教小卡：portrait + name + 簡短 buff（50% trait）+ 陣型 + 派系 icon
     const assistBuff = _traitShortLabel(c.trait, c.trait_value, 0.5);
     return `
       <button class="mt-coach-team-slot mt-coach-slot rarity-${c.rarity || 'R'} active role-${role}" data-ucid="${uc.id}">
         <span class="mt-coach-active-crown">${role === 'assist1' ? '①' : '②'}</span>
+        ${familyChipIcon}
         <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
         <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
         <div class="mt-coach-slot-trait">${escapeHtml(assistBuff)}</div>
+        ${formation ? `<div class="mt-coach-slot-formation">📋 ${formation}</div>` : ''}
         <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
       </button>
     `;
@@ -1592,20 +1628,19 @@
         const c = uc.coach || {};
         const role = roleOf(uc);
         const badge = role === 'head' ? '👑' : role === 'assist1' ? '①' : role === 'assist2' ? '②' : '';
-        const fams = _coachFamilies(c.trait);
-        const subFamChip = fams.length > 1
-          ? `<span class="mt-coach-slot-subfam" title="也算 ${FAMILY_META[fams[1]].label}">+${FAMILY_META[fams[1]].icon}</span>`
-          : '';
+        const familyChip = _renderFamilyChipHtml(c, 'icon');
+        const formation = _coachFormation(c);
         const slot = document.createElement('button');
         slot.className = `mt-coach-slot rarity-${c.rarity || 'R'}${role !== 'none' ? ' active' : ''} role-${role}`;
         slot.dataset.ucid = uc.id;
         const imgId = `coach-all-portrait-${uc.id.slice(0,8)}`;
         slot.innerHTML = `
           ${badge ? `<span class="mt-coach-active-crown">${badge}</span>` : ''}
-          ${subFamChip}
+          ${familyChip}
           <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
           <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
           <div class="mt-coach-slot-trait">${escapeHtml(_traitShortLabel(c.trait, c.trait_value))}</div>
+          ${formation ? `<div class="mt-coach-slot-formation">📋 ${formation}</div>` : ''}
           <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
         `;
         grid.appendChild(slot);
@@ -1794,13 +1829,6 @@
 
         <!-- 木地板 -->
         <div class="mt-coach-floor"></div>
-
-        <!-- 持券資訊（教練券 / 寶石） -->
-        <div class="mt-coach-wallet">
-          <span class="mt-coach-wallet-pill"><span class="mt-coach-wallet-icon">🎫</span><b>${coachTickets}</b> 教練券</span>
-          <span class="mt-coach-wallet-pill"><span class="mt-coach-wallet-icon">💎</span><b>${team.gems || 0}</b> 寶石</span>
-          <span class="mt-coach-wallet-pill mt-coach-wallet-soon" title="預計近期：SSR 自選券 — 任選 1 張 SSR 教練">🌟 SSR 教練券 <i>規劃中</i></span>
-        </div>
 
         <!-- 底部：抽教練（券 + 寶石雙費用、跟球員抽卡同樣式） -->
         <div class="mt-coach-actions">
@@ -4568,8 +4596,29 @@
       if (el && el.textContent !== String(val)) el.textContent = val;
     };
     set('mt-hub-tickets', team.tickets || 0);
+    set('mt-hub-coach-tickets', team.coach_tickets || 0);
     set('mt-hub-stamina', `${team.stamina || 0}/${team.stamina_max || 5}`);
-    set('mt-hub-ssr', team.ssr_select_tickets || 0);
+    // SSR 券 fallback badge：>0 才顯示，必要時動態插入
+    const ssrCount = team.ssr_select_tickets || 0;
+    let ssrBadge = _overlay.querySelector('#mt-hub-ssr-badge');
+    if (ssrCount > 0) {
+      if (!ssrBadge) {
+        const coachStat = _overlay.querySelector('#mt-hub-coach-tickets')?.parentElement;
+        if (coachStat) {
+          const b = document.createElement('span');
+          b.id = 'mt-hub-ssr-badge';
+          b.className = 'mt-hub-ssr-badge';
+          b.title = 'SSR 自選券（賽季冠軍）→ 寶石商店兌換';
+          b.textContent = `⭐${ssrCount}`;
+          coachStat.appendChild(b);
+        }
+      } else {
+        ssrBadge.textContent = `⭐${ssrCount}`;
+        ssrBadge.style.display = '';
+      }
+    } else if (ssrBadge) {
+      ssrBadge.style.display = 'none';
+    }
     set('mt-hub-team-name', team.team_name || '');
     set('mt-hub-team-meta', `Lv.${team.stadium_level} 球場 · ${team.fans} 球迷`);
     // 更新隊徽（如果 crest_id / 顏色變了）

@@ -525,6 +525,28 @@
   border-radius: 10px;
   padding: 8px 6px;
   text-align: center;
+  position: relative;
+}
+/* SSR 自選券稀有 badge — 只在 ssr_select_tickets > 0 時顯示，疊在教練券格右上 */
+.mt-hub-ssr-badge {
+  position: absolute;
+  top: -6px; right: -6px;
+  background: linear-gradient(180deg, #ffe680, #c08030);
+  color: #2a1505;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1.5px solid #fff;
+  box-shadow: 0 2px 6px rgba(240,192,64,0.6);
+  letter-spacing: 0.5px;
+  z-index: 2;
+  animation: mt-ssr-badge-pulse 2s ease-in-out infinite;
+  cursor: help;
+}
+@keyframes mt-ssr-badge-pulse {
+  0%, 100% { box-shadow: 0 2px 6px rgba(240,192,64,0.5); }
+  50%      { box-shadow: 0 2px 14px rgba(240,192,64,1); }
 }
 .mt-hub-stat-icon { font-size: 18px; }
 .mt-hub-stat-val {
@@ -5870,16 +5892,63 @@
   grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
   gap: 6px;
 }
-/* 副家族 chip（多重歸屬的 trait，如 tiki_taka / gegen_press）*/
-.mt-coach-slot-subfam {
+/* 派系 chip — 放在每張教練卡右上角（big = 主教練大卡用、icon = 助教/modal 小卡用）*/
+.mt-coach-family-chip {
   position: absolute;
-  top: 2px; left: 2px;
-  background: rgba(0,0,0,0.6);
-  border: 1px solid rgba(255,255,255,0.25);
+  top: 3px; right: 3px;
+  background: rgba(0,0,0,0.78);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  color: #ffe680;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 1px 6px 1px 5px;
   border-radius: 999px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  pointer-events: auto;
+}
+.mt-coach-family-chip small {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #fff;
+  margin-left: 1px;
+}
+.mt-coach-family-chip-sub {
   font-size: 9px;
-  padding: 0 3px;
-  z-index: 2;
+  margin-left: 1px;
+  opacity: 0.85;
+  border-left: 1px solid rgba(255,255,255,0.3);
+  padding-left: 3px;
+}
+/* icon only 模式（小卡用、不顯派系名）— 更小 */
+.mt-coach-family-chip-icon {
+  font-size: 10px;
+  padding: 1px 4px;
+  border-width: 1px;
+}
+/* 派系顏色邊框 */
+.mt-coach-family-chip.family-tactic   { border-color: #90caf9; }
+.mt-coach-family-chip.family-attack   { border-color: #ef5350; }
+.mt-coach-family-chip.family-defense  { border-color: #66bb6a; }
+.mt-coach-family-chip.family-speed    { border-color: #ffca28; }
+.mt-coach-family-chip.family-stamina  { border-color: #ec407a; }
+.mt-coach-family-chip.family-youth    { border-color: #ab47bc; }
+
+/* 教練卡上的陣型 chip — 卡片底部小行 */
+.mt-coach-slot-formation {
+  display: block;
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #90caf9;
+  margin-top: 1px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 合計加成面板（主 100% + 助教 50% × 2 + 羈絆）*/
@@ -6169,44 +6238,10 @@
   display: none;  /* AI 圖已含木地板、不再用 CSS 疊一層 */
 }
 
-/* 持券資訊列（教練券 / 寶石 / 規劃中 SSR 券）*/
-.mt-coach-wallet {
-  position: absolute;
-  top: 81%;
-  left: 4%; right: 4%;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
-  z-index: 4;
-}
-.mt-coach-wallet-pill {
-  background: rgba(0,0,0,0.65);
-  border: 1px solid rgba(240,192,64,0.55);
-  color: #ffe680;
-  border-radius: 999px;
-  padding: 2px 8px;
-  font-size: 10px;
-  font-weight: 800;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  white-space: nowrap;
-}
-.mt-coach-wallet-pill b { color: #fff; font-weight: 900; }
-.mt-coach-wallet-icon { font-size: 12px; }
-.mt-coach-wallet-soon {
-  border-style: dashed;
-  color: rgba(255,255,255,0.55);
-  border-color: rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.04);
-}
-.mt-coach-wallet-soon i { font-style: normal; opacity: 0.7; font-size: 9px; }
-
 /* 按鈕區：透明、讓按鈕自己跳出來 */
 .mt-coach-actions {
   position: absolute;
-  top: 88%;
+  top: 85%;
   left: 4%; right: 4%;
   display: flex; gap: 8px; align-items: stretch;
   z-index: 4;
