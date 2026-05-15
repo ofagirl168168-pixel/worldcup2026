@@ -1086,6 +1086,13 @@
   z-index: 5;
   perspective: 1200px;
   perspective-origin: 50% 60%;
+  /* idle 時夾住內部 shine 光影、避免跑到包裝外 */
+  overflow: hidden;
+}
+/* 拖曳 / 撕開時改 visible：flap 折起 / 飛走才不會被夾掉 */
+.mt-gacha-pack.dragging .mt-gacha-pack-wrap,
+.mt-gacha-pack.opening .mt-gacha-pack-wrap {
+  overflow: visible;
 }
 .mt-gacha-pack[data-rarity="SSR"] .mt-gacha-pack-wrap {
   filter: drop-shadow(0 0 40px rgba(240,192,64,0.75));
@@ -1101,31 +1108,26 @@
   position: relative;
   flex: 0 0 22%;
   transform-style: preserve-3d;
-  background:
-    radial-gradient(ellipse 60% 200% at 50% 50%,
-      rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 30%, transparent 60%),
-    radial-gradient(ellipse 35% 150% at 0% 50%,
-      rgba(0,0,0,0.35) 0%, transparent 70%),
-    radial-gradient(ellipse 35% 150% at 100% 50%,
-      rgba(0,0,0,0.4) 0%, transparent 70%),
-    linear-gradient(150deg, #d44b3a 0%, #c0392b 50%, #8a2a1f 100%);
+  /* 背景留給 .mt-gacha-pack-top-fold（帶鋸齒 clip-path）— 這層保持透明、
+     讓上方鋸齒熱封條的尖齒能透出深色背景，不會被同色 bg 蓋平 */
+  background: transparent;
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.55));
 }
 .mt-gacha-pack-top-fold {
   position: absolute;
-  /* 上段佔 top 的上 65%、bottom 在折線（top 的 35% 處）*/
-  left: 0; right: 0; top: 0;
-  height: 65%;
-  transform-origin: 50% 100%;    /* hinge 在自己的 bottom = 折線 */
+  /* 填滿整個 pack-top；hinge 在自己 bottom（= perforation 撕線位置）— 真正的折紙鉸鏈 */
+  left: 0; right: 0; top: 0; bottom: 0;
+  transform-origin: 50% 100%;
   transform-style: preserve-3d;
+  /* 折翻過去後正面消失、露出 ::after 模擬的紙張內側 */
   backface-visibility: hidden;
   display: flex; align-items: center; justify-content: center;
   background:
-    /* 折線陰影（上段底部多一道暗線、模擬被折）*/
+    /* 折線陰影（底部多一道暗線、模擬被折）*/
     linear-gradient(180deg,
-      transparent 0%, transparent 80%,
-      rgba(0,0,0,0.25) 95%, rgba(0,0,0,0.35) 100%),
-    /* 跟 pack-top 同色系（看起來連續）*/
+      transparent 0%, transparent 85%,
+      rgba(0,0,0,0.25) 96%, rgba(0,0,0,0.35) 100%),
+    /* 同 pack 色系（高光 + 左右暗角）*/
     radial-gradient(ellipse 60% 200% at 50% 50%,
       rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 30%, transparent 60%),
     radial-gradient(ellipse 35% 150% at 0% 50%,
@@ -1133,13 +1135,31 @@
     radial-gradient(ellipse 35% 150% at 100% 50%,
       rgba(0,0,0,0.4) 0%, transparent 70%),
     linear-gradient(150deg, #d44b3a 0%, #c0392b 50%, #8a2a1f 100%);
-  /* 鋸齒熱封邊在上段頂部 */
+  /* 鋸齒熱封邊在頂部（更深的齒、視覺更明顯）*/
   clip-path: polygon(
-    0% 22%, 5% 0%, 10% 22%, 15% 0%, 20% 22%, 25% 0%, 30% 22%, 35% 0%,
-    40% 22%, 45% 0%, 50% 22%, 55% 0%, 60% 22%, 65% 0%, 70% 22%, 75% 0%,
-    80% 22%, 85% 0%, 90% 22%, 95% 0%, 100% 22%,
+    0% 14%, 5% 0%, 10% 14%, 15% 0%, 20% 14%, 25% 0%, 30% 14%, 35% 0%,
+    40% 14%, 45% 0%, 50% 14%, 55% 0%, 60% 14%, 65% 0%, 70% 14%, 75% 0%,
+    80% 14%, 85% 0%, 90% 14%, 95% 0%, 100% 14%,
     100% 100%, 0% 100%
   );
+}
+/* 紙張內側（折翻過去後可見、用 rotateX(180) 形成真正的 back face）*/
+.mt-gacha-pack-top-fold::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 200% at 50% 30%,
+      rgba(0,0,0,0.35) 0%, transparent 60%),
+    linear-gradient(180deg, #5a1810 0%, #3a0e08 100%);
+  clip-path: polygon(
+    0% 14%, 5% 0%, 10% 14%, 15% 0%, 20% 14%, 25% 0%, 30% 14%, 35% 0%,
+    40% 14%, 45% 0%, 50% 14%, 55% 0%, 60% 14%, 65% 0%, 70% 14%, 75% 0%,
+    80% 14%, 85% 0%, 90% 14%, 95% 0%, 100% 14%,
+    100% 100%, 0% 100%
+  );
+  transform: rotateX(180deg);
+  backface-visibility: hidden;
+  pointer-events: none;
 }
 .mt-gacha-pack-logo {
   font-size: 24px;       /* 上半變窄 → logo 縮小 */
@@ -1161,7 +1181,7 @@
   opacity: 0.4;
   z-index: 1;
 }
-/* 整包橫掃光：永遠在播、覆蓋整包（不只上半）*/
+/* 整包橫掃光：被 wrap 的 overflow:hidden 夾在包裝內、不會跑出去 */
 .mt-gacha-pack-shine {
   position: absolute; inset: 0;
   background: linear-gradient(115deg,
@@ -1172,8 +1192,12 @@
     transparent 70%);
   pointer-events: none;
   z-index: 4;
-  /* clip-path 跟 bottom 一致、確保光不會跑出包裝外面 */
   animation: mt-pack-shine 2.6s ease-in-out infinite;
+}
+/* 拖曳 / 撕開時隱藏 shine，避免 overflow:visible 後光跑出去 */
+.mt-gacha-pack.dragging .mt-gacha-pack-shine,
+.mt-gacha-pack.opening .mt-gacha-pack-shine {
+  display: none;
 }
 
 /* 撕線（金邊穿孔 + 立體浮雕、隨拖曳進度發光）*/
@@ -1281,24 +1305,19 @@
   text-shadow: 0 1px 0 #6a4500, 0 2px 4px rgba(0,0,0,0.6);
 }
 
-/* ── 即時拖曳撕開：兩段折起（下段 + 上段各自 hinge、模擬塑膠錫箔包裝折起來）── */
-/* dir=+1 拖右 → 支點右下、左上角往上翹；dir=-1 反之 */
+/* ── 即時拖曳撕開：以撕線為鉸鏈、純 rotateX 折起（像真實紙張）── */
+/* pack-top 本身只是 wrapper / hinge，本體 BG 已透明、不需單獨 rotate */
 .mt-gacha-pack-top {
-  /* 下段：rotateX 較小（先輕微傾）+ rotateY 朝撕方向側傾 */
-  transform:
-    rotateX(calc(var(--tear-progress, 0) * 18deg))
-    rotateY(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * -12deg))
-    translateZ(calc(var(--tear-progress, 0) * 6px))
-    translateY(calc(var(--tear-progress, 0) * -4px));
-  transition: transform 0.18s ease-out;
-  transform-origin: calc(50% + var(--tear-dir, 0) * 50%) bottom;
+  transition: none;
+  transform-origin: 50% 100%;  /* 自己的底邊 = 撕線位置 */
 }
 .mt-gacha-pack-top-fold {
-  /* 上段：rotateX 更大（折線處再多折一段）+ 撕方向側傾 */
-  transform:
-    rotateX(calc(var(--tear-progress, 0) * 38deg))
-    rotateY(calc(var(--tear-progress, 0) * var(--tear-dir, 1) * -10deg));
-  transition: transform 0.18s ease-out;
+  /* 拖曳時：依進度，以 hinge（自己 bottom = 撕線）為支點往後折
+     0 → 0deg、1 → 100deg（拖到底時已折過一大半、預告完整翻過去）*/
+  transform: rotateX(calc(var(--tear-progress, 0) * 100deg));
+  transition: transform 0.18s ease-out, filter 0.18s ease-out;
+  /* 折越多越暗（從 1.0 → 0.85，配合最終 ::after 露出）*/
+  filter: brightness(calc(1 - var(--tear-progress, 0) * 0.15));
 }
 /* 下半不動（只撕上方）*/
 .mt-gacha-pack-bottom {
@@ -1332,62 +1351,18 @@
   animation: mt-pack-perforation-fade 0.4s ease-out forwards;
 }
 
-/* 下段折線（在 perforation 上方折起、輕微）*/
+/* pack-top 為 hinge wrapper、不動（本體無 BG）*/
 @keyframes mt-pack-tear-fold-lower {
-  0%   {
-    transform: rotateX(0) rotateY(0) translateZ(0) translateY(0);
-    opacity: 1;
-  }
-  30%  {
-    transform:
-      rotateX(35deg)
-      rotateY(calc(var(--tear-dir, 1) * -18deg))
-      translateZ(12px)
-      translateY(-6px);
-    opacity: 1;
-  }
-  60%  {
-    transform:
-      rotateX(70deg)
-      rotateY(calc(var(--tear-dir, 1) * -38deg))
-      translateZ(22px)
-      translateY(-18px);
-    opacity: 0.9;
-  }
-  100% {
-    transform:
-      rotateX(105deg)
-      rotateY(calc(var(--tear-dir, 1) * -60deg))
-      translateZ(18px)
-      translateY(-50px);
-    opacity: 0;
-  }
+  0%, 100% { transform: none; }
 }
 
-/* 上段折線（在折線處再折一段、compound 後讓上緣翻過去）*/
+/* 上段：純 rotateX 翻過撕線（180deg = 完全折到背後、露出 ::after 紙張內側）
+   稍微多飛一點 translateY(-2px) 給點離地感 */
 @keyframes mt-pack-tear-fold-upper {
-  0%   {
-    transform: rotateX(0) rotateY(0);
-    filter: brightness(1);
-  }
-  30%  {
-    transform:
-      rotateX(50deg)
-      rotateY(calc(var(--tear-dir, 1) * -12deg));
-    filter: brightness(0.95);
-  }
-  60%  {
-    transform:
-      rotateX(95deg)
-      rotateY(calc(var(--tear-dir, 1) * -22deg));
-    filter: brightness(0.78);
-  }
-  100% {
-    transform:
-      rotateX(135deg)
-      rotateY(calc(var(--tear-dir, 1) * -32deg));
-    filter: brightness(0.6);
-  }
+  0%   { transform: rotateX(0); filter: brightness(1); }
+  35%  { transform: rotateX(60deg) translateY(-1px); filter: brightness(0.95); }
+  70%  { transform: rotateX(135deg) translateY(-3px); filter: brightness(0.85); }
+  100% { transform: rotateX(178deg) translateY(-2px); filter: brightness(0.8); }
 }
 @keyframes mt-pack-perforation-fade {
   to { opacity: 0; transform: scaleY(0.2); }
