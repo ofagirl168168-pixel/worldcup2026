@@ -4280,9 +4280,68 @@
     const close = () => {
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 200);
+      // 慶祝彈窗關掉後 → 若有天賦覺醒 → 接著開覺醒彈窗
+      if (res.talent_awakened && res.talent_rolled) {
+        setTimeout(() => _showTalentAwakenModal(p, res.talent_rolled), 300);
+      }
     };
     overlay.querySelector('.mt-claim-result-confirm').addEventListener('click', close);
     setTimeout(close, 4500); // 自動關閉
+  }
+
+  // ── 天賦覺醒慶祝彈窗（24h 集訓營領取後、5% 機率觸發）──
+  function _showTalentAwakenModal(p, talentKey) {
+    const TALENT_META = {
+      speedster:   { icon: '⚡', name: '衝刺型', effect: '速度 +5、後半場不掉 stamina' },
+      bodybuilder: { icon: '💪', name: '體能怪', effect: '體力 +5、永遠不疲勞' },
+      shooter:     { icon: '🎯', name: '神射手', effect: '攻擊 +5、禁區射門精準 +20%' },
+      wall:        { icon: '🛡️', name: '城牆',   effect: '防守 +5、搶斷率 +30%' },
+      magician:    { icon: '✨', name: '魔法師', effect: '中場 +5、傳球準確度 +15%' },
+    };
+    const meta = TALENT_META[talentKey];
+    if (!meta) return;
+    const c = p.card || {};
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-talent-awaken-overlay';
+    const portraitId = `talent-awaken-portrait-${p.id}-${Date.now()}`;
+    overlay.innerHTML = `
+      <div class="mt-talent-awaken-card rarity-${c.rarity || 'R'}">
+        <div class="mt-talent-awaken-rays">
+          ${Array.from({length: 18}).map((_, i) => `<span class="mt-talent-ray" style="--ang:${i * 20}deg"></span>`).join('')}
+        </div>
+        <div class="mt-talent-awaken-title">✨ 天 賦 覺 醒 ✨</div>
+        <div class="mt-talent-awaken-hero">
+          <div class="mt-talent-awaken-halo"></div>
+          <img id="${portraitId}" alt="${escapeHtml(c.name)}"
+            src="${(typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id, c.rarity) : ''}"
+            onerror="this.style.display='none'">
+        </div>
+        <div class="mt-talent-awaken-name">${escapeHtml(c.name || '?')}</div>
+        <div class="mt-talent-awaken-badge">
+          <span class="mt-talent-awaken-icon">${meta.icon}</span>
+          <span class="mt-talent-awaken-label">${meta.name}</span>
+        </div>
+        <div class="mt-talent-awaken-effect">${meta.effect}</div>
+        <button class="mt-talent-awaken-confirm" type="button">🌟 確認</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+    if (look && window.LpcRenderer) {
+      const team = window.MyTeam.getCached();
+      const kit = team ? { shirtColor: team.kit_shirt_color, pantsColor: team.kit_pants_color } : null;
+      window.LpcRenderer.portrait(look, { scale: 7, kit }).then(url => {
+        const img = document.getElementById(portraitId);
+        if (img && url) img.src = url;
+      }).catch(() => {});
+    }
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 250);
+    };
+    overlay.querySelector('.mt-talent-awaken-confirm').addEventListener('click', close);
   }
 
   // 訓練系統說明 modal
