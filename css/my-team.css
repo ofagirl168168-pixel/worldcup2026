@@ -4262,39 +4262,39 @@
 .mt-gshop-btn:hover:not(:disabled) { transform: translateY(-2px); }
 .mt-gshop-btn:active:not(:disabled) { transform: translateY(1px); }
 .mt-gshop-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
-/* 1 抽：鮮亮藍金屬感（搭配 10 抽 #fbcd0c 的同等飽和度）*/
+/* 1 抽：明亮藍金屬感（提高頂部反光佔比、降低底部死黑、與 10 抽同等明亮度）*/
 .mt-gshop-btn-1 {
   background:
-    /* 頂部窄反光（不再蓋住主色）*/
+    /* 頂部寬高光（從 0% 一路漸淡到 35%）*/
     linear-gradient(180deg,
-      rgba(255,255,255,0.4) 0%,
-      rgba(255,255,255,0.08) 6%,
-      rgba(255,255,255,0) 12%,
-      rgba(0,0,0,0) 65%,
-      rgba(0,0,0,0.32) 95%,
-      rgba(0,0,0,0.55) 100%),
-    /* 金屬主色（#1e9be8）— 飽和色佔更多版面 */
+      rgba(255,255,255,0.55) 0%,
+      rgba(255,255,255,0.18) 12%,
+      rgba(255,255,255,0) 25%,
+      rgba(0,0,0,0) 70%,
+      rgba(0,0,0,0.18) 95%,
+      rgba(0,0,0,0.32) 100%),
+    /* 主色 — 整體拉亮 1~2 階，最深色不再是接近黑的 #053f6a */
     linear-gradient(180deg,
-      #2eaef2 0%,
-      #1e9be8 25%,
-      #1888d0 55%,
-      #0e6aa5 82%,
-      #053f6a 100%) !important;
+      #5dc8ff 0%,
+      #3ab8f5 25%,
+      #1e9be8 55%,
+      #1581c4 82%,
+      #0e6aa5 100%) !important;
   background-color: #1e9be8 !important;
   border: 2.5px solid #ffffff !important;
   color: #ffffff;
   text-shadow:
-    0 1px 0 rgba(255,255,255,0.3),
-    0 2px 4px rgba(0,20,45,1),
-    0 -1px 1px rgba(0,25,55,0.7);
+    0 1px 0 rgba(255,255,255,0.55),
+    0 2px 4px rgba(0,40,80,0.85),
+    0 -1px 1px rgba(0,40,90,0.5);
   box-shadow:
     0 0 0 2px #042746,
     0 4px 0 #08355d,
     0 8px 20px rgba(0,25,55,0.9),
-    inset 0 2px 0 rgba(255,255,255,0.9),
-    inset 0 4px 6px rgba(255,255,255,0.3),
-    inset 0 -4px 8px rgba(0,20,45,0.6),
-    inset 0 -1px 0 rgba(0,15,35,0.8) !important;
+    inset 0 2px 0 rgba(255,255,255,0.95),
+    inset 0 4px 6px rgba(255,255,255,0.45),
+    inset 0 -4px 8px rgba(0,20,45,0.5),
+    inset 0 -1px 0 rgba(0,15,35,0.7) !important;
   opacity: 1 !important;
 }
 /* 10 抽：金屬金（主色 #fbcd0c）*/
@@ -5722,12 +5722,29 @@
   line-height: 1.2;
   font-weight: 800;
 }
+/* 主教練卡的推薦陣型 — 不能再小到看不到，做成藍底邊框的 chip */
 .mt-coach-team-head-formation {
-  font-size: 9.5px;
-  color: rgba(255,255,255,0.75);
-  line-height: 1.2;
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.25;
+  background: linear-gradient(180deg, rgba(33,150,243,0.35), rgba(13,71,161,0.45));
+  border: 1.5px solid #42a5f5;
+  border-radius: 999px;
+  padding: 2px 10px 2px 8px;
+  margin-top: 3px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 8px rgba(66,165,245,0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+  white-space: nowrap;
 }
-.mt-coach-team-head-formation b { color: #90caf9; }
+.mt-coach-team-head-formation b {
+  color: #ffe680;
+  font-weight: 900;
+  font-size: 12.5px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  margin-left: 2px;
+}
 .mt-coach-head-role-badge {
   position: absolute;
   top: -8px; left: 8px;
@@ -5828,115 +5845,62 @@
   padding: 4px;
 }
 
-/* 派系分組區 */
-.mt-coach-all-sections {
-  max-height: 65vh;
-  overflow-y: auto;
-  padding: 4px;
+/* 羈絆狀態列（modal 頂部：6 個派系小 chip）*/
+.mt-coach-syn-bar {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.mt-coach-family-section {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-left-width: 3px;
-  border-radius: 8px;
-  padding: 6px 6px 8px;
-}
-.mt-coach-family-section.family-tactic   { border-left-color: #90caf9; }
-.mt-coach-family-section.family-attack   { border-left-color: #ef5350; }
-.mt-coach-family-section.family-defense  { border-left-color: #66bb6a; }
-.mt-coach-family-section.family-speed    { border-left-color: #ffca28; }
-.mt-coach-family-section.family-stamina  { border-left-color: #ec407a; }
-.mt-coach-family-section.family-youth    { border-left-color: #ab47bc; }
-.mt-coach-family-section.family-other    { border-left-color: rgba(255,255,255,0.2); }
-
-.mt-coach-family-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 4px 6px;
   flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  margin-bottom: 10px;
+  padding: 6px 4px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 8px;
 }
-.mt-coach-family-icon { font-size: 14px; }
-.mt-coach-family-name {
-  font-size: 12px;
-  font-weight: 900;
-  color: #ffe680;
-}
-.mt-coach-family-count {
-  font-size: 10px;
-  color: rgba(255,255,255,0.55);
-  font-weight: 700;
-}
-.mt-coach-family-state {
+.mt-coach-syn-chip {
   font-size: 10px;
   font-weight: 800;
   padding: 1px 6px;
   border-radius: 999px;
-  margin-left: auto;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.5px;
 }
-.mt-coach-family-state.ready {
-  background: rgba(76,175,80,0.25);
-  border: 1px solid rgba(76,175,80,0.6);
+.mt-coach-syn-chip.ready {
+  background: rgba(76,175,80,0.22);
+  border-color: rgba(76,175,80,0.6);
   color: #b9e8b3;
 }
-.mt-coach-family-state.need {
-  background: rgba(255,255,255,0.04);
-  border: 1px dashed rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.55);
-}
-.mt-coach-family-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-  gap: 6px;
-}
-/* 派系 chip — 放在每張教練卡右上角（big = 主教練大卡用、icon = 助教/modal 小卡用）*/
+.mt-coach-syn-chip.family-tactic.ready  { background: rgba(144,202,249,0.22); border-color: #90caf9; color: #bcdfff; }
+.mt-coach-syn-chip.family-attack.ready  { background: rgba(239,83,80,0.22);   border-color: #ef5350; color: #ffb1ab; }
+.mt-coach-syn-chip.family-defense.ready { background: rgba(102,187,106,0.22); border-color: #66bb6a; color: #c1ecc4; }
+.mt-coach-syn-chip.family-speed.ready   { background: rgba(255,202,40,0.22);  border-color: #ffca28; color: #ffe88a; }
+.mt-coach-syn-chip.family-stamina.ready { background: rgba(236,64,122,0.22);  border-color: #ec407a; color: #ffbacf; }
+.mt-coach-syn-chip.family-youth.ready   { background: rgba(171,71,188,0.22);  border-color: #ab47bc; color: #d8a8e3; }
+/* 派系 chip — 卡片右上角、純中文（戰術 / 攻擊 / 防線 / 速度 / 體能 / 青訓）*/
 .mt-coach-family-chip {
   position: absolute;
   top: 3px; right: 3px;
   background: rgba(0,0,0,0.78);
   border: 1.5px solid rgba(255,255,255,0.18);
-  color: #ffe680;
-  font-size: 11px;
-  font-weight: 800;
-  padding: 1px 6px 1px 5px;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 900;
+  padding: 1px 7px;
   border-radius: 999px;
   z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  letter-spacing: 0.3px;
+  letter-spacing: 1px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.6);
   pointer-events: auto;
+  line-height: 1.4;
 }
-.mt-coach-family-chip small {
-  font-size: 9.5px;
-  font-weight: 800;
-  color: #fff;
-  margin-left: 1px;
-}
-.mt-coach-family-chip-sub {
-  font-size: 9px;
-  margin-left: 1px;
-  opacity: 0.85;
-  border-left: 1px solid rgba(255,255,255,0.3);
-  padding-left: 3px;
-}
-/* icon only 模式（小卡用、不顯派系名）— 更小 */
-.mt-coach-family-chip-icon {
-  font-size: 10px;
-  padding: 1px 4px;
-  border-width: 1px;
-}
-/* 派系顏色邊框 */
-.mt-coach-family-chip.family-tactic   { border-color: #90caf9; }
-.mt-coach-family-chip.family-attack   { border-color: #ef5350; }
-.mt-coach-family-chip.family-defense  { border-color: #66bb6a; }
-.mt-coach-family-chip.family-speed    { border-color: #ffca28; }
-.mt-coach-family-chip.family-stamina  { border-color: #ec407a; }
-.mt-coach-family-chip.family-youth    { border-color: #ab47bc; }
+/* 派系顏色：邊框 + 同色文字 */
+.mt-coach-family-chip.family-tactic   { border-color: #90caf9; color: #bcdfff; }
+.mt-coach-family-chip.family-attack   { border-color: #ef5350; color: #ffb1ab; }
+.mt-coach-family-chip.family-defense  { border-color: #66bb6a; color: #c1ecc4; }
+.mt-coach-family-chip.family-speed    { border-color: #ffca28; color: #ffe88a; }
+.mt-coach-family-chip.family-stamina  { border-color: #ec407a; color: #ffbacf; }
+.mt-coach-family-chip.family-youth    { border-color: #ab47bc; color: #d8a8e3; }
 
 /* 教練卡上的陣型 chip — 卡片底部小行 */
 .mt-coach-slot-formation {
@@ -6238,6 +6202,33 @@
   display: none;  /* AI 圖已含木地板、不再用 CSS 疊一層 */
 }
 
+/* 抽卡 / 教練 tab 右上角持券 pill */
+.mt-gacha-tab-wallet {
+  position: absolute;
+  top: 8px; right: 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  z-index: 10;
+}
+.mt-gacha-tab-pill {
+  background: rgba(0,0,0,0.7);
+  border: 1.5px solid rgba(240,192,64,0.55);
+  color: #ffe680;
+  border-radius: 999px;
+  padding: 3px 9px 3px 7px;
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+}
+.mt-gacha-tab-pill b { color: #fff; font-weight: 900; font-size: 12px; }
+.mt-gacha-tab-pill-icon { font-size: 13px; line-height: 1; }
+
 /* 按鈕區：透明、讓按鈕自己跳出來 */
 .mt-coach-actions {
   position: absolute;
@@ -6248,21 +6239,40 @@
 }
 .mt-coach-draw-btn {
   flex: 1;
-  /* 單層實心金漸層、無透明（讓按鈕一眼看出來能按）*/
-  background: linear-gradient(180deg, #ffd92a 0%, #fbcd0c 45%, #d4a008 100%) !important;
+  /* 金屬金漸層 + 頂部高光、底部柔淡（同球員 10 抽風格）*/
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.42) 0%,
+      rgba(255,255,255,0.1) 6%,
+      rgba(255,255,255,0) 12%,
+      rgba(0,0,0,0) 60%,
+      rgba(70,45,5,0.32) 92%,
+      rgba(50,30,5,0.55) 100%),
+    linear-gradient(180deg,
+      #ffd92a 0%,
+      #fbcd0c 25%,
+      #d8a808 55%,
+      #a07808 82%,
+      #5f4604 100%) !important;
   background-color: #fbcd0c !important;
-  border: 2.5px solid #ffffff;
+  border: 2.5px solid #ffffff !important;
   color: #2a1505;
   font-weight: 900;
   padding: 8px 8px 10px;
   border-radius: 12px;
   cursor: pointer;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.9),
+    0 -1px 0 rgba(120,60,10,0.5);
+  /* 立體陰影（同球員按鈕的 3D 沉降效果：外圈深框 + 4px 沉降層 + 大柔陰影 + inset 高光/暗）*/
   box-shadow:
     0 0 0 2px #382308,
     0 4px 0 #5a3a0a,
-    0 8px 16px rgba(55,30,5,0.55),
-    inset 0 2px 0 rgba(255,255,255,0.85);
+    0 8px 20px rgba(55,30,5,0.8),
+    inset 0 2px 0 rgba(255,255,255,0.95),
+    inset 0 4px 6px rgba(255,255,255,0.4),
+    inset 0 -4px 8px rgba(80,45,5,0.55),
+    inset 0 -1px 0 rgba(45,25,0,0.85) !important;
   transition: transform 0.12s, filter 0.15s;
   animation: mt-draw-glow 1.8s ease-in-out infinite;
   display: flex;
@@ -7708,6 +7718,189 @@ button.mt-train-point-card:active { transform: translateY(0); }
   opacity: 0.5;
   cursor: not-allowed;
   filter: grayscale(0.6);
+}
+/* RP 不足但保持可點 — click 後預覽彈窗會說明 */
+.mt-train-pick-btn.is-unaffordable {
+  opacity: 0.55;
+  filter: grayscale(0.55) brightness(0.85);
+}
+.mt-train-pick-btn.is-unaffordable:hover { opacity: 0.7; }
+.mt-train-pick-btn.is-unaffordable .mt-train-btn-sub {
+  color: #ffab91;
+  font-weight: 900;
+}
+
+/* ─── 訓練預覽 modal (能力卡 + 增量條) ─── */
+.mt-train-preview-overlay { z-index: 12003; }
+.mt-train-preview-card { max-width: 420px; }
+.mt-train-preview-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #ffe680;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+.mt-train-preview-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  margin-bottom: 12px;
+}
+.mt-train-preview-lv-up {
+  color: #ffe680;
+  font-weight: 900;
+  text-shadow: 0 0 6px rgba(240,192,64,0.5);
+}
+.mt-train-preview-bars {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 8px 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.mt-train-preview-row {
+  display: grid;
+  grid-template-columns: 38px 1fr 82px;
+  align-items: center;
+  gap: 8px;
+}
+.mt-train-preview-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #cfd8dc;
+  text-align: right;
+}
+.mt-train-preview-bar {
+  position: relative;
+  height: 12px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.mt-train-preview-bar-cur {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  background: linear-gradient(180deg, #90caf9 0%, #5d9cdb 100%);
+  border-radius: 6px 0 0 6px;
+}
+.mt-train-preview-bar-gain {
+  position: absolute;
+  top: 0; bottom: 0;
+  background: linear-gradient(180deg, #66bb6a 0%, #2e7d32 100%);
+  border-radius: 0 6px 6px 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.4),
+    0 0 8px rgba(102,187,106,0.6);
+  animation: mt-train-gain-pulse 1.2s ease-in-out infinite;
+}
+@keyframes mt-train-gain-pulse {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.25); }
+}
+.mt-train-preview-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 900;
+}
+.mt-train-preview-val-cur { color: #fff; min-width: 22px; text-align: right; }
+.mt-train-preview-val-gain {
+  color: #b9e8b3;
+  background: rgba(76,175,80,0.2);
+  border: 1px solid rgba(76,175,80,0.5);
+  padding: 1px 5px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+}
+
+.mt-train-preview-cost {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 4px;
+  margin-bottom: 6px;
+}
+.mt-train-preview-cost-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.65);
+  margin-right: 2px;
+}
+.mt-train-preview-cost-pill {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+.mt-train-preview-cost-pill.is-miss {
+  background: rgba(229,57,53,0.18);
+  border-color: rgba(229,57,53,0.6);
+  color: #ffab91;
+}
+
+.mt-train-preview-blocked {
+  background: rgba(229,57,53,0.18);
+  border: 1px solid rgba(229,57,53,0.55);
+  color: #ffab91;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.mt-train-preview-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.mt-train-preview-cancel {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 9px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.mt-train-preview-cancel:hover { background: rgba(255,255,255,0.12); }
+.mt-train-preview-confirm {
+  flex: 2;
+  background: linear-gradient(180deg, #66bb6a 0%, #2e7d32 100%);
+  border: 1.5px solid #1b5e20;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+  padding: 9px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(46,125,50,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+  letter-spacing: 1px;
+}
+.mt-train-preview-confirm:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.mt-train-preview-confirm:disabled {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.5);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 .mt-train-pick-busy {
   font-size: 12px;

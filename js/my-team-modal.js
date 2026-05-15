@@ -1179,6 +1179,7 @@
   }
 
   // 撈使用者已解鎖的陣型（4-3-3 預設、抽到的教練解鎖更多）
+  // 不論教練等級：unlocks_formation 與 preferred_formation 都算解鎖
   async function _fetchUnlockedFormations() {
     const set = new Set(['4-3-3']);
     if (!window.DB || !window.currentUser && typeof currentUser === 'undefined') return set;
@@ -1186,11 +1187,43 @@
       const { data } = await window.DB.from('user_coach')
         .select('coach:coach_pool(trait_value)');
       (data || []).forEach(uc => {
-        const f = uc.coach?.trait_value?.unlocks_formation;
-        if (f) set.add(f);
+        const tv = uc.coach?.trait_value;
+        if (!tv) return;
+        if (tv.unlocks_formation)   set.add(tv.unlocks_formation);
+        if (tv.preferred_formation) set.add(tv.preferred_formation);
       });
     } catch (e) {}
     return set;
+  }
+
+  // 同步版本：依當前 cached 教練列表計算已解鎖陣型 — 給抽完比對「哪些是新的」用
+  function _computeUnlockedFromCoaches(coaches) {
+    const set = new Set(['4-3-3']);
+    (coaches || []).forEach(uc => {
+      const tv = uc.coach?.trait_value;
+      if (!tv) return;
+      if (tv.unlocks_formation)   set.add(tv.unlocks_formation);
+      if (tv.preferred_formation) set.add(tv.preferred_formation);
+    });
+    return set;
+  }
+
+  // 抽完比對新解鎖的陣型 → 顯示吐司
+  function _announceNewFormations(beforeSet, drawnCoaches) {
+    if (!Array.isArray(drawnCoaches) || drawnCoaches.length === 0) return;
+    const newOnes = new Set();
+    drawnCoaches.forEach(c => {
+      const tv = c.trait_value || c.coach?.trait_value;
+      if (!tv) return;
+      const f1 = tv.unlocks_formation, f2 = tv.preferred_formation;
+      if (f1 && !beforeSet.has(f1)) newOnes.add(f1);
+      if (f2 && !beforeSet.has(f2)) newOnes.add(f2);
+    });
+    if (newOnes.size === 0) return;
+    const list = [...newOnes].join('、');
+    if (typeof showToast === 'function') {
+      showToast(`🎉 解鎖新陣型：${list}！可到「球員」tab 切換`);
+    }
   }
 
   // 陣型 → 11 個 (x, y) %（pitch 是 home 視角，下半場為我方）
@@ -1447,24 +1480,18 @@
   }
 
   // ── helper：渲染教練派系標籤 chip（卡片右上角）──
-  // mode: 'big'（含派系名）/ 'icon'（只 icon、給助教/modal 小卡用）
-  function _renderFamilyChipHtml(coach, mode) {
+  // 純中文、不用 emoji。多家族顯示「主/副」（如 戰術·攻擊）
+  function _renderFamilyChipHtml(coach /* , _mode kept for compat */) {
     if (!coach || !coach.trait) return '';
     const fams = _coachFamilies(coach.trait);
     if (fams.length === 0) return '';
     const primary = fams[0];
     const meta = FAMILY_META[primary];
     if (!meta) return '';
-    const subIcon = fams.length > 1 ? FAMILY_META[fams[1]].icon : '';
-    const subTitle = fams.length > 1 ? ` / ${FAMILY_META[fams[1]].label}` : '';
-    if (mode === 'big') {
-      return `<span class="mt-coach-family-chip family-${primary}" title="${meta.label}${subTitle} → ${meta.synergy || ''} (${meta.effect || ''})">
-        ${meta.icon}<small>${meta.label}</small>${subIcon ? `<span class="mt-coach-family-chip-sub">${subIcon}</span>` : ''}
-      </span>`;
-    }
-    return `<span class="mt-coach-family-chip family-${primary} mt-coach-family-chip-icon" title="${meta.label}${subTitle} → ${meta.synergy || ''}">
-      ${meta.icon}${subIcon ? `<span class="mt-coach-family-chip-sub">${subIcon}</span>` : ''}
-    </span>`;
+    const subLabel = fams.length > 1 ? FAMILY_META[fams[1]].label : '';
+    const fullLabel = subLabel ? `${meta.label}·${subLabel}` : meta.label;
+    const titleHint = `${meta.label}${subLabel ? ' / ' + subLabel : ''} → ${meta.synergy || ''} ${meta.effect || ''}`.trim();
+    return `<span class="mt-coach-family-chip family-${primary}" title="${escapeHtml(titleHint)}">${escapeHtml(fullLabel)}</span>`;
   }
 
   // ── helper：渲染陣型 chip（卡片底部）──
@@ -1486,13 +1513,12 @@
     const badge = role === 'head' ? '👑 主教練' : role === 'assist1' ? '① 助教' : role === 'assist2' ? '② 助教' : '';
     const imgId = `coach-portrait-${uc.id.slice(0,8)}`;
     const formation = _coachFormation(c);
-    const familyChipBig = _renderFamilyChipHtml(c, 'big');
-    const familyChipIcon = _renderFamilyChipHtml(c, 'icon');
+    const familyChip = _renderFamilyChipHtml(c);
     if (isHead) {
       return `
         <button class="mt-coach-team-slot mt-coach-team-head-slot rarity-${c.rarity || 'R'} role-head" data-ucid="${uc.id}">
           <span class="mt-coach-head-role-badge">${badge}</span>
-          ${familyChipBig}
+          ${familyChip}
           <div class="mt-coach-team-head-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
           <div class="mt-coach-team-head-info">
             <div class="mt-coach-team-head-name-row">
@@ -1511,7 +1537,7 @@
     return `
       <button class="mt-coach-team-slot mt-coach-slot rarity-${c.rarity || 'R'} active role-${role}" data-ucid="${uc.id}">
         <span class="mt-coach-active-crown">${role === 'assist1' ? '①' : '②'}</span>
-        ${familyChipIcon}
+        ${familyChip}
         <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
         <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
         <div class="mt-coach-slot-trait">${escapeHtml(assistBuff)}</div>
@@ -1558,40 +1584,38 @@
       uc.id === team.assist_coach_id_1 ? 'assist1' :
       uc.id === team.assist_coach_id_2 ? 'assist2' : 'none';
 
-    // 計算每個 family 的擁有人數（重複歸屬都算）
+    // 計算每個 family 的擁有人數（重複歸屬都算）— 給頂部羈絆狀態列用
     const familyCount = {};
     coaches.forEach(uc => {
       const fams = _coachFamilies(uc.coach?.trait);
-      if (fams.length === 0) {
-        familyCount.other = (familyCount.other || 0) + 1;
-      } else {
-        fams.forEach(f => { familyCount[f] = (familyCount[f] || 0) + 1; });
-      }
-    });
-    // 教練分組（每個教練只放到主家族；多家族的會在 chip 顯示副家族）
-    const grouped = { tactic:[], attack:[], defense:[], speed:[], stamina:[], youth:[], other:[] };
-    coaches.forEach(uc => {
-      const fams = _coachFamilies(uc.coach?.trait);
-      const primary = fams[0] || 'other';
-      grouped[primary].push(uc);
+      fams.forEach(f => { familyCount[f] = (familyCount[f] || 0) + 1; });
     });
 
-    // 每組內排序：head → assist1 → assist2 → SSR → SR → R
+    // 排序：head → assist1 → assist2 → SSR → SR → R
     const rarityRank = { SSR: 0, SR: 1, R: 2 };
-    const sortFn = (a, b) => {
+    const sorted = [...coaches].sort((a, b) => {
       const ra = { head: -3, assist1: -2, assist2: -1 }[roleOf(a)] ?? 10;
       const rb = { head: -3, assist1: -2, assist2: -1 }[roleOf(b)] ?? 10;
       if (ra !== rb) return ra - rb;
       return (rarityRank[a.coach?.rarity] || 9) - (rarityRank[b.coach?.rarity] || 9);
-    };
-    FAMILY_ORDER.forEach(f => grouped[f].sort(sortFn));
+    });
+
+    // 羈絆狀態 chip 列（小總覽：哪些派系已可組／差幾人）
+    const synergyChips = FAMILY_ORDER.filter(f => f !== 'other').map(fam => {
+      const count = familyCount[fam] || 0;
+      const meta = FAMILY_META[fam];
+      const cls = count >= 3 ? 'ready' : 'need';
+      const text = count >= 3 ? `${meta.label} ✓` : `${meta.label} ${count}/3`;
+      return `<span class="mt-coach-syn-chip family-${fam} ${cls}" title="${escapeHtml(meta.synergy + ' ' + meta.effect)}">${escapeHtml(text)}</span>`;
+    }).join('');
 
     overlay.innerHTML = `
       <div class="mt-profile-card" style="max-width:520px">
         <button class="mt-modal-close mt-profile-close" type="button">×</button>
         <div class="mt-coach-all-title">📋 所有教練 (${coaches.length})</div>
         <div class="mt-coach-all-hint">點教練 → 指派為主教練 / 助教 1 / 助教 2．同派系 3 人齊上 → 觸發羈絆</div>
-        <div class="mt-coach-all-sections" id="mt-coach-all-sections"></div>
+        <div class="mt-coach-syn-bar">${synergyChips}</div>
+        <div class="mt-coach-all-grid" id="mt-coach-all-grid"></div>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -1600,63 +1624,40 @@
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 200);
     });
-    const sectionsHost = overlay.querySelector('#mt-coach-all-sections');
+    const grid = overlay.querySelector('#mt-coach-all-grid');
 
-    FAMILY_ORDER.forEach(fam => {
-      const arr = grouped[fam];
-      if (!arr || arr.length === 0) return;
-      const meta = FAMILY_META[fam];
-      const count = familyCount[fam] || 0; // 跨家族總計
-      const reachable = count >= 3;
-      const stateLabel = fam === 'other' ? '' :
-        reachable ? `<span class="mt-coach-family-state ready">✅ 可組「${meta.synergy}」</span>` :
-                    `<span class="mt-coach-family-state need">差 ${3 - count} 人組「${meta.synergy}」</span>`;
-      const section = document.createElement('div');
-      section.className = `mt-coach-family-section family-${fam}`;
-      section.innerHTML = `
-        <div class="mt-coach-family-header">
-          <span class="mt-coach-family-icon">${meta.icon}</span>
-          <span class="mt-coach-family-name">${meta.label}</span>
-          <span class="mt-coach-family-count">(${arr.length})</span>
-          ${stateLabel}
-        </div>
-        <div class="mt-coach-family-grid"></div>
+    sorted.forEach(uc => {
+      const c = uc.coach || {};
+      const role = roleOf(uc);
+      const badge = role === 'head' ? '👑' : role === 'assist1' ? '①' : role === 'assist2' ? '②' : '';
+      const familyChip = _renderFamilyChipHtml(c);
+      const formation = _coachFormation(c);
+      const slot = document.createElement('button');
+      slot.className = `mt-coach-slot rarity-${c.rarity || 'R'}${role !== 'none' ? ' active' : ''} role-${role}`;
+      slot.dataset.ucid = uc.id;
+      const imgId = `coach-all-portrait-${uc.id.slice(0,8)}`;
+      slot.innerHTML = `
+        ${badge ? `<span class="mt-coach-active-crown">${badge}</span>` : ''}
+        ${familyChip}
+        <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
+        <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
+        <div class="mt-coach-slot-trait">${escapeHtml(_traitShortLabel(c.trait, c.trait_value))}</div>
+        ${formation ? `<div class="mt-coach-slot-formation">📋 ${formation}</div>` : ''}
+        <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
       `;
-      sectionsHost.appendChild(section);
-      const grid = section.querySelector('.mt-coach-family-grid');
-      arr.forEach(uc => {
-        const c = uc.coach || {};
-        const role = roleOf(uc);
-        const badge = role === 'head' ? '👑' : role === 'assist1' ? '①' : role === 'assist2' ? '②' : '';
-        const familyChip = _renderFamilyChipHtml(c, 'icon');
-        const formation = _coachFormation(c);
-        const slot = document.createElement('button');
-        slot.className = `mt-coach-slot rarity-${c.rarity || 'R'}${role !== 'none' ? ' active' : ''} role-${role}`;
-        slot.dataset.ucid = uc.id;
-        const imgId = `coach-all-portrait-${uc.id.slice(0,8)}`;
-        slot.innerHTML = `
-          ${badge ? `<span class="mt-coach-active-crown">${badge}</span>` : ''}
-          ${familyChip}
-          <div class="mt-coach-slot-portrait"><img id="${imgId}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.opacity='0.3'"></div>
-          <div class="mt-coach-slot-name">${escapeHtml(c.name || '?')}</div>
-          <div class="mt-coach-slot-trait">${escapeHtml(_traitShortLabel(c.trait, c.trait_value))}</div>
-          ${formation ? `<div class="mt-coach-slot-formation">📋 ${formation}</div>` : ''}
-          <span class="mt-coach-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
-        `;
-        grid.appendChild(slot);
-        const look = uc.look_data || c.look_data;
-        if (look && window.LpcRenderer) {
-          window.LpcRenderer.portrait(look).then(url => {
-            const img = document.getElementById(imgId);
-            if (img && url) img.src = url;
-          }).catch(() => {});
-        }
-        slot.addEventListener('click', () => {
-          _openCoachRoleMenu(uc, () => {
-            overlay.classList.remove('open');
-            setTimeout(() => overlay.remove(), 200);
-            if (typeof onChange === 'function') onChange();
-          });
+      grid.appendChild(slot);
+      const look = uc.look_data || c.look_data;
+      if (look && window.LpcRenderer) {
+        window.LpcRenderer.portrait(look).then(url => {
+          const img = document.getElementById(imgId);
+          if (img && url) img.src = url;
+        }).catch(() => {});
+      }
+      slot.addEventListener('click', () => {
+        _openCoachRoleMenu(uc, () => {
+          overlay.classList.remove('open');
+          setTimeout(() => overlay.remove(), 200);
+          if (typeof onChange === 'function') onChange();
         });
       });
     });
@@ -1769,6 +1770,12 @@
         <div class="mt-coach-office-title">
           📋 教練辦公室
           <span class="mt-coach-office-formation">${formation}</span>
+        </div>
+
+        <!-- 右上角持券 pill：教練券 + 寶石 -->
+        <div class="mt-gacha-tab-wallet">
+          <span class="mt-gacha-tab-pill"><span class="mt-gacha-tab-pill-icon">👔</span><b>${coachTickets}</b></span>
+          <span class="mt-gacha-tab-pill"><span class="mt-gacha-tab-pill-icon">💎</span><b>${team.gems || 0}</b></span>
         </div>
 
         <!-- 中央黑板：畫陣型 + X/O 戰術 -->
@@ -1892,10 +1899,13 @@
     content.querySelectorAll('.mt-coach-draw-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const cnt = parseInt(btn.dataset.count, 10);
+        // 抽前 snapshot 已解鎖的陣型，抽後比對新解鎖
+        const beforeFormations = _computeUnlockedFromCoaches(coaches);
         if (window.CoachSummonRitual) {
           window.CoachSummonRitual.open({
             count: cnt,
             onSuccess: async (res) => {
+              _announceNewFormations(beforeFormations, res?.coaches || []);
               _showCoachDrawResult(res?.coaches || []);
             },
             onCancel: () => {},
@@ -1915,6 +1925,7 @@
           await window.MyTeam.refresh?.();
           // 自動把第一張高稀有度教練指派為主教練（如果還沒主）+ 補上助教
           await _autoAssignNewCoaches(res?.coaches || []);
+          _announceNewFormations(beforeFormations, res?.coaches || []);
           _showCoachDrawResult(res?.coaches || res || []);
         } catch (e) {
           const msg = String(e.message || e);
@@ -3076,6 +3087,12 @@
       <div class="mt-gacha-shop-fullscene" id="mt-gacha-fullshop">
         <!-- AI 生成背景圖（店面整個場景） -->
         <img class="mt-gshop-bg-img" src="img/my-team/gacha-bg.jpg" alt="">
+
+        <!-- 右上角持券 pill：抽券 + 寶石 -->
+        <div class="mt-gacha-tab-wallet">
+          <span class="mt-gacha-tab-pill"><span class="mt-gacha-tab-pill-icon">🎟️</span><b>${tickets}</b></span>
+          <span class="mt-gacha-tab-pill"><span class="mt-gacha-tab-pill-icon">💎</span><b>${gems}</b></span>
+        </div>
 
         <!-- 頂部招牌：球員卡販售 -->
         <div class="mt-gshop-marquee">
@@ -4270,15 +4287,15 @@
         </div>
         <div class="mt-train-pick-btns ${preferredMode ? 'mt-train-pick-btns-1' : 'mt-train-pick-btns-2'}">
           ${(!preferredMode || preferredMode === 'normal') ? `
-            <button class="mt-train-pick-btn mt-train-pick-rp" data-pid="${p.id}" data-mode="normal" ${canNormal ? '' : 'disabled'}>
+            <button class="mt-train-pick-btn mt-train-pick-rp ${canNormal ? '' : 'is-unaffordable'}" data-pid="${p.id}" data-mode="normal">
               <div class="mt-train-btn-title">⚡ 集訓升等</div>
-              <div class="mt-train-btn-sub">${canNormal ? '🧠10 💪10 → Lv+1, 屬性+1~3' : missNormal}</div>
+              <div class="mt-train-btn-sub">${canNormal ? '🧠10 💪10 → Lv+1, 屬性+1~3' : '⚠️ ' + missNormal}</div>
             </button>
           ` : ''}
           ${(!preferredMode || preferredMode === 'premium') ? `
-            <button class="mt-train-pick-btn mt-train-pick-rp mt-train-btn-premium" data-pid="${p.id}" data-mode="premium" ${canPremium ? '' : 'disabled'}>
+            <button class="mt-train-pick-btn mt-train-pick-rp mt-train-btn-premium ${canPremium ? '' : 'is-unaffordable'}" data-pid="${p.id}" data-mode="premium">
               <div class="mt-train-btn-title">⭐ 精英特訓</div>
-              <div class="mt-train-btn-sub">${canPremium ? '🧠30 💪30 ❤️10 💡10 → 屬性+2~5' : missPremium}</div>
+              <div class="mt-train-btn-sub">${canPremium ? '🧠30 💪30 ❤️10 💡10 → 屬性+2~5' : '⚠️ ' + missPremium}</div>
             </button>
           ` : ''}
         </div>
@@ -4294,27 +4311,16 @@
     });
 
     overlay.querySelectorAll('.mt-train-pick-rp').forEach(btn => {
-      btn.addEventListener('click', async () => {
+      btn.addEventListener('click', () => {
         const pid = btn.dataset.pid;
         const mode = btn.dataset.mode;
-        overlay.querySelectorAll('.mt-train-pick-rp').forEach(b => b.disabled = true);
-        try {
-          const result = await window.MyTeam.trainPlayer(pid, mode);
-          window.MyTeam.trackQuest?.('train', 1).catch(() => {});
-          const g = result.gains;
-          if (typeof showToast === 'function') {
-            showToast(`💪 Lv.${result.level_after}！攻+${g.attack} 防+${g.defense} 速+${g.speed} 中+${g.midfield} 體+${g.stamina} 環+${g.aura}`);
-          }
+        const player = players.find(pp => pp.id === pid);
+        if (!player) return;
+        _openTrainPreview(player, mode, team, () => {
           overlay.classList.remove('open');
           setTimeout(() => overlay.remove(), 200);
           renderHub();
-        } catch (err) {
-          const msg = String(err.message || err);
-          let friendly = '訓練失敗：' + msg;
-          if (msg.includes('INSUFFICIENT_RP')) friendly = '⚠️ 點數不足';
-          else if (msg.includes('MAX_LEVEL')) friendly = '⚠️ 已滿級';
-          if (typeof showToast === 'function') showToast(friendly);
-        }
+        });
       });
     });
   }
@@ -4392,13 +4398,13 @@
               <div class="mt-train-btn-title">⏱️ 慢慢練</div>
               <div class="mt-train-btn-sub">等 ${estLabel} → +1</div>
             </button>
-            <button class="mt-train-pick-btn mt-train-pick-rp" data-pid="${p.id}" data-mode="normal" ${canNormal ? '' : 'disabled'} title="${missNormal}">
+            <button class="mt-train-pick-btn mt-train-pick-rp ${canNormal ? '' : 'is-unaffordable'}" data-pid="${p.id}" data-mode="normal" title="${missNormal}">
               <div class="mt-train-btn-title">⚡ 集訓升等</div>
-              <div class="mt-train-btn-sub">${canNormal ? '🧠10 💪10 → Lv+1' : (missNormal || '')}</div>
+              <div class="mt-train-btn-sub">${canNormal ? '🧠10 💪10 → Lv+1' : '⚠️ ' + (missNormal || '')}</div>
             </button>
-            <button class="mt-train-pick-btn mt-train-pick-rp mt-train-btn-premium" data-pid="${p.id}" data-mode="premium" ${canPremium ? '' : 'disabled'} title="${missPremium}">
+            <button class="mt-train-pick-btn mt-train-pick-rp mt-train-btn-premium ${canPremium ? '' : 'is-unaffordable'}" data-pid="${p.id}" data-mode="premium" title="${missPremium}">
               <div class="mt-train-btn-title">⭐ 精英特訓</div>
-              <div class="mt-train-btn-sub">${canPremium ? '🧠30 💪30 ❤️10 💡10' : (missPremium || '')}</div>
+              <div class="mt-train-btn-sub">${canPremium ? '🧠30 💪30 ❤️10 💡10' : '⚠️ ' + (missPremium || '')}</div>
             </button>
           `}
         </div>
@@ -4434,22 +4440,140 @@
       });
     });
 
-    // RP 訓練
+    // RP 訓練 → 開預覽頁（不直接練）
     overlay.querySelectorAll('.mt-train-pick-rp').forEach(btn => {
-      btn.addEventListener('click', async () => {
+      btn.addEventListener('click', () => {
         const pid = btn.dataset.pid;
         const mode = btn.dataset.mode;
-        overlay.querySelectorAll('.mt-train-pick-rp').forEach(b => b.disabled = true);
-        try {
-          const result = await window.MyTeam.trainPlayer(pid, mode);
-          window.MyTeam.trackQuest?.('train', 1).catch(() => {});
-          const g = result.gains;
-          if (typeof showToast === 'function') {
-            showToast(`💪 Lv.${result.level_after}！攻+${g.attack}/防+${g.defense}/速+${g.speed}/中+${g.midfield}/體+${g.stamina}/環+${g.aura}`);
-          }
+        const player = players.find(pp => pp.id === pid);
+        if (!player) return;
+        _openTrainPreview(player, mode, team, () => {
+          // 訓練成功後 → 關掉這個 picker
           overlay.classList.remove('open');
           setTimeout(() => overlay.remove(), 200);
           renderHub();
+        });
+      });
+    });
+  }
+
+  // 訓練預覽：球員能力卡 + 每條會提升的能力條上加「增量條 + 數字」
+  function _openTrainPreview(p, mode, team, onSuccess) {
+    const c = p.card || {};
+    const ATTR_KEYS = ['attack','defense','speed','midfield','stamina','aura'];
+    const ATTR_LABELS = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
+    // 訓練 RP 加成（青訓 trait 給 +25%；上限 Lv 20）
+    const isMaxLevel = p.level >= 50;
+    const rpT = team.rp_tactical || 0, rpP = team.rp_physical || 0;
+    const rpH = team.rp_heart || 0, rpI = team.rp_idea || 0;
+    const cfg = mode === 'premium'
+      ? { gainMin: 2, gainMax: 5, costTac: 30, costPhy: 30, costHrt: 10, costIdea: 10, title: '⭐ 精英特訓', sub: 'Lv +1 · 6 屬性各 +2~5' }
+      : { gainMin: 1, gainMax: 3, costTac: 10, costPhy: 10, costHrt: 0,  costIdea: 0,  title: '⚡ 集訓升等', sub: 'Lv +1 · 6 屬性各 +1~3' };
+    const enoughRp = rpT >= cfg.costTac && rpP >= cfg.costPhy && rpH >= cfg.costHrt && rpI >= cfg.costIdea;
+    const blocked = isMaxLevel ? '已滿級 (Lv.50)' : !enoughRp ? '點數不足' : null;
+    // 缺哪一種點數
+    const missList = [];
+    if (rpT < cfg.costTac) missList.push(`🧠 戰術 ${rpT}/${cfg.costTac}`);
+    if (rpP < cfg.costPhy) missList.push(`💪 體能 ${rpP}/${cfg.costPhy}`);
+    if (rpH < cfg.costHrt) missList.push(`❤️ 鬥志 ${rpH}/${cfg.costHrt}`);
+    if (rpI < cfg.costIdea) missList.push(`💡 靈感 ${rpI}/${cfg.costIdea}`);
+
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-train-preview-overlay';
+    const portraitId = `train-preview-portrait-${p.id}`;
+    const rarityClass = `rarity-${c.rarity || 'R'}`;
+    overlay.innerHTML = `
+      <div class="mt-profile-card mt-train-preview-card ${rarityClass}">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <div class="mt-train-preview-title">${cfg.title}</div>
+        <div class="mt-train-preview-sub">${cfg.sub}</div>
+
+        <div class="mt-profile-hero">
+          <div class="mt-profile-portrait-wrap">
+            <img id="${portraitId}" class="mt-profile-portrait" alt="${escapeHtml(c.name)}"
+              src="${(typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id, c.rarity) : ''}"
+              onerror="this.style.display='none'">
+            <span class="mt-profile-rarity">${c.rarity || 'R'}</span>
+          </div>
+          <div class="mt-profile-meta">
+            <div class="mt-profile-name">${escapeHtml(c.name || '?')}</div>
+            <div class="mt-profile-pos">${c.position}・Lv.${p.level} → <b class="mt-train-preview-lv-up">Lv.${p.level + 1}</b></div>
+          </div>
+        </div>
+
+        <div class="mt-train-preview-bars">
+          ${ATTR_KEYS.map(k => {
+            const cur = p['current_' + k] || 0;
+            const projMin = Math.min(99, cur + cfg.gainMin);
+            const projMax = Math.min(99, cur + cfg.gainMax);
+            const actMin = projMin - cur, actMax = projMax - cur;
+            return `
+              <div class="mt-train-preview-row">
+                <span class="mt-train-preview-label">${ATTR_LABELS[k]}</span>
+                <div class="mt-train-preview-bar">
+                  <div class="mt-train-preview-bar-cur" style="width:${cur}%"></div>
+                  <div class="mt-train-preview-bar-gain" style="left:${cur}%; width:${Math.max(0, projMax - cur)}%"></div>
+                </div>
+                <span class="mt-train-preview-val">
+                  <span class="mt-train-preview-val-cur">${cur}</span>
+                  <span class="mt-train-preview-val-gain">+${actMin === actMax ? actMin : actMin + '~' + actMax}</span>
+                </span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="mt-train-preview-cost">
+          <span class="mt-train-preview-cost-label">本次消耗</span>
+          ${cfg.costTac ? `<span class="mt-train-preview-cost-pill ${rpT < cfg.costTac ? 'is-miss' : ''}">🧠 ${cfg.costTac}</span>` : ''}
+          ${cfg.costPhy ? `<span class="mt-train-preview-cost-pill ${rpP < cfg.costPhy ? 'is-miss' : ''}">💪 ${cfg.costPhy}</span>` : ''}
+          ${cfg.costHrt ? `<span class="mt-train-preview-cost-pill ${rpH < cfg.costHrt ? 'is-miss' : ''}">❤️ ${cfg.costHrt}</span>` : ''}
+          ${cfg.costIdea ? `<span class="mt-train-preview-cost-pill ${rpI < cfg.costIdea ? 'is-miss' : ''}">💡 ${cfg.costIdea}</span>` : ''}
+        </div>
+
+        ${blocked ? `<div class="mt-train-preview-blocked">⚠️ ${escapeHtml(blocked)}${missList.length ? '・' + missList.join(' / ') : ''}</div>` : ''}
+
+        <div class="mt-train-preview-actions">
+          <button class="mt-train-preview-cancel" type="button">取消</button>
+          <button class="mt-train-preview-confirm" type="button" ${blocked ? 'disabled' : ''}>
+            ${blocked ? '無法訓練' : '✅ 確認訓練'}
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+    if (look && window.LpcRenderer) {
+      const kit = team ? { shirtColor: team.kit_shirt_color, pantsColor: team.kit_pants_color } : null;
+      window.LpcRenderer.portrait(look, { scale: 6, kit }).then(url => {
+        const img = document.getElementById(portraitId);
+        if (img && url) img.src = url;
+      }).catch(() => {});
+    }
+
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    };
+    overlay.querySelector('.mt-profile-close').addEventListener('click', close);
+    overlay.querySelector('.mt-train-preview-cancel').addEventListener('click', close);
+
+    const confirmBtn = overlay.querySelector('.mt-train-preview-confirm');
+    if (!blocked) {
+      confirmBtn.addEventListener('click', async () => {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = '訓練中…';
+        try {
+          const result = await window.MyTeam.trainPlayer(p.id, mode);
+          try { await window.MyTeam.trackQuest?.('train', 1); } catch (_) {}
+          const g = result.gains;
+          if (typeof showToast === 'function') {
+            showToast(`💪 ${c.name || ''} Lv.${result.level_after}！攻+${g.attack}/防+${g.defense}/速+${g.speed}/中+${g.midfield}/體+${g.stamina}/氣+${g.aura}`);
+          }
+          close();
+          if (typeof onSuccess === 'function') onSuccess(result);
         } catch (err) {
           const msg = String(err.message || err);
           let friendly = '訓練失敗：' + msg;
@@ -4457,9 +4581,11 @@
           else if (msg.includes('MAX_LEVEL')) friendly = '⚠️ 已滿級';
           if (typeof showToast === 'function') showToast(friendly);
           else alert(friendly);
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = '✅ 確認訓練';
         }
       });
-    });
+    }
   }
 
   function escapeHtml(s) {
