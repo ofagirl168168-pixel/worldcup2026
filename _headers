@@ -48,3 +48,11 @@
 # OG 縮圖：CDN 端短快取，之後重畫圖能快點生效
 /img/og-cover.png
   Cache-Control: public, max-age=3600
+
+# my-team CSS 在 CF 端 500 → 加 no-transform 阻止 CF 做後處理（auto-minify/brotli）
+/css/my-team.css
+  Cache-Control: public, max-age=300, no-transform
+/css/my-team-v2.css
+  Cache-Control: public, max-age=300, no-transform
+/css/mt-styles.css
+  Cache-Control: public, max-age=300, no-transform
