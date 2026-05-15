@@ -7105,18 +7105,9 @@
    ═════════════════════════════════════════════════════════════ */
 .mt-train-gym {
   position: relative;
-  padding: 8px 8px 20px;
+  padding: 6px 8px 16px;
 }
-.mt-train-gym-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 8px;
-  flex-wrap: wrap; gap: 6px;
-}
-.mt-train-gym-title {
-  font-size: 15px; font-weight: 900;
-  color: #f0c040;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-}
+/* 已移除 mt-train-gym-header（節省垂直高度）*/
 .mt-train-rp-chips {
   display: flex; gap: 4px; flex-wrap: wrap;
 }
@@ -7152,6 +7143,12 @@
   flex-shrink: 0;
 }
 .mt-train-info-btn:hover { background: rgba(240,192,64,0.3); }
+/* 浮在訓練 tab 右上角的「❓ 屬性說明」chip */
+.mt-train-info-btn-float {
+  position: absolute;
+  top: 4px; right: 8px;
+  z-index: 5;
+}
 
 /* 機台動作標籤（例：跑步機、舉重）*/
 .mt-train-station-activity {
@@ -7177,27 +7174,27 @@ button.mt-train-point-card:hover {
 }
 button.mt-train-point-card:active { transform: translateY(0); }
 
-/* 餵球員 2 大按鈕（集訓/精英）*/
+/* 餵球員 2 大按鈕（集訓/精英）— 壓縮版 */
 .mt-train-feed-btns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin: 10px 0 8px;
+  gap: 6px;
+  margin: 4px 0 0;
 }
 .mt-train-feed-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 10px 8px;
-  border-radius: 10px;
+  gap: 2px;
+  padding: 6px 6px 7px;
+  border-radius: 9px;
   cursor: pointer;
   text-align: center;
   font-family: inherit;
   border: 2px solid;
   transition: transform 0.12s, box-shadow 0.12s;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
 }
 .mt-train-feed-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.6), 0 0 18px rgba(255,255,255,0.18); }
 .mt-train-feed-btn:active { transform: translateY(0); }
@@ -7275,9 +7272,63 @@ button.mt-train-point-card:active { transform: translateY(0); }
   font-size: 17px;
   font-weight: 900;
   color: #ffe680;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   text-align: center;
 }
+.mt-train-info-intro {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+/* 6 屬性說明卡片 grid */
+.mt-attr-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.mt-attr-info-card {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-left-width: 3px;
+  border-radius: 8px;
+  padding: 6px 10px 7px;
+}
+.mt-attr-info-card.attr-attack   { border-left-color: #ef5350; }
+.mt-attr-info-card.attr-defense  { border-left-color: #66bb6a; }
+.mt-attr-info-card.attr-speed    { border-left-color: #ffca28; }
+.mt-attr-info-card.attr-midfield { border-left-color: #90caf9; }
+.mt-attr-info-card.attr-stamina  { border-left-color: #ec407a; }
+.mt-attr-info-card.attr-aura     { border-left-color: #ab47bc; }
+.mt-attr-info-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.mt-attr-info-icon { font-size: 14px; }
+.mt-attr-info-name {
+  font-size: 13px;
+  font-weight: 900;
+  color: #ffe680;
+  letter-spacing: 0.5px;
+}
+.mt-attr-info-machine {
+  font-size: 10px;
+  color: rgba(255,255,255,0.45);
+  margin-left: auto;
+  background: rgba(255,255,255,0.05);
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+.mt-attr-info-body {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.45;
+}
+.mt-attr-info-body b { color: #ffe680; }
 .mt-train-info-section {
   background: rgba(0,0,0,0.3);
   border: 1px solid rgba(240,192,64,0.25);
@@ -7504,59 +7555,57 @@ button.mt-train-point-card:active { transform: translateY(0); }
   padding: 14px 0 4px;
 }
 
-/* 訓練點數面板（地板下方）*/
+/* 訓練點數面板（壓縮版：title + 庫存 chip 同一列、buttons 較矮）*/
 .mt-train-points-panel {
-  margin-top: 12px;
+  margin-top: 2px;
   background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.25) 100%);
-  border: 2px solid rgba(240,192,64,0.4);
+  border: 1.5px solid rgba(240,192,64,0.4);
   border-radius: 10px;
-  padding: 10px 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+  padding: 6px 10px 8px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
 }
 .mt-train-points-title {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
+  gap: 5px;
+  font-size: 12px;
   font-weight: 900;
   color: #f0c040;
   text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
-.mt-train-points-emoji { font-size: 16px; }
-.mt-train-points-title-sub {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.6);
-  margin-left: 4px;
-  letter-spacing: 0.3px;
+.mt-train-points-emoji { font-size: 14px; }
+/* 標題列右側 inline 庫存 chips */
+.mt-train-inventory-inline {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 3px;
 }
-.mt-train-points-desc {
-  font-size: 11px;
-  color: rgba(255,255,255,0.7);
-  line-height: 1.4;
-  margin-bottom: 8px;
+.mt-train-inventory-inline .mt-train-inv-chip {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.15);
+  font-size: 10px;
+  padding: 0 5px;
 }
 
-/* 集訓營區段標題（RP 面板下方、機台場景上方）*/
+/* 集訓營區段標題（壓縮成一行）*/
 .mt-train-section-divider {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin: 14px 0 6px;
-  padding: 0 4px;
+  gap: 6px;
+  margin: 8px 0 4px;
+  padding: 5px 4px 0;
   border-top: 1px solid rgba(255,255,255,0.08);
-  padding-top: 10px;
 }
 .mt-train-section-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 900;
   color: #f0c040;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
   text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
 .mt-train-section-sub {
-  font-size: 11px;
+  font-size: 10.5px;
   color: rgba(255,255,255,0.55);
   font-weight: 700;
 }

@@ -4009,46 +4009,36 @@
 
     content.innerHTML = `
       <div class="mt-train-gym">
-        <div class="mt-train-gym-header">
-          <span class="mt-train-gym-title">💪 訓練館</span>
-        </div>
+        <!-- 屬性說明（小、右上角浮）-->
+        <button class="mt-train-info-btn mt-train-info-btn-float" type="button" title="6 屬性說明">❓ 屬性說明</button>
 
-        <div class="mt-train-gym-hint">
-          <span>RP 廣度訓練 (上方) ・ 集訓營鎖人單項焦點 (下方)</span>
-          <button class="mt-train-info-btn" type="button">❓ 升等是什麼</button>
-        </div>
-
-        <!-- 餵球員快速訓練：2 大按鈕（集訓/精英）+ 4 種點數庫存顯示 -->
+        <!-- ⚡ RP 廣度訓練：2 按鈕 + 庫存 chip inline -->
         <div class="mt-train-points-panel">
           <div class="mt-train-points-title">
             <span class="mt-train-points-emoji">⚡</span>
             <span class="mt-train-points-title-text">RP 廣度訓練</span>
-            <span class="mt-train-points-title-sub">Lv +1 + 6 屬性同時平均長</span>
+            <span class="mt-train-inventory-inline">
+              <span class="mt-train-inv-chip" title="戰術">🧠 ${team.rp_tactical || 0}</span>
+              <span class="mt-train-inv-chip" title="體能">💪 ${team.rp_physical || 0}</span>
+              <span class="mt-train-inv-chip" title="鬥志">❤️ ${team.rp_heart || 0}</span>
+              <span class="mt-train-inv-chip" title="靈感">💡 ${team.rp_idea || 0}</span>
+            </span>
           </div>
           <div class="mt-train-feed-btns">
             <button class="mt-train-feed-btn mt-train-feed-normal" data-feed-mode="normal">
               <div class="mt-train-feed-btn-title">⚡ 集訓升等</div>
-              <div class="mt-train-feed-btn-benefit">Lv +1 · 6 屬性各 +1~3</div>
-              <div class="mt-train-feed-btn-cost">🧠 10  💪 10</div>
+              <div class="mt-train-feed-btn-benefit">Lv+1 · 6 屬性各 +1~3 · 🧠10 💪10</div>
             </button>
             <button class="mt-train-feed-btn mt-train-feed-premium" data-feed-mode="premium">
               <div class="mt-train-feed-btn-title">⭐ 精英特訓</div>
-              <div class="mt-train-feed-btn-benefit">Lv +1 · 6 屬性各 +2~5</div>
-              <div class="mt-train-feed-btn-cost">🧠 30  💪 30  ❤️ 10  💡 10</div>
+              <div class="mt-train-feed-btn-benefit">Lv+1 · 6 屬性各 +2~5 · 🧠30 💪30 ❤️10 💡10</div>
             </button>
-          </div>
-          <div class="mt-train-inventory">
-            <span class="mt-train-inv-label">點數庫存：</span>
-            <span class="mt-train-inv-chip" title="戰術點">🧠 ${team.rp_tactical || 0}</span>
-            <span class="mt-train-inv-chip" title="體能點">💪 ${team.rp_physical || 0}</span>
-            <span class="mt-train-inv-chip" title="鬥志點">❤️ ${team.rp_heart || 0}</span>
-            <span class="mt-train-inv-chip" title="靈感點">💡 ${team.rp_idea || 0}</span>
           </div>
         </div>
 
         <div class="mt-train-section-divider">
           <span class="mt-train-section-title">🏋️ 集訓營</span>
-          <span class="mt-train-section-sub">點機台 → 選球員 → 選時長（鎖人但單項拉超快）</span>
+          <span class="mt-train-section-sub">鎖人 / 單項焦點</span>
         </div>
 
         <!-- 開羅式機台場景：6 個機台 + 球員 chibi -->
@@ -4105,7 +4095,6 @@
           }).join('')}
         </div>
 
-        <div class="mt-train-points-source">📥 RP 來源：比賽勝利、看比賽解讀文、任務獎勵</div>
       </div>
     `;
 
@@ -4363,47 +4352,49 @@
     overlay.querySelector('.mt-talent-awaken-confirm').addEventListener('click', close);
   }
 
-  // 訓練系統說明 modal
+  // 6 屬性說明 modal — 每個屬性在比賽裡的真實影響
   function _openTrainInfoModal() {
     const overlay = document.createElement('div');
     overlay.className = 'mt-profile-overlay mt-train-info-modal';
     overlay.innerHTML = `
       <div class="mt-profile-card">
         <button class="mt-modal-close mt-profile-close" type="button">×</button>
-        <div class="mt-train-info-title">📖 訓練系統 FAQ</div>
+        <div class="mt-train-info-title">📖 6 屬性說明</div>
+        <div class="mt-train-info-intro">每個屬性在比賽中都有實際作用。括號內為對應的訓練機台。</div>
 
-        <div class="mt-train-info-section">
-          <div class="mt-train-info-q">Lv. 等級是什麼？</div>
-          <div class="mt-train-info-a">球員的累計訓練次數，<b>任何訓練 +1 級</b>（慢慢練、集訓、精英都會）。Lv 上限 50 — 等於每位球員最多訓練 50 次。</div>
-        </div>
-
-        <div class="mt-train-info-section">
-          <div class="mt-train-info-q">⏱️ 慢慢練 vs ⚡ 集訓 vs ⭐ 精英？</div>
-          <div class="mt-train-info-a">
-            ⏱️ 慢慢練：<b>免費</b>、等時間到 → Lv+1 + <b>1 個屬性 +1</b><br>
-            ⚡ 集訓升等：耗點數 → Lv+1 + <b>6 個屬性各 +1~3</b><br>
-            ⭐ 精英特訓：耗更多點數 → Lv+1 + <b>6 個屬性各 +2~5</b><br>
-            三種都消耗等級配額、但效率天差地別 — 用集訓/精英才能拉開差距
+        <div class="mt-attr-info-grid">
+          <div class="mt-attr-info-card attr-attack">
+            <div class="mt-attr-info-head"><span class="mt-attr-info-icon">⚔️</span><span class="mt-attr-info-name">攻擊</span><span class="mt-attr-info-machine">舉重</span></div>
+            <div class="mt-attr-info-body">射門進球率（射手 vs 對方 GK）。配神射手天賦 + 高氣場 → 禁區內最高 +20% 精準</div>
+          </div>
+          <div class="mt-attr-info-card attr-defense">
+            <div class="mt-attr-info-head"><span class="mt-attr-info-icon">🛡️</span><span class="mt-attr-info-name">防守</span><span class="mt-attr-info-machine">撞擊假人</span></div>
+            <div class="mt-attr-info-body">搶斷成功率 + GK 撲救成功率。城牆天賦再 +30% 搶斷</div>
+          </div>
+          <div class="mt-attr-info-card attr-speed">
+            <div class="mt-attr-info-head"><span class="mt-attr-info-icon">⚡</span><span class="mt-attr-info-name">速度</span><span class="mt-attr-info-machine">跳繩衝刺</span></div>
+            <div class="mt-attr-info-body">持球者跑動速度 + 搶斷時靠近持球者的能力</div>
+          </div>
+          <div class="mt-attr-info-card attr-midfield">
+            <div class="mt-attr-info-head"><span class="mt-attr-info-icon">🎯</span><span class="mt-attr-info-name">中場</span><span class="mt-attr-info-machine">傳球牆</span></div>
+            <div class="mt-attr-info-body">傳球決策頻率 + 不易被搶斷。魔法師天賦 +15% 傳球積極性</div>
+          </div>
+          <div class="mt-attr-info-card attr-stamina">
+            <div class="mt-attr-info-head"><span class="mt-attr-info-icon">❤️</span><span class="mt-attr-info-name">體力</span><span class="mt-attr-info-machine">跑步機</span></div>
+            <div class="mt-attr-info-body">後半場疲勞抗性（影響搶斷 / 跑動）。體能怪天賦完全免疲勞</div>
+          </div>
+          <div class="mt-attr-info-card attr-aura">
+            <div class="mt-attr-info-head"><span class="mt-attr-info-icon">✨</span><span class="mt-attr-info-name">氣場</span><span class="mt-attr-info-machine">鏡前姿勢</span></div>
+            <div class="mt-attr-info-body">射門精準度（高氣場大場面 +12%）+ <b>狂熱模式累積速度</b>（量表滿 100 → 該球員所有屬性 +25% 持續 18 秒）</div>
           </div>
         </div>
 
         <div class="mt-train-info-section">
-          <div class="mt-train-info-q">✨ 氣場有什麼用？</div>
+          <div class="mt-train-info-q">屬性上限 / Lv 是什麼？</div>
           <div class="mt-train-info-a">
-            <b>① 射門穩定</b>：氣場 80 比 50 射門精準度多 +3.6%<br>
-            <b>② 🔥 個人狂熱模式</b>（開羅式）：<br>
-            &nbsp;&nbsp;每球員有獨立「氣場量表」、比賽中自動累積<br>
-            &nbsp;&nbsp;氣場越高 → 累積越快（50:1× / 80:1.6× / 99:2×）<br>
-            &nbsp;&nbsp;進球 +35、鏟到 +12、量表滿 100 → 進狂熱<br>
-            &nbsp;&nbsp;狂熱期間：<b>該球員所有屬性 +25%</b>、持續 10 秒<br>
-            &nbsp;&nbsp;頭頂金光環 + 場上方跳「XX 狂熱中！」<br>
-            &nbsp;&nbsp;結束後 cd 25 秒、養王牌靠他帶比賽
+            每屬性上限 <b>99</b>，個別 cap = 球員 base + 15 + 緣分(★) × 5（5★ 多 +25 上限）。<br>
+            <b>Lv</b> = 累計訓練次數，上限 50（每位球員最多訓 50 次）。
           </div>
-        </div>
-
-        <div class="mt-train-info-section">
-          <div class="mt-train-info-q">屬性上限到多少？</div>
-          <div class="mt-train-info-a">每個屬性最高 <b>99</b>，個別 cap = 球員 base + 15 + 緣分(★) × 5。緣分 5★ = 多 +25 上限。</div>
         </div>
       </div>
     `;
