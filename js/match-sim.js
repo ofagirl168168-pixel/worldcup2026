@@ -467,11 +467,18 @@
 
       // 體力疲勞表現：gameTimeFrac × stamina 算當前疲勞度 + 鏟球額外消耗
       // 官方比賽（state.disableTeamMechanics）關閉體力影響
-      // 注意：render() 是 IIFE 頂層函式、看不到 runSim 的 opts，只能從 state 拿
+      // 天賦：💪 體能怪 → 完全免疲勞；⚡ 衝刺型 → 後半場（gtf > 0.5）疲勞減半
       const gtf = state.frame / TOTAL_FRAMES;
       const pStamina = p.stats?.stamina ?? 75;
-      const fatigue = state.disableTeamMechanics ? 0
-        : (gtf * Math.max(0.1, 0.55 - pStamina / 250) + (p._tackleFatigue || 0));
+      let fatigue;
+      if (state.disableTeamMechanics) {
+        fatigue = 0;
+      } else if (p.talent === 'bodybuilder') {
+        fatigue = 0;
+      } else {
+        fatigue = gtf * Math.max(0.1, 0.55 - pStamina / 250) + (p._tackleFatigue || 0);
+        if (p.talent === 'speedster' && gtf > 0.5) fatigue *= 0.5;
+      }
 
       // 頭頂體力條：持球者 + 正在鏟球的人都顯示
       const showStaminaBar = (isPos || tackleActive) && p.role !== 'GK';
@@ -851,6 +858,28 @@
       goalkeeping = Math.max(20, Math.min(99, Math.round(goalkeeping + jitter())));
       return { attack, defense, midfield, speed, stamina, goalkeeping };
     }
+    // 天賦屬性加成（+5 到對應的主屬性）— 在 _statsFor 結果上疊加
+    // 5 種：speedster / bodybuilder / shooter / wall / magician
+    const TALENT_BONUS = {
+      speedster:   { speed: 5 },
+      bodybuilder: { stamina: 5 },
+      shooter:     { attack: 5 },
+      wall:        { defense: 5 },
+      magician:    { midfield: 5 },
+    };
+    function _talentFor(teamData, idx) {
+      const kp = teamData.keyPlayers && teamData.keyPlayers[idx];
+      return kp?.talent || null;
+    }
+    function _applyTalentToStats(stats, talent) {
+      const bonus = TALENT_BONUS[talent];
+      if (!bonus) return stats;
+      const out = { ...stats };
+      Object.keys(bonus).forEach(k => {
+        out[k] = Math.min(99, (out[k] || 50) + bonus[k]);
+      });
+      return out;
+    }
     // 個人狂熱：accumGauge 從外部讀（跨場次保存）、個性 personality 賦予差異
     const initialGauges = opts.feverGauges || {};   // { card_id: number 0~100 }
     const makeFeverInit = (cardId) => ({
@@ -860,22 +889,30 @@
       _feverPersonality: 0.7 + rng() * 0.6,    // 0.7~1.3 變異、避免大家同時爆
     });
     const players = [
-      ...hF.map((p, i) => ({
-        ...p, team: 'h',
-        baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y,
-        flair: makeFlair(),
-        card_id: _cardIdFor(home, i),
-        stats: _statsFor(home, i, p.role, i < 5),
-        ...makeFeverInit(_cardIdFor(home, i)),
-      })),
-      ...aF.map((p, i) => ({
-        ...p, team: 'a',
-        baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y,
-        flair: makeFlair(),
-        card_id: _cardIdFor(away, i),
-        stats: _statsFor(away, i, p.role, i < 5),
-        ...makeFeverInit(_cardIdFor(away, i)),
-      })),
+      ...hF.map((p, i) => {
+        const tal = _talentFor(home, i);
+        return {
+          ...p, team: 'h',
+          baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y,
+          flair: makeFlair(),
+          card_id: _cardIdFor(home, i),
+          stats: _applyTalentToStats(_statsFor(home, i, p.role, i < 5), tal),
+          talent: tal,
+          ...makeFeverInit(_cardIdFor(home, i)),
+        };
+      }),
+      ...aF.map((p, i) => {
+        const tal = _talentFor(away, i);
+        return {
+          ...p, team: 'a',
+          baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y,
+          flair: makeFlair(),
+          card_id: _cardIdFor(away, i),
+          stats: _applyTalentToStats(_statsFor(away, i, p.role, i < 5), tal),
+          talent: tal,
+          ...makeFeverInit(_cardIdFor(away, i)),
+        };
+      }),
     ];
 
     // Phase 2.3+：preload LPC sprite per player（有 look_data 用 LPC、沒 look_data 也產一個）
@@ -1123,8 +1160,12 @@
       // 氣場加成：高氣場 = 大場面更穩 = 射門精準度提升（最多 +12%）
       const shooterAura = shooter?.stats?.aura ?? getTeam(state.possession).radar.aura ?? 50;
       const auraBonus  = (shooterAura - 50) / 100 * 0.12;
-      const goalProb = Math.max(0.10, Math.min(0.88,
-        ((shooterAtk - gkSave * 0.55) / 100) * 0.78 + auraBonus
+      // 🎯 神射手天賦：禁區內射門 +20% 進球率（dist 到對方球門 < 0.15 算禁區）
+      const goalX = state.possession === 'h' ? 1 : 0;
+      const distToGoal = shooter ? Math.abs(shooter.x - goalX) : 1;
+      const shooterTalentBonus = (shooter?.talent === 'shooter' && distToGoal < 0.15) ? 0.20 : 0;
+      const goalProb = Math.max(0.10, Math.min(0.92,
+        ((shooterAtk - gkSave * 0.55) / 100) * 0.78 + auraBonus + shooterTalentBonus
       ));
       const isGoal = rng() < goalProb;
       if (isGoal) {
@@ -1202,10 +1243,14 @@
         if (inMidfield) passChance = 0.12 + (atkStats.midfield / 100) * 0.04;
         else if (inAttackThird) passChance = 0.03 + (atkStats.midfield / 100) * 0.02;
         else passChance = 0.08 + (atkStats.midfield / 100) * 0.03;
-        passChance += urgency * 0.10; // 持球太久 → 積極找人傳
+        passChance += urgency * 0.10;
+        // ✨ 魔法師天賦：傳球決策 +15%（更頻繁、更積極地找人傳）
+        if (pos.talent === 'magician') passChance *= 1.15;
         if (rng() < passChance) {
           const candidates = rankPassTargets(pos);
-          if (candidates.length && candidates[0].score > -0.15) {
+          // 魔法師對「不是太爛」的傳球也願意執行（score 門檻放寬）
+          const threshold = pos.talent === 'magician' ? -0.25 : -0.15;
+          if (candidates.length && candidates[0].score > threshold) {
             startPass(candidates[0]);
             state.lastActionFrame = state.frame;
             return;
@@ -1225,14 +1270,24 @@
           const indMid = (pos.stats?.midfield ?? atkStats.midfield) * pFever;
           const indSpd = (near.player.stats?.speed ?? defStats.speed ?? 70) * tFever;
           // 體力疲勞影響：後半場 stamina 低的後衛 defense 效力下降 + 鏟過球的人更累
+          // 天賦：💪 體能怪 → 完全免疲勞；⚡ 衝刺型 → 後半場疲勞減半
           const gtf = state.frame / TOTAL_FRAMES;
           const tStamina = near.player.stats?.stamina ?? 75;
-          // 官方比賽關閉體力影響（疲勞 multiplier = 1）
-          const tackleFatigueMult = opts.disableTeamMechanics ? 1 : Math.max(0.55,
-            1 - gtf * Math.max(0.1, 0.4 - tStamina / 250) - (near.player._tackleFatigue || 0));
+          let tackleFatigueMult;
+          if (opts.disableTeamMechanics || near.player.talent === 'bodybuilder') {
+            tackleFatigueMult = 1;
+          } else {
+            const rawFatigue = gtf * Math.max(0.1, 0.4 - tStamina / 250) + (near.player._tackleFatigue || 0);
+            const fatigueAfterTalent = (near.player.talent === 'speedster' && gtf > 0.5)
+              ? rawFatigue * 0.5
+              : rawFatigue;
+            tackleFatigueMult = Math.max(0.55, 1 - fatigueAfterTalent);
+          }
           let tackleChance = ((indDef / 100) * 0.04 - (indMid / 100) * 0.02 + (indSpd / 100) * 0.012) * tackleFatigueMult;
           if (distToGoal < 0.22) tackleChance *= 1.3;
-          tackleChance = Math.max(0.005, Math.min(0.09, tackleChance));
+          // 🛡️ 城牆天賦：搶斷率 +30%
+          if (near.player.talent === 'wall') tackleChance *= 1.30;
+          tackleChance = Math.max(0.005, Math.min(0.12, tackleChance));
           if (rng() < tackleChance) {
             state.possession = near.player.team;
             state.possessorIdx = players.indexOf(near.player);

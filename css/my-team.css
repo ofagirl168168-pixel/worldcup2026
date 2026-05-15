@@ -7524,11 +7524,41 @@ button.mt-train-point-card:active { transform: translateY(0); }
   margin-bottom: 3px;
 }
 .mt-train-points-emoji { font-size: 16px; }
+.mt-train-points-title-sub {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  margin-left: 4px;
+  letter-spacing: 0.3px;
+}
 .mt-train-points-desc {
   font-size: 11px;
   color: rgba(255,255,255,0.7);
   line-height: 1.4;
   margin-bottom: 8px;
+}
+
+/* 集訓營區段標題（RP 面板下方、機台場景上方）*/
+.mt-train-section-divider {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 14px 0 6px;
+  padding: 0 4px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 10px;
+}
+.mt-train-section-title {
+  font-size: 14px;
+  font-weight: 900;
+  color: #f0c040;
+  letter-spacing: 0.8px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+.mt-train-section-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 700;
 }
 /* （舊 4 點數卡 grid 已改成 2 大按鈕 + 庫存 chips） */
 .mt-train-points-source {

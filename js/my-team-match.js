@@ -141,6 +141,17 @@
         club: team.team_name,
         card_id: p.card?.card_id || p.card_id,
         look_data: window.LpcRenderer ? window.LpcRenderer.resolveLook(p) : null,
+        // 天賦：awakened_talent (24h 集訓覺醒) 優先；fallback 卡片本身的 talent
+        talent: p.awakened_talent || p.card?.talent || null,
+        // 球員實際 6 屬性（讓 match-sim _statsFor 走玩家球員的真實數值、不是平均）
+        stats: {
+          attack: p.current_attack || 50,
+          defense: p.current_defense || 50,
+          speed: p.current_speed || 50,
+          midfield: p.current_midfield || 50,
+          stamina: p.current_stamina || 70,
+          aura: p.current_aura || 50,
+        },
       })),
       radar: {
         attack:     applyBuff(avg('current_attack'),  'attack'),

@@ -4014,8 +4014,41 @@
         </div>
 
         <div class="mt-train-gym-hint">
-          <span>點機台選球員 → 站旁邊訓練 → 完成領取</span>
+          <span>RP 廣度訓練 (上方) ・ 集訓營鎖人單項焦點 (下方)</span>
           <button class="mt-train-info-btn" type="button">❓ 升等是什麼</button>
+        </div>
+
+        <!-- 餵球員快速訓練：2 大按鈕（集訓/精英）+ 4 種點數庫存顯示 -->
+        <div class="mt-train-points-panel">
+          <div class="mt-train-points-title">
+            <span class="mt-train-points-emoji">⚡</span>
+            <span class="mt-train-points-title-text">RP 廣度訓練</span>
+            <span class="mt-train-points-title-sub">Lv +1 + 6 屬性同時平均長</span>
+          </div>
+          <div class="mt-train-feed-btns">
+            <button class="mt-train-feed-btn mt-train-feed-normal" data-feed-mode="normal">
+              <div class="mt-train-feed-btn-title">⚡ 集訓升等</div>
+              <div class="mt-train-feed-btn-benefit">Lv +1 · 6 屬性各 +1~3</div>
+              <div class="mt-train-feed-btn-cost">🧠 10  💪 10</div>
+            </button>
+            <button class="mt-train-feed-btn mt-train-feed-premium" data-feed-mode="premium">
+              <div class="mt-train-feed-btn-title">⭐ 精英特訓</div>
+              <div class="mt-train-feed-btn-benefit">Lv +1 · 6 屬性各 +2~5</div>
+              <div class="mt-train-feed-btn-cost">🧠 30  💪 30  ❤️ 10  💡 10</div>
+            </button>
+          </div>
+          <div class="mt-train-inventory">
+            <span class="mt-train-inv-label">點數庫存：</span>
+            <span class="mt-train-inv-chip" title="戰術點">🧠 ${team.rp_tactical || 0}</span>
+            <span class="mt-train-inv-chip" title="體能點">💪 ${team.rp_physical || 0}</span>
+            <span class="mt-train-inv-chip" title="鬥志點">❤️ ${team.rp_heart || 0}</span>
+            <span class="mt-train-inv-chip" title="靈感點">💡 ${team.rp_idea || 0}</span>
+          </div>
+        </div>
+
+        <div class="mt-train-section-divider">
+          <span class="mt-train-section-title">🏋️ 集訓營</span>
+          <span class="mt-train-section-sub">點機台 → 選球員 → 選時長（鎖人但單項拉超快）</span>
         </div>
 
         <!-- 開羅式機台場景：6 個機台 + 球員 chibi -->
@@ -4072,33 +4105,7 @@
           }).join('')}
         </div>
 
-        <!-- 餵球員快速訓練：2 大按鈕（集訓/精英）+ 4 種點數庫存顯示 -->
-        <div class="mt-train-points-panel">
-          <div class="mt-train-points-title">
-            <span class="mt-train-points-emoji">💎</span>
-            <span class="mt-train-points-title-text">餵球員快速升等</span>
-          </div>
-          <div class="mt-train-feed-btns">
-            <button class="mt-train-feed-btn mt-train-feed-normal" data-feed-mode="normal">
-              <div class="mt-train-feed-btn-title">⚡ 集訓升等</div>
-              <div class="mt-train-feed-btn-benefit">Lv +1 · 6 屬性各 +1~3</div>
-              <div class="mt-train-feed-btn-cost">🧠 10  💪 10</div>
-            </button>
-            <button class="mt-train-feed-btn mt-train-feed-premium" data-feed-mode="premium">
-              <div class="mt-train-feed-btn-title">⭐ 精英特訓</div>
-              <div class="mt-train-feed-btn-benefit">Lv +1 · 6 屬性各 +2~5</div>
-              <div class="mt-train-feed-btn-cost">🧠 30  💪 30  ❤️ 10  💡 10</div>
-            </button>
-          </div>
-          <div class="mt-train-inventory">
-            <span class="mt-train-inv-label">點數庫存：</span>
-            <span class="mt-train-inv-chip" title="戰術點">🧠 ${team.rp_tactical || 0}</span>
-            <span class="mt-train-inv-chip" title="體能點">💪 ${team.rp_physical || 0}</span>
-            <span class="mt-train-inv-chip" title="鬥志點">❤️ ${team.rp_heart || 0}</span>
-            <span class="mt-train-inv-chip" title="靈感點">💡 ${team.rp_idea || 0}</span>
-          </div>
-          <div class="mt-train-points-source">📥 來源：比賽勝利、看比賽解讀文、任務獎勵</div>
-        </div>
+        <div class="mt-train-points-source">📥 RP 來源：比賽勝利、看比賽解讀文、任務獎勵</div>
       </div>
     `;
 
