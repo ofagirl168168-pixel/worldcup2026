@@ -282,8 +282,15 @@
     const SPRITE_DRAW_W = 22;   // pitch 320 寬、22px chibi 容易看到
     const SPRITE_DRAW_H = 22;
     const FRAME_PX = 32;        // PIPOYA frame = 32×32
-    players.forEach((p, i) => {
-      const isPos = i === possessorIdx;
+    // Y 排序：y 大的（畫面下方）後畫 → 蓋在上方球員前面、營造前景感
+    // 鏟球者「鏟球」標籤 / 被搶者頭頂「!」都在 player loop 內畫，會跟著各自 Y 順位自動正確 z-order
+    // 保留原 index i 給：possessorIdx 比對、fever 火花交錯動畫（avoid frame-to-frame twitch）
+    const _possessor = possessorIdx >= 0 ? players[possessorIdx] : null;
+    const _renderOrder = players
+      .map((p, i) => ({ p, i }))
+      .sort((a, b) => a.p.y - b.p.y);
+    _renderOrder.forEach(({ p, i }) => {
+      const isPos = p === _possessor;
       let cx = p.x * PITCH_W;
       let cy = p.y * PITCH_H;
       // 鏟球視覺位移：朝鏟球方向滑行（前半 fast slide、後半略 overshoot）
