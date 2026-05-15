@@ -1337,13 +1337,15 @@
 
      fly-prog = max(0, progress * 5 - 4)：0~0.8 → 0、0.8~1.0 → 0~1 */
   transform:
-    /* 80% 後才生效的飛出位移 */
-    translateX(calc(max(0, var(--tear-progress, 0) * 5 - 4) * var(--tear-dir, 0) * 90px))
+    /* 80% 後才生效的飛出位移
+       注：fly 方向跟 fold 的 dir 含義相反（fold dir=-1 = 拖右、但飛走要飛右 = +X 方向）
+       所以 translateX / rotateZ 用 -dir 倍率 */
+    translateX(calc(max(0, var(--tear-progress, 0) * 5 - 4) * var(--tear-dir, 0) * -90px))
     translateY(calc(max(0, var(--tear-progress, 0) * 5 - 4) * -130px))
-    rotateZ(calc(max(0, var(--tear-progress, 0) * 5 - 4) * var(--tear-dir, 0) * 55deg))
+    rotateZ(calc(max(0, var(--tear-progress, 0) * 5 - 4) * var(--tear-dir, 0) * -55deg))
     /* 一直作用：紙頂往使用者臉翹 */
     rotateX(calc(var(--tear-progress, 0) * -25deg))
-    /* 一直作用：朝撕方向折（正號、上次方向是對的、JS 改 dir 鏡像）*/
+    /* 一直作用：朝撕方向折（fold 方向 OK、不要動）*/
     rotateY(calc(var(--tear-dir, 0) * var(--tear-progress, 0) * 90deg));
   transition: transform 0.18s ease-out, filter 0.18s ease-out;
   filter: brightness(calc(1 - var(--tear-progress, 0) * 0.12));
@@ -1381,9 +1383,9 @@
 @keyframes mt-pack-tear-fold {
   0% {
     transform:
-      translateX(calc(var(--tear-dir, 1) * 90px))
+      translateX(calc(var(--tear-dir, 1) * -90px))
       translateY(-130px)
-      rotateZ(calc(var(--tear-dir, 1) * 55deg))
+      rotateZ(calc(var(--tear-dir, 1) * -55deg))
       rotateX(-25deg)
       rotateY(calc(var(--tear-dir, 1) * 90deg));
     filter: brightness(0.88);
@@ -1391,9 +1393,9 @@
   }
   50% {
     transform:
-      translateX(calc(var(--tear-dir, 1) * 180px))
+      translateX(calc(var(--tear-dir, 1) * -180px))
       translateY(-220px)
-      rotateZ(calc(var(--tear-dir, 1) * 110deg))
+      rotateZ(calc(var(--tear-dir, 1) * -110deg))
       rotateX(-30deg)
       rotateY(calc(var(--tear-dir, 1) * 140deg));
     filter: brightness(0.75);
@@ -1401,9 +1403,9 @@
   }
   100% {
     transform:
-      translateX(calc(var(--tear-dir, 1) * 320px))
+      translateX(calc(var(--tear-dir, 1) * -320px))
       translateY(-400px)
-      rotateZ(calc(var(--tear-dir, 1) * 200deg))
+      rotateZ(calc(var(--tear-dir, 1) * -200deg))
       rotateX(-35deg)
       rotateY(calc(var(--tear-dir, 1) * 200deg));
     filter: brightness(0.6);
@@ -1903,11 +1905,11 @@
   position: relative; z-index: 2;
 }
 
-/* 球員頭像 — Phase 2.1++：LPC pixel art 64×48（CC-BY-SA），稀有度漸層 bg */
+/* 球員頭像 — LPC pixel art，稀有度漸層 bg、頭像框拉大到 ~80% 卡寬 */
 .mt-gacha-front-portrait {
   position: relative;
-  width: 120px; height: 120px;
-  margin: 6px auto 8px;
+  width: 160px; height: 160px;
+  margin: 4px auto 6px;
   border-radius: 50%;
   border: 3px solid rgba(255,255,255,0.25);
   overflow: hidden;
@@ -1935,13 +1937,13 @@
 }
 .mt-gacha-front-portrait-pos {
   position: absolute;
-  bottom: -4px; right: -4px;
-  width: 28px; height: 28px;
+  bottom: 2px; right: 2px;
+  width: 34px; height: 34px;
   background: linear-gradient(135deg, #1a1a2e, #2a1855);
   border: 2px solid rgba(255,255,255,0.3);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
+  font-size: 16px;
 }
 .mt-gacha-card3d.rarity-SR  .mt-gacha-front-portrait-pos { border-color: #b5a4ff; }
 .mt-gacha-card3d.rarity-SSR .mt-gacha-front-portrait-pos { border-color: #ffd455; }
