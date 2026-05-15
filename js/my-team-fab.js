@@ -24,6 +24,9 @@
     fab.className = 'mt-fab';
     fab.type = 'button';
     fab.setAttribute('aria-label', '開啟我的球隊');
+    // body 是 display:flex column，FAB 必須 position:fixed 才能脫離 flex 流（否則被拉成全寬）
+    // 萬一 .mt-fab CSS 沒套到（cache / load order / 被覆蓋）也至少 inline 守住關鍵定位
+    fab.style.cssText = 'position:fixed;right:16px;bottom:80px;width:64px;height:76px;z-index:9000;';
     fab.innerHTML = `
       <span class="mt-fab-crest" id="mt-fab-crest">⚽</span>
       <span class="mt-fab-label">我的隊伍</span>
