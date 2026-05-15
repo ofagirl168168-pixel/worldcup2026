@@ -26,7 +26,7 @@
     overlay.className = 'coach-ritual-overlay';
     const titleTxt = maxLoops === 10 ? '教練招募 · 連環圓 ×10' : '教練招募';
     const subTxt = maxLoops === 10
-      ? '中心畫圓不停筆、每繞一圈招募一位教練（每圈獨立計分、最多 10 圈）'
+      ? '不停筆畫圓、最多 10 圈 — 沒畫到的圈用 R 教練補齊（保證 10 位）'
       : '以中心為圓心畫一顆球，越圓的球招募到越強的教練';
     const progressHTML = maxLoops === 10 ? `
       <div class="coach-ritual-progress">
@@ -46,9 +46,9 @@
         </div>
         ${progressHTML}
         <div class="coach-ritual-rules">
-          <span class="coach-ritual-rules-pill rule-r">50%+ R</span>
-          <span class="coach-ritual-rules-pill rule-sr">85%+ SR</span>
-          <span class="coach-ritual-rules-pill rule-ssr">95%+ SSR</span>
+          <span class="coach-ritual-rules-pill rule-r">&lt;95% R</span>
+          <span class="coach-ritual-rules-pill rule-sr">95%+ SR</span>
+          <span class="coach-ritual-rules-pill rule-ssr">98%+ SSR</span>
         </div>
         <div class="coach-ritual-hint" id="coach-ritual-hint">${maxLoops === 10 ? '不停筆、連續畫圈 — 每圈算一個教練' : '準備好就在中心按下、開始畫圓'}</div>
       </div>
@@ -202,8 +202,8 @@
       const score = computeRoundness(points);
       scoreNum.textContent = score + '%';
       scoreNum.className = 'coach-ritual-score-num ' + (
-        score >= 95 ? 'is-ssr' :
-        score >= 85 ? 'is-sr' :
+        score >= 98 ? 'is-ssr' :
+        score >= 95 ? 'is-sr' :
         score >= 50 ? 'is-r' : 'is-low'
       );
     }
@@ -282,7 +282,7 @@
       if (progressNum) progressNum.textContent = loopScores.length;
       if (progressPills) {
         const pill = document.createElement('span');
-        const rarity = score >= 95 ? 'ssr' : score >= 85 ? 'sr' : score >= 50 ? 'r' : 'fail';
+        const rarity = score >= 98 ? 'ssr' : score >= 95 ? 'sr' : score >= 50 ? 'r' : 'fail';
         pill.className = `coach-ritual-progress-pill is-${rarity}`;
         pill.textContent = score;
         progressPills.appendChild(pill);
@@ -342,16 +342,25 @@
         flashRedraw('沒完成任何一圈、再來一次');
         return;
       }
-      // 過濾低於 50 的圈（保留 >= 50 的視為成功）
-      const validScores = loopScores.filter(s => s >= MIN_SCORE);
-      if (validScores.length === 0) {
-        flashRedraw(`圈都不夠圓（最高 ${Math.max(...loopScores)}%）— 再來一次`);
+      // 至少一圈 ≥ 50 才算成功（防完全亂畫）
+      const bestScore = Math.max(...loopScores);
+      if (bestScore < MIN_SCORE) {
+        flashRedraw(`圈都不夠圓（最高 ${bestScore}%）— 再來一次`);
         return;
       }
       frozen = true;
       drawing = false;
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      runSuccessAnimation(validScores);
+      // 10 連 mode：pad 到 10、未完成的補 0（後端視為 R consolation）
+      // 1 抽 mode：只送第 1 圈分數
+      let scores;
+      if (maxLoops === 10) {
+        scores = [...loopScores];
+        while (scores.length < 10) scores.push(0);
+      } else {
+        scores = [loopScores[0]];
+      }
+      runSuccessAnimation(scores);
     }
 
     // ── 成功動畫：軌跡填滿 → 變足球 → 踢進螢幕 → 教練卡 ──
