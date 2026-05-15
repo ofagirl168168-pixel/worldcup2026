@@ -28,8 +28,8 @@ const EPL_TEAMS = {
       {name:'Martin Ødegaard',pos:'攻擊中場',status:'膝傷（缺席 vs FUL 5/2），歐冠次回合替補上陣',returnDate:'需評估'},
       {name:'Kai Havertz',pos:'前鋒',status:'肌肉傷勢（vs NEW 4/25），歐冠次回合（5/5）復出先發',returnDate:'可出場'},
       {name:'Jurrien Timber',pos:'後衛',status:'腹股溝傷（3/14 起缺陣），賽季末評估',returnDate:'賽季末'},
-      {name:'Mikel Merino',pos:'中場',status:'已脫護具但本季不預期回歸',returnDate:'賽季報銷'},
-      {name:'Ben White',pos:'右後衛',status:'傷勢缺陣中',returnDate:'評估中'},
+      {name:'Mikel Merino',pos:'中場',status:'已回草地訓練，目標賽季末復出',returnDate:'賽季末待定'},
+      {name:'Ben White',pos:'右後衛',status:'膝傷（5/10 vs WHU），賽季報銷',returnDate:'賽季報銷'},
       {name:'Noni Madueke',pos:'右翼',status:'膝傷（歐冠八強次回合退場）',returnDate:'評估中'}
     ]
   },

@@ -3451,7 +3451,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px">Mikel Merino</td>
-<td style="padding:8px">賽季報銷</td>
+<td style="padding:8px">已回草地訓練，賽季末復出待定</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.15)">
 <td style="padding:8px">Jurrien Timber</td>
@@ -3467,7 +3467,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>關鍵看點</h3>
 
-<p><b>Gyökeres 需要進球</b>：冬窗從 Sporting 加盟後，Viktor Gyökeres 的英超進球效率不如在葡超時期。兵工廠需要他在冠軍衝刺階段站出來——面對英超最弱的後防線，這是重拾信心的最佳時機。</p>
+<p><b>Gyökeres 需要進球</b>：去年夏窗從 Sporting 加盟後，Viktor Gyökeres 的英超進球效率不如在葡超時期。兵工廠需要他在冠軍衝刺階段站出來——面對英超最弱的後防線，這是重拾信心的最佳時機。</p>
 
 <p><b>Ødegaard 的回歸</b>：如果 Ødegaard 能先發，兵工廠的中場創造力將大幅提升。他與 Saka 的右路連線是英超最具威脅的進攻組合之一。</p>
 
