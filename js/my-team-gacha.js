@@ -241,6 +241,11 @@
       <div class="mt-gacha-beam" data-rarity="${peakRarity}" hidden></div>
       <div class="mt-gacha-rays" hidden></div>
 
+      <!-- 直版固定寬度容器：所有元素以此為定位基準、寬螢幕兩側自然黑底 letterbox
+           可避免 banner / cards-wrap / actions 在不同階段用不同 positioning 機制
+           導致 X 軸視覺中心不一致的 jumping -->
+      <div class="mt-gacha-stage-frame">
+
       <!-- Stage 0：紙袋包裝（Pokémon TCG Pocket 風）-->
       <div class="mt-gacha-pack" id="mt-gacha-pack" data-rarity="${peakRarity}" data-count="${cards.length}">
         <div class="mt-gacha-pack-banner">
@@ -321,6 +326,9 @@
           `}
         </div>
       </div>
+
+      </div><!-- /.mt-gacha-stage-frame -->
+
       <div class="mt-gacha-flash" id="mt-gacha-flash"></div>
     `;
     document.body.appendChild(overlay);
