@@ -4303,7 +4303,7 @@
       speedster:   { icon: '⚡', name: '衝刺型', effect: '速度 +5、後半場不掉 stamina' },
       bodybuilder: { icon: '💪', name: '體能怪', effect: '體力 +5、永遠不疲勞' },
       shooter:     { icon: '🎯', name: '神射手', effect: '攻擊 +5、禁區射門精準 +20%' },
-      wall:        { icon: '🛡️', name: '城牆',   effect: '防守 +5、搶斷率 +30%' },
+      wall:        { icon: '🛡️', name: '城牆',   effect: '防守 +5、搶斷率 +30%（GK 換成撲球率 +30%）' },
       magician:    { icon: '✨', name: '魔法師', effect: '中場 +5、傳球準確度 +15%' },
     };
     const meta = TALENT_META[talentKey];
@@ -4369,7 +4369,11 @@
           </div>
           <div class="mt-attr-info-card attr-defense">
             <div class="mt-attr-info-head"><span class="mt-attr-info-icon">🛡️</span><span class="mt-attr-info-name">防守</span><span class="mt-attr-info-machine">撞擊假人</span></div>
-            <div class="mt-attr-info-body">搶斷成功率 + GK 撲救成功率。城牆天賦再 +30% 搶斷</div>
+            <div class="mt-attr-info-body">搶斷成功率。<b>GK 球員自動 +12 換算成「守門」</b>（撲球率）— 練 GK 就是練防守</div>
+          </div>
+          <div class="mt-attr-info-card attr-defense">
+            <div class="mt-attr-info-head"><span class="mt-attr-info-icon">🧤</span><span class="mt-attr-info-name">守門</span><span class="mt-attr-info-machine">GK 專屬</span></div>
+            <div class="mt-attr-info-body">= 該 GK 的防守 + 12，影響撲球率。城牆天賦對 GK 自動轉換成「撲球率 +30%」、狂熱模式 +20%</div>
           </div>
           <div class="mt-attr-info-card attr-speed">
             <div class="mt-attr-info-head"><span class="mt-attr-info-icon">⚡</span><span class="mt-attr-info-name">速度</span><span class="mt-attr-info-machine">跳繩衝刺</span></div>

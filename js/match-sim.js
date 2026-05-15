@@ -1151,12 +1151,15 @@
       const defTeam = state.possession === 'h' ? 'a' : 'h';
       const gk = players.find(p => p.team === defTeam && p.role === 'GK');
       // 個人狂熱加成：射手 + 25%、守門員狂熱 +20% 撲球
+      // 🛡️ 城牆天賦：守門員撲球率 +30%（搶斷天賦對 GK 自動轉換成撲球加成）
       const shooterFevered = shooter && shooter.fever > 0;
       const gkFevered = gk && gk.fever > 0;
+      const gkWall = gk && gk.talent === 'wall';
       const shooterAtk = (shooter?.stats?.attack ?? getTeam(state.possession).radar.attack)
                        * (shooterFevered ? 1.25 : 1);
       const gkSave     = (gk?.stats?.goalkeeping ?? getTeam(defTeam).radar.defense)
-                       * (gkFevered ? 1.20 : 1);
+                       * (gkFevered ? 1.20 : 1)
+                       * (gkWall ? 1.30 : 1);
       // 氣場加成：高氣場 = 大場面更穩 = 射門精準度提升（最多 +12%）
       const shooterAura = shooter?.stats?.aura ?? getTeam(state.possession).radar.aura ?? 50;
       const auraBonus  = (shooterAura - 50) / 100 * 0.12;
