@@ -418,7 +418,9 @@
         const pt = e.touches ? e.touches[0] : e;
         const dx = pt.clientX - startX;
         if (direction === 0 && Math.abs(dx) > 8) {
-          direction = dx > 0 ? 1 : -1;
+          // 拖右 (dx > 0) 期望「右側被撕起」的效果
+          // CSS 的 transform-origin 跟 rotateY 用 --tear-dir 鏡像，需要 dx>0 → dir=-1 才能對上
+          direction = dx > 0 ? -1 : 1;
           if (perf) perf.dataset.dir = String(direction);
         }
         const progress = Math.min(1, Math.abs(dx) / TEAR_THRESHOLD);
