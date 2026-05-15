@@ -1331,14 +1331,23 @@
   transform-origin: 50% 100%;
 }
 .mt-gacha-pack-top-fold {
-  /* 拖曳時組合兩個旋轉：
-     1) rotateX 負值 → 整張紙頂部往使用者臉翹（最多 -25deg）
-        必要：沒這個翹起，rotateY 看起來像平面在轉、看不出 z 軸折
-     2) rotateY 朝撕的方向折（dir 鏡像、最多 90deg）
-     pivot 在「撕方向反側」的底角 → 像揭開蓋子那角先翹起 */
+  /* 拖曳時：
+     0~60% 進度 → rotateX 翹起 + rotateY 朝撕方向折（同方向 = drag 方向）
+     60%~100%  → 額外 translateX/Y + rotateZ 把紙朝左上或右上「飛出」
+                  表現「整片撕下來飛走」的樣子
+
+     方向修正：rotateY 用「正 dir × 負 90deg」= dir=+1 拖右 → 右側朝玩家來
+     fly-prog = max(0, progress * 2.5 - 1.5)：0~0.6 → 0、0.6~1.0 → 0~1 */
   transform:
+    /* 60% 後才生效的飛出位移 */
+    translateX(calc(max(0, var(--tear-progress, 0) * 2.5 - 1.5) * var(--tear-dir, 0) * 90px))
+    translateY(calc(max(0, var(--tear-progress, 0) * 2.5 - 1.5) * -130px))
+    /* 飛出時翻一個小角度（增加 dynamic 感）*/
+    rotateZ(calc(max(0, var(--tear-progress, 0) * 2.5 - 1.5) * var(--tear-dir, 0) * 55deg))
+    /* 一直作用：紙頂往使用者臉翹 */
     rotateX(calc(var(--tear-progress, 0) * -25deg))
-    rotateY(calc(var(--tear-dir, 0) * var(--tear-progress, 0) * 90deg));
+    /* 一直作用：朝撕方向折（dir=+1 → 右側朝玩家來、rotateY 用 -90deg）*/
+    rotateY(calc(var(--tear-dir, 0) * var(--tear-progress, 0) * -90deg));
   transition: transform 0.18s ease-out, filter 0.18s ease-out;
   filter: brightness(calc(1 - var(--tear-progress, 0) * 0.12));
 }
@@ -1370,23 +1379,39 @@
   animation: mt-pack-perforation-fade 0.4s ease-out forwards;
 }
 
-/* 撕開動畫：rotateX -25→-40deg（一直翹起來）+ rotateY 0→180deg（朝玩家完全折過去）*/
+/* 撕開動畫（放開後 → 紙完全飛出）：
+   - 前 50%：繼續完成翹起 + 折轉的動作（從 drag 末 ~progress=1 狀態繼續）
+   - 50%~100%：把紙整片朝左上或右上飛出畫面 + 旋轉 + 漸暗淡出 */
 @keyframes mt-pack-tear-fold {
-  0%   {
-    transform: rotateX(0) rotateY(0);
-    filter: brightness(1);
+  0% {
+    transform:
+      translateX(calc(var(--tear-dir, 1) * 90px))
+      translateY(-130px)
+      rotateZ(calc(var(--tear-dir, 1) * 55deg))
+      rotateX(-25deg)
+      rotateY(calc(var(--tear-dir, 1) * -90deg));
+    filter: brightness(0.88);
+    opacity: 1;
   }
-  35%  {
-    transform: rotateX(-25deg) rotateY(calc(var(--tear-dir, 1) * 60deg));
-    filter: brightness(0.92);
-  }
-  70%  {
-    transform: rotateX(-35deg) rotateY(calc(var(--tear-dir, 1) * 130deg));
-    filter: brightness(0.82);
+  50% {
+    transform:
+      translateX(calc(var(--tear-dir, 1) * 180px))
+      translateY(-220px)
+      rotateZ(calc(var(--tear-dir, 1) * 110deg))
+      rotateX(-30deg)
+      rotateY(calc(var(--tear-dir, 1) * -140deg));
+    filter: brightness(0.75);
+    opacity: 0.85;
   }
   100% {
-    transform: rotateX(-40deg) rotateY(calc(var(--tear-dir, 1) * 180deg));
-    filter: brightness(0.72);
+    transform:
+      translateX(calc(var(--tear-dir, 1) * 320px))
+      translateY(-400px)
+      rotateZ(calc(var(--tear-dir, 1) * 200deg))
+      rotateX(-35deg)
+      rotateY(calc(var(--tear-dir, 1) * -200deg));
+    filter: brightness(0.6);
+    opacity: 0;
   }
 }
 @keyframes mt-pack-perforation-fade {
