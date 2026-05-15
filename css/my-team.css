@@ -1136,18 +1136,16 @@
   background: transparent;
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.55));
 }
-/* 下半（base）：鉸鏈在撕線、整片紅、沒鋸齒 — 提供「靠近撕線」的折紙質感 */
+/* base：鉸鏈在「撕方向相反」那側的垂直邊（pivot 側），輕微 rotateY 翹起
+   pivot edge dynamic via --tear-dir：dir=+1 (拖右) pivot 在左、dir=-1 (拖左) pivot 在右
+   base 整片紅、無鋸齒（鋸齒在 curl 的頂部）*/
 .mt-gacha-pack-top-fold {
   position: absolute;
   left: 0; right: 0; top: 0; bottom: 0;
-  transform-origin: 50% 100%;
+  transform-origin: calc(50% - var(--tear-dir, 0) * 50%) 50%;
   transform-style: preserve-3d;
   backface-visibility: hidden;
   background:
-    /* 折線陰影（底部 = 撕線、強化「在這裡折」的視覺）*/
-    linear-gradient(180deg,
-      transparent 0%, transparent 80%,
-      rgba(0,0,0,0.3) 96%, rgba(0,0,0,0.45) 100%),
     radial-gradient(ellipse 60% 200% at 50% 50%,
       rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.06) 30%, transparent 60%),
     radial-gradient(ellipse 35% 150% at 0% 50%,
@@ -1155,8 +1153,19 @@
     radial-gradient(ellipse 35% 150% at 100% 50%,
       rgba(0,0,0,0.4) 0%, transparent 70%),
     linear-gradient(150deg, #d44b3a 0%, #c0392b 50%, #8a2a1f 100%);
+  /* 鋸齒熱封邊：base 的頂部也要有齒（pivot 側那段、curl 蓋不到的地方）*/
+  clip-path: polygon(
+    0% 35%, 2% 35%, 3% 0%, 4% 35%, 7% 35%, 8% 0%, 9% 35%, 12% 35%, 13% 0%, 14% 35%,
+    17% 35%, 18% 0%, 19% 35%, 22% 35%, 23% 0%, 24% 35%, 27% 35%, 28% 0%, 29% 35%,
+    32% 35%, 33% 0%, 34% 35%, 37% 35%, 38% 0%, 39% 35%, 42% 35%, 43% 0%, 44% 35%,
+    47% 35%, 48% 0%, 49% 35%, 52% 35%, 53% 0%, 54% 35%, 57% 35%, 58% 0%, 59% 35%,
+    62% 35%, 63% 0%, 64% 35%, 67% 35%, 68% 0%, 69% 35%, 72% 35%, 73% 0%, 74% 35%,
+    77% 35%, 78% 0%, 79% 35%, 82% 35%, 83% 0%, 84% 35%, 87% 35%, 88% 0%, 89% 35%,
+    92% 35%, 93% 0%, 94% 35%, 97% 35%, 98% 0%, 99% 35%, 100% 35%,
+    100% 100%, 0% 100%
+  );
 }
-/* base 的紙張內側（fold 翻過去後可見）*/
+/* base 的紙張內側（fold 翻過去後可見、rotateY 反面）*/
 .mt-gacha-pack-top-fold::after {
   content: '';
   position: absolute; inset: 0;
@@ -1164,26 +1173,25 @@
     radial-gradient(ellipse 60% 200% at 50% 30%,
       rgba(0,0,0,0.35) 0%, transparent 60%),
     linear-gradient(180deg, #5a1810 0%, #3a0e08 100%);
-  transform: rotateX(180deg);
+  transform: rotateY(180deg);   /* 配合 rotateY 翻面 */
   backface-visibility: hidden;
   pointer-events: none;
 }
 
-/* 上半（curl）：鉸鏈在 fold 中線、帶鋸齒熱封邊 — compound 旋轉 = 紙真正在彎
-   curl 拉大到 75%，base 留 25% — 讓鋸齒齒深度有空間、compound 視覺差距明顯 */
+/* curl：占外側 75% 寬（撕的那邊）— 鉸鏈在 base/curl 的接縫（垂直）
+   compound rotateY → 紙從側邊往上翹再彎一下 = 真正的 vertical fold */
 .mt-gacha-pack-top-curl {
   position: absolute;
-  left: 0; right: 0; top: 0;
-  height: 75%;
-  transform-origin: 50% 100%;               /* 自己 bottom = fold 上 3/4 處 */
+  top: 0; bottom: 0;
+  width: 75%;
+  /* dir=+1 (拖右): curl 在右（left:25%）；dir=-1 (拖左): curl 在左（left:0%）*/
+  left: calc(12.5% + var(--tear-dir, 0) * 12.5%);
+  /* 自己的 pivot 邊（pivot=base/curl 接縫）：dir=+1 left edge(0%)、dir=-1 right edge(100%）*/
+  transform-origin: calc(50% - var(--tear-dir, 0) * 50%) 50%;
   transform-style: preserve-3d;
   backface-visibility: hidden;
   display: flex; align-items: center; justify-content: center;
   background:
-    /* curl 自己 bottom 處的陰影（= 紙的第二折線）*/
-    linear-gradient(180deg,
-      transparent 0%, transparent 80%,
-      rgba(0,0,0,0.25) 93%, rgba(0,0,0,0.4) 100%),
     radial-gradient(ellipse 60% 200% at 50% 50%,
       rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 30%, transparent 60%),
     radial-gradient(ellipse 35% 150% at 0% 50%,
@@ -1191,15 +1199,18 @@
     radial-gradient(ellipse 35% 150% at 100% 50%,
       rgba(0,0,0,0.4) 0%, transparent 70%),
     linear-gradient(150deg, #d44b3a 0%, #c0392b 50%, #8a2a1f 100%);
-  /* 鋸齒熱封邊：齒深 40%（curl 75% × 40% ≈ 包裝高度 6.6% ≈ 13px、明顯可見）*/
+  /* 鋸齒熱封邊：flat 基線（y=35%）+ 明確向上尖刺（y=0%）— 不會誤讀方向 */
   clip-path: polygon(
-    0% 40%, 5% 0%, 10% 40%, 15% 0%, 20% 40%, 25% 0%, 30% 40%, 35% 0%,
-    40% 40%, 45% 0%, 50% 40%, 55% 0%, 60% 40%, 65% 0%, 70% 40%, 75% 0%,
-    80% 40%, 85% 0%, 90% 40%, 95% 0%, 100% 40%,
+    0% 35%, 2% 35%, 3% 0%, 4% 35%, 8% 35%, 9% 0%, 10% 35%, 14% 35%, 15% 0%, 16% 35%,
+    20% 35%, 21% 0%, 22% 35%, 26% 35%, 27% 0%, 28% 35%, 32% 35%, 33% 0%, 34% 35%,
+    38% 35%, 39% 0%, 40% 35%, 44% 35%, 45% 0%, 46% 35%, 50% 35%, 51% 0%, 52% 35%,
+    56% 35%, 57% 0%, 58% 35%, 62% 35%, 63% 0%, 64% 35%, 68% 35%, 69% 0%, 70% 35%,
+    74% 35%, 75% 0%, 76% 35%, 80% 35%, 81% 0%, 82% 35%, 86% 35%, 87% 0%, 88% 35%,
+    92% 35%, 93% 0%, 94% 35%, 98% 35%, 99% 0%, 100% 35%,
     100% 100%, 0% 100%
   );
 }
-/* curl 的紙張內側（curl 翻過去後可見）*/
+/* curl 的紙張內側 */
 .mt-gacha-pack-top-curl::after {
   content: '';
   position: absolute; inset: 0;
@@ -1208,12 +1219,15 @@
       rgba(0,0,0,0.35) 0%, transparent 60%),
     linear-gradient(180deg, #5a1810 0%, #3a0e08 100%);
   clip-path: polygon(
-    0% 40%, 5% 0%, 10% 40%, 15% 0%, 20% 40%, 25% 0%, 30% 40%, 35% 0%,
-    40% 40%, 45% 0%, 50% 40%, 55% 0%, 60% 40%, 65% 0%, 70% 40%, 75% 0%,
-    80% 40%, 85% 0%, 90% 40%, 95% 0%, 100% 40%,
+    0% 35%, 2% 35%, 3% 0%, 4% 35%, 8% 35%, 9% 0%, 10% 35%, 14% 35%, 15% 0%, 16% 35%,
+    20% 35%, 21% 0%, 22% 35%, 26% 35%, 27% 0%, 28% 35%, 32% 35%, 33% 0%, 34% 35%,
+    38% 35%, 39% 0%, 40% 35%, 44% 35%, 45% 0%, 46% 35%, 50% 35%, 51% 0%, 52% 35%,
+    56% 35%, 57% 0%, 58% 35%, 62% 35%, 63% 0%, 64% 35%, 68% 35%, 69% 0%, 70% 35%,
+    74% 35%, 75% 0%, 76% 35%, 80% 35%, 81% 0%, 82% 35%, 86% 35%, 87% 0%, 88% 35%,
+    92% 35%, 93% 0%, 94% 35%, 98% 35%, 99% 0%, 100% 35%,
     100% 100%, 0% 100%
   );
-  transform: rotateX(180deg);
+  transform: rotateY(180deg);
   backface-visibility: hidden;
   pointer-events: none;
 }
@@ -1367,16 +1381,17 @@
   transform-origin: 50% 100%;
 }
 .mt-gacha-pack-top-fold {
-  /* 下半（base 25%）：以撕線為支點，rotateX 小（30deg）— 只是輕微翹 */
-  transform: rotateX(calc(var(--tear-progress, 0) * 30deg));
+  /* base（pivot 側 25%）：以側邊垂直軸為支點、輕微 rotateY（最多 30deg）
+     方向：dir=+1 (拖右) → rotateY 負值 (右邊往後)；dir=-1 → 正值 (左邊往後) */
+  transform: rotateY(calc(var(--tear-dir, 0) * var(--tear-progress, 0) * -30deg));
   transition: transform 0.18s ease-out, filter 0.18s ease-out;
   filter: brightness(calc(1 - var(--tear-progress, 0) * 0.08));
 }
 .mt-gacha-pack-top-curl {
-  /* 上半（curl 75%）：以 fold 上 3/4 處為支點，rotateX 大（110deg）
-     compound = 30 + 110 = 140deg 強烈彎曲、像紙真的在折 */
-  transform: rotateX(calc(var(--tear-progress, 0) * 110deg));
-  transition: transform 0.18s ease-out, filter 0.18s ease-out;
+  /* curl（外側 75%）：以 base/curl 接縫的垂直軸為支點、大角度 rotateY（最多 110deg）
+     compound = 30 + 110 = 140deg → 紙從側邊大幅彎過去、像真的撕開 */
+  transform: rotateY(calc(var(--tear-dir, 0) * var(--tear-progress, 0) * -110deg));
+  transition: transform 0.18s ease-out, filter 0.18s ease-out, left 0.18s ease-out;
   filter: brightness(calc(1 - var(--tear-progress, 0) * 0.2));
 }
 .mt-gacha-pack-bottom {
@@ -1418,21 +1433,23 @@
   0%, 100% { transform: none; }
 }
 
-/* base：撕線處小角度翹起（最多 50deg）*/
+/* base：pivot 側垂直軸 + 小角度 rotateY（撕的方向用 CSS 變數，全部以 dir=+1 寫；dir=-1 由 CSS var 鏡像）
+   注：keyframe 沒法直接讀 --tear-dir 多項計算、所以用個 calc 內聯 CSS variable
+   實際上 .opening 時 dir 已固定，直接用變數 OK */
 @keyframes mt-pack-tear-fold-base {
-  0%   { transform: rotateX(0); filter: brightness(1); }
-  35%  { transform: rotateX(20deg) translateY(-1px); filter: brightness(0.95); }
-  70%  { transform: rotateX(40deg) translateY(-2px); filter: brightness(0.88); }
-  100% { transform: rotateX(50deg) translateY(-2px); filter: brightness(0.82); }
+  0%   { transform: rotateY(0); filter: brightness(1); }
+  35%  { transform: rotateY(calc(var(--tear-dir, 1) * -20deg)); filter: brightness(0.95); }
+  70%  { transform: rotateY(calc(var(--tear-dir, 1) * -40deg)); filter: brightness(0.88); }
+  100% { transform: rotateY(calc(var(--tear-dir, 1) * -50deg)); filter: brightness(0.82); }
 }
 
-/* curl：fold 上 3/4 處猛折回去（最多 140deg）
-   compound 末態 ≈ 50 + 140 = 190deg → 整個上半完全翻到背後、紙真的彎了一大段 */
+/* curl：base/curl 接縫的垂直軸 + 大角度 rotateY、compound ≈ 50 + 140 = 190deg
+   → 整個 curl 完全翻到背後、紙真的彎一大段 */
 @keyframes mt-pack-tear-fold-curl {
-  0%   { transform: rotateX(0); filter: brightness(1); }
-  35%  { transform: rotateX(50deg); filter: brightness(0.92); }
-  70%  { transform: rotateX(105deg); filter: brightness(0.82); }
-  100% { transform: rotateX(140deg); filter: brightness(0.72); }
+  0%   { transform: rotateY(0); filter: brightness(1); }
+  35%  { transform: rotateY(calc(var(--tear-dir, 1) * -50deg)); filter: brightness(0.92); }
+  70%  { transform: rotateY(calc(var(--tear-dir, 1) * -105deg)); filter: brightness(0.82); }
+  100% { transform: rotateY(calc(var(--tear-dir, 1) * -140deg)); filter: brightness(0.72); }
 }
 @keyframes mt-pack-perforation-fade {
   to { opacity: 0; transform: scaleY(0.2); }
