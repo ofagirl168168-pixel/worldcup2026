@@ -104,6 +104,30 @@
     }
   }
 
+  // 暴力修：fetch my-team.css 內容、inject 成 <style> tag
+  // 目的：繞過任何瀏覽器 cache / Cloudflare edge cache / MIME 問題
+  // 如果 <link> 載入的 CSS 沒套用、這個 inline <style> 也會強制套上
+  async function _forceInjectCSS() {
+    if (document.getElementById('mt-css-force-inject')) return;
+    // 用 cache-bust query 確保拿到 fresh content
+    const url = 'css/my-team-v2.css?force=' + Date.now();
+    try {
+      const r = await fetch(url, { cache: 'no-store' });
+      if (!r.ok) {
+        console.error('[my-team] force-inject CSS failed:', r.status);
+        return;
+      }
+      const text = await r.text();
+      const style = document.createElement('style');
+      style.id = 'mt-css-force-inject';
+      style.textContent = text;
+      document.head.appendChild(style);
+      console.log('[my-team] force-injected CSS:', text.length, 'bytes,', (text.match(/{/g)||[]).length, 'rules');
+    } catch (e) {
+      console.error('[my-team] force-inject CSS error:', e);
+    }
+  }
+
   // 初始化：等 DOM ready 再注入
   function init() {
     if (!_isEnabled()) {
@@ -111,6 +135,7 @@
       return;
     }
     injectFab();
+    _forceInjectCSS();  // 暴力 inject CSS 內容繞過 cache
     // 嘗試 fetch（已登入會拿資料、未登入 fetch 回 null）
     if (window.MyTeam) {
       window.MyTeam.fetch().then(() => updateFab());
