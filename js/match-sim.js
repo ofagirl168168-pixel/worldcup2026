@@ -527,45 +527,8 @@
       }
     });
 
-    // 鏟球成功閃光 + 「搶到!」文字（持續 18 幀）
-    if (state.tackleFlash && state.frame < state.tackleFlash.endFrame) {
-      const tf = state.tackleFlash;
-      const age = state.frame - tf.startFrame;
-      const t = age / 18;
-      const cx = tf.x * PITCH_W;
-      const cy = tf.y * PITCH_H;
-      // 放射狀爆炸線（8 條、向外發散）
-      ctx.strokeStyle = `rgba(255,213,74,${1 - t})`;
-      ctx.lineWidth = 2;
-      const radius = 6 + t * 14;
-      for (let i = 0; i < 8; i++) {
-        const ang = (i / 8) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(ang) * (radius - 4), cy + Math.sin(ang) * (radius - 4));
-        ctx.lineTo(cx + Math.cos(ang) * radius, cy + Math.sin(ang) * radius);
-        ctx.stroke();
-      }
-      // 中央白色閃光
-      ctx.fillStyle = `rgba(255,255,255,${0.8 * (1 - t)})`;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 5 - t * 3, 0, Math.PI * 2);
-      ctx.fill();
-      // 「搶到!」文字向上飄
-      const textY = cy - 10 - t * 12;
-      const textScale = 1 + (1 - t) * 0.3;
-      ctx.save();
-      ctx.translate(cx, textY);
-      ctx.scale(textScale, textScale);
-      ctx.font = 'bold 11px Impact, Arial Black';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#1a1a1a';
-      ctx.fillText(tf.text || '搶到!', 1, 1);
-      ctx.fillText(tf.text || '搶到!', -1, 1);
-      ctx.fillStyle = '#ffd54a';
-      ctx.fillText(tf.text || '搶到!', 0, 0);
-      ctx.restore();
-      ctx.textAlign = 'start';
-    }
+    // 鏟球的視覺：鏟球者頭頂「鏟球」標籤 + 被搶者頭頂「!」（兩處都已在 player loop 內畫）
+    // 之前還有「搶到!」金字 + 爆炸放射線，會跟「鏟球」標籤撞太近、互蓋 → 已移除
 
     // 球（帶陰影）— 視覺 y offset 9px 讓球在球員腳邊（之前剛好在胸口）
     // 鏟球後球的小彈跳：從原位置滑到新持球者（10 幀過渡）
@@ -1278,14 +1241,8 @@
             near.player._tackleDirY /= tMag;
             // 鏟球額外消耗體力（每次 +0.05、stamina 越差影響越久）
             near.player._tackleFatigue = (near.player._tackleFatigue || 0) + 0.05;
-            // ── 鏟球視覺加強：被搶者頭上「!」+ 鏟球點閃光 + 球小幅彈走 ──
+            // ── 鏟球視覺：被搶者頭頂「!」+ 鏟球者頭頂「鏟球」標籤（兩處都在 render player loop 內）──
             pos._stunUntil = state.frame + 30;          // 被搶者愣 30 幀（頭上「!」）
-            state.tackleFlash = {                        // 鏟球點閃光
-              x: ball.x, y: ball.y,
-              startFrame: state.frame,
-              endFrame: state.frame + 18,
-              text: '搶到!',
-            };
             // 球從原持球者位置彈到鏟球者位置（不再瞬移、有過渡）
             state.ballPopOff = {
               fromX: pos.x, fromY: pos.y,
