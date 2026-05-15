@@ -295,14 +295,19 @@
           ${options.subtitle ? `<div class="mt-gacha-banner-sub">${escapeHtml(options.subtitle)}</div>` : ''}
         </div>
         <div class="mt-gacha-cards-wrap">
-          <div class="mt-gacha-cards" id="mt-gacha-cards" data-count="${cards.length}"></div>
+          <div class="mt-gacha-cards" id="mt-gacha-cards" data-count="${cards.length}" data-mode="${cards.length > 1 ? 'stack' : 'single'}"></div>
         </div>
         <div class="mt-gacha-flip-prompt" id="mt-gacha-flip-prompt" hidden>
           <button class="mt-gacha-flip-btn" id="mt-gacha-flip-btn">
             <span class="mt-gacha-pack-finger">👆</span>
-            <span>${cards.length > 1 ? '點擊翻開全部' : '點擊翻牌'}</span>
+            <span>${cards.length > 1 ? '點卡片翻開・下方可一鍵全翻' : '點卡片翻開'}</span>
           </button>
         </div>
+        ${cards.length > 1 ? `
+          <button class="mt-gacha-flip-all-btn" id="mt-gacha-flip-all-btn" hidden type="button">
+            ⏭ 一鍵翻全部
+          </button>
+        ` : ''}
         <div class="mt-gacha-rarity-hint" id="mt-gacha-rarity-hint"></div>
         <div class="mt-gacha-actions" id="mt-gacha-actions" hidden>
           ${options.ctaCreateTeam ? `
@@ -469,6 +474,9 @@
       document.addEventListener('touchend', onDragEnd);
       document.addEventListener('touchcancel', onDragEnd);
 
+      let stackTopIdx = 0;   // 多抽 stack 模式中、當前最上面那張的 index
+      let allRevealed = false;
+
       async function startStage1() {
         // 200ms 後顯示 skip
         await _sleep(skipped ? 0 : 250);
@@ -488,49 +496,127 @@
           await _sleep(skipped ? 0 : 250);
         }
 
-        // Stage 2：卡背飛入（不翻牌、等用戶點）
+        // Stage 2：卡片從卡包飛出 → 落到堆疊位置（或單張中央）
+        // 起始態為 .mt-card-pending（scale 0.15、opacity 0、translateY 60）
+        // 用 cascading setTimeout 一張一張移除 pending、transition 飛到最終位置
         const cardsEl = overlay.querySelector('#mt-gacha-cards');
+        cardsEl.classList.add('mt-cards-fly-out');
         for (let i = 0; i < cards.length; i++) {
-          const c = cards[i];
-          const cardEl = _buildCard3D(c, i);
+          const cardEl = _buildCard3D(cards[i], i);
+          cardEl.dataset.cardIdx = i;
+          cardEl.dataset.stackIdx = i;        // 初始 stack 順位
+          cardEl.classList.add('mt-card-pending');
           cardsEl.appendChild(cardEl);
-          await _sleep(skipped ? 0 : (cards.length > 5 ? 80 : 200));
+          // 延遲移除 pending → 觸發 transition 飛到最終位置
+          setTimeout(() => cardEl.classList.remove('mt-card-pending'),
+            50 + (skipped ? 0 : i * 70));
         }
+        // 等飛出動畫播完
+        await _sleep(skipped ? 0 : Math.min(900, 300 + cards.length * 70));
 
         if (skipped) {
-          // skip：一口氣翻 + count + 顯示 CTA
           revealAll(true);
           return;
         }
 
-        // Stage 2.5：等用戶點翻牌
+        // Stage 2.5：綁定卡片點擊事件（一張一張翻）
+        bindCardClicks();
+        // 顯示底部「一鍵翻全部」按鈕（多抽才有）
+        const flipAllBtn = overlay.querySelector('#mt-gacha-flip-all-btn');
+        if (flipAllBtn) flipAllBtn.hidden = false;
+        // 提示「點卡片翻開」
         flipPrompt.hidden = false;
       }
 
-      flipBtn.addEventListener('click', () => {
-        flipPrompt.hidden = true;
-        revealAll(false);
-      });
+      function bindCardClicks() {
+        overlay.querySelectorAll('.mt-gacha-card3d').forEach(el => {
+          el.addEventListener('click', () => handleCardClick(el));
+        });
+      }
 
-      async function revealAll(instant) {
-        const cardEls = Array.from(overlay.querySelectorAll('.mt-gacha-card3d'));
-        for (let i = 0; i < cardEls.length; i++) {
-          const cardEl = cardEls[i];
-          const c = cards[i];
-          cardEl.classList.add('flipped');
-          _emitParticles(cardEl, c.rarity, instant);
-          if (!instant) _animateCounts(cardEl, c);
-          // 連續翻牌的間隔（SSR 多停一下、有儀式感）
-          await _sleep(instant ? 0 : (c.rarity === 'SSR' ? 350 : 150));
+      function handleCardClick(el) {
+        const idx = parseInt(el.dataset.cardIdx, 10);
+        const c = cards[idx];
+        if (cards.length === 1) {
+          // 1 抽：直接翻、不需 stack
+          if (!el.classList.contains('flipped')) {
+            el.classList.add('flipped');
+            _emitParticles(el, c.rarity, false);
+            _animateCounts(el, c);
+            flipPrompt.hidden = true;
+            showCTAs();
+          }
+          return;
         }
+        // 多抽 stack 模式：只有最上面那張可以翻
+        const stackIdx = parseInt(el.dataset.stackIdx, 10);
+        if (stackIdx !== stackTopIdx) return;     // 不是最上面、不理
 
-        await _sleep(instant ? 0 : 400);
+        if (!el.classList.contains('flipped')) {
+          // 第一次點：翻
+          el.classList.add('flipped');
+          _emitParticles(el, c.rarity, false);
+          _animateCounts(el, c);
+          flipPrompt.hidden = true;
+        } else {
+          // 翻過了再點：滑走、露出下一張
+          advanceStack();
+        }
+      }
+
+      function advanceStack() {
+        const top = overlay.querySelector(`.mt-gacha-card3d[data-stack-idx="${stackTopIdx}"]`);
+        if (top) top.classList.add('slid-off');
+        stackTopIdx++;
+        if (stackTopIdx >= cards.length) {
+          allRevealed = true;
+          setTimeout(showCTAs, 400);
+        }
+      }
+
+      function showCTAs() {
         skipBtn.hidden = true;
+        const flipAllBtn = overlay.querySelector('#mt-gacha-flip-all-btn');
+        if (flipAllBtn) flipAllBtn.hidden = true;
         overlay.querySelector('#mt-gacha-actions').hidden = false;
         overlay.querySelector('#mt-gacha-actions').classList.add('reveal');
         const hint = overlay.querySelector('#mt-gacha-rarity-hint');
         if (peakRarity === 'SSR') hint.innerHTML = '✨ <b>SSR</b> 召喚成功！';
         else if (peakRarity === 'SR') hint.innerHTML = '💜 <b>SR</b> 不錯！';
+      }
+
+      // 一鍵翻全部
+      const flipAllBtn = overlay.querySelector('#mt-gacha-flip-all-btn');
+      if (flipAllBtn) {
+        flipAllBtn.addEventListener('click', () => revealAll(true));
+      }
+      // 保留舊 flip 按鈕（雖然 hidden、但點擊就是翻全部）
+      flipBtn.addEventListener('click', () => {
+        flipPrompt.hidden = true;
+        revealAll(true);
+      });
+
+      async function revealAll(instant) {
+        flipPrompt.hidden = true;
+        const flipAllBtn = overlay.querySelector('#mt-gacha-flip-all-btn');
+        if (flipAllBtn) flipAllBtn.hidden = true;
+        const cardEls = Array.from(overlay.querySelectorAll('.mt-gacha-card3d'));
+        for (let i = 0; i < cardEls.length; i++) {
+          const cardEl = cardEls[i];
+          const c = cards[i];
+          if (!cardEl.classList.contains('flipped')) {
+            cardEl.classList.add('flipped');
+            _emitParticles(cardEl, c.rarity, instant);
+            if (!instant) _animateCounts(cardEl, c);
+          }
+          // 多抽：每張間隔 100ms 連翻
+          await _sleep(instant ? 0 : (c.rarity === 'SSR' ? 250 : 100));
+        }
+        // 全部展開後一起淡淡展示，不再 slide-off
+        stackTopIdx = cards.length;
+        allRevealed = true;
+        await _sleep(instant ? 0 : 400);
+        showCTAs();
       }
 
       // 按鈕：用 delegation
