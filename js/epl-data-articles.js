@@ -3498,7 +3498,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>熱刺近況</h3>
 
-<p>De Zerbi 的保級作戰出乎意料地有效——4 場不敗（2W 2D）讓熱刺暫時逃離降級區。<b>Mathys Tel</b> 已復出並提供即戰力，但核心傷兵依然嚴重：<b>Xavi Simons</b>（前十字韌帶，賽季報銷）、<b>James Maddison</b>（前十字韌帶，賽季報銷）、<b>Cristian Romero</b>（膝傷，賽季報銷但世界盃仍有希望）。<b>Dominic Solanke</b> 的出場狀態仍是問號。</p>
+<p>De Zerbi 的保級作戰出乎意料地有效——4 場不敗（2W 2D）讓熱刺暫時逃離降級區。<b>Mathys Tel</b> 已復出並提供即戰力，<b>James Maddison</b> 也在缺席 375 天後從 ACL 手術復出（vs Leeds 86 分鐘替補登場），為保級衝刺增添火力。但核心傷兵依然嚴重：<b>Xavi Simons</b>（前十字韌帶，賽季報銷）、<b>Cristian Romero</b>（膝傷，賽季報銷但世界盃仍有希望）。<b>Dominic Solanke</b> 的出場狀態仍是問號。</p>
 
 <h3>歷史交鋒</h3>
 

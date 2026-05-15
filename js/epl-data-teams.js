@@ -151,7 +151,7 @@ const EPL_TEAMS = {
     injuries:[
       {name:'Dominic Solanke',pos:'前鋒',status:'肌肉傷（vs WOL 4/25），改善中但出場仍存疑',returnDate:'評估中'},
       {name:'Xavi Simons',pos:'攻擊中場',status:'右膝前十字韌帶斷裂（vs WOL 4/25），需手術',returnDate:'賽季報銷＋世界盃報銷'},
-      {name:'James Maddison',pos:'攻擊中場',status:'前十字韌帶傷（恢復中）',returnDate:'賽季報銷'},
+      {name:'James Maddison',pos:'攻擊中場',status:'ACL 手術後復出（vs LEE 5/12 替補 86 分鐘登場）',returnDate:'已復出'},
       {name:'Cristian Romero',pos:'中後衛',status:'膝傷',returnDate:'賽季報銷（世界盃存疑）'},
       {name:'Mathys Tel',pos:'翼鋒',status:'已復出（vs AVL 5/3 先發助攻）',returnDate:'已復出'}
     ]
