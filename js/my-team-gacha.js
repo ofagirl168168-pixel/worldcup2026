@@ -459,12 +459,12 @@
             beam.hidden = false;
             stage.hidden = false;
             startStage1();
-            // 卡片飛出 2 秒後再淡出卡包（多張連抽要更久）
-            const packFadeDelay = cards.length > 1 ? 2600 : 1800;
+            // 卡片全部飛完後再淡出卡包（讓玩家看到所有卡片從卡包噴出來）
+            const packFadeDelay = cards.length > 1 ? (1500 + cards.length * 200) : 2200;
             setTimeout(() => {
-              pack.style.transition = 'opacity 1s ease-out';
+              pack.style.transition = 'opacity 1.2s ease-out';
               pack.style.opacity = '0';
-              setTimeout(() => { pack.style.display = 'none'; }, 1100);
+              setTimeout(() => { pack.style.display = 'none'; }, 1300);
             }, packFadeDelay);
           }, 700);
         } else {
@@ -515,12 +515,12 @@
           cardEl.classList.add('mt-card-pending');
           cardsEl.appendChild(cardEl);
           // 延遲移除 pending → 觸發 transition 飛到最終位置
-          // 一張一張間隔 150ms（10 連約 1.5s 全部飛出）
+          // 一張一張間隔 200ms（10 連約 2 秒全部飛出、看得到一張一張噴出來）
           setTimeout(() => cardEl.classList.remove('mt-card-pending'),
-            100 + (skipped ? 0 : i * 150));
+            150 + (skipped ? 0 : i * 200));
         }
-        // 等飛出動畫播完（transition 1s + 最後一張延遲）
-        await _sleep(skipped ? 0 : Math.min(2400, 600 + cards.length * 150));
+        // 等飛出動畫播完（transition 1.2s + 最後一張延遲）
+        await _sleep(skipped ? 0 : Math.min(3500, 800 + cards.length * 200));
 
         if (skipped) {
           revealAll(true);

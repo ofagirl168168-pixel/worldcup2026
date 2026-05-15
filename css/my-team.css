@@ -1697,48 +1697,50 @@
 }
 
 /* ─── 主舞台 ─── */
+/* Stage 改用 CSS grid 自動置中 — 不受 scrollbar、transform、animation 干擾 */
 .mt-gacha-stage {
   position: fixed;
   inset: 0;
   padding: 20px;
   text-align: center;
   z-index: 5;
-  pointer-events: none;   /* 容器不擋滑鼠、讓內部各 element 各自 enable */
+  pointer-events: none;
+  /* grid 4 rows：banner / cards-wrap / rarity-hint / actions */
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  justify-items: center;    /* 所有 children 水平置中（不受 animation transform 影響）*/
+  align-items: center;
+  gap: 16px;
 }
 .mt-gacha-stage > * { pointer-events: auto; }
-/* 改用 left:0;right:0;margin:0 auto 取代 translateX(-50%)
-   避免 body scrollbar 讓 left:50% 視覺偏右 */
 .mt-gacha-stage > .mt-gacha-banner {
-  position: absolute;
-  top: 16px; left: 0; right: 0;
-  margin: 0 auto !important;
-  width: max-content;
+  grid-row: 1;
+  align-self: start;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   max-width: 90vw;
   white-space: nowrap;
+  /* 砍掉舊的 banner-in animation 內含 transform、會壞掉 grid 置中 */
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 .mt-gacha-stage > .mt-gacha-cards-wrap {
-  /* cards-wrap：水平 left:0/right:0/margin:auto、垂直 transform:translateY(-50%) */
-  position: absolute;
-  top: 50%; left: 0; right: 0;
-  margin: 0 auto;
-  width: max-content;
-  height: max-content;
-  transform: translateY(-50%);
+  grid-row: 2;
+  align-self: center;   /* 垂直置中於 1fr 區段 */
   padding: 0;
   max-height: none;
 }
 .mt-gacha-stage > .mt-gacha-rarity-hint {
-  position: absolute;
-  top: calc(50% + 220px); left: 0; right: 0;
-  margin: 0 auto;
-  width: max-content;
+  grid-row: 3;
+  align-self: end;
+  margin-bottom: 8px;
   white-space: nowrap;
 }
 .mt-gacha-stage > .mt-gacha-actions {
-  position: absolute;
-  bottom: 30px; left: 0; right: 0;
-  margin: 0 auto;
-  width: max-content;
+  grid-row: 4;
+  align-self: end;
+  margin-bottom: 20px;
   max-width: 90vw;
   white-space: nowrap;
   display: flex;
@@ -1827,15 +1829,16 @@
   to   { opacity: 1; transform: translateY(0) scale(1) rotateZ(0deg); }
 }
 
-/* 從卡包飛出：起始位置 = 卡包開口處（撕線位置、約 viewport center - 30px）
-   起始小 + 略往下 → 動畫向上長大到最終位置 → 像從卡包頂飛出來 */
+/* 從卡包飛出：起始 = 卡包底部（深下方）超小、向上飛 + 放大到最終位置
+   translateY(120px) 把卡片放到卡包下半身的位置（pack-bottom 區域）
+   transition 拉長到 1.2s 讓玩家絕對看得到「從卡包噴出來」過程 */
 .mt-gacha-card3d.mt-card-pending {
   opacity: 0;
-  transform: translateY(40px) scale(0.12) rotateZ(0deg) !important;
+  transform: translateY(120px) scale(0.08) rotateZ(0deg) !important;
 }
 .mt-cards-fly-out .mt-gacha-card3d {
-  transition: opacity 0.6s ease-out,
-              transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.7s ease-out,
+              transform 1.2s cubic-bezier(0.34, 1.5, 0.5, 1);
   cursor: pointer;
 }
 
