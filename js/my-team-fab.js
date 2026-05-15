@@ -82,10 +82,6 @@
   }
 
   async function onClick(e) {
-    // 暫時 debug：強制 alert 確認 click handler 有跑（之後移除）
-    console.log('[FAB] clicked! currentUser=', typeof currentUser !== 'undefined' ? !!currentUser : 'undefined', 'openMyTeamModal=', typeof window.openMyTeamModal);
-    alert('FAB clicked! currentUser=' + (typeof currentUser !== 'undefined' ? (currentUser ? 'logged in' : 'null') : 'undefined') + ', openMyTeamModal=' + typeof window.openMyTeamModal);
-
     if (typeof currentUser === 'undefined' || !currentUser) {
       // 沒登入 → 提示登入
       if (typeof showToast === 'function') {

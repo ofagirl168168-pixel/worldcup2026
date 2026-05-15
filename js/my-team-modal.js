@@ -19,14 +19,24 @@
   let _homeAnimId = null;
 
   // ── 建 overlay shell ──
+  // 注意：所有關鍵定位都用 inline style 守住，不依賴 .mt-modal-overlay CSS rule
+  // （怕 CSS cache/load issue 跟 FAB 同樣情況、整個 my-team.css 沒套到 → modal 變成 body 底部一個沒定位的 div、看不到）
   function ensureOverlay() {
     if (_overlay) return _overlay;
     _overlay = document.createElement('div');
     _overlay.className = 'mt-modal-overlay';
+    _overlay.style.cssText = [
+      'position:fixed','inset:0',
+      'background:rgba(0,0,0,0.7)','z-index:10500',
+      'display:none',  // open() 會改成 flex
+      'align-items:stretch','justify-content:center',
+      'opacity:0','transition:opacity 0.25s ease'
+    ].join(';');
     _overlay.innerHTML = `
-      <div class="mt-modal">
-        <button class="mt-modal-close" type="button" aria-label="關閉">×</button>
-        <div class="mt-modal-body" id="mt-modal-body"></div>
+      <div class="mt-modal" style="width:100%;max-width:560px;height:100vh;max-height:100vh;background:linear-gradient(180deg,#1a1a2e 0%,#0d1224 100%);display:flex;flex-direction:column;position:relative;border-left:1px solid rgba(240,192,64,0.2);border-right:1px solid rgba(240,192,64,0.2);overflow:hidden;">
+        <button class="mt-modal-close" type="button" aria-label="關閉"
+          style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;z-index:5;">×</button>
+        <div class="mt-modal-body" id="mt-modal-body" style="flex:1;min-height:0;display:flex;flex-direction:column;"></div>
       </div>
     `;
     _overlay.querySelector('.mt-modal-close').addEventListener('click', close);
@@ -44,7 +54,11 @@
     }
     ensureOverlay();
     _overlay.style.display = 'flex';
-    requestAnimationFrame(() => _overlay.classList.add('open'));
+    // 同時 inline 改 opacity（不依賴 .mt-modal-overlay.open CSS rule）
+    requestAnimationFrame(() => {
+      _overlay.classList.add('open');
+      _overlay.style.opacity = '1';
+    });
 
     // 撈 my_team 決定渲染 onboarding 還是 hub
     const team = await window.MyTeam.fetch();
@@ -385,6 +399,7 @@
   function close() {
     if (!_overlay) return;
     _overlay.classList.remove('open');
+    _overlay.style.opacity = '0';  // inline fade out（不依賴 CSS rule）
     _stopOnboardScene();
     setTimeout(() => {
       _overlay.style.display = 'none';
