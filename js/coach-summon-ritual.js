@@ -26,7 +26,7 @@
     overlay.className = 'coach-ritual-overlay';
     const titleTxt = maxLoops === 10 ? '教練招募 · 連環圓 ×10' : '教練招募';
     const subTxt = maxLoops === 10
-      ? '不停筆畫圓、最多 10 圈 — 沒畫到的圈用 R 教練補齊（保證 10 位）'
+      ? '每 30 秒一輪、繼續畫到湊滿 10 位（鬆手 / 超時自動進下一輪、進度保留）'
       : '以中心為圓心畫一顆球，越圓的球招募到越強的教練';
     const progressHTML = maxLoops === 10 ? `
       <div class="coach-ritual-progress">
@@ -222,14 +222,19 @@
       e.preventDefault();
       const p = pos(e);
       drawing = true;
+      // 新一輪：清空當前 round 的軌跡 + 角度，但保留歷史 loopScores（已招募的 N/10）
       points = [p];
       totalAngle = 0;
-      loopScores = [];
       loopStartIdx = 0;
-      if (progressNum) progressNum.textContent = '0';
-      if (progressPills) progressPills.innerHTML = '';
+      // 只在第一次按下時清空進度（後續 round 維持進度）
+      if (loopScores.length === 0 && progressNum) progressNum.textContent = '0';
+      if (loopScores.length === 0 && progressPills) progressPills.innerHTML = '';
       startTime = performance.now();
-      hintEl.textContent = maxLoops === 10 ? '繼續畫圈、每完成一圈算一個教練' : '畫到回原點 → 自動完成';
+      const remaining = maxLoops - loopScores.length;
+      hintEl.textContent = maxLoops === 10
+        ? `繼續畫 — 還差 ${remaining} 位招募滿`
+        : '畫到回原點 → 自動完成';
+      hintEl.classList.remove('is-warn');
       startTimer();
     }
 
@@ -263,12 +268,38 @@
     function pointerUp(e) {
       if (!drawing) return;
       drawing = false;
-      if (loopScores.length >= 1) {
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      // 1 抽 mode：完成 1 圈才算成功、否則重畫
+      if (maxLoops === 1) {
+        if (loopScores.length >= 1) finishDraw();
+        else flashRedraw('沒畫完整圈、再來一次');
+        return;
+      }
+      // 10 連 mode：
+      // - 完成 10 圈 → 結算
+      // - 還沒滿 10 → 起新一輪 30 秒、保留 N/10 進度、清掉本次軌跡
+      if (loopScores.length >= maxLoops) {
         finishDraw();
       } else {
-        // 鬆手但沒完成任何一圈 → 重畫
-        flashRedraw('沒畫完整圈、再來一次');
+        startNewRound();
       }
+    }
+
+    // 開啟新一輪 30 秒（保留 loopScores、清軌跡 + 計時）
+    function startNewRound() {
+      points = [];
+      totalAngle = 0;
+      loopStartIdx = 0;
+      drawing = false;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      timerNum.textContent = TIMEOUT_MS / 1000;
+      scoreNum.textContent = '100%';
+      scoreNum.className = 'coach-ritual-score-num is-ssr';
+      const remaining = maxLoops - loopScores.length;
+      hintEl.textContent = `已招募 ${loopScores.length}/${maxLoops} — 中心再按下、繼續招募剩餘 ${remaining} 位`;
+      hintEl.classList.remove('is-warn');
+      // 重畫背景（清掉軌跡）
+      drawBackground();
     }
 
     // 完成一圈：計算該圈分數、記錄、UI 更新
@@ -315,7 +346,18 @@
         timerNum.textContent = remain;
         if (remain <= 0) {
           clearInterval(timerInterval);
-          flashRedraw('太久了、再來一次');
+          // 1 抽 mode：超時 = 全部重畫
+          if (maxLoops === 1) {
+            flashRedraw('太久了、再來一次');
+            return;
+          }
+          // 10 連 mode：超時不丟進度、起新一輪 30 秒
+          drawing = false;
+          if (loopScores.length >= maxLoops) {
+            finishDraw();
+          } else {
+            startNewRound();
+          }
         }
       }, 1000);
     }
@@ -337,29 +379,21 @@
 
     function finishDraw() {
       if (frozen) return;
-      // 沒完成任何一圈 → 重畫
-      if (loopScores.length === 0) {
-        flashRedraw('沒完成任何一圈、再來一次');
+      // 10 連 mode：必須完成全部 10 圈才能結算（不夠就回新一輪）
+      if (maxLoops === 10 && loopScores.length < 10) {
+        startNewRound();
         return;
       }
-      // 至少一圈 ≥ 50 才算成功（防完全亂畫）
-      const bestScore = Math.max(...loopScores);
-      if (bestScore < MIN_SCORE) {
-        flashRedraw(`圈都不夠圓（最高 ${bestScore}%）— 再來一次`);
+      // 1 抽：必須至少 1 圈
+      if (loopScores.length === 0) {
+        flashRedraw('沒完成任何一圈、再來一次');
         return;
       }
       frozen = true;
       drawing = false;
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      // 10 連 mode：pad 到 10、未完成的補 0（後端視為 R consolation）
-      // 1 抽 mode：只送第 1 圈分數
-      let scores;
-      if (maxLoops === 10) {
-        scores = [...loopScores];
-        while (scores.length < 10) scores.push(0);
-      } else {
-        scores = [loopScores[0]];
-      }
+      // 1 抽：送第一圈分數；10 連：送全部 10 圈
+      const scores = maxLoops === 10 ? loopScores.slice(0, 10) : [loopScores[0]];
       runSuccessAnimation(scores);
     }
 
