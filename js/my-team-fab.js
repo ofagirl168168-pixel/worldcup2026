@@ -136,17 +136,17 @@
   }
 
   // 初始化：等 DOM ready 再注入
+  // 注意：feature 還沒正式上線、為了降低 Supabase Nano tier 的負載：
+  // - 不在頁面載入時自動 fetch my_team（FAB 圖示用預設 ⚽）
+  // - 不啟用 setInterval polling
+  // - 只有使用者「點 FAB 開 modal」時 modal.open() 才會 fetch 一次
   function init() {
     if (!_isEnabled()) {
       console.log('[my-team] disabled (set localStorage.mt_beta="1" to enable)');
       return;
     }
     injectFab();
-    _forceInjectCSS();  // 暴力 inject CSS 內容繞過 cache
-    // 嘗試 fetch（已登入會拿資料、未登入 fetch 回 null）
-    if (window.MyTeam) {
-      window.MyTeam.fetch().then(() => updateFab());
-    }
+    // _forceInjectCSS() 暫時拔掉，等 DB 穩定再啟用（會打 CF /css/my-team-v2.css 一次）
   }
 
   if (document.readyState === 'loading') {
@@ -155,14 +155,6 @@
     init();
   }
 
-  // 監聽 my-team-changed event
+  // 監聽 my-team-changed event（modal 內部抽完卡、改名等動作會觸發、即時更新 FAB 顯示）
   window.addEventListener('my-team-changed', updateFab);
-
-  // 監聽登入變化（supabase-client.js 的 currentUser 變化會觸發 my-team-changed via fetch）
-  // 我們也定期重撈一次以防錯過 event
-  setInterval(() => {
-    if (window.MyTeam && typeof currentUser !== 'undefined' && currentUser) {
-      window.MyTeam.fetch();
-    }
-  }, 60000); // 每分鐘
 })();
