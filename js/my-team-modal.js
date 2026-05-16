@@ -4959,11 +4959,9 @@
         try {
           const result = await window.MyTeam.trainPlayer(p.id, mode);
           try { await window.MyTeam.trackQuest?.('train', 1); } catch (_) {}
-          const g = result.gains;
-          if (typeof showToast === 'function') {
-            showToast(`💪 ${c.name || ''} Lv.${result.level_after}！攻+${g.attack}/防+${g.defense}/速+${g.speed}/中+${g.midfield}/體+${g.stamina}/氣+${g.aura}`);
-          }
           close();
+          // 結果展示動畫頁：portrait + Lv up + 6 屬性條 before→after 動畫
+          _showRpTrainResult(p, result, mode);
           if (typeof onSuccess === 'function') onSuccess(result);
         } catch (err) {
           const msg = String(err.message || err);
@@ -4977,6 +4975,87 @@
         }
       });
     }
+  }
+
+  // ── RP 訓練（精英特訓 / 集訓升等）結果展示動畫頁
+  // 跟 _showTimedClaimResult 同視覺風格、但顯示全 6 屬性的 before→after + gain
+  function _showRpTrainResult(p, result, mode) {
+    if (!p || !result) {
+      if (typeof showToast === 'function') showToast(`✅ 訓練完成！`);
+      return;
+    }
+    const c = p.card || {};
+    const ATTR_KEYS = ['attack','defense','speed','midfield','stamina','aura'];
+    const ATTR_LBL = { attack:'攻擊', defense:'防守', speed:'速度', midfield:'中場', stamina:'體力', aura:'氣場' };
+    const modeLabel = mode === 'premium' ? '⭐ 精英特訓' : '⚡ 集訓升等';
+    const newLevel = result.level_after || (p.level + 1);
+    const gains = result.gains || {};
+
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-claim-result-overlay mt-rp-train-result';
+    const portraitId = `rp-train-portrait-${p.id}-${Date.now()}`;
+    overlay.innerHTML = `
+      <div class="mt-claim-result-card rarity-${c.rarity || 'R'}">
+        <div class="mt-claim-result-burst">
+          ${Array.from({length: 12}).map((_, i) => `<span class="mt-claim-spark" style="--ang:${i * 30}deg"></span>`).join('')}
+        </div>
+        <div class="mt-claim-result-title">🎉 ${modeLabel} 完成！</div>
+        <div class="mt-claim-result-hero">
+          <img id="${portraitId}" alt="${escapeHtml(c.name)}"
+            src="${(typeof window.MyTeamPortrait === 'function') ? window.MyTeamPortrait(c.card_id, c.rarity) : ''}"
+            onerror="this.style.display='none'">
+          <div class="mt-claim-result-meta">
+            <div class="mt-claim-result-name">${escapeHtml(c.name || '?')}</div>
+            <div class="mt-claim-result-lvup">
+              <span class="mt-claim-result-lv-old">Lv.${p.level}</span>
+              <span class="mt-claim-result-arrow">→</span>
+              <span class="mt-claim-result-lv-new">Lv.${newLevel}</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-rp-train-bars">
+          ${ATTR_KEYS.map(k => {
+            const gain = gains[k] || 0;
+            const beforeVal = p['current_' + k] || 0;
+            const newVal = Math.min(99, beforeVal + gain);
+            return `
+              <div class="mt-claim-result-bar-row">
+                <span class="mt-claim-result-bar-label">${ATTR_LBL[k]}</span>
+                <div class="mt-claim-result-bar">
+                  <div class="mt-claim-result-bar-old" style="width:${beforeVal}%"></div>
+                  <div class="mt-claim-result-bar-new" style="--target:${newVal}%"></div>
+                </div>
+                <div class="mt-claim-result-val">
+                  <span class="mt-claim-result-val-old">${beforeVal}</span>
+                  <span class="mt-claim-result-arrow">→</span>
+                  <span class="mt-claim-result-val-new">${newVal}</span>
+                  <span class="mt-claim-result-gain">+${gain}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <button class="mt-claim-result-confirm" type="button">確認</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const look = window.LpcRenderer && window.LpcRenderer.resolveLook(p);
+    if (look && window.LpcRenderer) {
+      const team = window.MyTeam.getCached();
+      const kit = team ? { shirtColor: team.kit_shirt_color, pantsColor: team.kit_pants_color } : null;
+      window.LpcRenderer.portrait(look, { scale: 6, kit }).then(url => {
+        const img = document.getElementById(portraitId);
+        if (img && url) img.src = url;
+      }).catch(() => {});
+    }
+    const closeIt = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    };
+    overlay.querySelector('.mt-claim-result-confirm').addEventListener('click', closeIt);
+    // 不再自動關閉、讓玩家慢慢看 6 條屬性條動畫
   }
 
   function escapeHtml(s) {

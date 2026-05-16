@@ -8437,6 +8437,30 @@ button.mt-train-point-card:active { transform: translateY(0); }
   padding: 8px 10px;
   margin-bottom: 14px;
 }
+
+/* RP 訓練結果頁：6 屬性條一次顯示、間距要更緊 */
+.mt-rp-train-result .mt-claim-result-card {
+  max-width: 440px;
+}
+.mt-rp-train-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 14px;
+}
+.mt-rp-train-result .mt-claim-result-bar-row {
+  margin-bottom: 0;
+  padding: 5px 9px;
+}
+.mt-rp-train-result .mt-claim-result-bar-row .mt-claim-result-bar-label {
+  font-size: 12px;
+}
+.mt-rp-train-result .mt-claim-result-bar {
+  height: 11px;
+}
+.mt-rp-train-result .mt-claim-result-val {
+  font-size: 11px;
+}
 .mt-claim-result-bar-row .mt-claim-result-bar-label {
   font-size: 13px;
   font-weight: 900;
