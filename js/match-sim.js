@@ -392,7 +392,7 @@
         ctx.textAlign = 'start';
         ctx.textBaseline = 'alphabetic';
       }
-      // 個人狂熱光環（球員腳下發光 + 上方光暈）
+      // 個人狂熱光環（球員腳下發光）— 移除頭頂飄星星（使用者反映不需要）
       if (p.fever > 0) {
         const pulse = 0.7 + Math.sin(state.frame / 4) * 0.3;
         // 腳下金色發光圈
@@ -402,16 +402,6 @@
         grd.addColorStop(1, 'rgba(255,140,0,0)');
         ctx.fillStyle = grd;
         ctx.fillRect(cx - 14, cy + SPRITE_DRAW_H / 2 - 8, 28, 14);
-        // 上方光點向上飄（每幀 3 個）
-        for (let s = 0; s < 3; s++) {
-          const t = ((state.frame + i * 5 + s * 17) % 36) / 36;
-          const sx = cx + Math.sin(t * Math.PI * 2 + s) * 5;
-          const sy = cy - SPRITE_DRAW_H / 2 + 4 - t * 10;
-          ctx.fillStyle = `rgba(255,235,128,${1 - t})`;
-          ctx.beginPath();
-          ctx.arc(sx, sy, 1.3, 0, Math.PI * 2);
-          ctx.fill();
-        }
       }
 
       // 腳下影子：控球者用半透明白小點（不搶戲）、其他用黑影
@@ -888,11 +878,17 @@
       feverCooldown: 0,
       _feverPersonality: 0.7 + rng() * 0.6,    // 0.7~1.3 變異、避免大家同時爆
     });
+    // helper：從 keyPlayers 找名字、找不到回退到 role+編號（保險）
+    const _nameFor = (teamData, idx, role) => {
+      const kp = teamData.keyPlayers && teamData.keyPlayers[idx];
+      return (kp && kp.name) || `${role}${idx + 1}`;
+    };
     const players = [
       ...hF.map((p, i) => {
         const tal = _talentFor(home, i);
         return {
           ...p, team: 'h',
+          name: _nameFor(home, i, p.role),
           baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y,
           flair: makeFlair(),
           card_id: _cardIdFor(home, i),
@@ -905,6 +901,7 @@
         const tal = _talentFor(away, i);
         return {
           ...p, team: 'a',
+          name: _nameFor(away, i, p.role),
           baseX: p.x, baseY: p.y, x: p.x, y: p.y, tx: p.x, ty: p.y,
           flair: makeFlair(),
           card_id: _cardIdFor(away, i),

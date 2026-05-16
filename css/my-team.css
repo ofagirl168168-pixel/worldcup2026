@@ -2891,7 +2891,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  /* z-index 50 → 200：確保闖關成功 splash 蓋在所有 modal content / post-match 之上 */
+  z-index: 200;
   pointer-events: none;
   overflow: hidden;
   animation: mt-result-bg-in 0.4s ease-out forwards;

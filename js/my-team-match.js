@@ -614,13 +614,17 @@
     `;
     stage.appendChild(splash);
 
+    // 闖關模式 + 勝利時 splash 多停 1.5 秒（從 2200→3700ms）讓玩家看清楚「幹得好、繼續闖關」
+    // 不被立刻換場到 post-match 的大比分蓋過
+    const isStageWin = result === 'W' && !ctx.isPvp;
+    const splashDuration = isStageWin ? 3700 : 2200;
     setTimeout(() => {
       splash.classList.add('exit');
       setTimeout(() => {
         if (splash.parentElement) splash.remove();
         onDone && onDone();
       }, 400);
-    }, 2200);
+    }, splashDuration);
   }
 
   function _renderPostMatch(overlay, ctx, score, result) {
