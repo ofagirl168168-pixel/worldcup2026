@@ -760,9 +760,29 @@
                 fill="#5a6b85" opacity="0.75"/>
             </svg>
             <div class="mt-home-sun"></div>
-            <div class="mt-home-cloud mt-home-cloud-1"></div>
-            <div class="mt-home-cloud mt-home-cloud-2"></div>
-            <div class="mt-home-cloud mt-home-cloud-3"></div>
+            <div class="mt-home-cloud mt-home-cloud-1">
+              <svg viewBox="0 0 80 36" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M 12 28 Q 4 28 4 22 Q 4 14 14 13 Q 17 5 28 6 Q 36 0 46 5 Q 54 3 60 10 Q 72 11 74 20 Q 76 28 66 28 Z"
+                      fill="#fff" stroke="#1a1a2e" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M 16 26 Q 14 21 18 19 Q 22 17 26 20" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.2" stroke-linecap="round"/>
+                <ellipse cx="60" cy="26" rx="10" ry="2" fill="rgba(160,180,210,0.45)"/>
+              </svg>
+            </div>
+            <div class="mt-home-cloud mt-home-cloud-2">
+              <svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M 8 24 Q 3 24 3 18 Q 3 11 12 11 Q 15 4 24 6 Q 32 1 40 7 Q 50 8 52 17 Q 54 24 46 24 Z"
+                      fill="#fff" stroke="#1a1a2e" stroke-width="1.8" stroke-linejoin="round"/>
+                <ellipse cx="38" cy="22" rx="8" ry="1.6" fill="rgba(160,180,210,0.45)"/>
+              </svg>
+            </div>
+            <div class="mt-home-cloud mt-home-cloud-3">
+              <svg viewBox="0 0 96 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M 14 32 Q 5 32 5 25 Q 5 16 16 15 Q 19 6 32 8 Q 42 1 54 7 Q 64 4 70 12 Q 86 13 88 23 Q 90 32 78 32 Z"
+                      fill="#fff" stroke="#1a1a2e" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M 20 30 Q 17 22 23 20 Q 30 18 35 22" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.4" stroke-linecap="round"/>
+                <ellipse cx="62" cy="30" rx="14" ry="2.2" fill="rgba(160,180,210,0.45)"/>
+              </svg>
+            </div>
             <div class="mt-home-birds">˜ ˜</div>
           </div>
           <!-- 遠景：建築 + 樹（依 stadium_level 變外觀）-->
@@ -3140,21 +3160,26 @@
   }
 
   // Lv 3+ 球場邊看台下方一排廣告牌
-  // 數量隨等級遞增、文字以球隊名 + 通用 slogan 輪替
+  // 兩半（左右），中間留訓練館門口的空隙
   function _renderPitchAds(lv, team) {
     const teamName = (team?.team_name || 'TEAM').toUpperCase().slice(0, 6);
     const ads = ['SOCCERMADDY', teamName, 'GO!', 'CHAMPIONS', teamName, 'WIN', 'SOCCERMADDY', teamName];
     const palette = ['#c0392b', '#1a3050', '#16a085', '#d35400', '#7d3c98', '#1a3050'];
-    // Lv 3-4: 6 個、Lv 5-7: 8 個、Lv 8-10: 10 個
     const count = lv >= 8 ? 10 : (lv >= 5 ? 8 : 6);
-    let html = '<div class="mt-home-pitch-ads">';
-    for (let i = 0; i < count; i++) {
-      const text = ads[i % ads.length];
-      const color = palette[i % palette.length];
-      html += `<div class="mt-home-pitch-ad" style="--c:${color}">${text}</div>`;
-    }
-    html += '</div>';
-    return html;
+    const half = Math.ceil(count / 2);
+    const make = (start, end) => {
+      let h = '';
+      for (let i = start; i < end; i++) {
+        h += `<div class="mt-home-pitch-ad" style="--c:${palette[i % palette.length]}">${ads[i % ads.length]}</div>`;
+      }
+      return h;
+    };
+    return `
+<div class="mt-home-pitch-ads">
+  <div class="mt-home-pitch-ads-side mt-home-pitch-ads-l">${make(0, half)}</div>
+  <div class="mt-home-pitch-ads-gap"></div>
+  <div class="mt-home-pitch-ads-side mt-home-pitch-ads-r">${make(half, count)}</div>
+</div>`;
   }
 
 

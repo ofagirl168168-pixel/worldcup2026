@@ -4112,34 +4112,19 @@
 }
 .mt-home-cloud {
   position: absolute;
-  background: #fff;
-  border: 2px solid #1a1a2e;
-  height: 14px;
   z-index: 2;             /* 雲在太陽前面、但低於建築 / 裝飾 / 球員 */
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15));
   animation:
     mt-cloud-drift 90s linear infinite,
     mt-cloud-bob 6s ease-in-out infinite;
 }
-.mt-home-cloud::before, .mt-home-cloud::after {
-  content: ''; position: absolute;
-  background: #fff;
-  border: 2px solid #1a1a2e;
+.mt-home-cloud svg {
+  width: 100%; height: 100%; display: block; overflow: visible;
 }
-.mt-home-cloud::before {
-  left: 20%; top: -10px;
-  width: 14px; height: 12px;
-  border-bottom: 0;
-  box-shadow: inset 0 -2px 0 #fff;
-}
-.mt-home-cloud::after {
-  right: 18%; top: -14px;
-  width: 18px; height: 16px;
-  border-bottom: 0;
-  box-shadow: inset 0 -2px 0 #fff;
-}
-.mt-home-cloud-1 { top: 14%;  left: -20%; width: 56px; animation-duration: 110s, 7s; }
-.mt-home-cloud-2 { top: 38%;  left: -10%; width: 40px; animation-duration: 85s, 5s;  animation-delay: -28s, -2s; }
-.mt-home-cloud-3 { top: 58%;  left: -30%; width: 72px; animation-duration: 140s, 8s; animation-delay: -60s, -4s; }
+.mt-home-cloud-1 { top: 10%;  left: -20%; width: 70px;  height: 32px; animation-duration: 110s, 7s; }
+.mt-home-cloud-2 { top: 32%;  left: -10%; width: 52px;  height: 26px; animation-duration: 85s, 5s;  animation-delay: -28s, -2s; }
+.mt-home-cloud-3 { top: 54%;  left: -30%; width: 90px;  height: 38px; animation-duration: 140s, 8s; animation-delay: -60s, -4s; }
 @keyframes mt-cloud-drift {
   from { transform: translateX(0); }
   to   { transform: translateX(140vw); }
@@ -4711,18 +4696,26 @@
 .mt-home-cw-2 { right: 18%; }
 
 /* Lv 3+ 球場邊（看台下方）一排廣告牌、彩色 LED 風
-   定位：bottom: 100% → 廣告牌的底邊貼在地平線（操場頂緣）、整體往上伸入天空一點 */
+   兩半 + 中間留 gap 給訓練館門口、底邊貼地平線 */
 .mt-home-pitch-ads {
   position: absolute;
   left: 0; right: 0;
-  bottom: 100%;                    /* 底邊貼地平線、整體在地平線「上方」*/
+  bottom: 100%;
   height: 13px;
   display: flex;
-  gap: 1px;
-  padding: 0 2px;
   z-index: 5;
   pointer-events: none;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.45));
+}
+.mt-home-pitch-ads-side {
+  flex: 1;
+  display: flex;
+  gap: 1px;
+  padding: 0 2px;
+}
+.mt-home-pitch-ads-gap {
+  width: 17%;                      /* 中央留訓練館門口的空隙 */
+  flex-shrink: 0;
 }
 .mt-home-pitch-ad {
   flex: 1;
