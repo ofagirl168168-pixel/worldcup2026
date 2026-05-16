@@ -4711,6 +4711,13 @@
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   z-index: 5;        /* 高於窗戶（z 1）、roof（z 2）→ 永遠蓋住背後窗戶 */
 }
+/* Lv 5+：建物變高、隊牌往上移到屋頂下方、塞在第 2 層窗戶上方 */
+.mt-home-distance[data-stadium-level="5"]  .mt-home-clubhouse-sign,
+.mt-home-distance[data-stadium-level="6"]  .mt-home-clubhouse-sign,
+.mt-home-distance[data-stadium-level="7"]  .mt-home-clubhouse-sign,
+.mt-home-distance[data-stadium-level="8"]  .mt-home-clubhouse-sign,
+.mt-home-distance[data-stadium-level="9"]  .mt-home-clubhouse-sign,
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-sign { top: 5%; }
 .mt-home-clubhouse-door {
   position: absolute; left: 42%; bottom: 0;
   width: 16%; height: 40%;
