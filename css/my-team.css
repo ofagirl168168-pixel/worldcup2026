@@ -3303,7 +3303,26 @@
 .mt-starter-complete-buttons {
   display: flex; flex-direction: column; gap: 6px;
 }
-.mt-starter-arrange, .mt-starter-train, .mt-starter-primary { width: 100%; }
+.mt-starter-arrange, .mt-starter-train, .mt-starter-primary {
+  width: 100%;
+  background: linear-gradient(135deg, #f0c040 0%, #e07020 100%);
+  color: #1a1a2e;
+  font-weight: 900;
+  font-size: 15px;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(240,192,64,0.55), inset 0 1px 0 rgba(255,255,255,0.4);
+  transition: transform 0.1s;
+}
+.mt-starter-arrange:hover, .mt-starter-train:hover, .mt-starter-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(240,192,64,0.75), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+.mt-starter-arrange:active, .mt-starter-train:active, .mt-starter-primary:active {
+  transform: translateY(0);
+}
 
 /* 教學賽賽後 banner */
 .mt-post-tutorial-banner {

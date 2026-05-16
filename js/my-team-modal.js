@@ -139,40 +139,93 @@
         }, 200);
         return;
       }
-      // 最後一步：觸發新手套裝 + 跑完整 10 連抽動畫
-      ctaBtn.disabled = true; ctaBtn.textContent = '召喚中…';
-      try {
-        const { data, error } = await window.DB.rpc('claim_starter_pack');
-        if (error) throw error;
-        // 關掉教學
-        overlay.classList.remove('open');
-        setTimeout(() => overlay.remove(), 200);
-        // 播放完整 gacha 動畫（Stage 0 卡包 → Stage 2.5 翻牌）— 不暴露「首抽套裝」字眼
-        if (window.MyTeam?.openGachaAnimation) {
-          // 兼容 claim_starter_pack 回傳的 players key 跟一般 gacha 的 cards key
-          const cards = data.cards || data.players || [];
-          await window.MyTeam.openGachaAnimation(cards, {
-            title: '🎰 10 連抽召喚',
-            subtitle: '看看你的手氣',
-          });
-        }
-        // 動畫結束 → refresh + 跳球員 tab + 結尾引導
-        await window.MyTeam.refresh?.();
-        _currentTab = 'roster';
-        renderHub();
-        setTimeout(() => _showStarterCompleteToast(data.count || 10), 200);
-      } catch (e) {
-        const msg = (e.message || String(e));
-        if (msg.includes('ALREADY_CLAIMED')) {
-          // 已領過：直接關 tutorial
-          overlay.classList.remove('open');
-          setTimeout(() => overlay.remove(), 200);
-        } else {
-          alert('召喚失敗：' + msg);
-          ctaBtn.disabled = false; render();
-        }
-      }
+      // 最後一步：關 tutorial、切到抽卡 tab + spotlight 10 連抽按鈕
+      // 使用者自己按下 → 攔截 click 改呼叫 claim_starter_pack → 開抽卡動畫
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+      setTimeout(() => _spotlightStarterPackPull(), 250);
     });
+  }
+
+  // 切到抽卡 tab + spotlight 10 連抽 button + 攔截 click 改呼叫 claim_starter_pack
+  function _spotlightStarterPackPull() {
+    const tabBtn = document.querySelector('.mt-hub-tab[data-tab="gacha"]');
+    if (tabBtn) tabBtn.click();
+    setTimeout(() => {
+      const target = document.querySelector('#mt-gacha-10');
+      if (!target) {
+        console.warn('[starter] #mt-gacha-10 not found, fallback to direct claim');
+        _runStarterPackDraw();
+        return;
+      }
+      // 暫時 enable + 標記新手套裝模式（cleanup 時還原）
+      const wasDisabled = target.disabled;
+      target.disabled = false;
+      target.dataset.starterTutorial = '1';
+
+      // Spotlight overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'mt-spotlight';
+      overlay.innerHTML = `
+        <div class="mt-spotlight-ring" id="mt-spotlight-ring"></div>
+        <div class="mt-spotlight-hint">👉 點這裡 10 連抽 — 第一發我們幫你出！</div>
+      `;
+      document.body.appendChild(overlay);
+      const ring = overlay.querySelector('#mt-spotlight-ring');
+      const reposition = () => {
+        const r = target.getBoundingClientRect();
+        ring.style.left   = (r.left - 6) + 'px';
+        ring.style.top    = (r.top - 6) + 'px';
+        ring.style.width  = (r.width + 12) + 'px';
+        ring.style.height = (r.height + 12) + 'px';
+      };
+      reposition();
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(reposition, 400);
+      window.addEventListener('scroll', reposition, true);
+      window.addEventListener('resize', reposition);
+
+      // 攔截 click（capture phase）→ 不跑正常 gacha，改 starter pack
+      const intercept = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        target.removeEventListener('click', intercept, true);
+        window.removeEventListener('scroll', reposition, true);
+        window.removeEventListener('resize', reposition);
+        if (wasDisabled) target.disabled = true;
+        delete target.dataset.starterTutorial;
+        overlay.classList.add('is-fading');
+        setTimeout(() => overlay.remove(), 300);
+        _runStarterPackDraw();
+      };
+      target.addEventListener('click', intercept, true);
+    }, 350);
+  }
+
+  async function _runStarterPackDraw() {
+    try {
+      const { data, error } = await window.DB.rpc('claim_starter_pack');
+      if (error) throw error;
+      if (window.MyTeam?.openGachaAnimation) {
+        const cards = data.cards || data.players || [];
+        await window.MyTeam.openGachaAnimation(cards, {
+          title: '🎰 新手 10 連抽',
+          subtitle: '免費送你的開隊禮',
+        });
+      }
+      await window.MyTeam.refresh?.();
+      _currentTab = 'roster';
+      renderHub();
+      setTimeout(() => _showStarterCompleteToast(data.count || 10), 200);
+    } catch (e) {
+      const msg = (e.message || String(e));
+      if (msg.includes('ALREADY_CLAIMED')) {
+        // 已領過 → 直接進下一步
+        setTimeout(() => _showStarterCompleteToast(0), 200);
+      } else {
+        alert('召喚失敗：' + msg);
+      }
+    }
   }
 
   async function _showStarterCompleteToast(n) {
@@ -232,17 +285,19 @@
     t.querySelector('.mt-starter-primary').addEventListener('click', async () => {
       close();
       if (action === 'coach') {
-        _spotlightTab('coach', '.mt-coach-draw-1', '👉 點這裡抽你的第一位教練！',
-          () => _waitFor(() => !document.querySelector('.mt-gacha-overlay'), 60000)
-                  .then(() => setTimeout(() => _showStarterCompleteToast(0), 500)));
+        // 等所有教練相關 modal 都關掉（ritual 圓 + draw result）
+        _spotlightTab('coach', '.mt-coach-draw-1', '👉 點這裡抽你的第一位教練！', () =>
+          _waitForAllClosed(['.coach-ritual-overlay', '.mt-coach-draw-result-overlay', '.mt-claim-result-overlay'], 180000)
+            .then(() => setTimeout(() => _showStarterCompleteToast(0), 600)));
       } else if (action === 'train') {
-        _spotlightTab('train', '[data-feed-mode="normal"]', '👉 點這裡開始訓練！',
-          () => _waitFor(() => !document.querySelector('.mt-train-feed-result, .mt-train-result-overlay'), 60000)
-                  .then(() => setTimeout(() => _showStarterCompleteToast(0), 1500)));
+        // 訓練：點集訓升等 → picker → 結果 modal
+        _spotlightTab('train', '[data-feed-mode="normal"]', '👉 點這裡開始訓練！', () =>
+          _waitForAllClosed(['.mt-rp-train-result', '.mt-claim-result-overlay', '.mt-train-info-modal', '.mt-profile-overlay'], 60000)
+            .then(() => setTimeout(() => _showStarterCompleteToast(0), 800)));
       } else if (action === 'match') {
-        _spotlightTab('match', '#mt-match-start', '👉 點這裡開始熱身賽！',
-          () => _waitFor(() => !document.querySelector('.mt-match-overlay'), 180000)
-                  .then(() => setTimeout(() => _showStarterCompleteToast(0), 500)));
+        _spotlightTab('match', '#mt-match-start', '👉 點這裡開始熱身賽！', () =>
+          _waitForAllClosed(['.mt-match-overlay'], 300000)
+            .then(() => setTimeout(() => _showStarterCompleteToast(0), 600)));
       } else {
         // done
       }
@@ -313,6 +368,24 @@
     });
   }
 
+  // 等所有給的 selector 對應的 modal 都消失才 resolve
+  // 同時要先等其中任一個出現過、避免「還沒打開就 resolve」
+  function _waitForAllClosed(selectors, timeoutMs) {
+    return new Promise(resolve => {
+      const start = Date.now();
+      let everOpened = false;
+      const tick = () => {
+        const anyOpen = selectors.some(s => document.querySelector(s));
+        if (anyOpen) everOpened = true;
+        // 已經開過 + 現在都關掉 → resolve
+        if (everOpened && !anyOpen) return resolve(true);
+        if (Date.now() - start > timeoutMs) return resolve(false);
+        setTimeout(tick, 400);
+      };
+      tick();
+    });
+  }
+
   // ── 教練教學：跳教練 tab + 自動抽 1 教練 + 設為主教練 ──
   async function _runCoachTutorial() {
     const overlay = document.createElement('div');
@@ -324,7 +397,6 @@
         <p>新手送你 <b>1 張教練聘任券</b>。<br>
           抽到的教練自動指派為主教練、解鎖一個新陣型。</p>
         <button class="mt-tutorial-cta" id="mt-tut-coach-cta">🎰 抽教練</button>
-        <button class="mt-tutorial-skip" id="mt-tut-coach-skip">先跳過</button>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -334,7 +406,6 @@
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 200);
     };
-    overlay.querySelector('#mt-tut-coach-skip').addEventListener('click', close);
     overlay.querySelector('#mt-tut-coach-cta').addEventListener('click', async () => {
       const cta = overlay.querySelector('#mt-tut-coach-cta');
       cta.disabled = true; cta.textContent = '抽取中…';
