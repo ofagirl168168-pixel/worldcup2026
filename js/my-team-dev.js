@@ -216,10 +216,34 @@
     await window.MyTeam?.triggerInstantGacha?.(2, 'predict_5');
   }
 
+  // ── 測試球場每級視覺 ──
+  // 直接改 stadium_level（不花寶石）+ 重 render hub。用法：
+  //   MyTeamDev.setStadiumLevel(1) ... MyTeamDev.setStadiumLevel(10)
+  async function setStadiumLevel(lv) {
+    const v = Math.max(1, Math.min(10, parseInt(lv, 10) || 1));
+    if (!window.DB || typeof currentUser === 'undefined' || !currentUser) {
+      console.warn('沒登入');
+      return;
+    }
+    const { error } = await window.DB
+      .from('my_team')
+      .update({ stadium_level: v })
+      .eq('user_id', currentUser.id);
+    if (error) {
+      console.error('設定失敗', error);
+      return;
+    }
+    if (window.MyTeam?.refresh) await window.MyTeam.refresh();
+    // 強制重 render 主頁 tab
+    document.querySelector('.mt-hub-tab[data-tab="home"]')?.click();
+    console.log('%c🏟️ 球場 → Lv.' + v, 'color:#ffd96f;font-weight:bold');
+  }
+
   window.MyTeamDev = {
     enable, disable, status,
     reset, resetLocalOnly,
     addTickets, addCoachTickets, addGems, addRP, addStamina, debugCoaches,
+    setStadiumLevel,
     replayTutorial,
     simulateArenaVote, simulateDailyLogin, simulatePredict5,
   };
