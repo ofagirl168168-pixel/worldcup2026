@@ -792,7 +792,7 @@
               ${_renderClubhouseRoofSvg(team?.stadium_level || 1)}
               <div class="mt-home-clubhouse-roof-tiles"></div>
               <div class="mt-home-clubhouse-chimney"></div>
-              <div class="mt-home-clubhouse-sign">${escapeHtml(team?.team_name || '我的訓練館')}</div>
+              <div class="mt-home-clubhouse-sign">${escapeHtml((team?.team_name || '我') + ' 的訓練館')}</div>
               <div class="mt-home-clubhouse-door">
                 <div class="mt-home-clubhouse-handle"></div>
               </div>
