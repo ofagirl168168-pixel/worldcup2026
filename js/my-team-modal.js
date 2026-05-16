@@ -74,6 +74,7 @@
   }
 
   // ── 新手指引：階段式 tutorial、最後觸發 10 連抽動畫 ──
+  // 進入後不再有「稍後」選項、引導使用者完整走過所有功能
   async function _showStarterPackIntro() {
     const steps = [
       {
@@ -85,7 +86,7 @@
       {
         emoji: '⚽',
         title: '球員是俱樂部的核心',
-        body: '抽到的每張球員卡會自動站在球場上對應位置。SSR 是稀有強卡，SR 是中堅，R 是基礎陣容。',
+        body: '抽到的每張球員卡會自動站在球場上對應位置。SSR 是稀有強卡，SR / R / N 依序遞減。',
         cta: '繼續 →',
       },
       {
@@ -106,7 +107,6 @@
         <h2 id="mt-tut-title"></h2>
         <p id="mt-tut-body"></p>
         <button class="mt-tutorial-cta" id="mt-tut-cta"></button>
-        <button class="mt-tutorial-skip" id="mt-tut-skip">先跳過、稍後手動領取</button>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -123,12 +123,6 @@
       ).join('');
     }
     render();
-
-    const skipBtn = overlay.querySelector('#mt-tut-skip');
-    skipBtn.addEventListener('click', () => {
-      overlay.classList.remove('open');
-      setTimeout(() => overlay.remove(), 200);
-    });
 
     const ctaBtn = overlay.querySelector('#mt-tut-cta');
     ctaBtn.addEventListener('click', async () => {
@@ -183,7 +177,7 @@
 
   async function _showStarterCompleteToast(n) {
     const team = window.MyTeam.getCached();
-    // 教學鏈：先抽教練 → 比賽 → 訓練
+    // 教學鏈：先抽教練 → 訓練 → 比賽 → 結束
     // 撈是否已聘過教練（user_coach 有資料 → 跳過教練 step）
     let hasCoach = false;
     try {
@@ -191,30 +185,30 @@
       hasCoach = (count || 0) > 0;
     } catch (e) {}
     const needsCoachTutorial = !hasCoach;
-    const needsTutorialMatch = team && team.tutorial_match_done === false;
     const needsTrainingTutorial = team && team.tutorial_first_training_used === false;
+    const needsTutorialMatch = team && team.tutorial_match_done === false;
 
     let title, body, primaryBtn, action;
     if (needsCoachTutorial) {
       title = '太棒了！';
       body = '接下來<b>抽你的第一位教練</b>！<br>教練會給你 buff + <b>解鎖新陣型</b>';
-      primaryBtn = '👔 抽教練';
+      primaryBtn = '👔 去抽教練';
       action = 'coach';
-    } else if (needsTutorialMatch) {
-      title = '教練聘任完成！';
-      body = '接下來打<b>第一場熱身賽</b>看你的隊伍表現 ⚽';
-      primaryBtn = '🏟️ 開始熱身賽';
-      action = 'match';
     } else if (needsTrainingTutorial) {
       title = '太棒了！';
-      body = '接下來教你<b>訓練</b>球員 — 讓他們變更強';
-      primaryBtn = '🏋️ 教我訓練';
+      body = '球員可以<b>訓練變強</b>！<br>接下來教你怎麼訓練';
+      primaryBtn = '🏋️ 去訓練球員';
       action = 'train';
+    } else if (needsTutorialMatch) {
+      title = '陣容已就緒！';
+      body = '接下來打<b>第一場熱身賽</b>看你的隊伍表現 ⚽';
+      primaryBtn = '🏟️ 去比賽';
+      action = 'match';
     } else {
-      title = '太棒了！';
-      body = '接下來去 <b>球員</b> 或 <b>設定</b> 安排陣容';
-      primaryBtn = '📋 去安排隊伍';
-      action = 'roster';
+      title = '🎉 新手指引完成！';
+      body = '你已學會：<b>抽卡 / 抽教練 / 訓練 / 比賽</b>。<br>之後可以去設定調整陣型 / 球衣 / 隊徽。';
+      primaryBtn = '完成';
+      action = 'done';
     }
 
     const t = document.createElement('div');
@@ -226,7 +220,6 @@
         <p>${body}</p>
         <div class="mt-starter-complete-buttons">
           <button class="mt-gacha-btn mt-starter-primary">${primaryBtn}</button>
-          <button class="mt-starter-complete-skip">稍後再說</button>
         </div>
       </div>
     `;
@@ -239,17 +232,85 @@
     t.querySelector('.mt-starter-primary').addEventListener('click', async () => {
       close();
       if (action === 'coach') {
-        await _runCoachTutorial();
-      } else if (action === 'match') {
-        window.MyTeam?.runMatch?.({ tutorial: true });
+        _spotlightTab('coach', '.mt-coach-draw-1', '👉 點這裡抽你的第一位教練！',
+          () => _waitFor(() => !document.querySelector('.mt-gacha-overlay'), 60000)
+                  .then(() => setTimeout(() => _showStarterCompleteToast(0), 500)));
       } else if (action === 'train') {
-        _runTrainingTutorial();
+        _spotlightTab('train', '[data-feed-mode="normal"]', '👉 點這裡開始訓練！',
+          () => _waitFor(() => !document.querySelector('.mt-train-feed-result, .mt-train-result-overlay'), 60000)
+                  .then(() => setTimeout(() => _showStarterCompleteToast(0), 1500)));
+      } else if (action === 'match') {
+        _spotlightTab('match', '#mt-match-start', '👉 點這裡開始熱身賽！',
+          () => _waitFor(() => !document.querySelector('.mt-match-overlay'), 180000)
+                  .then(() => setTimeout(() => _showStarterCompleteToast(0), 500)));
       } else {
-        _currentTab = 'roster';
-        document.querySelector('.mt-hub-tab[data-tab="roster"]')?.click();
+        // done
       }
     });
-    t.querySelector('.mt-starter-complete-skip').addEventListener('click', close);
+  }
+
+  // ── Spotlight：切到指定 tab + 在目標 button 上 highlight + 等使用者自己按 ──
+  function _spotlightTab(tabId, selector, hint, onClicked) {
+    // 切到 tab
+    const tabBtn = document.querySelector(`.mt-hub-tab[data-tab="${tabId}"]`);
+    if (tabBtn) tabBtn.click();
+    // 等 tab 渲染好
+    setTimeout(() => _attachSpotlight(selector, hint, onClicked), 350);
+  }
+
+  function _attachSpotlight(selector, hint, onClicked) {
+    const target = document.querySelector(selector);
+    if (!target) {
+      console.warn('[spotlight] target not found:', selector);
+      if (onClicked) onClicked();
+      return;
+    }
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-spotlight';
+    overlay.innerHTML = `
+      <div class="mt-spotlight-ring" id="mt-spotlight-ring"></div>
+      <div class="mt-spotlight-hint">${escapeHtml(hint)}</div>
+    `;
+    document.body.appendChild(overlay);
+    const ring = overlay.querySelector('#mt-spotlight-ring');
+
+    const reposition = () => {
+      const r = target.getBoundingClientRect();
+      ring.style.left   = (r.left - 6) + 'px';
+      ring.style.top    = (r.top - 6) + 'px';
+      ring.style.width  = (r.width + 12) + 'px';
+      ring.style.height = (r.height + 12) + 'px';
+    };
+    reposition();
+    // 自動滾到目標
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(reposition, 400);
+
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition);
+
+    const onClick = () => {
+      target.removeEventListener('click', onClick);
+      window.removeEventListener('scroll', reposition, true);
+      window.removeEventListener('resize', reposition);
+      overlay.classList.add('is-fading');
+      setTimeout(() => overlay.remove(), 300);
+      if (onClicked) onClicked();
+    };
+    target.addEventListener('click', onClick);
+  }
+
+  // 等到 predicate 變 true（每 500ms 檢查、最多 timeoutMs）
+  function _waitFor(predicate, timeoutMs) {
+    return new Promise(resolve => {
+      const start = Date.now();
+      const tick = () => {
+        if (predicate()) return resolve(true);
+        if (Date.now() - start > timeoutMs) return resolve(false);
+        setTimeout(tick, 500);
+      };
+      tick();
+    });
   }
 
   // ── 教練教學：跳教練 tab + 自動抽 1 教練 + 設為主教練 ──
@@ -327,6 +388,8 @@
 
   // ── 訓練教學：自動幫第一位球員跑 3 秒速度訓練（暴露給 my-team-match.js 在賽後 chain）──
   window._runTrainingTutorial = _runTrainingTutorial;
+  // 新的全域 entry：讓外部（my-team-match）能觸發「下一步」教學
+  window._mtAdvanceTutorial = () => _showStarterCompleteToast(0);
   async function _runTrainingTutorial() {
     const players = await window.MyTeam.fetchPlayers();
     if (!players.length) return;
@@ -3982,6 +4045,7 @@
         try {
           localStorage.removeItem('mt_daily_login_date_v1');
           localStorage.removeItem('mt_preview_cards');
+          localStorage.removeItem('mt_preview_cards_v2');
         } catch (e) {}
         // 清掉 MyTeam cache（讓 fetch 重抓）
         await window.MyTeam.refresh?.();

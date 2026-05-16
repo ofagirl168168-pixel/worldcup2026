@@ -746,9 +746,9 @@
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 250);
       window.dispatchEvent(new CustomEvent('my-team-changed'));
-      // 教學賽 → 接訓練 tutorial
-      if (ctx.isTutorial && typeof window._runTrainingTutorial === 'function') {
-        setTimeout(() => window._runTrainingTutorial(), 400);
+      // 教學賽結束 → 觸發新手指引下一步（會自動判斷是訓練還是 done）
+      if (ctx.isTutorial && typeof window._mtAdvanceTutorial === 'function') {
+        setTimeout(() => window._mtAdvanceTutorial(), 400);
       }
     });
     // count-up

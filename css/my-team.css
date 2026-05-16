@@ -3174,6 +3174,62 @@
   opacity: 0; transition: opacity 0.2s; backdrop-filter: blur(6px);
   padding: 16px;
 }
+
+/* ─── Spotlight：環狀框 + 全幕變暗（環外部用 box-shadow 撐黑）─── */
+.mt-spotlight {
+  position: fixed;
+  inset: 0;
+  z-index: 12500;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.mt-spotlight.is-fading { opacity: 0; }
+.mt-spotlight-ring {
+  position: fixed;
+  border: 3px solid #ffd96f;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 9999px rgba(0,0,0,0.7),
+    0 0 24px rgba(255,217,111,0.9),
+    inset 0 0 14px rgba(255,217,111,0.35);
+  pointer-events: none;
+  animation: mt-spotlight-pulse 1.4s ease-in-out infinite;
+  transition: left 0.25s ease, top 0.25s ease, width 0.25s ease, height 0.25s ease;
+}
+@keyframes mt-spotlight-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 9999px rgba(0,0,0,0.7),
+      0 0 24px rgba(255,217,111,0.9),
+      inset 0 0 14px rgba(255,217,111,0.35);
+  }
+  50% {
+    box-shadow:
+      0 0 0 9999px rgba(0,0,0,0.75),
+      0 0 36px rgba(255,217,111,1),
+      inset 0 0 18px rgba(255,217,111,0.55);
+  }
+}
+.mt-spotlight-hint {
+  position: fixed;
+  left: 50%; top: 60px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #1a1a2e 0%, #0d1224 100%);
+  border: 2px solid #ffd96f;
+  color: #ffe680;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 10px 20px;
+  border-radius: 999px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6), 0 0 20px rgba(255,217,111,0.4);
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  z-index: 12501;
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .mt-tutorial-overlay.open { opacity: 1; }
 .mt-tutorial-card {
   background: linear-gradient(180deg, #1a1a2e 0%, #0d1224 100%);

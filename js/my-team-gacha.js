@@ -117,11 +117,13 @@
       cards.push(_clientPickCard(pool));
     }
 
-    // 存卡片 ID 到 localStorage（建隊後 _mtConsumePreviewCards 會收進球員列表）
+    // 存完整卡片資料到 localStorage（建隊後 _mtConsumePreviewCards 用 look_data 維持一致外觀）
     try {
-      const existing = JSON.parse(localStorage.getItem('mt_preview_cards') || '[]');
-      const newCardIds = cards.map(c => c.card_id);
-      localStorage.setItem('mt_preview_cards', JSON.stringify([...existing, ...newCardIds]));
+      const existing = JSON.parse(localStorage.getItem('mt_preview_cards_v2') || '[]');
+      const slim = cards.map(c => ({ card_id: c.card_id, look_data: c.look_data }));
+      localStorage.setItem('mt_preview_cards_v2', JSON.stringify([...existing, ...slim]));
+      // 清掉舊版 key（只 ID 陣列）避免衝突
+      localStorage.removeItem('mt_preview_cards');
     } catch (e) {}
 
     // 跑抽卡動畫（CTA = 引導建隊）
@@ -134,14 +136,26 @@
   }
 
   // 客戶端依稀有度權重抽 1 張卡（沒建隊時用）
+  // 對應 server-side gacha_draw 機率：N 50% / R 30% / SR 15% / SSR 5%
   function _clientPickCard(pool) {
     const roll = Math.random() * 100;
     let rarity;
     if (roll < 5) rarity = 'SSR';
-    else if (roll < 25) rarity = 'SR';
-    else rarity = 'R';
-    const candidates = pool.filter(c => c.rarity === rarity);
+    else if (roll < 20) rarity = 'SR';
+    else if (roll < 50) rarity = 'R';
+    else rarity = 'N';
+    let candidates = pool.filter(c => c.rarity === rarity);
+    // N 卡如果池子沒 seed 退到 R
+    if (!candidates.length && rarity === 'N') {
+      rarity = 'R';
+      candidates = pool.filter(c => c.rarity === rarity);
+    }
     const card = candidates[Math.floor(Math.random() * candidates.length)];
+    // look_data：SSR 用卡池既有形象、其他用 LPC 隨機生（跟 server-side 行為一致）
+    let look_data = card.look_data;
+    if (!(card.rarity === 'SSR' && card.look_data) && window.LPC_SSR_LOOKS?.generateRandomLook) {
+      look_data = window.LPC_SSR_LOOKS.generateRandomLook(Date.now() + Math.random() * 1e9);
+    }
     return {
       card_id:      card.card_id,
       rarity:       card.rarity,
@@ -156,28 +170,38 @@
       aura:         card.base_aura,
       talent:       card.talent,
       illustration: card.illustration,
+      look_data,
       is_duplicate: false,
       forced_ssr:   false,
     };
   }
 
   // 公開：建隊完成後 modal 呼叫 → 把 preview 卡收進 team_player
+  // v2: 用 mt_preview_cards_v2（含 look_data 維持預覽 / 收下的外觀一致）
   window._mtConsumePreviewCards = async function () {
-    let cardIds = [];
-    try { cardIds = JSON.parse(localStorage.getItem('mt_preview_cards') || '[]'); }
-    catch (e) {}
-    if (!cardIds.length) return 0;
-    try { localStorage.removeItem('mt_preview_cards'); } catch (e) {}
+    let saved = [];
+    try {
+      saved = JSON.parse(localStorage.getItem('mt_preview_cards_v2')
+        || localStorage.getItem('mt_preview_cards') || '[]');
+      // 舊版本是 string ID 陣列、新版本是 {card_id, look_data} 陣列、容錯
+      saved = saved.map(x => (typeof x === 'string' ? { card_id: x } : x));
+    } catch (e) {}
+    if (!saved.length) return 0;
+    try {
+      localStorage.removeItem('mt_preview_cards_v2');
+      localStorage.removeItem('mt_preview_cards');
+    } catch (e) {}
+
+    const cardIds = saved.map(s => s.card_id);
+    const lookMap = new Map(saved.map(s => [s.card_id, s.look_data]));
 
     const uid = (typeof currentUser !== 'undefined' && currentUser) ? currentUser.id : null;
     if (!uid) return 0;
 
-    // 拿這幾張卡的完整資料
     const { data: cards, error: pErr } = await window.DB
       .from('player_card_pool').select('*').in('card_id', cardIds);
     if (pErr || !cards || !cards.length) return 0;
 
-    // 已擁有的不重複 insert（同卡 bond++）
     const { data: existing } = await window.DB
       .from('team_player').select('id, card_id, bond')
       .eq('team_user_id', uid)
@@ -193,6 +217,7 @@
       if (ex) {
         if (ex.bond < 5) bondUpdates.push(ex);
       } else {
+        const look = lookMap.get(cardId) || card.look_data || null;
         newInserts.push({
           team_user_id: uid,
           card_id: card.card_id,
@@ -202,6 +227,7 @@
           current_midfield: card.base_midfield,
           current_stamina: card.base_stamina,
           current_aura: card.base_aura,
+          look_data: look,
         });
       }
     }
@@ -724,7 +750,7 @@
     const talent = card.talent ? `<div class="mt-gacha-talent">${talentMap[card.talent] || card.talent}</div>` : '';
     const dup = card.is_duplicate ? '<div class="mt-gacha-dup">重複 → ★+1</div>' : '';
     const force = card.forced_ssr ? '<div class="mt-gacha-pity">🎊 保底必中！</div>' : '';
-    const stars = ({ R: '★', SR: '★★', SSR: '★★★' })[card.rarity];
+    const stars = ({ N: '', R: '★', SR: '★★', SSR: '★★★' })[card.rarity] || '';
 
     const portraitImgId = `gacha-portrait-${card.card_id}-${Math.random().toString(36).slice(2,8)}`;
     el.innerHTML = `
