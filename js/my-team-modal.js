@@ -786,9 +786,9 @@
                 <div class="mt-home-clubhouse-window-cross"></div>
               </div>
               ${(team?.stadium_level || 1) >= 3 ? `
-                <!-- Lv 3+：兩側看台（含階梯 + 球迷依 tier 隨機排）-->
-                <div class="mt-home-stand mt-home-stand-l">${_renderStandFans(stadiumTeamColor, stadiumLv)}</div>
-                <div class="mt-home-stand mt-home-stand-r">${_renderStandFans(stadiumTeamColor, stadiumLv)}</div>
+                <!-- Lv 3+：兩側看台（球迷在主 fans loop 中分配進來）-->
+                <div class="mt-home-stand mt-home-stand-l"><div class="mt-home-stand-fans"></div></div>
+                <div class="mt-home-stand mt-home-stand-r"><div class="mt-home-stand-fans"></div></div>
               ` : ''}
               ${(team?.stadium_level || 1) >= 5 ? `
                 <!-- Lv 5+：聚光燈 -->
@@ -801,8 +801,8 @@
                 <div class="mt-home-flag mt-home-flag-r"></div>
               ` : ''}
               ${stadiumLv >= 5 ? `
-                <!-- Lv 5+ 多樓層分隔線 (overlay on clubhouse) -->
-                <div class="mt-home-floors" data-floors="${stadiumLv <= 6 ? 2 : (stadiumLv <= 8 ? 3 : 4)}"></div>
+                <!-- Lv 5-6: 2 樓、Lv 7-10: 3 樓（樓層數上限 3、再高就靠建築尺寸大不是樓多）-->
+                <div class="mt-home-floors" data-floors="${stadiumLv <= 6 ? 2 : 3}"></div>
               ` : ''}
             </div>
             <div class="mt-home-tree mt-home-tree-r"></div>
@@ -850,27 +850,18 @@
       };
       // 臉部表情 SVG fragment（眼睛 + 張嘴歡呼）— 共用於所有類型
       const face = (skin, headCy = 4) => `
-        <!-- 眼睛 -->
         <circle cx="5"   cy="${headCy - 0.2}" r="0.35" fill="#1a1a2e"/>
         <circle cx="7"   cy="${headCy - 0.2}" r="0.35" fill="#1a1a2e"/>
-        <!-- 嘴巴（張嘴歡呼）-->
         <ellipse cx="6" cy="${headCy + 1.1}" rx="0.7" ry="0.5" fill="#5a1010"/>`;
 
-      const fragments = [];
-      for (let i = 0; i < fanCount; i++) {
+      // chibi svg 共用 builder
+      const buildChibi = (i) => {
         const type = i % 3;
-        // 位置加 jitter（不再 i*91%90 的死板數列）
-        const x = 3 + ((i * 7 + rand(i, 89)) % 92);
-        // 動畫 variant（3 種）+ random delay
-        const variant = (rand(i + 1, 3)) + 1;
-        const delay = (rand(i + 3, 100) / 25).toFixed(2);    // 0~4s
         const skin = SKIN[rand(i + 5, SKIN.length)];
         const pants = PANTS[rand(i + 7, PANTS.length)];
         const scarf = SCARF[rand(i + 11, SCARF.length)];
-        let svg = '';
         if (type === 0) {
-          // 舉手歡呼
-          svg = `<svg viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
+          return `<svg viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
             <circle cx="6" cy="4" r="2.6" fill="${skin}" stroke="#1a1a2e" stroke-width="0.6"/>
             ${face(skin)}
             <rect x="3.6" y="6.5" width="4.8" height="6" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.6"/>
@@ -879,34 +870,62 @@
             <rect x="2.5" y="2"  width="1.5" height="5" fill="${skin}" stroke="#1a1a2e" stroke-width="0.4" transform="rotate(-25 3.25 4.5)"/>
             <rect x="8"   y="2"  width="1.5" height="5" fill="${skin}" stroke="#1a1a2e" stroke-width="0.4" transform="rotate( 25 8.75 4.5)"/>
           </svg>`;
-        } else if (type === 1) {
-          // 揮旗
-          svg = `<svg viewBox="0 0 14 18" xmlns="http://www.w3.org/2000/svg">
+        }
+        if (type === 1) {
+          return `<svg viewBox="0 0 14 18" xmlns="http://www.w3.org/2000/svg">
             <circle cx="6" cy="4" r="2.6" fill="${skin}" stroke="#1a1a2e" stroke-width="0.6"/>
             ${face(skin)}
             <rect x="3.6" y="6.5" width="4.8" height="6" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.6"/>
             <rect x="3" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
             <rect x="7" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
-            <!-- 旗桿 + 旗 -->
             <line x1="9" y1="2" x2="9" y2="10" stroke="#6d4c2a" stroke-width="0.7"/>
             <polygon points="9,2 13,3.5 9,5.5" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.4"/>
           </svg>`;
-        } else {
-          // 戴圍巾
-          svg = `<svg viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="6" cy="4" r="2.6" fill="${skin}" stroke="#1a1a2e" stroke-width="0.6"/>
-            ${face(skin)}
-            <rect x="3.6" y="6.5" width="4.8" height="6" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.6"/>
-            <rect x="3" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
-            <rect x="7" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
-            <!-- 圍巾（顏色隨機）-->
-            <rect x="2.6" y="6.4" width="6.8" height="1.8" fill="${scarf}" stroke="#1a1a2e" stroke-width="0.4"/>
-            <rect x="2" y="8" width="1.4" height="3.5" fill="${scarf}" stroke="#1a1a2e" stroke-width="0.4"/>
-          </svg>`;
         }
-        fragments.push(`<span class="mt-home-fan fan-v${variant}" style="left:${x}%; animation-delay:${delay}s">${svg}</span>`);
+        return `<svg viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="6" cy="4" r="2.6" fill="${skin}" stroke="#1a1a2e" stroke-width="0.6"/>
+          ${face(skin)}
+          <rect x="3.6" y="6.5" width="4.8" height="6" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.6"/>
+          <rect x="3" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
+          <rect x="7" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
+          <rect x="2.6" y="6.4" width="6.8" height="1.8" fill="${scarf}" stroke="#1a1a2e" stroke-width="0.4"/>
+          <rect x="2" y="8" width="1.4" height="3.5" fill="${scarf}" stroke="#1a1a2e" stroke-width="0.4"/>
+        </svg>`;
+      };
+
+      const hasStands = stadiumLv >= 3;
+      const tierCount = stadiumLv >= 6 ? 5 : 3;
+      // 分配比例：有看台時 60% 上看台、40% 地平線；無看台時全在地平線
+      const groundFrags = [];
+      const standLFrags = [];
+      const standRFrags = [];
+
+      for (let i = 0; i < fanCount; i++) {
+        const variant = (rand(i + 1, 3)) + 1;
+        const delay = (rand(i + 3, 100) / 25).toFixed(2);
+        const svg = buildChibi(i);
+
+        if (hasStands && rand(i + 13, 10) < 6) {
+          // 上看台：左右、tier、左右 % 隨機
+          const side = rand(i + 17, 2);   // 0=左、1=右
+          const tier = rand(i + 19, tierCount);
+          const leftPct = 8 + rand(i + 23, 84);  // 8-92% 看台寬內
+          const frag = `<span class="mt-home-fan mt-home-fan-on-stand fan-v${variant}" style="--tier:${tier};left:${leftPct}%;animation-delay:${delay}s">${svg}</span>`;
+          (side === 0 ? standLFrags : standRFrags).push(frag);
+        } else {
+          // 地平線
+          const x = 3 + ((i * 7 + rand(i, 89)) % 92);
+          groundFrags.push(`<span class="mt-home-fan fan-v${variant}" style="left:${x}%;animation-delay:${delay}s">${svg}</span>`);
+        }
       }
-      fansEl.innerHTML = fragments.join('');
+      fansEl.innerHTML = groundFrags.join('');
+      // 注入看台球迷到對應 stand 內的 .mt-home-stand-fans
+      if (hasStands) {
+        const standL = content.querySelector('.mt-home-stand-l .mt-home-stand-fans');
+        const standR = content.querySelector('.mt-home-stand-r .mt-home-stand-fans');
+        if (standL) standL.innerHTML = standLFrags.join('');
+        if (standR) standR.innerHTML = standRFrags.join('');
+      }
     }
 
     // 預生每位 starter 的 LPC 全身 sprite sheet
@@ -3299,17 +3318,18 @@
     const lv = Math.max(1, Math.min(10, level));
     // 每級 building shape config（5 階段視覺進化）
     // w/h: 建築寬高、floors: 樓層數、roof: gable/hipped/flat/pyramid/stepped/dome
+    // 樓層上限 3、高等級靠建築尺寸大不是樓多
     const SHAPE = {
       1:  { w: 36, h: 22, floors: 1, roof: 'gable',   roofH: 12 },
       2:  { w: 42, h: 24, floors: 1, roof: 'gable',   roofH: 13 },
       3:  { w: 50, h: 28, floors: 1, roof: 'hipped',  roofH: 12 },
       4:  { w: 54, h: 30, floors: 1, roof: 'hipped',  roofH: 12 },
-      5:  { w: 56, h: 36, floors: 2, roof: 'hipped',  roofH: 10 },
-      6:  { w: 58, h: 40, floors: 2, roof: 'flat',    roofH: 4  },
-      7:  { w: 60, h: 46, floors: 3, roof: 'pyramid', roofH: 16 },
-      8:  { w: 64, h: 50, floors: 3, roof: 'stepped', roofH: 14 },
-      9:  { w: 64, h: 56, floors: 4, roof: 'pyramid', roofH: 18 },
-      10: { w: 72, h: 58, floors: 4, roof: 'dome',    roofH: 18 },
+      5:  { w: 60, h: 36, floors: 2, roof: 'hipped',  roofH: 10 },
+      6:  { w: 64, h: 40, floors: 2, roof: 'flat',    roofH: 4  },
+      7:  { w: 70, h: 46, floors: 3, roof: 'pyramid', roofH: 14 },
+      8:  { w: 76, h: 50, floors: 3, roof: 'stepped', roofH: 14 },
+      9:  { w: 82, h: 54, floors: 3, roof: 'pyramid', roofH: 18 },
+      10: { w: 90, h: 58, floors: 3, roof: 'dome',    roofH: 18 },
     }[lv];
     const baseY = 86;   // 建築底邊 y（地面）
     const bx = (200 - SHAPE.w) / 2;

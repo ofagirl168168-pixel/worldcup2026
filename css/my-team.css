@@ -3995,12 +3995,14 @@
   pointer-events: none;
 }
 .mt-home-grass-decor svg { width: 100%; height: 100%; display: block; }
-.mt-home-grass-decor.is-bush     { width: 36px; height: 28px; bottom: 6%; }
-.mt-home-grass-decor.is-lamp     { width: 18px; height: 60px; bottom: 8%; }
-.mt-home-grass-decor.is-bench    { width: 48px; height: 22px; bottom: 5%; }
-.mt-home-grass-decor.is-tree     { width: 50px; height: 70px; bottom: 6%; }
-.mt-home-grass-decor.is-statue   { width: 28px; height: 56px; bottom: 8%; }
-.mt-home-grass-decor.is-podium   { width: 60px; height: 16px; bottom: 4%; filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
+/* 草地裝飾尺寸 — 對齊球員 sprite 高度（球員 ~22x45px）
+   燈、樹比球員高才會合理（球員走在前景、樹/燈在背景但更突出）*/
+.mt-home-grass-decor.is-bush     { width: 50px; height: 38px; bottom: 6%;  }
+.mt-home-grass-decor.is-lamp     { width: 24px; height: 90px; bottom: 8%;  }
+.mt-home-grass-decor.is-bench    { width: 64px; height: 28px; bottom: 5%;  }
+.mt-home-grass-decor.is-tree     { width: 70px; height: 110px; bottom: 6%; }
+.mt-home-grass-decor.is-statue   { width: 36px; height: 76px; bottom: 8%;  }
+.mt-home-grass-decor.is-podium   { width: 80px; height: 22px; bottom: 4%; filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
 
 /* 多樓層分隔線（疊在 clubhouse 上的透明 overlay div .mt-home-floors）*/
 .mt-home-floors {
@@ -4025,17 +4027,17 @@
     linear-gradient(180deg, transparent calc(75% - 0.5px), rgba(0,0,0,0.45) calc(75% - 0.5px) calc(75% + 0.5px), transparent calc(75% + 0.5px));
 }
 
-/* clubhouse 高度依等級（建築實際 grow）— 1 樓 →  4 樓 視覺差距明顯 */
-.mt-home-distance[data-stadium-level="1"]  .mt-home-clubhouse { height: 80px; }
-.mt-home-distance[data-stadium-level="2"]  .mt-home-clubhouse { height: 90px; }
+/* clubhouse 高度依等級（樓層上限 3、高等級靠建築變寬不是堆樓） */
+.mt-home-distance[data-stadium-level="1"]  .mt-home-clubhouse { height: 80px;  }
+.mt-home-distance[data-stadium-level="2"]  .mt-home-clubhouse { height: 90px;  }
 .mt-home-distance[data-stadium-level="3"]  .mt-home-clubhouse { height: 100px; }
 .mt-home-distance[data-stadium-level="4"]  .mt-home-clubhouse { height: 110px; }
-.mt-home-distance[data-stadium-level="5"]  .mt-home-clubhouse { height: 135px; }
-.mt-home-distance[data-stadium-level="6"]  .mt-home-clubhouse { height: 150px; }
-.mt-home-distance[data-stadium-level="7"]  .mt-home-clubhouse { height: 175px; }
-.mt-home-distance[data-stadium-level="8"]  .mt-home-clubhouse { height: 190px; }
-.mt-home-distance[data-stadium-level="9"]  .mt-home-clubhouse { height: 210px; }
-.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse { height: 230px; }
+.mt-home-distance[data-stadium-level="5"]  .mt-home-clubhouse { height: 130px; }
+.mt-home-distance[data-stadium-level="6"]  .mt-home-clubhouse { height: 145px; }
+.mt-home-distance[data-stadium-level="7"]  .mt-home-clubhouse { height: 165px; max-width: 320px; }
+.mt-home-distance[data-stadium-level="8"]  .mt-home-clubhouse { height: 175px; max-width: 340px; }
+.mt-home-distance[data-stadium-level="9"]  .mt-home-clubhouse { height: 185px; max-width: 360px; }
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse { height: 195px; max-width: 380px; }
 .mt-home-distance[data-stadium-level="10"] {
   animation: mt-stadium-rainbow 6s linear infinite;
 }
@@ -4224,23 +4226,21 @@
 .mt-home-distance[data-stadium-level="9"]  .mt-home-stand-r,
 .mt-home-distance[data-stadium-level="10"] .mt-home-stand-r { right: -102px; }
 
-/* 看台上的球迷：依 --tier 階梯位置疊 + left 隨機水平位置 */
+/* 看台上的球迷容器：球迷用 .mt-home-fan.mt-home-fan-on-stand 變體（同 chibi 縮小） */
 .mt-home-stand-fans {
   position: absolute;
   inset: 12px 2px 0 2px;     /* 留頂部彩條 + 扶手 + 兩側邊框 */
   pointer-events: none;
   overflow: hidden;
 }
-.mt-home-stand-fan {
-  position: absolute;
-  width: 8px;
-  height: 12px;
-  /* tier 0 = 最下排（地平線階梯）、tier 1, 2... = 越來越高
-     每階高 14px 對應 background repeating-linear-gradient */
+/* 看台球迷：用同一套 .mt-home-fan chibi、縮 50% 才裝得進 14px 一階 */
+.mt-home-fan.mt-home-fan-on-stand {
+  width: 16px;
+  height: 24px;
   bottom: calc(var(--tier, 0) * 14px + 2px);
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
+  transform: translateX(-50%) scale(0.7);
+  transform-origin: bottom center;
 }
-.mt-home-stand-fan svg { width: 100%; height: 100%; display: block; }
 
 /* 聚光燈：base 從地平線（clubhouse bottom）開始往上長、最頂端是燈具 */
 .mt-home-floodlight {
