@@ -163,21 +163,41 @@
       target.disabled = false;
       target.dataset.starterTutorial = '1';
 
-      // Spotlight overlay
+      // Spotlight overlay（共用 _attachSpotlight 但這裡需要攔截而不只是 listen click、所以自己組）
       const overlay = document.createElement('div');
       overlay.className = 'mt-spotlight';
       overlay.innerHTML = `
         <div class="mt-spotlight-ring" id="mt-spotlight-ring"></div>
-        <div class="mt-spotlight-hint">👉 點這裡 10 連抽 — 第一發我們幫你出！</div>
+        <div class="mt-spotlight-hint" id="mt-spotlight-hint">
+          <span class="mt-spotlight-hint-text">點這裡 10 連抽 — 第一發免費！</span>
+          <span class="mt-spotlight-hint-arrow"></span>
+        </div>
       `;
       document.body.appendChild(overlay);
       const ring = overlay.querySelector('#mt-spotlight-ring');
+      const hintEl = overlay.querySelector('#mt-spotlight-hint');
+      const hintArrow = overlay.querySelector('.mt-spotlight-hint-arrow');
       const reposition = () => {
         const r = target.getBoundingClientRect();
         ring.style.left   = (r.left - 6) + 'px';
         ring.style.top    = (r.top - 6) + 'px';
         ring.style.width  = (r.width + 12) + 'px';
         ring.style.height = (r.height + 12) + 'px';
+        // hint 跟著 button、上下方向自動
+        const vh = window.innerHeight;
+        const placeAbove = (r.top + r.height / 2) > vh / 2;
+        const gap = 18;
+        if (placeAbove) {
+          hintEl.style.transform = 'translate(-50%, -100%)';
+          hintEl.style.top  = (r.top - gap) + 'px';
+          hintArrow.textContent = '👇';
+        } else {
+          hintEl.style.transform = 'translate(-50%, 0)';
+          hintEl.style.top  = (r.bottom + gap) + 'px';
+          hintArrow.textContent = '👆';
+        }
+        const cx = r.left + r.width / 2;
+        hintEl.style.left = Math.max(140, Math.min(window.innerWidth - 140, cx)) + 'px';
       };
       reposition();
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -285,9 +305,9 @@
     t.querySelector('.mt-starter-primary').addEventListener('click', async () => {
       close();
       if (action === 'coach') {
-        // 等所有教練相關 modal 都關掉（ritual 圓 + draw result）
-        _spotlightTab('coach', '.mt-coach-draw-1', '👉 點這裡抽你的第一位教練！', () =>
-          _waitForAllClosed(['.coach-ritual-overlay', '.mt-coach-draw-result-overlay', '.mt-claim-result-overlay'], 180000)
+        // 等所有教練相關 modal 都關掉（ritual 圓 + 新教練加入 result modal）
+        _spotlightTab('coach', '.mt-coach-draw-1', '點這裡抽你的第一位教練', () =>
+          _waitForAllClosed(['.coach-ritual-overlay', '.mt-coach-result-overlay'], 180000)
             .then(() => setTimeout(() => _showStarterCompleteToast(0), 600)));
       } else if (action === 'train') {
         // 訓練：點集訓升等 → picker → 結果 modal
@@ -324,10 +344,17 @@
     overlay.className = 'mt-spotlight';
     overlay.innerHTML = `
       <div class="mt-spotlight-ring" id="mt-spotlight-ring"></div>
-      <div class="mt-spotlight-hint">${escapeHtml(hint)}</div>
+      <div class="mt-spotlight-hint" id="mt-spotlight-hint">
+        <span class="mt-spotlight-hint-text"></span>
+        <span class="mt-spotlight-hint-arrow"></span>
+      </div>
     `;
     document.body.appendChild(overlay);
-    const ring = overlay.querySelector('#mt-spotlight-ring');
+    const ring  = overlay.querySelector('#mt-spotlight-ring');
+    const hintEl = overlay.querySelector('#mt-spotlight-hint');
+    const hintText = overlay.querySelector('.mt-spotlight-hint-text');
+    const hintArrow = overlay.querySelector('.mt-spotlight-hint-arrow');
+    hintText.textContent = hint;
 
     const reposition = () => {
       const r = target.getBoundingClientRect();
@@ -335,6 +362,31 @@
       ring.style.top    = (r.top - 6) + 'px';
       ring.style.width  = (r.width + 12) + 'px';
       ring.style.height = (r.height + 12) + 'px';
+
+      // 計算 hint 位置：button 在下半部 → hint 放上方（指下）；button 在上半部 → hint 放下方（指上）
+      const vh = window.innerHeight;
+      const placeAbove = (r.top + r.height / 2) > vh / 2;
+      // 為了不擋到 ring，hint 上下留 16-24px gap
+      const gap = 18;
+      let hintTop;
+      if (placeAbove) {
+        hintTop = r.top - gap;
+        hintEl.classList.add('point-down');
+        hintEl.classList.remove('point-up');
+        hintArrow.textContent = '👇';
+        hintEl.style.transform = 'translate(-50%, -100%)';
+      } else {
+        hintTop = r.bottom + gap;
+        hintEl.classList.add('point-up');
+        hintEl.classList.remove('point-down');
+        hintArrow.textContent = '👆';
+        hintEl.style.transform = 'translate(-50%, 0)';
+      }
+      // X 中心對齊 button 中心、但 clamp 在 viewport 內
+      const cx = r.left + r.width / 2;
+      const clampedCx = Math.max(140, Math.min(window.innerWidth - 140, cx));
+      hintEl.style.left = clampedCx + 'px';
+      hintEl.style.top  = hintTop + 'px';
     };
     reposition();
     // 自動滾到目標
