@@ -3216,24 +3216,30 @@
     return `<svg class="mt-home-clubhouse-roof" data-roof="${ROOF}" viewBox="0 0 110 32" preserveAspectRatio="none">${body}</svg>`;
   }
 
-  // 主頁訓練館窗戶 — 兩側窗（left:18% / right:18%、size 14% × 24%）
-  // Lv 1-4：1 樓、Lv 5-6：2 樓、Lv 7-10：3 樓建物但「第 3 層不放窗」（只有底下 2 樓有窗）
-  // 第 1 層位置往下移、讓窗戶離地平線更近
+  // 主頁訓練館窗戶
+  // Lv 1-4：1 樓 × 兩側各 1 個（左右 18% 各一）
+  // Lv 5+：2 樓 × 兩側各 2 個 = 兩側各 4 個（第 3 層空牆、跳過）
+  //         每側 2 column（外排 6% / 內排 24%），中間留 6% gap、不碰到
   function _renderClubhouseWindowsHtml(lv) {
     const l = Math.max(1, Math.min(10, lv || 1));
-    // tops 由低到高 → 由「第 1 層」往「第 3 層」由下排到上
-    // 第 3 層被刻意省略：Lv 7-10 只回 2 個 top（floor 1 + floor 2、跳過 floor 3）
-    // 兩排之間至少留 6% 間距（高度 24% × 兩排 = 48% + 6% gap = 54% 起算）
-    const tops =
-        l <= 4 ? [55]            // 1 樓：第 1 層 top 55%
-      : l <= 6 ? [55, 25]        // 2 樓：第1層 55、第2層 25 → 中間 6% gap
-      : [60, 30];                // 3 樓建物但只放 2 排（第 3 層空牆）→ 6% gap
+    const cells = [];
+    if (l <= 4) {
+      // 原本兩側單窗
+      cells.push({ pos: 'left:18%',  top: 55, w: 14 });
+      cells.push({ pos: 'right:18%', top: 55, w: 14 });
+    } else {
+      // Lv 5+ 兩側各 2 cols × 2 floors = 4 per side
+      const tops = l <= 6 ? [55, 25] : [60, 30];
+      for (const top of tops) {
+        cells.push({ pos: 'left:6%',   top, w: 12 });
+        cells.push({ pos: 'left:24%',  top, w: 12 });
+        cells.push({ pos: 'right:24%', top, w: 12 });
+        cells.push({ pos: 'right:6%',  top, w: 12 });
+      }
+    }
     let html = '';
-    for (let f = 0; f < tops.length; f++) {
-      const top = tops[f];
-      html += `<div class="mt-home-clubhouse-window" style="left:18%;top:${top}%">`
-            + `<div class="mt-home-clubhouse-window-cross"></div></div>`;
-      html += `<div class="mt-home-clubhouse-window" style="right:18%;top:${top}%">`
+    for (const c of cells) {
+      html += `<div class="mt-home-clubhouse-window" style="${c.pos};top:${c.top}%;width:${c.w}%">`
             + `<div class="mt-home-clubhouse-window-cross"></div></div>`;
     }
     return html;
