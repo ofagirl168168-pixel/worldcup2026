@@ -312,10 +312,10 @@
           ${options.subtitle ? `<div class="mt-gacha-banner-sub">${escapeHtml(options.subtitle)}</div>` : ''}
         </div>
         <div class="mt-gacha-flip-prompt" id="mt-gacha-flip-prompt" hidden>
-          <button class="mt-gacha-flip-btn" id="mt-gacha-flip-btn">
+          <div class="mt-gacha-flip-hint">
             <span class="mt-gacha-pack-finger">👆</span>
-            <span>${cards.length > 1 ? '點卡片翻開・下方可一鍵全翻' : '點卡片翻開'}</span>
-          </button>
+            <span>點卡片翻開</span>
+          </div>
         </div>
         ${cards.length > 1 ? `
           <button class="mt-gacha-flip-all-btn" id="mt-gacha-flip-all-btn" hidden type="button">
@@ -365,7 +365,8 @@
       const stage   = overlay.querySelector('#mt-gacha-stage');
       const beam    = overlay.querySelector('.mt-gacha-beam');
       const flipPrompt = overlay.querySelector('#mt-gacha-flip-prompt');
-      const flipBtn = overlay.querySelector('#mt-gacha-flip-btn');
+      // flipBtn 已改成純文字提示 .mt-gacha-flip-hint、不再 listen click
+      // 一鍵翻全部 由 .mt-gacha-flip-all-btn 處理
 
       // ── Stage 0：神秘 hover 互動（3D 跟隨滑鼠 + 火花粒子）──
       const pack3D = overlay.querySelector('#mt-gacha-pack-3d');
@@ -658,11 +659,7 @@
       if (flipAllBtn) {
         flipAllBtn.addEventListener('click', () => revealAll(true));
       }
-      // 保留舊 flip 按鈕（雖然 hidden、但點擊就是翻全部）
-      flipBtn.addEventListener('click', () => {
-        flipPrompt.hidden = true;
-        revealAll(true);
-      });
+      // flip-hint 改成純提示文字、不再可點擊（一鍵翻全部由 #mt-gacha-flip-all-btn 處理）
 
       async function revealAll(instant) {
         flipPrompt.hidden = true;

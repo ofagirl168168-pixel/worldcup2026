@@ -1615,25 +1615,28 @@
   50%      { transform: translateY(3px); }
 }
 
-/* ── Stage 2.5：點擊翻牌（固定螢幕底部、不被卡擠掉）── */
+/* ── Stage 2.5：點擊翻牌提示（固定螢幕底部、不被卡擠掉）──
+   改成純文字提示（不是按鈕、不閃爍）— 引導使用者去點卡片
+   「一鍵翻全部」由旁邊的 .mt-gacha-flip-all-btn 處理、不在這個提示裡提 */
 .mt-gacha-flip-prompt {
   position: fixed;
   bottom: 28px; left: 0; right: 0;
   display: flex; justify-content: center;
   z-index: 20;
-  animation: mt-pack-cta-blink 1.2s ease-in-out infinite;
+  pointer-events: none;
 }
 .mt-gacha-flip-prompt[hidden] { display: none !important; }
-.mt-gacha-flip-btn {
-  background: linear-gradient(180deg, #f0c040 0%, #e07020 100%);
-  color: #000; font-weight: 900; font-size: 16px;
-  padding: 12px 32px; border: 0; border-radius: 28px;
-  display: flex; gap: 8px; align-items: center;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 30px rgba(240,192,64,0.6);
+.mt-gacha-flip-hint {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: rgba(255,255,255,0.85);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8), 0 0 12px rgba(0,0,0,0.6);
+  padding: 8px 16px;
 }
-.mt-gacha-flip-btn:hover { transform: translateY(-2px); }
-.mt-gacha-flip-btn:active { transform: translateY(1px); }
 
 .mt-gacha-stars {
   position: absolute; inset: 0;
