@@ -3216,15 +3216,19 @@
     return `<svg class="mt-home-clubhouse-roof" data-roof="${ROOF}" viewBox="0 0 110 32" preserveAspectRatio="none">${body}</svg>`;
   }
 
-  // 主頁訓練館窗戶 — 維持原本兩側窗（left:18% / right:18%、size 14%×18%）
-  // 樓層數隨等級增加，每層 2 個一樣大小的窗
-  // Lv 1-4：1 樓；Lv 5-6：2 樓；Lv 7-10：3 樓
+  // 主頁訓練館窗戶 — 兩側窗（left:18% / right:18%、size 14% × 24%）
+  // Lv 1-4：1 樓、Lv 5-6：2 樓、Lv 7-10：3 樓建物但「第 3 層不放窗」（只有底下 2 樓有窗）
+  // 第 1 層位置往下移、讓窗戶離地平線更近
   function _renderClubhouseWindowsHtml(lv) {
     const l = Math.max(1, Math.min(10, lv || 1));
-    const floors = l <= 4 ? 1 : (l <= 6 ? 2 : 3);
-    const tops = { 1: [45], 2: [25, 55], 3: [12, 36, 60] }[floors];
+    // tops 由低到高 → 由「第 1 層」往「第 3 層」由下排到上
+    // 第 3 層被刻意省略：Lv 7-10 只回 2 個 top（floor 1 + floor 2、跳過 floor 3）
+    const tops =
+        l <= 4 ? [55]            // 1 樓：第 1 層 top 55%（往下移、避開隊牌）
+      : l <= 6 ? [56, 28]        // 2 樓：[第1層, 第2層]
+      : [60, 36];                // 3 樓建物但只放 2 排窗（第 3 層空牆）
     let html = '';
-    for (let f = 0; f < floors; f++) {
+    for (let f = 0; f < tops.length; f++) {
       const top = tops[f];
       html += `<div class="mt-home-clubhouse-window" style="left:18%;top:${top}%">`
             + `<div class="mt-home-clubhouse-window-cross"></div></div>`;

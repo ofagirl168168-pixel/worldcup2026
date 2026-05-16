@@ -4731,10 +4731,10 @@
   box-shadow: 0 0 0 1px #1a1a2e;
 }
 .mt-home-clubhouse-window {
-  position: absolute; width: 14%; height: 18%; top: 45%;
+  position: absolute; width: 14%; height: 24%; top: 55%;
   background: linear-gradient(135deg, #b0ddef 0%, #87ceeb 60%, #6fa8d6 100%);
   border: 2px solid #1a1a2e;
-  z-index: 1;   /* 在隊牌之下、roof / 看台之上一點點 */
+  z-index: 1;   /* 在隊牌之下 */
   box-sizing: border-box;
 }
 /* 窗框十字（垂直 + 水平兩條線）*/
