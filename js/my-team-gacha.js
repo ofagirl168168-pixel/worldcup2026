@@ -672,7 +672,14 @@
           if (!cardEl.classList.contains('flipped')) {
             cardEl.classList.add('flipped');
             _emitParticles(cardEl, c.rarity, instant);
-            if (!instant) _animateCounts(cardEl, c);
+            // instant 模式（一鍵翻全部）也要設能力值、不能跳過、否則卡在 0
+            if (instant) {
+              cardEl.querySelectorAll('.mt-gacha-front-stats b[data-target]').forEach(el => {
+                el.textContent = el.dataset.target;
+              });
+            } else {
+              _animateCounts(cardEl, c);
+            }
           }
           // 多抽：每張間隔連翻
           await _sleep(instant ? 0 : (c.rarity === 'SSR' ? 250 : 100));
