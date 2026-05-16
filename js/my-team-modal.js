@@ -3057,7 +3057,6 @@
   // 球場預覽 SVG generator — 依等級畫出明顯不同的迷你場景
   function _stadiumPreviewSvg(level) {
     const lv = Math.max(1, Math.min(10, level));
-    const goldRoof = lv >= 7;
     const hasStands = lv >= 3;
     const hasStone = lv >= 4;
     const hasRail = lv >= 4;
@@ -3071,9 +3070,27 @@
     const hasTallLight = lv >= 8;
     const hasClock = lv >= 9;
     const isMaxed = lv >= 10;
-
-    const roofFill = isMaxed ? '#ffd700' : (goldRoof ? '#e8c870' : '#c0392b');
-    const wallFill = isMaxed ? '#f0e0a0' : (goldRoof ? '#d8c490' : '#b08858');
+    const hasChimney = lv <= 3;
+    // 每級牆 / 屋頂顏色（跟 home tab 進化階段對應）
+    // 1-2 木造、3-4 紅磚/米磚、5-6 石造/混凝土、7-8 玻璃帷幕、9-10 鋼骨黃金
+    const wallByLv = {
+      1:'#7e5a30', 2:'#b89060', 3:'#a85040', 4:'#d4c19c',
+      5:'#d8d0bc', 6:'#e0e0e0', 7:'#3a4a65', 8:'#22293a',
+      9:'#f8efd0', 10:'#ffd700'
+    };
+    const roofByLv = {
+      1:'#5a3a1a', 2:'#8a4a2a', 3:'#c0392b', 4:'#a82e1f',
+      5:'#b04030', 6:'#5a5a5a', 7:'#f0c040', 8:'#f0c040',
+      9:'#f0c040', 10:'#ffd700'
+    };
+    const wallFill = wallByLv[lv];
+    const roofFill = roofByLv[lv];
+    // 牆面細節紋路顏色（深色比例）
+    const wallTexture = {
+      1:'#3a1f0a', 2:'#704a2a', 3:'#5e1810', 4:'#8a6840',
+      5:'#a89a80', 6:'#a8a8a8', 7:'#1a2030', 8:'#0c0e15',
+      9:'#b89060', 10:'#a87010'
+    }[lv];
 
     return `
 <svg viewBox="0 0 200 110" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
@@ -3141,12 +3158,57 @@
 
   <!-- Clubhouse base -->
   <rect x="76" y="56" width="48" height="30" fill="${wallFill}" stroke="#2a1408" stroke-width="1.2"/>
-  <!-- Brick texture -->
-  <g stroke="#7a5a3a" stroke-width="0.3" opacity="0.5">
-    <line x1="76" y1="64" x2="124" y2="64"/>
-    <line x1="76" y1="72" x2="124" y2="72"/>
-    <line x1="76" y1="80" x2="124" y2="80"/>
+  <!-- 牆面紋路（每階段不同 — 木紋 / 磚紋 / 石材 / 玻璃格 / 金屬） -->
+  <g stroke="${wallTexture}" stroke-width="0.3" opacity="${lv <= 2 || lv === 6 ? '0.55' : '0.45'}">
+    ${lv <= 2 ? `
+      <!-- 木造：純水平木紋 -->
+      <line x1="76" y1="60" x2="124" y2="60"/>
+      <line x1="76" y1="64" x2="124" y2="64"/>
+      <line x1="76" y1="68" x2="124" y2="68"/>
+      <line x1="76" y1="76" x2="124" y2="76"/>
+      <line x1="76" y1="82" x2="124" y2="82"/>
+    ` : (lv <= 4 ? `
+      <!-- 磚造：橫紋 + 直紋交錯 -->
+      <line x1="76" y1="64" x2="124" y2="64"/>
+      <line x1="76" y1="72" x2="124" y2="72"/>
+      <line x1="76" y1="80" x2="124" y2="80"/>
+      <line x1="88" y1="56" x2="88" y2="64"/>
+      <line x1="100" y1="64" x2="100" y2="72"/>
+      <line x1="112" y1="56" x2="112" y2="64"/>
+      <line x1="88" y1="72" x2="88" y2="80"/>
+      <line x1="112" y1="72" x2="112" y2="80"/>
+    ` : (lv <= 6 ? `
+      <!-- 石造/混凝土：大格子 -->
+      <line x1="76" y1="66" x2="124" y2="66"/>
+      <line x1="76" y1="76" x2="124" y2="76"/>
+      <line x1="100" y1="56" x2="100" y2="86"/>
+    ` : (lv <= 8 ? `
+      <!-- 玻璃帷幕：細格 -->
+      <line x1="76" y1="62" x2="124" y2="62"/>
+      <line x1="76" y1="68" x2="124" y2="68"/>
+      <line x1="76" y1="74" x2="124" y2="74"/>
+      <line x1="76" y1="80" x2="124" y2="80"/>
+      <line x1="86" y1="56" x2="86" y2="86"/>
+      <line x1="94" y1="56" x2="94" y2="86"/>
+      <line x1="106" y1="56" x2="106" y2="86"/>
+      <line x1="114" y1="56" x2="114" y2="86"/>
+    ` : `
+      <!-- 鋼骨/黃金：閃光斜紋 -->
+      <line x1="76" y1="62" x2="124" y2="62"/>
+      <line x1="76" y1="70" x2="124" y2="70"/>
+      <line x1="76" y1="78" x2="124" y2="78"/>
+      <line x1="90" y1="56" x2="90" y2="86"/>
+      <line x1="110" y1="56" x2="110" y2="86"/>
+    `)))}
   </g>
+  ${hasChimney ? `
+    <!-- Lv 1-3 煙囪 -->
+    <rect x="113" y="44" width="5" height="12" fill="#a04030" stroke="#2a1408" stroke-width="0.6"/>
+    <rect x="111" y="42" width="9" height="3" fill="#2a1408"/>
+    <!-- 煙霧 -->
+    <ellipse cx="116" cy="38" rx="2" ry="1.5" fill="#fff" opacity="0.7"/>
+    <ellipse cx="118" cy="33" rx="2.5" ry="2" fill="#fff" opacity="0.45"/>
+  ` : ''}
   <!-- 門 -->
   <rect x="93" y="72" width="14" height="14" fill="#5a3a2a" stroke="#2a1408" stroke-width="0.6"/>
   <circle cx="105" cy="79" r="0.5" fill="#ffd700"/>

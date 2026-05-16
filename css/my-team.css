@@ -3901,7 +3901,7 @@
   to   { transform: translate(50vw, -10px); }
 }
 .mt-home-sun {
-  position: absolute; top: 14%; right: 14%;
+  position: absolute; top: 14%; left: 14%;     /* 改左邊、避開右上角的木牌 widget */
   width: 32px; height: 32px; border-radius: 50%;
   background: radial-gradient(circle, #fff7c0 0%, #ffd866 55%, #ffaa33 100%);
   box-shadow:
@@ -4055,7 +4055,203 @@
 }
 
 /* 球場等級 → clubhouse 漸進變更 */
-.mt-home-distance[data-stadium-level="2"] .mt-home-clubhouse { max-width: 240px; }
+/* ════════════════════════════════════════════════
+   球場 10 級整體進化（牆體 / 屋頂 / 門 / 窗 / 煙囪）
+   5 階段：木造 → 紅磚 → 石造/現代 → 玻璃帷幕 → 鋼骨/黃金
+   ══════════════════════════════════════════════ */
+
+/* Lv 1：原始木造小屋 — 深棕、木紋粗糙、有煙囪 */
+.mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 12px, rgba(0,0,0,0.22) 12px 13px),
+    repeating-linear-gradient(90deg, transparent 0 40px, rgba(0,0,0,0.15) 40px 41px),
+    linear-gradient(180deg, #8a6238 0%, #6e4a26 100%);
+}
+.mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse-roof polygon {
+  fill: #5a3a1a; stroke: #2a1408; stroke-width: 2.5;
+}
+.mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse-door {
+  background: #3a2410;
+}
+.mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse-window {
+  background: linear-gradient(135deg, #5a8090 0%, #3a5060 100%);
+}
+
+/* Lv 2：木造小屋升級 — 修整過的淺棕木、屋瓦初現 */
+.mt-home-distance[data-stadium-level="2"] .mt-home-clubhouse {
+  max-width: 240px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 10px, rgba(0,0,0,0.15) 10px 11px),
+    linear-gradient(180deg, #c19a6b 0%, #a07d52 100%);
+}
+.mt-home-distance[data-stadium-level="2"] .mt-home-clubhouse-roof polygon {
+  fill: #8a4a2a; stroke: #2a1408; stroke-width: 2.5;
+}
+.mt-home-distance[data-stadium-level="2"] .mt-home-clubhouse-window {
+  background: linear-gradient(135deg, #9ec5d6 0%, #6fa8d6 100%);
+}
+
+/* Lv 3：紅磚體育館 — 磚紋清晰、紅瓦屋頂、無煙囪改加陶瓦 */
+.mt-home-distance[data-stadium-level="3"] .mt-home-clubhouse {
+  max-width: 260px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 8px, rgba(60,15,5,0.45) 8px 9px),
+    repeating-linear-gradient(90deg, transparent 0 18px, rgba(60,15,5,0.4) 18px 19px),
+    linear-gradient(180deg, #b85e4a 0%, #9a4830 100%);
+}
+.mt-home-distance[data-stadium-level="3"] .mt-home-clubhouse-roof polygon {
+  fill: #c0392b; stroke: #2a1408; stroke-width: 2.5;
+}
+.mt-home-distance[data-stadium-level="3"] .mt-home-clubhouse-roof-tiles {
+  background: repeating-linear-gradient(0deg, transparent 0 4px, rgba(0,0,0,0.3) 4px 5px);
+}
+.mt-home-distance[data-stadium-level="3"] .mt-home-clubhouse-window {
+  background: linear-gradient(135deg, #b0ddef 0%, #87ceeb 60%, #6fa8d6 100%);
+}
+
+/* Lv 4：米色磚 + 鋪石路 — 磚較精細、屋瓦更暗紅 */
+.mt-home-distance[data-stadium-level="4"] .mt-home-clubhouse {
+  max-width: 260px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 6px, rgba(100,70,40,0.3) 6px 7px),
+    repeating-linear-gradient(90deg, transparent 0 14px, rgba(100,70,40,0.25) 14px 15px),
+    linear-gradient(180deg, #e8dcc2 0%, #c5b896 100%);
+}
+.mt-home-distance[data-stadium-level="4"] .mt-home-clubhouse-roof polygon {
+  fill: #a82e1f; stroke: #2a1408; stroke-width: 2.5;
+}
+.mt-home-distance[data-stadium-level="4"] .mt-home-clubhouse-chimney {
+  display: none;  /* 進入磚造後不再有木屋煙囪 */
+}
+
+/* Lv 5：石造體育館 — 石灰白牆、紅瓦、大門柱 */
+.mt-home-distance[data-stadium-level="5"] .mt-home-clubhouse {
+  max-width: 280px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 20px, rgba(0,0,0,0.12) 20px 21px),
+    repeating-linear-gradient(90deg, transparent 0 36px, rgba(0,0,0,0.1) 36px 37px),
+    linear-gradient(180deg, #e8e0d0 0%, #c5bca8 100%);
+}
+.mt-home-distance[data-stadium-level="5"] .mt-home-clubhouse-roof polygon {
+  fill: #b04030; stroke: #2a1408; stroke-width: 2.5;
+}
+.mt-home-distance[data-stadium-level="5"] .mt-home-clubhouse-chimney { display: none; }
+.mt-home-distance[data-stadium-level="5"] .mt-home-clubhouse-door {
+  background: linear-gradient(180deg, #6a4a30 0%, #4a3520 100%);
+}
+
+/* Lv 6：現代化 — 灰白混凝土 + 玻璃感窗、平頂感 */
+.mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse {
+  max-width: 280px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 40px, rgba(0,0,0,0.06) 40px 41px),
+    linear-gradient(180deg, #f0f0f0 0%, #c8c8c8 100%);
+}
+.mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse-roof polygon {
+  fill: #5a5a5a; stroke: #2a1408; stroke-width: 2.5;
+}
+.mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse-roof-tiles {
+  background: none;       /* 現代平頂、不用瓦片紋 */
+}
+.mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse-chimney { display: none; }
+.mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse-window {
+  background: linear-gradient(135deg, #c0e8f5 0%, #7090a8 100%);
+  border-color: #2a3040;
+}
+
+/* Lv 7：玻璃帷幕 + 金色屋頂 — 深藍玻璃格、屋頂變金 */
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse {
+  max-width: 300px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 18px, rgba(255,255,255,0.12) 18px 19px),
+    repeating-linear-gradient(90deg, transparent 0 26px, rgba(255,255,255,0.1) 26px 27px),
+    linear-gradient(180deg, #4a6080 0%, #2a3a55 100%);
+}
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-roof polygon {
+  fill: #f0c040 !important; stroke: #5a4010; stroke-width: 2.5;
+}
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-roof-tiles { background: none; }
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-chimney { display: none; }
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-window {
+  background: linear-gradient(135deg, #80b8d0 0%, #4070a0 100%);
+  border-color: #ffd96f;
+}
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-door {
+  background: linear-gradient(180deg, #1a2030 0%, #0a1020 100%);
+  border-color: #ffd96f;
+}
+
+/* Lv 8：鋼骨+LED — 黑底玻璃 + 鋼框、屋頂金色發光 */
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse {
+  max-width: 300px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 14px, rgba(255,217,111,0.2) 14px 15px),
+    repeating-linear-gradient(90deg, transparent 0 22px, rgba(255,217,111,0.15) 22px 23px),
+    linear-gradient(180deg, #2a3040 0%, #1a1f30 100%);
+  box-shadow: 0 0 12px rgba(255,217,111,0.3);
+}
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-roof polygon {
+  fill: #f0c040 !important; stroke: #5a4010; stroke-width: 2.5;
+}
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-roof-tiles { background: none; }
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-chimney { display: none; }
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-window {
+  background: linear-gradient(135deg, #ffd96f 0%, #c0a040 100%);
+  border-color: #5a4010;
+}
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-door {
+  background: linear-gradient(180deg, #1a1408 0%, #0a0a04 100%);
+  border-color: #ffd96f;
+}
+
+/* Lv 9：高聳鋼骨 — 純白混凝土 + 金邊框 + 鐘塔效果（已在 ::after 加）*/
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse {
+  max-width: 320px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 22px, rgba(180,150,80,0.18) 22px 23px),
+    repeating-linear-gradient(90deg, transparent 0 32px, rgba(180,150,80,0.15) 32px 33px),
+    linear-gradient(180deg, #fdfaf0 0%, #e0d8c0 100%);
+  border-color: #b89060;
+  box-shadow: 0 0 16px rgba(255,217,111,0.4);
+}
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-roof polygon {
+  fill: #f0c040 !important; stroke: #5a4010; stroke-width: 2.5;
+}
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-roof-tiles { background: none; }
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-chimney { display: none; }
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-window {
+  background: linear-gradient(135deg, #fff5d0 0%, #f0c060 100%);
+  border-color: #b89060;
+}
+
+/* Lv 10：黃金球場 — 全金 + 發光 */
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse {
+  max-width: 320px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 18px, rgba(200,140,40,0.45) 18px 19px),
+    repeating-linear-gradient(90deg, transparent 0 28px, rgba(200,140,40,0.35) 28px 29px),
+    linear-gradient(180deg, #ffe890 0%, #d4a040 100%);
+  border-color: #6e4a08;
+  box-shadow: 0 0 24px rgba(255,215,0,0.7), inset 0 0 12px rgba(255,255,255,0.4);
+}
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-roof polygon {
+  fill: #ffd700 !important; stroke: #6e4a08; stroke-width: 2.5;
+}
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-roof-tiles {
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(180,130,0,0.5) 3px 4px);
+}
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-chimney { display: none; }
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-window {
+  background: linear-gradient(135deg, #fff0a0 0%, #ffd700 100%);
+  border-color: #6e4a08;
+}
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-door {
+  background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%);
+  border-color: #6e4a08;
+}
+
+/* 舊規則：Lv 2-10 max-width 漸增（保留兼容、新規則優先） */
+.mt-home-distance[data-stadium-level="2"] .mt-home-clubhouse-OLD { max-width: 240px; }
 .mt-home-distance[data-stadium-level="3"] .mt-home-clubhouse,
 .mt-home-distance[data-stadium-level="4"] .mt-home-clubhouse { max-width: 260px; }
 .mt-home-distance[data-stadium-level="5"] .mt-home-clubhouse,
