@@ -4789,12 +4789,12 @@
   background: var(--c, #1a3050);
   border: 1px solid #1a1a2e;
   color: #fff;
-  font-size: 6px;
+  font-size: 9px;
   font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   overflow: hidden;
   white-space: nowrap;
   text-shadow: 0 1px 0 rgba(0,0,0,0.5);
