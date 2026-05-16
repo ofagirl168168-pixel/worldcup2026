@@ -4731,22 +4731,26 @@
   box-shadow: 0 0 0 1px #1a1a2e;
 }
 .mt-home-clubhouse-window {
-  position: absolute;
-  /* 寬高 + 位置由 JS inline 設定（_renderClubhouseWindowsHtml）*/
+  position: absolute; width: 14%; height: 18%; top: 45%;
   background: linear-gradient(135deg, #b0ddef 0%, #87ceeb 60%, #6fa8d6 100%);
-  border: 1.5px solid #1a1a2e;
-  z-index: 1;   /* 在隊牌之下、roof / 看台之下 */
+  border: 2px solid #1a1a2e;
+  z-index: 1;   /* 在隊牌之下、roof / 看台之上一點點 */
   box-sizing: border-box;
 }
-/* 窗框：單一垂直中線（對齊預覽 SVG 設計）*/
+/* 窗框十字（垂直 + 水平兩條線）*/
 .mt-home-clubhouse-window-cross {
   position: absolute; inset: 0;
 }
-.mt-home-clubhouse-window-cross::before {
+.mt-home-clubhouse-window-cross::before,
+.mt-home-clubhouse-window-cross::after {
   content: ''; position: absolute;
-  left: 50%; top: 0; bottom: 0; width: 1.5px;
   background: #1a1a2e;
-  transform: translateX(-50%);
+}
+.mt-home-clubhouse-window-cross::before {
+  left: 50%; top: 0; bottom: 0; width: 2px; transform: translateX(-50%);
+}
+.mt-home-clubhouse-window-cross::after {
+  top: 50%; left: 0; right: 0; height: 2px; transform: translateY(-50%);
 }
 /* mt-home-cw-1 / mt-home-cw-2 已停用 — 窗戶改由 _renderClubhouseWindowsHtml(lv) 動態渲染、inline 設 left/top/width/height */
 

@@ -3216,35 +3216,20 @@
     return `<svg class="mt-home-clubhouse-roof" data-roof="${ROOF}" viewBox="0 0 110 32" preserveAspectRatio="none">${body}</svg>`;
   }
 
-  // 主頁訓練館窗戶 — 依等級切換 cols × floors 排列、對齊預覽 SVG 設計
-  // 預覽窗戶為直立窄長方形 (3:4)、最後一層中央留給門、Lv 7+ 改深色玻璃
+  // 主頁訓練館窗戶 — 維持原本兩側窗（left:18% / right:18%、size 14%×18%）
+  // 樓層數隨等級增加，每層 2 個一樣大小的窗
+  // Lv 1-4：1 樓；Lv 5-6：2 樓；Lv 7-10：3 樓
   function _renderClubhouseWindowsHtml(lv) {
     const l = Math.max(1, Math.min(10, lv || 1));
-    // 用 px 而非 %，讓窗戶不會被 clubhouse 比例壓扁、永遠直立
-    // tops 仍用 % 以便對齊 sign / door 區域
-    const WIN = {
-      1:  { cols: 3, tops: [40],         wPx: 18, hPx: 24 },   // 2 visible（跳過中央放門）
-      2:  { cols: 3, tops: [32],         wPx: 18, hPx: 26 },
-      3:  { cols: 4, tops: [32],         wPx: 16, hPx: 26 },
-      4:  { cols: 4, tops: [32],         wPx: 16, hPx: 28 },
-      5:  { cols: 5, tops: [22, 52],     wPx: 15, hPx: 22 },
-      6:  { cols: 5, tops: [20, 50],     wPx: 14, hPx: 22 },
-      7:  { cols: 5, tops: [14, 38, 62], wPx: 14, hPx: 18 },
-      8:  { cols: 6, tops: [12, 36, 60], wPx: 12, hPx: 18 },
-      9:  { cols: 6, tops: [10, 34, 58], wPx: 12, hPx: 18 },
-      10: { cols: 7, tops: [8, 32, 56],  wPx: 11, hPx: 18 },
-    }[l];
-    const floors = WIN.tops.length;
+    const floors = l <= 4 ? 1 : (l <= 6 ? 2 : 3);
+    const tops = { 1: [45], 2: [25, 55], 3: [12, 36, 60] }[floors];
     let html = '';
     for (let f = 0; f < floors; f++) {
-      for (let c = 0; c < WIN.cols; c++) {
-        // 最後一層中央（cols 為奇數時）留給門
-        const skipForDoor = (f === floors - 1) && (WIN.cols % 2 === 1) && (c === Math.floor(WIN.cols / 2));
-        if (skipForDoor) continue;
-        const left = ((c + 0.5) / WIN.cols) * 100;
-        html += `<div class="mt-home-clubhouse-window" style="left:${left.toFixed(2)}%;top:${WIN.tops[f]}%;width:${WIN.wPx}px;height:${WIN.hPx}px;transform:translateX(-50%);">`
-              + `<div class="mt-home-clubhouse-window-cross"></div></div>`;
-      }
+      const top = tops[f];
+      html += `<div class="mt-home-clubhouse-window" style="left:18%;top:${top}%">`
+            + `<div class="mt-home-clubhouse-window-cross"></div></div>`;
+      html += `<div class="mt-home-clubhouse-window" style="right:18%;top:${top}%">`
+            + `<div class="mt-home-clubhouse-window-cross"></div></div>`;
     }
     return html;
   }
