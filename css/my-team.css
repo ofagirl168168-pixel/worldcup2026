@@ -3900,7 +3900,7 @@
   z-index: 1;
 }
 
-/* Lv 6+：clubhouse 旁加廣告板（左右兩塊小招牌） */
+/* Lv 6+：CHAMPIONS 廣告板（搬到屋頂上方避開看台）*/
 .mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse::before,
 .mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse::before,
 .mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse::before,
@@ -3908,20 +3908,23 @@
 .mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse::before {
   content: 'CHAMPIONS';
   position: absolute;
-  bottom: -2px;
-  left: -28%;
-  width: 22%;
-  height: 14px;
+  top: -52px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 16px;
   background: linear-gradient(180deg, #1a3050 0%, #0d1830 100%);
-  border: 1px solid #ffd96f;
+  border: 1.5px solid #ffd96f;
   color: #ffd96f;
-  font-size: 7px;
+  font-size: 9px;
   font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: 0.5px;
-  border-radius: 1px;
+  letter-spacing: 1.5px;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  z-index: 5;
 }
 
 /* Lv 8+：屋頂 LED 跑馬燈（屋頂上方一條閃動的字幕） */
@@ -3940,23 +3943,19 @@
 }
 
 /* Lv 9+：clubhouse 右邊加鐘塔（::after on .mt-home-clubhouse） */
-.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse::after,
-.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse::after {
-  content: '🕰️';
+/* 鐘塔（Lv 9-10）：改在 JS 渲染為 .mt-home-clocktower 獨立 SVG element
+   定位在 clubhouse 右側、看台外側、不會被擋住 */
+.mt-home-clocktower {
   position: absolute;
   bottom: 0;
-  right: -35%;
-  width: 24%;
-  height: 80%;
-  background: linear-gradient(180deg, #d4c8b8 0%, #8a7a6a 100%);
-  border: 1.5px solid #1a1a2e;
-  border-radius: 2px 2px 0 0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 6px;
-  font-size: 18px;
-  box-shadow: inset 0 -10px 0 rgba(0,0,0,0.2);
+  width: 38px;
+  height: calc(100% + 70px);   /* 比 clubhouse 高 70px、tower 要顯眼 */
+  right: -130px;               /* 看台右側 (-102px) 再外 28px */
+  z-index: 4;
+  pointer-events: none;
+}
+.mt-home-clocktower svg {
+  width: 100%; height: 100%; display: block;
 }
 
 /* Lv 10：草地噴泉用 SVG（emoji 拔掉、JS 渲染 .mt-home-fountain 容器）+ 全場彩虹光環 */
@@ -3967,7 +3966,8 @@
   transform: translateX(-50%);
   width: 64px;
   height: 90px;
-  z-index: 4;
+  /* z = 100 + (100 - 32) = 168（同步球員 z-sort、球員走到下方時可在前）*/
+  z-index: 168;
   pointer-events: none;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.35)) drop-shadow(0 0 14px rgba(135,206,235,0.55));
   animation: mt-fountain-bob 3.2s ease-in-out infinite;
@@ -3996,13 +3996,15 @@
 }
 .mt-home-grass-decor svg { width: 100%; height: 100%; display: block; }
 /* 草地裝飾尺寸 — 對齊球員 sprite 高度（球員 ~22x45px）
-   燈、樹比球員高才會合理（球員走在前景、樹/燈在背景但更突出）*/
-.mt-home-grass-decor.is-bush     { width: 50px; height: 38px; bottom: 6%;  }
-.mt-home-grass-decor.is-lamp     { width: 24px; height: 90px; bottom: 8%;  }
-.mt-home-grass-decor.is-bench    { width: 64px; height: 28px; bottom: 5%;  }
-.mt-home-grass-decor.is-tree     { width: 70px; height: 110px; bottom: 6%; }
-.mt-home-grass-decor.is-statue   { width: 36px; height: 76px; bottom: 8%;  }
-.mt-home-grass-decor.is-podium   { width: 80px; height: 22px; bottom: 4%; filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
+   燈、樹比球員高才會合理（球員走在前景、樹/燈在背景但更突出）
+   z-index 依 bottom% (Y from bottom) 計算：z = 100 + (100 - bottomPct)
+   球員 z = 100 + round(player.y * 100)、低於物件 (y 更大) 時球員在前 */
+.mt-home-grass-decor.is-bush     { width: 50px; height: 38px;  bottom: 6%; z-index: 194; }
+.mt-home-grass-decor.is-lamp     { width: 24px; height: 90px;  bottom: 8%; z-index: 192; }
+.mt-home-grass-decor.is-bench    { width: 64px; height: 28px;  bottom: 5%; z-index: 195; }
+.mt-home-grass-decor.is-tree     { width: 70px; height: 110px; bottom: 6%; z-index: 194; }
+.mt-home-grass-decor.is-statue   { width: 36px; height: 76px;  bottom: 8%; z-index: 192; }
+.mt-home-grass-decor.is-podium   { width: 80px; height: 22px;  bottom: 4%; z-index: 196; filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
 
 /* 多樓層分隔線（疊在 clubhouse 上的透明 overlay div .mt-home-floors）*/
 .mt-home-floors {
@@ -4087,6 +4089,7 @@
   box-shadow:
     0 0 40px rgba(255,200,80,0.65),
     0 0 80px rgba(255,170,50,0.35);
+  z-index: 2;        /* 太陽在雲之上、但仍在 distance/building/decoration 之下 */
 }
 .mt-home-sun::before {
   content: '';
@@ -4126,7 +4129,7 @@
   background: #fff;
   border: 2px solid #1a1a2e;
   height: 14px;
-  z-index: 5;             /* 在太陽 (z 0) 之上 */
+  z-index: 1;             /* 雲在最背景、只比天空高、低於太陽 / 建築 / 裝飾 / 球員 */
   animation:
     mt-cloud-drift 90s linear infinite,
     mt-cloud-bob 6s ease-in-out infinite;
@@ -4169,7 +4172,7 @@
 }
 
 /* 球場等級裝飾 — 看台 / 聚光燈 / 旗桿 / 球迷 */
-/* 看台：3 層階梯（高 Lv 5 層）、深色階梯紋 + 頂部繽紛飾條
+/* 看台：3 層階梯（高 Lv 5 層）、每階白扶手 + 階梯踏面 + 前緣陰影
    寬度從 30 → 80px、視覺感才像真的看台 */
 .mt-home-stand {
   position: absolute;
@@ -4177,12 +4180,15 @@
   width: 80px;
   height: 65%;
   background:
-    /* 階梯紋路：每 14px 一階、底色交錯深淺、線條深色 */
+    /* 每階白扶手線（offset 0-1px of each 14px tier）*/
     repeating-linear-gradient(180deg,
-      #6a4a30 0 6px,
-      #4a3020 6px 7px,
-      #5a3a26 7px 13px,
-      #3a2010 13px 14px),
+      #f0e8c0 0 1.5px,
+      transparent 1.5px 14px),
+    /* 階梯紋：踏面 + 前緣陰影 + 階梯下凹 */
+    repeating-linear-gradient(180deg,
+      #6a4a30 0 11px,
+      #4a3020 11px 13px,
+      #2a1408 13px 14px),
     linear-gradient(180deg, #5a4030 0%, #3a2410 100%);
   border: 2px solid #1a1a2e;
   border-bottom: 0;
