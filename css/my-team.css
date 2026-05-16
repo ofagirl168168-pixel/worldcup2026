@@ -1924,17 +1924,18 @@
   100% { opacity: 0; transform: translate(140%, -40%) rotateZ(20deg) scale(0.85); }
 }
 
-/* 全部翻完 → grid layout 展示所有卡（cards-wrap 寬度不變、cards 內溢出可見）*/
+/* 全部翻完 → grid layout 展示所有卡（cards-wrap 寬度不變、cards 內溢出可見）
+   寬度放大到 520px → 每張卡 ~125px、頭像才看得清角色 */
 .mt-gacha-cards.all-revealed {
   position: absolute !important;
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
-  width: 420px !important;
+  width: 520px !important;
   height: auto !important;
   display: grid !important;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  gap: 8px;
   justify-items: center;
 }
 .mt-gacha-cards.all-revealed .mt-gacha-card3d {
@@ -1960,15 +1961,15 @@
   padding: 6px 4px !important;
 }
 .mt-gacha-cards.all-revealed .mt-gacha-front-portrait {
-  width: 70px !important;
-  height: 70px !important;
-  margin: 2px auto 3px !important;
+  width: 95px !important;
+  height: 95px !important;
+  margin: 3px auto 4px !important;
   border-width: 2px !important;
 }
 .mt-gacha-cards.all-revealed .mt-gacha-front-portrait-pos {
-  width: 18px !important;
-  height: 18px !important;
-  font-size: 10px !important;
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 11px !important;
 }
 .mt-gacha-cards.all-revealed .mt-gacha-front-rarity-badge { font-size: 8px !important; padding: 1px 4px !important; }
 .mt-gacha-cards.all-revealed .mt-gacha-front-stars { font-size: 9px !important; }
