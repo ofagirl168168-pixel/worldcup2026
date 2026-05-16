@@ -248,18 +248,21 @@
     }
   }
 
+  // 本地紀錄已完成的 tutorial step（DB flag 只在 special tutorial mode 才寫、RP 廣度訓練 / 一般 PvE 不會寫）
+  const _tutorialDone = new Set();
+
   async function _showStarterCompleteToast(n) {
     const team = window.MyTeam.getCached();
     // 教學鏈：先抽教練 → 訓練 → 比賽 → 結束
-    // 撈是否已聘過教練（user_coach 有資料 → 跳過教練 step）
     let hasCoach = false;
     try {
       const { count } = await window.DB.from('user_coach').select('id', { count: 'exact', head: true });
       hasCoach = (count || 0) > 0;
     } catch (e) {}
-    const needsCoachTutorial = !hasCoach;
-    const needsTrainingTutorial = team && team.tutorial_first_training_used === false;
-    const needsTutorialMatch = team && team.tutorial_match_done === false;
+    // 各 step 需要：DB flag 還沒設 AND 本地還沒標 done
+    const needsCoachTutorial    = !hasCoach && !_tutorialDone.has('coach');
+    const needsTrainingTutorial = team && team.tutorial_first_training_used === false && !_tutorialDone.has('train');
+    const needsTutorialMatch    = team && team.tutorial_match_done === false && !_tutorialDone.has('match');
 
     let title, body, primaryBtn, action;
     if (needsCoachTutorial) {
@@ -305,19 +308,42 @@
     t.querySelector('.mt-starter-primary').addEventListener('click', async () => {
       close();
       if (action === 'coach') {
-        // 等所有教練相關 modal 都關掉（ritual 圓 + 新教練加入 result modal）
-        _spotlightTab('coach', '.mt-coach-draw-1', '點這裡抽你的第一位教練', () =>
-          _waitForAllClosed(['.coach-ritual-overlay', '.mt-coach-result-overlay'], 180000)
-            .then(() => setTimeout(() => _showStarterCompleteToast(0), 600)));
+        _spotlightTab('coach', '.mt-coach-draw-1', '點這裡抽你的第一位教練', async () => {
+          await _waitForAllClosed(['.coach-ritual-overlay', '.mt-coach-result-overlay'], 180000);
+          _tutorialDone.add('coach');
+          setTimeout(() => _showStarterCompleteToast(0), 600);
+        });
       } else if (action === 'train') {
-        // 訓練：點集訓升等 → picker → 結果 modal
-        _spotlightTab('train', '[data-feed-mode="normal"]', '👉 點這裡開始訓練！', () =>
-          _waitForAllClosed(['.mt-rp-train-result', '.mt-claim-result-overlay', '.mt-train-info-modal', '.mt-profile-overlay'], 60000)
-            .then(() => setTimeout(() => _showStarterCompleteToast(0), 800)));
+        // 訓練是 3 段：集訓升等 button → picker 中選球員 → preview 確認 → result modal 關
+        _spotlightTab('train', '[data-feed-mode="normal"]', '點這裡開始 RP 訓練', async () => {
+          // 等 picker 開
+          if (!await _waitForOpen('.mt-train-picker', 30000)) {
+            _tutorialDone.add('train'); _showStarterCompleteToast(0); return;
+          }
+          await _delay(300);
+          _attachSpotlight('.mt-train-pick-rp[data-mode="normal"]', '選一位球員集訓升等', async () => {
+            // 等 preview 開
+            if (!await _waitForOpen('.mt-train-preview-overlay', 30000)) {
+              _tutorialDone.add('train'); _showStarterCompleteToast(0); return;
+            }
+            await _delay(300);
+            _attachSpotlight('.mt-train-preview-confirm', '點確認、扣 RP 開始訓練', async () => {
+              // 等所有訓練相關 modal 都關掉
+              await _waitForAllClosed(
+                ['.mt-rp-train-result', '.mt-claim-result-overlay', '.mt-train-preview-overlay', '.mt-train-picker'],
+                60000
+              );
+              _tutorialDone.add('train');
+              setTimeout(() => _showStarterCompleteToast(0), 600);
+            });
+          });
+        });
       } else if (action === 'match') {
-        _spotlightTab('match', '#mt-match-start', '👉 點這裡開始熱身賽！', () =>
-          _waitForAllClosed(['.mt-match-overlay'], 300000)
-            .then(() => setTimeout(() => _showStarterCompleteToast(0), 600)));
+        _spotlightTab('match', '#mt-match-start', '點這裡開始熱身賽', async () => {
+          await _waitForAllClosed(['.mt-match-overlay'], 300000);
+          _tutorialDone.add('match');
+          setTimeout(() => _showStarterCompleteToast(0), 600);
+        });
       } else {
         // done
       }
@@ -437,6 +463,21 @@
       tick();
     });
   }
+
+  // 等目標 selector 出現（modal 開）
+  function _waitForOpen(selector, timeoutMs) {
+    return new Promise(resolve => {
+      const start = Date.now();
+      const tick = () => {
+        if (document.querySelector(selector)) return resolve(true);
+        if (Date.now() - start > timeoutMs) return resolve(false);
+        setTimeout(tick, 200);
+      };
+      tick();
+    });
+  }
+
+  function _delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
   // ── 教練教學：跳教練 tab + 自動抽 1 教練 + 設為主教練 ──
   async function _runCoachTutorial() {
