@@ -1032,9 +1032,10 @@
     const starters = players.filter(p => p.in_starting_11 &&
       (!p.injured_until || new Date(p.injured_until) <= now));
     // 板凳：SSR → SR → R 排序、好辨識
+    // 注意用 ?? 不要用 ||  — rarityRank['SSR'] = 0 是 falsy、|| 會 fallback 變 9 排到最後
     const bench = players
       .filter(p => !p.in_starting_11 || (p.injured_until && new Date(p.injured_until) > now))
-      .sort((a, b) => (rarityRank[a.card?.rarity] || 9) - (rarityRank[b.card?.rarity] || 9));
+      .sort((a, b) => (rarityRank[a.card?.rarity] ?? 9) - (rarityRank[b.card?.rarity] ?? 9));
 
     // 解鎖的陣型：初始只 4-3-3、抽到的教練會解鎖更多
     const unlocked = await _fetchUnlockedFormations();
@@ -1179,7 +1180,8 @@
     const sorted = [...players].sort((a, b) => {
       const ga = groupRank(a), gb = groupRank(b);
       if (ga !== gb) return ga - gb;
-      return (rarityRank[a.card?.rarity] || 9) - (rarityRank[b.card?.rarity] || 9);
+      // 用 ?? 不要用 || — SSR 的 rank 是 0 (falsy) 會被 || 誤判 fallback 到 9
+      return (rarityRank[a.card?.rarity] ?? 9) - (rarityRank[b.card?.rarity] ?? 9);
     });
 
     overlay.innerHTML = `
@@ -1714,7 +1716,8 @@
       const ra = { head: -3, assist1: -2, assist2: -1 }[roleOf(a)] ?? 10;
       const rb = { head: -3, assist1: -2, assist2: -1 }[roleOf(b)] ?? 10;
       if (ra !== rb) return ra - rb;
-      return (rarityRank[a.coach?.rarity] || 9) - (rarityRank[b.coach?.rarity] || 9);
+      // 用 ?? 不要用 || — SSR rank 0 (falsy) 會被 || 誤判 fallback 到 9
+      return (rarityRank[a.coach?.rarity] ?? 9) - (rarityRank[b.coach?.rarity] ?? 9);
     });
 
     // 羈絆狀態 chip 列（小總覽：哪些派系已可組／差幾人）
