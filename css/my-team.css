@@ -1615,15 +1615,20 @@
   50%      { transform: translateY(3px); }
 }
 
-/* ── Stage 2.5：點擊翻牌提示（固定螢幕底部、不被卡擠掉）──
-   改成純文字提示（不是按鈕、不閃爍）— 引導使用者去點卡片
-   「一鍵翻全部」由旁邊的 .mt-gacha-flip-all-btn 處理、不在這個提示裡提 */
+/* ── Stage 2.5：點擊翻牌提示（緊貼卡片下方）──
+   改成純文字提示（不是按鈕、不閃爍）— 引導使用者點卡片正面
+   「一鍵翻全部」由旁邊的 .mt-gacha-flip-all-btn 處理、不在這個提示裡提
+   位置改成跟著 viewport 中心（卡片位置）+ 偏下 170px、貼在卡片下沿
+   不再在螢幕最底端、避免使用者誤以為在指底部按鈕 */
 .mt-gacha-flip-prompt {
   position: fixed;
-  bottom: 28px; left: 0; right: 0;
+  top: calc(50% + 170px);
+  left: 50%;
+  transform: translateX(-50%);
   display: flex; justify-content: center;
   z-index: 20;
   pointer-events: none;
+  white-space: nowrap;
 }
 .mt-gacha-flip-prompt[hidden] { display: none !important; }
 .mt-gacha-flip-hint {
