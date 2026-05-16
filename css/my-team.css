@@ -769,6 +769,29 @@
 }
 .mt-settings-action-btn:active:not(:disabled) { transform: translateY(0); }
 .mt-settings-action-btn:disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(0.4); }
+
+/* 開發測試 danger zone */
+.mt-settings-danger-zone {
+  margin-top: 24px;
+  border: 1.5px dashed rgba(255,120,120,0.5);
+  border-radius: 10px;
+  padding: 12px;
+  background: rgba(40,15,15,0.3);
+}
+.mt-settings-dev-btn {
+  width: 100%;
+  background: linear-gradient(180deg, #c2453a 0%, #7a2520 100%);
+  border-color: #6a1c18;
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 6px;
+}
+.mt-settings-dev-btn:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(255,80,60,0.6);
+}
 .mt-settings-save-btn {
   margin-top: 16px;
   /* 黏在最底部更明顯 */

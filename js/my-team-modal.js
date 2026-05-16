@@ -3891,6 +3891,14 @@
         </div>
 
         <button class="mt-settings-action-btn mt-settings-save-btn" id="mt-settings-save">💾 儲存隊名 / 球衣 / 隊徽</button>
+
+        <!-- 開發測試：重跑新手指引（清隊伍、重置 flag、重抽新手包）-->
+        <div class="mt-settings-section mt-settings-danger-zone">
+          <div class="mt-settings-title">🧪 開發測試</div>
+          <button class="mt-settings-action-btn mt-settings-dev-btn" id="mt-settings-reset-starter">
+            ♻️ 重跑新手指引（會清空所有球員）
+          </button>
+        </div>
       </div>
     `;
 
@@ -3948,6 +3956,26 @@
         renderTab();
       } catch (e) {
         alert('儲存失敗：' + (e.message || e));
+      }
+    });
+
+    // 開發測試：重跑新手指引
+    content.querySelector('#mt-settings-reset-starter')?.addEventListener('click', async () => {
+      if (!confirm('⚠️ 將清空所有球員、重置新手指引 flag、重抽新手包。確定要重跑？')) return;
+      const btn = content.querySelector('#mt-settings-reset-starter');
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '處理中…';
+      try {
+        const { error } = await window.DB.rpc('dev_reset_starter_pack');
+        if (error) throw error;
+        await window.MyTeam.refresh?.();
+        if (typeof showToast === 'function') showToast('♻️ 已重跑新手指引、重新抽到 10 張球員');
+        renderTab();
+      } catch (e) {
+        alert('重跑失敗：' + (e.message || e));
+        btn.disabled = false;
+        btn.textContent = orig;
       }
     });
   }
