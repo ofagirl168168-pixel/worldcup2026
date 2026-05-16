@@ -3342,6 +3342,10 @@
           </button>
           <div class="mt-stadium-up-hint">下一級新增：<b>${escapeHtml(nextLabel)}</b></div>
         `}
+
+        <button class="mt-stadium-preview-all-link" id="mt-stadium-preview-all" type="button">
+          🔍 預覽所有等級 ▸
+        </button>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -3373,6 +3377,73 @@
         }
       });
     }
+
+    // 「預覽所有等級」連結 → 開 10 級 gallery
+    overlay.querySelector('#mt-stadium-preview-all')?.addEventListener('click', () => {
+      _openStadiumGallery(team, () => {
+        close();
+        if (typeof onSuccess === 'function') onSuccess();
+      });
+    });
+  }
+
+  // ─────────── 球場 10 級預覽 gallery（從升級 modal 點開）─────────
+  function _openStadiumGallery(team, onPickLevel) {
+    const currentLv = team?.stadium_level || 1;
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-stadium-gallery-overlay';
+    overlay.innerHTML = `
+      <div class="mt-stadium-gallery-card">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <div class="mt-stadium-gallery-title">🏟️ 球場 10 級預覽</div>
+        <div class="mt-stadium-gallery-hint">點任一格 → 切換到該等級看實際主頁</div>
+        <div class="mt-stadium-gallery-grid">
+          ${[1,2,3,4,5,6,7,8,9,10].map(lv => `
+            <button class="mt-stadium-gallery-item ${lv === currentLv ? 'is-current' : ''}" type="button" data-lv="${lv}">
+              <div class="mt-stadium-gallery-preview">${_stadiumPreviewSvg(lv)}</div>
+              <div class="mt-stadium-gallery-row">
+                <span class="mt-stadium-gallery-lv">Lv. ${lv}</span>
+                ${lv === currentLv ? '<span class="mt-stadium-gallery-now">目前</span>' : ''}
+              </div>
+              <div class="mt-stadium-gallery-label">${escapeHtml(STADIUM_TIER_LABEL[lv])}</div>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    const closeIt = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    };
+    overlay.querySelector('.mt-profile-close').addEventListener('click', closeIt);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeIt(); });
+
+    overlay.querySelectorAll('[data-lv]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const targetLv = parseInt(btn.dataset.lv, 10);
+        if (!window.DB || typeof currentUser === 'undefined' || !currentUser) {
+          alert('沒登入');
+          return;
+        }
+        btn.disabled = true;
+        try {
+          const { error } = await window.DB
+            .from('my_team')
+            .update({ stadium_level: targetLv })
+            .eq('user_id', currentUser.id);
+          if (error) throw error;
+          if (window.MyTeam?.refresh) await window.MyTeam.refresh();
+          closeIt();
+          if (typeof onPickLevel === 'function') onPickLevel(targetLv);
+          if (typeof showToast === 'function') showToast(`🏟️ 已切到 Lv. ${targetLv}`);
+        } catch (e) {
+          alert('切換失敗：' + (e.message || e));
+          btn.disabled = false;
+        }
+      });
+    });
   }
 
   // ─────────── 設定 tab：Kit + 隊徽 + 球場 + 陣型 ───────────────────────
