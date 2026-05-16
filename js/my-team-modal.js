@@ -4349,9 +4349,11 @@
     const oppIsReal = !!nextOpp?._isReal;
 
     content.innerHTML = `
-      <div class="mt-match-map">
+      <div class="mt-match-map" data-tier="${tier}">
+        <!-- 開發測試：跳關預覽（每次點 +1 / 到 10 後回 1） -->
+        <button class="mt-match-test-tier" id="mt-match-test-tier" type="button" title="開發測試：跳 Tier 預覽">🧪 跳到 Tier ${(tier % 10) + 1}</button>
         <!-- 頂部：主角踢球 2D 卷軸動畫 + tier 標題 -->
-        <div class="mt-match-banner">
+        <div class="mt-match-banner" data-tier="${tier}">
           <div class="mt-match-banner-scroll">
             <div class="mt-match-banner-clouds">
               <span class="mt-match-cloud c1"></span>
@@ -4452,7 +4454,7 @@
         </div>
 
         <!-- 闖關路線（可滾、自動聚焦當前關） -->
-        <div class="mt-match-path-wrap" id="mt-match-path-wrap">
+        <div class="mt-match-path-wrap" id="mt-match-path-wrap" data-tier="${tier}">
           <div class="mt-match-path">
             <svg class="mt-match-path-line" viewBox="0 0 300 480" preserveAspectRatio="none" aria-hidden="true">
               <path d="M 150 456
@@ -4517,6 +4519,20 @@
     content.querySelector('#mt-match-start')?.addEventListener('click', () => {
       if (typeof window.MyTeam.runMatch === 'function') {
         window.MyTeam.runMatch();
+      }
+    });
+
+    // 開發測試：跳到下一個 Tier（1→2→…→10→1 循環）→ 重新 render
+    content.querySelector('#mt-match-test-tier')?.addEventListener('click', async () => {
+      const nextTier = (tier % 10) + 1;
+      try {
+        await window.DB.from('league_progress')
+          .update({ current_tier: nextTier, matches_played: 0, wins: 0, draws: 0, losses: 0 })
+          .eq('user_id', team.user_id);
+        if (typeof showToast === 'function') showToast(`🧪 跳到 Tier ${nextTier}`);
+        renderTab();
+      } catch (e) {
+        if (typeof showToast === 'function') showToast('跳 Tier 失敗：' + (e.message || e));
       }
     });
 

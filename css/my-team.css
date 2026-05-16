@@ -7884,7 +7884,46 @@
 .mt-match-map {
   position: relative;
   padding: 6px 8px 24px;
+  /* 每 tier 用 CSS 變數定義主題色（sky / ground / accent）→ banner & path wrap 共用 */
+  --tier-sky-top:    #74cfff;
+  --tier-sky-mid:    #b6e6ff;
+  --tier-sky-bot:    #c7e9ff;
+  --tier-ground-top: #6ec24a;
+  --tier-ground-bot: #3a7a25;
+  --tier-accent:     #ffd96f;
+  --tier-overlay-bg: rgba(0,0,0,0.65);
+  --tier-overlay-fg: #ffe680;
+  --tier-extra-bg:   transparent;
 }
+/* ─── 10 tier 主題（sky 上→下、ground 上→下、accent）─── */
+.mt-match-map[data-tier="1"]  { --tier-sky-top:#74cfff; --tier-sky-mid:#b6e6ff; --tier-sky-bot:#c7e9ff; --tier-ground-top:#6ec24a; --tier-ground-bot:#3a7a25; --tier-accent:#ffd96f; --tier-overlay-fg:#ffe680; }
+.mt-match-map[data-tier="2"]  { --tier-sky-top:#ffc488; --tier-sky-mid:#ffe2b8; --tier-sky-bot:#fff0d6; --tier-ground-top:#80b760; --tier-ground-bot:#5a9040; --tier-accent:#ff9a3c; --tier-overlay-fg:#ffd07a; }
+.mt-match-map[data-tier="3"]  { --tier-sky-top:#5a9fd0; --tier-sky-mid:#9ec7e2; --tier-sky-bot:#cce3f0; --tier-ground-top:#5fb050; --tier-ground-bot:#2e6822; --tier-accent:#42a5f5; --tier-overlay-fg:#a5d6ff; }
+.mt-match-map[data-tier="4"]  { --tier-sky-top:#7889a0; --tier-sky-mid:#a6b8cc; --tier-sky-bot:#cdd8e6; --tier-ground-top:#52a542; --tier-ground-bot:#2c6020; --tier-accent:#90a4ae; --tier-overlay-fg:#cfd8dc; }
+.mt-match-map[data-tier="5"]  { --tier-sky-top:#ffa050; --tier-sky-mid:#ffcc88; --tier-sky-bot:#ffe3b8; --tier-ground-top:#58a448; --tier-ground-bot:#286018; --tier-accent:#f39c12; --tier-overlay-fg:#ffcc66; }
+.mt-match-map[data-tier="6"]  { --tier-sky-top:#d4452f; --tier-sky-mid:#ff6f55; --tier-sky-bot:#ffa688; --tier-ground-top:#4a8a3a; --tier-ground-bot:#2a5820; --tier-accent:#c0392b; --tier-overlay-fg:#ffb088; }
+.mt-match-map[data-tier="7"]  { --tier-sky-top:#e8b020; --tier-sky-mid:#ffd95a; --tier-sky-bot:#fff0a8; --tier-ground-top:#50983e; --tier-ground-bot:#2c6020; --tier-accent:#d4af37; --tier-overlay-fg:#fff2a0; }
+.mt-match-map[data-tier="8"]  { --tier-sky-top:#1a2050; --tier-sky-mid:#2c3a78; --tier-sky-bot:#4860a0; --tier-ground-top:#4caf50; --tier-ground-bot:#2e7d32; --tier-accent:#ffd96f; --tier-overlay-fg:#ffe680; }
+.mt-match-map[data-tier="9"]  { --tier-sky-top:#5a2a8a; --tier-sky-mid:#a050c0; --tier-sky-bot:#ff8ab0; --tier-ground-top:#3da030; --tier-ground-bot:#1f6020; --tier-accent:#ce93d8; --tier-overlay-fg:#f0c0ff; }
+.mt-match-map[data-tier="10"] { --tier-sky-top:#ffd700; --tier-sky-mid:#ffbf40; --tier-sky-bot:#fff0a8; --tier-ground-top:#56b048; --tier-ground-bot:#1f5818; --tier-accent:#ffd700; --tier-overlay-fg:#fff5b0; }
+
+/* 開發測試：跳 Tier 按鈕（fixed 右上角小膠囊）*/
+.mt-match-test-tier {
+  position: absolute;
+  top: 10px; right: 12px;
+  z-index: 20;
+  background: rgba(0,0,0,0.85);
+  border: 1.5px dashed rgba(255,217,111,0.7);
+  color: #ffd96f;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.mt-match-test-tier:hover { background: rgba(0,0,0,0.95); }
+.mt-match-test-tier:active { transform: scale(0.96); }
 
 /* 頂部 2D 主角卷軸 banner */
 .mt-match-banner {
@@ -7892,11 +7931,45 @@
   height: 120px;
   border-radius: 12px;
   overflow: hidden;
-  background: linear-gradient(180deg, #74cfff 0%, #b6e6ff 70%, #c7e9ff 100%);
+  background:
+    linear-gradient(180deg, var(--tier-sky-top) 0%, var(--tier-sky-mid) 60%, var(--tier-sky-bot) 100%);
   border: 2px solid #1a1a2e;
   margin-bottom: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.45), inset 0 -8px 12px rgba(0,0,0,0.18);
 }
+/* Tier 8（夜場）：sky 上加一層星空雜點（小白點）*/
+.mt-match-banner[data-tier="8"]::before {
+  content: ''; position: absolute; inset: 0 0 32px 0;
+  background-image:
+    radial-gradient(circle at 12% 30%, rgba(255,255,255,0.9) 1px, transparent 1.5px),
+    radial-gradient(circle at 28% 14%, rgba(255,255,255,0.7) 1px, transparent 1.5px),
+    radial-gradient(circle at 48% 38%, rgba(255,255,255,0.85) 1px, transparent 1.5px),
+    radial-gradient(circle at 68% 22%, rgba(255,255,255,0.6) 1px, transparent 1.5px),
+    radial-gradient(circle at 86% 48%, rgba(255,255,255,0.95) 1px, transparent 1.5px),
+    radial-gradient(circle at 38% 60%, rgba(255,255,255,0.5) 1px, transparent 1.5px);
+  pointer-events: none;
+}
+/* Tier 9（紫粉黎明）：頂部加極光帶 */
+.mt-match-banner[data-tier="9"]::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 40px;
+  background: linear-gradient(180deg,
+    rgba(140,80,200,0.55) 0%, rgba(255,140,200,0.3) 50%, transparent 100%);
+  pointer-events: none;
+}
+/* Tier 10（傳奇）：彩虹光環 + 金色閃光 */
+.mt-match-banner[data-tier="10"]::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 50% 100%, rgba(255,215,0,0.45) 0%, transparent 60%),
+    conic-gradient(from 0deg at 50% 90%,
+      transparent 0deg, rgba(255,107,107,0.18) 60deg, transparent 90deg,
+      rgba(255,217,111,0.22) 150deg, transparent 180deg,
+      rgba(126,211,107,0.18) 210deg, transparent 240deg,
+      rgba(135,206,235,0.18) 300deg, transparent 360deg);
+  pointer-events: none;
+  animation: mt-match-rainbow-spin 18s linear infinite;
+}
+@keyframes mt-match-rainbow-spin { to { transform: rotate(360deg); } }
 .mt-match-banner-scroll {
   position: absolute; inset: 0;
 }
@@ -7923,13 +7996,12 @@
 .mt-match-banner-ground {
   position: absolute; left: 0; right: 0; bottom: 0;
   height: 28px;
-  background: linear-gradient(180deg, #6ec24a 0%, #3a7a25 100%);
-  border-top: 2px solid #1a3a08;
+  border-top: 2px solid rgba(0,0,0,0.55);
   background-image:
     repeating-linear-gradient(90deg,
       transparent 0, transparent 16px,
       rgba(255,255,255,0.07) 16px, rgba(255,255,255,0.07) 18px),
-    linear-gradient(180deg, #6ec24a 0%, #3a7a25 100%);
+    linear-gradient(180deg, var(--tier-ground-top, #6ec24a) 0%, var(--tier-ground-bot, #3a7a25) 100%);
 }
 /* 主角 LPC sprite（JS 控位置/sprite frame） */
 .mt-match-hero {
@@ -8052,14 +8124,16 @@
 .mt-match-banner-overlay {
   position: absolute;
   left: 8px; top: 8px;
-  background: rgba(0,0,0,0.65);
+  background: var(--tier-overlay-bg, rgba(0,0,0,0.65));
+  border: 1.2px solid var(--tier-accent, #ffd96f);
   border-radius: 8px;
   padding: 4px 10px;
   color: #fff;
+  z-index: 5;
 }
 .mt-match-banner-overlay .mt-match-tier {
   font-size: 13px; font-weight: 900;
-  color: #ffe680;
+  color: var(--tier-overlay-fg, #ffe680);
   text-shadow: 0 1px 2px rgba(0,0,0,0.7);
 }
 .mt-match-banner-overlay .mt-match-tier small { font-size: 10px; opacity: 0.75; margin-left: 4px; }
@@ -8079,7 +8153,9 @@
 }
 
 /* 路線地圖外框：可滾、自動聚焦當前關 */
+/* 每 tier 用 inherit 的 CSS 變數做出不同的色調背景（從 banner 那邊繼承 --tier-* ）*/
 .mt-match-path-wrap {
+  position: relative;
   max-height: 280px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -8089,7 +8165,14 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(240,192,64,0.5) rgba(0,0,0,0.2);
   border-radius: 10px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.15));
+  border: 1.5px solid rgba(255,255,255,0.08);
+  background:
+    /* 朦朧光斑 */
+    radial-gradient(ellipse at 20% 10%, rgba(255,255,255,0.08), transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,255,255,0.05), transparent 50%),
+    /* 主色調漸層 — 跟著 tier 變 */
+    linear-gradient(160deg, color-mix(in srgb, var(--tier-ground-top, #4caf50) 50%, #0a1418) 0%,
+                            color-mix(in srgb, var(--tier-ground-bot, #2e7d32) 70%, #050a0e) 100%);
   box-shadow: inset 0 4px 6px -4px rgba(0,0,0,0.45), inset 0 -4px 6px -4px rgba(0,0,0,0.45);
 }
 .mt-match-path-wrap::-webkit-scrollbar { width: 6px; }
