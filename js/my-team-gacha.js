@@ -293,14 +293,19 @@
         </div>
       </div>
 
+      <!-- cards-wrap 直接放在 stage-frame 裡、跟 pack 同一個 grid cell
+           兩者用完全相同的 positioning 機制，pack 消失/cards 出現之間不會有
+           sub-pixel 位移問題（之前 pack 是 flex-centered、cards 是 absolute
+           top:50% left:50% translate(-50%,-50%) → 計算路徑不同會差 1-2px） -->
+      <div class="mt-gacha-cards-wrap">
+        <div class="mt-gacha-cards" id="mt-gacha-cards" data-count="${cards.length}" data-mode="${cards.length > 1 ? 'stack' : 'single'}"></div>
+      </div>
+
       <div class="mt-gacha-stage" id="mt-gacha-stage" hidden>
         <button class="mt-gacha-skip" id="mt-gacha-skip" hidden type="button" aria-label="跳過">⏭ 跳過</button>
         <div class="mt-gacha-banner" id="mt-gacha-banner">
           <div class="mt-gacha-banner-title">${escapeHtml(options.title || '🎰 球員召喚')}</div>
           ${options.subtitle ? `<div class="mt-gacha-banner-sub">${escapeHtml(options.subtitle)}</div>` : ''}
-        </div>
-        <div class="mt-gacha-cards-wrap">
-          <div class="mt-gacha-cards" id="mt-gacha-cards" data-count="${cards.length}" data-mode="${cards.length > 1 ? 'stack' : 'single'}"></div>
         </div>
         <div class="mt-gacha-flip-prompt" id="mt-gacha-flip-prompt" hidden>
           <button class="mt-gacha-flip-btn" id="mt-gacha-flip-btn">

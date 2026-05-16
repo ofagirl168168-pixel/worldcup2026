@@ -1053,10 +1053,21 @@
   transform: translateX(-50%);
   width: 100%;
   max-width: 460px;
-  /* 內部 pack 靠 flex 置中、stage 用 inset:0 鋪滿 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* Grid stacking：pack + cards-wrap 同放在 1/1 cell、自動 100% 重疊
+     stage 用 absolute inset:0 鋪滿、不參與 grid flow
+     →  pack 跟 cards-wrap 用完全相同的 positioning 機制
+        不會有 sub-pixel 計算差異造成位移 */
+  display: grid;
+  place-items: center;
+}
+.mt-gacha-stage-frame > .mt-gacha-pack,
+.mt-gacha-stage-frame > .mt-gacha-cards-wrap {
+  grid-area: 1 / 1;
+}
+.mt-gacha-stage-frame > .mt-gacha-cards-wrap {
+  position: relative;       /* 給內部 .all-revealed 卡片 absolute 用 */
+  width: 280px;
+  height: 320px;
 }
 .mt-gacha-overlay.open { opacity: 1; }
 .mt-gacha-overlay[data-peak="SR"]  { background: radial-gradient(ellipse at center, #1a0a3a 0%, #050118 70%, #000 100%); }
