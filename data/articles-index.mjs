@@ -32,6 +32,16 @@ export default [
     "shareable": true
   },
   {
+    "id": "epl-064",
+    "tournament": "epl",
+    "title": "【賽後戰報】Villa 4-2 Liverpool：Watkins 梅開二度，維拉鎖定歐冠資格",
+    "summary": "英超第37輪——阿斯頓維拉在維拉公園球場以 4-2 大勝利物浦，Watkins 梅開二度、Rogers 與 McGinn 各入一球。維拉確認下季歐冠資格，利物浦跌至第五、前四告急。",
+    "date": "2026-05-16",
+    "category": "賽後深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-060",
     "tournament": "epl",
     "title": "【賽前分析】阿斯頓維拉 vs 利物浦：59 分生死戰，歐冠門票一戰定生死",
