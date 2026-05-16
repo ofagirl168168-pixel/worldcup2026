@@ -1027,11 +1027,14 @@
     const positions = _formationPositions(formation);
 
     const now = new Date();
+    const rarityRank = { SSR: 0, SR: 1, R: 2 };
     // 場上 = in_starting_11 且非傷停（傷停顯示在板凳）
     const starters = players.filter(p => p.in_starting_11 &&
       (!p.injured_until || new Date(p.injured_until) <= now));
-    const bench = players.filter(p => !p.in_starting_11 ||
-      (p.injured_until && new Date(p.injured_until) > now));
+    // 板凳：SSR → SR → R 排序、好辨識
+    const bench = players
+      .filter(p => !p.in_starting_11 || (p.injured_until && new Date(p.injured_until) > now))
+      .sort((a, b) => (rarityRank[a.card?.rarity] || 9) - (rarityRank[b.card?.rarity] || 9));
 
     // 解鎖的陣型：初始只 4-3-3、抽到的教練會解鎖更多
     const unlocked = await _fetchUnlockedFormations();
@@ -1183,7 +1186,7 @@
       <div class="mt-profile-card" style="max-width:520px">
         <button class="mt-modal-close mt-profile-close" type="button">×</button>
         <div class="mt-roster-all-title">📋 所有球員 (${players.length})</div>
-        <div class="mt-roster-all-hint">⚽ 場上 · 🤕 傷停 · 點球員開個人主頁</div>
+        <div class="mt-roster-all-hint">右上「場上 / 傷停」標籤直接看狀態 · 點卡開個人主頁</div>
         <div class="mt-roster-all-grid" id="mt-roster-all-grid"></div>
       </div>
     `;
@@ -1205,7 +1208,8 @@
       const c = p.card || {};
       const onPitch = p.in_starting_11 && (!p.injured_until || new Date(p.injured_until) <= now);
       const injured = p.injured_until && new Date(p.injured_until) > now;
-      const badge = onPitch ? '⚽' : injured ? '🤕' : '';
+      const badgeText = onPitch ? '場上' : injured ? '傷停' : '';
+      const badgeClass = onPitch ? 'is-starter-badge' : injured ? 'is-injured-badge' : '';
       const portraitUrl = (window.MyTeamPortrait || (id => '')) (c.card_id, c.rarity);
       const imgId = `roster-all-portrait-${p.id.slice(0,8)}`;
 
@@ -1213,7 +1217,7 @@
       slot.type = 'button';
       slot.className = `mt-roster-slot rarity-${c.rarity || 'R'}${onPitch ? ' is-starter' : ''}${injured ? ' is-injured' : ''}`;
       slot.innerHTML = `
-        ${badge ? `<span class="mt-roster-slot-badge">${badge}</span>` : ''}
+        ${badgeText ? `<span class="mt-roster-slot-badge ${badgeClass}">${badgeText}</span>` : ''}
         <div class="mt-roster-slot-portrait">
           <img id="${imgId}" src="${portraitUrl}" alt="${escapeHtml(c.name || '?')}" loading="lazy" onerror="this.style.opacity='0.3'">
         </div>
