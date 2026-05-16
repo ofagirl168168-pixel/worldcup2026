@@ -3960,8 +3960,11 @@
     });
 
     // 開發測試：重跑新手指引
+    // 1) 清隊伍 + 重置 flag（不自動 re-claim）
+    // 2) 關掉我的隊伍 modal
+    // 3) 重開 modal → 觸發 _showStarterPackIntro 動畫（教學 → 10 連抽 → 翻牌）
     content.querySelector('#mt-settings-reset-starter')?.addEventListener('click', async () => {
-      if (!confirm('⚠️ 將清空所有球員、重置新手指引 flag、重抽新手包。確定要重跑？')) return;
+      if (!confirm('⚠️ 將清空所有球員、重置新手指引 flag。將會關掉這個視窗、模擬登入跳出新手 10 連抽。確定要重跑？')) return;
       const btn = content.querySelector('#mt-settings-reset-starter');
       const orig = btn.textContent;
       btn.disabled = true;
@@ -3970,8 +3973,11 @@
         const { error } = await window.DB.rpc('dev_reset_starter_pack');
         if (error) throw error;
         await window.MyTeam.refresh?.();
-        if (typeof showToast === 'function') showToast('♻️ 已重跑新手指引、重新抽到 10 張球員');
-        renderTab();
+        // 關掉視窗 → 短暫延遲後重開（觸發 _showStarterPackIntro 走完整動畫）
+        if (typeof window.closeMyTeamModal === 'function') window.closeMyTeamModal();
+        setTimeout(() => {
+          if (typeof window.openMyTeamModal === 'function') window.openMyTeamModal();
+        }, 500);
       } catch (e) {
         alert('重跑失敗：' + (e.message || e));
         btn.disabled = false;
