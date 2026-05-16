@@ -5419,8 +5419,8 @@
               </tbody>
             </table>
             <div class="mt-train-info-note">
-              <b>個別屬性 cap = min(Lv 硬上限, base + 15 + 緣分(★) × 5)</b><br>
-              5★ bond 卡 = 多 +25 上限（base + 40）；卡 base 低就被 base 拖累、上不去高 Lv 上限
+              <b>個別屬性 cap = min(Lv 硬上限, base + 15 + 星等(★) × 5)</b><br>
+              5★ 星等卡 = 多 +25 上限（base + 40）；卡 base 低就被 base 拖累、上不去高 Lv 上限
             </div>
           </div>
         </div>
