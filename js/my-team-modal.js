@@ -732,6 +732,7 @@
     const stadiumLv = team?.stadium_level || 1;
     const stadiumMaxFans = team?.fans || 100;
     const stadiumMaxStam = team?.stamina_max || 5;
+    const stadiumTeamColor = _colorHex(team?.crest_primary || 'red');
 
     content.innerHTML = `
       <div class="mt-home-tab">
@@ -785,9 +786,9 @@
                 <div class="mt-home-clubhouse-window-cross"></div>
               </div>
               ${(team?.stadium_level || 1) >= 3 ? `
-                <!-- Lv 3+：兩側看台 -->
-                <div class="mt-home-stand mt-home-stand-l"></div>
-                <div class="mt-home-stand mt-home-stand-r"></div>
+                <!-- Lv 3+：兩側看台（含階梯 + 球迷依 tier 隨機排）-->
+                <div class="mt-home-stand mt-home-stand-l">${_renderStandFans(stadiumTeamColor, stadiumLv)}</div>
+                <div class="mt-home-stand mt-home-stand-r">${_renderStandFans(stadiumTeamColor, stadiumLv)}</div>
               ` : ''}
               ${(team?.stadium_level || 1) >= 5 ? `
                 <!-- Lv 5+：聚光燈 -->
@@ -3059,6 +3060,64 @@
     9: '鐘塔 + 延伸看台',
     10: '黃金屋頂 + 噴泉 + 彩虹光環',
   };
+
+  // 看台上的球迷（小 chibi、依階梯 tier 疊）
+  // - 看台高度依等級：Lv 3-5 單層（3 tier），Lv 6-10 雙層（5 tier）
+  // - 每 tier 上有 3-4 個球迷、左右隨機分佈
+  function _renderStandFans(teamColor, stadiumLv) {
+    const SKIN = ['#f5d0a0','#e8b896','#d8b08a','#c0905d','#a67340','#7a4f2c'];
+    const PANTS = ['#1a3050','#202020','#3a2410','#2a1a3a','#1a4030'];
+    const tierCount = stadiumLv >= 6 ? 5 : 3;
+    const fansPerTier = stadiumLv >= 6 ? 4 : 3;
+    const total = tierCount * fansPerTier;
+    const rand = (seed, mod) => {
+      let h = seed * 2654435761;
+      h = (h ^ (h >>> 16)) >>> 0;
+      return h % mod;
+    };
+    let html = '<div class="mt-home-stand-fans">';
+    for (let i = 0; i < total; i++) {
+      const tier = i % tierCount;
+      // 隨機左右位置：用 hash 避免每位看起來太規律
+      const slot = Math.floor(i / tierCount);          // 0, 1, 2, 3
+      const base = (100 / fansPerTier) * slot + (100 / fansPerTier) / 2;
+      const jitter = (rand(i + 7, 11) - 5) * 1.4;     // ±7%
+      const left = Math.max(4, Math.min(86, base + jitter));
+      const skin = SKIN[rand(i + 3, SKIN.length)];
+      const pants = PANTS[rand(i + 5, PANTS.length)];
+      const type = rand(i + 11, 3);
+      const svg = type === 0 ? `
+        <svg viewBox="0 0 8 12" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="4" cy="2.5" r="1.8" fill="${skin}" stroke="#1a1a2e" stroke-width="0.35"/>
+          <rect x="2.5" y="4" width="3" height="4" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.35"/>
+          <rect x="2" y="8" width="1.5" height="3" fill="${pants}" stroke="#1a1a2e" stroke-width="0.3"/>
+          <rect x="4.5" y="8" width="1.5" height="3" fill="${pants}" stroke="#1a1a2e" stroke-width="0.3"/>
+          <rect x="1.6" y="1" width="1" height="3" fill="${skin}" stroke="#1a1a2e" stroke-width="0.25" transform="rotate(-20 2.1 2)"/>
+          <rect x="5.4" y="1" width="1" height="3" fill="${skin}" stroke="#1a1a2e" stroke-width="0.25" transform="rotate( 20 5.9 2)"/>
+        </svg>
+      ` : type === 1 ? `
+        <svg viewBox="0 0 9 12" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="4" cy="2.5" r="1.8" fill="${skin}" stroke="#1a1a2e" stroke-width="0.35"/>
+          <rect x="2.5" y="4" width="3" height="4" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.35"/>
+          <rect x="2" y="8" width="1.5" height="3" fill="${pants}" stroke="#1a1a2e" stroke-width="0.3"/>
+          <rect x="4.5" y="8" width="1.5" height="3" fill="${pants}" stroke="#1a1a2e" stroke-width="0.3"/>
+          <line x1="6.5" y1="1" x2="6.5" y2="7" stroke="#6d4c2a" stroke-width="0.45"/>
+          <polygon points="6.5,1 8.5,1.8 6.5,3" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.25"/>
+        </svg>
+      ` : `
+        <svg viewBox="0 0 8 12" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="4" cy="2.5" r="1.8" fill="${skin}" stroke="#1a1a2e" stroke-width="0.35"/>
+          <rect x="2.5" y="4" width="3" height="4" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.35"/>
+          <rect x="2" y="8" width="1.5" height="3" fill="${pants}" stroke="#1a1a2e" stroke-width="0.3"/>
+          <rect x="4.5" y="8" width="1.5" height="3" fill="${pants}" stroke="#1a1a2e" stroke-width="0.3"/>
+          <rect x="1.8" y="4" width="4.4" height="1" fill="#ffd700" stroke="#1a1a2e" stroke-width="0.2"/>
+        </svg>
+      `;
+      html += `<span class="mt-home-stand-fan" style="--tier:${tier};left:${left.toFixed(1)}%">${svg}</span>`;
+    }
+    html += '</div>';
+    return html;
+  }
 
   // 主頁草地 SVG 噴泉（取代 emoji ⛲、純 SVG 質感）
   function _renderFountainSvg() {

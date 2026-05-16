@@ -4167,23 +4167,80 @@
 }
 
 /* 球場等級裝飾 — 看台 / 聚光燈 / 旗桿 / 球迷 */
+/* 看台：3 層階梯（高 Lv 5 層）、深色階梯紋 + 頂部繽紛飾條
+   寬度從 30 → 80px、視覺感才像真的看台 */
 .mt-home-stand {
   position: absolute;
   bottom: 0;
-  width: 30px; height: 50%;
-  background: linear-gradient(180deg, #5a4030 0%, #3a2410 100%);
+  width: 80px;
+  height: 65%;
+  background:
+    /* 階梯紋路：每 14px 一階、底色交錯深淺、線條深色 */
+    repeating-linear-gradient(180deg,
+      #6a4a30 0 6px,
+      #4a3020 6px 7px,
+      #5a3a26 7px 13px,
+      #3a2010 13px 14px),
+    linear-gradient(180deg, #5a4030 0%, #3a2410 100%);
   border: 2px solid #1a1a2e;
   border-bottom: 0;
   z-index: 1;
 }
-.mt-home-stand-l { left: -32px; }
-.mt-home-stand-r { right: -32px; }
+.mt-home-stand-l { left: -82px; }
+.mt-home-stand-r { right: -82px; }
 .mt-home-stand::before {
+  /* 頂部彩條（球隊應援色） */
   content: ''; position: absolute;
   left: 2px; right: 2px; top: 2px; height: 6px;
   background: repeating-linear-gradient(90deg,
     #f0c040 0, #f0c040 3px, #e07020 3px, #e07020 6px);
+  z-index: 2;
 }
+.mt-home-stand::after {
+  /* 頂部白色扶手 */
+  content: ''; position: absolute;
+  left: 0; right: 0; top: 9px; height: 1.5px;
+  background: #f0e8c0;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  z-index: 2;
+}
+/* Lv 6+ 雙層看台（更高、加中間扶手分層）*/
+.mt-home-distance[data-stadium-level="6"]  .mt-home-stand,
+.mt-home-distance[data-stadium-level="7"]  .mt-home-stand,
+.mt-home-distance[data-stadium-level="8"]  .mt-home-stand,
+.mt-home-distance[data-stadium-level="9"]  .mt-home-stand,
+.mt-home-distance[data-stadium-level="10"] .mt-home-stand {
+  width: 100px;
+  height: 85%;
+}
+.mt-home-distance[data-stadium-level="6"]  .mt-home-stand-l,
+.mt-home-distance[data-stadium-level="7"]  .mt-home-stand-l,
+.mt-home-distance[data-stadium-level="8"]  .mt-home-stand-l,
+.mt-home-distance[data-stadium-level="9"]  .mt-home-stand-l,
+.mt-home-distance[data-stadium-level="10"] .mt-home-stand-l { left: -102px; }
+.mt-home-distance[data-stadium-level="6"]  .mt-home-stand-r,
+.mt-home-distance[data-stadium-level="7"]  .mt-home-stand-r,
+.mt-home-distance[data-stadium-level="8"]  .mt-home-stand-r,
+.mt-home-distance[data-stadium-level="9"]  .mt-home-stand-r,
+.mt-home-distance[data-stadium-level="10"] .mt-home-stand-r { right: -102px; }
+
+/* 看台上的球迷：依 --tier 階梯位置疊 + left 隨機水平位置 */
+.mt-home-stand-fans {
+  position: absolute;
+  inset: 12px 2px 0 2px;     /* 留頂部彩條 + 扶手 + 兩側邊框 */
+  pointer-events: none;
+  overflow: hidden;
+}
+.mt-home-stand-fan {
+  position: absolute;
+  width: 8px;
+  height: 12px;
+  /* tier 0 = 最下排（地平線階梯）、tier 1, 2... = 越來越高
+     每階高 14px 對應 background repeating-linear-gradient */
+  bottom: calc(var(--tier, 0) * 14px + 2px);
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
+}
+.mt-home-stand-fan svg { width: 100%; height: 100%; display: block; }
 
 /* 聚光燈：base 從地平線（clubhouse bottom）開始往上長、最頂端是燈具 */
 .mt-home-floodlight {
