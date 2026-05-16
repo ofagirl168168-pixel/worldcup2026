@@ -553,7 +553,10 @@
 
   function _renderFlag(f) {
     if (!f) return '🏴';
-    if (/^https?:\/\//.test(f)) return `<img src="${f}" style="width:48px;height:48px;border-radius:50%;background:#fff;object-fit:contain">`;
+    const s = String(f);
+    if (/^https?:\/\//.test(s) || /\.(png|jpe?g|svg|webp|gif)$/i.test(s)) {
+      return `<img src="${s}" style="width:48px;height:48px;border-radius:50%;background:#fff;object-fit:contain">`;
+    }
     return f;
   }
 

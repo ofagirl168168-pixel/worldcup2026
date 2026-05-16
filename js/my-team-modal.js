@@ -4347,11 +4347,12 @@
     const oppName = nextOpp?.nameCN || '未知對手';
     const oppFlag = nextOpp?.flag || '🏴';
     const oppIsReal = !!nextOpp?._isReal;
-    // 對手 crest：URL 用 <img>、emoji 直接放
+    // 對手 crest：URL 或 .png/.jpg/.svg/.webp 路徑用 <img>、emoji 直接放
     const renderOppCrest = (f, sz) => {
       if (!f) return '🏴';
       const s = String(f);
-      if (/^https?:\/\//.test(s)) {
+      const isImage = /^https?:\/\//.test(s) || /\.(png|jpe?g|svg|webp|gif)$/i.test(s);
+      if (isImage) {
         return `<img class="mt-match-opp-crest-img" src="${escapeHtml(s)}" alt="" style="width:${sz}px;height:${sz}px">`;
       }
       return escapeHtml(s);
