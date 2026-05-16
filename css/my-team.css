@@ -8077,6 +8077,16 @@
 .mt-match-opp-label-crest {
   font-size: 15px;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+.mt-match-opp-crest-img {
+  border-radius: 50%;
+  background: #fff;
+  object-fit: contain;
+  vertical-align: middle;
+  border: 1.5px solid #1a1a2e;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.45);
 }
 .mt-match-opp-label-name {
   font-size: 11px;
@@ -8156,24 +8166,69 @@
 /* 每 tier 用 inherit 的 CSS 變數做出不同的色調背景（從 banner 那邊繼承 --tier-* ）*/
 .mt-match-path-wrap {
   position: relative;
-  max-height: 280px;
+  max-height: 320px;
   overflow-y: auto;
   overflow-x: hidden;
   margin: 0 0 12px;
   padding: 4px 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: rgba(240,192,64,0.5) rgba(0,0,0,0.2);
-  border-radius: 10px;
-  border: 1.5px solid rgba(255,255,255,0.08);
+  scrollbar-color: var(--tier-accent, #ffd96f) rgba(0,0,0,0.2);
+  border-radius: 12px;
+  border: 1.5px solid var(--tier-accent, #ffd96f);
   background:
-    /* 朦朧光斑 */
-    radial-gradient(ellipse at 20% 10%, rgba(255,255,255,0.08), transparent 50%),
-    radial-gradient(ellipse at 80% 90%, rgba(255,255,255,0.05), transparent 50%),
-    /* 主色調漸層 — 跟著 tier 變 */
-    linear-gradient(160deg, color-mix(in srgb, var(--tier-ground-top, #4caf50) 50%, #0a1418) 0%,
-                            color-mix(in srgb, var(--tier-ground-bot, #2e7d32) 70%, #050a0e) 100%);
-  box-shadow: inset 0 4px 6px -4px rgba(0,0,0,0.45), inset 0 -4px 6px -4px rgba(0,0,0,0.45);
+    radial-gradient(ellipse at 20% 10%, rgba(255,255,255,0.12), transparent 55%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,255,255,0.06), transparent 55%),
+    linear-gradient(160deg, color-mix(in srgb, var(--tier-sky-top, #4caf50) 35%, #0a1418) 0%,
+                            color-mix(in srgb, var(--tier-ground-bot, #2e7d32) 60%, #050a0e) 100%);
+  box-shadow:
+    inset 0 4px 8px -4px rgba(0,0,0,0.55),
+    inset 0 -4px 8px -4px rgba(0,0,0,0.55),
+    0 4px 10px rgba(0,0,0,0.35);
+}
+.mt-match-path-wrap::-webkit-scrollbar { width: 6px; }
+.mt-match-path-wrap::-webkit-scrollbar-thumb { background: var(--tier-accent, #ffd96f); border-radius: 3px; }
+
+/* 路線背景裝飾層：遠山 SVG + 飄浮粒子（每 tier 變色）*/
+.mt-match-path-deco {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.mt-match-path-deco-hills {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.mt-match-path-spark {
+  position: absolute;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--tier-accent, #ffd96f);
+  box-shadow: 0 0 8px var(--tier-accent, #ffd96f);
+  opacity: 0.7;
+  animation: mt-match-spark-twinkle 3.5s ease-in-out infinite;
+}
+.mt-match-path-spark.s1 { left: 8%;  top: 12%; animation-delay: 0s;    }
+.mt-match-path-spark.s2 { left: 88%; top: 28%; animation-delay: -0.7s; width: 3px; height: 3px; }
+.mt-match-path-spark.s3 { left: 14%; top: 48%; animation-delay: -1.4s; width: 4px; height: 4px; }
+.mt-match-path-spark.s4 { left: 82%; top: 64%; animation-delay: -2.1s; }
+.mt-match-path-spark.s5 { left: 22%; top: 82%; animation-delay: -2.8s; width: 3px; height: 3px; }
+@keyframes mt-match-spark-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50%      { opacity: 0.9; transform: scale(1.2); }
+}
+
+/* 路徑主線 dashed-flow 動畫（流動感）*/
+.mt-match-path-anim {
+  animation: mt-match-path-flow 1.6s linear infinite;
+}
+@keyframes mt-match-path-flow {
+  to { stroke-dashoffset: -14; }
 }
 .mt-match-path-wrap::-webkit-scrollbar { width: 6px; }
 .mt-match-path-wrap::-webkit-scrollbar-thumb { background: rgba(240,192,64,0.5); border-radius: 3px; }

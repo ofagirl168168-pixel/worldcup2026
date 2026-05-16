@@ -4347,6 +4347,15 @@
     const oppName = nextOpp?.nameCN || '未知對手';
     const oppFlag = nextOpp?.flag || '🏴';
     const oppIsReal = !!nextOpp?._isReal;
+    // 對手 crest：URL 用 <img>、emoji 直接放
+    const renderOppCrest = (f, sz) => {
+      if (!f) return '🏴';
+      const s = String(f);
+      if (/^https?:\/\//.test(s)) {
+        return `<img class="mt-match-opp-crest-img" src="${escapeHtml(s)}" alt="" style="width:${sz}px;height:${sz}px">`;
+      }
+      return escapeHtml(s);
+    };
 
     content.innerHTML = `
       <div class="mt-match-map" data-tier="${tier}">
@@ -4422,7 +4431,7 @@
           <div class="mt-match-opp-label">
             <div class="mt-match-opp-label-tag">▶ 下一隊對手</div>
             <div class="mt-match-opp-label-row">
-              <span class="mt-match-opp-label-crest">${escapeHtml(oppFlag)}</span>
+              <span class="mt-match-opp-label-crest">${renderOppCrest(oppFlag, 18)}</span>
               <span class="mt-match-opp-label-name">${escapeHtml(oppName)}</span>
               ${oppIsReal ? '<span class="mt-match-opp-real">REAL</span>' : ''}
             </div>
@@ -4441,7 +4450,7 @@
           </div>
           <div class="mt-match-current-right">
             <div class="mt-match-current-vs-label">VS</div>
-            <div class="mt-match-current-opp-name">${escapeHtml(oppFlag)} ${escapeHtml(oppName)}</div>
+            <div class="mt-match-current-opp-name">${renderOppCrest(oppFlag, 18)} ${escapeHtml(oppName)}</div>
             <div class="mt-match-current-opp-meta">
               ${oppIsReal ? '<span class="mt-match-opp-real">REAL</span>' : '<span class="mt-match-opp-npc">NPC</span>'}
               <span class="mt-match-current-opp-power">能力 ~${tierAvg}</span>
@@ -4455,8 +4464,36 @@
 
         <!-- 闖關路線（可滾、自動聚焦當前關） -->
         <div class="mt-match-path-wrap" id="mt-match-path-wrap" data-tier="${tier}">
+          <!-- 背景裝飾層：山丘 + 雲 + 光點（依 tier 用 CSS 變數變色）-->
+          <div class="mt-match-path-deco" aria-hidden="true">
+            <svg class="mt-match-path-deco-hills" viewBox="0 0 300 480" preserveAspectRatio="none">
+              <!-- 遠山 1（淺色）-->
+              <path d="M 0 380 L 40 320 L 90 360 L 140 310 L 200 350 L 250 305 L 300 345 L 300 480 L 0 480 Z"
+                    fill="var(--tier-ground-top, #6ec24a)" opacity="0.18"/>
+              <!-- 遠山 2（深色）-->
+              <path d="M 0 420 L 50 380 L 110 410 L 160 370 L 220 405 L 270 360 L 300 395 L 300 480 L 0 480 Z"
+                    fill="var(--tier-ground-bot, #3a7a25)" opacity="0.28"/>
+              <!-- 中段山 -->
+              <path d="M 0 240 L 35 200 L 80 230 L 130 188 L 180 220 L 230 175 L 280 215 L 300 200 L 300 280 L 0 280 Z"
+                    fill="var(--tier-ground-top, #6ec24a)" opacity="0.12"/>
+            </svg>
+            <!-- 飄浮粒子（高 tier 的星 / 光點）-->
+            <span class="mt-match-path-spark s1"></span>
+            <span class="mt-match-path-spark s2"></span>
+            <span class="mt-match-path-spark s3"></span>
+            <span class="mt-match-path-spark s4"></span>
+            <span class="mt-match-path-spark s5"></span>
+          </div>
           <div class="mt-match-path">
             <svg class="mt-match-path-line" viewBox="0 0 300 480" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="mt-path-grad-${tier}" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%"  stop-color="var(--tier-accent, #ffd96f)" stop-opacity="0.3"/>
+                  <stop offset="50%" stop-color="var(--tier-accent, #ffd96f)" stop-opacity="0.65"/>
+                  <stop offset="100%" stop-color="var(--tier-accent, #ffd96f)" stop-opacity="0.9"/>
+                </linearGradient>
+              </defs>
+              <!-- 路徑底層粗描邊 -->
               <path d="M 150 456
                        C 240 456, 230 400, 70 400
                        C 30 400, 30 345, 150 345
@@ -4467,10 +4504,25 @@
                        C 270 134, 270 82, 150 82
                        C 90 82, 60 43, 234 14"
                 fill="none"
-                stroke="rgba(240,192,64,0.5)"
-                stroke-width="4"
+                stroke="rgba(0,0,0,0.35)"
+                stroke-width="8"
+                stroke-linecap="round"/>
+              <!-- 路徑主線（漸層、虛線）-->
+              <path d="M 150 456
+                       C 240 456, 230 400, 70 400
+                       C 30 400, 30 345, 150 345
+                       C 270 345, 270 290, 70 290
+                       C 30 290, 30 240, 150 240
+                       C 270 240, 270 187, 70 187
+                       C 30 187, 30 134, 150 134
+                       C 270 134, 270 82, 150 82
+                       C 90 82, 60 43, 234 14"
+                fill="none"
+                stroke="url(#mt-path-grad-${tier})"
+                stroke-width="5"
                 stroke-linecap="round"
-                stroke-dasharray="3,6"/>
+                stroke-dasharray="6,8"
+                class="mt-match-path-anim"/>
             </svg>
             <div class="mt-match-stages">
               ${stages.map(s => {
