@@ -1964,7 +1964,18 @@
   width: 95px !important;
   height: 95px !important;
   margin: 3px auto 4px !important;
-  border-width: 2px !important;
+  border: 3px solid #ff00ff !important;        /* DEBUG: 桃紅 outline 確認 container 渲染 */
+  background: #00ffff !important;              /* DEBUG: 青色背景確認 img 是否覆蓋 */
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.mt-gacha-cards.all-revealed .mt-gacha-front-portrait-img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 .mt-gacha-cards.all-revealed .mt-gacha-front-portrait-pos {
   width: 22px !important;
