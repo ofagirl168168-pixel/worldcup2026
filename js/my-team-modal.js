@@ -789,10 +789,7 @@
           <div class="mt-home-distance" data-stadium-level="${team?.stadium_level || 1}">
             <div class="mt-home-tree mt-home-tree-l"></div>
             <div class="mt-home-clubhouse">
-              <svg class="mt-home-clubhouse-roof" viewBox="0 0 110 32" preserveAspectRatio="none">
-                <polygon points="2,30 55,2 108,30" fill="#c0392b"
-                  stroke="#1a1a2e" stroke-width="3" stroke-linejoin="round"/>
-              </svg>
+              ${_renderClubhouseRoofSvg(team?.stadium_level || 1)}
               <div class="mt-home-clubhouse-roof-tiles"></div>
               <div class="mt-home-clubhouse-chimney"></div>
               <div class="mt-home-clubhouse-sign">${escapeHtml(team?.team_name || '我的訓練館')}</div>
@@ -3182,6 +3179,47 @@
 </div>`;
   }
 
+
+  // 主頁訓練館屋頂 SVG — 依等級切換 6 種屋頂形狀（對齊預覽圖）
+  // viewBox 110x32、CSS .mt-home-clubhouse-roof 蓋滿牆頂 + eaves overhang
+  // class is-roof-main 由 CSS 決定 fill / stroke（per stadium level）
+  // class is-roof-spire 永遠金色（per CSS rule）
+  function _renderClubhouseRoofSvg(lv) {
+    const l = Math.max(1, Math.min(10, lv || 1));
+    const ROOF = ({
+      1: 'gable',   2: 'gable',   3: 'hipped',  4: 'hipped',
+      5: 'hipped',  6: 'flat',    7: 'pyramid', 8: 'stepped',
+      9: 'pyramid', 10: 'dome',
+    })[l];
+    let body = '';
+    if (ROOF === 'gable') {
+      body = `<polygon class="is-roof-main" points="2,30 55,2 108,30" stroke-linejoin="round"/>`;
+    } else if (ROOF === 'hipped') {
+      // 四坡（梯形、上邊較窄）
+      body = `<polygon class="is-roof-main" points="2,30 28,4 82,4 108,30" stroke-linejoin="round"/>
+              <line class="is-roof-ridge" x1="28" y1="4" x2="82" y2="4"/>`;
+    } else if (ROOF === 'flat') {
+      // 平頂厚條（屋簷 + 主體）
+      body = `<rect class="is-roof-main" x="2" y="14" width="106" height="16"/>
+              <rect class="is-roof-main" x="0" y="26" width="110" height="4"/>`;
+    } else if (ROOF === 'pyramid') {
+      // 高金字塔 + 中央尖塔
+      body = `<polygon class="is-roof-main" points="2,30 55,4 108,30" stroke-linejoin="round"/>
+              <polygon class="is-roof-spire" points="53,8 55,-12 57,8" stroke-linejoin="round"/>`;
+    } else if (ROOF === 'stepped') {
+      // 兩階階梯屋頂（梯形 + 上層三角）
+      body = `<polygon class="is-roof-main" points="2,30 18,18 92,18 108,30" stroke-linejoin="round"/>
+              <polygon class="is-roof-main" points="18,18 55,4 92,18" stroke-linejoin="round"/>
+              <rect class="is-roof-spire" x="54.2" y="-8" width="1.6" height="12"/>`;
+    } else if (ROOF === 'dome') {
+      // 半圓金頂 + 旗
+      body = `<rect class="is-roof-main" x="0" y="26" width="110" height="4"/>
+              <path class="is-roof-main" d="M 22 26 A 33 24 0 0 1 88 26 Z" stroke-linejoin="round"/>
+              <line class="is-roof-ridge" x1="55" y1="2" x2="55" y2="-14"/>
+              <polygon class="is-roof-spire" points="55,-14 64,-11 55,-8" stroke-linejoin="round"/>`;
+    }
+    return `<svg class="mt-home-clubhouse-roof" data-roof="${ROOF}" viewBox="0 0 110 32" preserveAspectRatio="none">${body}</svg>`;
+  }
 
   // 主頁草地 SVG 噴泉（取代 emoji ⛲、純 SVG 質感）
   function _renderFountainSvg() {

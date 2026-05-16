@@ -4323,7 +4323,7 @@
     repeating-linear-gradient(90deg, transparent 0 40px, rgba(0,0,0,0.15) 40px 41px),
     linear-gradient(180deg, #8a6238 0%, #6e4a26 100%);
 }
-.mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse-roof polygon {
+.mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse-roof .is-roof-main {
   fill: #5a3a1a; stroke: #2a1408; stroke-width: 2.5;
 }
 .mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse-door {
@@ -4341,7 +4341,7 @@
     repeating-linear-gradient(0deg, transparent 0 10px, rgba(0,0,0,0.15) 10px 11px),
     linear-gradient(180deg, #c19a6b 0%, #a07d52 100%);
 }
-.mt-home-distance[data-stadium-level="2"] .mt-home-clubhouse-roof polygon {
+.mt-home-distance[data-stadium-level="2"] .mt-home-clubhouse-roof .is-roof-main {
   fill: #8a4a2a; stroke: #2a1408; stroke-width: 2.5;
 }
 .mt-home-distance[data-stadium-level="2"] .mt-home-clubhouse-window {
@@ -4356,7 +4356,7 @@
     repeating-linear-gradient(90deg, transparent 0 18px, rgba(60,15,5,0.4) 18px 19px),
     linear-gradient(180deg, #b85e4a 0%, #9a4830 100%);
 }
-.mt-home-distance[data-stadium-level="3"] .mt-home-clubhouse-roof polygon {
+.mt-home-distance[data-stadium-level="3"] .mt-home-clubhouse-roof .is-roof-main {
   fill: #c0392b; stroke: #2a1408; stroke-width: 2.5;
 }
 .mt-home-distance[data-stadium-level="3"] .mt-home-clubhouse-roof-tiles {
@@ -4374,7 +4374,7 @@
     repeating-linear-gradient(90deg, transparent 0 14px, rgba(100,70,40,0.25) 14px 15px),
     linear-gradient(180deg, #e8dcc2 0%, #c5b896 100%);
 }
-.mt-home-distance[data-stadium-level="4"] .mt-home-clubhouse-roof polygon {
+.mt-home-distance[data-stadium-level="4"] .mt-home-clubhouse-roof .is-roof-main {
   fill: #a82e1f; stroke: #2a1408; stroke-width: 2.5;
 }
 .mt-home-distance[data-stadium-level="4"] .mt-home-clubhouse-chimney {
@@ -4389,7 +4389,7 @@
     repeating-linear-gradient(90deg, transparent 0 36px, rgba(0,0,0,0.1) 36px 37px),
     linear-gradient(180deg, #e8e0d0 0%, #c5bca8 100%);
 }
-.mt-home-distance[data-stadium-level="5"] .mt-home-clubhouse-roof polygon {
+.mt-home-distance[data-stadium-level="5"] .mt-home-clubhouse-roof .is-roof-main {
   fill: #b04030; stroke: #2a1408; stroke-width: 2.5;
 }
 .mt-home-distance[data-stadium-level="5"] .mt-home-clubhouse-chimney { display: none; }
@@ -4404,7 +4404,7 @@
     repeating-linear-gradient(0deg, transparent 0 40px, rgba(0,0,0,0.06) 40px 41px),
     linear-gradient(180deg, #f0f0f0 0%, #c8c8c8 100%);
 }
-.mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse-roof polygon {
+.mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse-roof .is-roof-main {
   fill: #5a5a5a; stroke: #2a1408; stroke-width: 2.5;
 }
 .mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse-roof-tiles {
@@ -4424,7 +4424,7 @@
     repeating-linear-gradient(90deg, transparent 0 26px, rgba(255,255,255,0.1) 26px 27px),
     linear-gradient(180deg, #4a6080 0%, #2a3a55 100%);
 }
-.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-roof polygon {
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-roof .is-roof-main {
   fill: #f0c040 !important; stroke: #5a4010; stroke-width: 2.5;
 }
 .mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-roof-tiles { background: none; }
@@ -4447,7 +4447,7 @@
     linear-gradient(180deg, #2a3040 0%, #1a1f30 100%);
   box-shadow: 0 0 12px rgba(255,217,111,0.3);
 }
-.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-roof polygon {
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-roof .is-roof-main {
   fill: #f0c040 !important; stroke: #5a4010; stroke-width: 2.5;
 }
 .mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-roof-tiles { background: none; }
@@ -4471,7 +4471,7 @@
   border-color: #b89060;
   box-shadow: 0 0 16px rgba(255,217,111,0.4);
 }
-.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-roof polygon {
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-roof .is-roof-main {
   fill: #f0c040 !important; stroke: #5a4010; stroke-width: 2.5;
 }
 .mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-roof-tiles { background: none; }
@@ -4491,7 +4491,7 @@
   border-color: #6e4a08;
   box-shadow: 0 0 24px rgba(255,215,0,0.7), inset 0 0 12px rgba(255,255,255,0.4);
 }
-.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-roof polygon {
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-roof .is-roof-main {
   fill: #ffd700 !important; stroke: #6e4a08; stroke-width: 2.5;
 }
 .mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-roof-tiles {
@@ -4518,10 +4518,10 @@
 .mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse,
 .mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse { max-width: 320px; }
 /* 高等級換金頂 */
-.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-roof polygon,
-.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-roof polygon,
-.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-roof polygon,
-.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-roof polygon {
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-roof .is-roof-main,
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-roof .is-roof-main,
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-roof .is-roof-main,
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-roof .is-roof-main {
   fill: #f0c040 !important;
 }
 
@@ -4622,7 +4622,8 @@
   border-bottom: 0;
   margin: 0 12px;
 }
-/* SVG triangle 屋頂：寬 110% 蓋滿牆頂 + 兩側 eaves overhang */
+/* SVG 屋頂：寬 110% 蓋滿牆頂 + 兩側 eaves overhang
+   shape 由 JS _renderClubhouseRoofSvg 依等級切換（gable/hipped/flat/pyramid/stepped/dome） */
 .mt-home-clubhouse-roof {
   position: absolute;
   left: -8%; right: -8%; top: -28px;
@@ -4632,7 +4633,22 @@
   overflow: visible;
   z-index: 2;
 }
-/* 屋頂磚瓦紋路（橫條紋）*/
+/* 主屋頂 fill / stroke：被 per-stadium-level rule 覆寫 */
+.mt-home-clubhouse-roof .is-roof-main {
+  fill: #c0392b;
+  stroke: #1a1a2e;
+  stroke-width: 3;
+}
+.mt-home-clubhouse-roof .is-roof-ridge {
+  stroke: #2a1408;
+  stroke-width: 1.2;
+}
+.mt-home-clubhouse-roof .is-roof-spire {
+  fill: #ffd700;
+  stroke: #2a1408;
+  stroke-width: 1;
+}
+/* 屋頂磚瓦紋路（橫條紋）— 只在 gable 屋頂（Lv 1-2）才合理 */
 .mt-home-clubhouse-roof-tiles {
   position: absolute;
   left: -8%; right: -8%; top: -26px;
@@ -4644,6 +4660,15 @@
   pointer-events: none;
   z-index: 3;
 }
+/* Lv 3+ 屋頂改變形狀、hide triangle-clipped tiles */
+.mt-home-distance[data-stadium-level="3"]  .mt-home-clubhouse-roof-tiles,
+.mt-home-distance[data-stadium-level="4"]  .mt-home-clubhouse-roof-tiles,
+.mt-home-distance[data-stadium-level="5"]  .mt-home-clubhouse-roof-tiles,
+.mt-home-distance[data-stadium-level="6"]  .mt-home-clubhouse-roof-tiles,
+.mt-home-distance[data-stadium-level="7"]  .mt-home-clubhouse-roof-tiles,
+.mt-home-distance[data-stadium-level="8"]  .mt-home-clubhouse-roof-tiles,
+.mt-home-distance[data-stadium-level="9"]  .mt-home-clubhouse-roof-tiles,
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-roof-tiles { display: none; }
 /* 煙囪（坐落於右側屋頂斜面上）*/
 .mt-home-clubhouse-chimney {
   position: absolute;
