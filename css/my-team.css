@@ -4250,12 +4250,14 @@
   transform-origin: bottom center;
 }
 
-/* 聚光燈：base 從地平線（clubhouse bottom）開始往上長、最頂端是燈具 */
+/* 聚光燈：base 從地平線（clubhouse bottom）開始往上長、最頂端是燈具
+   高度有上限（避免高等級 clubhouse 過高、燈頭跑出 scene 外）*/
 .mt-home-floodlight {
   position: absolute;
   bottom: 0;
   width: 5px;
-  height: calc(100% + 35px);   /* 比 clubhouse 高、超過屋頂 */
+  height: calc(100% + 25px);
+  max-height: min(200px, 30vh);
   background: #404040;
   border: 1.5px solid #1a1a2e;
   z-index: 3;
@@ -4273,11 +4275,12 @@
   box-shadow: 0 0 12px rgba(255,235,150,0.9), 0 0 20px rgba(255,235,150,0.45);
   animation: mt-floodlight-flicker 3s ease-in-out infinite;
 }
-/* Lv 8+ 高聳聚光燈 */
+/* Lv 8+ 高聳聚光燈（仍受 max-height 上限保護不超出 scene）*/
 .mt-home-distance[data-stadium-level="8"] .mt-home-floodlight,
 .mt-home-distance[data-stadium-level="9"] .mt-home-floodlight,
 .mt-home-distance[data-stadium-level="10"] .mt-home-floodlight {
-  height: calc(100% + 60px);
+  height: calc(100% + 30px);
+  max-height: min(220px, 33vh);
 }
 @keyframes mt-floodlight-flicker {
   0%, 95%, 100% { opacity: 1; }
@@ -4331,7 +4334,6 @@
 }
 .mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse-window {
   background: linear-gradient(135deg, #5a8090 0%, #3a5060 100%);
-  top: 52%;            /* Lv1 高度小、窗戶下移避開隊牌、其餘大小不變 */
 }
 
 /* Lv 2：木造小屋升級 — 修整過的淺棕木、屋瓦初現 */
@@ -4747,8 +4749,7 @@
 .mt-home-clubhouse-window-cross::after {
   top: 50%; left: 0; right: 0; height: 2px; transform: translateY(-50%);
 }
-.mt-home-cw-1 { left: 18%; }
-.mt-home-cw-2 { right: 18%; }
+/* mt-home-cw-1 / mt-home-cw-2 已停用 — 窗戶改由 _renderClubhouseWindowsHtml(lv) 動態渲染、inline 設 left/top/width/height */
 
 /* Lv 3+ 球場邊（看台下方）一排廣告牌、彩色 LED 風
    兩半 + 中間留 gap 給訓練館門口、底邊貼地平線 */

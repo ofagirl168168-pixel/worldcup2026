@@ -796,12 +796,7 @@
               <div class="mt-home-clubhouse-door">
                 <div class="mt-home-clubhouse-handle"></div>
               </div>
-              <div class="mt-home-clubhouse-window mt-home-cw-1">
-                <div class="mt-home-clubhouse-window-cross"></div>
-              </div>
-              <div class="mt-home-clubhouse-window mt-home-cw-2">
-                <div class="mt-home-clubhouse-window-cross"></div>
-              </div>
+              ${_renderClubhouseWindowsHtml(team?.stadium_level || 1)}
               ${(team?.stadium_level || 1) >= 3 ? `
                 <!-- Lv 3+：兩側看台（球迷在主 fans loop 中分配進來）-->
                 <div class="mt-home-stand mt-home-stand-l"><div class="mt-home-stand-fans"></div></div>
@@ -3219,6 +3214,38 @@
               <polygon class="is-roof-spire" points="55,-14 64,-11 55,-8" stroke-linejoin="round"/>`;
     }
     return `<svg class="mt-home-clubhouse-roof" data-roof="${ROOF}" viewBox="0 0 110 32" preserveAspectRatio="none">${body}</svg>`;
+  }
+
+  // 主頁訓練館窗戶 — 依等級切換 cols × floors 排列、Lv 7+ 改深色玻璃
+  // 對齊預覽 SVG drawWindows 的設計：多列、多樓、最後一層中央留給門
+  function _renderClubhouseWindowsHtml(lv) {
+    const l = Math.max(1, Math.min(10, lv || 1));
+    // per-level config：cols × floors × 每樓 top% × 窗寬 / 高 (%)
+    const WIN = {
+      1:  { cols: 2, w: 14, h: 18, tops: [55] },          // Lv1 矮、避開隊牌
+      2:  { cols: 2, w: 14, h: 20, tops: [42] },
+      3:  { cols: 3, w: 14, h: 20, tops: [42] },
+      4:  { cols: 3, w: 13, h: 20, tops: [42] },
+      5:  { cols: 3, w: 13, h: 14, tops: [24, 50] },
+      6:  { cols: 3, w: 12, h: 14, tops: [22, 47] },
+      7:  { cols: 4, w: 10, h: 12, tops: [14, 34, 54] },
+      8:  { cols: 4, w: 10, h: 12, tops: [13, 33, 53] },
+      9:  { cols: 4, w: 10, h: 12, tops: [12, 32, 52] },
+      10: { cols: 5, w: 9,  h: 12, tops: [10, 30, 50] },
+    }[l];
+    const floors = WIN.tops.length;
+    let html = '';
+    for (let f = 0; f < floors; f++) {
+      for (let c = 0; c < WIN.cols; c++) {
+        // 最後一層中央（cols 為奇數時）留給門
+        const skipForDoor = (f === floors - 1) && (WIN.cols % 2 === 1) && (c === Math.floor(WIN.cols / 2));
+        if (skipForDoor) continue;
+        const left = ((c + 0.5) / WIN.cols) * 100;
+        html += `<div class="mt-home-clubhouse-window" style="left:${left.toFixed(2)}%;top:${WIN.tops[f]}%;width:${WIN.w}%;height:${WIN.h}%;transform:translateX(-50%);">`
+              + `<div class="mt-home-clubhouse-window-cross"></div></div>`;
+      }
+    }
+    return html;
   }
 
   // 主頁草地 SVG 噴泉（取代 emoji ⛲、純 SVG 質感）
