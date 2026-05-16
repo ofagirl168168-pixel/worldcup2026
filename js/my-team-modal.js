@@ -4952,12 +4952,15 @@
     overlay.querySelector('.mt-train-preview-cancel').addEventListener('click', close);
 
     const confirmBtn = overlay.querySelector('.mt-train-preview-confirm');
+    console.log('[train-preview] confirmBtn:', confirmBtn, 'blocked:', blocked, 'p.id:', p.id, 'mode:', mode);
     if (!blocked) {
       confirmBtn.addEventListener('click', async () => {
+        console.log('[train-preview] confirm clicked, calling trainPlayer', p.id, mode);
         confirmBtn.disabled = true;
         confirmBtn.textContent = '訓練中…';
         try {
           const result = await window.MyTeam.trainPlayer(p.id, mode);
+          console.log('[train-preview] trainPlayer result:', result);
           try { await window.MyTeam.trackQuest?.('train', 1); } catch (_) {}
           const g = result.gains;
           if (typeof showToast === 'function') {
