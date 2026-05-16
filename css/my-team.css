@@ -2585,6 +2585,23 @@
 }
 
 /* 勝率條 */
+.mt-pre-match-fans {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 16px 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.06);
+  border: 1.2px solid rgba(255,255,255,0.12);
+}
+.mt-pre-match-fan-pct { font-size: 12px; font-weight: 900; }
+.mt-pre-match-fans.is-pos     { background: rgba(76,175,80,0.18);  border-color: rgba(76,175,80,0.45);  color: #b9f0bf; }
+.mt-pre-match-fans.is-neg     { background: rgba(239,68,68,0.18);  border-color: rgba(239,68,68,0.5);   color: #ffc1c1; }
+.mt-pre-match-fans.is-neutral { color: rgba(255,255,255,0.7); }
+
 .mt-pre-match-prob { margin: 18px 0; }
 .mt-pre-match-prob-label {
   font-size: 11px;
@@ -3108,6 +3125,14 @@
 }
 .mt-post-season-tier.up { color: #4caf50; }
 .mt-post-season-tier.down { color: #ef9a9a; }
+.mt-post-season-tier.blocked {
+  color: #ffd96f;
+  background: rgba(255,200,100,0.12);
+  border: 1.5px dashed rgba(255,217,111,0.5);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 4px 0;
+}
 .mt-post-season-reward { color: #f0c040; font-size: 13px; margin-top: 2px; }
 
 /* ───────── tab 內各區共用提示 ───────── */
@@ -3808,6 +3833,11 @@
 .mt-stadium-up-stat-row span:last-child {
   color: #ffd96f;
   font-weight: 800;
+}
+.mt-stadium-up-stat-sub {
+  color: rgba(255,255,255,0.55);
+  font-weight: 600;
+  font-size: 11px;
 }
 .mt-stadium-up-confirm {
   width: 100%;

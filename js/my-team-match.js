@@ -381,7 +381,28 @@
       isBoss = !!opponent._isReal;
     }
 
-    _openMatchModal({ team, homeData, opponent, tier, matchIdx, isBoss, isTutorial });
+    // 球迷差距加成：我的球迷 vs 對手（AI 依 tier 推估、PvP 用實際 fans）
+    const myFans = team.fans || 100;
+    const oppFans = isTutorial ? myFans  // 教學賽不算
+      : (opponent.fans != null ? opponent.fans
+        : (opponent._isReal ? tier * 300 : tier * 200));
+    // ±5% 範圍：每 200 球迷差距 1%
+    const fanPct = Math.max(-5, Math.min(5, (myFans - oppFans) / 200));
+    if (!isTutorial && Math.abs(fanPct) >= 0.5) {
+      const m = 1 + fanPct / 100;
+      ['attack','defense','midfield','speed'].forEach(k => {
+        homeData.radar[k] = Math.max(20, Math.min(99, Math.round(homeData.radar[k] * m)));
+      });
+      (homeData.keyPlayers || []).forEach(p => {
+        if (!p.stats) return;
+        ['attack','defense','midfield','speed'].forEach(k => {
+          p.stats[k] = Math.max(20, Math.min(99, Math.round(p.stats[k] * m)));
+        });
+      });
+    }
+
+    _openMatchModal({ team, homeData, opponent, tier, matchIdx, isBoss, isTutorial,
+      myFans, oppFans, fanPct });
   }
 
   // ── 比賽 modal ──
@@ -436,6 +457,18 @@
             <div class="mt-pre-match-avg">綜合 <span data-count="${aAvg}">0</span></div>
           </div>
         </div>
+
+        ${!ctx.isTutorial && ctx.fanPct != null ? `
+        <!-- 球迷比拼 → 主場優勢 -->
+        <div class="mt-pre-match-fans ${ctx.fanPct >= 0.5 ? 'is-pos' : ctx.fanPct <= -0.5 ? 'is-neg' : 'is-neutral'}">
+          <span>👥 ${ctx.myFans} vs ${ctx.oppFans}</span>
+          <span class="mt-pre-match-fan-pct">
+            ${ctx.fanPct >= 0.5 ? `📣 主場優勢 +${ctx.fanPct.toFixed(1)}%`
+              : ctx.fanPct <= -0.5 ? `📉 客場劣勢 ${ctx.fanPct.toFixed(1)}%`
+              : '勢均力敵'}
+          </span>
+        </div>
+        ` : ''}
 
         <!-- 勝率對比條 -->
         <div class="mt-pre-match-prob">
@@ -650,6 +683,7 @@
     if (result.season_complete) {
       const tierMsg = result.tier_change === 'up' ? `<div class="mt-post-season-tier up">⬆️ 晉級到 Tier ${result.new_tier}</div>` :
                       result.tier_change === 'down' ? `<div class="mt-post-season-tier down">⬇️ 降級到 Tier ${result.new_tier}</div>` :
+                      result.tier_change === 'blocked' || result.promotion_blocked ? `<div class="mt-post-season-tier blocked">🔒 達晉級條件，但球場 Lv 不足、留在 Tier ${result.new_tier}<br><span style="font-size:11px;opacity:0.85">升到 Tier ${result.new_tier + 1} 需要球場 Lv ${result.new_tier}</span></div>` :
                       `<div class="mt-post-season-tier">留在 Tier ${result.new_tier}</div>`;
       seasonHtml = `
         <div class="mt-post-match-season">

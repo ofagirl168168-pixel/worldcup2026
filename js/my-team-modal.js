@@ -571,7 +571,7 @@
           <div class="mt-hub-team-crest" id="mt-hub-crest">${_renderCrest(team)}</div>
           <div class="mt-hub-team-info">
             <div class="mt-hub-team-name" id="mt-hub-team-name">${escapeHtml(team.team_name)}</div>
-            <div class="mt-hub-team-meta" id="mt-hub-team-meta">Lv.${team.stadium_level} 球場 · ${team.fans} 球迷</div>
+            <div class="mt-hub-team-meta" id="mt-hub-team-meta">Lv.${team.stadium_level} 球場 · 👥 ${team.fans}/${_fansCap(team.stadium_level)}</div>
           </div>
         </div>
         <div class="mt-hub-stats">
@@ -3590,12 +3590,24 @@
   ` : ''}
 </svg>`;
   }
+  // 球迷上限：跟 SQL fans_cap_for_level 對齊（200 + lv * 300）
+  function _fansCap(lv) { return 200 + Math.max(1, Math.min(10, lv || 1)) * 300; }
+  // 球迷加速 %：跟 SQL fans_speed_bonus_pct 對齊（min(40, floor(fans/100))）
+  function _fansSpeedPct(fans) { return Math.min(40, Math.max(0, Math.floor((fans || 0) / 100))); }
+
   function _openStadiumUpgradeModal(team, onSuccess) {
     const lv = team?.stadium_level || 1;
     const isMaxed = lv >= 10;
     const cost = STADIUM_COST[lv + 1] || 0;
     const currentLabel = STADIUM_TIER_LABEL[lv];
     const nextLabel = STADIUM_TIER_LABEL[lv + 1];
+    const curCap = _fansCap(lv);
+    const nextCap = _fansCap(lv + 1);
+    const curMaxTier = Math.min(10, lv + 1);
+    const nextMaxTier = Math.min(10, lv + 2);
+    const curSpdNow = _fansSpeedPct(team.fans || 0);
+    const curSpdAtCap = _fansSpeedPct(curCap);
+    const nextSpdAtCap = _fansSpeedPct(nextCap);
 
     const overlay = document.createElement('div');
     overlay.className = 'mt-profile-overlay mt-stadium-upgrade-overlay';
@@ -3623,11 +3635,19 @@
         <div class="mt-stadium-up-stats">
           <div class="mt-stadium-up-stat-row">
             <span>👥 球迷上限</span>
-            <span>${team.fans || 100}</span>
+            <span>${team.fans || 100} / <b>${curCap}</b>${isMaxed ? '' : ` → <b>${nextCap}</b>`}</span>
           </div>
           <div class="mt-stadium-up-stat-row">
             <span>⚡ 體力上限</span>
-            <span>${team.stamina_max || 5}</span>
+            <span>${team.stamina_max || 5}${isMaxed ? '' : (([3,6,9].includes(lv + 1)) ? ` → <b>${(team.stamina_max || 5) + 1}</b>` : '')}</span>
+          </div>
+          <div class="mt-stadium-up-stat-row">
+            <span>🏆 聯賽 Tier 上限</span>
+            <span><b>Tier ${curMaxTier}</b>${isMaxed ? '' : ` → <b>Tier ${nextMaxTier}</b>`}</span>
+          </div>
+          <div class="mt-stadium-up-stat-row" title="球迷越多、訓練/傷病恢復越快">
+            <span>⏱️ 訓練 / 恢復加速</span>
+            <span>-${curSpdNow}% <span class="mt-stadium-up-stat-sub">（滿員 -${curSpdAtCap}%${isMaxed ? '' : ` → -${nextSpdAtCap}%`}）</span></span>
           </div>
         </div>
 
@@ -3637,7 +3657,7 @@
           <button class="mt-stadium-up-confirm" id="mt-stadium-up-btn">
             升到 Lv. ${lv + 1}<span class="mt-stadium-up-cost">💎 ${cost}</span>
           </button>
-          <div class="mt-stadium-up-hint">下一級新增：<b>${escapeHtml(nextLabel)}</b></div>
+          <div class="mt-stadium-up-hint">下一級新增：<b>${escapeHtml(nextLabel)}</b> · 解鎖 Tier ${nextMaxTier}</div>
         `}
 
         <button class="mt-stadium-preview-all-link" id="mt-stadium-preview-all" type="button">
@@ -5939,7 +5959,7 @@
       ssrBadge.style.display = 'none';
     }
     set('mt-hub-team-name', team.team_name || '');
-    set('mt-hub-team-meta', `Lv.${team.stadium_level} 球場 · ${team.fans} 球迷`);
+    set('mt-hub-team-meta', `Lv.${team.stadium_level} 球場 · 👥 ${team.fans}/${_fansCap(team.stadium_level)}`);
     // 更新隊徽（如果 crest_id / 顏色變了）
     const crestEl = _overlay.querySelector('#mt-hub-crest');
     if (crestEl) crestEl.innerHTML = _renderCrest(team);
