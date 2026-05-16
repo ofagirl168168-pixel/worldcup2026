@@ -805,8 +805,8 @@
               <div class="mt-home-clubhouse-window mt-home-cw-2">
                 <div class="mt-home-clubhouse-window-cross"></div>
               </div>
-              ${(team?.stadium_level || 1) >= 3 ? `
-                <!-- Lv 3+：兩側看台（球迷在主 fans loop 中分配進來）-->
+              ${(team?.stadium_level || 1) >= 5 ? `
+                <!-- Lv 5+：兩側看台（球迷在主 fans loop 中分配進來）-->
                 <div class="mt-home-stand mt-home-stand-l"><div class="mt-home-stand-fans"></div></div>
                 <div class="mt-home-stand mt-home-stand-r"><div class="mt-home-stand-fans"></div></div>
               ` : ''}
@@ -831,7 +831,7 @@
           </div>
           <!-- 地面（操場）-->
           <div class="mt-home-ground" id="mt-home-ground">
-            ${stadiumLv >= 3 ? _renderPitchAds(stadiumLv, team) : ''}
+            ${stadiumLv >= 5 ? _renderPitchAds(stadiumLv, team) : ''}
             <div class="mt-home-ground-lines"></div>
             <div class="mt-home-ground-tufts"></div>
             ${_renderGrassDecor(stadiumLv)}
@@ -914,7 +914,7 @@
         </svg>`;
       };
 
-      const hasStands = stadiumLv >= 3;
+      const hasStands = stadiumLv >= 5;
       const tierCount = stadiumLv >= 6 ? 5 : 3;
       // 分配比例：有看台時 60% 上看台、40% 地平線；無看台時全在地平線
       const groundFrags = [];
@@ -3091,13 +3091,13 @@
   const STADIUM_TIER_LABEL = {
     1: '木造小屋',
     2: '門前燈飾',
-    3: '兩側看台',
-    4: '鋪石路 + 看台扶手',
-    5: '聚光燈 + 羅馬柱',
-    6: '雙層看台 + 廣告板',
+    3: '紅磚體育館',
+    4: '鋪石路 + 羅馬柱',
+    5: '兩側看台 + 球場邊廣告',
+    6: '雙層看台 + 聚光燈',
     7: '旗桿 + 金色屋頂',
     8: '高聳聚光燈 + LED 跑馬燈',
-    9: '鐘塔 + 延伸看台',
+    9: 'CHAMPIONS 燈牌 + 延伸看台',
     10: '黃金屋頂 + 噴泉 + 彩虹光環',
   };
 
@@ -3374,7 +3374,7 @@
 
     // 旗標
     const isMaxed = lv >= 10;
-    const hasStands = lv >= 3;
+    const hasStands = lv >= 5;
     const hasStone = lv >= 4;
     const hasLights = lv >= 5;
     const hasColumn = lv >= 5;
