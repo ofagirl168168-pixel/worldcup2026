@@ -3216,22 +3216,23 @@
     return `<svg class="mt-home-clubhouse-roof" data-roof="${ROOF}" viewBox="0 0 110 32" preserveAspectRatio="none">${body}</svg>`;
   }
 
-  // 主頁訓練館窗戶 — 依等級切換 cols × floors 排列、Lv 7+ 改深色玻璃
-  // 對齊預覽 SVG drawWindows 的設計：多列、多樓、最後一層中央留給門
+  // 主頁訓練館窗戶 — 依等級切換 cols × floors 排列、對齊預覽 SVG 設計
+  // 預覽窗戶為直立窄長方形 (3:4)、最後一層中央留給門、Lv 7+ 改深色玻璃
   function _renderClubhouseWindowsHtml(lv) {
     const l = Math.max(1, Math.min(10, lv || 1));
-    // per-level config：cols × floors × 每樓 top% × 窗寬 / 高 (%)
+    // 用 px 而非 %，讓窗戶不會被 clubhouse 比例壓扁、永遠直立
+    // tops 仍用 % 以便對齊 sign / door 區域
     const WIN = {
-      1:  { cols: 2, w: 14, h: 18, tops: [55] },          // Lv1 矮、避開隊牌
-      2:  { cols: 2, w: 14, h: 20, tops: [42] },
-      3:  { cols: 3, w: 14, h: 20, tops: [42] },
-      4:  { cols: 3, w: 13, h: 20, tops: [42] },
-      5:  { cols: 3, w: 13, h: 14, tops: [24, 50] },
-      6:  { cols: 3, w: 12, h: 14, tops: [22, 47] },
-      7:  { cols: 4, w: 10, h: 12, tops: [14, 34, 54] },
-      8:  { cols: 4, w: 10, h: 12, tops: [13, 33, 53] },
-      9:  { cols: 4, w: 10, h: 12, tops: [12, 32, 52] },
-      10: { cols: 5, w: 9,  h: 12, tops: [10, 30, 50] },
+      1:  { cols: 3, tops: [40],         wPx: 18, hPx: 24 },   // 2 visible（跳過中央放門）
+      2:  { cols: 3, tops: [32],         wPx: 18, hPx: 26 },
+      3:  { cols: 4, tops: [32],         wPx: 16, hPx: 26 },
+      4:  { cols: 4, tops: [32],         wPx: 16, hPx: 28 },
+      5:  { cols: 5, tops: [22, 52],     wPx: 15, hPx: 22 },
+      6:  { cols: 5, tops: [20, 50],     wPx: 14, hPx: 22 },
+      7:  { cols: 5, tops: [14, 38, 62], wPx: 14, hPx: 18 },
+      8:  { cols: 6, tops: [12, 36, 60], wPx: 12, hPx: 18 },
+      9:  { cols: 6, tops: [10, 34, 58], wPx: 12, hPx: 18 },
+      10: { cols: 7, tops: [8, 32, 56],  wPx: 11, hPx: 18 },
     }[l];
     const floors = WIN.tops.length;
     let html = '';
@@ -3241,7 +3242,7 @@
         const skipForDoor = (f === floors - 1) && (WIN.cols % 2 === 1) && (c === Math.floor(WIN.cols / 2));
         if (skipForDoor) continue;
         const left = ((c + 0.5) / WIN.cols) * 100;
-        html += `<div class="mt-home-clubhouse-window" style="left:${left.toFixed(2)}%;top:${WIN.tops[f]}%;width:${WIN.w}%;height:${WIN.h}%;transform:translateX(-50%);">`
+        html += `<div class="mt-home-clubhouse-window" style="left:${left.toFixed(2)}%;top:${WIN.tops[f]}%;width:${WIN.wPx}px;height:${WIN.hPx}px;transform:translateX(-50%);">`
               + `<div class="mt-home-clubhouse-window-cross"></div></div>`;
       }
     }
