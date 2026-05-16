@@ -804,7 +804,6 @@
                 <!-- Lv 5-6: 2 樓、Lv 7-10: 3 樓（樓層數上限 3、再高就靠建築尺寸大不是樓多）-->
                 <div class="mt-home-floors" data-floors="${stadiumLv <= 6 ? 2 : 3}"></div>
               ` : ''}
-              ${stadiumLv >= 9 ? _renderClockTowerSvg() : ''}
             </div>
             <div class="mt-home-tree mt-home-tree-r"></div>
             <!-- 球迷：根據 team.fans 數量在看台/草地周圍加油 -->
@@ -812,6 +811,7 @@
           </div>
           <!-- 地面（操場）-->
           <div class="mt-home-ground" id="mt-home-ground">
+            ${stadiumLv >= 3 ? _renderPitchAds(stadiumLv, team) : ''}
             <div class="mt-home-ground-lines"></div>
             <div class="mt-home-ground-tufts"></div>
             ${_renderGrassDecor(stadiumLv)}
@@ -3139,69 +3139,24 @@
     return html;
   }
 
-  // Lv 9-10 鐘塔 — 獨立 SVG element、放 clubhouse 右側看台外
-  // (避免被 stand 擋住)、夠高才像鐘塔
-  function _renderClockTowerSvg() {
-    return `
-<div class="mt-home-clocktower">
-  <svg viewBox="0 0 38 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- 塔身（石材）-->
-    <rect x="6" y="40" width="26" height="160" fill="#d4c8b8" stroke="#1a1a2e" stroke-width="1.5"/>
-    <!-- 塔身石材紋 -->
-    <line x1="6"  y1="80"  x2="32" y2="80"  stroke="#9a8f78" stroke-width="0.6"/>
-    <line x1="6"  y1="120" x2="32" y2="120" stroke="#9a8f78" stroke-width="0.6"/>
-    <line x1="6"  y1="160" x2="32" y2="160" stroke="#9a8f78" stroke-width="0.6"/>
-    <line x1="19" y1="40"  x2="19" y2="200" stroke="#9a8f78" stroke-width="0.4"/>
-    <!-- 鐘樓主體（鐘上方擋雨頂）-->
-    <rect x="2" y="38" width="34" height="4" fill="#8a7860" stroke="#1a1a2e" stroke-width="1.2"/>
-    <!-- 屋頂尖塔 -->
-    <polygon points="4,40 19,4 34,40" fill="#3a2410" stroke="#1a1a2e" stroke-width="1.5"/>
-    <!-- 屋頂裝飾線 -->
-    <line x1="11" y1="22" x2="27" y2="22" stroke="#6e4a26" stroke-width="0.6"/>
-    <!-- 風向標 / 旗杆 -->
-    <line x1="19" y1="4" x2="19" y2="-4" stroke="#1a1a2e" stroke-width="1.2"/>
-    <polygon points="19,-4 26,-2 19,0" fill="#c0392b" stroke="#1a1a2e" stroke-width="0.5"/>
-    <!-- 鐘面背景（圓） -->
-    <circle cx="19" cy="62" r="11" fill="#fff" stroke="#1a1a2e" stroke-width="1.5"/>
-    <circle cx="19" cy="62" r="9.5" fill="#fef8e0" stroke="#1a1a2e" stroke-width="0.4"/>
-    <!-- 鐘面刻度（12、3、6、9）-->
-    <g fill="#1a1a2e" font-size="3" font-family="serif" font-weight="900" text-anchor="middle">
-      <text x="19" y="55">12</text>
-      <text x="27" y="64">3</text>
-      <text x="19" y="71">6</text>
-      <text x="11" y="64">9</text>
-    </g>
-    <!-- 小刻度點 -->
-    <g fill="#1a1a2e">
-      <circle cx="22" cy="56" r="0.4"/>
-      <circle cx="24.5" cy="59" r="0.4"/>
-      <circle cx="24.5" cy="65" r="0.4"/>
-      <circle cx="22" cy="68" r="0.4"/>
-      <circle cx="16" cy="68" r="0.4"/>
-      <circle cx="13.5" cy="65" r="0.4"/>
-      <circle cx="13.5" cy="59" r="0.4"/>
-      <circle cx="16" cy="56" r="0.4"/>
-    </g>
-    <!-- 時針 -->
-    <line x1="19" y1="62" x2="19" y2="56" stroke="#1a1a2e" stroke-width="1.5" stroke-linecap="round"/>
-    <!-- 分針 -->
-    <line x1="19" y1="62" x2="24" y2="62.5" stroke="#1a1a2e" stroke-width="1" stroke-linecap="round"/>
-    <!-- 中心圓 -->
-    <circle cx="19" cy="62" r="0.8" fill="#1a1a2e"/>
-    <!-- 塔身窗戶（拱形）-->
-    <rect x="14" y="100" width="10" height="14" fill="#5a8090" stroke="#1a1a2e" stroke-width="0.8"/>
-    <path d="M 14 100 Q 19 95 24 100" fill="#5a8090" stroke="#1a1a2e" stroke-width="0.8"/>
-    <line x1="19" y1="100" x2="19" y2="114" stroke="#1a1a2e" stroke-width="0.4"/>
-    <line x1="14" y1="107" x2="24" y2="107" stroke="#1a1a2e" stroke-width="0.4"/>
-    <!-- 塔身底窗 -->
-    <rect x="14" y="150" width="10" height="12" fill="#5a8090" stroke="#1a1a2e" stroke-width="0.8"/>
-    <line x1="19" y1="150" x2="19" y2="162" stroke="#1a1a2e" stroke-width="0.4"/>
-    <!-- 塔底拱門 -->
-    <rect x="13" y="184" width="12" height="16" fill="#3a2410" stroke="#1a1a2e" stroke-width="0.8"/>
-    <path d="M 13 184 Q 19 178 25 184" fill="#3a2410" stroke="#1a1a2e" stroke-width="0.8"/>
-  </svg>
-</div>`;
+  // Lv 3+ 球場邊看台下方一排廣告牌
+  // 數量隨等級遞增、文字以球隊名 + 通用 slogan 輪替
+  function _renderPitchAds(lv, team) {
+    const teamName = (team?.team_name || 'TEAM').toUpperCase().slice(0, 6);
+    const ads = ['SOCCERMADDY', teamName, 'GO!', 'CHAMPIONS', teamName, 'WIN', 'SOCCERMADDY', teamName];
+    const palette = ['#c0392b', '#1a3050', '#16a085', '#d35400', '#7d3c98', '#1a3050'];
+    // Lv 3-4: 6 個、Lv 5-7: 8 個、Lv 8-10: 10 個
+    const count = lv >= 8 ? 10 : (lv >= 5 ? 8 : 6);
+    let html = '<div class="mt-home-pitch-ads">';
+    for (let i = 0; i < count; i++) {
+      const text = ads[i % ads.length];
+      const color = palette[i % palette.length];
+      html += `<div class="mt-home-pitch-ad" style="--c:${color}">${text}</div>`;
+    }
+    html += '</div>';
+    return html;
   }
+
 
   // 主頁草地 SVG 噴泉（取代 emoji ⛲、純 SVG 質感）
   function _renderFountainSvg() {
@@ -3398,13 +3353,12 @@
     const hasStone = lv >= 4;
     const hasLights = lv >= 5;
     const hasColumn = lv >= 5;
-    const hasAds = lv >= 6;
     const has2ndDeck = lv >= 6;
     const hasFlag = lv >= 7;
     const hasLED = lv >= 8;
     const hasTallLight = lv >= 8;
-    const hasClock = lv >= 9;
     const hasChimney = lv <= 3;
+    const hasChampWall = lv >= 6;
 
     // 屋頂 SVG 依形狀
     const drawRoof = () => {
@@ -3568,37 +3522,39 @@
   <polygon points="${bx + SHAPE.w + 8},${roofTop - 6} ${bx + SHAPE.w},${roofTop - 4} ${bx + SHAPE.w + 8},${roofTop - 2}" fill="#c0392b" stroke="#2a1408" stroke-width="0.4"/>
   ` : ''}
 
-  ${hasAds ? `
-  <!-- 廣告板 -->
-  <rect x="6" y="92" width="32" height="9" fill="#1a3050" stroke="#ffd96f" stroke-width="0.5"/>
-  <text x="22" y="98.5" text-anchor="middle" fill="#ffd96f" font-size="3.2" font-family="sans-serif" font-weight="900">CHAMPIONS</text>
-  <rect x="162" y="92" width="32" height="9" fill="#1a3050" stroke="#ffd96f" stroke-width="0.5"/>
-  <text x="178" y="98.5" text-anchor="middle" fill="#ffd96f" font-size="3.2" font-family="sans-serif" font-weight="900">CHAMPIONS</text>
+  ${hasStands ? `
+  <!-- Lv 3+ 看台下方一排彩色廣告牌（沿球場頂緣）-->
+  ${(() => {
+    const adColors = ['#c0392b', '#1a3050', '#16a085', '#d35400', '#7d3c98', '#1a3050', '#c0392b', '#16a085'];
+    const cnt = lv >= 8 ? 10 : (lv >= 5 ? 8 : 6);
+    const adW = 200 / cnt;
+    let out = '';
+    for (let i = 0; i < cnt; i++) {
+      const x = i * adW;
+      out += `<rect x="${x + 0.5}" y="62" width="${adW - 1}" height="5" fill="${adColors[i % adColors.length]}" stroke="#1a1a2e" stroke-width="0.4"/>`;
+    }
+    return out;
+  })()}
   ` : ''}
 
-  ${hasClock ? `
-  <!-- 鐘塔 -->
-  <rect x="${bx - 22}" y="${by - 18}" width="14" height="${SHAPE.h + 18}" fill="#d4c8b8" stroke="#2a1408" stroke-width="1"/>
-  <polygon points="${bx - 24},${by - 18} ${bx - 15},${by - 28} ${bx - 6},${by - 18}" fill="#3a2410" stroke="#2a1408" stroke-width="0.6"/>
-  <circle cx="${bx - 15}" cy="${by - 8}" r="4.5" fill="#fff" stroke="#2a1408" stroke-width="0.6"/>
-  <line x1="${bx - 15}" y1="${by - 8}" x2="${bx - 15}" y2="${by - 11}" stroke="#000" stroke-width="0.5"/>
-  <line x1="${bx - 15}" y1="${by - 8}" x2="${bx - 12}" y2="${by - 7.5}" stroke="#000" stroke-width="0.5"/>
-  <g fill="#2a1408">
-    <circle cx="${bx - 15}" cy="${by - 12.2}" r="0.3"/>
-    <circle cx="${bx - 10.8}" cy="${by - 8}" r="0.3"/>
-    <circle cx="${bx - 15}" cy="${by - 3.8}" r="0.3"/>
-    <circle cx="${bx - 19.2}" cy="${by - 8}" r="0.3"/>
-  </g>
+  ${hasChampWall ? `
+  <!-- CHAMPIONS 燈牌（掛在訓練館牆上）-->
+  <rect x="${bcx - SHAPE.w * 0.28}" y="${by + 2}" width="${SHAPE.w * 0.56}" height="4" fill="#0d1830" stroke="#ffd96f" stroke-width="0.4"/>
+  <text x="${bcx}" y="${by + 5.2}" text-anchor="middle" fill="#ffd96f" font-size="2.6" font-family="sans-serif" font-weight="900" letter-spacing="0.3">CHAMPIONS</text>
   ` : ''}
 
   ${isMaxed ? `
-  <!-- 噴泉 -->
-  <ellipse cx="100" cy="98" rx="6" ry="1.5" fill="#4080a0" stroke="#2a4050" stroke-width="0.4"/>
-  <rect x="98.5" y="91" width="3" height="7" fill="#d4c8b8"/>
-  <circle cx="100" cy="90.5" r="1.5" fill="#a5cce6"/>
-  <path d="M 99 90 Q 96 84 95 82" stroke="#a5cce6" stroke-width="0.8" fill="none" opacity="0.85"/>
-  <path d="M 101 90 Q 104 84 105 82" stroke="#a5cce6" stroke-width="0.8" fill="none" opacity="0.85"/>
-  <path d="M 100 90 L 100 80" stroke="#a5cce6" stroke-width="0.8" fill="none" opacity="0.9"/>
+  <!-- 噴泉（Lv 10、大型）-->
+  <ellipse cx="100" cy="103" rx="11" ry="2" fill="#4080a0" stroke="#2a4050" stroke-width="0.5"/>
+  <ellipse cx="100" cy="101" rx="9" ry="1.6" fill="#7eb5d4"/>
+  <rect x="96" y="89" width="8" height="12" fill="#d4c8b8" stroke="#2a1408" stroke-width="0.5"/>
+  <ellipse cx="100" cy="89" rx="6" ry="1.5" fill="#d4c8b8" stroke="#2a1408" stroke-width="0.4"/>
+  <rect x="97.5" y="80" width="5" height="9" fill="#e0d4b8" stroke="#2a1408" stroke-width="0.4"/>
+  <ellipse cx="100" cy="80" rx="4" ry="1" fill="#a5cce6" stroke="#2a1408" stroke-width="0.3"/>
+  <path d="M 100 78 L 100 64" stroke="#cce8f5" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <path d="M 98 78 Q 95 70 93 66" stroke="#a5cce6" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 102 78 Q 105 70 107 66" stroke="#a5cce6" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.85"/>
+  <circle cx="100" cy="62" r="1.2" fill="#a5cce6" opacity="0.8"/>
   <rect x="0" y="0" width="200" height="110" fill="none" stroke="#ffd700" stroke-width="2" opacity="0.5"/>
   ` : ''}
 </svg>`;

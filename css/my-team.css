@@ -3945,20 +3945,6 @@
 }
 
 /* Lv 9+：clubhouse 右邊加鐘塔（::after on .mt-home-clubhouse） */
-/* 鐘塔（Lv 9-10）：附在訓練館右側、向上延伸過屋頂、不會被看台擋住 */
-.mt-home-clocktower {
-  position: absolute;
-  bottom: 0;
-  right: 6px;                   /* 附在 clubhouse 內側右邊、不出 clubhouse */
-  width: 32px;
-  height: calc(100% + 100px);   /* 比 clubhouse 高 100px、tower 從地面直達天空 */
-  z-index: 5;                   /* 高過 clubhouse 牆/窗/門 */
-  pointer-events: none;
-}
-.mt-home-clocktower svg {
-  width: 100%; height: 100%; display: block;
-}
-
 /* Lv 10：草地噴泉用 SVG — 大幅放大、依「最下面台座 Y」決定 z 軸 */
 .mt-home-fountain {
   position: absolute;
@@ -4330,6 +4316,16 @@
 }
 .mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse-window {
   background: linear-gradient(135deg, #5a8090 0%, #3a5060 100%);
+  top: 52%;            /* Lv1 高度只有 80px、窗戶下移避開隊牌 */
+  height: 16%;
+}
+/* Lv1 隊牌變小、貼在屋頂下方一條、避免跟窗戶撞到 */
+.mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse-sign {
+  top: 4%;
+  margin: 0 18%;
+  padding: 1px 3px;
+  font-size: 9px;
+  border-width: 1.5px;
 }
 
 /* Lv 2：木造小屋升級 — 修整過的淺棕木、屋瓦初現 */
@@ -4722,6 +4718,39 @@
 }
 .mt-home-cw-1 { left: 18%; }
 .mt-home-cw-2 { right: 18%; }
+
+/* Lv 3+ 球場邊（看台下方）一排廣告牌、彩色 LED 風 */
+.mt-home-pitch-ads {
+  position: absolute;
+  left: 0; right: 0;
+  top: 0;                          /* 貼著操場頂緣（即看台底部）*/
+  height: 12px;
+  display: flex;
+  gap: 1px;
+  padding: 0 2px;
+  z-index: 5;                      /* 高過草紋、但低於球員與裝飾 */
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.45));
+}
+.mt-home-pitch-ad {
+  flex: 1;
+  min-width: 0;
+  background: var(--c, #1a3050);
+  border: 1px solid #1a1a2e;
+  color: #fff;
+  font-size: 6px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 40%, rgba(0,0,0,0.25) 100%),
+    linear-gradient(180deg, var(--c, #1a3050), var(--c, #1a3050));
+}
 
 /* Pixel art 操場 — 多層綠色漸層 + 條紋 + 草簇紋路 */
 .mt-home-ground {
