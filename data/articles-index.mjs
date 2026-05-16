@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-065",
+    "tournament": "epl",
+    "title": "【賽前分析】伯恩茅斯 vs 曼城：冠軍之路最後客場考驗，Haaland 能否射下爭冠關鍵三分？",
+    "summary": "英超第37輪——曼城（第2・77分）作客活力球場挑戰狀態火熱的伯恩茅斯（第6・55分）。曼城落後兵工廠 2 分，這場必須取勝才能把懸念帶到最後一輪。Iraola 的告別季對 Guardiola 的冠軍野心——誰的動機更強？",
+    "date": "2026-05-17",
+    "category": "賽前深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-061",
     "tournament": "epl",
     "title": "【賽後回顧】阿斯頓維拉 4-2 利物浦：Watkins 梅開二度，維拉鎖定歐冠席位",
@@ -169,7 +179,7 @@ export default [
     "date": "2026-05-09",
     "category": "球星聚焦",
     "readTime": "8分鐘",
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "12",
