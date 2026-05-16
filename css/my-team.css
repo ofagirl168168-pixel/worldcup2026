@@ -1960,17 +1960,24 @@
 .mt-gacha-cards.all-revealed .mt-gacha-card3d-front {
   padding: 6px 4px !important;
 }
-.mt-gacha-cards.all-revealed .mt-gacha-front-portrait {
+/* 更狠的 selector 鎖住 width/height、min-height 強制撐開、防止被壓 */
+.mt-gacha-cards.all-revealed .mt-gacha-card3d .mt-gacha-front-portrait {
   width: 95px !important;
   height: 95px !important;
+  min-width: 95px !important;
+  min-height: 95px !important;
+  max-width: 95px !important;
+  max-height: 95px !important;
+  flex: 0 0 95px !important;                 /* 萬一父用 flex 壓縮 */
   margin: 3px auto 4px !important;
-  border: 3px solid #ff00ff !important;        /* DEBUG: 桃紅 outline 確認 container 渲染 */
-  background: #00ffff !important;              /* DEBUG: 青色背景確認 img 是否覆蓋 */
+  border: 3px solid #ff00ff !important;
+  background: #00ffff !important;
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
+  box-sizing: border-box !important;
 }
-.mt-gacha-cards.all-revealed .mt-gacha-front-portrait-img {
+.mt-gacha-cards.all-revealed .mt-gacha-card3d .mt-gacha-front-portrait-img {
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
