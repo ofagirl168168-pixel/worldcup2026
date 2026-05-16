@@ -3048,11 +3048,208 @@
     4: '鋪石路 + 看台扶手',
     5: '聚光燈 + 羅馬柱',
     6: '雙層看台 + 廣告板',
-    7: '旗桿 + 屋頂尖塔',
+    7: '旗桿 + 金色屋頂',
     8: '高聳聚光燈 + LED 跑馬燈',
     9: '鐘塔 + 延伸看台',
     10: '黃金屋頂 + 噴泉 + 彩虹光環',
   };
+
+  // 球場預覽 SVG generator — 依等級畫出明顯不同的迷你場景
+  function _stadiumPreviewSvg(level) {
+    const lv = Math.max(1, Math.min(10, level));
+    const goldRoof = lv >= 7;
+    const hasStands = lv >= 3;
+    const hasStone = lv >= 4;
+    const hasRail = lv >= 4;
+    const hasLights = lv >= 5;
+    const hasColumn = lv >= 5;
+    const hasAds = lv >= 6;
+    const has2ndDeck = lv >= 6;
+    const hasFlag = lv >= 7;
+    const hasSpire = lv >= 7;
+    const hasLED = lv >= 8;
+    const hasTallLight = lv >= 8;
+    const hasClock = lv >= 9;
+    const isMaxed = lv >= 10;
+
+    const roofFill = isMaxed ? '#ffd700' : (goldRoof ? '#e8c870' : '#c0392b');
+    const wallFill = isMaxed ? '#f0e0a0' : (goldRoof ? '#d8c490' : '#b08858');
+
+    return `
+<svg viewBox="0 0 200 110" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky${lv}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${isMaxed ? '#ffb988' : '#7eb6e0'}"/>
+      <stop offset="60%" stop-color="${isMaxed ? '#ffd9b0' : '#b3d7eb'}"/>
+      <stop offset="100%" stop-color="${isMaxed ? '#fff0c8' : '#d4e7f3'}"/>
+    </linearGradient>
+    <linearGradient id="grass${lv}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5fc05f"/>
+      <stop offset="100%" stop-color="#3d8a3d"/>
+    </linearGradient>
+  </defs>
+  <!-- 天空 -->
+  <rect x="0" y="0" width="200" height="62" fill="url(#sky${lv})"/>
+  <!-- 太陽 -->
+  <circle cx="172" cy="16" r="7" fill="${isMaxed ? '#ffd700' : '#fff5b0'}" filter="url(#glow${lv})"/>
+  <circle cx="172" cy="16" r="10" fill="${isMaxed ? '#ffd700' : '#fff5b0'}" opacity="0.25"/>
+  <!-- 遠山 2 層 -->
+  <polygon points="0,58 25,42 55,50 90,38 125,46 165,38 200,46 200,62 0,62" fill="#a8b6c8" opacity="0.6"/>
+  <polygon points="0,60 30,50 65,56 100,46 135,52 170,46 200,52 200,62 0,62" fill="#7a8aa0" opacity="0.8"/>
+  <!-- 草地 -->
+  <rect x="0" y="60" width="200" height="50" fill="url(#grass${lv})"/>
+  <!-- 草地紋路 -->
+  <line x1="0" y1="65" x2="200" y2="65" stroke="#3a8c3a" stroke-width="0.4" stroke-dasharray="3,2"/>
+  <line x1="0" y1="80" x2="200" y2="80" stroke="#3a8c3a" stroke-width="0.4" stroke-dasharray="3,2" opacity="0.6"/>
+
+  ${hasStone ? `
+  <!-- Lv 4+ 鋪石路 -->
+  <rect x="92" y="84" width="16" height="26" fill="#a89888" stroke="#5a4a3a" stroke-width="0.5"/>
+  <line x1="92" y1="89" x2="108" y2="89" stroke="#5a4a3a" stroke-width="0.4"/>
+  <line x1="92" y1="96" x2="108" y2="96" stroke="#5a4a3a" stroke-width="0.4"/>
+  <line x1="92" y1="103" x2="108" y2="103" stroke="#5a4a3a" stroke-width="0.4"/>
+  <line x1="100" y1="84" x2="100" y2="110" stroke="#5a4a3a" stroke-width="0.3"/>
+  ` : ''}
+
+  ${hasStands ? `
+  <!-- Lv 3+ 兩側看台 -->
+  <rect x="14" y="${has2ndDeck ? 64 : 72}" width="54" height="${has2ndDeck ? 22 : 14}" fill="#8a6a4a" stroke="#2a1408" stroke-width="0.8"/>
+  ${has2ndDeck ? '<line x1="14" y1="75" x2="68" y2="75" stroke="#2a1408" stroke-width="0.6"/>' : ''}
+  ${hasRail ? `<line x1="16" y1="${has2ndDeck ? 66 : 74}" x2="66" y2="${has2ndDeck ? 66 : 74}" stroke="#fff" stroke-width="0.4"/>` : ''}
+  <!-- 看台座位點 -->
+  <g fill="#5a4030">
+    <circle cx="22" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+    <circle cx="30" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+    <circle cx="38" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+    <circle cx="46" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+    <circle cx="54" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+    <circle cx="62" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+  </g>
+
+  <rect x="132" y="${has2ndDeck ? 64 : 72}" width="54" height="${has2ndDeck ? 22 : 14}" fill="#8a6a4a" stroke="#2a1408" stroke-width="0.8"/>
+  ${has2ndDeck ? '<line x1="132" y1="75" x2="186" y2="75" stroke="#2a1408" stroke-width="0.6"/>' : ''}
+  ${hasRail ? `<line x1="134" y1="${has2ndDeck ? 66 : 74}" x2="184" y2="${has2ndDeck ? 66 : 74}" stroke="#fff" stroke-width="0.4"/>` : ''}
+  <g fill="#5a4030">
+    <circle cx="140" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+    <circle cx="148" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+    <circle cx="156" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+    <circle cx="164" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+    <circle cx="172" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+    <circle cx="180" cy="${has2ndDeck ? 81 : 79}" r="1"/>
+  </g>
+  ` : ''}
+
+  <!-- Clubhouse base -->
+  <rect x="76" y="56" width="48" height="30" fill="${wallFill}" stroke="#2a1408" stroke-width="1.2"/>
+  <!-- Brick texture -->
+  <g stroke="#7a5a3a" stroke-width="0.3" opacity="0.5">
+    <line x1="76" y1="64" x2="124" y2="64"/>
+    <line x1="76" y1="72" x2="124" y2="72"/>
+    <line x1="76" y1="80" x2="124" y2="80"/>
+  </g>
+  <!-- 門 -->
+  <rect x="93" y="72" width="14" height="14" fill="#5a3a2a" stroke="#2a1408" stroke-width="0.6"/>
+  <circle cx="105" cy="79" r="0.5" fill="#ffd700"/>
+  <!-- 窗 -->
+  <rect x="82" y="62" width="6" height="6" fill="#a5cce6" stroke="#2a1408" stroke-width="0.5"/>
+  <line x1="85" y1="62" x2="85" y2="68" stroke="#2a1408" stroke-width="0.3"/>
+  <line x1="82" y1="65" x2="88" y2="65" stroke="#2a1408" stroke-width="0.3"/>
+  <rect x="112" y="62" width="6" height="6" fill="#a5cce6" stroke="#2a1408" stroke-width="0.5"/>
+  <line x1="115" y1="62" x2="115" y2="68" stroke="#2a1408" stroke-width="0.3"/>
+  <line x1="112" y1="65" x2="118" y2="65" stroke="#2a1408" stroke-width="0.3"/>
+
+  ${lv >= 2 ? `
+  <!-- Lv 2+ 門簷招牌 + 路燈 -->
+  <rect x="89" y="70" width="22" height="2" fill="#3a2410"/>
+  <rect x="74" y="70" width="2" height="12" fill="#3a2a1a"/>
+  <circle cx="75" cy="68" r="1.5" fill="#ffd96f" filter="url(#glow${lv})"/>
+  ` : ''}
+
+  ${hasColumn ? `
+  <!-- Lv 5+ 大門柱 -->
+  <rect x="76" y="74" width="4" height="12" fill="#e8d8c0" stroke="#2a1408" stroke-width="0.4"/>
+  <rect x="75" y="73" width="6" height="2" fill="#d8c0a0" stroke="#2a1408" stroke-width="0.3"/>
+  <rect x="120" y="74" width="4" height="12" fill="#e8d8c0" stroke="#2a1408" stroke-width="0.4"/>
+  <rect x="119" y="73" width="6" height="2" fill="#d8c0a0" stroke="#2a1408" stroke-width="0.3"/>
+  ` : ''}
+
+  <!-- Roof -->
+  <polygon points="${hasSpire ? '74,56 100,38 126,56' : '74,56 100,40 126,56'}" fill="${roofFill}" stroke="#2a1408" stroke-width="1"/>
+  <!-- Roof tiles -->
+  <g stroke="#2a1408" stroke-width="0.3" opacity="0.4">
+    <line x1="80" y1="54" x2="84" y2="48"/>
+    <line x1="90" y1="54" x2="93" y2="46"/>
+    <line x1="100" y1="54" x2="100" y2="${hasSpire ? 38 : 40}"/>
+    <line x1="110" y1="54" x2="107" y2="46"/>
+    <line x1="120" y1="54" x2="116" y2="48"/>
+  </g>
+  ${hasSpire ? '<polygon points="98,38 100,32 102,38" fill="#ffd700" stroke="#2a1408" stroke-width="0.5"/>' : ''}
+
+  ${hasLED ? `
+  <!-- Lv 8+ LED 跑馬燈 -->
+  <rect x="80" y="50" width="40" height="4" fill="#0d0d20" stroke="#ffd96f" stroke-width="0.4"/>
+  <text x="100" y="53.2" text-anchor="middle" fill="#ffd96f" font-size="2.6" font-family="sans-serif" font-weight="900">★ CHAMPION ★</text>
+  ` : ''}
+
+  ${hasLights ? `
+  <!-- Lv 5+ 聚光燈（Lv 8+ 更高） -->
+  <rect x="64" y="${hasTallLight ? 38 : 50}" width="2" height="${hasTallLight ? 18 : 6}" fill="#3a3a3a"/>
+  <rect x="62" y="${hasTallLight ? 36 : 48}" width="6" height="2" fill="#5a5a5a" stroke="#2a1408" stroke-width="0.3"/>
+  <circle cx="65" cy="${hasTallLight ? 36 : 48}" r="2.5" fill="#ffeb88" filter="url(#glow${lv})"/>
+  <rect x="134" y="${hasTallLight ? 38 : 50}" width="2" height="${hasTallLight ? 18 : 6}" fill="#3a3a3a"/>
+  <rect x="132" y="${hasTallLight ? 36 : 48}" width="6" height="2" fill="#5a5a5a" stroke="#2a1408" stroke-width="0.3"/>
+  <circle cx="135" cy="${hasTallLight ? 36 : 48}" r="2.5" fill="#ffeb88" filter="url(#glow${lv})"/>
+  ` : ''}
+
+  ${hasFlag ? `
+  <!-- Lv 7+ 旗桿 -->
+  <line x1="68" y1="${hasTallLight ? 38 : 56}" x2="68" y2="32" stroke="#6d4c2a" stroke-width="1.2"/>
+  <polygon points="68,32 78,34 68,38" fill="#c0392b" stroke="#2a1408" stroke-width="0.4"/>
+  <line x1="132" y1="${hasTallLight ? 38 : 56}" x2="132" y2="32" stroke="#6d4c2a" stroke-width="1.2"/>
+  <polygon points="132,32 122,34 132,38" fill="#c0392b" stroke="#2a1408" stroke-width="0.4"/>
+  ` : ''}
+
+  ${hasAds ? `
+  <!-- Lv 6+ 廣告板 -->
+  <rect x="6" y="92" width="32" height="9" fill="#1a3050" stroke="#ffd96f" stroke-width="0.5"/>
+  <text x="22" y="98.5" text-anchor="middle" fill="#ffd96f" font-size="3.2" font-family="sans-serif" font-weight="900">CHAMPIONS</text>
+  <rect x="162" y="92" width="32" height="9" fill="#1a3050" stroke="#ffd96f" stroke-width="0.5"/>
+  <text x="178" y="98.5" text-anchor="middle" fill="#ffd96f" font-size="3.2" font-family="sans-serif" font-weight="900">CHAMPIONS</text>
+  ` : ''}
+
+  ${hasClock ? `
+  <!-- Lv 9+ 鐘塔 -->
+  <rect x="44" y="38" width="14" height="32" fill="#d4c8b8" stroke="#2a1408" stroke-width="1"/>
+  <polygon points="42,40 51,28 60,40" fill="#3a2410" stroke="#2a1408" stroke-width="0.6"/>
+  <circle cx="51" cy="50" r="4.5" fill="#fff" stroke="#2a1408" stroke-width="0.6"/>
+  <line x1="51" y1="50" x2="51" y2="47" stroke="#000" stroke-width="0.5"/>
+  <line x1="51" y1="50" x2="54" y2="50.5" stroke="#000" stroke-width="0.5"/>
+  <g fill="#2a1408">
+    <circle cx="51" cy="45.8" r="0.3"/>
+    <circle cx="55.2" cy="50" r="0.3"/>
+    <circle cx="51" cy="54.2" r="0.3"/>
+    <circle cx="46.8" cy="50" r="0.3"/>
+  </g>
+  ` : ''}
+
+  ${isMaxed ? `
+  <!-- Lv 10 噴泉（草地中央偏上） -->
+  <ellipse cx="100" cy="96" rx="6" ry="1.5" fill="#4080a0" stroke="#2a4050" stroke-width="0.4"/>
+  <rect x="98.5" y="89" width="3" height="7" fill="#d4c8b8"/>
+  <circle cx="100" cy="88.5" r="1.5" fill="#a5cce6"/>
+  <path d="M 99 88 Q 96 82 95 80" stroke="#a5cce6" stroke-width="0.8" fill="none" opacity="0.85"/>
+  <path d="M 101 88 Q 104 82 105 80" stroke="#a5cce6" stroke-width="0.8" fill="none" opacity="0.85"/>
+  <path d="M 100 88 L 100 78" stroke="#a5cce6" stroke-width="0.8" fill="none" opacity="0.9"/>
+  <!-- 整體金光環 -->
+  <rect x="0" y="0" width="200" height="110" fill="none" stroke="#ffd700" stroke-width="2" opacity="0.5"/>
+  ` : ''}
+
+  <!-- glow filter（給太陽 / 燈 / 路燈用） -->
+  <filter id="glow${lv}" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="${isMaxed ? 1.5 : 0.8}"/>
+  </filter>
+</svg>`;
+  }
   function _openStadiumUpgradeModal(team, onSuccess) {
     const lv = team?.stadium_level || 1;
     const isMaxed = lv >= 10;
@@ -3070,20 +3267,14 @@
         <div class="mt-stadium-up-compare">
           <!-- 當前等級小場景預覽 -->
           <div class="mt-stadium-up-side">
-            <div class="mt-stadium-up-mini" data-stadium-level="${lv}">
-              <div class="mt-stadium-up-mini-clubhouse"></div>
-              <div class="mt-stadium-up-mini-ground"></div>
-            </div>
+            <div class="mt-stadium-up-mini">${_stadiumPreviewSvg(lv)}</div>
             <div class="mt-stadium-up-side-lv">Lv. ${lv}</div>
             <div class="mt-stadium-up-side-label">${escapeHtml(currentLabel)}</div>
           </div>
           <div class="mt-stadium-up-arrow">${isMaxed ? '★' : '→'}</div>
           <!-- 下一等級小場景預覽 -->
           <div class="mt-stadium-up-side ${isMaxed ? 'is-maxed' : 'is-next'}">
-            <div class="mt-stadium-up-mini" data-stadium-level="${isMaxed ? lv : lv + 1}">
-              <div class="mt-stadium-up-mini-clubhouse"></div>
-              <div class="mt-stadium-up-mini-ground"></div>
-            </div>
+            <div class="mt-stadium-up-mini">${_stadiumPreviewSvg(isMaxed ? lv : lv + 1)}</div>
             <div class="mt-stadium-up-side-lv">${isMaxed ? 'MAX' : 'Lv. ' + (lv + 1)}</div>
             <div class="mt-stadium-up-side-label">${escapeHtml(isMaxed ? '已達最高' : nextLabel)}</div>
           </div>

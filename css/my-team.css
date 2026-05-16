@@ -3646,37 +3646,17 @@
 .mt-stadium-up-mini {
   position: relative;
   width: 100%;
-  height: 90px;
-  background: linear-gradient(180deg, #5b8db8 0%, #82b4d8 50%, #4caf50 50%, #2e7d32 100%);
+  height: 110px;
   border-radius: 6px;
   overflow: hidden;
   margin-bottom: 6px;
-  image-rendering: pixelated;
-}
-.mt-stadium-up-mini-clubhouse {
-  position: absolute;
-  bottom: 25%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 38%;
-  height: 38%;
-  background: #c08858;
   border: 1.5px solid #2a1408;
-  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 2px 4px rgba(0,0,0,0.4);
 }
-.mt-stadium-up-mini-clubhouse::before {
-  content: '';
-  position: absolute;
-  top: -10px; left: -8%; right: -8%;
-  height: 12px;
-  background: #c0392b;
-  clip-path: polygon(0 100%, 50% 0, 100% 100%);
-}
-.mt-stadium-up-mini-ground {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 25%;
-  background: repeating-linear-gradient(90deg, #43a047 0 6px, #388e3c 6px 12px);
+.mt-stadium-up-mini svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 .mt-stadium-up-side-lv {
   font-size: 14px;
@@ -3693,45 +3673,7 @@
   text-overflow: ellipsis;
 }
 
-/* mini 預覽依等級加裝飾 */
-.mt-stadium-up-mini[data-stadium-level="3"]::before,
-.mt-stadium-up-mini[data-stadium-level="4"]::before,
-.mt-stadium-up-mini[data-stadium-level="5"]::before,
-.mt-stadium-up-mini[data-stadium-level="6"]::before,
-.mt-stadium-up-mini[data-stadium-level="7"]::before,
-.mt-stadium-up-mini[data-stadium-level="8"]::before,
-.mt-stadium-up-mini[data-stadium-level="9"]::before,
-.mt-stadium-up-mini[data-stadium-level="10"]::before {
-  content: '';
-  position: absolute;
-  bottom: 25%;
-  left: 4%; right: 4%;
-  height: 10%;
-  background: #6b4530;
-  border: 1px solid #2a1408;
-  border-radius: 1px;
-}
-.mt-stadium-up-mini[data-stadium-level="5"]::after,
-.mt-stadium-up-mini[data-stadium-level="6"]::after,
-.mt-stadium-up-mini[data-stadium-level="7"]::after,
-.mt-stadium-up-mini[data-stadium-level="8"]::after,
-.mt-stadium-up-mini[data-stadium-level="9"]::after,
-.mt-stadium-up-mini[data-stadium-level="10"]::after {
-  content: '🔦🔦';
-  position: absolute;
-  top: 8%; left: 0; right: 0;
-  text-align: center;
-  font-size: 10px;
-  letter-spacing: 30px;
-  filter: drop-shadow(0 0 4px rgba(255,255,200,0.7));
-}
-.mt-stadium-up-mini[data-stadium-level="10"] {
-  background: linear-gradient(180deg, #ff9966 0%, #ffcc99 30%, #c08040 50%, #4caf50 50%, #2e7d32 100%);
-  box-shadow: 0 0 12px rgba(255,215,0,0.6), inset 0 0 10px rgba(255,215,0,0.3);
-}
-.mt-stadium-up-mini[data-stadium-level="10"] .mt-stadium-up-mini-clubhouse::before {
-  background: #ffd700;
-}
+/* 舊的 mini 預覽 ::before / ::after 已拔掉（改用 _stadiumPreviewSvg 直接畫 SVG）*/
 
 .mt-stadium-up-stats {
   background: rgba(0,0,0,0.3);
@@ -3960,9 +3902,44 @@
 }
 .mt-home-sun {
   position: absolute; top: 14%; right: 14%;
-  width: 28px; height: 28px; border-radius: 50%;
-  background: radial-gradient(circle, #fff7c0 0%, #ffd866 70%, #ffaa33 100%);
-  box-shadow: 0 0 26px rgba(255,200,80,0.75);
+  width: 32px; height: 32px; border-radius: 50%;
+  background: radial-gradient(circle, #fff7c0 0%, #ffd866 55%, #ffaa33 100%);
+  box-shadow:
+    0 0 40px rgba(255,200,80,0.65),
+    0 0 80px rgba(255,170,50,0.35);
+}
+.mt-home-sun::before {
+  content: '';
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg,
+    rgba(255,220,120,0.25) 0deg, transparent 20deg,
+    rgba(255,220,120,0.25) 45deg, transparent 65deg,
+    rgba(255,220,120,0.25) 90deg, transparent 110deg,
+    rgba(255,220,120,0.25) 135deg, transparent 155deg,
+    rgba(255,220,120,0.25) 180deg, transparent 200deg,
+    rgba(255,220,120,0.25) 225deg, transparent 245deg,
+    rgba(255,220,120,0.25) 270deg, transparent 290deg,
+    rgba(255,220,120,0.25) 315deg, transparent 335deg);
+  animation: mt-sun-rays 30s linear infinite;
+  z-index: -1;
+}
+.mt-home-sun::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,235,160,0.4), transparent 70%);
+  animation: mt-sun-pulse 3.5s ease-in-out infinite;
+  z-index: -1;
+}
+@keyframes mt-sun-rays {
+  to { transform: rotate(360deg); }
+}
+@keyframes mt-sun-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50%      { transform: scale(1.15); opacity: 0.9; }
 }
 .mt-home-cloud {
   position: absolute;
@@ -4311,7 +4288,29 @@
     /* 水平亮帶（草坪修剪痕）*/
     repeating-linear-gradient(180deg,
       transparent 0, transparent 30px,
-      rgba(255,255,255,0.06) 30px, rgba(255,255,255,0.06) 60px);
+      rgba(255,255,255,0.08) 30px, rgba(255,255,255,0.08) 60px),
+    /* 微弱垂直紋路（垂直草修剪線）*/
+    repeating-linear-gradient(90deg,
+      transparent 0, transparent 80px,
+      rgba(0,0,0,0.04) 80px, rgba(0,0,0,0.04) 81px);
+  pointer-events: none;
+}
+/* 草地上的小花點綴 — 黃 / 白 / 粉，散落在草坪上 */
+.mt-home-ground-lines::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle 2px at 15% 25%, #ffeb3b 60%, transparent 61%),
+    radial-gradient(circle 2px at 42% 18%, #fff 60%, transparent 61%),
+    radial-gradient(circle 2px at 68% 38%, #ff80c8 60%, transparent 61%),
+    radial-gradient(circle 2px at 88% 55%, #ffeb3b 60%, transparent 61%),
+    radial-gradient(circle 2px at 8% 65%, #fff 60%, transparent 61%),
+    radial-gradient(circle 2px at 35% 78%, #ff80c8 60%, transparent 61%),
+    radial-gradient(circle 2px at 78% 85%, #ffeb3b 60%, transparent 61%),
+    radial-gradient(circle 2px at 55% 60%, #fff 60%, transparent 61%);
+  background-size: 360px 240px;
+  background-repeat: repeat;
+  opacity: 0.7;
   pointer-events: none;
 }
 /* 隨機草簇 dots — 用 radial-gradient repeat 模擬 */
