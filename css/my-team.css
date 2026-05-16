@@ -1056,9 +1056,12 @@
   /* Grid stacking：pack + cards-wrap 同放在 1/1 cell、自動 100% 重疊
      stage 用 absolute inset:0 鋪滿、不參與 grid flow
      →  pack 跟 cards-wrap 用完全相同的 positioning 機制
-        不會有 sub-pixel 計算差異造成位移 */
+        不會有 sub-pixel 計算差異造成位移
+     place-items: item 在 cell 內置中（cell 小於 item 時 — 這裡 cell 自動撐大、不需要）
+     place-content: cell 在 grid container 內置中（漏掉這個會讓 cell 黏在頂端）*/
   display: grid;
   place-items: center;
+  place-content: center;
 }
 .mt-gacha-stage-frame > .mt-gacha-pack,
 .mt-gacha-stage-frame > .mt-gacha-cards-wrap {
@@ -1671,7 +1674,11 @@
 
 /* ─── SSR 光線爆發（多條放射光線） ─── */
 .mt-gacha-rays {
-  position: absolute; inset: 0;
+  position: absolute;
+  /* inset:-50% → 元素是 overlay 的 200%×200%、置中
+     不管 rotate 到幾度、bounding box 都比 viewport 大很多
+     →  寬螢幕看不到旋轉的 corner / edge 跑進畫面 */
+  inset: -50%;
   background: repeating-conic-gradient(from 0deg at 50% 50%,
     rgba(255,210,90,0.0) 0deg,
     rgba(255,210,90,0.0) 15deg,
@@ -1680,6 +1687,7 @@
   animation: mt-rays-rotate 8s linear infinite;
   mix-blend-mode: screen;
   pointer-events: none;
+  transform-origin: center;
 }
 @keyframes mt-rays-rotate { to { transform: rotate(360deg); } }
 
