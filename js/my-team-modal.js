@@ -1064,6 +1064,11 @@
           <div class="mt-swap-banner-slot" id="mt-swap-banner-slot"></div>
           <div class="mt-bench-strip" id="mt-bench-strip"></div>
         </div>
+
+        <!-- 展開所有球員按鈕（同教練 tab 的設計）-->
+        <button class="mt-roster-expand-btn" id="mt-roster-expand" type="button">
+          📋 展開所有球員 (${players.length})
+        </button>
       </div>
     `;
 
@@ -1142,8 +1147,97 @@
       });
     }
 
+    // 展開所有球員 → 開 grid modal
+    content.querySelector('#mt-roster-expand')?.addEventListener('click', () => {
+      _openAllPlayersModal(players);
+    });
+
     // 進場時若已在替換模式 → 注入 banner
     if (_swapPending) _mountSwapBanner(content);
+  }
+
+  // ─────────── 所有球員 grid modal（仿教練 tab 設計） ───────────
+  // 板凳區是橫向 strip、球員一多就要滑動、UX 差
+  // 這個 modal 提供 grid 全覽：按稀有度排序、點球員開個人主頁
+  function _openAllPlayersModal(players) {
+    const now = new Date();
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-roster-all-modal';
+
+    // 排序：場上 (非傷停) → 傷停 → 板凳；同類別內 SSR → SR → R
+    const rarityRank = { SSR: 0, SR: 1, R: 2 };
+    const groupRank = (p) => {
+      const onPitch = p.in_starting_11 && (!p.injured_until || new Date(p.injured_until) <= now);
+      const injured = p.injured_until && new Date(p.injured_until) > now;
+      if (onPitch) return 0;
+      if (injured) return 1;
+      return 2;
+    };
+    const sorted = [...players].sort((a, b) => {
+      const ga = groupRank(a), gb = groupRank(b);
+      if (ga !== gb) return ga - gb;
+      return (rarityRank[a.card?.rarity] || 9) - (rarityRank[b.card?.rarity] || 9);
+    });
+
+    overlay.innerHTML = `
+      <div class="mt-profile-card" style="max-width:520px">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <div class="mt-roster-all-title">📋 所有球員 (${players.length})</div>
+        <div class="mt-roster-all-hint">⚽ 場上 · 🤕 傷停 · 點球員開個人主頁</div>
+        <div class="mt-roster-all-grid" id="mt-roster-all-grid"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    overlay.querySelector('.mt-profile-close').addEventListener('click', () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.remove(), 200);
+      }
+    });
+
+    const grid = overlay.querySelector('#mt-roster-all-grid');
+    sorted.forEach(p => {
+      const c = p.card || {};
+      const onPitch = p.in_starting_11 && (!p.injured_until || new Date(p.injured_until) <= now);
+      const injured = p.injured_until && new Date(p.injured_until) > now;
+      const badge = onPitch ? '⚽' : injured ? '🤕' : '';
+      const portraitUrl = (window.MyTeamPortrait || (id => '')) (c.card_id, c.rarity);
+      const imgId = `roster-all-portrait-${p.id.slice(0,8)}`;
+
+      const slot = document.createElement('button');
+      slot.type = 'button';
+      slot.className = `mt-roster-slot rarity-${c.rarity || 'R'}${onPitch ? ' is-starter' : ''}${injured ? ' is-injured' : ''}`;
+      slot.innerHTML = `
+        ${badge ? `<span class="mt-roster-slot-badge">${badge}</span>` : ''}
+        <div class="mt-roster-slot-portrait">
+          <img id="${imgId}" src="${portraitUrl}" alt="${escapeHtml(c.name || '?')}" loading="lazy" onerror="this.style.opacity='0.3'">
+        </div>
+        <div class="mt-roster-slot-name">${escapeHtml(c.name || '?')}</div>
+        <div class="mt-roster-slot-pos">${c.position || ''}</div>
+        <span class="mt-roster-slot-rarity rarity-${c.rarity || 'R'}">${c.rarity || 'R'}</span>
+      `;
+      grid.appendChild(slot);
+
+      // LPC async render
+      const look = p.look_data || c.look_data;
+      if (look && window.LpcRenderer) {
+        window.LpcRenderer.portrait(look).then(url => {
+          const img = document.getElementById(imgId);
+          if (img && url) img.src = url;
+        }).catch(() => {});
+      }
+
+      slot.addEventListener('click', () => {
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.remove(), 200);
+        _openPlayerProfile(p);
+      });
+    });
   }
 
   // 動態注入替換橫幅到板凳區上方
