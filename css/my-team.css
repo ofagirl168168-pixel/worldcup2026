@@ -1053,22 +1053,20 @@
   transform: translateX(-50%);
   width: 100%;
   max-width: 460px;
-  /* Grid stacking：pack + cards-wrap 同放在 1/1 cell、自動 100% 重疊
-     stage 用 absolute inset:0 鋪滿、不參與 grid flow
-     →  pack 跟 cards-wrap 用完全相同的 positioning 機制
-        不會有 sub-pixel 計算差異造成位移
-     place-items: item 在 cell 內置中（cell 小於 item 時 — 這裡 cell 自動撐大、不需要）
-     place-content: cell 在 grid container 內置中（漏掉這個會讓 cell 黏在頂端）*/
-  display: grid;
-  place-items: center;
-  place-content: center;
+  /* 不用 flex / grid — 純 positioning 容器
+     pack-pos 跟 cards-wrap 都用 absolute top:50% left:50% translate(-50%,-50%) 置中
+     stage 用 absolute inset:0 鋪滿
+     →  三者各自獨立定位、互不干擾、不會被 grid track 推位 */
 }
-.mt-gacha-stage-frame > .mt-gacha-pack,
+/* pack 包進 pack-pos，pack-pos 負責置中；pack 維持原本的 mt-pack-float 動畫 */
+.mt-gacha-stage-frame > .mt-gacha-pack-pos,
 .mt-gacha-stage-frame > .mt-gacha-cards-wrap {
-  grid-area: 1 / 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 .mt-gacha-stage-frame > .mt-gacha-cards-wrap {
-  position: relative;       /* 給內部 .all-revealed 卡片 absolute 用 */
   width: 280px;
   height: 320px;
 }
@@ -4433,7 +4431,7 @@
 /* 抽卡按鈕（疊在背景的木地板區域）*/
 .mt-gshop-buttons {
   position: absolute;
-  bottom: 5%;
+  bottom: 10%;              /* 從 5% 往上拉到 10% — 不再貼底 */
   left: 5%; right: 5%;
   display: flex;
   gap: 10px;

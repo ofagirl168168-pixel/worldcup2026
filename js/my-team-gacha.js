@@ -246,6 +246,9 @@
            導致 X 軸視覺中心不一致的 jumping -->
       <div class="mt-gacha-stage-frame">
 
+      <!-- Pack 包進 positioning wrapper：wrapper 負責 absolute top:50% left:50% 置中
+           內部 pack 維持原本的 mt-pack-float 動畫不衝突 -->
+      <div class="mt-gacha-pack-pos">
       <!-- Stage 0：紙袋包裝（Pokémon TCG Pocket 風）-->
       <div class="mt-gacha-pack" id="mt-gacha-pack" data-rarity="${peakRarity}" data-count="${cards.length}">
         <div class="mt-gacha-pack-banner">
@@ -292,8 +295,9 @@
           <span class="mt-gacha-pack-finger mt-gacha-pack-finger-swipe-r">👉</span>
         </div>
       </div>
+      </div><!-- /.mt-gacha-pack-pos -->
 
-      <!-- cards-wrap 直接放在 stage-frame 裡、跟 pack 同一個 grid cell
+      <!-- cards-wrap 直接放在 stage-frame 裡、跟 pack-pos 用一樣的 absolute 置中
            兩者用完全相同的 positioning 機制，pack 消失/cards 出現之間不會有
            sub-pixel 位移問題（之前 pack 是 flex-centered、cards 是 absolute
            top:50% left:50% translate(-50%,-50%) → 計算路徑不同會差 1-2px） -->
