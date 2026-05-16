@@ -1069,6 +1069,13 @@
 .mt-gacha-stage-frame > .mt-gacha-cards-wrap {
   width: 280px;
   height: 320px;
+  /* 不擋 pack 的 drag 事件 — cards-wrap 看不見但在 pack-pos 上層、
+     會攔住點擊。卡片進場後個別卡片有自己的 pointer-events:auto */
+  pointer-events: none;
+}
+.mt-gacha-card3d {
+  /* 重新啟用卡片 click（用於翻牌、cards-wrap pointer-events:none 不繼承）*/
+  pointer-events: auto;
 }
 .mt-gacha-overlay.open { opacity: 1; }
 .mt-gacha-overlay[data-peak="SR"]  { background: radial-gradient(ellipse at center, #1a0a3a 0%, #050118 70%, #000 100%); }
@@ -4246,13 +4253,12 @@
    🎰 GACHA TAB — AI 背景圖 + 卡包/按鈕/招牌 overlay
    ═════════════════════════════════════════════════════════════ */
 .mt-gacha-shop-fullscene {
-  /* 改用 absolute + inset 取代 width/height percentage
-     (在 flex 容器內 percentage height 會被當作 indefinite 算成 0) */
+  /* 改用 absolute + inset:0 填滿父 .mt-hub-content 的 padding-box
+     (絕對定位下 padding-box 包含 parent 的 padding 區域、視覺上跟原本
+      width: calc(100%+40px) + 負 margin 效果一樣、但 element 寬高就是 558×671
+      child 用 % 定位才會落在正確位置) */
   position: absolute;
-  top: -16px;
-  right: -20px;
-  bottom: -40px;
-  left: -20px;
+  inset: 0;
   padding: 0;
   overflow: hidden;
   background:
@@ -5787,13 +5793,9 @@
    ═════════════════════════════════════════════════════════════ */
 /* AI 背景：填滿父容器（不滑動）*/
 .mt-coach-office {
-  /* 改用 absolute + inset 取代 width/height percentage
-     (在 flex 容器內 percentage height 會被當作 indefinite 算成 0) */
+  /* 改用 absolute + inset:0 填滿父 padding-box（同 .mt-gacha-shop-fullscene 原因）*/
   position: absolute;
-  top: -16px;
-  right: -20px;
-  bottom: -40px;
-  left: -20px;
+  inset: 0;
   padding: 0;
   overflow: hidden;
   background:
