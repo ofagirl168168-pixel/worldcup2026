@@ -155,7 +155,9 @@
         setTimeout(() => overlay.remove(), 200);
         // 播放完整 gacha 動畫（Stage 0 卡包 → Stage 2.5 翻牌）— 不暴露「首抽套裝」字眼
         if (window.MyTeam?.openGachaAnimation) {
-          await window.MyTeam.openGachaAnimation(data.cards || [], {
+          // 兼容 claim_starter_pack 回傳的 players key 跟一般 gacha 的 cards key
+          const cards = data.cards || data.players || [];
+          await window.MyTeam.openGachaAnimation(cards, {
             title: '🎰 10 連抽召喚',
             subtitle: '看看你的手氣',
           });
@@ -3959,12 +3961,16 @@
       }
     });
 
-    // 開發測試：重跑新手指引
-    // 1) 清隊伍 + 重置 flag（不自動 re-claim）
-    // 2) 關掉我的隊伍 modal
-    // 3) 重開 modal → 觸發 _showStarterPackIntro 動畫（教學 → 10 連抽 → 翻牌）
+    // 開發測試：重跑新手指引（模擬全新使用者）
+    // 1) RPC 完全清空：my_team / team_player / coach / league / history / log
+    // 2) 清 localStorage（每日登入旗標 + preview cards）→ 讓「每日 1 抽」可重觸發
+    // 3) 關掉我的隊伍 modal
+    // 4) 呼叫 triggerInstantGacha(1, 'daily_login') → 因為沒隊
+    //    走 _previewGachaForOnboarding → 1 連抽動畫 + 「建隊就能收下」CTA
+    // 5) 使用者點 CTA → 開 my-team modal → renderOnboarding（建隊表單）
+    // 6) 建隊後自動跑 _showStarterPackIntro → 10 連抽動畫
     content.querySelector('#mt-settings-reset-starter')?.addEventListener('click', async () => {
-      if (!confirm('⚠️ 將清空所有球員、重置新手指引 flag。將會關掉這個視窗、模擬登入跳出新手 10 連抽。確定要重跑？')) return;
+      if (!confirm('⚠️ 將完全清空你的球隊（包含隊伍本身、所有球員 / 教練 / 聯賽進度 / 比賽歷史），模擬「連隊都沒建過」的新使用者。\n\n確定要重跑？')) return;
       const btn = content.querySelector('#mt-settings-reset-starter');
       const orig = btn.textContent;
       btn.disabled = true;
@@ -3972,12 +3978,23 @@
       try {
         const { error } = await window.DB.rpc('dev_reset_starter_pack');
         if (error) throw error;
+        // 清 localStorage：讓每日登入 1 抽可重觸發、清掉舊預覽卡
+        try {
+          localStorage.removeItem('mt_daily_login_date_v1');
+          localStorage.removeItem('mt_preview_cards');
+        } catch (e) {}
+        // 清掉 MyTeam cache（讓 fetch 重抓）
         await window.MyTeam.refresh?.();
-        // 關掉視窗 → 短暫延遲後重開（觸發 _showStarterPackIntro 走完整動畫）
+        // 關掉現在的 modal
         if (typeof window.closeMyTeamModal === 'function') window.closeMyTeamModal();
-        setTimeout(() => {
-          if (typeof window.openMyTeamModal === 'function') window.openMyTeamModal();
-        }, 500);
+        // 等 modal 關完後觸發 1 抽（模擬每日登入彈窗）
+        setTimeout(async () => {
+          if (typeof window.MyTeam?.triggerInstantGacha === 'function') {
+            await window.MyTeam.triggerInstantGacha(1, 'daily_login');
+          } else if (typeof window.openMyTeamModal === 'function') {
+            window.openMyTeamModal();
+          }
+        }, 600);
       } catch (e) {
         alert('重跑失敗：' + (e.message || e));
         btn.disabled = false;
