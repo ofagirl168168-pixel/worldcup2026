@@ -5400,38 +5400,26 @@
         </div>
 
         <div class="mt-train-info-section">
-          <div class="mt-train-info-q">📈 Lv 解鎖屬性上限</div>
+          <div class="mt-train-info-q">📈 屬性能力值上限</div>
           <div class="mt-train-info-a">
-            訓練 1 次 → Lv +1（最高 Lv 50）。Lv 越高解鎖越高屬性上限：
+            訓練 1 次 → 球員 Lv +1（最高 Lv 50）。<b>等級越高、屬性能練得越高。</b>
             <table class="mt-lv-cap-table">
-              <thead><tr><th>Lv 區間</th><th>硬上限</th></tr></thead>
+              <thead><tr><th>Lv 區間</th><th>上限</th><th>+ 5★ 星等</th></tr></thead>
               <tbody>
-                <tr><td>1-9</td><td>99</td></tr>
-                <tr><td>10-14</td><td>105</td></tr>
-                <tr><td>15-19</td><td>110</td></tr>
-                <tr><td>20-24</td><td>115</td></tr>
-                <tr><td>25-29</td><td>120</td></tr>
-                <tr><td>30-34</td><td>125</td></tr>
-                <tr><td>35-39</td><td>130</td></tr>
-                <tr><td>40-44</td><td>135</td></tr>
-                <tr><td>45-49</td><td>140</td></tr>
-                <tr class="is-max"><td><b>50</b></td><td><b>145</b></td></tr>
+                <tr><td>1-9</td><td>99</td><td>124</td></tr>
+                <tr><td>10-14</td><td>105</td><td>130</td></tr>
+                <tr><td>15-19</td><td>110</td><td>135</td></tr>
+                <tr><td>20-24</td><td>115</td><td>140</td></tr>
+                <tr><td>25-29</td><td>120</td><td>145</td></tr>
+                <tr><td>30-34</td><td>125</td><td>150</td></tr>
+                <tr><td>35-39</td><td>130</td><td>155</td></tr>
+                <tr><td>40-44</td><td>135</td><td>160</td></tr>
+                <tr><td>45-49</td><td>140</td><td>165</td></tr>
+                <tr class="is-max"><td><b>50</b></td><td><b>145</b></td><td><b>170</b></td></tr>
               </tbody>
             </table>
             <div class="mt-train-info-note">
-              <b>💡 個別屬性可以練到多高？</b><br>
-              每張卡每個屬性都有「天生底子」（例如某 SR 卡攻擊天生 80）。<br>
-              ・<b>天生底子</b> + <b>15</b>（基本訓練可拉到的範圍）+ <b>星等 × 5</b>（每升 1★ 加 5、滿 5★ +25）= <b>這張卡的個人天花板</b><br>
-              ・最後再跟上面的「Lv 硬上限」比、<b>取較小的</b>那個就是實際能練到的最高值<br><br>
-              <b>📊 範例：</b>SR 卡攻擊天生 80、3★、Lv 18<br>
-              ・個人天花板 = 80 + 15 + 3×5 = <b>110</b><br>
-              ・Lv 18 硬上限 = <b>110</b>（Lv 15-19 區段）<br>
-              ・實際 cap = min(110, 110) = <b>110</b> ✓ 練滿<br><br>
-              <b>📊 反例：</b>R 卡攻擊天生 50、1★、Lv 50<br>
-              ・個人天花板 = 50 + 15 + 5 = <b>70</b> ← 被低底子拖死<br>
-              ・Lv 50 硬上限 145、但天花板才 70<br>
-              ・實際 cap = min(70, 145) = <b>70</b><br>
-              👉 R 卡 / 低底子卡硬練也上不去、要靠 SSR / SR 高底子卡 + 升星等才有意義
+              星等每 1 ★ 額外 <b>+5</b> 上限、滿 5★ 共 <b>+25</b>。
             </div>
           </div>
         </div>
