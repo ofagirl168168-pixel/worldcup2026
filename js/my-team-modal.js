@@ -3144,7 +3144,7 @@
   function _renderClockTowerSvg() {
     return `
 <div class="mt-home-clocktower">
-  <svg viewBox="0 0 38 200" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 38 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <!-- 塔身（石材）-->
     <rect x="6" y="40" width="26" height="160" fill="#d4c8b8" stroke="#1a1a2e" stroke-width="1.5"/>
     <!-- 塔身石材紋 -->
@@ -3356,22 +3356,6 @@
     <circle cx="14" cy="28" r="8" fill="#3a8e3a" stroke="#1a3a1a" stroke-width="0.8"/>
     <circle cx="36" cy="30" r="9" fill="#3a8e3a" stroke="#1a3a1a" stroke-width="0.8"/>
     <circle cx="25" cy="20" r="8" fill="#4caf50" stroke="#1a3a1a" stroke-width="0.8"/>
-  </svg>
-</div>`);
-    }
-
-    // Lv 10 冠軍領獎台（草地中央偏前）
-    if (lvl >= 10) {
-      items.push(`
-<div class="mt-home-grass-decor is-podium" style="left:50%; transform: translateX(-50%); bottom: 18%;">
-  <svg viewBox="0 0 60 16" xmlns="http://www.w3.org/2000/svg">
-    <!-- 3 階領獎台 -->
-    <rect x="22" y="0" width="16" height="16" fill="#ffd700" stroke="#5a4010" stroke-width="0.8"/>
-    <text x="30" y="11" text-anchor="middle" fill="#5a4010" font-size="9" font-weight="900" font-family="sans-serif">1</text>
-    <rect x="6" y="4" width="16" height="12" fill="#c0c0c0" stroke="#3a3a3a" stroke-width="0.8"/>
-    <text x="14" y="13" text-anchor="middle" fill="#3a3a3a" font-size="7" font-weight="900" font-family="sans-serif">2</text>
-    <rect x="38" y="6" width="16" height="10" fill="#cd7f32" stroke="#5a3010" stroke-width="0.8"/>
-    <text x="46" y="14" text-anchor="middle" fill="#5a3010" font-size="6" font-weight="900" font-family="sans-serif">3</text>
   </svg>
 </div>`);
     }
