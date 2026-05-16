@@ -3446,21 +3446,22 @@
     </filter>
   </defs>
 
-  <!-- 天空 / 太陽 / 遠山 / 草地 -->
-  <rect x="0" y="0" width="200" height="62" fill="url(#sky${lv})"/>
+  <!-- 天空 / 太陽 / 遠山 / 草地（地平線 y=86、與建築底齊平、所有物件貼地平線）-->
+  <rect x="0" y="0" width="200" height="86" fill="url(#sky${lv})"/>
   <circle cx="172" cy="16" r="10" fill="${isMaxed ? '#ffd700' : '#fff5b0'}" opacity="0.25"/>
   <circle cx="172" cy="16" r="7" fill="${isMaxed ? '#ffd700' : '#fff5b0'}" filter="url(#glow${lv})"/>
-  <polygon points="0,58 25,42 55,50 90,38 125,46 165,38 200,46 200,62 0,62" fill="#a8b6c8" opacity="0.6"/>
-  <polygon points="0,60 30,50 65,56 100,46 135,52 170,46 200,52 200,62 0,62" fill="#7a8aa0" opacity="0.8"/>
-  <rect x="0" y="60" width="200" height="50" fill="url(#grass${lv})"/>
-  <line x1="0" y1="68" x2="200" y2="68" stroke="#3a8c3a" stroke-width="0.4" stroke-dasharray="3,2"/>
-  <line x1="0" y1="82" x2="200" y2="82" stroke="#3a8c3a" stroke-width="0.4" stroke-dasharray="3,2" opacity="0.6"/>
+  <polygon points="0,82 25,66 55,74 90,62 125,70 165,62 200,70 200,86 0,86" fill="#a8b6c8" opacity="0.6"/>
+  <polygon points="0,84 30,74 65,80 100,70 135,76 170,70 200,76 200,86 0,86" fill="#7a8aa0" opacity="0.8"/>
+  <rect x="0" y="86" width="200" height="24" fill="url(#grass${lv})"/>
+  <line x1="0" y1="94" x2="200" y2="94" stroke="#3a8c3a" stroke-width="0.4" stroke-dasharray="3,2"/>
+  <line x1="0" y1="102" x2="200" y2="102" stroke="#3a8c3a" stroke-width="0.4" stroke-dasharray="3,2" opacity="0.6"/>
 
   ${hasStone ? `
-  <rect x="92" y="86" width="16" height="24" fill="#a89888" stroke="#5a4a3a" stroke-width="0.5"/>
+  <!-- 地平線前的石碑（從地平線往前景延伸）-->
+  <rect x="92" y="86" width="16" height="20" fill="#a89888" stroke="#5a4a3a" stroke-width="0.5"/>
   <line x1="92" y1="92" x2="108" y2="92" stroke="#5a4a3a" stroke-width="0.4"/>
   <line x1="92" y1="100" x2="108" y2="100" stroke="#5a4a3a" stroke-width="0.4"/>
-  <line x1="100" y1="86" x2="100" y2="110" stroke="#5a4a3a" stroke-width="0.3"/>
+  <line x1="100" y1="86" x2="100" y2="106" stroke="#5a4a3a" stroke-width="0.3"/>
   ` : ''}
 
   ${hasStands ? `
@@ -3504,26 +3505,31 @@
   <text x="${bcx}" y="${by - 3}" text-anchor="middle" fill="#ffd96f" font-size="2.6" font-family="sans-serif" font-weight="900">★ CHAMPION ★</text>
   ` : ''}
 
-  ${hasLights ? `
-  <!-- 聚光燈（Lv 8+ 更高） -->
-  <rect x="${bx - 14}" y="${hasTallLight ? roofTop - 6 : by - 6}" width="2" height="${hasTallLight ? (by - roofTop + 6) : 8}" fill="#3a3a3a"/>
-  <rect x="${bx - 16}" y="${hasTallLight ? roofTop - 8 : by - 8}" width="6" height="2" fill="#5a5a5a" stroke="#2a1408" stroke-width="0.3"/>
-  <circle cx="${bx - 13}" cy="${hasTallLight ? roofTop - 8 : by - 8}" r="2.5" fill="#ffeb88" filter="url(#glow${lv})"/>
-  <rect x="${bx + SHAPE.w + 12}" y="${hasTallLight ? roofTop - 6 : by - 6}" width="2" height="${hasTallLight ? (by - roofTop + 6) : 8}" fill="#3a3a3a"/>
-  <rect x="${bx + SHAPE.w + 10}" y="${hasTallLight ? roofTop - 8 : by - 8}" width="6" height="2" fill="#5a5a5a" stroke="#2a1408" stroke-width="0.3"/>
-  <circle cx="${bx + SHAPE.w + 13}" cy="${hasTallLight ? roofTop - 8 : by - 8}" r="2.5" fill="#ffeb88" filter="url(#glow${lv})"/>
-  ` : ''}
+  ${hasLights ? (() => {
+    // 燈柱底端必須貼地平線 baseY=86、頂端從 roofTop 或 by 起算
+    const poleTopY = hasTallLight ? (roofTop - 6) : (by - 6);
+    const poleH = baseY - poleTopY;
+    return `
+  <!-- 聚光燈（Lv 8+ 更高、柱腳貼地平線）-->
+  <rect x="${bx - 14}" y="${poleTopY}" width="2" height="${poleH}" fill="#3a3a3a"/>
+  <rect x="${bx - 16}" y="${poleTopY - 2}" width="6" height="2" fill="#5a5a5a" stroke="#2a1408" stroke-width="0.3"/>
+  <circle cx="${bx - 13}" cy="${poleTopY - 2}" r="2.5" fill="#ffeb88" filter="url(#glow${lv})"/>
+  <rect x="${bx + SHAPE.w + 12}" y="${poleTopY}" width="2" height="${poleH}" fill="#3a3a3a"/>
+  <rect x="${bx + SHAPE.w + 10}" y="${poleTopY - 2}" width="6" height="2" fill="#5a5a5a" stroke="#2a1408" stroke-width="0.3"/>
+  <circle cx="${bx + SHAPE.w + 13}" cy="${poleTopY - 2}" r="2.5" fill="#ffeb88" filter="url(#glow${lv})"/>
+  `;
+  })() : ''}
 
   ${hasFlag ? `
-  <!-- 旗桿 -->
-  <line x1="${bx - 8}" y1="${by - 6}" x2="${bx - 8}" y2="${roofTop - 6}" stroke="#6d4c2a" stroke-width="1.2"/>
+  <!-- 旗桿（柱腳貼地平線 baseY=86）-->
+  <line x1="${bx - 8}" y1="${baseY}" x2="${bx - 8}" y2="${roofTop - 6}" stroke="#6d4c2a" stroke-width="1.2"/>
   <polygon points="${bx - 8},${roofTop - 6} ${bx},${roofTop - 4} ${bx - 8},${roofTop - 2}" fill="#c0392b" stroke="#2a1408" stroke-width="0.4"/>
-  <line x1="${bx + SHAPE.w + 8}" y1="${by - 6}" x2="${bx + SHAPE.w + 8}" y2="${roofTop - 6}" stroke="#6d4c2a" stroke-width="1.2"/>
+  <line x1="${bx + SHAPE.w + 8}" y1="${baseY}" x2="${bx + SHAPE.w + 8}" y2="${roofTop - 6}" stroke="#6d4c2a" stroke-width="1.2"/>
   <polygon points="${bx + SHAPE.w + 8},${roofTop - 6} ${bx + SHAPE.w},${roofTop - 4} ${bx + SHAPE.w + 8},${roofTop - 2}" fill="#c0392b" stroke="#2a1408" stroke-width="0.4"/>
   ` : ''}
 
   ${hasStands ? `
-  <!-- Lv 3+ 看台下方一排彩色廣告牌（沿球場頂緣）-->
+  <!-- Lv 3+ 看台下方一排彩色廣告牌（底邊貼地平線 y=86、往上伸出 4px）-->
   ${(() => {
     const adColors = ['#c0392b', '#1a3050', '#16a085', '#d35400', '#7d3c98', '#1a3050', '#c0392b', '#16a085'];
     const cnt = lv >= 8 ? 10 : (lv >= 5 ? 8 : 6);
@@ -3531,7 +3537,7 @@
     let out = '';
     for (let i = 0; i < cnt; i++) {
       const x = i * adW;
-      out += `<rect x="${x + 0.5}" y="62" width="${adW - 1}" height="5" fill="${adColors[i % adColors.length]}" stroke="#1a1a2e" stroke-width="0.4"/>`;
+      out += `<rect x="${x + 0.5}" y="82" width="${adW - 1}" height="4" fill="${adColors[i % adColors.length]}" stroke="#1a1a2e" stroke-width="0.4"/>`;
     }
     return out;
   })()}

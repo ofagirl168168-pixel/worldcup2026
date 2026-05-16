@@ -4316,16 +4316,7 @@
 }
 .mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse-window {
   background: linear-gradient(135deg, #5a8090 0%, #3a5060 100%);
-  top: 52%;            /* Lv1 高度只有 80px、窗戶下移避開隊牌 */
-  height: 16%;
-}
-/* Lv1 隊牌變小、貼在屋頂下方一條、避免跟窗戶撞到 */
-.mt-home-distance[data-stadium-level="1"] .mt-home-clubhouse-sign {
-  top: 4%;
-  margin: 0 18%;
-  padding: 1px 3px;
-  font-size: 9px;
-  border-width: 1.5px;
+  top: 52%;            /* Lv1 高度小、窗戶下移避開隊牌、其餘大小不變 */
 }
 
 /* Lv 2：木造小屋升級 — 修整過的淺棕木、屋瓦初現 */
@@ -4719,16 +4710,17 @@
 .mt-home-cw-1 { left: 18%; }
 .mt-home-cw-2 { right: 18%; }
 
-/* Lv 3+ 球場邊（看台下方）一排廣告牌、彩色 LED 風 */
+/* Lv 3+ 球場邊（看台下方）一排廣告牌、彩色 LED 風
+   定位：bottom: 100% → 廣告牌的底邊貼在地平線（操場頂緣）、整體往上伸入天空一點 */
 .mt-home-pitch-ads {
   position: absolute;
   left: 0; right: 0;
-  top: 0;                          /* 貼著操場頂緣（即看台底部）*/
-  height: 12px;
+  bottom: 100%;                    /* 底邊貼地平線、整體在地平線「上方」*/
+  height: 13px;
   display: flex;
   gap: 1px;
   padding: 0 2px;
-  z-index: 5;                      /* 高過草紋、但低於球員與裝飾 */
+  z-index: 5;
   pointer-events: none;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.45));
 }
