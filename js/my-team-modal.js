@@ -5016,11 +5016,13 @@
           <div class="mt-train-feed-btns">
             <button class="mt-train-feed-btn mt-train-feed-normal" data-feed-mode="normal">
               <div class="mt-train-feed-btn-title">⚡ 集訓升等</div>
-              <div class="mt-train-feed-btn-benefit">Lv+1 · 6 屬性各 +1~3 · 🧠10 💪10</div>
+              <div class="mt-train-feed-btn-benefit">Lv+1 · 6 屬性各 +1~3</div>
+              <div class="mt-train-feed-btn-cost">需要：🧠10 💪10</div>
             </button>
             <button class="mt-train-feed-btn mt-train-feed-premium" data-feed-mode="premium">
               <div class="mt-train-feed-btn-title">⭐ 精英特訓</div>
-              <div class="mt-train-feed-btn-benefit">Lv+1 · 6 屬性各 +2~5 · 🧠30 💪30 ❤️10 💡10</div>
+              <div class="mt-train-feed-btn-benefit">Lv+1 · 6 屬性各 +2~5</div>
+              <div class="mt-train-feed-btn-cost">需要：🧠30 💪30 ❤️10 💡10</div>
             </button>
           </div>
         </div>
