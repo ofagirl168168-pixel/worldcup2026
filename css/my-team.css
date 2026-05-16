@@ -3959,23 +3959,83 @@
   box-shadow: inset 0 -10px 0 rgba(0,0,0,0.2);
 }
 
-/* Lv 10：草地中央噴泉 + 全場彩虹光環 */
-.mt-home-distance[data-stadium-level="10"] ~ .mt-home-ground::after,
-.mt-home-distance[data-stadium-level="10"] .mt-home-ground-tufts::before {
-  content: '⛲';
+/* Lv 10：草地噴泉用 SVG（emoji 拔掉、JS 渲染 .mt-home-fountain 容器）+ 全場彩虹光環 */
+.mt-home-fountain {
   position: absolute;
-  bottom: 40%;
+  bottom: 32%;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 32px;
-  filter: drop-shadow(0 0 10px rgba(135,206,235,0.8));
-  animation: mt-fountain-pulse 2s ease-in-out infinite;
+  width: 64px;
+  height: 90px;
+  z-index: 4;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.35)) drop-shadow(0 0 14px rgba(135,206,235,0.55));
+  animation: mt-fountain-bob 3.2s ease-in-out infinite;
+}
+.mt-home-fountain svg { width: 100%; height: 100%; display: block; }
+@keyframes mt-fountain-bob {
+  0%, 100% { transform: translateX(-50%) scale(1);    }
+  50%      { transform: translateX(-50%) scale(1.04); }
+}
+/* 噴泉水柱單獨 pulse */
+.mt-home-fountain .mt-fountain-water {
+  animation: mt-fountain-water 1.6s ease-in-out infinite;
+  transform-origin: 30px 38px;
+}
+@keyframes mt-fountain-water {
+  0%, 100% { transform: scaleY(1);    opacity: 0.85; }
+  50%      { transform: scaleY(1.15); opacity: 1;    }
+}
+
+/* ─── 草地裝飾：每級在地面區加 SVG 物件（樹叢 / 燈柱 / 長椅 / 雕像）─── */
+.mt-home-grass-decor {
+  position: absolute;
+  bottom: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.mt-home-grass-decor svg { width: 100%; height: 100%; display: block; }
+.mt-home-grass-decor.is-bush     { width: 36px; height: 28px; bottom: 6%; }
+.mt-home-grass-decor.is-lamp     { width: 18px; height: 60px; bottom: 8%; }
+.mt-home-grass-decor.is-bench    { width: 48px; height: 22px; bottom: 5%; }
+.mt-home-grass-decor.is-tree     { width: 50px; height: 70px; bottom: 6%; }
+.mt-home-grass-decor.is-statue   { width: 28px; height: 56px; bottom: 8%; }
+.mt-home-grass-decor.is-podium   { width: 60px; height: 16px; bottom: 4%; filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
+
+/* 多樓層分隔線（疊在 clubhouse 上的透明 overlay div .mt-home-floors）*/
+.mt-home-floors {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   z-index: 2;
 }
-@keyframes mt-fountain-pulse {
-  0%, 100% { transform: translateX(-50%) scale(1); filter: drop-shadow(0 0 8px rgba(135,206,235,0.6)); }
-  50%      { transform: translateX(-50%) scale(1.06); filter: drop-shadow(0 0 14px rgba(135,206,235,1)); }
+.mt-home-floors[data-floors="2"] {
+  background:
+    linear-gradient(180deg, transparent calc(50% - 0.5px), rgba(0,0,0,0.45) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px));
 }
+.mt-home-floors[data-floors="3"] {
+  background:
+    linear-gradient(180deg, transparent calc(33% - 0.5px), rgba(0,0,0,0.45) calc(33% - 0.5px) calc(33% + 0.5px), transparent calc(33% + 0.5px)),
+    linear-gradient(180deg, transparent calc(66% - 0.5px), rgba(0,0,0,0.45) calc(66% - 0.5px) calc(66% + 0.5px), transparent calc(66% + 0.5px));
+}
+.mt-home-floors[data-floors="4"] {
+  background:
+    linear-gradient(180deg, transparent calc(25% - 0.5px), rgba(0,0,0,0.45) calc(25% - 0.5px) calc(25% + 0.5px), transparent calc(25% + 0.5px)),
+    linear-gradient(180deg, transparent calc(50% - 0.5px), rgba(0,0,0,0.45) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+    linear-gradient(180deg, transparent calc(75% - 0.5px), rgba(0,0,0,0.45) calc(75% - 0.5px) calc(75% + 0.5px), transparent calc(75% + 0.5px));
+}
+
+/* clubhouse 高度依等級（建築實際 grow）— 1 樓 →  4 樓 視覺差距明顯 */
+.mt-home-distance[data-stadium-level="1"]  .mt-home-clubhouse { height: 80px; }
+.mt-home-distance[data-stadium-level="2"]  .mt-home-clubhouse { height: 90px; }
+.mt-home-distance[data-stadium-level="3"]  .mt-home-clubhouse { height: 100px; }
+.mt-home-distance[data-stadium-level="4"]  .mt-home-clubhouse { height: 110px; }
+.mt-home-distance[data-stadium-level="5"]  .mt-home-clubhouse { height: 135px; }
+.mt-home-distance[data-stadium-level="6"]  .mt-home-clubhouse { height: 150px; }
+.mt-home-distance[data-stadium-level="7"]  .mt-home-clubhouse { height: 175px; }
+.mt-home-distance[data-stadium-level="8"]  .mt-home-clubhouse { height: 190px; }
+.mt-home-distance[data-stadium-level="9"]  .mt-home-clubhouse { height: 210px; }
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse { height: 230px; }
 .mt-home-distance[data-stadium-level="10"] {
   animation: mt-stadium-rainbow 6s linear infinite;
 }
@@ -4125,10 +4185,12 @@
     #f0c040 0, #f0c040 3px, #e07020 3px, #e07020 6px);
 }
 
+/* 聚光燈：base 從地平線（clubhouse bottom）開始往上長、最頂端是燈具 */
 .mt-home-floodlight {
   position: absolute;
-  top: -34px;
-  width: 5px; height: 38px;
+  bottom: 0;
+  width: 5px;
+  height: calc(100% + 35px);   /* 比 clubhouse 高、超過屋頂 */
   background: #404040;
   border: 1.5px solid #1a1a2e;
   z-index: 3;
@@ -4136,6 +4198,7 @@
 .mt-home-floodlight-l { left: -38px; }
 .mt-home-floodlight-r { right: -38px; }
 .mt-home-floodlight::after {
+  /* 燈具在桿頂 */
   content: ''; position: absolute;
   left: -6px; right: -6px; top: -10px;
   width: 17px; height: 10px;
@@ -4145,27 +4208,37 @@
   box-shadow: 0 0 12px rgba(255,235,150,0.9), 0 0 20px rgba(255,235,150,0.45);
   animation: mt-floodlight-flicker 3s ease-in-out infinite;
 }
+/* Lv 8+ 高聳聚光燈 */
+.mt-home-distance[data-stadium-level="8"] .mt-home-floodlight,
+.mt-home-distance[data-stadium-level="9"] .mt-home-floodlight,
+.mt-home-distance[data-stadium-level="10"] .mt-home-floodlight {
+  height: calc(100% + 60px);
+}
 @keyframes mt-floodlight-flicker {
   0%, 95%, 100% { opacity: 1; }
   97% { opacity: 0.6; }
 }
 
+/* 旗桿：base 從地平線開始、桿頂掛旗 */
 .mt-home-flag {
   position: absolute;
-  top: -28px;
-  width: 2px; height: 32px;
+  bottom: 0;
+  width: 2px;
+  height: calc(100% + 25px);   /* 比 clubhouse 還高一截 */
   background: #6d4c2a;
   z-index: 3;
 }
 .mt-home-flag-l { left: 10%; }
 .mt-home-flag-r { right: 10%; }
 .mt-home-flag::after {
+  /* 旗在桿頂 */
   content: ''; position: absolute;
   left: 2px; top: 0;
   width: 14px; height: 10px;
   background: linear-gradient(135deg, #e53935 0%, #f0c040 100%);
   border: 1px solid #1a1a2e;
   animation: mt-flag-wave 1.8s ease-in-out infinite;
+  transform-origin: left center;
 }
 @keyframes mt-flag-wave {
   0%, 100% { transform: skewX(0deg);  }

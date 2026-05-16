@@ -799,6 +799,10 @@
                 <div class="mt-home-flag mt-home-flag-l"></div>
                 <div class="mt-home-flag mt-home-flag-r"></div>
               ` : ''}
+              ${stadiumLv >= 5 ? `
+                <!-- Lv 5+ 多樓層分隔線 (overlay on clubhouse) -->
+                <div class="mt-home-floors" data-floors="${stadiumLv <= 6 ? 2 : (stadiumLv <= 8 ? 3 : 4)}"></div>
+              ` : ''}
             </div>
             <div class="mt-home-tree mt-home-tree-r"></div>
             <!-- 球迷：根據 team.fans 數量在看台/草地周圍加油 -->
@@ -808,6 +812,8 @@
           <div class="mt-home-ground" id="mt-home-ground">
             <div class="mt-home-ground-lines"></div>
             <div class="mt-home-ground-tufts"></div>
+            ${_renderGrassDecor(stadiumLv)}
+            ${stadiumLv >= 10 ? _renderFountainSvg() : ''}
           </div>
         </div>
       </div>
@@ -3053,6 +3059,181 @@
     9: '鐘塔 + 延伸看台',
     10: '黃金屋頂 + 噴泉 + 彩虹光環',
   };
+
+  // 主頁草地 SVG 噴泉（取代 emoji ⛲、純 SVG 質感）
+  function _renderFountainSvg() {
+    return `
+<div class="mt-home-fountain">
+  <svg viewBox="0 0 60 90" xmlns="http://www.w3.org/2000/svg">
+    <!-- 池底陰影 -->
+    <ellipse cx="30" cy="84" rx="26" ry="3" fill="rgba(0,0,0,0.25)"/>
+    <!-- 水池外緣 -->
+    <ellipse cx="30" cy="78" rx="26" ry="6" fill="#5a8aa8" stroke="#1a3050" stroke-width="1.5"/>
+    <!-- 池水 -->
+    <ellipse cx="30" cy="76" rx="23" ry="4.5" fill="#7eb5d4"/>
+    <ellipse cx="30" cy="75.5" rx="20" ry="3.5" fill="#a5cce6" opacity="0.85"/>
+    <!-- 反光波紋 -->
+    <ellipse cx="24" cy="76" rx="6" ry="1" fill="#fff" opacity="0.4"/>
+    <ellipse cx="36" cy="77" rx="4" ry="0.7" fill="#fff" opacity="0.3"/>
+    <!-- 中央柱底座（兩層） -->
+    <ellipse cx="30" cy="72" rx="11" ry="3" fill="#d0c4a8" stroke="#1a1a2e" stroke-width="1"/>
+    <rect x="22" y="58" width="16" height="14" fill="#e0d4b8" stroke="#1a1a2e" stroke-width="1.2"/>
+    <line x1="22" y1="64" x2="38" y2="64" stroke="#1a1a2e" stroke-width="0.4" opacity="0.5"/>
+    <!-- 上層碗 -->
+    <ellipse cx="30" cy="58" rx="10" ry="2.5" fill="#d0c4a8" stroke="#1a1a2e" stroke-width="1"/>
+    <rect x="26" y="48" width="8" height="10" fill="#e0d4b8" stroke="#1a1a2e" stroke-width="1"/>
+    <ellipse cx="30" cy="48" rx="6" ry="2" fill="#a5cce6" stroke="#1a1a2e" stroke-width="0.8"/>
+    <!-- 水柱（一條主柱 + 兩條側流） -->
+    <g class="mt-fountain-water">
+      <path d="M 30 46 L 30 14" stroke="#cce8f5" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M 27 46 Q 22 30 18 20" stroke="#a5cce6" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.85"/>
+      <path d="M 33 46 Q 38 30 42 20" stroke="#a5cce6" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.85"/>
+      <!-- 水珠 -->
+      <circle cx="30" cy="10" r="2" fill="#a5cce6" opacity="0.7"/>
+      <circle cx="18" cy="22" r="1.5" fill="#a5cce6" opacity="0.6"/>
+      <circle cx="42" cy="22" r="1.5" fill="#a5cce6" opacity="0.6"/>
+      <circle cx="30" cy="20" r="1" fill="#fff" opacity="0.8"/>
+    </g>
+  </svg>
+</div>`;
+  }
+
+  // 主頁草地裝飾 — 每等級加不同 SVG 物件、純 pixel-art 質感
+  function _renderGrassDecor(lv) {
+    const lvl = lv || 1;
+    const items = [];
+
+    // Lv 2+ 小灌木（左右各一）
+    if (lvl >= 2) {
+      const bush = `
+<div class="mt-home-grass-decor is-bush" style="left:8%">
+  <svg viewBox="0 0 36 28" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="9" cy="22" rx="8" ry="4" fill="#2e7a2e" stroke="#1a3a1a" stroke-width="1"/>
+    <ellipse cx="18" cy="20" rx="9" ry="5" fill="#3a8e3a" stroke="#1a3a1a" stroke-width="1"/>
+    <ellipse cx="27" cy="22" rx="8" ry="4" fill="#2e7a2e" stroke="#1a3a1a" stroke-width="1"/>
+    <circle cx="14" cy="14" r="3" fill="#4caf50" stroke="#1a3a1a" stroke-width="0.8"/>
+    <circle cx="22" cy="13" r="3" fill="#4caf50" stroke="#1a3a1a" stroke-width="0.8"/>
+    <circle cx="18" cy="9" r="2.5" fill="#5fc05f" stroke="#1a3a1a" stroke-width="0.8"/>
+  </svg>
+</div>
+<div class="mt-home-grass-decor is-bush" style="right:8%">
+  <svg viewBox="0 0 36 28" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="9" cy="22" rx="8" ry="4" fill="#2e7a2e" stroke="#1a3a1a" stroke-width="1"/>
+    <ellipse cx="18" cy="20" rx="9" ry="5" fill="#3a8e3a" stroke="#1a3a1a" stroke-width="1"/>
+    <ellipse cx="27" cy="22" rx="8" ry="4" fill="#2e7a2e" stroke="#1a3a1a" stroke-width="1"/>
+    <circle cx="14" cy="14" r="3" fill="#4caf50" stroke="#1a3a1a" stroke-width="0.8"/>
+    <circle cx="22" cy="13" r="3" fill="#4caf50" stroke="#1a3a1a" stroke-width="0.8"/>
+    <circle cx="18" cy="9" r="2.5" fill="#5fc05f" stroke="#1a3a1a" stroke-width="0.8"/>
+  </svg>
+</div>`;
+      items.push(bush);
+    }
+
+    // Lv 4+ 路燈（左右各一）
+    if (lvl >= 4) {
+      const lamp = `
+<div class="mt-home-grass-decor is-lamp" style="left:20%">
+  <svg viewBox="0 0 18 60" xmlns="http://www.w3.org/2000/svg">
+    <!-- 桿 -->
+    <rect x="7.5" y="14" width="3" height="44" fill="#3a3a3a" stroke="#1a1a2e" stroke-width="0.6"/>
+    <!-- 基座 -->
+    <rect x="5" y="56" width="8" height="4" fill="#5a5a5a" stroke="#1a1a2e" stroke-width="0.6"/>
+    <!-- 燈罩 -->
+    <polygon points="3,14 15,14 13,4 5,4" fill="#3a3a3a" stroke="#1a1a2e" stroke-width="0.6"/>
+    <!-- 燈泡 -->
+    <ellipse cx="9" cy="10" rx="4" ry="3" fill="#ffeb88" filter="url(#lampGlow)"/>
+    <defs>
+      <filter id="lampGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="1.5"/>
+      </filter>
+    </defs>
+  </svg>
+</div>
+<div class="mt-home-grass-decor is-lamp" style="right:20%">
+  <svg viewBox="0 0 18 60" xmlns="http://www.w3.org/2000/svg">
+    <rect x="7.5" y="14" width="3" height="44" fill="#3a3a3a" stroke="#1a1a2e" stroke-width="0.6"/>
+    <rect x="5" y="56" width="8" height="4" fill="#5a5a5a" stroke="#1a1a2e" stroke-width="0.6"/>
+    <polygon points="3,14 15,14 13,4 5,4" fill="#3a3a3a" stroke="#1a1a2e" stroke-width="0.6"/>
+    <ellipse cx="9" cy="10" rx="4" ry="3" fill="#ffeb88"/>
+  </svg>
+</div>`;
+      items.push(lamp);
+    }
+
+    // Lv 6+ 長椅
+    if (lvl >= 6) {
+      items.push(`
+<div class="mt-home-grass-decor is-bench" style="left:30%">
+  <svg viewBox="0 0 48 22" xmlns="http://www.w3.org/2000/svg">
+    <!-- 椅背 -->
+    <rect x="3" y="3" width="42" height="3" fill="#6e4a26" stroke="#1a1a2e" stroke-width="0.6"/>
+    <rect x="3" y="7" width="42" height="2" fill="#6e4a26" stroke="#1a1a2e" stroke-width="0.6"/>
+    <!-- 坐板 -->
+    <rect x="2" y="11" width="44" height="3" fill="#8a5a30" stroke="#1a1a2e" stroke-width="0.6"/>
+    <!-- 腳 -->
+    <rect x="5" y="14" width="3" height="6" fill="#3a3a3a" stroke="#1a1a2e" stroke-width="0.4"/>
+    <rect x="40" y="14" width="3" height="6" fill="#3a3a3a" stroke="#1a1a2e" stroke-width="0.4"/>
+    <!-- 椅背支柱 -->
+    <rect x="6" y="3" width="2" height="10" fill="#5a3a1a" stroke="#1a1a2e" stroke-width="0.3"/>
+    <rect x="40" y="3" width="2" height="10" fill="#5a3a1a" stroke="#1a1a2e" stroke-width="0.3"/>
+  </svg>
+</div>
+<div class="mt-home-grass-decor is-bench" style="right:30%">
+  <svg viewBox="0 0 48 22" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="3" width="42" height="3" fill="#6e4a26" stroke="#1a1a2e" stroke-width="0.6"/>
+    <rect x="3" y="7" width="42" height="2" fill="#6e4a26" stroke="#1a1a2e" stroke-width="0.6"/>
+    <rect x="2" y="11" width="44" height="3" fill="#8a5a30" stroke="#1a1a2e" stroke-width="0.6"/>
+    <rect x="5" y="14" width="3" height="6" fill="#3a3a3a" stroke="#1a1a2e" stroke-width="0.4"/>
+    <rect x="40" y="14" width="3" height="6" fill="#3a3a3a" stroke="#1a1a2e" stroke-width="0.4"/>
+    <rect x="6" y="3" width="2" height="10" fill="#5a3a1a" stroke="#1a1a2e" stroke-width="0.3"/>
+    <rect x="40" y="3" width="2" height="10" fill="#5a3a1a" stroke="#1a1a2e" stroke-width="0.3"/>
+  </svg>
+</div>`);
+    }
+
+    // Lv 8+ 大樹（左右）
+    if (lvl >= 8) {
+      items.push(`
+<div class="mt-home-grass-decor is-tree" style="left:3%">
+  <svg viewBox="0 0 50 70" xmlns="http://www.w3.org/2000/svg">
+    <rect x="22" y="50" width="6" height="20" fill="#6e4a26" stroke="#1a1a2e" stroke-width="0.8"/>
+    <ellipse cx="25" cy="36" rx="22" ry="20" fill="#2e7a2e" stroke="#1a3a1a" stroke-width="1.2"/>
+    <circle cx="14" cy="28" r="8" fill="#3a8e3a" stroke="#1a3a1a" stroke-width="0.8"/>
+    <circle cx="36" cy="30" r="9" fill="#3a8e3a" stroke="#1a3a1a" stroke-width="0.8"/>
+    <circle cx="25" cy="20" r="8" fill="#4caf50" stroke="#1a3a1a" stroke-width="0.8"/>
+    <circle cx="18" cy="38" r="3" fill="#5fc05f"/>
+    <circle cx="32" cy="40" r="2.5" fill="#5fc05f"/>
+  </svg>
+</div>
+<div class="mt-home-grass-decor is-tree" style="right:3%">
+  <svg viewBox="0 0 50 70" xmlns="http://www.w3.org/2000/svg">
+    <rect x="22" y="50" width="6" height="20" fill="#6e4a26" stroke="#1a1a2e" stroke-width="0.8"/>
+    <ellipse cx="25" cy="36" rx="22" ry="20" fill="#2e7a2e" stroke="#1a3a1a" stroke-width="1.2"/>
+    <circle cx="14" cy="28" r="8" fill="#3a8e3a" stroke="#1a3a1a" stroke-width="0.8"/>
+    <circle cx="36" cy="30" r="9" fill="#3a8e3a" stroke="#1a3a1a" stroke-width="0.8"/>
+    <circle cx="25" cy="20" r="8" fill="#4caf50" stroke="#1a3a1a" stroke-width="0.8"/>
+  </svg>
+</div>`);
+    }
+
+    // Lv 10 冠軍領獎台（草地中央偏前）
+    if (lvl >= 10) {
+      items.push(`
+<div class="mt-home-grass-decor is-podium" style="left:50%; transform: translateX(-50%); bottom: 18%;">
+  <svg viewBox="0 0 60 16" xmlns="http://www.w3.org/2000/svg">
+    <!-- 3 階領獎台 -->
+    <rect x="22" y="0" width="16" height="16" fill="#ffd700" stroke="#5a4010" stroke-width="0.8"/>
+    <text x="30" y="11" text-anchor="middle" fill="#5a4010" font-size="9" font-weight="900" font-family="sans-serif">1</text>
+    <rect x="6" y="4" width="16" height="12" fill="#c0c0c0" stroke="#3a3a3a" stroke-width="0.8"/>
+    <text x="14" y="13" text-anchor="middle" fill="#3a3a3a" font-size="7" font-weight="900" font-family="sans-serif">2</text>
+    <rect x="38" y="6" width="16" height="10" fill="#cd7f32" stroke="#5a3010" stroke-width="0.8"/>
+    <text x="46" y="14" text-anchor="middle" fill="#5a3010" font-size="6" font-weight="900" font-family="sans-serif">3</text>
+  </svg>
+</div>`);
+    }
+
+    return items.join('\n');
+  }
 
   // 球場預覽 SVG generator — 每級不同建築 SHAPE（不只顏色、寬高/樓層/屋頂形狀都進化）
   function _stadiumPreviewSvg(level) {
