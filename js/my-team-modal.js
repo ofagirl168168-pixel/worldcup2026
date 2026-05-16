@@ -809,31 +809,56 @@
     if (fansEl) {
       const fans = team?.fans || 100;
       const fanCount = Math.min(30, Math.max(2, Math.floor(fans / 60)));
-      // 球迷類型：3 種 SVG chibi（舉手歡呼 / 揮旗 / 戴圍巾）
       const teamColor = _colorHex(team?.crest_primary || 'red');
+      // 隨機膚色 / 褲子顏色 / 圍巾顏色 — 增加視覺多樣性
+      const SKIN = ['#f5d0a0','#e8b896','#d8b08a','#c0905d','#a67340','#7a4f2c'];
+      const PANTS = ['#1a3050','#202020','#3a2410','#4a3520','#2a1a3a','#1a4030'];
+      const SCARF = ['#f0c040','#e53935','#1976d2','#43a047','#9b87f5','#fb8c00'];
+      // 簡單 hash function 給 deterministic 隨機（基於 index）
+      const rand = (seed, mod) => {
+        let h = seed * 2654435761;
+        h = (h ^ (h >>> 16)) >>> 0;
+        return h % mod;
+      };
+      // 臉部表情 SVG fragment（眼睛 + 張嘴歡呼）— 共用於所有類型
+      const face = (skin, headCy = 4) => `
+        <!-- 眼睛 -->
+        <circle cx="5"   cy="${headCy - 0.2}" r="0.35" fill="#1a1a2e"/>
+        <circle cx="7"   cy="${headCy - 0.2}" r="0.35" fill="#1a1a2e"/>
+        <!-- 嘴巴（張嘴歡呼）-->
+        <ellipse cx="6" cy="${headCy + 1.1}" rx="0.7" ry="0.5" fill="#5a1010"/>`;
+
       const fragments = [];
       for (let i = 0; i < fanCount; i++) {
         const type = i % 3;
-        const x = 5 + (i * 91) % 90;
-        const delay = (i * 0.27) % 1.5;
+        // 位置加 jitter（不再 i*91%90 的死板數列）
+        const x = 3 + ((i * 7 + rand(i, 89)) % 92);
+        // 動畫 variant（3 種）+ random delay
+        const variant = (rand(i + 1, 3)) + 1;
+        const delay = (rand(i + 3, 100) / 25).toFixed(2);    // 0~4s
+        const skin = SKIN[rand(i + 5, SKIN.length)];
+        const pants = PANTS[rand(i + 7, PANTS.length)];
+        const scarf = SCARF[rand(i + 11, SCARF.length)];
         let svg = '';
         if (type === 0) {
           // 舉手歡呼
           svg = `<svg viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="6" cy="4" r="2.6" fill="#f5d0a0" stroke="#1a1a2e" stroke-width="0.6"/>
+            <circle cx="6" cy="4" r="2.6" fill="${skin}" stroke="#1a1a2e" stroke-width="0.6"/>
+            ${face(skin)}
             <rect x="3.6" y="6.5" width="4.8" height="6" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.6"/>
-            <rect x="3" y="12.4" width="2" height="4" fill="#1a3050" stroke="#1a1a2e" stroke-width="0.5"/>
-            <rect x="7" y="12.4" width="2" height="4" fill="#1a3050" stroke="#1a1a2e" stroke-width="0.5"/>
-            <rect x="2.5" y="2"  width="1.5" height="5" fill="#f5d0a0" stroke="#1a1a2e" stroke-width="0.4" transform="rotate(-25 3.25 4.5)"/>
-            <rect x="8"   y="2"  width="1.5" height="5" fill="#f5d0a0" stroke="#1a1a2e" stroke-width="0.4" transform="rotate( 25 8.75 4.5)"/>
+            <rect x="3" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
+            <rect x="7" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
+            <rect x="2.5" y="2"  width="1.5" height="5" fill="${skin}" stroke="#1a1a2e" stroke-width="0.4" transform="rotate(-25 3.25 4.5)"/>
+            <rect x="8"   y="2"  width="1.5" height="5" fill="${skin}" stroke="#1a1a2e" stroke-width="0.4" transform="rotate( 25 8.75 4.5)"/>
           </svg>`;
         } else if (type === 1) {
           // 揮旗
           svg = `<svg viewBox="0 0 14 18" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="6" cy="4" r="2.6" fill="#e8b896" stroke="#1a1a2e" stroke-width="0.6"/>
+            <circle cx="6" cy="4" r="2.6" fill="${skin}" stroke="#1a1a2e" stroke-width="0.6"/>
+            ${face(skin)}
             <rect x="3.6" y="6.5" width="4.8" height="6" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.6"/>
-            <rect x="3" y="12.4" width="2" height="4" fill="#202020" stroke="#1a1a2e" stroke-width="0.5"/>
-            <rect x="7" y="12.4" width="2" height="4" fill="#202020" stroke="#1a1a2e" stroke-width="0.5"/>
+            <rect x="3" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
+            <rect x="7" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
             <!-- 旗桿 + 旗 -->
             <line x1="9" y1="2" x2="9" y2="10" stroke="#6d4c2a" stroke-width="0.7"/>
             <polygon points="9,2 13,3.5 9,5.5" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.4"/>
@@ -841,16 +866,17 @@
         } else {
           // 戴圍巾
           svg = `<svg viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="6" cy="4" r="2.6" fill="#d8b08a" stroke="#1a1a2e" stroke-width="0.6"/>
+            <circle cx="6" cy="4" r="2.6" fill="${skin}" stroke="#1a1a2e" stroke-width="0.6"/>
+            ${face(skin)}
             <rect x="3.6" y="6.5" width="4.8" height="6" fill="${teamColor}" stroke="#1a1a2e" stroke-width="0.6"/>
-            <rect x="3" y="12.4" width="2" height="4" fill="#3a2410" stroke="#1a1a2e" stroke-width="0.5"/>
-            <rect x="7" y="12.4" width="2" height="4" fill="#3a2410" stroke="#1a1a2e" stroke-width="0.5"/>
-            <!-- 圍巾 -->
-            <rect x="2.6" y="6.4" width="6.8" height="1.8" fill="#f0c040" stroke="#1a1a2e" stroke-width="0.4"/>
-            <rect x="2" y="8" width="1.4" height="3.5" fill="#f0c040" stroke="#1a1a2e" stroke-width="0.4"/>
+            <rect x="3" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
+            <rect x="7" y="12.4" width="2" height="4" fill="${pants}" stroke="#1a1a2e" stroke-width="0.5"/>
+            <!-- 圍巾（顏色隨機）-->
+            <rect x="2.6" y="6.4" width="6.8" height="1.8" fill="${scarf}" stroke="#1a1a2e" stroke-width="0.4"/>
+            <rect x="2" y="8" width="1.4" height="3.5" fill="${scarf}" stroke="#1a1a2e" stroke-width="0.4"/>
           </svg>`;
         }
-        fragments.push(`<span class="mt-home-fan" style="left:${x}%; animation-delay:${delay}s">${svg}</span>`);
+        fragments.push(`<span class="mt-home-fan fan-v${variant}" style="left:${x}%; animation-delay:${delay}s">${svg}</span>`);
       }
       fansEl.innerHTML = fragments.join('');
     }

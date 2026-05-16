@@ -3700,20 +3700,44 @@
   position: absolute;
   bottom: 0;          /* 腳站在地平線上 */
   top: auto;
-  width: 22px;        /* 放大：14 → 22 */
-  height: 34px;       /* 放大：22 → 34 */
+  width: 22px;
+  height: 34px;
   filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6));
-  animation: mt-fan-cheer 1.4s ease-in-out infinite;
   image-rendering: pixelated;
-  transform-origin: 50% 95%;   /* hinge 在腳、跳動時腳不離地 */
+  transform-origin: 50% 95%;
 }
 .mt-home-fan svg {
   width: 100%; height: 100%;
   display: block;
 }
-@keyframes mt-fan-cheer {
-  0%, 100% { transform: translateY(0)    rotate(-5deg); }
-  50%      { transform: translateY(-4px) rotate( 5deg); }
+
+/* 3 個動畫 variant — 不旋轉、只偶爾上下跳、停留時間長
+   v1: 慢節奏單跳、v2: 快雙跳、v3: 中速大跳
+   配合 JS 給的 random animation-delay 整體不會同步 */
+.mt-home-fan.fan-v1 { animation: mt-fan-jump-1 5.4s ease-in-out infinite; }
+.mt-home-fan.fan-v2 { animation: mt-fan-jump-2 6.8s ease-in-out infinite; }
+.mt-home-fan.fan-v3 { animation: mt-fan-jump-3 4.6s ease-in-out infinite; }
+
+/* v1: 慢的小跳、85% 時間靜止 */
+@keyframes mt-fan-jump-1 {
+  0%, 80%, 100% { transform: translateY(0); }
+  87%           { transform: translateY(-5px); }
+  93%           { transform: translateY(-1px); }
+}
+/* v2: 快雙跳（連續 2 次彈） */
+@keyframes mt-fan-jump-2 {
+  0%, 75%, 100% { transform: translateY(0); }
+  82%           { transform: translateY(-6px); }
+  86%           { transform: translateY(-1px); }
+  90%           { transform: translateY(-4px); }
+  95%           { transform: translateY(0); }
+}
+/* v3: 大跳（一次彈很高、慢慢回） */
+@keyframes mt-fan-jump-3 {
+  0%, 70%, 100% { transform: translateY(0); }
+  80%           { transform: translateY(-8px); }
+  88%           { transform: translateY(-3px); }
+  94%           { transform: translateY(-1px); }
 }
 
 /* Pixel art 樹 — 純色塊 + 黑框 */
