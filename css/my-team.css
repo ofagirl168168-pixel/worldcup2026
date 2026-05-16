@@ -3503,7 +3503,7 @@
    🏟️ 主頁 tab：戶外訓練場景
    天空 + 雲 + 太陽 + 樹 + 訓練館 + 操場 + 全身球員漫步
    ════════════════════════════════════════ */
-.mt-home-tab { padding: 8px; }
+.mt-home-tab { padding: 8px; position: relative; }
 .mt-home-scene {
   position: relative;
   width: 100%;
@@ -3514,6 +3514,415 @@
   border-radius: 8px;
   image-rendering: pixelated;
   box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+}
+
+/* ─── 球場等級招牌 widget（主頁右上角 pixel-art 木牌）─── */
+.mt-home-stadium-widget {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 8;
+  padding: 6px 10px 7px;
+  background: linear-gradient(180deg, #c9905a 0%, #8c5d2e 100%);
+  border: 2px solid #2a1408;
+  border-radius: 6px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    inset 0 -2px 4px rgba(0,0,0,0.35),
+    0 4px 10px rgba(0,0,0,0.5);
+  color: #fff8e0;
+  font-family: inherit;
+  cursor: pointer;
+  min-width: 130px;
+  image-rendering: pixelated;
+  text-align: left;
+  transition: transform 0.15s ease-out, box-shadow 0.15s;
+}
+.mt-home-stadium-widget:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.4),
+    inset 0 -2px 4px rgba(0,0,0,0.35),
+    0 6px 14px rgba(0,0,0,0.55);
+}
+.mt-home-stadium-widget:active { transform: translateY(0); }
+/* 高等級招牌變金色 */
+.mt-home-stadium-widget[data-lv="7"],
+.mt-home-stadium-widget[data-lv="8"] {
+  background: linear-gradient(180deg, #d4af5e 0%, #8a6a25 100%);
+}
+.mt-home-stadium-widget[data-lv="9"] {
+  background: linear-gradient(180deg, #e8c870 0%, #9a7820 100%);
+}
+.mt-home-stadium-widget[data-lv="10"] {
+  background: linear-gradient(180deg, #ffd700 0%, #c89010 100%);
+  border-color: #6e4a08;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -2px 4px rgba(0,0,0,0.35),
+    0 4px 10px rgba(0,0,0,0.5),
+    0 0 16px rgba(255,215,0,0.5);
+}
+.mt-home-stadium-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+.mt-home-stadium-icon { font-size: 16px; line-height: 1; }
+.mt-home-stadium-lv {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+.mt-home-stadium-lv small { font-size: 10px; opacity: 0.8; font-weight: 700; }
+.mt-home-stadium-row-sub {
+  font-size: 11px;
+  margin-top: 2px;
+  gap: 8px;
+  opacity: 0.95;
+}
+.mt-home-stadium-cta {
+  font-size: 10px;
+  margin-top: 3px;
+  color: #ffeaa0;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-align: center;
+  border-top: 1px dashed rgba(255,255,255,0.25);
+  padding-top: 3px;
+}
+.mt-home-stadium-cta.is-maxed {
+  color: #fff;
+  background: rgba(255,255,255,0.15);
+  border-radius: 3px;
+  border-top: 0;
+  padding: 2px 0;
+}
+
+/* ─── 球場升級 modal ─── */
+.mt-stadium-upgrade-overlay {
+  /* 用既有 mt-profile-overlay 殼、card 自己定義 */
+}
+.mt-stadium-upgrade-card {
+  background: linear-gradient(180deg, #1a2330 0%, #0d141c 100%);
+  border: 2px solid #d4af5e;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 420px;
+  padding: 18px;
+  position: relative;
+  color: #fff;
+  box-shadow: 0 0 32px rgba(212,175,94,0.4);
+}
+.mt-stadium-up-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #ffd96f;
+  text-align: center;
+  margin-bottom: 14px;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+.mt-stadium-up-compare {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.mt-stadium-up-side {
+  flex: 1;
+  text-align: center;
+}
+.mt-stadium-up-side.is-next {
+  filter: drop-shadow(0 0 8px rgba(255,217,111,0.6));
+}
+.mt-stadium-up-arrow {
+  font-size: 26px;
+  font-weight: 900;
+  color: #ffd96f;
+  flex-shrink: 0;
+}
+.mt-stadium-up-mini {
+  position: relative;
+  width: 100%;
+  height: 90px;
+  background: linear-gradient(180deg, #5b8db8 0%, #82b4d8 50%, #4caf50 50%, #2e7d32 100%);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  image-rendering: pixelated;
+}
+.mt-stadium-up-mini-clubhouse {
+  position: absolute;
+  bottom: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38%;
+  height: 38%;
+  background: #c08858;
+  border: 1.5px solid #2a1408;
+  border-radius: 2px;
+}
+.mt-stadium-up-mini-clubhouse::before {
+  content: '';
+  position: absolute;
+  top: -10px; left: -8%; right: -8%;
+  height: 12px;
+  background: #c0392b;
+  clip-path: polygon(0 100%, 50% 0, 100% 100%);
+}
+.mt-stadium-up-mini-ground {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 25%;
+  background: repeating-linear-gradient(90deg, #43a047 0 6px, #388e3c 6px 12px);
+}
+.mt-stadium-up-side-lv {
+  font-size: 14px;
+  font-weight: 900;
+  color: #ffd96f;
+}
+.mt-stadium-up-side-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.75);
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* mini 預覽依等級加裝飾 */
+.mt-stadium-up-mini[data-stadium-level="3"]::before,
+.mt-stadium-up-mini[data-stadium-level="4"]::before,
+.mt-stadium-up-mini[data-stadium-level="5"]::before,
+.mt-stadium-up-mini[data-stadium-level="6"]::before,
+.mt-stadium-up-mini[data-stadium-level="7"]::before,
+.mt-stadium-up-mini[data-stadium-level="8"]::before,
+.mt-stadium-up-mini[data-stadium-level="9"]::before,
+.mt-stadium-up-mini[data-stadium-level="10"]::before {
+  content: '';
+  position: absolute;
+  bottom: 25%;
+  left: 4%; right: 4%;
+  height: 10%;
+  background: #6b4530;
+  border: 1px solid #2a1408;
+  border-radius: 1px;
+}
+.mt-stadium-up-mini[data-stadium-level="5"]::after,
+.mt-stadium-up-mini[data-stadium-level="6"]::after,
+.mt-stadium-up-mini[data-stadium-level="7"]::after,
+.mt-stadium-up-mini[data-stadium-level="8"]::after,
+.mt-stadium-up-mini[data-stadium-level="9"]::after,
+.mt-stadium-up-mini[data-stadium-level="10"]::after {
+  content: '🔦🔦';
+  position: absolute;
+  top: 8%; left: 0; right: 0;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 30px;
+  filter: drop-shadow(0 0 4px rgba(255,255,200,0.7));
+}
+.mt-stadium-up-mini[data-stadium-level="10"] {
+  background: linear-gradient(180deg, #ff9966 0%, #ffcc99 30%, #c08040 50%, #4caf50 50%, #2e7d32 100%);
+  box-shadow: 0 0 12px rgba(255,215,0,0.6), inset 0 0 10px rgba(255,215,0,0.3);
+}
+.mt-stadium-up-mini[data-stadium-level="10"] .mt-stadium-up-mini-clubhouse::before {
+  background: #ffd700;
+}
+
+.mt-stadium-up-stats {
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+.mt-stadium-up-stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 3px 0;
+}
+.mt-stadium-up-stat-row span:last-child {
+  color: #ffd96f;
+  font-weight: 800;
+}
+.mt-stadium-up-confirm {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(180deg, #66bb6a 0%, #2e7d32 100%);
+  border: 1.5px solid #1b5e20;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: 1px;
+  box-shadow: 0 3px 8px rgba(46,125,50,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+  transition: filter 0.15s, transform 0.15s;
+}
+.mt-stadium-up-confirm:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.mt-stadium-up-confirm:disabled {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.4);
+  cursor: not-allowed;
+}
+.mt-stadium-up-cost {
+  background: rgba(0,0,0,0.3);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.mt-stadium-up-hint {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  margin-top: 8px;
+}
+.mt-stadium-up-hint b { color: #ffd96f; }
+.mt-stadium-up-maxed {
+  text-align: center;
+  font-size: 14px;
+  color: #ffd96f;
+  font-weight: 900;
+  padding: 12px;
+  background: rgba(255,215,0,0.1);
+  border: 1px solid #ffd96f;
+  border-radius: 8px;
+  letter-spacing: 1px;
+}
+
+/* ─── 10 Tier 視覺逐步升級（額外加碼、不取代既有 max-width / roof color rules） ─── */
+/* Lv 2：屋頂下方加門簷小招牌（純 CSS、用 ::before on clubhouse-door） */
+.mt-home-distance[data-stadium-level="2"] .mt-home-clubhouse-door::before,
+.mt-home-distance[data-stadium-level="3"] .mt-home-clubhouse-door::before,
+.mt-home-distance[data-stadium-level="4"] .mt-home-clubhouse-door::before,
+.mt-home-distance[data-stadium-level="5"] .mt-home-clubhouse-door::before,
+.mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse-door::before,
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse-door::before,
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-door::before,
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-door::before,
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-door::before {
+  content: '';
+  position: absolute;
+  top: -8px; left: -10%; right: -10%;
+  height: 5px;
+  background: #2a1408;
+  border-radius: 1px;
+}
+
+/* Lv 4+：地面加鋪石路（從 ground 中央到 clubhouse door） */
+.mt-home-distance[data-stadium-level="4"] ~ .mt-home-ground::before,
+.mt-home-distance[data-stadium-level="5"] ~ .mt-home-ground::before,
+.mt-home-distance[data-stadium-level="6"] ~ .mt-home-ground::before,
+.mt-home-distance[data-stadium-level="7"] ~ .mt-home-ground::before,
+.mt-home-distance[data-stadium-level="8"] ~ .mt-home-ground::before,
+.mt-home-distance[data-stadium-level="9"] ~ .mt-home-ground::before,
+.mt-home-distance[data-stadium-level="10"] ~ .mt-home-ground::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 47%;
+  width: 6%;
+  height: 100%;
+  background: repeating-linear-gradient(180deg, #8a7a6a 0 8px, #6a5a4a 8px 14px);
+  border-left: 1px solid #1a1a2e;
+  border-right: 1px solid #1a1a2e;
+  z-index: 1;
+}
+
+/* Lv 6+：clubhouse 旁加廣告板（左右兩塊小招牌） */
+.mt-home-distance[data-stadium-level="6"] .mt-home-clubhouse::before,
+.mt-home-distance[data-stadium-level="7"] .mt-home-clubhouse::before,
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse::before,
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse::before,
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse::before {
+  content: 'CHAMPIONS';
+  position: absolute;
+  bottom: -2px;
+  left: -28%;
+  width: 22%;
+  height: 14px;
+  background: linear-gradient(180deg, #1a3050 0%, #0d1830 100%);
+  border: 1px solid #ffd96f;
+  color: #ffd96f;
+  font-size: 7px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.5px;
+  border-radius: 1px;
+}
+
+/* Lv 8+：屋頂 LED 跑馬燈（屋頂上方一條閃動的字幕） */
+.mt-home-distance[data-stadium-level="8"] .mt-home-clubhouse-sign,
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse-sign,
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse-sign {
+  background: linear-gradient(180deg, #0d0d20 0%, #1a1a3a 100%);
+  border: 1px solid #ffd96f;
+  color: #ffd96f;
+  text-shadow: 0 0 6px rgba(255,217,111,0.9);
+  animation: mt-led-glow 1.5s ease-in-out infinite;
+}
+@keyframes mt-led-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(255,217,111,0.4); }
+  50%      { box-shadow: 0 0 12px rgba(255,217,111,0.9); }
+}
+
+/* Lv 9+：clubhouse 右邊加鐘塔（::after on .mt-home-clubhouse） */
+.mt-home-distance[data-stadium-level="9"] .mt-home-clubhouse::after,
+.mt-home-distance[data-stadium-level="10"] .mt-home-clubhouse::after {
+  content: '🕰️';
+  position: absolute;
+  bottom: 0;
+  right: -35%;
+  width: 24%;
+  height: 80%;
+  background: linear-gradient(180deg, #d4c8b8 0%, #8a7a6a 100%);
+  border: 1.5px solid #1a1a2e;
+  border-radius: 2px 2px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 6px;
+  font-size: 18px;
+  box-shadow: inset 0 -10px 0 rgba(0,0,0,0.2);
+}
+
+/* Lv 10：草地中央噴泉 + 全場彩虹光環 */
+.mt-home-distance[data-stadium-level="10"] ~ .mt-home-ground::after,
+.mt-home-distance[data-stadium-level="10"] .mt-home-ground-tufts::before {
+  content: '⛲';
+  position: absolute;
+  bottom: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
+  filter: drop-shadow(0 0 10px rgba(135,206,235,0.8));
+  animation: mt-fountain-pulse 2s ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes mt-fountain-pulse {
+  0%, 100% { transform: translateX(-50%) scale(1); filter: drop-shadow(0 0 8px rgba(135,206,235,0.6)); }
+  50%      { transform: translateX(-50%) scale(1.06); filter: drop-shadow(0 0 14px rgba(135,206,235,1)); }
+}
+.mt-home-distance[data-stadium-level="10"] {
+  animation: mt-stadium-rainbow 6s linear infinite;
+}
+@keyframes mt-stadium-rainbow {
+  0%   { filter: hue-rotate(0deg)   drop-shadow(0 0 20px rgba(255,215,0,0.3)); }
+  50%  { filter: hue-rotate(20deg)  drop-shadow(0 0 25px rgba(255,215,0,0.5)); }
+  100% { filter: hue-rotate(0deg)   drop-shadow(0 0 20px rgba(255,215,0,0.3)); }
 }
 
 /* Pixel art 風天空 — 三層漸層 + 遠山 silhouette、延伸到操場頂避免縫隙 */

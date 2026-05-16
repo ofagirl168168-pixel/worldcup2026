@@ -729,8 +729,24 @@
     // 主頁顯示前 11 starter（或現有所有 < 11）
     const onField = starters.slice(0, 11);
 
+    const stadiumLv = team?.stadium_level || 1;
+    const stadiumMaxFans = team?.fans || 100;
+    const stadiumMaxStam = team?.stamina_max || 5;
+
     content.innerHTML = `
       <div class="mt-home-tab">
+        <!-- 球場等級招牌（從設定 tab 搬出來、像素木牌風） -->
+        <button class="mt-home-stadium-widget" id="mt-home-stadium-widget" type="button" data-lv="${stadiumLv}">
+          <div class="mt-home-stadium-row">
+            <span class="mt-home-stadium-icon">🏟️</span>
+            <span class="mt-home-stadium-lv">Lv. ${stadiumLv}<small> / 10</small></span>
+          </div>
+          <div class="mt-home-stadium-row mt-home-stadium-row-sub">
+            <span title="球迷上限">👥 ${stadiumMaxFans}</span>
+            <span title="體力上限">⚡ ${stadiumMaxStam}</span>
+          </div>
+          ${stadiumLv < 10 ? '<div class="mt-home-stadium-cta">點擊升級 ▸</div>' : '<div class="mt-home-stadium-cta is-maxed">★ MAX</div>'}
+        </button>
         <div class="mt-home-scene" id="mt-home-scene">
           <!-- 天空（雲在太陽之上、遠山 silhouette 墊底）-->
           <div class="mt-home-sky">
@@ -803,6 +819,11 @@
       pantsColor: team?.kit_pants_color || 'white',
       shoeColor:  team?.kit_shoes_color || 'white',
     };
+
+    // 球場招牌 → 開升級 modal
+    content.querySelector('#mt-home-stadium-widget')?.addEventListener('click', () => {
+      _openStadiumUpgradeModal(team, () => renderTab());
+    });
 
     // 渲染球迷：fans 上限對應加油人數（pixel chibi 小人 + 旗 / 圍巾）
     const fansEl = content.querySelector('#mt-home-fans');
@@ -3017,6 +3038,109 @@
     }
   }
 
+  // ─────────── 球場升級 modal（從主頁招牌 widget 點開）───────────────────────
+  // 每級升級加成、視覺差別請看 css/my-team.css 的 .mt-home-distance[data-stadium-level="N"]
+  const STADIUM_COST = { 2:30, 3:60, 4:120, 5:200, 6:350, 7:550, 8:800, 9:1200, 10:2000 };
+  const STADIUM_TIER_LABEL = {
+    1: '木造小屋',
+    2: '門前燈飾',
+    3: '兩側看台',
+    4: '鋪石路 + 看台扶手',
+    5: '聚光燈 + 羅馬柱',
+    6: '雙層看台 + 廣告板',
+    7: '旗桿 + 屋頂尖塔',
+    8: '高聳聚光燈 + LED 跑馬燈',
+    9: '鐘塔 + 延伸看台',
+    10: '黃金屋頂 + 噴泉 + 彩虹光環',
+  };
+  function _openStadiumUpgradeModal(team, onSuccess) {
+    const lv = team?.stadium_level || 1;
+    const isMaxed = lv >= 10;
+    const cost = STADIUM_COST[lv + 1] || 0;
+    const currentLabel = STADIUM_TIER_LABEL[lv];
+    const nextLabel = STADIUM_TIER_LABEL[lv + 1];
+
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-profile-overlay mt-stadium-upgrade-overlay';
+    overlay.innerHTML = `
+      <div class="mt-stadium-upgrade-card">
+        <button class="mt-modal-close mt-profile-close" type="button">×</button>
+        <div class="mt-stadium-up-title">🏟️ 球場升級</div>
+
+        <div class="mt-stadium-up-compare">
+          <!-- 當前等級小場景預覽 -->
+          <div class="mt-stadium-up-side">
+            <div class="mt-stadium-up-mini" data-stadium-level="${lv}">
+              <div class="mt-stadium-up-mini-clubhouse"></div>
+              <div class="mt-stadium-up-mini-ground"></div>
+            </div>
+            <div class="mt-stadium-up-side-lv">Lv. ${lv}</div>
+            <div class="mt-stadium-up-side-label">${escapeHtml(currentLabel)}</div>
+          </div>
+          <div class="mt-stadium-up-arrow">${isMaxed ? '★' : '→'}</div>
+          <!-- 下一等級小場景預覽 -->
+          <div class="mt-stadium-up-side ${isMaxed ? 'is-maxed' : 'is-next'}">
+            <div class="mt-stadium-up-mini" data-stadium-level="${isMaxed ? lv : lv + 1}">
+              <div class="mt-stadium-up-mini-clubhouse"></div>
+              <div class="mt-stadium-up-mini-ground"></div>
+            </div>
+            <div class="mt-stadium-up-side-lv">${isMaxed ? 'MAX' : 'Lv. ' + (lv + 1)}</div>
+            <div class="mt-stadium-up-side-label">${escapeHtml(isMaxed ? '已達最高' : nextLabel)}</div>
+          </div>
+        </div>
+
+        <div class="mt-stadium-up-stats">
+          <div class="mt-stadium-up-stat-row">
+            <span>👥 球迷上限</span>
+            <span>${team.fans || 100}</span>
+          </div>
+          <div class="mt-stadium-up-stat-row">
+            <span>⚡ 體力上限</span>
+            <span>${team.stamina_max || 5}</span>
+          </div>
+        </div>
+
+        ${isMaxed ? `
+          <div class="mt-stadium-up-maxed">🏆 你的球場已達最高等級！</div>
+        ` : `
+          <button class="mt-stadium-up-confirm" id="mt-stadium-up-btn">
+            升到 Lv. ${lv + 1}<span class="mt-stadium-up-cost">💎 ${cost}</span>
+          </button>
+          <div class="mt-stadium-up-hint">下一級新增：<b>${escapeHtml(nextLabel)}</b></div>
+        `}
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    };
+    overlay.querySelector('.mt-profile-close').addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+    const upBtn = overlay.querySelector('#mt-stadium-up-btn');
+    if (upBtn) {
+      upBtn.addEventListener('click', async () => {
+        upBtn.disabled = true;
+        upBtn.textContent = '升級中…';
+        try {
+          const { data, error } = await window.DB.rpc('upgrade_stadium');
+          if (error) throw error;
+          await window.MyTeam.refresh?.();
+          if (typeof showToast === 'function') showToast(`🏟️ 球場升到 Lv. ${data.new_level}！花費 ${data.cost} 💎`);
+          close();
+          if (typeof onSuccess === 'function') onSuccess();
+        } catch (e) {
+          alert('升級失敗：' + (e.message || e));
+          upBtn.disabled = false;
+          upBtn.textContent = `升到 Lv. ${lv + 1}`;
+        }
+      });
+    }
+  }
+
   // ─────────── 設定 tab：Kit + 隊徽 + 球場 + 陣型 ───────────────────────
   function renderSettingsTab(content) {
     const team = window.MyTeam.getCached();
@@ -3040,24 +3164,13 @@
       </button>
     `).join('');
 
-    const lv = team.stadium_level || 1;
-    const nextCost = lv >= 10 ? null : ({2:30,3:60,4:120,5:200,6:350,7:550,8:800,9:1200,10:2000})[lv+1];
-
+    // 球場等級 section 已移到主頁招牌、設定 tab 不再重複顯示
     content.innerHTML = `
       <div class="mt-settings-tab">
         <div class="mt-settings-section">
           <div class="mt-settings-title">🏷️ 球隊名稱</div>
           <input class="mt-settings-name-input" id="mt-settings-name" maxlength="24"
             value="${escapeHtml(team.team_name || '')}" placeholder="輸入新隊名" />
-        </div>
-        <div class="mt-settings-section">
-          <div class="mt-settings-title">🏟️ 球場等級 Lv. ${lv} / 10</div>
-          <div style="font-size:12px;opacity:0.8;margin-bottom:6px">
-            目前球迷上限：${team.fans || 100}・體力上限：${team.stamina_max}
-          </div>
-          ${nextCost ? `
-            <button class="mt-settings-action-btn" id="mt-stadium-upgrade">🏟️ 升級到 Lv. ${lv+1}（${nextCost} 💎）</button>
-          ` : '<div style="opacity:0.7">已達最高等級！</div>'}
         </div>
         <!-- 球衣 / 球褲 / 球鞋 + 即時全身預覽（並排） -->
         <div class="mt-settings-section mt-settings-with-sprite">
@@ -3097,23 +3210,7 @@
       </div>
     `;
 
-    // 球場升級按鈕
-    const upBtn = content.querySelector('#mt-stadium-upgrade');
-    if (upBtn) {
-      upBtn.addEventListener('click', async () => {
-        upBtn.disabled = true; upBtn.textContent = '升級中…';
-        try {
-          const { data, error } = await window.DB.rpc('upgrade_stadium');
-          if (error) throw error;
-          await window.MyTeam.refresh?.();
-          if (typeof showToast === 'function') showToast(`🏟️ 球場升到 Lv. ${data.new_level}！花費 ${data.cost} 💎`);
-          renderTab();
-        } catch (e) {
-          alert('升級失敗：' + (e.message || e));
-          upBtn.disabled = false;
-        }
-      });
-    }
+    // 球場升級按鈕已搬到主頁招牌 widget、settings tab 不再處理
     // 隊名 input change
     const nameInput = content.querySelector('#mt-settings-name');
     if (nameInput) {
