@@ -5344,20 +5344,20 @@
     overlay.querySelector('.mt-talent-awaken-confirm').addEventListener('click', close);
   }
 
-  // 6 屬性說明 modal — 每個屬性在比賽裡的真實影響
+  // 6 屬性說明 modal — 每個屬性的比賽真實影響 + 天賦 + Lv 解鎖上限
   function _openTrainInfoModal() {
     const overlay = document.createElement('div');
     overlay.className = 'mt-profile-overlay mt-train-info-modal';
     overlay.innerHTML = `
       <div class="mt-profile-card">
         <button class="mt-modal-close mt-profile-close" type="button">×</button>
-        <div class="mt-train-info-title">📖 6 屬性說明</div>
+        <div class="mt-train-info-title">📖 球員屬性 / 天賦 / Lv 全攻略</div>
         <div class="mt-train-info-intro">每個屬性在比賽中都有實際作用。括號內為對應的訓練機台。</div>
 
         <div class="mt-attr-info-grid">
           <div class="mt-attr-info-card attr-attack">
             <div class="mt-attr-info-head"><span class="mt-attr-info-icon">⚔️</span><span class="mt-attr-info-name">攻擊</span><span class="mt-attr-info-machine">舉重</span></div>
-            <div class="mt-attr-info-body">射門進球率（射手 vs 對方 GK）。配神射手天賦 + 高氣場 → 禁區內最高 +20% 精準</div>
+            <div class="mt-attr-info-body">射門進球率（射手 vs 對方 GK）。配神射手天賦在禁區內 +20% 進球率</div>
           </div>
           <div class="mt-attr-info-card attr-defense">
             <div class="mt-attr-info-head"><span class="mt-attr-info-icon">🛡️</span><span class="mt-attr-info-name">防守</span><span class="mt-attr-info-machine">撞擊假人</span></div>
@@ -5365,31 +5365,76 @@
           </div>
           <div class="mt-attr-info-card attr-defense">
             <div class="mt-attr-info-head"><span class="mt-attr-info-icon">🧤</span><span class="mt-attr-info-name">守門</span><span class="mt-attr-info-machine">GK 專屬</span></div>
-            <div class="mt-attr-info-body">= 該 GK 的防守 + 12，影響撲球率。城牆天賦對 GK 自動轉換成「撲球率 +30%」、狂熱模式 +20%</div>
+            <div class="mt-attr-info-body">= 該 GK 的防守 + 12，影響撲球率。城牆天賦對 GK 自動轉換成撲球率 +30%</div>
           </div>
           <div class="mt-attr-info-card attr-speed">
             <div class="mt-attr-info-head"><span class="mt-attr-info-icon">⚡</span><span class="mt-attr-info-name">速度</span><span class="mt-attr-info-machine">跳繩衝刺</span></div>
-            <div class="mt-attr-info-body">持球者跑動速度 + 搶斷時靠近持球者的能力</div>
+            <div class="mt-attr-info-body">持球者跑動速度 + 接近持球者的反應速度（搶斷判定靠近度）</div>
           </div>
           <div class="mt-attr-info-card attr-midfield">
             <div class="mt-attr-info-head"><span class="mt-attr-info-icon">🎯</span><span class="mt-attr-info-name">中場</span><span class="mt-attr-info-machine">傳球牆</span></div>
-            <div class="mt-attr-info-body">傳球決策頻率 + 不易被搶斷。魔法師天賦 +15% 傳球積極性</div>
+            <div class="mt-attr-info-body">傳球決策積極性 + 不易被搶斷。魔法師天賦 +15% 傳球決策、低分傳球也願意執行</div>
           </div>
           <div class="mt-attr-info-card attr-stamina">
             <div class="mt-attr-info-head"><span class="mt-attr-info-icon">❤️</span><span class="mt-attr-info-name">體力</span><span class="mt-attr-info-machine">跑步機</span></div>
-            <div class="mt-attr-info-body">後半場疲勞抗性（影響搶斷 / 跑動）。體能怪天賦完全免疲勞</div>
+            <div class="mt-attr-info-body">後半場疲勞抗性（影響搶斷 / 跑動速度）。體能怪天賦完全免疲勞、衝刺型後半場疲勞減半</div>
           </div>
           <div class="mt-attr-info-card attr-aura">
             <div class="mt-attr-info-head"><span class="mt-attr-info-icon">✨</span><span class="mt-attr-info-name">氣場</span><span class="mt-attr-info-machine">鏡前姿勢</span></div>
-            <div class="mt-attr-info-body">射門精準度（高氣場大場面 +12%）+ <b>狂熱模式累積速度</b>（量表滿 100 → 該球員所有屬性 +25% 持續 18 秒）</div>
+            <div class="mt-attr-info-body"><b>狂熱模式累積速度</b>（量表滿 100 → 該球員所有屬性 +25% 持續 18 秒）</div>
           </div>
         </div>
 
         <div class="mt-train-info-section">
-          <div class="mt-train-info-q">屬性上限 / Lv 是什麼？</div>
+          <div class="mt-train-info-q">🌟 5 個天賦（覺醒 / 卡片自帶）</div>
           <div class="mt-train-info-a">
-            每屬性上限 <b>99</b>，個別 cap = 球員 base + 15 + 緣分(★) × 5（5★ 多 +25 上限）。<br>
-            <b>Lv</b> = 累計訓練次數，上限 50（每位球員最多訓 50 次）。
+            <div class="mt-talents-info-list">
+              <div class="mt-talent-info-row"><b>⚡ 衝刺型</b> · speed +5 · 後半場疲勞減半</div>
+              <div class="mt-talent-info-row"><b>💪 體能怪</b> · stamina +5 · 完全免疲勞</div>
+              <div class="mt-talent-info-row"><b>🎯 神射手</b> · attack +5 · 禁區內射門 +20% 進球率</div>
+              <div class="mt-talent-info-row"><b>🛡️ 城牆</b> · defense +5 · GK 撲球率 +30% / 外場搶斷率 +30%</div>
+              <div class="mt-talent-info-row"><b>✨ 魔法師</b> · midfield +5 · 傳球決策 +15%、敢傳低分球</div>
+            </div>
+            <div class="mt-train-info-note">SSR 卡通常自帶 1 天賦；其他卡可在 24h 集訓營有 5% 機率覺醒</div>
+          </div>
+        </div>
+
+        <div class="mt-train-info-section">
+          <div class="mt-train-info-q">📈 Lv 解鎖屬性上限</div>
+          <div class="mt-train-info-a">
+            訓練 1 次 → Lv +1（最高 Lv 50）。Lv 越高解鎖越高屬性上限：
+            <table class="mt-lv-cap-table">
+              <thead><tr><th>Lv 區間</th><th>硬上限</th></tr></thead>
+              <tbody>
+                <tr><td>1-9</td><td>99</td></tr>
+                <tr><td>10-14</td><td>105</td></tr>
+                <tr><td>15-19</td><td>110</td></tr>
+                <tr><td>20-24</td><td>115</td></tr>
+                <tr><td>25-29</td><td>120</td></tr>
+                <tr><td>30-34</td><td>125</td></tr>
+                <tr><td>35-39</td><td>130</td></tr>
+                <tr><td>40-44</td><td>135</td></tr>
+                <tr><td>45-49</td><td>140</td></tr>
+                <tr class="is-max"><td><b>50</b></td><td><b>145</b></td></tr>
+              </tbody>
+            </table>
+            <div class="mt-train-info-note">
+              <b>個別屬性 cap = min(Lv 硬上限, base + 15 + 緣分(★) × 5)</b><br>
+              5★ bond 卡 = 多 +25 上限（base + 40）；卡 base 低就被 base 拖累、上不去高 Lv 上限
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-train-info-section">
+          <div class="mt-train-info-q">⚡ 訓練 / 集訓營</div>
+          <div class="mt-train-info-a">
+            <b>RP 廣度訓練</b>（即時、6 屬性全升）：<br>
+            ・⚡ 集訓升等 — Lv+1、6 屬性各 +1~3、需要 🧠10 💪10<br>
+            ・⭐ 精英特訓 — Lv+1、6 屬性各 +2~5、需要 🧠30 💪30 ❤️10 💡10<br><br>
+            <b>🏋️ 集訓營</b>（鎖人、單項焦點、需時間）：<br>
+            ・30m / 2h — +1 / +2 屬性、不升 Lv<br>
+            ・8h — +4 屬性 + Lv+1<br>
+            ・24h — +7 屬性 + Lv+1 + <b>5% 機率覺醒天賦</b>（無天賦卡）
           </div>
         </div>
       </div>
