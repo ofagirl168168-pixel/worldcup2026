@@ -3958,18 +3958,18 @@
   width: 100%; height: 100%; display: block;
 }
 
-/* Lv 10：草地噴泉用 SVG（emoji 拔掉、JS 渲染 .mt-home-fountain 容器）+ 全場彩虹光環 */
+/* Lv 10：草地噴泉用 SVG — 大幅放大、依「最下面台座 Y」決定 z 軸 */
 .mt-home-fountain {
   position: absolute;
-  bottom: 32%;
+  bottom: 22%;   /* 台座 Y = 22% from bottom → z = 100 + (100 - 22) = 178 */
   left: 50%;
   transform: translateX(-50%);
-  width: 64px;
-  height: 90px;
-  /* z = 100 + (100 - 32) = 168（同步球員 z-sort、球員走到下方時可在前）*/
-  z-index: 168;
+  width: 130px;
+  height: 200px;
+  /* 所有 SVG 內部物件共享同一 z（依台座 Y 計算）→ 球員若 y > 22% 在前、否則在後 */
+  z-index: 178;
   pointer-events: none;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.35)) drop-shadow(0 0 14px rgba(135,206,235,0.55));
+  filter: drop-shadow(0 5px 8px rgba(0,0,0,0.4)) drop-shadow(0 0 18px rgba(135,206,235,0.6));
   animation: mt-fountain-bob 3.2s ease-in-out infinite;
 }
 .mt-home-fountain svg { width: 100%; height: 100%; display: block; }
@@ -3995,16 +3995,15 @@
   pointer-events: none;
 }
 .mt-home-grass-decor svg { width: 100%; height: 100%; display: block; }
-/* 草地裝飾尺寸 — 對齊球員 sprite 高度（球員 ~22x45px）
-   燈、樹比球員高才會合理（球員走在前景、樹/燈在背景但更突出）
-   z-index 依 bottom% (Y from bottom) 計算：z = 100 + (100 - bottomPct)
-   球員 z = 100 + round(player.y * 100)、低於物件 (y 更大) 時球員在前 */
-.mt-home-grass-decor.is-bush     { width: 50px; height: 38px;  bottom: 6%; z-index: 194; }
-.mt-home-grass-decor.is-lamp     { width: 24px; height: 90px;  bottom: 8%; z-index: 192; }
-.mt-home-grass-decor.is-bench    { width: 64px; height: 28px;  bottom: 5%; z-index: 195; }
-.mt-home-grass-decor.is-tree     { width: 70px; height: 110px; bottom: 6%; z-index: 194; }
+/* 草地裝飾尺寸
+   底部裝飾（樹、燈、灌木、長椅、頒獎台）→ 永遠最前（球員不會走到那麼下面）
+   雕像在較高處 → 依 Y 軸動態排序 (z = 100 + (100 - bottomPct)) */
+.mt-home-grass-decor.is-bush     { width: 50px; height: 38px;  bottom: 6%; z-index: 250; }
+.mt-home-grass-decor.is-lamp     { width: 24px; height: 90px;  bottom: 8%; z-index: 250; }
+.mt-home-grass-decor.is-bench    { width: 64px; height: 28px;  bottom: 5%; z-index: 250; }
+.mt-home-grass-decor.is-tree     { width: 70px; height: 110px; bottom: 6%; z-index: 250; }
 .mt-home-grass-decor.is-statue   { width: 36px; height: 76px;  bottom: 8%; z-index: 192; }
-.mt-home-grass-decor.is-podium   { width: 80px; height: 22px;  bottom: 4%; z-index: 196; filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
+.mt-home-grass-decor.is-podium   { width: 80px; height: 22px;  bottom: 4%; z-index: 250; filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
 
 /* 多樓層分隔線（疊在 clubhouse 上的透明 overlay div .mt-home-floors）*/
 .mt-home-floors {
@@ -4172,19 +4171,22 @@
 }
 
 /* 球場等級裝飾 — 看台 / 聚光燈 / 旗桿 / 球迷 */
-/* 看台：3 層階梯（高 Lv 5 層）、每階白扶手 + 階梯踏面 + 前緣陰影
-   寬度從 30 → 80px、視覺感才像真的看台 */
+/* 看台：階梯踏面 + 直立扶手（上下樓用）
+   90deg 直線扶手：每約 30px 一根 3px 米色 + 深邊（上下樓抓的那種）*/
 .mt-home-stand {
   position: absolute;
   bottom: 0;
   width: 80px;
   height: 65%;
   background:
-    /* 每階白扶手線（offset 0-1px of each 14px tier）*/
-    repeating-linear-gradient(180deg,
-      #f0e8c0 0 1.5px,
-      transparent 1.5px 14px),
-    /* 階梯紋：踏面 + 前緣陰影 + 階梯下凹 */
+    /* 直立扶手（90deg = 垂直線、上下樓階梯的扶手）*/
+    repeating-linear-gradient(90deg,
+      transparent       0    27px,
+      #1a1a2e          27px 28px,
+      #f5edc8          28px 31px,
+      #1a1a2e          31px 32px,
+      transparent      32px 36px),
+    /* 階梯踏面紋（180deg 横向）：踏面 + 前緣陰影 + 階梯下凹 */
     repeating-linear-gradient(180deg,
       #6a4a30 0 11px,
       #4a3020 11px 13px,
