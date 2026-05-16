@@ -4229,10 +4229,13 @@
    🎰 GACHA TAB — AI 背景圖 + 卡包/按鈕/招牌 overlay
    ═════════════════════════════════════════════════════════════ */
 .mt-gacha-shop-fullscene {
-  position: relative;
-  width: calc(100% + 40px);
-  height: calc(100% + 56px);     /* 填滿父 hub-content + 補 padding */
-  margin: -16px -20px -40px;
+  /* 改用 absolute + inset 取代 width/height percentage
+     (在 flex 容器內 percentage height 會被當作 indefinite 算成 0) */
+  position: absolute;
+  top: -16px;
+  right: -20px;
+  bottom: -40px;
+  left: -20px;
   padding: 0;
   overflow: hidden;
   background:
@@ -5767,16 +5770,18 @@
    ═════════════════════════════════════════════════════════════ */
 /* AI 背景：填滿父容器（不滑動）*/
 .mt-coach-office {
-  position: relative;
-  width: calc(100% + 40px);
-  height: calc(100% + 56px);    /* 補回父 hub-content 的 padding 16+40 */
-  margin: -16px -20px -40px;
+  /* 改用 absolute + inset 取代 width/height percentage
+     (在 flex 容器內 percentage height 會被當作 indefinite 算成 0) */
+  position: absolute;
+  top: -16px;
+  right: -20px;
+  bottom: -40px;
+  left: -20px;
   padding: 0;
   overflow: hidden;
   background:
     url('../img/my-team/coach-bg.jpg') 0 0 / 100% 100% no-repeat,
     #2a1812;
-  min-height: 0;
 }
 /* coach tab 不滾動（office 已填滿） */
 .mt-hub-content[data-tab="coach"] {
