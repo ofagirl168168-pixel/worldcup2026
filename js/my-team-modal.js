@@ -4125,9 +4125,6 @@
 
     content.innerHTML = `
       <div class="mt-train-gym">
-        <!-- 屬性說明（小、右上角浮）-->
-        <button class="mt-train-info-btn mt-train-info-btn-float" type="button" title="6 屬性說明">❓ 屬性說明</button>
-
         <!-- ⚡ RP 廣度訓練：2 按鈕 + 庫存 chip inline -->
         <div class="mt-train-points-panel">
           <div class="mt-train-points-title">
@@ -4155,6 +4152,7 @@
         <div class="mt-train-section-divider">
           <span class="mt-train-section-title">🏋️ 集訓營</span>
           <span class="mt-train-section-sub">鎖人 / 單項焦點</span>
+          <button class="mt-train-info-btn mt-train-info-btn-inline" type="button" title="6 屬性說明">❓ 屬性說明</button>
         </div>
 
         <!-- 開羅式機台場景：6 個機台 + 球員 chibi -->

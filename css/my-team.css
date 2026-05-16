@@ -7574,11 +7574,15 @@
   flex-shrink: 0;
 }
 .mt-train-info-btn:hover { background: rgba(240,192,64,0.3); }
-/* 浮在訓練 tab 右上角的「❓ 屬性說明」chip */
+/* 浮在訓練 tab 右上角的「❓ 屬性說明」chip（已停用、改成 inline 嵌在 section-divider）*/
 .mt-train-info-btn-float {
   position: absolute;
   top: 4px; right: 8px;
   z-index: 5;
+}
+/* 嵌在「🏋️ 集訓營」section-divider 同行的右側 */
+.mt-train-info-btn-inline {
+  margin-left: auto;
 }
 
 /* 機台動作標籤（例：跑步機、舉重）*/
