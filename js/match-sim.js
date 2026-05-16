@@ -1160,15 +1160,14 @@
       const gkSave     = (gk?.stats?.goalkeeping ?? getTeam(defTeam).radar.defense)
                        * (gkFevered ? 1.20 : 1)
                        * (gkWall ? 1.30 : 1);
-      // 氣場加成：高氣場 = 大場面更穩 = 射門精準度提升（最多 +12%）
-      const shooterAura = shooter?.stats?.aura ?? getTeam(state.possession).radar.aura ?? 50;
-      const auraBonus  = (shooterAura - 50) / 100 * 0.12;
+      // 氣場：純影響狂熱條累積速度（見 line ~1634）、不再加成射門精準
+      // （avoid double-dipping：高 aura 已經有狂熱期間 +25% 全屬性的收益）
       // 🎯 神射手天賦：禁區內射門 +20% 進球率（dist 到對方球門 < 0.15 算禁區）
       const goalX = state.possession === 'h' ? 1 : 0;
       const distToGoal = shooter ? Math.abs(shooter.x - goalX) : 1;
       const shooterTalentBonus = (shooter?.talent === 'shooter' && distToGoal < 0.15) ? 0.20 : 0;
       const goalProb = Math.max(0.10, Math.min(0.92,
-        ((shooterAtk - gkSave * 0.55) / 100) * 0.78 + auraBonus + shooterTalentBonus
+        ((shooterAtk - gkSave * 0.55) / 100) * 0.78 + shooterTalentBonus
       ));
       const isGoal = rng() < goalProb;
       if (isGoal) {
@@ -1614,9 +1613,12 @@
 
       // ── 個人狂熱模式：每球員氣場累積 gauge、滿了進個人狂熱 ──
       // 官方比賽（真實賽事模擬、朋友直播房）關閉狂熱 + 體力 — opts.disableTeamMechanics
+      // gauge 跨場保存（opts.feverGauges in / opts.onFeverGaugeChange out）
+      // 不一定要在 1 場內爆、累積夠了才釋放
       if (!opts.disableTeamMechanics) {
         const FEVER_DURATION = Math.round(FPS * 18);  // 18 秒（更長、影響更明顯）
-        const FEVER_BASE_FILL = 0.04;
+        // base fill rate: 0.04 → 0.010（4× 慢）— 之前大家在 1 場內就全部爆、太頻繁
+        const FEVER_BASE_FILL = 0.010;
         players.forEach((p, i) => {
           if (p.fever > 0) {
             p.fever--;
@@ -1628,10 +1630,12 @@
           } else if (p.feverCooldown > 0) {
             p.feverCooldown--;
           } else {
-            // 累積：aura 影響更誇張（50→0.5×、80→1.8×、99→3.0×）
+            // 累積：aura 影響、但壓低指數（1.8 → 1.2）避免高氣場壓倒性快
+            // 預期：aura 50 → 3 場才滿、aura 80 → 1.7 場、aura 99 → 1.3 場
+            // 加上 1 場通常 1 進球 +35 + 1-2 抄球 +12 加成 → SSR 1 場底爆、R 要累積
             // 加入個人 _feverPersonality 變異（0.7~1.3、init 時隨機）避免大家同時爆
             const pAura = p.stats?.aura ?? 50;
-            const auraSpeed = Math.pow(pAura / 50, 1.8);
+            const auraSpeed = Math.pow(pAura / 50, 1.2);
             const personality = p._feverPersonality || 1;
             p.feverGauge = Math.min(100, (p.feverGauge || 0) + FEVER_BASE_FILL * auraSpeed * personality);
             if (p.feverGauge >= 100) {
