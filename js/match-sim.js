@@ -471,20 +471,13 @@
         const srcX = frame * frameW;
         const srcY = dirRow * frameH;
         if (diving) {
-          // 撲球：slash-up（手舉過頭）旋轉 90° 變橫向飛撲
-          //   Home GK（左門線、面右）→ 順時針 +90° → 手指向右（場內）
-          //   Away GK（右門線、面左）→ 逆時針 -90° → 手指向左（場內）
-          // 撲上 / 下方向：用 scaleY 翻轉決定身體頭尾位置（撲上頭朝上、撲下頭朝下）
+          // 撲球：slash-up（手舉過頭）保持直立、用 scaleY 決定頭朝上或朝下
+          //   撲上 (_diveDirY < 0)：不翻轉 → 頭朝上、手在上
+          //   撲下 (_diveDirY > 0)：scaleY 翻轉 → 頭朝下、手在下
           ctx.save();
           ctx.translate(cx, cy);
-          const rotDeg = (p.team === 'h') ? 90 : -90;
-          ctx.rotate(rotDeg * Math.PI / 180);
-          // 旋轉後身體 X = 原本 Y、Y = 原本 X
-          // 撲球方向決定身體左右翻轉（讓頭朝撲球方向）
-          const flipForDir = ((p._diveDirY || 1) < 0)
-            ? (p.team === 'h' ? 1 : -1)
-            : (p.team === 'h' ? -1 : 1);
-          ctx.scale(1.15, 1.15 * flipForDir);
+          const flipY = ((p._diveDirY || 1) < 0) ? 1 : -1;
+          ctx.scale(1.15, 1.15 * flipY);
           ctx.drawImage(sheet, srcX, srcY, frameW, frameH, -drawW / 2, -drawH / 2, drawW, drawH);
           ctx.restore();
         } else {
