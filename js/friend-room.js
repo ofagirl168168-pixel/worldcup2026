@@ -181,7 +181,7 @@
   //   開賽前 → 倒數
   //   開賽後 < 5 min → 🔴 進行中
   //   開賽後 5min ~ 1hr → ⏳ 結算中
-  //   ended + 有比分 → 🎮 模擬 X-Y（強調是模擬賽結果、不是真實比分）
+  //   ended + 有比分 → 🎮 模擬比分 X-Y（強調是模擬賽結果、不是真實比分）
   //   ended + 無比分 → 🎮 模擬結束
   //   1 小時後沒人觀戰 → 🎮 模擬結束（伺服器 cron 會把 stale live 標 ended）
   function _countdown(kickoffISO, room) {
@@ -198,7 +198,7 @@
     if (status === 'ended') {
       const rh = room.result_home, ra = room.result_away;
       if (rh != null && ra != null) {
-        return `<span class="fr-cd-ended fr-cd-ended--sim">🎮 模擬 ${rh}-${ra}</span>`;
+        return `<span class="fr-cd-ended fr-cd-ended--sim">🎮 模擬比分 ${rh}-${ra}</span>`;
       }
       return '<span class="fr-cd-ended fr-cd-ended--sim">🎮 模擬結束</span>';
     }
@@ -2065,7 +2065,7 @@
       action = { label: '進入', onClick: () => joinRoom(hit.r.room_code) };
     } else if (hit.s === 'ended') {
       const rh = hit.r.result_home, ra = hit.r.result_away;
-      icon = '🎮'; head = '模擬結束'; desc = `${title} · 模擬 ${rh}-${ra}`;
+      icon = '🎮'; head = '模擬結束'; desc = `${title} · 模擬比分 ${rh}-${ra}`;
       action = { label: '查看', onClick: () => joinRoom(hit.r.room_code) };
     } else { // joined
       const ms = new Date(hit.r.kickoff_at).getTime() - Date.now();
