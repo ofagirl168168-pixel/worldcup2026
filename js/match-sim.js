@@ -297,10 +297,22 @@
       if (p._tackleVisualUntil && state.frame < p._tackleVisualUntil) {
         const tAge = state.frame - (p._tackleStart || state.frame);
         const tNorm = Math.min(1, tAge / 24);
-        // ease-out：前半快滑、後半慢
-        const slideAmt = (1 - Math.pow(1 - tNorm, 2)) * 18; // 最遠滑 18px 視覺
+        const slideAmt = (1 - Math.pow(1 - tNorm, 2)) * 18;
         cx += (p._tackleDirX || 0) * slideAmt;
         cy += (p._tackleDirY || 0) * slideAmt;
+      }
+      // GK 撲球視覺位移：沿球門線僅 Y 軸、不偏 X（GK 不離開門線）
+      const diving = p._diveUntil && state.frame < p._diveUntil;
+      if (diving) {
+        const dAge = state.frame - (p._diveStart || state.frame);
+        const dDur = (p._diveUntil - p._diveStart) || 24;
+        const t = Math.min(1, dAge / dDur);
+        const maxSlide = (p._diveDistance || 0.06) * PITCH_H * 1.6;
+        // 0~0.4：快速飛撲。0.4~1：定格保持 95% 撲出狀態
+        const slide = t < 0.4
+          ? (t / 0.4) * maxSlide
+          : maxSlide * (0.95 + Math.sin((t - 0.4) * Math.PI / 0.6 / 2) * 0.05);
+        cy += (p._diveDirY || 1) * slide;
       }
 
       // row 覆寫順序：tackle > fulltime > celebrate > walk
@@ -444,9 +456,23 @@
       if (sheet) {
         const srcX = frame * frameW;
         const srcY = dirRow * frameH;
-        const dx = Math.round(cx - drawW / 2);
-        const dy = Math.round(cy - drawH / 2);
-        ctx.drawImage(sheet, srcX, srcY, frameW, frameH, dx, dy, drawW, drawH);
+        if (diving) {
+          // 撲球：旋轉 ±75 度（朝 dive 方向橫躺）+ 略放大、加運動模糊感
+          ctx.save();
+          ctx.translate(cx, cy);
+          const dAge = state.frame - (p._diveStart || state.frame);
+          const t = Math.min(1, dAge / ((p._diveUntil - p._diveStart) || 24));
+          // 前半快速轉到 75 度、後半保持
+          const angleDeg = (t < 0.4 ? (t / 0.4) * 75 : 75) * (p._diveDirY || 1);
+          ctx.rotate(angleDeg * Math.PI / 180);
+          ctx.scale(1.1, 1.1);
+          ctx.drawImage(sheet, srcX, srcY, frameW, frameH, -drawW / 2, -drawH / 2, drawW, drawH);
+          ctx.restore();
+        } else {
+          const dx = Math.round(cx - drawW / 2);
+          const dy = Math.round(cy - drawH / 2);
+          ctx.drawImage(sheet, srcX, srcY, frameW, frameH, dx, dy, drawW, drawH);
+        }
       } else {
         // fallback: 簡單色圈（sprite 還沒載入完成）
         ctx.fillStyle = teamColor;
@@ -1139,6 +1165,16 @@
       state.ballTravelLeft = state.ballTravelTotal;
       state.phase = 'shoot';
       state.stats[state.possession].shots++;
+
+      // 每次射門都觸發 GK 撲球視覺（沿球門線朝 ballTargetY 撲）
+      const defTeam = state.possession === 'h' ? 'a' : 'h';
+      const gkPlayer = players.find(p => p.team === defTeam && p.role === 'GK');
+      if (gkPlayer) {
+        gkPlayer._diveStart = state.frame;
+        gkPlayer._diveUntil = state.frame + state.ballTravelTotal + 6;
+        gkPlayer._diveDirY = Math.sign(state.ballTargetY - gkPlayer.y) || 1;
+        gkPlayer._diveDistance = Math.min(0.10, Math.abs(state.ballTargetY - gkPlayer.y));
+      }
     }
 
     function resolveShot() {
@@ -1191,20 +1227,8 @@
         state.possessorIdx = gkIdx;
         state.phase = 'dribble';
         state.lastActionFrame = state.frame;
-        const gkPlayer = players[gkIdx];
-        // GK 撲球視覺：沿用鏟球動畫（_tackleVisualUntil + slide dir）
-        // dir = shooter → GK 的反向（朝球飛來方向撲過去）
-        if (shooter) {
-          const dx = shooter.x - gkPlayer.x;
-          const dy = shooter.y - gkPlayer.y;
-          const mag = Math.max(0.001, Math.hypot(dx, dy));
-          gkPlayer._tackleStart = state.frame;
-          gkPlayer._tackleVisualUntil = state.frame + 24;
-          gkPlayer._tackleDirX = dx / mag;
-          gkPlayer._tackleDirY = dy / mag;
-        }
-        ball.x = gkPlayer.x;
-        ball.y = gkPlayer.y;
+        ball.x = players[gkIdx].x;
+        ball.y = players[gkIdx].y;
         // 換邊 → 清最近經手傳球者記錄、並記錄換邊時機（movePlayers 會降速避免瞬移）
         state.recentPassers = [];
         state.recentPassersSet = new Set();
