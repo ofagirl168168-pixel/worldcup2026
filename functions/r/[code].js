@@ -99,7 +99,7 @@ export async function onRequest(context) {
     const meta = room.match_meta || {};
     const home = sanitize(meta.home_name || meta.home_code || '主隊');
     const away = sanitize(meta.away_name || meta.away_code || '客隊');
-    const roomName = sanitize(room.room_name || (room.is_official ? '麥迪官方聯賽' : ''));
+    const roomName = sanitize(room.room_name || (room.is_official ? '🎮 麥迪官方模擬聯賽' : ''));
     const kickoff = fmtTaiwanTime(room.kickoff_at);
     const bet = room.bet_amount > 0 ? `押 ${room.bet_amount} 💎` : '純娛樂';
 

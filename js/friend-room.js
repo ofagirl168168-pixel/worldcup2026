@@ -156,7 +156,7 @@
   // 官方房沒設 room_name 時用 fallback 名稱
   function _displayRoomName(room) {
     if (room.room_name) return room.room_name;
-    if (room.is_official) return '麥迪官方聯賽';
+    if (room.is_official) return '🎮 麥迪官方模擬聯賽';
     return null;
   }
 
@@ -181,9 +181,9 @@
   //   開賽前 → 倒數
   //   開賽後 < 5 min → 🔴 進行中
   //   開賽後 5min ~ 1hr → ⏳ 結算中
-  //   ended + 有比分 → 🏁 比分 X-Y
-  //   ended + 無比分 → 🏁 已結束（沒人觀戰）
-  //   1 小時後沒人觀戰 → 🏁 已結束（伺服器 cron 會把 stale live 標 ended）
+  //   ended + 有比分 → 🎮 模擬 X-Y（強調是模擬賽結果、不是真實比分）
+  //   ended + 無比分 → 🎮 模擬結束
+  //   1 小時後沒人觀戰 → 🎮 模擬結束（伺服器 cron 會把 stale live 標 ended）
   function _countdown(kickoffISO, room) {
     const t = new Date(kickoffISO).getTime() - Date.now();
     if (t > 0) {
@@ -198,9 +198,9 @@
     if (status === 'ended') {
       const rh = room.result_home, ra = room.result_away;
       if (rh != null && ra != null) {
-        return `<span class="fr-cd-ended">🏁 ${rh}-${ra}</span>`;
+        return `<span class="fr-cd-ended fr-cd-ended--sim">🎮 模擬 ${rh}-${ra}</span>`;
       }
-      return '<span class="fr-cd-ended">🏁 已結束</span>';
+      return '<span class="fr-cd-ended fr-cd-ended--sim">🎮 模擬結束</span>';
     }
     // status='live'/'locked'：依 kickoff 已過的時間分階段
     const elapsedMin = Math.floor(-t / 60000);
@@ -1469,8 +1469,9 @@
     }
     body.innerHTML = `
       <div class="fr-ended">
-        <div class="fr-ended-icon">🏁</div>
-        <div class="fr-ended-title">比賽結束</div>
+        <div class="fr-ended-icon">🎮</div>
+        <div class="fr-ended-title">模擬賽結束</div>
+        <div class="fr-ended-sim-tag">這是模擬賽結果、不是真實比分</div>
         ${haveResult ? `
           <div class="fr-ended-score">
             <span>${_escapeHtml(meta.home_name || '主隊')}</span>
@@ -1485,6 +1486,10 @@
         <div class="fr-winners" id="fr-winners">
           <div class="fr-winners-loading">載入大家的猜測…</div>
         </div>
+        <div class="fr-ended-real-link">
+          想看真實比賽的賽前分析 / 比分？
+          <a href="#" id="fr-end-go-schedule">點我去「賽程」</a>
+        </div>
         <div class="fr-pick-actions" style="margin-top:18px">
           <button class="fr-btn fr-btn--submit" id="fr-end-back">回大廳</button>
         </div>
@@ -1492,6 +1497,11 @@
     `;
     body.querySelector('#fr-end-back').addEventListener('click', () => {
       _backToLobby(state);
+    });
+    const goSched = body.querySelector('#fr-end-go-schedule');
+    if (goSched) goSched.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (typeof window.showSection === 'function') window.showSection('schedule');
     });
     // 非同步拉所有 picks 渲染得獎名單
     if (haveResult) {
@@ -2055,7 +2065,7 @@
       action = { label: '進入', onClick: () => joinRoom(hit.r.room_code) };
     } else if (hit.s === 'ended') {
       const rh = hit.r.result_home, ra = hit.r.result_away;
-      icon = '🏁'; head = '已結束'; desc = `${title} · ${rh}-${ra}`;
+      icon = '🎮'; head = '模擬結束'; desc = `${title} · 模擬 ${rh}-${ra}`;
       action = { label: '查看', onClick: () => joinRoom(hit.r.room_code) };
     } else { // joined
       const ms = new Date(hit.r.kickoff_at).getTime() - Date.now();
