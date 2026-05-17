@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-05-17 日更）
+   資料截止：2025/26 賽季（2026-05-18 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -868,19 +868,51 @@ window.EPL_MATCHES = [
    ]},
 
   // 曼聯 vs 諾丁漢森林 | 05/17 19:30 台灣時間 (05/17 12:30 BST)
-  {id:'EPL-MW37-MUN-NFO', matchday:37, date:'2026-05-17', time:'19:30', home:'MUN', away:'NFO', stage:'league', status:'upcoming'},
+  {id:'EPL-MW37-MUN-NFO', matchday:37, date:'2026-05-17', time:'19:30', home:'MUN', away:'NFO', stage:'league',
+   status:'finished', score:{h:3,a:2}, halfTime:{h:1,a:0},
+   goals:[
+     {min:'5',player:'Luke Shaw',side:'h'},
+     {min:'53',player:'Morato',side:'a'},
+     {min:'55',player:'Matheus Cunha',side:'h'},
+     {min:'76',player:'Bryan Mbeumo',side:'h'},
+     {min:'78',player:'Morgan Gibbs-White',side:'a'}
+   ]},
 
   // 布倫特福德 vs 水晶宮 | 05/17 22:00 台灣時間 (05/17 15:00 BST)
-  {id:'EPL-MW37-BRE-CRY', matchday:37, date:'2026-05-17', time:'22:00', home:'BRE', away:'CRY', stage:'league', status:'upcoming'},
+  {id:'EPL-MW37-BRE-CRY', matchday:37, date:'2026-05-17', time:'22:00', home:'BRE', away:'CRY', stage:'league',
+   status:'finished', score:{h:2,a:2}, halfTime:{h:1,a:1},
+   goals:[
+     {min:'6',player:'Ismaila Sarr',side:'a',note:'pen'},
+     {min:'40',player:'Dango Ouattara',side:'h'},
+     {min:'52',player:'Adam Wharton',side:'a'},
+     {min:'88',player:'Dango Ouattara',side:'h'}
+   ]},
 
   // 愛華頓 vs 桑德蘭 | 05/17 22:00 台灣時間 (05/17 15:00 BST)
-  {id:'EPL-MW37-EVE-SUN', matchday:37, date:'2026-05-17', time:'22:00', home:'EVE', away:'SUN', stage:'league', status:'upcoming'},
+  {id:'EPL-MW37-EVE-SUN', matchday:37, date:'2026-05-17', time:'22:00', home:'EVE', away:'SUN', stage:'league',
+   status:'finished', score:{h:1,a:3}, halfTime:{h:1,a:0},
+   goals:[
+     {min:'38',player:'Merlin Rohl',side:'h'},
+     {min:'59',player:'Brian Brobbey',side:'a'},
+     {min:'81',player:'Enzo Le Fee',side:'a'},
+     {min:'85',player:'Wilson Isidor',side:'a'}
+   ]},
 
   // 里茲聯 vs 布萊頓 | 05/17 22:00 台灣時間 (05/17 15:00 BST)
-  {id:'EPL-MW37-LEE-BHA', matchday:37, date:'2026-05-17', time:'22:00', home:'LEE', away:'BHA', stage:'league', status:'upcoming'},
+  {id:'EPL-MW37-LEE-BHA', matchday:37, date:'2026-05-17', time:'22:00', home:'LEE', away:'BHA', stage:'league',
+   status:'finished', score:{h:1,a:0}, halfTime:{h:0,a:0},
+   goals:[
+     {min:'90+3',player:'Dominic Calvert-Lewin',side:'h'}
+   ]},
 
   // 狼隊 vs 富勒姆 | 05/17 22:00 台灣時間 (05/17 15:00 BST)
-  {id:'EPL-MW37-WOL-FUL', matchday:37, date:'2026-05-17', time:'22:00', home:'WOL', away:'FUL', stage:'league', status:'upcoming'},
+  {id:'EPL-MW37-WOL-FUL', matchday:37, date:'2026-05-17', time:'22:00', home:'WOL', away:'FUL', stage:'league',
+   status:'finished', score:{h:1,a:2}, halfTime:{h:1,a:1},
+   goals:[
+     {min:'1',player:'Ryan Sessegnon',side:'a'},
+     {min:'18',player:'Joao Gomes',side:'h'},
+     {min:'46',player:'Rodrigo Muniz',side:'a'}
+   ]},
 
   // 紐卡索 vs 西漢姆 | 05/18 00:30 台灣時間 (05/17 17:30 BST)
   {id:'EPL-MW37-NEW-WHU', matchday:37, date:'2026-05-18', time:'00:30', home:'NEW', away:'WHU', stage:'league', status:'upcoming'},

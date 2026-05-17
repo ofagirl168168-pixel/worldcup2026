@@ -22,6 +22,56 @@ export default [
     "shareable": true
   },
   {
+    "id": "epl-067",
+    "tournament": "epl",
+    "title": "【賽後戰報】曼聯 3-2 諾丁漢森林：Fernandes 追平助攻紀錄，紅魔鎖定第三",
+    "summary": "英超第37輪——曼聯在老特拉福德以 3-2 擊敗諾丁漢森林，Shaw、Cunha、Mbeumo 各入一球。Bruno Fernandes 追平英超單季助攻紀錄（20 次），曼聯確定以第三名完賽。",
+    "date": "2026-05-17",
+    "category": "賽後深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-068",
+    "tournament": "epl",
+    "title": "【賽後戰報】布倫特福德 2-2 水晶宮：Ouattara 梅開二度救主，雙方各取一分",
+    "summary": "英超第37輪——布倫特福德在主場兩度落後兩度追平水晶宮，Dango Ouattara 梅開二度，Adam Wharton 遠射破門。兩隊各取一分，歐戰資格懸念延續至最後一輪。",
+    "date": "2026-05-17",
+    "category": "賽後深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-069",
+    "tournament": "epl",
+    "title": "【賽後戰報】艾佛頓 1-3 桑德蘭：黑貓三箭齊發粉碎太妃糖歐戰夢",
+    "summary": "英超第37輪——桑德蘭在古迪遜公園 3-1 逆轉艾佛頓，Brobbey、Le Fee、Isidor 下半場連入三球。艾佛頓的歐戰夢幾乎破碎，桑德蘭繼續衝擊歐戰名額。",
+    "date": "2026-05-17",
+    "category": "賽後深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-070",
+    "tournament": "epl",
+    "title": "【賽後戰報】里茲聯 1-0 布萊頓：Calvert-Lewin 絕殺，里茲聯驚險搶三分",
+    "summary": "英超第37輪——Dominic Calvert-Lewin 在補時第93分鐘絕殺破門，里茲聯主場 1-0 險勝布萊頓。Van Hecke 回傳失誤成為致命轉折。",
+    "date": "2026-05-17",
+    "category": "賽後深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
+    "id": "epl-071",
+    "tournament": "epl",
+    "title": "【賽後戰報】狼隊 1-2 富勒姆：Sessegnon 與 Muniz 閃擊建功，富勒姆衝擊歐冠",
+    "summary": "英超第37輪——富勒姆在莫利紐球場以 2-1 擊敗已降級的狼隊，Sessegnon 開場 58 秒破門、Muniz 下半場開場即進。富勒姆升至第九，歐冠資格仍有希望。",
+    "date": "2026-05-17",
+    "category": "賽後深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-061",
     "tournament": "epl",
     "title": "【賽後回顧】阿斯頓維拉 4-2 利物浦：Watkins 梅開二度，維拉鎖定歐冠席位",
