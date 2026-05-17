@@ -106,6 +106,40 @@
   }
 
   // 給抽券（不限上限；source 用於追蹤來源）
+  // 每日登入鏈：先「帳號首抽」(動畫 → 確保進新手指引前有 1 球員)、再「每日 1 抽券」
+  // 由 data-fix.js 在擂台 popup 關掉後呼叫、避免跟擂台 modal 疊到
+  async function runDailyLoginChain() {
+    if (typeof window.MyTeamBetaEnabled === 'function' && !window.MyTeamBetaEnabled()) return;
+    if (!window.currentUser) return;
+
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+
+    // X. 帳號首抽（my-team 上線後第一次登入 → 確保進新手指引時帶 1 球員）
+    const firstKey = 'mt_first_ever_pull_v1';
+    if (!localStorage.getItem(firstKey)) {
+      localStorage.setItem(firstKey, today);
+      try {
+        if (typeof window.MyTeam?.triggerInstantGacha === 'function') {
+          await window.MyTeam.triggerInstantGacha(1, 'first_ever_pull');
+        }
+      } catch (e) { console.warn('[my-team] first-pull err', e); }
+    }
+
+    // 4. 每日登入送 1 抽券（不再 fire 動畫、只給 ticket + toast）
+    const dailyKey = 'mt_daily_login_date_v1';
+    if (localStorage.getItem(dailyKey) !== today) {
+      localStorage.setItem(dailyKey, today);
+      try {
+        const ok = await awardTickets(1, 'daily_login');
+        if (ok && typeof showToast === 'function') {
+          showToast('🎟️ 每日登入獎勵 +1 抽券、到「我的隊伍 → 抽卡」使用');
+        }
+        // 還沒建隊：把 ticket 留著、建隊後 awardTickets 會 short-circuit、但記下來
+        // 已透過 mt_first_ever_pull_v1 確保建隊路徑、這裡若還沒建隊也 OK、之後 awardTickets 撈 my_team 失敗會 return false
+      } catch (e) { console.warn('[my-team] daily ticket err', e); }
+    }
+  }
+
   async function awardTickets(n, source) {
     const uid = _getUserId();
     if (!uid || !n || n <= 0) return false;
@@ -353,6 +387,7 @@
     fetchPlayers,
     fetchCardPool,
     awardTickets,
+    runDailyLoginChain,
     awardStamina,
     awardGems,
     awardSSRSelectTicket,

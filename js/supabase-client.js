@@ -83,20 +83,10 @@ async function handleUserLoggedIn(isNew) {
   // 初始化寶石（每日簽到 + 餘額）
   await initGems?.();
 
-  // 我的球隊：每日登入首次 → 1 抽券（§5.4）
-  // 注意：beta off 時不能消耗 date flag、保留「首次」測試機會
-  try {
-    if (window.MyTeamBetaEnabled && window.MyTeamBetaEnabled()) {
-      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
-      const lastDate = localStorage.getItem('mt_daily_login_date_v1');
-      if (lastDate !== today && window.MyTeam && typeof window.MyTeam.triggerInstantGacha === 'function') {
-        localStorage.setItem('mt_daily_login_date_v1', today);
-        setTimeout(() => {
-          window.MyTeam.triggerInstantGacha(1, 'daily_login').catch(() => {});
-        }, 2500);
-      }
-    }
-  } catch (e) {}
+  // 我的球隊每日登入流程改成在擂台 popup 之後跑（data-fix.js）：
+  //   1. 帳號首次抽卡（mt_first_ever_pull_v1 沒設）→ 跑 1 抽動畫
+  //   2. 每日登入送 1 抽券（mt_daily_login_date_v1 跟今天比）
+  // 不在這裡 fire、避免跟擂台 modal 疊到
   // unlockedMatchSet 已就緒，重新檢查階層成就
   checkTieredAchievements?.();
 

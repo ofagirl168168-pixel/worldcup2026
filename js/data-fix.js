@@ -424,7 +424,14 @@ window.addEventListener('load', () => {
       return;
     }
     const pollOpts = pollId ? { pollId } : undefined;
-    _safe(() => showOpinionPoll(() => {
+    _safe(() => showOpinionPoll(async () => {
+      // 擂台關掉後：先跑「我的球隊每日鏈」(X 首抽 + 4 每日券)、再彈每日任務
+      try {
+        if (window.MyTeam?.runDailyLoginChain) {
+          await window.MyTeam.runDailyLoginChain();
+        }
+      } catch (e) { console.warn('[my-team] dailyChain', e); }
+
       if (isArticleLanding) {
         window.__pendingDailyTaskAfterArticle = true;
       } else if (window.__deferDailyTaskForChallenge) {

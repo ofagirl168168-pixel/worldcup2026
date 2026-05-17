@@ -2727,7 +2727,9 @@ function closeModal() {
     setTimeout(() => {
       if (typeof window.showOpinionPoll === 'function') {
         try {
-          window.showOpinionPoll(() => {
+          window.showOpinionPoll(async () => {
+            // 擂台關掉後：先跑我的球隊每日鏈、再彈每日任務
+            try { await window.MyTeam?.runDailyLoginChain?.(); } catch (e) {}
             if (typeof window.showDailyTaskPopup === 'function') {
               try { window.showDailyTaskPopup(); } catch (e) {}
             }
