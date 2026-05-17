@@ -332,7 +332,6 @@
       </div>
 
       <div class="mt-gacha-stage" id="mt-gacha-stage" hidden>
-        <button class="mt-gacha-skip" id="mt-gacha-skip" hidden type="button" aria-label="跳過">⏭ 跳過</button>
         <div class="mt-gacha-banner" id="mt-gacha-banner">
           <div class="mt-gacha-banner-title">${escapeHtml(options.title || '🎰 球員召喚')}</div>
           ${options.subtitle ? `<div class="mt-gacha-banner-sub">${escapeHtml(options.subtitle)}</div>` : ''}
@@ -384,8 +383,7 @@
         resolve();
       };
 
-      const skipBtn = overlay.querySelector('#mt-gacha-skip');
-      skipBtn.addEventListener('click', () => { skipped = true; });
+      // 跳過按鈕已移除（玩家反映多餘、看完抽卡動畫才是體驗的精華）
 
       const pack    = overlay.querySelector('#mt-gacha-pack');
       const stage   = overlay.querySelector('#mt-gacha-stage');
@@ -546,8 +544,7 @@
             120 + (skipped ? 0 : i * 180));
         }
 
-        // skip 按鈕短延遲後出現（不阻塞）
-        setTimeout(() => { skipBtn.hidden = false; }, skipped ? 0 : 250);
+        // (skip 按鈕已移除)
 
         // SSR / SR 特效：併發、不阻塞卡片飛出
         if (peakRarity === 'SSR' && !skipped) {
@@ -670,7 +667,6 @@
       }
 
       function showCTAs() {
-        skipBtn.hidden = true;
         const flipAllBtn = overlay.querySelector('#mt-gacha-flip-all-btn');
         if (flipAllBtn) flipAllBtn.hidden = true;
         overlay.querySelector('#mt-gacha-actions').hidden = false;

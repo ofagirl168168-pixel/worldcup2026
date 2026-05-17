@@ -205,6 +205,9 @@
       window.addEventListener('scroll', reposition, true);
       window.addEventListener('resize', reposition);
 
+      // 教學期間禁止亂按其他地方
+      const removeBlocker = _installClickBlocker(target);
+
       // 攔截 click（capture phase）→ 不跑正常 gacha，改 starter pack
       const intercept = (e) => {
         e.stopPropagation();
@@ -212,6 +215,7 @@
         target.removeEventListener('click', intercept, true);
         window.removeEventListener('scroll', reposition, true);
         window.removeEventListener('resize', reposition);
+        removeBlocker();
         if (wasDisabled) target.disabled = true;
         delete target.dataset.starterTutorial;
         overlay.classList.add('is-fading');
@@ -403,6 +407,18 @@
     setTimeout(() => _attachSpotlight(selector, hint, onClicked), 350);
   }
 
+  // 攔截 target 以外的點擊（capture phase）→ 教學期間禁止亂按
+  function _installClickBlocker(target) {
+    const block = (e) => {
+      if (target.contains(e.target)) return;  // 點到 target 自己 → 通過
+      e.stopPropagation();
+      e.preventDefault();
+    };
+    const evts = ['click', 'mousedown', 'pointerdown', 'touchstart'];
+    evts.forEach(ev => document.addEventListener(ev, block, true));
+    return () => evts.forEach(ev => document.removeEventListener(ev, block, true));
+  }
+
   function _attachSpotlight(selector, hint, onClicked) {
     const target = document.querySelector(selector);
     if (!target) {
@@ -420,6 +436,7 @@
       </div>
     `;
     document.body.appendChild(overlay);
+    const removeBlocker = _installClickBlocker(target);
     const ring  = overlay.querySelector('#mt-spotlight-ring');
     const hintEl = overlay.querySelector('#mt-spotlight-hint');
     const hintText = overlay.querySelector('.mt-spotlight-hint-text');
@@ -470,6 +487,7 @@
       target.removeEventListener('click', onClick);
       window.removeEventListener('scroll', reposition, true);
       window.removeEventListener('resize', reposition);
+      removeBlocker();
       overlay.classList.add('is-fading');
       setTimeout(() => overlay.remove(), 300);
       if (onClicked) onClicked();
