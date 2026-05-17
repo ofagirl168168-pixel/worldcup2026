@@ -184,17 +184,19 @@
     const kitShirt = opts.shirtColor || 'red';
     const kitPants = opts.pantsColor || 'blue';
     const kitShoes = opts.shoeColor || 'white';
-    const key = JSON.stringify(look) + '|F|' + kitShirt + '|' + kitPants + '|' + kitShoes;
+    // v2 = 加入 row 8 = GK 撲球（hurt frame 5、完全橫躺）
+    const key = JSON.stringify(look) + '|F|v2|' + kitShirt + '|' + kitPants + '|' + kitShoes;
     if (fullBodyCache.has(key)) return fullBodyCache.get(key);
 
     // 寬一點才裝得下 slash 揮腿、spellcast 舉手張開的手臂
     const FRAME_W = 48, FRAME_H = 64;
-    const FRAME_COLS = 3, FRAME_ROWS = 8;
+    const FRAME_COLS = 3, FRAME_ROWS = 9;
     // row 順序：0=walk-down, 1=walk-left, 2=walk-right, 3=walk-up,
     //          4=kick(slash-down), 5=cheer/stretch(spellcast-down),
-    //          6=frustration(hurt), 7=tackle/slide(thrust-right 伸腿鏟球)
+    //          6=frustration(hurt 1-3), 7=tackle/slide(thrust-right 伸腿鏟球),
+    //          8=GK dive(hurt frame 5、整個橫躺 — match-sim 會再加 rotate)
     // LPC y 行：walk=8/9/10/11、slash=12-15、spellcast=0-3、hurt=20、thrust=4-7
-    const ROW_TO_LPC_Y = [10*64, 9*64, 11*64, 8*64, 14*64, 2*64, 20*64, 7*64];
+    const ROW_TO_LPC_Y = [10*64, 9*64, 11*64, 8*64, 14*64, 2*64, 20*64, 7*64, 20*64];
     const ROW_FRAMES = [
       [1, 4, 7],  // walk-down
       [1, 4, 7],
@@ -204,6 +206,7 @@
       [1, 3, 5],  // cheer：spellcast-down 舉手（frame 5 = LPC 雙手過頂最高點、最有戲）
       [1, 2, 3],  // frustration：hurt 站不穩→稍微跪下（不到最後 5 那種完全倒地）
       [3, 5, 7],  // tackle：thrust-right 伸腿撲擊（後半幀腿伸最長）
+      [5, 5, 5],  // GK dive：hurt 最後一格、完全倒地姿勢（3 frame 都同一張、配 rotate 做飛撲視覺）
     ];
 
     const SX = 8, SY_OFF = 0;  // 寬 8-55、高 0-63 整個 frame、手臂 + 頂部頭髮都裝得下

@@ -315,10 +315,14 @@
         cy += (p._diveDirY || 1) * slide;
       }
 
-      // row 覆寫順序：tackle > fulltime > celebrate > walk
+      // row 覆寫順序：dive (GK) > tackle > fulltime > celebrate > walk
       let dirRow, frame;
       const tackleActive = p._tackleVisualUntil && state.frame < p._tackleVisualUntil;
-      if (tackleActive) {
+      if (diving) {
+        // GK 撲球 (row 8 = hurt frame 5、整個橫躺)
+        dirRow = 8;
+        frame = 0;
+      } else if (tackleActive) {
         // 鏟球 (row 7 = thrust)
         dirRow = 7;
         const tackleAge = state.frame - (p._tackleStart || state.frame);
