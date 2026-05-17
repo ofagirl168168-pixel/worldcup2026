@@ -14,8 +14,8 @@ export default [
   {
     "id": "epl-066",
     "tournament": "epl",
-    "title": "【賽前分析】曼聯 vs 諾丁漢森林：紅魔收官戰，Fernandes 能否締造助攻紀錄？",
-    "summary": "英超第37輪——已鎖定歐冠資格的曼聯（第3・65分）在老特拉福德迎戰成功保級的諾丁漢森林（第15・42分）。Bruno Fernandes 距英超單季助攻紀錄僅差 1 次，Šeško 脛傷缺陣；森林近 8 場不敗、Gibbs-White 戴面罩出戰存疑。",
+    "title": "【賽前分析】曼聯 vs 諾丁漢森林：紅魔收官戰，Fernandes 能否打破助攻紀錄？",
+    "summary": "英超第37輪——已鎖定歐冠資格的曼聯（第3・65分）在老特拉福德迎戰成功保級的諾丁漢森林（第16・43分）。Bruno Fernandes 已追平英超單季助攻紀錄（20 次），能否在主場破紀錄？Šeško 脛傷缺陣；森林聯賽近 8 場不敗、Gibbs-White 戴面罩出戰存疑。",
     "date": "2026-05-17",
     "category": "賽前深度分析",
     "readTime": null,
