@@ -1187,12 +1187,24 @@
         // 被撲 / 沒中 → 對方球門員帶球
         const newTeam = state.possession === 'h' ? 'a' : 'h';
         state.possession = newTeam;
-        const gk = players.findIndex(p => p.team === newTeam && p.role === 'GK');
-        state.possessorIdx = gk;
+        const gkIdx = players.findIndex(p => p.team === newTeam && p.role === 'GK');
+        state.possessorIdx = gkIdx;
         state.phase = 'dribble';
         state.lastActionFrame = state.frame;
-        ball.x = players[gk].x;
-        ball.y = players[gk].y;
+        const gkPlayer = players[gkIdx];
+        // GK 撲球視覺：沿用鏟球動畫（_tackleVisualUntil + slide dir）
+        // dir = shooter → GK 的反向（朝球飛來方向撲過去）
+        if (shooter) {
+          const dx = shooter.x - gkPlayer.x;
+          const dy = shooter.y - gkPlayer.y;
+          const mag = Math.max(0.001, Math.hypot(dx, dy));
+          gkPlayer._tackleStart = state.frame;
+          gkPlayer._tackleVisualUntil = state.frame + 24;
+          gkPlayer._tackleDirX = dx / mag;
+          gkPlayer._tackleDirY = dy / mag;
+        }
+        ball.x = gkPlayer.x;
+        ball.y = gkPlayer.y;
         // 換邊 → 清最近經手傳球者記錄、並記錄換邊時機（movePlayers 會降速避免瞬移）
         state.recentPassers = [];
         state.recentPassersSet = new Set();
