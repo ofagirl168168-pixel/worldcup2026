@@ -266,6 +266,18 @@
     return data;
   }
 
+  // 給單一 type 訓練素材（擂台 / 預測 / 文章活動觸發）
+  // type: 'tactical' | 'physical' | 'heart' | 'idea'
+  async function awardRp(type, amount) {
+    if (!window.DB || !window.currentUser) return null;
+    if (!amount || amount <= 0) return null;
+    try {
+      const { data, error } = await window.DB.rpc('award_rp_to_team', { p_type: type, p_amount: amount });
+      if (error) { console.warn('[my-team] award_rp', error); return null; }
+      return data;
+    } catch (e) { return null; }
+  }
+
   async function trackQuest(action, amount = 1) {
     if (!window.DB || !window.currentUser) return [];
     try {
@@ -347,6 +359,7 @@
     redeemSSRSelect,
     findPvpOpponent,
     finalizePvpMatch,
+    awardRp,
     trackQuest,
     claimQuest,
     fetchQuests,

@@ -3667,6 +3667,8 @@ function openArticle(id) {
   const a = ARTICLES.find(x => x.id === id);
   if (!a) return;
   completeDailyTask?.('read_article');
+  // 💡 靈感素材：看文章 +3
+  window.MyTeam?.awardRp?.('idea', 3)?.catch?.(() => {});
   _pushArticleUrl(a.id);
   _ensureArticleOverlay();
   document.getElementById('article-modal-inner').innerHTML = `
@@ -3689,6 +3691,8 @@ function openUCLArticle(id) {
   const a = arts.find(x => String(x.id) === String(id));
   if (!a) return;
   completeDailyTask?.('read_article');
+  // 💡 靈感素材：看文章 +3
+  window.MyTeam?.awardRp?.('idea', 3)?.catch?.(() => {});
   _pushArticleUrl(a.id);
   _ensureArticleOverlay();
   // Convert markdown-ish content to HTML
@@ -4242,6 +4246,8 @@ function saveMyPred(matchId) {
         // 任務：每場預測都算一次
         if (window.MyTeamBetaEnabled?.() && window.MyTeam) {
           window.MyTeam.trackQuest?.('predict_match', 1).catch(() => {});
+          // 💡 靈感素材：每場預測 +5
+          window.MyTeam.awardRp?.('idea', 5)?.catch?.(() => {});
         }
       }
     } catch (e) {}
@@ -4262,6 +4268,10 @@ function saveMyPred(matchId) {
           // 里程碑分享卡
           setTimeout(() => window._maybeShowPredictStreakCard?.(streakBumped.current, bonus), 4000);
         }
+        // 💪 體能素材：連續天數 milestone +N
+        const STREAK_PHY = { 3: 8, 7: 25, 30: 80 };
+        const phy = STREAK_PHY[streakBumped.current];
+        if (phy) window.MyTeam?.awardRp?.('physical', phy)?.catch?.(() => {});
       }
     } catch (e) {}
 

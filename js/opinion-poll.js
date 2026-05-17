@@ -453,6 +453,9 @@
         // 任務：每次投票都算一次（不只首投）
         if (window.MyTeamBetaEnabled?.() && window.MyTeam) {
           window.MyTeam.trackQuest?.('arena_vote', 1).catch(() => {});
+          // ❤️ 鬥志素材 — 投票每次 +2、首投額外送 +8（首投 = lastDate !== today 那條件已 set 過 today）
+          const isFirstVoteToday = lastDate !== today;
+          window.MyTeam.awardRp?.('heart', isFirstVoteToday ? 10 : 2)?.catch?.(() => {});
         }
       }
     } catch (e) {}
@@ -1417,6 +1420,8 @@
                     window.MyTeam.triggerInstantGacha?.(1, 'arena_comment').catch(() => {});
                   }, 1200);
                 }
+                // ❤️ 鬥志素材 — 留言每則 +3
+                window.MyTeam.awardRp?.('heart', 3)?.catch?.(() => {});
               }
             } catch (e) {}
           }

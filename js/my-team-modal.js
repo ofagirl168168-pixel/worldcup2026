@@ -371,7 +371,7 @@
               _tutorialDone.add('train'); _showStarterCompleteToast(0); return;
             }
             await _delay(300);
-            _attachSpotlight('.mt-train-preview-confirm', '點確認、扣訓練點開始', async () => {
+            _attachSpotlight('.mt-train-preview-confirm', '點確認、扣訓練素材開始', async () => {
               // 等所有訓練相關 modal 都關掉
               await _waitForAllClosed(
                 ['.mt-rp-train-result', '.mt-claim-result-overlay', '.mt-train-preview-overlay', '.mt-train-picker'],
@@ -1836,7 +1836,7 @@
     if (fam.attack >= 3)  return { label: '⚔️ 攻擊三叉戟', effect: '攻擊 +15%', buff: { attack: 0.15 } };
     if (fam.speed >= 3)   return { label: '⚡ 衝刺軍團', effect: '速度 +12%', buff: { speed: 0.12 } };
     if (fam.stamina >= 3) return { label: '❤️ 體能訓練營', effect: '體力 +20%', buff: { stamina: 0.20 } };
-    if (fam.youth >= 3)   return { label: '👶 青訓計畫', effect: '訓練點效率 +50%', buff: null };
+    if (fam.youth >= 3)   return { label: '👶 青訓計畫', effect: '訓練素材效率 +50%', buff: null };
     if (rarities.filter(r => r === 'SSR').length >= 3) {
       return { label: '⭐ SSR 全明星', effect: '全屬性 +5%',
         buff: { attack: 0.05, defense: 0.05, speed: 0.05, midfield: 0.05, stamina: 0.05, aura: 0.05 } };
@@ -1869,7 +1869,7 @@
     if (!coach || !coach.trait) return [];
     const w = weight === undefined ? 1 : weight;
     const MAP = {
-      youth_developer:    { icon: '📚', label: '訓練點', pct: 0.25, scope: '訓練' },
+      youth_developer:    { icon: '📚', label: '訓練素材', pct: 0.25, scope: '訓練' },
       champion_mentality: { icon: '🏆', label: '抗翻盤',   pct: 0.30, scope: '比賽 · 不疊加' },
       veteran_handler:    { icon: '🧓', label: '老將',     pct: 0.10, scope: '老將屬性' },
     };
@@ -1910,8 +1910,8 @@
     add(_coachOffMatchBuffs(a2?.coach, 0.5));
     // 青訓羈絆 → 訓練 RP +50%
     if (synergy && /青訓/.test(synergy.label || '')) {
-      if (!merged['訓練點']) merged['訓練點'] = { icon: '📚', label: '訓練點', pct: 0, scope: '訓練' };
-      merged['訓練點'].pct += 0.50;
+      if (!merged['訓練素材']) merged['訓練素材'] = { icon: '📚', label: '訓練素材', pct: 0, scope: '訓練' };
+      merged['訓練素材'].pct += 0.50;
     }
     return Object.values(merged).filter(b => b.pct > 0);
   }
@@ -2047,7 +2047,7 @@
     defense: { icon: '🛡️', label: '防線派',  synergy: '🛡️ 鋼鐵防線',    effect: '防守 +15%' },
     speed:   { icon: '⚡', label: '速度派',  synergy: '⚡ 衝刺軍團',    effect: '速度 +12%' },
     stamina: { icon: '❤️', label: '體能派',  synergy: '❤️ 體能訓練營',  effect: '體力 +20%' },
-    youth:   { icon: '👶', label: '青訓派',  synergy: '👶 青訓計畫',    effect: '訓練點 +50%' },
+    youth:   { icon: '👶', label: '青訓派',  synergy: '👶 青訓計畫',    effect: '訓練素材 +50%' },
     other:   { icon: '🎓', label: '其他',    synergy: null,            effect: null },
   };
   const FAMILY_ORDER = ['tactic','attack','defense','speed','stamina','youth','other'];
@@ -2505,7 +2505,7 @@
       iron_wall:        [{ k: '防', v: 0.08 }],
       gegen_press:      [{ k: '速', v: 0.05 }, { k: '體', v: 0.10 }],
       physio:           [{ k: '體', v: 0.10 }],
-      youth_developer:  [{ k: '訓練點', v: 0.25 }],
+      youth_developer:  [{ k: '訓練素材', v: 0.25 }],
       champion_mentality:[{ k: '抗翻盤', v: 0.30 }],
       veteran_handler:  [{ k: '老將', v: 0.10 }],
     };
@@ -5328,7 +5328,7 @@
         <div class="mt-train-points-panel">
           <div class="mt-train-points-title">
             <span class="mt-train-points-emoji">⚡</span>
-            <span class="mt-train-points-title-text">訓練點廣度訓練</span>
+            <span class="mt-train-points-title-text">廣度訓練</span>
             <span class="mt-train-inventory-inline">
               <span class="mt-train-inv-chip" title="戰術">🧠 ${team.rp_tactical || 0}</span>
               <span class="mt-train-inv-chip" title="體能">💪 ${team.rp_physical || 0}</span>
@@ -5750,13 +5750,24 @@
         <div class="mt-train-info-section">
           <div class="mt-train-info-q">⚡ 訓練 / 集訓營</div>
           <div class="mt-train-info-a">
-            <b>訓練點廣度訓練</b>（即時、6 屬性全升）：<br>
+            <b>廣度訓練</b>（即時、6 屬性全升）：<br>
             ・⚡ 集訓升等 — Lv+1、6 屬性各 +1~3、需要 🧠10 💪10<br>
             ・⭐ 精英特訓 — Lv+1、6 屬性各 +2~5、需要 🧠30 💪30 ❤️10 💡10<br><br>
             <b>🏋️ 集訓營</b>（鎖人、單項焦點、需時間）：<br>
-            ・30m / 2h — +1 / +2 屬性、不升 Lv<br>
-            ・8h — +4 屬性 + Lv+1<br>
-            ・24h — +7 屬性 + Lv+1 + <b>5% 機率覺醒天賦</b>（無天賦卡）
+            ・30m / 2h — +1 / +2 屬性、不升 Lv（領取送 💪 +2 / +4）<br>
+            ・8h — +4 屬性 + Lv+1（送 💪 +8）<br>
+            ・24h — +7 屬性 + Lv+1 + <b>5% 機率覺醒天賦</b>（送 💪 +15）
+          </div>
+        </div>
+
+        <div class="mt-train-info-section">
+          <div class="mt-train-info-q">📦 訓練素材怎麼來？</div>
+          <div class="mt-train-info-a">
+            <b>🧠 戰術</b> ← 聯賽比賽（W +25 / D +12 / L +5）<br>
+            <b>💪 體能</b> ← PvP 排位（W +18 / D +9 / L +5）+ 集訓營領取 + 預測連續天數里程碑<br>
+            <b>❤️ 鬥志</b> ← 擂台投票（每日首投 +10 / 之後 +2）+ 擂台留言（每則 +3）<br>
+            <b>💡 靈感</b> ← 每場預測 +5 + 看文章 +3<br><br>
+            另外：每日任務 / 商店補給包 🧪 / 教練「青訓計畫」加成（訓練素材 +50%）
           </div>
         </div>
       </div>
@@ -6209,7 +6220,7 @@
         } catch (err) {
           const msg = String(err.message || err);
           let friendly = '訓練失敗：' + msg;
-          if (msg.includes('INSUFFICIENT_RP')) friendly = '⚠️ 訓練點不足';
+          if (msg.includes('INSUFFICIENT_RP')) friendly = '⚠️ 訓練素材不足';
           else if (msg.includes('MAX_LEVEL')) friendly = '⚠️ 已滿級';
           if (typeof showToast === 'function') showToast(friendly);
           else alert(friendly);
