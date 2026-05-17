@@ -683,7 +683,7 @@
       pvpHtml = `
         <div class="mt-post-pvp">
           <div class="mt-post-pvp-title">⚔️ PvP 排位</div>
-          <div class="mt-post-pvp-elo ${cls}">ELO ${sign}${result.my_elo_delta} → <b>${result.new_my_elo}</b></div>
+          <div class="mt-post-pvp-elo ${cls}">積分 ${sign}${result.my_elo_delta} → <b>${result.new_my_elo}</b></div>
         </div>
       `;
     }
@@ -811,20 +811,80 @@
       return;
     }
 
-    // 找對手（會 throw 如果沒對手 / 額度滿）
-    const opponent = await window.MyTeam.findPvpOpponent();
-    if (!opponent) {
-      if (typeof showToast === 'function') showToast('找不到合適對手');
+    // 找 3 個對手讓玩家選（會 throw 如果沒對手 / 額度滿）
+    let choices;
+    try {
+      choices = await window.MyTeam.findPvpOpponents(3);
+    } catch (e) {
+      const msg = String(e.message || e);
+      let friendly = 'PvP 失敗：' + msg;
+      if (msg.includes('INSUFFICIENT_STAMINA')) friendly = '⚡ 體力不足';
+      else if (msg.includes('PVP_DAILY_LIMIT_REACHED')) friendly = '⚠️ 今日 PvP 場次已滿（5/5）';
+      else if (msg.includes('NO_PVP_OPPONENT')) friendly = '⚠️ 目前找不到合適對手，稍後再試';
+      if (typeof showToast === 'function') showToast(friendly);
+      return;
+    }
+    if (!choices || !choices.length) {
+      if (typeof showToast === 'function') showToast('⚠️ 目前找不到合適對手，稍後再試');
       return;
     }
 
-    // 標記成 PvP（之後結算用 finalize_pvp_match 而非 finalize_match）
-    opponent._isPvp = true;
-    opponent._oppUserId = opponent.user_id;
+    _openPvpChoiceModal(choices, team.pvp_elo || 1000, (opponent) => {
+      // 標記成 PvP（之後結算用 finalize_pvp_match 而非 finalize_match）
+      opponent._isPvp = true;
+      opponent._oppUserId = opponent.user_id;
+      _openMatchModal({
+        team, homeData, opponent,
+        tier: null, matchIdx: 0, isBoss: false, isPvp: true,
+      });
+    });
+  }
 
-    _openMatchModal({
-      team, homeData, opponent,
-      tier: null, matchIdx: 0, isBoss: false, isPvp: true,
+  // PvP 對手 3 選 1 modal
+  function _openPvpChoiceModal(choices, myElo, onPick) {
+    const overlay = document.createElement('div');
+    overlay.className = 'mt-pvp-choice-overlay';
+    overlay.innerHTML = `
+      <div class="mt-pvp-choice-card">
+        <button class="mt-pvp-choice-close" type="button">×</button>
+        <div class="mt-pvp-choice-title">⚔️ 選擇對手</div>
+        <div class="mt-pvp-choice-sub">你的積分 ${myElo}・優先撈 ±200 內、不夠補最接近的</div>
+        <div class="mt-pvp-choice-list">
+          ${choices.map((c, i) => {
+            const oppElo = c.pvp_elo || 1000;
+            const diff = oppElo - myElo;
+            const diffSign = diff > 0 ? '+' : '';
+            const diffCls = diff > 200 ? 'is-harder' : diff < -200 ? 'is-easier' : 'is-fair';
+            const r = c.radar || {};
+            return `
+              <button class="mt-pvp-choice-btn ${diffCls}" data-i="${i}">
+                <div class="mt-pvp-choice-name">${escapeHtml(c.nameCN || '?')}</div>
+                <div class="mt-pvp-choice-meta">陣型 ${c.formation || '4-3-3'}・積分 <b>${oppElo}</b> <span class="mt-pvp-choice-diff">(${diffSign}${diff})</span></div>
+                <div class="mt-pvp-choice-radar">攻 ${r.attack || 50}・防 ${r.defense || 50}・中 ${r.midfield || 50}・速 ${r.speed || 50}</div>
+                ${diff > 200 ? '<div class="mt-pvp-choice-tag">⬆ 比你強</div>' : diff < -200 ? '<div class="mt-pvp-choice-tag">⬇ 比你弱</div>' : '<div class="mt-pvp-choice-tag">≈ 旗鼓相當</div>'}
+              </button>
+            `;
+          }).join('')}
+        </div>
+        <button class="mt-pvp-choice-cancel" type="button">取消</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    const close = () => {
+      overlay.classList.remove('open');
+      setTimeout(() => overlay.remove(), 200);
+    };
+    overlay.querySelector('.mt-pvp-choice-close').addEventListener('click', close);
+    overlay.querySelector('.mt-pvp-choice-cancel').addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    overlay.querySelectorAll('.mt-pvp-choice-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const i = parseInt(btn.dataset.i, 10);
+        const picked = choices[i];
+        close();
+        if (picked && typeof onPick === 'function') onPick(picked);
+      });
     });
   }
 

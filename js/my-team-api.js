@@ -306,6 +306,14 @@
     return data;
   }
 
+  // 新版：一次回 N 個對手讓玩家挑（預設 3）
+  async function findPvpOpponents(count = 3) {
+    if (!window.DB) throw new Error('NOT_LOGGED_IN');
+    const { data, error } = await window.DB.rpc('find_pvp_opponents', { p_count: count });
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+  }
+
   // 給單一 type 訓練素材（擂台 / 預測 / 文章活動觸發）
   // type: 'tactical' | 'physical' | 'heart' | 'idea'
   const _RP_ICON  = { tactical: '🧠', physical: '💪', heart: '❤️', idea: '💡' };
@@ -412,6 +420,7 @@
     claimTimedTraining,
     redeemSSRSelect,
     findPvpOpponent,
+    findPvpOpponents,
     finalizePvpMatch,
     awardRp,
     trackQuest,

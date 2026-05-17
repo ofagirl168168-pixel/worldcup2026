@@ -3261,7 +3261,7 @@
       <div class="mt-rank-tab">
         <div class="mt-rank-mode-tabs">
           <button class="mt-rank-mode-tab ${_rankMode === 'season' ? 'active' : ''}" data-mode="season">🏆 賽季排行</button>
-          <button class="mt-rank-mode-tab ${_rankMode === 'pvp' ? 'active' : ''}" data-mode="pvp">⚔️ PvP ELO</button>
+          <button class="mt-rank-mode-tab ${_rankMode === 'pvp' ? 'active' : ''}" data-mode="pvp">⚔️ PvP 積分</button>
         </div>
         <div class="mt-rank-list" id="mt-rank-list">載入中…</div>
       </div>
@@ -3297,7 +3297,7 @@
         const isMe = row.user_id === me;
         const statsHtml = _rankMode === 'pvp'
           ? `<div class="mt-rank-stats">
-               <div class="mt-rank-pt mt-rank-elo">${row.pvp_elo || 1000} <span>ELO</span></div>
+               <div class="mt-rank-pt mt-rank-elo">${row.pvp_elo || 1000} <span>積分</span></div>
              </div>`
           : `<div class="mt-rank-stats">
                <div class="mt-rank-pt">${row.points || 0} <span>pt</span></div>
@@ -3395,7 +3395,7 @@
               <div class="mt-rank-crest">${crest}</div>
               <div class="mt-rank-info">
                 <div class="mt-rank-name">${escapeHtml(t.team_name || '')}</div>
-                <div class="mt-rank-meta">${escapeHtml(t.player_name)} · Tier ${t.current_tier || 1} · ELO ${t.pvp_elo || '—'}</div>
+                <div class="mt-rank-meta">${escapeHtml(t.player_name)} · Tier ${t.current_tier || 1} · 積分 ${t.pvp_elo || '—'}</div>
               </div>
               <button class="mt-friend-remove" data-rm="${f.friend_id}" title="移除好友">×</button>
             </div>`;
@@ -3450,7 +3450,7 @@
           <div class="mt-opp-crest">${crest}</div>
           <div>
             <div class="mt-opp-name">${escapeHtml(data.nameCN)}</div>
-            <div class="mt-opp-meta">陣型 ${data.formation || '4-3-3'} · ELO ${data.pvp_elo || '—'}</div>
+            <div class="mt-opp-meta">陣型 ${data.formation || '4-3-3'} · 積分 ${data.pvp_elo || '—'}</div>
           </div>
         </div>
         <div class="mt-opp-radar">
@@ -5027,7 +5027,7 @@
         <button class="mt-match-wall-sign mt-match-pvp-sign" id="mt-pvp-find" ${pvpDisabled ? 'disabled' : ''}>
           <div class="mt-match-wall-sign-icon">⚔️</div>
           <div class="mt-match-wall-sign-title">PvP 排位</div>
-          <div class="mt-match-wall-sign-sub">ELO ${team.pvp_elo || 1000}・${pvpCount}/5</div>
+          <div class="mt-match-wall-sign-sub">積分 ${team.pvp_elo || 1000}・${pvpCount}/5</div>
         </button>
       </div>
     `;
