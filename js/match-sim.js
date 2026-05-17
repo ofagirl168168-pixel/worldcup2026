@@ -301,30 +301,23 @@
         cx += (p._tackleDirX || 0) * slideAmt;
         cy += (p._tackleDirY || 0) * slideAmt;
       }
-      // GK 撲球視覺位移：沿球門線僅 Y 軸 + 略向上跳起（jump feel）
-      // 3 段：anticipation（蹲）→ launch（跳撲）→ hold（短暫保持）
+      // GK 撲球視覺：實際位移已 snap、視覺只做固定距離的小幅撲擊 + 跳起感
+      // 不依射門距離縮放、每次撲都同樣一致感
       const diving = p._diveUntil && state.frame < p._diveUntil;
       if (diving) {
         const dAge = state.frame - (p._diveStart || state.frame);
-        const dDur = (p._diveUntil - p._diveStart) || 30;
+        const dDur = (p._diveUntil - p._diveStart) || 24;
         const t = Math.min(1, dAge / dDur);
-        // 適中的撲球距離（不要太誇張）：maxSlide ≤ ~10px
-        const maxSlide = (p._diveDistance || 0.05) * PITCH_H * 1.0;
+        const SLIDE_PX = 8;  // 固定小幅延伸（離影子不會太遠）
         let slide;
-        if (t < 0.15) {
-          slide = -(t / 0.15) * 2;       // 蹲 2px
-        } else if (t < 0.50) {
-          const launchT = (t - 0.15) / 0.35;
-          slide = -2 + (1 - Math.pow(1 - launchT, 2)) * (maxSlide + 2);
-        } else {
-          slide = maxSlide;              // hold
-        }
+        if (t < 0.20) slide = -(t / 0.20) * 2;                              // 蹲
+        else if (t < 0.60) slide = -2 + (1 - Math.pow(1 - (t - 0.20) / 0.40, 2)) * (SLIDE_PX + 2);
+        else              slide = SLIDE_PX;                                  // hold
         cy += (p._diveDirY || 1) * slide;
-        // 跳起感：身體往上飄（負 Y），拋物線、launch 階段最高
-        if (t >= 0.15 && t < 0.65) {
-          const jumpT = (t - 0.15) / 0.50;
-          const jumpUp = Math.sin(jumpT * Math.PI) * 4;  // 最高 4px
-          cy -= jumpUp;
+        // 跳起感：身體往上飄拋物線
+        if (t >= 0.10 && t < 0.75) {
+          const jumpT = (t - 0.10) / 0.65;
+          cy -= Math.sin(jumpT * Math.PI) * 5;
         }
       }
 
@@ -1181,16 +1174,19 @@
       state.phase = 'shoot';
       state.stats[state.possession].shots++;
 
-      // 每次射門都觸發 GK 撲球視覺（沿球門線朝 ballTargetY 撲）
-      // 撲球持續：球飛時間 + 12 幀（撲完球差不多就接到了、不會 hold 太久）
+      // 每次射門都觸發 GK 撲球
+      // 1) 真實位移：GK 的 p.y 直接 snap 到 ballTargetY、確保球到 GK 位置不會「磁吸」
+      // 2) 視覺撲球：固定距離 + 跳起感、不論射哪都一樣
       const defTeam = state.possession === 'h' ? 'a' : 'h';
       const gkPlayer = players.find(p => p.team === defTeam && p.role === 'GK');
       if (gkPlayer) {
+        const startY = gkPlayer.y;
+        // 實際位移：朝球目標方向移動（不直接 snap、保留 1 段視覺移動感）
+        gkPlayer.y = state.ballTargetY;
+        gkPlayer.ty = state.ballTargetY;
         gkPlayer._diveStart = state.frame;
-        gkPlayer._diveUntil = state.frame + state.ballTravelTotal + 12;
-        gkPlayer._diveDirY = Math.sign(state.ballTargetY - gkPlayer.y) || 1;
-        // 撲球距離：不超過 0.05 pitch（影子相對位置才不會太遠）
-        gkPlayer._diveDistance = Math.min(0.05, Math.abs(state.ballTargetY - gkPlayer.y) + 0.02);
+        gkPlayer._diveUntil = state.frame + state.ballTravelTotal + 6;
+        gkPlayer._diveDirY = Math.sign(state.ballTargetY - startY) || 1;
       }
     }
 
