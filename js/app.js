@@ -2871,7 +2871,7 @@ function renderSchedule(phaseFilter, groupFilter) {
       const eplPredTag = (m.status === 'finished' || m.status === 'live') ? '' : eplMine
         ? `<div class="match-pred-tag predicted">${eplMine.h}-${eplMine.a} 已預測</div>`
         : `<div class="match-pred-tag">🎯 預測比分</div>`;
-      return header + `<div class="match-card${isLive ? ' match-live' : ''}" data-match-status="${m.status||'scheduled'}" data-match-date="${m.date||''}" onclick="openPredModal('${m.id}')">
+      return header + `<div class="match-card${isLive ? ' match-live' : ''}" data-match-id="${m.id}" data-match-status="${m.status||'scheduled'}" data-match-date="${m.date||''}" onclick="openPredModal('${m.id}')">
         ${isLive ? '<div class="live-badge"><span class="live-dot"></span>LIVE</div>' : ''}
         <div class="match-team">
           <div class="match-team-flag">${flagImg(ht.flag)}</div>
@@ -2945,7 +2945,7 @@ function renderSchedule(phaseFilter, groupFilter) {
       const uclPredTag = (m.status === 'finished' || m.status === 'live') ? '' : uclMine
         ? `<div class="match-pred-tag predicted">${uclMine.h}-${uclMine.a} 已預測</div>`
         : `<div class="match-pred-tag" data-pred-cd="${uclKo}">🎯 預測比分</div>`;
-      return header + `<div class="match-card${isLive ? ' match-live' : ''}" data-match-status="${m.status||'scheduled'}" data-match-date="${m.date||''}" onclick="openPredModal('${m.id}')">
+      return header + `<div class="match-card${isLive ? ' match-live' : ''}" data-match-id="${m.id}" data-match-status="${m.status||'scheduled'}" data-match-date="${m.date||''}" onclick="openPredModal('${m.id}')">
         ${isLive ? '<div class="live-badge"><span class="live-dot"></span>LIVE</div>' : ''}
         <div class="match-team">
           <div class="match-team-flag">${flagImg(ht.flag)}</div>
@@ -3009,7 +3009,7 @@ function renderSchedule(phaseFilter, groupFilter) {
     const wcPredTag = wcStarted ? '' : wcMine
       ? `<div class="match-pred-tag predicted">${wcMine.h}-${wcMine.a} 已預測</div>`
       : `<div class="match-pred-tag" data-pred-cd="${wcKo}">🎯 預測比分</div>`;
-    return header + `<div class="match-card" data-match-status="${m.status||'scheduled'}" data-match-date="${m.twDate||''}" onclick="openPredModal('${m.id}')">
+    return header + `<div class="match-card" data-match-id="${m.id}" data-match-status="${m.status||'scheduled'}" data-match-date="${m.twDate||''}" onclick="openPredModal('${m.id}')">
       <div class="match-team">
         <div class="match-team-flag">${flagImg(ht.flag)}</div>
         <div><div class="match-team-name">${ht.nameCN}</div><div class="match-team-sub">FIFA #${ht.fifaRank}</div></div>

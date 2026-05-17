@@ -6548,8 +6548,21 @@ body.opinion-open .btn-arena-float { display: none; }
   font-weight: 700;
   text-decoration: none;
   margin-left: 6px;
+  white-space: nowrap;
+  display: inline-block;
 }
 .fr-ended-real-link a:hover { text-decoration: underline; }
+
+/* 從挑戰賽結算點「去賽程」跳過去後高亮閃 2 秒 */
+.match-card--highlight {
+  animation: match-card-flash 0.7s ease-in-out 3;
+  outline: 2px solid #ffd700;
+  outline-offset: 2px;
+}
+@keyframes match-card-flash {
+  0%, 100% { background: inherit; }
+  50% { background: rgba(255,215,0,0.18); }
+}
 
 /* 猜比分區塊 */
 .fr-pick-title {

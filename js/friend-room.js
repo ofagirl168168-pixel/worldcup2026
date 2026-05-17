@@ -1501,7 +1501,27 @@
     const goSched = body.querySelector('#fr-end-go-schedule');
     if (goSched) goSched.addEventListener('click', (e) => {
       e.preventDefault();
-      if (typeof window.showSection === 'function') window.showSection('schedule');
+      // 1) 關閉房間 modal
+      if (state && state._close) state._close();
+      // 2) 切到賽程 section
+      if (typeof window.showSection === 'function') {
+        try { window.showSection('schedule'); } catch (err) {}
+      }
+      // 3) 滾到該場比賽 card（renderSchedule 後 DOM 重建、稍延遲再找）
+      const matchId = state?.room?.match_meta?.match_id;
+      if (matchId) {
+        const tryScroll = (attempt = 0) => {
+          const card = document.querySelector(`#section-schedule .match-card[data-match-id="${matchId}"]`);
+          if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.classList.add('match-card--highlight');
+            setTimeout(() => card.classList.remove('match-card--highlight'), 2200);
+          } else if (attempt < 8) {
+            setTimeout(() => tryScroll(attempt + 1), 150);
+          }
+        };
+        setTimeout(tryScroll, 100);
+      }
     });
     // 非同步拉所有 picks 渲染得獎名單
     if (haveResult) {
