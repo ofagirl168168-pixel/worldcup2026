@@ -639,7 +639,47 @@ async function main() {
     }
   }
 
-  // 跨日超時：採用「使用者看到的第 1 題」= rawCandidates[0]（telegram 一開始顯示的那題）
+  // 跨日超時：fallback 前必須先重讀題庫，確認使用者沒在 bot 啟動後手動寫入
+  //   bot 啟動時 require 過 data-opinions.js → cache 凍結。
+  //   使用者可能在凌晨手動 commit 了當日題（如 [[feedback_arena_no_overwrite]]）。
+  //   若不清 cache 重讀，就會把使用者選好的題覆蓋掉（2026-05-18 中場秀事件）。
+  let alreadyHasEntries = [];
+  try {
+    const dataPath = path.join(__dirname, '..', 'js', 'data-opinions.js');
+    delete require.cache[require.resolve(dataPath)];
+    const fresh = require(dataPath);
+    const freshList = fresh.DAILY_OPINIONS || [];
+    alreadyHasEntries = freshList.filter(o => {
+      if (o.date === targetDate) return true;
+      if (Array.isArray(o.dates) && o.dates.includes(targetDate)) return true;
+      return false;
+    });
+  } catch (err) {
+    console.warn(`⚠️ 跨日 fallback 重讀題庫失敗（${err.message}），保守起見直接放棄 fallback`);
+    alreadyHasEntries = [{ id: 'unknown' }]; // 強制 bail
+  }
+
+  if (alreadyHasEntries.length > 0) {
+    console.log(`⏭️ 跨日 fallback：題庫已有 ${alreadyHasEntries.length} 則 ${targetDate} 題目（${alreadyHasEntries.map(o => o.id).join(', ')}），不覆蓋使用者選擇`);
+    for (const mid of sentMessages) {
+      await tg('editMessageReplyMarkup', {
+        chat_id: CHAT_ID,
+        message_id: mid,
+        reply_markup: { inline_keyboard: [] },
+      }).catch(() => {});
+    }
+    await tg('sendMessage', {
+      chat_id: CHAT_ID,
+      text:
+        `⏰ *時間已到（跨日）*\n\n` +
+        `題庫已有 ${escapeMd(targetDate)} 題目，不覆蓋。\n` +
+        `現有：${escapeMd((alreadyHasEntries[0].q || '').slice(0, 60))}`,
+      parse_mode: 'MarkdownV2',
+    }).catch(() => {});
+    process.exit(0);
+  }
+
+  // 題庫真的沒有同日題目 → 才採用 fallback
   const fallback = rawCandidates[0];
   console.log(`⏰ 已跨日未回應，自動採用候選第 1 題：${fallback.q}`);
   for (const mid of sentMessages) {
@@ -657,13 +697,6 @@ async function main() {
       `${escapeMd(fallback.q)}`,
     parse_mode: 'MarkdownV2',
   }).catch(() => {});
-  // 先清掉同日殘留 entry（跟 `use` action 一致）— 避免舊題壓在前面被 find() 撿走
-  // 雖然 appendToDataFile 是 prepend、新題會在前面，但如果之前的人手動加錯位置殘留就會出包
-  // add-only 模式（午後回顧題）跳過清理，純粹新增第 2 題
-  if (!addOnly) {
-    const removed = removeEntriesForDate(targetDate);
-    if (removed) console.log(`🗑️ 已移除 ${removed} 則同日 (${targetDate}) 舊題目`);
-  }
   const filePath = appendToDataFile(fallback);
   console.log(`📝 已寫入 ${path.relative(process.cwd(), filePath)}`);
   autoCommitAndPush(targetDate, fallback.q);
