@@ -3669,15 +3669,18 @@ function renderFocus() {
 function _maybeAwardArticleIdea() {
   if (!window.MyTeamBetaEnabled?.() || !window.MyTeam) return;
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
-  const key = 'mt_article_idea_' + today;
-  if (localStorage.getItem(key)) return;  // 今天已領過
+  const ideaKey = 'mt_article_idea_' + today;
   setTimeout(() => {
-    // 15 秒後檢查文章 modal 還開著 + 今天還沒領過
+    // 15 秒後檢查文章 modal 還開著
     const overlay = document.getElementById('article-modal-overlay');
     if (!overlay || !overlay.classList.contains('open')) return;
-    if (localStorage.getItem(key)) return;
-    localStorage.setItem(key, '1');
-    window.MyTeam.awardRp?.('idea', 3)?.catch?.(() => {});
+    // 任務進度：每篇都算（給週任務 w_article_5 累積用）
+    window.MyTeam.trackQuest?.('read_article', 1).catch(() => {});
+    // 💡 靈感素材獎勵：每日僅一次
+    if (!localStorage.getItem(ideaKey)) {
+      localStorage.setItem(ideaKey, '1');
+      window.MyTeam.awardRp?.('idea', 3)?.catch?.(() => {});
+    }
   }, 15000);
 }
 
