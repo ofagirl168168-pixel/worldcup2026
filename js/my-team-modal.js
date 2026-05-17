@@ -2978,7 +2978,13 @@
     if (r.tickets)        parts.push('🎟️ ' + r.tickets);
     if (r.coach_tickets)  parts.push('👔 ' + r.coach_tickets);
     if (r.gems)           parts.push('💎 ' + r.gems);
-    if (r.rp_all)         parts.push('⚙️ ' + r.rp_all);
+    // 訓練素材 — typed（新）
+    if (r.rp_tactical)    parts.push('🧠 ' + r.rp_tactical);
+    if (r.rp_physical)    parts.push('💪 ' + r.rp_physical);
+    if (r.rp_heart)       parts.push('❤️ ' + r.rp_heart);
+    if (r.rp_idea)        parts.push('💡 ' + r.rp_idea);
+    // rp_all（舊任務相容）→ 4 種同步
+    if (r.rp_all)         parts.push(`🧠💪❤️💡 各 ${r.rp_all}`);
     return parts.join(' ');
   }
 
