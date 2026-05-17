@@ -332,13 +332,18 @@
       if (typeof showToast === 'function') showToast('🎰 還沒有球員！先去抽卡');
       return;
     }
-    const healthyCount = players.filter(p => !p.injured_until || new Date(p.injured_until) <= new Date()).length;
-    if (players.length < 11) {
-      if (typeof showToast === 'function') showToast(`⚠️ 不足 11 人（目前 ${players.length}）— 先抽卡補滿陣容才能比賽`);
-      return;
-    }
-    if (healthyCount < 11) {
-      if (typeof showToast === 'function') showToast(`🏥 健康球員不足 11 人（${healthyCount}/11）— 用「傷病恢復包」治療或等他們康復`);
+    const now = new Date();
+    const healthyStarters = players.filter(p =>
+      p.in_starting_11 && (!p.injured_until || new Date(p.injured_until) <= now));
+    if (healthyStarters.length < 11) {
+      if (typeof showToast === 'function') {
+        const totalStarters = players.filter(p => p.in_starting_11).length;
+        if (totalStarters < 11) {
+          showToast(`⚠️ 先發只有 ${totalStarters}/11 人 — 去「球員」頁把板凳球員排進空位才能開賽`);
+        } else {
+          showToast(`🏥 健康先發只有 ${healthyStarters.length}/11 — 受傷球員無法上場、去「球員」換上板凳`);
+        }
+      }
       return;
     }
 

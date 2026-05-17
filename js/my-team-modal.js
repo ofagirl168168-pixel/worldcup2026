@@ -253,14 +253,26 @@
 
   async function _showStarterCompleteToast(n) {
     const team = window.MyTeam.getCached();
-    // 教學鏈：先抽教練 → 訓練 → 比賽 → 結束
+    // 教學鏈：抽教練 → 排陣容 → 訓練 → 比賽 → 結束
     let hasCoach = false;
     try {
       const { count } = await window.DB.from('user_coach').select('id', { count: 'exact', head: true });
       hasCoach = (count || 0) > 0;
     } catch (e) {}
+    // 撈球員陣容狀態
+    let startingCount = 0;
+    let benchAvailable = 0;
+    try {
+      const players = await window.MyTeam.fetchPlayers();
+      const now = new Date();
+      const healthy = (players || []).filter(p => !p.injured_until || new Date(p.injured_until) <= now);
+      startingCount = healthy.filter(p => p.in_starting_11).length;
+      benchAvailable = healthy.filter(p => !p.in_starting_11).length;
+    } catch (e) {}
+
     // 各 step 需要：DB flag 還沒設 AND 本地還沒標 done
     const needsCoachTutorial    = !hasCoach && !_tutorialDone.has('coach');
+    const needsRosterTutorial   = startingCount < 11 && benchAvailable > 0 && !_tutorialDone.has('roster');
     const needsTrainingTutorial = team && team.tutorial_first_training_used === false && !_tutorialDone.has('train');
     const needsTutorialMatch    = team && team.tutorial_match_done === false && !_tutorialDone.has('match');
 
@@ -270,19 +282,24 @@
       body = '接下來<b>抽你的第一位教練</b>！<br>教練會給你 buff + <b>解鎖新陣型</b>';
       primaryBtn = '👔 去抽教練';
       action = 'coach';
+    } else if (needsRosterTutorial) {
+      title = '陣容還缺人！';
+      body = `先發只有 <b>${startingCount}/11</b> 人。<br>把<b>板凳球員</b>排進陣容空位、湊滿 11 才能比賽`;
+      primaryBtn = '📋 去排陣容';
+      action = 'roster';
     } else if (needsTrainingTutorial) {
-      title = '太棒了！';
+      title = '陣容齊了！';
       body = '球員可以<b>訓練變強</b>！<br>接下來教你怎麼訓練';
       primaryBtn = '🏋️ 去訓練球員';
       action = 'train';
     } else if (needsTutorialMatch) {
-      title = '陣容已就緒！';
-      body = '接下來打<b>第一場熱身賽</b>看你的隊伍表現 ⚽';
+      title = '一切就緒！';
+      body = '打<b>第一場熱身賽</b>看你的隊伍表現 ⚽';
       primaryBtn = '🏟️ 去比賽';
       action = 'match';
     } else {
       title = '🎉 新手指引完成！';
-      body = '你已學會：<b>抽卡 / 抽教練 / 訓練 / 比賽</b>。<br>之後可以去設定調整陣型 / 球衣 / 隊徽。';
+      body = '你已學會：<b>抽卡 / 抽教練 / 排陣容 / 訓練 / 比賽</b>。<br>之後可以去設定調整陣型 / 球衣 / 隊徽。';
       primaryBtn = '完成';
       action = 'done';
     }
@@ -312,6 +329,29 @@
           await _waitForAllClosed(['.coach-ritual-overlay', '.mt-coach-result-overlay'], 180000);
           _tutorialDone.add('coach');
           setTimeout(() => _showStarterCompleteToast(0), 600);
+        });
+      } else if (action === 'roster') {
+        // 陣容空位引導：點板凳球員 → 點空位 → 確認上場
+        _spotlightTab('roster', '.mt-bench-player', '點板凳球員、選他上場', async () => {
+          // 等空位 highlight（swap mode 觸發後 .mt-pitch-empty-slot 變 visible）
+          if (!await _waitForOpen('.mt-pitch-empty-slot', 5000)) {
+            _tutorialDone.add('roster'); _showStarterCompleteToast(0); return;
+          }
+          await _delay(300);
+          _attachSpotlight('.mt-pitch-empty-slot', '點空位讓他上場', async () => {
+            // 等一下 DB 更新
+            await _delay(800);
+            await window.MyTeam.refresh?.();
+            // 重新檢查是否還有空位（萬一還沒滿 11）
+            const players = await window.MyTeam.fetchPlayers();
+            const now = new Date();
+            const stillStarting = (players || []).filter(p =>
+              p.in_starting_11 && (!p.injured_until || new Date(p.injured_until) <= now)).length;
+            if (stillStarting >= 11) {
+              _tutorialDone.add('roster');
+            }
+            setTimeout(() => _showStarterCompleteToast(0), 400);
+          });
         });
       } else if (action === 'train') {
         // 訓練是 3 段：集訓升等 button → picker 中選球員 → preview 確認 → result modal 關
