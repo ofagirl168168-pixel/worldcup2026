@@ -8631,6 +8631,25 @@ button.mt-train-point-card:active { transform: translateY(0); }
   font-size: 10.5px;
   letter-spacing: 0.3px;
 }
+.mt-train-preview-val-cap {
+  color: #ffd54f;
+  background: rgba(255,213,79,0.18);
+  border: 1px solid rgba(255,213,79,0.5);
+  padding: 1px 5px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+}
+.mt-focus-tier-cap-warn {
+  background: rgba(255,213,79,0.10);
+  border: 1px solid rgba(255,213,79,0.35);
+  color: #ffd54f;
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 1.5;
+}
 
 .mt-train-preview-cost {
   display: flex;

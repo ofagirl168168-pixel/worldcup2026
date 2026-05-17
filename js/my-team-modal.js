@@ -6001,6 +6001,24 @@
     });
   }
 
+  // 屬性 cap = Lv 硬上限 + 星等 × 5（跟 attr_hard_ceiling_for_level SQL 公式同步）
+  function _attrCeilingForLv(lv) {
+    if (lv >= 50) return 145;
+    if (lv >= 45) return 140;
+    if (lv >= 40) return 135;
+    if (lv >= 35) return 130;
+    if (lv >= 30) return 125;
+    if (lv >= 25) return 120;
+    if (lv >= 20) return 115;
+    if (lv >= 15) return 110;
+    if (lv >= 10) return 105;
+    return 99;
+  }
+  function _attrCapForPlayer(p, willLvUp) {
+    const newLv = (p.level || 1) + (willLvUp ? 1 : 0);
+    return _attrCeilingForLv(newLv) + ((p.bond || 0) * 5);
+  }
+
   // ─── 集訓營 preview：選 4 個時長之一 + 顯示能力條增量 ───
   function _openFocusTrainPreview(p, attr, onSuccess) {
     const c = p.card || {};
@@ -6052,6 +6070,7 @@
           `).join('')}
         </div>
 
+        <div class="mt-focus-tier-cap-warn" id="mt-focus-tier-cap-warn" style="display:none"></div>
         <div class="mt-focus-tier-finish" id="mt-focus-tier-finish"></div>
 
         <div class="mt-train-preview-actions">
@@ -6077,12 +6096,18 @@
     function renderBars() {
       const tier = TIERS.find(t => t.id === selectedTier);
       const gain = tier?.gain || 0;
+      const cap = _attrCapForPlayer(p, !!tier?.lvUp);  // 訓練後的 cap（含可能的 Lv up）
+      const curTarget = p['current_' + attr] || 0;
+      const actualGain = Math.max(0, Math.min(cap, curTarget + gain) - curTarget);
+      const capWarn = (gain > 0 && actualGain < gain);  // 部分或全部被 cap 吃掉
+      const fullyCapped = (gain > 0 && actualGain === 0);
       const barsHost = overlay.querySelector('#mt-focus-preview-bars');
       barsHost.innerHTML = ATTR_KEYS.map(k => {
         const cur = p['current_' + k] || 0;
         const isTarget = k === attr;
-        const projVal = isTarget ? Math.min(99, cur + gain) : cur;
+        const projVal = isTarget ? Math.min(cap, cur + gain) : cur;
         const gainW = Math.max(0, projVal - cur);
+        const shownGain = isTarget ? projVal - cur : 0;
         return `
           <div class="mt-train-preview-row ${isTarget ? 'is-target' : ''}">
             <span class="mt-train-preview-label">${ATTR_LABELS[k]}</span>
@@ -6092,11 +6117,26 @@
             </div>
             <span class="mt-train-preview-val">
               <span class="mt-train-preview-val-cur">${cur}</span>
-              ${isTarget && gain > 0 ? `<span class="mt-train-preview-val-gain">+${gain}</span>` : ''}
+              ${isTarget && gain > 0 ? (shownGain > 0
+                ? `<span class="mt-train-preview-val-gain">+${shownGain}</span>`
+                : `<span class="mt-train-preview-val-cap">⚠️ 已滿</span>`) : ''}
             </span>
           </div>
         `;
       }).join('');
+      // cap 提示：若訓練後會被上限切掉
+      const capHost = overlay.querySelector('#mt-focus-tier-cap-warn');
+      if (capHost) {
+        if (fullyCapped) {
+          capHost.innerHTML = `⚠️ ${ATTR_LABELS[attr]} 已達上限 ${cap}，這次訓練不會提升（升星等可解鎖更高上限）`;
+          capHost.style.display = '';
+        } else if (capWarn) {
+          capHost.innerHTML = `ℹ️ ${ATTR_LABELS[attr]} 訓練後達上限 ${cap}（實得 +${actualGain}、剩 ${gain - actualGain} 點被上限吃掉）`;
+          capHost.style.display = '';
+        } else {
+          capHost.style.display = 'none';
+        }
+      }
       // 完成時間顯示
       const finish = new Date(Date.now() + tier.dur * 1000);
       const today = new Date();
@@ -6191,25 +6231,45 @@
         </div>
 
         <div class="mt-train-preview-bars">
-          ${ATTR_KEYS.map(k => {
-            const cur = p['current_' + k] || 0;
-            const projMin = Math.min(99, cur + cfg.gainMin);
-            const projMax = Math.min(99, cur + cfg.gainMax);
-            const actMin = projMin - cur, actMax = projMax - cur;
-            return `
-              <div class="mt-train-preview-row">
-                <span class="mt-train-preview-label">${ATTR_LABELS[k]}</span>
-                <div class="mt-train-preview-bar">
-                  <div class="mt-train-preview-bar-cur" style="width:${cur}%"></div>
-                  <div class="mt-train-preview-bar-gain" style="left:${cur}%; width:${Math.max(0, projMax - cur)}%"></div>
+          ${(() => {
+            // train_player：訓練後 Lv +1
+            const cap = _attrCapForPlayer(p, true);
+            const capInfo = { hits: [], rows: '' };
+            capInfo.rows = ATTR_KEYS.map(k => {
+              const cur = p['current_' + k] || 0;
+              const projMin = Math.min(cap, cur + cfg.gainMin);
+              const projMax = Math.min(cap, cur + cfg.gainMax);
+              const actMin = projMin - cur, actMax = projMax - cur;
+              if (cur >= cap) capInfo.hits.push({ k, full: true });
+              else if (actMax < cfg.gainMax) capInfo.hits.push({ k, full: false });
+              const gainTxt = actMax === 0
+                ? '<span class="mt-train-preview-val-cap">⚠️ 已滿</span>'
+                : `<span class="mt-train-preview-val-gain">+${actMin === actMax ? actMin : actMin + '~' + actMax}</span>`;
+              return `
+                <div class="mt-train-preview-row">
+                  <span class="mt-train-preview-label">${ATTR_LABELS[k]}</span>
+                  <div class="mt-train-preview-bar">
+                    <div class="mt-train-preview-bar-cur" style="width:${cur}%"></div>
+                    <div class="mt-train-preview-bar-gain" style="left:${cur}%; width:${Math.max(0, projMax - cur)}%"></div>
+                  </div>
+                  <span class="mt-train-preview-val">
+                    <span class="mt-train-preview-val-cur">${cur}</span>
+                    ${gainTxt}
+                  </span>
                 </div>
-                <span class="mt-train-preview-val">
-                  <span class="mt-train-preview-val-cur">${cur}</span>
-                  <span class="mt-train-preview-val-gain">+${actMin === actMax ? actMin : actMin + '~' + actMax}</span>
-                </span>
-              </div>
-            `;
-          }).join('')}
+              `;
+            }).join('');
+            // 把 cap warn 也夾在這裡（避免改外層結構太多）
+            if (capInfo.hits.length) {
+              const fullList = capInfo.hits.filter(h => h.full).map(h => ATTR_LABELS[h.k]);
+              const partList = capInfo.hits.filter(h => !h.full).map(h => ATTR_LABELS[h.k]);
+              const parts = [];
+              if (fullList.length) parts.push(`${fullList.join('、')} 已達上限不再提升`);
+              if (partList.length) parts.push(`${partList.join('、')} 訓練後達上限`);
+              capInfo.rows += `<div class="mt-focus-tier-cap-warn" style="margin-top:8px">⚠️ ${parts.join('；')}（上限 ${cap}、升星可解鎖更高）</div>`;
+            }
+            return capInfo.rows;
+          })()}
         </div>
 
         <div class="mt-train-preview-cost">
