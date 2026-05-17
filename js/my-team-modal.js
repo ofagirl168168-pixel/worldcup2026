@@ -331,26 +331,30 @@
           setTimeout(() => _showStarterCompleteToast(0), 600);
         });
       } else if (action === 'roster') {
-        // 陣容空位引導：點板凳球員 → 點空位 → 確認上場
-        _spotlightTab('roster', '.mt-bench-player', '點板凳球員、選他上場', async () => {
-          // 等空位 highlight（swap mode 觸發後 .mt-pitch-empty-slot 變 visible）
-          if (!await _waitForOpen('.mt-pitch-empty-slot', 5000)) {
+        // 陣容引導 3 段：板凳球員 → profile modal「設為先發」按鈕 → 空位
+        _spotlightTab('roster', '.mt-bench-player', '點板凳球員、看詳細', async () => {
+          // 等 profile modal 開
+          if (!await _waitForOpen('.mt-profile-overlay', 5000)) {
             _tutorialDone.add('roster'); _showStarterCompleteToast(0); return;
           }
           await _delay(300);
-          _attachSpotlight('.mt-pitch-empty-slot', '點空位讓他上場', async () => {
-            // 等一下 DB 更新
-            await _delay(800);
-            await window.MyTeam.refresh?.();
-            // 重新檢查是否還有空位（萬一還沒滿 11）
-            const players = await window.MyTeam.fetchPlayers();
-            const now = new Date();
-            const stillStarting = (players || []).filter(p =>
-              p.in_starting_11 && (!p.injured_until || new Date(p.injured_until) <= now)).length;
-            if (stillStarting >= 11) {
-              _tutorialDone.add('roster');
+          _attachSpotlight('.mt-profile-overlay [data-act="toggle-start"]', '點「設為先發」', async () => {
+            // 等 profile modal 關 + 空位出現
+            await _waitForAllClosed(['.mt-profile-overlay'], 3000);
+            if (!await _waitForOpen('.mt-pitch-empty-slot', 3000)) {
+              _tutorialDone.add('roster'); _showStarterCompleteToast(0); return;
             }
-            setTimeout(() => _showStarterCompleteToast(0), 400);
+            await _delay(300);
+            _attachSpotlight('.mt-pitch-empty-slot', '點空位讓他上場', async () => {
+              await _delay(800);
+              await window.MyTeam.refresh?.();
+              const players = await window.MyTeam.fetchPlayers();
+              const now = new Date();
+              const stillStarting = (players || []).filter(p =>
+                p.in_starting_11 && (!p.injured_until || new Date(p.injured_until) <= now)).length;
+              if (stillStarting >= 11) _tutorialDone.add('roster');
+              setTimeout(() => _showStarterCompleteToast(0), 400);
+            });
           });
         });
       } else if (action === 'train') {
