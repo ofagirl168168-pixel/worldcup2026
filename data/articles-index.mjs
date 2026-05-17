@@ -64,8 +64,8 @@ export default [
   {
     "id": "epl-071",
     "tournament": "epl",
-    "title": "【賽後戰報】狼隊 1-2 富勒姆：Sessegnon 與 Muniz 閃擊建功，富勒姆衝擊歐冠",
-    "summary": "英超第37輪——富勒姆在莫利紐球場以 2-1 擊敗已降級的狼隊，Sessegnon 開場 58 秒破門、Muniz 下半場開場即進。富勒姆升至第九，歐冠資格仍有希望。",
+    "title": "【賽後戰報】狼隊 1-1 富勒姆：Mane 先馳得點，Robinson 點球追平",
+    "summary": "英超第37輪——已降級的狼隊在莫利紐球場與富勒姆 1-1 握手言和。Mateus Mane 25 分鐘先開紀錄，Antonee Robinson 在補時階段以點球扳平。",
     "date": "2026-05-17",
     "category": "賽後深度分析",
     "readTime": null,

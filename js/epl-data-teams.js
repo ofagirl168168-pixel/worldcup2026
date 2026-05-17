@@ -907,11 +907,10 @@ window.EPL_MATCHES = [
 
   // 狼隊 vs 富勒姆 | 05/17 22:00 台灣時間 (05/17 15:00 BST)
   {id:'EPL-MW37-WOL-FUL', matchday:37, date:'2026-05-17', time:'22:00', home:'WOL', away:'FUL', stage:'league',
-   status:'finished', score:{h:1,a:2}, halfTime:{h:1,a:1},
+   status:'finished', score:{h:1,a:1}, halfTime:{h:1,a:1},
    goals:[
-     {min:'1',player:'Ryan Sessegnon',side:'a'},
-     {min:'18',player:'Joao Gomes',side:'h'},
-     {min:'46',player:'Rodrigo Muniz',side:'a'}
+     {min:'25',player:'Mateus Mane',side:'h'},
+     {min:'45+4',player:'Antonee Robinson',side:'a',note:'pen'}
    ]},
 
   // 紐卡索 vs 西漢姆 | 05/18 00:30 台灣時間 (05/17 17:30 BST)
