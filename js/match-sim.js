@@ -301,17 +301,27 @@
         cx += (p._tackleDirX || 0) * slideAmt;
         cy += (p._tackleDirY || 0) * slideAmt;
       }
-      // GK 撲球視覺位移：沿球門線僅 Y 軸、不偏 X（GK 不離開門線）
+      // GK 撲球視覺位移：沿球門線僅 Y 軸（不偏 X、GK 不離開門線）
+      // 動畫分 3 段：anticipation（蹲）→ launch（飛撲）→ hold（保持撲出姿勢）
       const diving = p._diveUntil && state.frame < p._diveUntil;
       if (diving) {
         const dAge = state.frame - (p._diveStart || state.frame);
-        const dDur = (p._diveUntil - p._diveStart) || 24;
+        const dDur = (p._diveUntil - p._diveStart) || 60;
         const t = Math.min(1, dAge / dDur);
-        const maxSlide = (p._diveDistance || 0.06) * PITCH_H * 1.6;
-        // 0~0.4：快速飛撲。0.4~1：定格保持 95% 撲出狀態
-        const slide = t < 0.4
-          ? (t / 0.4) * maxSlide
-          : maxSlide * (0.95 + Math.sin((t - 0.4) * Math.PI / 0.6 / 2) * 0.05);
+        const maxSlide = (p._diveDistance || 0.08) * PITCH_H * 1.6;
+        let slide;
+        if (t < 0.15) {
+          // 0-15%：蹲下準備（反向小幅位移）
+          slide = -(t / 0.15) * 3;
+        } else if (t < 0.55) {
+          // 15-55%：爆發飛撲（ease-out）
+          const launchT = (t - 0.15) / 0.40;
+          slide = -3 + (1 - Math.pow(1 - launchT, 2)) * (maxSlide + 3);
+        } else {
+          // 55-100%：hold（微微震動表示努力撐著）
+          const holdT = (t - 0.55) / 0.45;
+          slide = maxSlide * (1 - holdT * 0.05) + Math.sin(state.frame * 0.4) * 0.6;
+        }
         cy += (p._diveDirY || 1) * slide;
       }
 
@@ -461,15 +471,13 @@
         const srcX = frame * frameW;
         const srcY = dirRow * frameH;
         if (diving) {
-          // 撲球：旋轉 ±75 度（朝 dive 方向橫躺）+ 略放大、加運動模糊感
+          // 撲球：LPC hurt 最後一格本身就是「整個倒地」、不再 rotate
+          // 朝撲球方向 vertical flip：頭朝撲球方向（上撲 → 頭朝上、下撲 → 頭朝下）
+          // 注意：LPC hurt frame 5 默認頭朝下、所以「上撲」要 scaleY(-1) 翻過來
           ctx.save();
           ctx.translate(cx, cy);
-          const dAge = state.frame - (p._diveStart || state.frame);
-          const t = Math.min(1, dAge / ((p._diveUntil - p._diveStart) || 24));
-          // 前半快速轉到 75 度、後半保持
-          const angleDeg = (t < 0.4 ? (t / 0.4) * 75 : 75) * (p._diveDirY || 1);
-          ctx.rotate(angleDeg * Math.PI / 180);
-          ctx.scale(1.1, 1.1);
+          const flipY = (p._diveDirY || 1) < 0 ? -1 : 1;
+          ctx.scale(1.15, 1.15 * flipY);
           ctx.drawImage(sheet, srcX, srcY, frameW, frameH, -drawW / 2, -drawH / 2, drawW, drawH);
           ctx.restore();
         } else {
@@ -1171,13 +1179,14 @@
       state.stats[state.possession].shots++;
 
       // 每次射門都觸發 GK 撲球視覺（沿球門線朝 ballTargetY 撲）
+      // 撲球持續：射門飛行時間 + 36 幀 hold（射門當下就開始撲、撲完還會 hold 一陣子）
       const defTeam = state.possession === 'h' ? 'a' : 'h';
       const gkPlayer = players.find(p => p.team === defTeam && p.role === 'GK');
       if (gkPlayer) {
         gkPlayer._diveStart = state.frame;
-        gkPlayer._diveUntil = state.frame + state.ballTravelTotal + 6;
+        gkPlayer._diveUntil = state.frame + state.ballTravelTotal + 36;
         gkPlayer._diveDirY = Math.sign(state.ballTargetY - gkPlayer.y) || 1;
-        gkPlayer._diveDistance = Math.min(0.10, Math.abs(state.ballTargetY - gkPlayer.y));
+        gkPlayer._diveDistance = Math.min(0.12, Math.abs(state.ballTargetY - gkPlayer.y) + 0.04);
       }
     }
 
