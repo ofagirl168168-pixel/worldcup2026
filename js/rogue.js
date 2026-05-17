@@ -1155,6 +1155,11 @@
           if (typeof renderRogueLeaderboard === 'function') renderRogueLeaderboard();
         });
       });
+      // 我的球隊：射門挑戰算 1 場 → 💡 靈感素材 +5
+      if (window.MyTeamBetaEnabled?.() && window.MyTeam) {
+        window.MyTeam.trackQuest?.('rogue_play', 1).catch(() => {});
+        window.MyTeam.awardRp?.('idea', 5).catch?.(() => {});
+      }
     } else {
       console.log('未登入，分數未上傳');
     }

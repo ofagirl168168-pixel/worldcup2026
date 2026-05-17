@@ -1870,6 +1870,11 @@
       if (typeof window.completeDailyTask === 'function') {
         try { window.completeDailyTask('play_friend_room'); } catch (e) {}
       }
+      // 我的球隊：參加 1 場挑戰賽 → ❤️ 鬥志素材 +5 + trackQuest
+      if (window.MyTeamBetaEnabled?.() && window.MyTeam) {
+        window.MyTeam.trackQuest?.('friend_room_play', 1).catch(() => {});
+        window.MyTeam.awardRp?.('heart', 5).catch?.(() => {});
+      }
       // 「房主先投」獨立 modal 用：成功送出後跑 onPickSaved（會關 modal、把 host_picked 標起來、跳分享）
       if (typeof state.onPickSaved === 'function') {
         try { await state.onPickSaved(state); } catch (cbe) { console.warn('onPickSaved cb', cbe); }
