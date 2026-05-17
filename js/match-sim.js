@@ -301,19 +301,32 @@
         cx += (p._tackleDirX || 0) * slideAmt;
         cy += (p._tackleDirY || 0) * slideAmt;
       }
-      // GK 撲球視覺：實際位移已 snap、視覺只做固定距離的小幅撲擊 + 跳起感
-      // 不依射門距離縮放、每次撲都同樣一致感
+      // GK 撲球視覺：實際位移已 snap (p.y = ballTargetY)、視覺從原位置 ease 到目標
+      //   避免「snap 瞬移」看起來像瞬移、用視覺 displacement 還原完整撲球軌跡
       const diving = p._diveUntil && state.frame < p._diveUntil;
       if (diving) {
         const dAge = state.frame - (p._diveStart || state.frame);
         const dDur = (p._diveUntil - p._diveStart) || 24;
         const t = Math.min(1, dAge / dDur);
-        const SLIDE_PX = 8;  // 固定小幅延伸（離影子不會太遠）
-        let slide;
-        if (t < 0.20) slide = -(t / 0.20) * 2;                              // 蹲
-        else if (t < 0.60) slide = -2 + (1 - Math.pow(1 - (t - 0.20) / 0.40, 2)) * (SLIDE_PX + 2);
-        else              slide = SLIDE_PX;                                  // hold
-        cy += (p._diveDirY || 1) * slide;
+        const fromY = (p._diveFromY != null) ? p._diveFromY : p.y;
+        const dirY = p._diveDirY || 1;
+        const absDist = Math.abs((p.y - fromY) * PITCH_H);  // 撲球距離 (px)
+        const OVERSHOOT = 8;  // 撲到目標後再多延伸一點
+        let displacement;
+        if (t < 0.20) {
+          // 蹲伏：反向蹲 2px
+          displacement = -(t / 0.20) * 2;
+        } else if (t < 0.85) {
+          // 飛撲：ease-out 從 -2 → absDist + OVERSHOOT
+          const phaseT = (t - 0.20) / 0.65;
+          const ease = 1 - Math.pow(1 - phaseT, 2);
+          displacement = -2 + ease * (absDist + OVERSHOOT + 2);
+        } else {
+          // hold 終點
+          displacement = absDist + OVERSHOOT;
+        }
+        // cy 此時 = p.y * PITCH_H (snap 後位置) → 改回從原位置出發
+        cy = fromY * PITCH_H + dirY * displacement;
         // 跳起感：身體往上飄拋物線
         if (t >= 0.10 && t < 0.75) {
           const jumpT = (t - 0.10) / 0.65;
@@ -1185,12 +1198,14 @@
       const gkPlayer = players.find(p => p.team === defTeam && p.role === 'GK');
       if (gkPlayer) {
         const startY = gkPlayer.y;
-        // 實際位移：朝球目標方向移動（不直接 snap、保留 1 段視覺移動感）
+        // 物理：snap 到球目標（避免球被「磁吸」過來）
         gkPlayer.y = state.ballTargetY;
         gkPlayer.ty = state.ballTargetY;
         gkPlayer._diveStart = state.frame;
         gkPlayer._diveUntil = state.frame + state.ballTravelTotal + 6;
         gkPlayer._diveDirY = Math.sign(state.ballTargetY - startY) || 1;
+        // 視覺：從 startY 出發 ease 到 ballTargetY、避免看起來像瞬移
+        gkPlayer._diveFromY = startY;
       }
     }
 
