@@ -914,7 +914,14 @@ window.EPL_MATCHES = [
    ]},
 
   // 紐卡索 vs 西漢姆 | 05/18 00:30 台灣時間 (05/17 17:30 BST)
-  {id:'EPL-MW37-NEW-WHU', matchday:37, date:'2026-05-18', time:'00:30', home:'NEW', away:'WHU', stage:'league', status:'upcoming'},
+  {id:'EPL-MW37-NEW-WHU', matchday:37, date:'2026-05-18', time:'00:30', home:'NEW', away:'WHU', stage:'league',
+   status:'finished', score:{h:3,a:1}, halfTime:{h:2,a:0},
+   goals:[
+     {min:'15',player:'Nick Woltemade',side:'h'},
+     {min:'19',player:'William Osula',side:'h'},
+     {min:'65',player:'William Osula',side:'h'},
+     {min:'69',player:'Valentín Castellanos',side:'a'}
+   ]},
 
   // 兵工廠 vs 伯恩利 | 05/19 03:00 台灣時間 (05/18 20:00 BST)
   {id:'EPL-MW37-ARS-BUR', matchday:37, date:'2026-05-19', time:'03:00', home:'ARS', away:'BUR', stage:'league', status:'upcoming'},

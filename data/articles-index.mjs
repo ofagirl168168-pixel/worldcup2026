@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "epl-072",
+    "tournament": "epl",
+    "title": "【賽後戰報】紐卡索 3-1 西漢姆：Osula 梅開二度，鐵鎚幫跌入降級深淵",
+    "summary": "英超第37輪——紐卡索在聖詹姆斯公園以 3-1 擊敗西漢姆。Woltemade 與 Osula 上半場連下兩城，Osula 下半場再添一球，Castellanos 扳回顏面但無力回天，西漢姆降級幾成定局。",
+    "date": "2026-05-18",
+    "category": "賽後深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-065",
     "tournament": "epl",
     "title": "【賽前分析】伯恩茅斯 vs 曼城：冠軍之路最後客場考驗，Haaland 能否射下爭冠關鍵三分？",
