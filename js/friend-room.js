@@ -1503,13 +1503,17 @@
       e.preventDefault();
       // 1) 關閉房間 modal
       if (state && state._close) state._close();
-      // 2) 切到賽程 section
-      if (typeof window.showSection === 'function') {
-        try { window.showSection('schedule'); } catch (err) {}
-      }
-      // 3) 滾到該場比賽 card（renderSchedule 後 DOM 重建、稍延遲再找）
+
       const matchId = state?.room?.match_meta?.match_id;
-      if (matchId) {
+      const targetLeague = state?.room?.match_meta?.league;  // 'epl' | 'ucl' | 'wc'
+      const curLeague = window.Tournament?.current?.();
+
+      const goToScheduleAndScroll = () => {
+        if (typeof window.showSection === 'function') {
+          try { window.showSection('schedule'); } catch (err) {}
+        }
+        if (!matchId) return;
+        // renderSchedule 重建後找 card、最多重試 8 次
         const tryScroll = (attempt = 0) => {
           const card = document.querySelector(`#section-schedule .match-card[data-match-id="${matchId}"]`);
           if (card) {
@@ -1517,10 +1521,28 @@
             card.classList.add('match-card--highlight');
             setTimeout(() => card.classList.remove('match-card--highlight'), 2200);
           } else if (attempt < 8) {
-            setTimeout(() => tryScroll(attempt + 1), 150);
+            setTimeout(() => tryScroll(attempt + 1), 200);
           }
         };
-        setTimeout(tryScroll, 100);
+        setTimeout(tryScroll, 150);
+      };
+
+      // 需要切賽事 (EPL ↔ UCL ↔ WC) → 等 tournamentChanged 事件
+      const needSwitch = targetLeague && curLeague && curLeague !== targetLeague
+        && typeof window.Tournament?.switch === 'function';
+      if (needSwitch) {
+        let done = false;
+        const onSwitched = () => {
+          if (done) return;
+          done = true;
+          // 給 swapGlobalData + renderSchedule 一點時間再 scroll
+          setTimeout(goToScheduleAndScroll, 200);
+        };
+        window.addEventListener('tournamentChanged', onSwitched, { once: true });
+        setTimeout(onSwitched, 1800);  // 保險 fallback：動畫總長 ~1000ms
+        try { window.Tournament.switch(targetLeague); } catch (err) { onSwitched(); }
+      } else {
+        goToScheduleAndScroll();
       }
     });
     // 非同步拉所有 picks 渲染得獎名單
