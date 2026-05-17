@@ -649,7 +649,7 @@
           overlay.classList.remove('open');
           setTimeout(() => overlay.remove(), 200);
           if (typeof showToast === 'function') {
-            showToast(`✅ ${target.card?.name || '球員'} 速度 +1！記得常常回來訓練`);
+            showToast(`✅ ${target.card?.name || '球員'} 速度 +1！訓練讓球員越來越強、多回來練！`);
           }
           // 跳到球員 tab
           _currentTab = 'roster';
@@ -1696,7 +1696,7 @@
     if (newOnes.size === 0) return;
     const list = [...newOnes].join('、');
     if (typeof showToast === 'function') {
-      showToast(`🎉 解鎖新陣型：${list}！可到「球員」tab 切換`);
+      showToast(`🎉 教練解鎖新陣型：${list}！快到「球員」tab 切換、試出最強組合！`);
     }
   }
 
@@ -2962,7 +2962,7 @@
         btn.disabled = true; btn.textContent = '領取中…';
         try {
           const res = await window.MyTeam.claimQuest(qid);
-          if (typeof showToast === 'function') showToast(`✅ 領取：${_rewardLabel(res.reward)}`);
+          if (typeof showToast === 'function') showToast(`🎁 任務獎勵入袋：${_rewardLabel(res.reward)}！繼續達成下一個目標！`);
           renderTab();
         } catch (e) {
           alert('領取失敗：' + (e.message || e));
@@ -4571,7 +4571,9 @@
           overlay.classList.remove('open');
           setTimeout(() => overlay.remove(), 200);
           if (typeof showToast === 'function') {
-            showToast(res.is_duplicate ? `⭐ ${res.name} ★+1` : `🎉 收到 ${res.name}！`);
+            showToast(res.is_duplicate
+              ? `⭐ ${res.name} 星等 +1！上限解鎖更多、繼續訓練！`
+              : `🎉 新球員 ${res.name} 加入球隊！快去排進陣容讓他上場！`);
           }
           await window.MyTeam.refresh?.();
           renderTab();
@@ -6092,7 +6094,7 @@
         await window.MyTeam.startTimedTraining(p.id, attr, selectedTier);
         if (typeof showToast === 'function') {
           const tier = TIERS.find(t => t.id === selectedTier);
-          showToast(`🏋️ ${c.name} 進入 ${tier.label} ${ATTR_LABELS[attr]} 集訓營！`);
+          showToast(`🏋️ ${c.name} 進入 ${tier.label} ${ATTR_LABELS[attr]} 集訓營！結束記得回來領、會送 💪 體能素材！`);
         }
         close();
         if (typeof onSuccess === 'function') onSuccess();

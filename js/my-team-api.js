@@ -132,7 +132,7 @@
       try {
         const ok = await awardTickets(1, 'daily_login');
         if (ok && typeof showToast === 'function') {
-          showToast('🎟️ 每日登入獎勵 +1 抽券、到「我的隊伍 → 抽卡」使用');
+          showToast('🎟️ 每日登入禮：+1 球員抽卡券！快去抽取心儀的球星吧！');
         }
         // 還沒建隊：把 ticket 留著、建隊後 awardTickets 會 short-circuit、但記下來
         // 已透過 mt_first_ever_pull_v1 確保建隊路徑、這裡若還沒建隊也 OK、之後 awardTickets 撈 my_team 失敗會 return false
@@ -171,9 +171,13 @@
       .update({ stamina: newStamina })
       .eq('user_id', uid);
     if (error) { console.error('[my-team] awardStamina error', error); return false; }
+    const gained = newStamina - (_cache.stamina || 0);
     _cache.stamina = newStamina;
     _saveCache();
     _emitChange();
+    if (typeof showToast === 'function' && gained > 0) {
+      showToast(`⚡ +${gained} 體力，可以再打 ${gained} 場比賽！`);
+    }
     return true;
   }
 
@@ -303,7 +307,12 @@
   // 給單一 type 訓練素材（擂台 / 預測 / 文章活動觸發）
   // type: 'tactical' | 'physical' | 'heart' | 'idea'
   const _RP_ICON  = { tactical: '🧠', physical: '💪', heart: '❤️', idea: '💡' };
-  const _RP_LABEL = { tactical: '戰術', physical: '體能', heart: '鬥志', idea: '靈感' };
+  const _RP_BLURB = {
+    tactical: '戰術素材，去訓練球員、打出更聰明的隊形！',
+    physical: '體能素材，球員跑得久、後半場不掉速！',
+    heart:    '鬥志素材，氣場滿滿、關鍵時刻挺得住！',
+    idea:     '靈感素材，球場上的小聰明來自這裡！',
+  };
   async function awardRp(type, amount) {
     if (!window.DB || !window.currentUser) return null;
     if (!amount || amount <= 0) return null;
@@ -312,7 +321,9 @@
       if (error) { console.warn('[my-team] award_rp', error); return null; }
       // Toast 通知玩家拿到素材
       if (typeof showToast === 'function') {
-        showToast(`+${amount} ${_RP_ICON[type] || ''} ${_RP_LABEL[type] || type} 訓練素材`);
+        const icon = _RP_ICON[type] || '';
+        const blurb = _RP_BLURB[type] || '訓練素材';
+        showToast(`${icon} +${amount} ${blurb}`);
       }
       return data;
     } catch (e) { return null; }

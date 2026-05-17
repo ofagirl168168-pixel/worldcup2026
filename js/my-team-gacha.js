@@ -73,7 +73,7 @@
     if (count > 3) {
       await window.MyTeam.awardTickets(count, source);
       if (typeof showToast === 'function') {
-        showToast(`🎟️ +${count} 抽券（${source}）— 累積在背包，去 my-team 抽卡`);
+        showToast(`🎟️ +${count} 球員抽卡券！到「我的隊伍 → 抽卡」抽出心儀的球星！`);
       }
       return { granted: count, mode: 'inventory' };
     }

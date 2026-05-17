@@ -307,7 +307,7 @@
     window.DB?.rpc('injure_random_player', { p_chance_pct: 8 }).then(res => {
       const d = res?.data;
       if (d?.injured && typeof showToast === 'function') {
-        showToast(`🏥 ${d.name} 受傷了！${d.days} 天無法出賽`);
+        showToast(`🏥 ${d.name} 受傷了！${d.days} 天無法出賽、用「傷病恢復包」或等他自然康復`);
       }
     }).catch(() => {});
     return data;
