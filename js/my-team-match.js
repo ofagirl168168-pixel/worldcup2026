@@ -367,14 +367,15 @@
 
     let tier = 1, matchIdx = 0, opponent, isBoss = false, isTutorial = false;
     if (opts.tutorial) {
-      // 教學賽：弱對手保證新手贏（radar 全 25-30、無 talent）
+      // 教學賽：弱對手保證新手贏（radar 全 20-22 + stamina 25 = 真的弱）
+      // bug 修：之前 radar 沒 stamina → match-sim fallback 用 75 → 後半場反被對手體力輾壓
       isTutorial = true;
       opponent = {
         nameCN: '友隊 FC',
         flag: '🏟️',
         _isReal: false,
         _isTutorial: true,
-        radar: { attack: 25, defense: 22, midfield: 25, speed: 25, experience: 30 },
+        radar: { attack: 22, defense: 20, midfield: 22, speed: 22, stamina: 25, experience: 28 },
         keyPlayers: _generateAIPlayers(99999),
       };
     } else {
