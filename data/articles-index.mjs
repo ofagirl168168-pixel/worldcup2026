@@ -2,6 +2,16 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "17",
+    "tournament": "wc",
+    "title": "麥迪擂台第四週戰報：301 票！Messi 世界盃去不去引爆全站投票",
+    "summary": "第四週擂台累積 7 題、301 票、50 則留言——票數翻倍破紀錄。Messi 入選阿根廷初選名單一題獨攬 205 票，英超冠軍歸屬分裂指數破百。",
+    "date": "2026-05-18",
+    "category": "社群觀察",
+    "readTime": "5分鐘",
+    "shareable": true
+  },
+  {
     "id": "epl-072",
     "tournament": "epl",
     "title": "【賽後戰報】紐卡索 3-1 西漢姆：Osula 梅開二度，鐵鎚幫跌入降級深淵",
