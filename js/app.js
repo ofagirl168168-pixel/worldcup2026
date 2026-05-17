@@ -3663,12 +3663,28 @@ function renderFocus() {
     </div>`).join('');
 }
 
+// 文章靈感素材：停留 15 秒 + 每日上限 1 次（防刷）
+function _maybeAwardArticleIdea() {
+  if (!window.MyTeamBetaEnabled?.() || !window.MyTeam) return;
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
+  const key = 'mt_article_idea_' + today;
+  if (localStorage.getItem(key)) return;  // 今天已領過
+  setTimeout(() => {
+    // 15 秒後檢查文章 modal 還開著 + 今天還沒領過
+    const overlay = document.getElementById('article-modal-overlay');
+    if (!overlay || !overlay.classList.contains('open')) return;
+    if (localStorage.getItem(key)) return;
+    localStorage.setItem(key, '1');
+    window.MyTeam.awardRp?.('idea', 3)?.catch?.(() => {});
+  }, 15000);
+}
+
 function openArticle(id) {
   const a = ARTICLES.find(x => x.id === id);
   if (!a) return;
   completeDailyTask?.('read_article');
-  // 💡 靈感素材：看文章 +3
-  window.MyTeam?.awardRp?.('idea', 3)?.catch?.(() => {});
+  // 💡 靈感素材：看文章 +3、需停留 15 秒且當日尚未領過
+  _maybeAwardArticleIdea();
   _pushArticleUrl(a.id);
   _ensureArticleOverlay();
   document.getElementById('article-modal-inner').innerHTML = `
@@ -3691,8 +3707,8 @@ function openUCLArticle(id) {
   const a = arts.find(x => String(x.id) === String(id));
   if (!a) return;
   completeDailyTask?.('read_article');
-  // 💡 靈感素材：看文章 +3
-  window.MyTeam?.awardRp?.('idea', 3)?.catch?.(() => {});
+  // 💡 靈感素材：看文章 +3、需停留 15 秒且當日尚未領過
+  _maybeAwardArticleIdea();
   _pushArticleUrl(a.id);
   _ensureArticleOverlay();
   // Convert markdown-ish content to HTML

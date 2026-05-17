@@ -268,12 +268,18 @@
 
   // 給單一 type 訓練素材（擂台 / 預測 / 文章活動觸發）
   // type: 'tactical' | 'physical' | 'heart' | 'idea'
+  const _RP_ICON  = { tactical: '🧠', physical: '💪', heart: '❤️', idea: '💡' };
+  const _RP_LABEL = { tactical: '戰術', physical: '體能', heart: '鬥志', idea: '靈感' };
   async function awardRp(type, amount) {
     if (!window.DB || !window.currentUser) return null;
     if (!amount || amount <= 0) return null;
     try {
       const { data, error } = await window.DB.rpc('award_rp_to_team', { p_type: type, p_amount: amount });
       if (error) { console.warn('[my-team] award_rp', error); return null; }
+      // Toast 通知玩家拿到素材
+      if (typeof showToast === 'function') {
+        showToast(`+${amount} ${_RP_ICON[type] || ''} ${_RP_LABEL[type] || type} 訓練素材`);
+      }
       return data;
     } catch (e) { return null; }
   }

@@ -453,9 +453,17 @@
         // 任務：每次投票都算一次（不只首投）
         if (window.MyTeamBetaEnabled?.() && window.MyTeam) {
           window.MyTeam.trackQuest?.('arena_vote', 1).catch(() => {});
-          // ❤️ 鬥志素材 — 投票每次 +2、首投額外送 +8（首投 = lastDate !== today 那條件已 set 過 today）
+          // ❤️ 鬥志素材：首投 +10、之後 +2 但綁每日上限 5 次（共最多 20）
           const isFirstVoteToday = lastDate !== today;
-          window.MyTeam.awardRp?.('heart', isFirstVoteToday ? 10 : 2)?.catch?.(() => {});
+          const rpKey = 'mt_arena_vote_rp_' + today;
+          const cnt = parseInt(localStorage.getItem(rpKey) || '0') | 0;
+          if (isFirstVoteToday) {
+            localStorage.setItem(rpKey, '1');
+            window.MyTeam.awardRp?.('heart', 10)?.catch?.(() => {});
+          } else if (cnt < 6) {  // 首投 +1、再投 +5 次 = cnt 1-5 都還能領
+            localStorage.setItem(rpKey, String(cnt + 1));
+            window.MyTeam.awardRp?.('heart', 2)?.catch?.(() => {});
+          }
         }
       }
     } catch (e) {}
@@ -1419,9 +1427,9 @@
                   setTimeout(() => {
                     window.MyTeam.triggerInstantGacha?.(1, 'arena_comment').catch(() => {});
                   }, 1200);
+                  // ❤️ 鬥志素材 — 留言每則 +3、跟 ticket 一樣綁每週 5 則 cap
+                  window.MyTeam.awardRp?.('heart', 3)?.catch?.(() => {});
                 }
-                // ❤️ 鬥志素材 — 留言每則 +3
-                window.MyTeam.awardRp?.('heart', 3)?.catch?.(() => {});
               }
             } catch (e) {}
           }
