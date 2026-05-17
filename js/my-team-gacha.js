@@ -103,7 +103,7 @@
       'predict_5':     '完成 5 場預測獎勵',
       'predict_exact': '精準預測獎勵',
       'arena_comment': '擂台留言獎勵',
-      'pending':       '排隊中抽券',
+      'pending':       '排隊中球員抽卡券',
     })[source] || '免費抽卡';
   }
 

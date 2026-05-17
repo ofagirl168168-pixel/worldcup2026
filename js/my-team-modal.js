@@ -746,7 +746,7 @@
         </div>
 
         <div class="mt-onboard-perks">
-          <div class="mt-onboard-perk">🎟️ <b>5</b> 抽券</div>
+          <div class="mt-onboard-perk">🎟️ <b>5</b> 球員抽卡券</div>
           <div class="mt-onboard-perk">⚡ <b>5</b> 體力</div>
           <div class="mt-onboard-perk">🏆 Tier <b>1</b> 起跑</div>
         </div>
@@ -851,7 +851,7 @@
           <div class="mt-hub-stat">
             <div class="mt-hub-stat-icon">🎟️</div>
             <div class="mt-hub-stat-val" id="mt-hub-tickets">${team.tickets || 0}</div>
-            <div class="mt-hub-stat-label">抽券</div>
+            <div class="mt-hub-stat-label">球員抽卡券</div>
           </div>
           <div class="mt-hub-stat">
             <div class="mt-hub-stat-icon">👔</div>
@@ -1370,7 +1370,7 @@
         <div class="mt-roster-empty">
           <div class="mt-roster-empty-icon">📭</div>
           <div>還沒有球員！</div>
-          <div style="font-size:12px;margin:8px 0 16px;opacity:0.7">用抽券抽幾張卡組隊吧</div>
+          <div style="font-size:12px;margin:8px 0 16px;opacity:0.7">用球員抽卡券抽幾張卡組隊吧</div>
           <button class="mt-roster-empty-cta" data-go-gacha>🎰 去抽卡</button>
         </div>
       `;
@@ -4594,7 +4594,7 @@
       console.error('[my-team] gacha error', err);
       const msg = String(err.message || err);
       let friendly = '抽卡失敗：' + msg;
-      if (msg.includes('INSUFFICIENT_TICKETS')) friendly = '⚠️ 抽券不足';
+      if (msg.includes('INSUFFICIENT_TICKETS')) friendly = '⚠️ 球員抽卡券不足';
       else if (msg.includes('NO_TEAM')) friendly = '⚠️ 請先建立球隊';
       else if (msg.includes('NOT_LOGGED_IN')) friendly = '⚠️ 請先登入';
       if (typeof showToast === 'function') showToast(friendly);
