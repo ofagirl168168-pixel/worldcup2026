@@ -437,6 +437,8 @@
     `;
     document.body.appendChild(overlay);
     const removeBlocker = _installClickBlocker(target);
+    // 教學期間鎖住所有 modal X close、避免使用者中途離開破壞流程
+    document.body.classList.add('mt-spotlight-active');
     const ring  = overlay.querySelector('#mt-spotlight-ring');
     const hintEl = overlay.querySelector('#mt-spotlight-hint');
     const hintText = overlay.querySelector('.mt-spotlight-hint-text');
@@ -488,6 +490,7 @@
       window.removeEventListener('scroll', reposition, true);
       window.removeEventListener('resize', reposition);
       removeBlocker();
+      document.body.classList.remove('mt-spotlight-active');
       overlay.classList.add('is-fading');
       setTimeout(() => overlay.remove(), 300);
       if (onClicked) onClicked();

@@ -3184,6 +3184,12 @@
   transition: opacity 0.3s ease;
 }
 .mt-spotlight.is-fading { opacity: 0; }
+/* 教學 spotlight active 時鎖住所有 modal X close，避免使用者中途離開破壞流程 */
+body.mt-spotlight-active .mt-modal-close {
+  pointer-events: none;
+  opacity: 0.25;
+  cursor: not-allowed;
+}
 .mt-spotlight-ring {
   position: fixed;
   border: 3px solid #ffd96f;
