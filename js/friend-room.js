@@ -181,9 +181,9 @@
   //   開賽前 → 倒數
   //   開賽後 < 5 min → 🔴 進行中
   //   開賽後 5min ~ 1hr → ⏳ 結算中
-  //   ended + 有比分 → 🎮 模擬比分 X-Y（強調是模擬賽結果、不是真實比分）
-  //   ended + 無比分 → 🎮 模擬結束
-  //   1 小時後沒人觀戰 → 🎮 模擬結束（伺服器 cron 會把 stale live 標 ended）
+  //   ended + 有比分 → 模擬比分 X-Y（強調是模擬賽結果、不是真實比分）
+  //   ended + 無比分 → 模擬賽結束
+  //   1 小時後沒人觀戰 → 模擬賽結束（伺服器 cron 會把 stale live 標 ended）
   function _countdown(kickoffISO, room) {
     const t = new Date(kickoffISO).getTime() - Date.now();
     if (t > 0) {
@@ -198,9 +198,9 @@
     if (status === 'ended') {
       const rh = room.result_home, ra = room.result_away;
       if (rh != null && ra != null) {
-        return `<span class="fr-cd-ended fr-cd-ended--sim">🎮 模擬比分 ${rh}-${ra}</span>`;
+        return `<span class="fr-cd-ended">模擬比分 ${rh}-${ra}</span>`;
       }
-      return '<span class="fr-cd-ended fr-cd-ended--sim">🎮 模擬結束</span>';
+      return '<span class="fr-cd-ended">模擬賽結束</span>';
     }
     // status='live'/'locked'：依 kickoff 已過的時間分階段
     const elapsedMin = Math.floor(-t / 60000);
@@ -1469,7 +1469,7 @@
     }
     body.innerHTML = `
       <div class="fr-ended">
-        <div class="fr-ended-icon">🎮</div>
+        <div class="fr-ended-icon">🏁</div>
         <div class="fr-ended-title">模擬賽結束</div>
         <div class="fr-ended-sim-tag">這是模擬賽結果、不是真實比分</div>
         ${haveResult ? `
@@ -2065,7 +2065,7 @@
       action = { label: '進入', onClick: () => joinRoom(hit.r.room_code) };
     } else if (hit.s === 'ended') {
       const rh = hit.r.result_home, ra = hit.r.result_away;
-      icon = '🎮'; head = '模擬結束'; desc = `${title} · 模擬比分 ${rh}-${ra}`;
+      icon = '🏁'; head = '模擬賽結束'; desc = `${title} · 模擬比分 ${rh}-${ra}`;
       action = { label: '查看', onClick: () => joinRoom(hit.r.room_code) };
     } else { // joined
       const ms = new Date(hit.r.kickoff_at).getTime() - Date.now();

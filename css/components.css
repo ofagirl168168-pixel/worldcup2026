@@ -6522,13 +6522,6 @@ body.opinion-open .btn-arena-float { display: none; }
 .fr-cd-num { color: #fff; font-weight: 800; font-size: 16px; margin-left: 6px; }
 .fr-cd-live { color: #ff5757; font-weight: 800; animation: fr-pulse 1.5s ease-in-out infinite; }
 .fr-cd-ended { color: var(--text-muted); }
-.fr-cd-ended--sim {
-  color: #c8b3ff;
-  background: rgba(180,140,255,0.10);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-weight: 700;
-}
 .fr-ended-sim-tag {
   display: inline-block;
   margin: 6px auto 12px;
