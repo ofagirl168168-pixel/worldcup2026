@@ -115,12 +115,14 @@
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Taipei' });
 
     // X. 帳號首抽（my-team 上線後第一次登入 → 確保進新手指引時帶 1 球員）
+    // 先抽、確認成功才寫 marker：避免「marker 寫了但 rpc 在這一兩秒被重整中斷」掉首抽
     const firstKey = 'mt_first_ever_pull_v1';
     if (!localStorage.getItem(firstKey)) {
-      localStorage.setItem(firstKey, today);
       try {
         if (typeof window.MyTeam?.triggerInstantGacha === 'function') {
-          await window.MyTeam.triggerInstantGacha(1, 'first_ever_pull');
+          const r = await window.MyTeam.triggerInstantGacha(1, 'first_ever_pull');
+          // r === null 代表未登入 / beta 未開 → 下次再試；其他 truthy 表示有走完 RPC 或 preview localStorage
+          if (r) localStorage.setItem(firstKey, today);
         }
       } catch (e) { console.warn('[my-team] first-pull err', e); }
     }

@@ -380,6 +380,8 @@
         document.body.style.overflow = _bodyOverflow;   // 還原 body scroll
         overlay.classList.remove('open');
         setTimeout(() => overlay.remove(), 350);
+        // 標記「球員揭曉動畫已看過」→ 下次開 my-team 不會補播這批卡
+        try { localStorage.setItem('mt_last_seen_players_at', new Date().toISOString()); } catch (e) {}
         resolve();
       };
 

@@ -69,7 +69,107 @@
       // 新手禮包：第一次進來且還沒領 → 觸發新手指引
       if (team.starter_pack_claimed === false) {
         setTimeout(() => _showStarterPackIntro(), 400);
+      } else {
+        // 斷線重連補播：若使用者抽卡 / 抽教練動畫沒看完就關掉 / 重整，
+        // 再次開 my-team 時補播揭曉動畫（避免錯過新卡入隊體驗）
+        setTimeout(() => { _replayMissedReveals().catch(() => {}); }, 500);
       }
+    }
+  }
+
+  // 補播「上次沒看完的揭曉」— 新球員 + 新教練
+  // 依據 localStorage 的 mt_last_seen_players_at / mt_last_seen_coaches_at
+  // 查 team_player.obtained_at / user_coach.hired_at 比 last_seen 新的 → 跑揭曉
+  async function _replayMissedReveals() {
+    if (typeof currentUser === 'undefined' || !currentUser) return;
+    const uid = currentUser.id;
+    if (!window.DB) return;
+
+    // ── 補播球員卡 ──
+    const lastP = (() => { try { return localStorage.getItem('mt_last_seen_players_at'); } catch (e) { return null; } })();
+    if (!lastP) {
+      // 第一次紀錄：直接把當下標為「已看過」、不補播歷史卡
+      try { localStorage.setItem('mt_last_seen_players_at', new Date().toISOString()); } catch (e) {}
+    } else {
+      try {
+        const { data } = await window.DB
+          .from('team_player')
+          .select(`
+            card_id, obtained_at, look_data, bond, level,
+            current_attack, current_defense, current_speed,
+            current_midfield, current_stamina, current_aura,
+            card:player_card_pool!card_id (
+              name, nickname, rarity, position, talent, illustration,
+              base_attack, base_defense, base_speed,
+              base_midfield, base_stamina, base_aura
+            )
+          `)
+          .eq('team_user_id', uid)
+          .gt('obtained_at', lastP)
+          .order('obtained_at', { ascending: true });
+        const newPlayers = data || [];
+        if (newPlayers.length) {
+          const cards = newPlayers.map(p => ({
+            card_id:      p.card_id,
+            rarity:       p.card?.rarity || 'R',
+            name:         p.card?.name || '?',
+            nickname:     p.card?.nickname || '',
+            position:     p.card?.position,
+            attack:       p.card?.base_attack ?? p.current_attack,
+            defense:      p.card?.base_defense ?? p.current_defense,
+            speed:        p.card?.base_speed ?? p.current_speed,
+            midfield:     p.card?.base_midfield ?? p.current_midfield,
+            stamina:      p.card?.base_stamina ?? p.current_stamina,
+            aura:         p.card?.base_aura ?? p.current_aura,
+            talent:       p.card?.talent,
+            illustration: p.card?.illustration,
+            look_data:    p.look_data,
+            is_duplicate: false,
+          }));
+          if (typeof window.MyTeam?.openGachaAnimation === 'function') {
+            await window.MyTeam.openGachaAnimation(cards, {
+              title: '🎁 補播：你上次錯過的卡片',
+              subtitle: '抽到時還沒看完、再給你看一次',
+            });
+          }
+          // openGachaAnimation 的 cleanup 內已 setItem mt_last_seen_players_at
+        }
+      } catch (e) { console.warn('[my-team] replay players err', e); }
+    }
+
+    // ── 補播教練 ──
+    const lastC = (() => { try { return localStorage.getItem('mt_last_seen_coaches_at'); } catch (e) { return null; } })();
+    if (!lastC) {
+      try { localStorage.setItem('mt_last_seen_coaches_at', new Date().toISOString()); } catch (e) {}
+    } else {
+      try {
+        const { data } = await window.DB
+          .from('user_coach')
+          .select(`
+            coach_id, hired_at, look_data, level, bond,
+            coach:coach_pool!coach_id (
+              name, nickname, rarity, trait, trait_value
+            )
+          `)
+          .eq('user_id', uid)
+          .gt('hired_at', lastC)
+          .order('hired_at', { ascending: true });
+        const newCoaches = data || [];
+        if (newCoaches.length) {
+          const list = newCoaches.map(c => ({
+            coach_id:    c.coach_id,
+            rarity:      c.coach?.rarity || 'R',
+            name:        c.coach?.name || '?',
+            nickname:    c.coach?.nickname || '',
+            trait:       c.coach?.trait,
+            trait_value: c.coach?.trait_value,
+            look_data:   c.look_data,
+            is_duplicate: false,
+          }));
+          await _showCoachDrawResult(list, { skipRerender: true });
+          // _showCoachDrawResult 的 close 內已 setItem mt_last_seen_coaches_at
+        }
+      } catch (e) { console.warn('[my-team] replay coaches err', e); }
     }
   }
 
@@ -2451,12 +2551,15 @@
   }
 
   // 教練抽卡結果動畫：彈出大卡 + 揭曉動畫
-  async function _showCoachDrawResult(results) {
+  //   opts.skipRerender: true → 不要 renderTab（補播時 modal 還沒進到 coach tab 用）
+  //   returns Promise<void> resolved on close
+  async function _showCoachDrawResult(results, opts = {}) {
     const list = Array.isArray(results) ? results : [];
     if (!list.length) {
-      renderTab();
+      if (!opts.skipRerender) renderTab();
       return;
     }
+    return new Promise(_resolve => {
     const overlay = document.createElement('div');
     overlay.className = 'mt-coach-result-overlay';
     overlay.innerHTML = `
@@ -2494,16 +2597,21 @@
       }
     });
 
-    overlay.querySelector('#mt-coach-result-close').addEventListener('click', () => {
+    const _close = () => {
       overlay.classList.remove('open');
       setTimeout(() => {
         overlay.remove();
-        renderTab();
+        if (!opts.skipRerender) renderTab();
+        // 標記「教練揭曉動畫已看過」
+        try { localStorage.setItem('mt_last_seen_coaches_at', new Date().toISOString()); } catch (e) {}
+        _resolve();
       }, 200);
-    });
+    };
+    overlay.querySelector('#mt-coach-result-close').addEventListener('click', _close);
     // 點背景也關
     overlay.addEventListener('click', e => {
-      if (e.target === overlay) overlay.querySelector('#mt-coach-result-close').click();
+      if (e.target === overlay) _close();
+    });
     });
   }
 
