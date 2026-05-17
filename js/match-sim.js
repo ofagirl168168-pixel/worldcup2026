@@ -325,9 +325,13 @@
       let dirRow, frame;
       const tackleActive = p._tackleVisualUntil && state.frame < p._tackleVisualUntil;
       if (diving) {
-        // GK 撲球 (row 8 = hurt frame 5、整個橫躺)
+        // GK 撲球：row 8 = slash-up frames 2-3-4（手舉過頭、近似 1h_halfslash）
         dirRow = 8;
-        frame = 0;
+        const dAge = state.frame - (p._diveStart || state.frame);
+        const dDur = (p._diveUntil - p._diveStart) || 24;
+        const tt = Math.min(1, dAge / dDur);
+        // 撲球姿勢演進：t<0.25 windup (frame 0)、t<0.55 apex (frame 1 = 手過頂)、之後 hold apex
+        frame = tt < 0.25 ? 0 : tt < 0.55 ? 1 : 1;
       } else if (tackleActive) {
         // 鏟球 (row 7 = thrust)
         dirRow = 7;
@@ -467,13 +471,20 @@
         const srcX = frame * frameW;
         const srcY = dirRow * frameH;
         if (diving) {
-          // 撲球：LPC hurt 最後一格本身就是「整個倒地」、不再 rotate
-          // 朝撲球方向 vertical flip：頭朝撲球方向（上撲 → 頭朝上、下撲 → 頭朝下）
-          // 注意：LPC hurt frame 5 默認頭朝下、所以「上撲」要 scaleY(-1) 翻過來
+          // 撲球：slash-up（手舉過頭）旋轉 90° 變橫向飛撲
+          //   Home GK（左門線、面右）→ 順時針 +90° → 手指向右（場內）
+          //   Away GK（右門線、面左）→ 逆時針 -90° → 手指向左（場內）
+          // 撲上 / 下方向：用 scaleY 翻轉決定身體頭尾位置（撲上頭朝上、撲下頭朝下）
           ctx.save();
           ctx.translate(cx, cy);
-          const flipY = (p._diveDirY || 1) < 0 ? -1 : 1;
-          ctx.scale(1.15, 1.15 * flipY);
+          const rotDeg = (p.team === 'h') ? 90 : -90;
+          ctx.rotate(rotDeg * Math.PI / 180);
+          // 旋轉後身體 X = 原本 Y、Y = 原本 X
+          // 撲球方向決定身體左右翻轉（讓頭朝撲球方向）
+          const flipForDir = ((p._diveDirY || 1) < 0)
+            ? (p.team === 'h' ? 1 : -1)
+            : (p.team === 'h' ? -1 : 1);
+          ctx.scale(1.15, 1.15 * flipForDir);
           ctx.drawImage(sheet, srcX, srcY, frameW, frameH, -drawW / 2, -drawH / 2, drawW, drawH);
           ctx.restore();
         } else {
