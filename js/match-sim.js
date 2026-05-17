@@ -301,28 +301,31 @@
         cx += (p._tackleDirX || 0) * slideAmt;
         cy += (p._tackleDirY || 0) * slideAmt;
       }
-      // GK 撲球視覺位移：沿球門線僅 Y 軸（不偏 X、GK 不離開門線）
-      // 動畫分 3 段：anticipation（蹲）→ launch（飛撲）→ hold（保持撲出姿勢）
+      // GK 撲球視覺位移：沿球門線僅 Y 軸 + 略向上跳起（jump feel）
+      // 3 段：anticipation（蹲）→ launch（跳撲）→ hold（短暫保持）
       const diving = p._diveUntil && state.frame < p._diveUntil;
       if (diving) {
         const dAge = state.frame - (p._diveStart || state.frame);
-        const dDur = (p._diveUntil - p._diveStart) || 60;
+        const dDur = (p._diveUntil - p._diveStart) || 30;
         const t = Math.min(1, dAge / dDur);
-        const maxSlide = (p._diveDistance || 0.08) * PITCH_H * 1.6;
+        // 適中的撲球距離（不要太誇張）：maxSlide ≤ ~10px
+        const maxSlide = (p._diveDistance || 0.05) * PITCH_H * 1.0;
         let slide;
         if (t < 0.15) {
-          // 0-15%：蹲下準備（反向小幅位移）
-          slide = -(t / 0.15) * 3;
-        } else if (t < 0.55) {
-          // 15-55%：爆發飛撲（ease-out）
-          const launchT = (t - 0.15) / 0.40;
-          slide = -3 + (1 - Math.pow(1 - launchT, 2)) * (maxSlide + 3);
+          slide = -(t / 0.15) * 2;       // 蹲 2px
+        } else if (t < 0.50) {
+          const launchT = (t - 0.15) / 0.35;
+          slide = -2 + (1 - Math.pow(1 - launchT, 2)) * (maxSlide + 2);
         } else {
-          // 55-100%：hold（微微震動表示努力撐著）
-          const holdT = (t - 0.55) / 0.45;
-          slide = maxSlide * (1 - holdT * 0.05) + Math.sin(state.frame * 0.4) * 0.6;
+          slide = maxSlide;              // hold
         }
         cy += (p._diveDirY || 1) * slide;
+        // 跳起感：身體往上飄（負 Y），拋物線、launch 階段最高
+        if (t >= 0.15 && t < 0.65) {
+          const jumpT = (t - 0.15) / 0.50;
+          const jumpUp = Math.sin(jumpT * Math.PI) * 4;  // 最高 4px
+          cy -= jumpUp;
+        }
       }
 
       // row 覆寫順序：dive (GK) > tackle > fulltime > celebrate > walk
@@ -1179,14 +1182,15 @@
       state.stats[state.possession].shots++;
 
       // 每次射門都觸發 GK 撲球視覺（沿球門線朝 ballTargetY 撲）
-      // 撲球持續：射門飛行時間 + 36 幀 hold（射門當下就開始撲、撲完還會 hold 一陣子）
+      // 撲球持續：球飛時間 + 12 幀（撲完球差不多就接到了、不會 hold 太久）
       const defTeam = state.possession === 'h' ? 'a' : 'h';
       const gkPlayer = players.find(p => p.team === defTeam && p.role === 'GK');
       if (gkPlayer) {
         gkPlayer._diveStart = state.frame;
-        gkPlayer._diveUntil = state.frame + state.ballTravelTotal + 36;
+        gkPlayer._diveUntil = state.frame + state.ballTravelTotal + 12;
         gkPlayer._diveDirY = Math.sign(state.ballTargetY - gkPlayer.y) || 1;
-        gkPlayer._diveDistance = Math.min(0.12, Math.abs(state.ballTargetY - gkPlayer.y) + 0.04);
+        // 撲球距離：不超過 0.05 pitch（影子相對位置才不會太遠）
+        gkPlayer._diveDistance = Math.min(0.05, Math.abs(state.ballTargetY - gkPlayer.y) + 0.02);
       }
     }
 
