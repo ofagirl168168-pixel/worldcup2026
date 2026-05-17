@@ -6128,7 +6128,7 @@
       const capHost = overlay.querySelector('#mt-focus-tier-cap-warn');
       if (capHost) {
         if (fullyCapped) {
-          capHost.innerHTML = `⚠️ ${ATTR_LABELS[attr]} 已達上限 ${cap}，這次訓練不會提升（升星等可解鎖更高上限）`;
+          capHost.innerHTML = `⚠️ ${ATTR_LABELS[attr]} 已達上限 ${cap}，這次訓練不會提升（升等 / 升星可解鎖更高上限）`;
           capHost.style.display = '';
         } else if (capWarn) {
           capHost.innerHTML = `ℹ️ ${ATTR_LABELS[attr]} 訓練後達上限 ${cap}（實得 +${actualGain}、剩 ${gain - actualGain} 點被上限吃掉）`;
@@ -6266,7 +6266,7 @@
               const parts = [];
               if (fullList.length) parts.push(`${fullList.join('、')} 已達上限不再提升`);
               if (partList.length) parts.push(`${partList.join('、')} 訓練後達上限`);
-              capInfo.rows += `<div class="mt-focus-tier-cap-warn" style="margin-top:8px">⚠️ ${parts.join('；')}（上限 ${cap}、升星可解鎖更高）</div>`;
+              capInfo.rows += `<div class="mt-focus-tier-cap-warn" style="margin-top:8px">⚠️ ${parts.join('；')}（上限 ${cap}、升等 / 升星可解鎖更高）</div>`;
             }
             return capInfo.rows;
           })()}
