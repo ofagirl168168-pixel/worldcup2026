@@ -3617,7 +3617,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p><b>曼聯缺陣：</b>Benjamin Šeško（脛骨傷勢加劇，缺陣）、Matthijs de Ligt（背傷，賽季報銷）、Patrick Dorgu（肌肉傷，賽季末復出存疑）。Joshua Zirkzee 預計頂替 Šeško 先發。</p>
 
-<p><b>森林缺陣：</b>Callum Hudson-Odoi（肌肉傷）、Willy Boly（膝傷）、John Victor（膝傷）、Nicolò Savona（膝傷）。Morgan Gibbs-White 因面部傷勢戴面罩訓練，能否出場是最大懸念。Murillo（腿後肌）和 Ola Aina（撞傷）也是存疑狀態。</p>
+<p><b>森林缺陣：</b>Callum Hudson-Odoi（股四頭肌手術，賽季報銷）、Willy Boly（膝傷）、John Victor（膝傷）、Nicolò Savona（膝傷）、Ola Aina（歐霸半決賽傷勢未癒，確定缺陣）。Morgan Gibbs-White 因面部傷勢戴面罩訓練，能否出場是最大懸念。Murillo（腿後肌）存疑。</p>
 
 <h3>戰術焦點</h3>
 
