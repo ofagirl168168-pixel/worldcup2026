@@ -4696,6 +4696,24 @@
     const oppName = nextOpp?.nameCN || '未知對手';
     const oppFlag = nextOpp?.flag || '🏴';
     const oppIsReal = !!nextOpp?._isReal;
+    // 計算「無法開賽」的原因（給玩家提示）
+    const nowDate = new Date();
+    const totalStarters = (allPlayers || []).filter(p => p.in_starting_11).length;
+    const healthyStarters = (allPlayers || []).filter(p =>
+      p.in_starting_11 && (!p.injured_until || new Date(p.injured_until) <= nowDate)).length;
+    const injuredStartersList = (allPlayers || []).filter(p =>
+      p.in_starting_11 && p.injured_until && new Date(p.injured_until) > nowDate);
+    const canStart = totalStarters >= 11 && healthyStarters >= 11 && team.stamina >= 1;
+    let lineupWarn = '';
+    if (team.stamina < 1) {
+      lineupWarn = '⚡ 體力 0 — 預測比賽、看文章可賺體力';
+    } else if (totalStarters < 11) {
+      lineupWarn = `⚠️ 先發只有 ${totalStarters}/11 人 — 去「球員」頁把板凳球員排進空位才能開賽`;
+    } else if (healthyStarters < 11) {
+      const names = injuredStartersList.slice(0, 3).map(p => p.card?.name || '?').join('、');
+      lineupWarn = `🏥 ${names}${injuredStartersList.length > 3 ? ' 等' : ''} 受傷無法上場 — 去「球員」頁把板凳健康球員替補上`;
+    }
+
     // 對手 crest：URL 或 .png/.jpg/.svg/.webp 路徑用 <img>、emoji 直接放
     const renderOppCrest = (f, sz) => {
       if (!f) return '🏴';
@@ -4792,7 +4810,7 @@
         <div class="mt-match-current">
           <div class="mt-match-current-stage-badge">第 ${currentStage} 關</div>
           <div class="mt-match-current-left">
-            <button class="mt-match-engage-btn" id="mt-match-start" ${team.stamina < 1 ? 'disabled' : ''}>
+            <button class="mt-match-engage-btn" id="mt-match-start" ${!canStart ? 'disabled' : ''}>
               <span class="mt-match-engage-sword">⚔</span>
               <span class="mt-match-engage-label">開始</span>
               <span class="mt-match-engage-cost">⚡1</span>
@@ -4809,7 +4827,7 @@
                 : isBossLikely ? `<span class="mt-match-current-boss-pill mt-match-current-boss-pill--maybe">⭐ Boss ${Math.round(realRatio*100)}%</span>` : ''}
             </div>
           </div>
-          ${team.stamina < 1 ? '<div class="mt-match-current-warn">⚡ 體力 0 — 預測比賽、看文章可賺體力</div>' : ''}
+          ${lineupWarn ? `<div class="mt-match-current-warn">${lineupWarn}</div>` : ''}
         </div>
 
         <!-- 闖關路線（可滾、自動聚焦當前關） -->
