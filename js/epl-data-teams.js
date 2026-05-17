@@ -1,7 +1,7 @@
 /* =============================================
    EPL-DATA-TEAMS.JS — 2025/26 英超 20 支球隊資料
    隊徽：football-data.org CDN
-   資料截止：2025/26 賽季（2026-05-16 日更）
+   資料截止：2025/26 賽季（2026-05-17 日更）
    ============================================= */
 
 const EPL_TEAMS = {
@@ -27,7 +27,7 @@ const EPL_TEAMS = {
       {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題已復出，vs FUL（5/2）先發進球',returnDate:'可出場'},
       {name:'Martin Ødegaard',pos:'攻擊中場',status:'膝傷（缺席 vs FUL 5/2），歐冠次回合替補上陣',returnDate:'需評估'},
       {name:'Kai Havertz',pos:'前鋒',status:'肌肉傷勢（vs NEW 4/25），歐冠次回合（5/5）復出先發',returnDate:'可出場'},
-      {name:'Jurrien Timber',pos:'後衛',status:'腹股溝傷（3/14 起缺陣），賽季末評估',returnDate:'賽季末'},
+      {name:'Jurrien Timber',pos:'後衛',status:'腹股溝傷（3/14 起缺陣），接近復出',returnDate:'MW38 評估'},
       {name:'Mikel Merino',pos:'中場',status:'已回草地訓練，目標賽季末復出',returnDate:'賽季末待定'},
       {name:'Ben White',pos:'右後衛',status:'膝傷（5/10 vs WHU），賽季報銷',returnDate:'賽季報銷'},
       {name:'Noni Madueke',pos:'右翼',status:'膝傷（歐冠八強次回合退場）',returnDate:'評估中'}
@@ -122,12 +122,12 @@ const EPL_TEAMS = {
     ],
     radar:{attack:82,defense:78,midfield:81,speed:84,experience:80},
     style:'三後衛體系，翼衛推進，快速反擊',
-    strengths:['Bruno Fernandes核心創造力','年輕球員快速成長','Amorim戰術改造進行中'],
+    strengths:['Bruno Fernandes核心創造力','年輕球員快速成長','Carrick戰術體系穩定中'],
     weaknesses:['體系轉換需要時間','防守穩定性不足','傷兵問題嚴重'],
     recentForm:['D','L','W','W','W'],
     history:'20次英格蘭頂級聯賽冠軍，3次歐冠冠軍，英格蘭最成功俱樂部',
     injuries:[
-      {name:'Benjamin Šeško',pos:'前鋒',status:'脛骨問題持續管理中（vs LIV 5/3 後加劇）',returnDate:'帶傷出賽'},
+      {name:'Benjamin Šeško',pos:'前鋒',status:'脛骨傷勢加劇（被替換下場），出場存疑',returnDate:'MW37 評估'},
       {name:'Patrick Dorgu',pos:'翼衛',status:'肌肉傷復健中，恢復進度中',returnDate:'賽季末'},
       {name:'Lisandro Martínez',pos:'中後衛',status:'MW35 停賽期滿，已可出場',returnDate:'已解禁'},
       {name:'Matheus Cunha',pos:'翼鋒',status:'已復出（vs LIV 5/3 先發進球）',returnDate:'已復出'}
@@ -856,14 +856,15 @@ window.EPL_MATCHES = [
   // ===== 第 37 輪 (2026-05-15 ~ 05-20 台灣時間) =====
 
   // 阿斯頓維拉 vs 利物浦 | 05/16 03:00 台灣時間 (05/15 20:00 BST)
-  {id:'EPL-MW37-AVL-LIV', matchday:37, date:'2026-05-16', time:'03:00', home:'AVL', away:'LIV', stage:'league', status:'played',
-   homeScore:4, awayScore:2, goals:[
-     {min:'42',player:'Rogers',side:'h'},
-     {min:'52',player:'Van Dijk',side:'a'},
-     {min:'57',player:'Watkins',side:'h'},
-     {min:'73',player:'Watkins',side:'h'},
-     {min:'89',player:'McGinn',side:'h'},
-     {min:'90+2',player:'Van Dijk',side:'a'}
+  {id:'EPL-MW37-AVL-LIV', matchday:37, date:'2026-05-16', time:'03:00', home:'AVL', away:'LIV', stage:'league',
+   status:'finished', score:{h:4,a:2}, halfTime:{h:1,a:0},
+   goals:[
+     {min:'42',player:'Morgan Rogers',side:'h'},
+     {min:'52',player:'Virgil van Dijk',side:'a'},
+     {min:'57',player:'Ollie Watkins',side:'h'},
+     {min:'73',player:'Ollie Watkins',side:'h'},
+     {min:'89',player:'John McGinn',side:'h'},
+     {min:'90+2',player:'Virgil van Dijk',side:'a'}
    ]},
 
   // 曼聯 vs 諾丁漢森林 | 05/17 19:30 台灣時間 (05/17 12:30 BST)
