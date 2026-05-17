@@ -176,7 +176,7 @@
     _saveCache();
     _emitChange();
     if (typeof showToast === 'function' && gained > 0) {
-      showToast(`⚡ +${gained} 體力，可以再打 ${gained} 場比賽！`);
+      showToast(`⚡ +${gained} 體力！到「我的隊伍 → 比賽」可再打 ${gained} 場`);
     }
     return true;
   }
@@ -308,10 +308,10 @@
   // type: 'tactical' | 'physical' | 'heart' | 'idea'
   const _RP_ICON  = { tactical: '🧠', physical: '💪', heart: '❤️', idea: '💡' };
   const _RP_BLURB = {
-    tactical: '戰術素材，去訓練球員、打出更聰明的隊形！',
-    physical: '體能素材，球員跑得久、後半場不掉速！',
-    heart:    '鬥志素材，氣場滿滿、關鍵時刻挺得住！',
-    idea:     '靈感素材，球場上的小聰明來自這裡！',
+    tactical: '戰術素材！到「我的隊伍 → 訓練」訓練球員、打出更聰明隊形',
+    physical: '體能素材！到「我的隊伍 → 訓練」讓球員跑得久、後半場不掉速',
+    heart:    '鬥志素材！到「我的隊伍 → 訓練」氣場滿滿、關鍵時刻挺得住',
+    idea:     '靈感素材！到「我的隊伍 → 訓練」打出對手沒想到的傳球',
   };
   async function awardRp(type, amount) {
     if (!window.DB || !window.currentUser) return null;
