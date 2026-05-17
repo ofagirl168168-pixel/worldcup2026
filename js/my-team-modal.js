@@ -1269,7 +1269,7 @@
       const injured = (w.player.injured_until && new Date(w.player.injured_until) > now)
         ? '<span class="mt-pitch-injury">🏥</span>' : '';
       const SCALE = w.scale;
-      const SHEET_ROWS = 8;  // walk×4 + kick + cheer + frustration + tackle
+      const SHEET_ROWS = 9;  // walk×4 + kick + cheer + frustration + tackle + GK dive
       const SHEET_COLS = 3;
       const rarity = w.player.card?.rarity || 'R';
       const pos = w.player.card?.position || '';
@@ -5018,7 +5018,7 @@
     } catch (e) { console.warn('[my-team] opp render fail', e); }
 
     const SHEET_COLS = 3;
-    const SHEET_ROWS = 8;
+    const SHEET_ROWS = 9;  // walk×4 + kick + cheer + frustration + tackle + GK dive
     const setupSprite = (el, sheetUrl) => {
       el.style.width = frameW + 'px';
       el.style.height = frameH + 'px';
