@@ -47,14 +47,122 @@ window.WC_SQUADS = {
     ],
   },
 
-  // 🇫🇷 法國：5/16 公布
-  'FRA': { status: 'final', announcedAt: '2026-05-16', players: [], note: '名單已公布、待匯入球員' },
+  // 🇫🇷 法國：5/15 公布、Mbappé 隊長、Camavinga 落選
+  'FRA': {
+    status: 'final',
+    announcedAt: '2026-05-15',
+    note: '姆巴佩擔任隊長；卡馬文加爆冷落選引爭議；Deschamps 帥位最後一屆',
+    players: [
+      // 守門員
+      { name: 'Mike Maignan',       nameCN: '邁尼昂',       pos: 'GK',  club: 'AC 米蘭',          age: 30 },
+      { name: 'Brice Samba',        nameCN: '桑巴',          pos: 'GK',  club: '雷恩',              age: 31 },
+      { name: 'Robin Risser',       nameCN: '里塞',          pos: 'GK',  club: 'Strasbourg',        age: 22 },
+      // 後衛
+      { name: 'Lucas Digne',        nameCN: '迪涅',          pos: 'DEF', club: '阿斯頓維拉',        age: 32 },
+      { name: 'Malo Gusto',         nameCN: '古斯托',        pos: 'DEF', club: '切爾西',            age: 23 },
+      { name: 'Lucas Hernández',    nameCN: '盧卡斯·埃爾南德斯', pos: 'DEF', club: 'PSG',         age: 30 },
+      { name: 'Theo Hernández',     nameCN: '特奧·埃爾南德斯', pos: 'DEF', club: '艾哈利',          age: 28 },
+      { name: 'Ibrahima Konaté',    nameCN: '科納特',        pos: 'DEF', club: '利物浦',            age: 26 },
+      { name: 'Jules Koundé',       nameCN: '孔德',          pos: 'DEF', club: '巴塞隆納',          age: 27 },
+      { name: 'Maxence Lacroix',    nameCN: '拉克魯瓦',      pos: 'DEF', club: '水晶宮',            age: 26 },
+      { name: 'William Saliba',     nameCN: '薩利巴',        pos: 'DEF', club: '兵工廠',            age: 25 },
+      { name: 'Dayot Upamecano',    nameCN: '烏帕梅卡諾',    pos: 'DEF', club: '拜仁慕尼黑',        age: 27 },
+      // 中場
+      { name: "N'Golo Kanté",       nameCN: '坎特',          pos: 'MID', club: '吉達伊蒂哈德',      age: 35 },
+      { name: 'Manu Koné',          nameCN: '科內',          pos: 'MID', club: '羅馬',              age: 25 },
+      { name: 'Adrien Rabiot',      nameCN: '拉比奧',        pos: 'MID', club: '馬賽',              age: 31 },
+      { name: 'Aurélien Tchouaméni',nameCN: '楚阿梅尼',      pos: 'MID', club: '皇家馬德里',        age: 26 },
+      { name: 'Warren Zaïre-Emery', nameCN: '薩伊爾-埃梅里', pos: 'MID', club: 'PSG',               age: 20 },
+      // 前鋒
+      { name: 'Kylian Mbappé',      nameCN: '姆巴佩',        pos: 'FWD', club: '皇家馬德里',        age: 27, note: '隊長' },
+      { name: 'Ousmane Dembélé',    nameCN: '登貝萊',        pos: 'FWD', club: 'PSG',               age: 28 },
+      { name: 'Michael Olise',      nameCN: '奧利斯',        pos: 'FWD', club: '拜仁慕尼黑',        age: 24 },
+      { name: 'Marcus Thuram',      nameCN: '圖拉姆',        pos: 'FWD', club: '國際米蘭',          age: 28 },
+      { name: 'Bradley Barcola',    nameCN: '巴爾科拉',      pos: 'FWD', club: 'PSG',               age: 23 },
+      { name: 'Rayan Cherki',       nameCN: '切爾基',        pos: 'FWD', club: '曼城',              age: 22 },
+      { name: 'Désiré Doué',        nameCN: '杜埃',          pos: 'FWD', club: 'PSG',               age: 20 },
+      { name: 'Jean-Philippe Mateta',nameCN: '馬泰塔',       pos: 'FWD', club: '水晶宮',            age: 28 },
+      { name: 'Maghnes Akliouche',  nameCN: '阿克留什',      pos: 'FWD', club: '摩納哥',            age: 24 },
+    ],
+  },
 
-  // 🇰🇷 南韓：5/14 公布
-  'KOR': { status: 'final', announcedAt: '2026-05-14', players: [], note: '名單已公布、待匯入球員' },
+  // 🇰🇷 南韓：5/16 公布、孫興慜隊長（4 度世界盃）、Jens Castrop 為首位混血血統球員
+  'KOR': {
+    status: 'final',
+    announcedAt: '2026-05-16',
+    note: '孫興慜擔任隊長（生涯第 4 屆世界盃）；德國出生的 Jens Castrop 成為首位混血血統入選的韓國球員',
+    players: [
+      // 守門員
+      { name: 'Jo Hyeon-woo',    nameCN: '趙賢祐',   pos: 'GK',  club: '蔚山現代',      age: 34 },
+      { name: 'Kim Seung-gyu',   nameCN: '金承奎',   pos: 'GK',  club: '艾沙巴布',      age: 35 },
+      { name: 'Song Bum-keun',   nameCN: '宋範根',   pos: 'GK',  club: '全北現代',      age: 28 },
+      // 後衛
+      { name: 'Kim Min-jae',     nameCN: '金玟哉',   pos: 'DEF', club: '拜仁慕尼黑',    age: 29 },
+      { name: 'Cho Yu-min',      nameCN: '趙裕民',   pos: 'DEF', club: '夏馬克',        age: 30 },
+      { name: 'Lee Han-beom',    nameCN: '李韓凡',   pos: 'DEF', club: '密德蒂蘭',      age: 23 },
+      { name: 'Kim Tae-hyeon',   nameCN: '金泰賢',   pos: 'DEF', club: 'FC 首爾',       age: 25 },
+      { name: 'Park Jin-seob',   nameCN: '朴鎮燮',   pos: 'DEF', club: '蔚山現代',      age: 30 },
+      { name: 'Lee Gi-hyuk',     nameCN: '李奇赫',   pos: 'DEF', club: '抱川市民',      age: 25 },
+      { name: 'Lee Tae-seok',    nameCN: '李泰錫',   pos: 'DEF', club: '韓國',          age: 24 },
+      { name: 'Seol Young-woo',  nameCN: '薛永祐',   pos: 'DEF', club: '蔚山現代',      age: 26 },
+      { name: 'Jens Castrop',    nameCN: '卡斯特羅普', pos: 'DEF', club: '門興格拉德巴赫', age: 21, note: '首位混血' },
+      { name: 'Kim Moon-hwan',   nameCN: '金紋奐',   pos: 'DEF', club: '全北現代',      age: 30 },
+      // 中場
+      { name: 'Hwang In-beom',   nameCN: '黃仁範',   pos: 'MID', club: '費耶諾德',      age: 29 },
+      { name: 'Paik Seung-ho',   nameCN: '白昇浩',   pos: 'MID', club: 'Birmingham',    age: 28 },
+      { name: 'Yang Hyun-jun',   nameCN: '楊玹埈',   pos: 'MID', club: '塞爾提克',      age: 23 },
+      { name: 'Kim Jin-gyu',     nameCN: '金鎮奎',   pos: 'MID', club: '全北現代',      age: 28 },
+      { name: 'Bae Jun-ho',      nameCN: '裴俊浩',   pos: 'MID', club: '斯托克城',      age: 22 },
+      { name: 'Eom Ji-sung',     nameCN: '嚴志成',   pos: 'MID', club: '盧加諾',        age: 22 },
+      { name: 'Lee Dong-gyeong', nameCN: '李東炅',   pos: 'MID', club: '蔚山現代',      age: 28 },
+      { name: 'Lee Jae-sung',    nameCN: '李在城',   pos: 'MID', club: '美因茨',        age: 33 },
+      // 前鋒
+      { name: 'Son Heung-min',   nameCN: '孫興慜',   pos: 'FWD', club: 'LAFC',          age: 33, note: '隊長' },
+      { name: 'Lee Kang-in',     nameCN: '李剛仁',   pos: 'FWD', club: 'PSG',           age: 25 },
+      { name: 'Hwang Hee-chan',  nameCN: '黃喜燦',   pos: 'FWD', club: '狼隊',          age: 30 },
+      { name: 'Oh Hyeon-gyu',    nameCN: '吳賢揆',   pos: 'FWD', club: '亨克',          age: 25 },
+      { name: 'Cho Gue-sung',    nameCN: '趙圭成',   pos: 'FWD', club: '密德蒂蘭',      age: 28 },
+    ],
+  },
 
-  // 🇧🇪 比利時
-  'BEL': { status: 'final', announcedAt: '2026-05-16', players: [], note: '名單已公布、待匯入球員' },
+  // 🇧🇪 比利時：5/15 公布、Garcia 帶隊、De Bruyne + Courtois + Lukaku 黃金世代最後一舞
+  'BEL': {
+    status: 'final',
+    announcedAt: '2026-05-15',
+    note: 'De Bruyne + Courtois + Lukaku 領銜；魯卡庫帶傷入選、黃金世代最後一屆',
+    players: [
+      // 守門員
+      { name: 'Thibaut Courtois',   nameCN: '庫爾圖瓦',    pos: 'GK',  club: '皇家馬德里',   age: 33 },
+      { name: 'Senne Lammens',      nameCN: '拉門斯',       pos: 'GK',  club: '曼聯',         age: 22 },
+      { name: 'Mike Penders',       nameCN: '彭德斯',       pos: 'GK',  club: '史特拉斯堡',   age: 21 },
+      // 後衛
+      { name: 'Timothy Castagne',   nameCN: '卡斯塔涅',    pos: 'DEF', club: '富勒姆',       age: 30 },
+      { name: 'Zeno Debast',        nameCN: '德巴斯特',    pos: 'DEF', club: '葡萄牙體育',   age: 22 },
+      { name: 'Maxim de Cuyper',    nameCN: '德庫珀',      pos: 'DEF', club: '布萊頓',       age: 25 },
+      { name: 'Koni de Winter',     nameCN: '德溫特',      pos: 'DEF', club: 'AC 米蘭',      age: 24 },
+      { name: 'Brandon Mechele',    nameCN: '梅切爾',      pos: 'DEF', club: '布魯日',       age: 33 },
+      { name: 'Thomas Meunier',     nameCN: '梅尼耶',      pos: 'DEF', club: '里爾',         age: 34 },
+      { name: 'Nathan Ngoy',        nameCN: '恩戈伊',      pos: 'DEF', club: '里爾',         age: 22 },
+      { name: 'Joaquin Seys',       nameCN: '塞斯',         pos: 'DEF', club: '布魯日',       age: 22 },
+      { name: 'Arthur Theate',      nameCN: '特亞特',      pos: 'DEF', club: '法蘭克福',     age: 26 },
+      // 中場
+      { name: 'Kevin De Bruyne',    nameCN: '德布勞內',    pos: 'MID', club: '拿坡里',       age: 34 },
+      { name: 'Amadou Onana',       nameCN: '奧納納',      pos: 'MID', club: '阿斯頓維拉',   age: 24 },
+      { name: 'Nicolas Raskin',     nameCN: '拉斯金',      pos: 'MID', club: '格拉斯哥流浪者', age: 25 },
+      { name: 'Youri Tielemans',    nameCN: '蒂勒曼斯',    pos: 'MID', club: '阿斯頓維拉',   age: 29 },
+      { name: 'Hans Vanaken',       nameCN: '范納肯',      pos: 'MID', club: '布魯日',       age: 33 },
+      { name: 'Axel Witsel',        nameCN: '維特塞爾',    pos: 'MID', club: '吉羅納',       age: 37 },
+      // 前鋒
+      { name: 'Romelu Lukaku',      nameCN: '盧卡庫',      pos: 'FWD', club: '拿坡里',       age: 33 },
+      { name: 'Jeremy Doku',        nameCN: '多庫',         pos: 'FWD', club: '曼城',         age: 24 },
+      { name: 'Leandro Trossard',   nameCN: '特羅薩德',    pos: 'FWD', club: '兵工廠',       age: 31 },
+      { name: 'Charles De Ketelaere', nameCN: '德凱特拉雷', pos: 'FWD', club: '亞特蘭大',    age: 25 },
+      { name: 'Alexis Saelemaekers',nameCN: '薩雷馬可斯',  pos: 'FWD', club: 'AC 米蘭',      age: 26 },
+      { name: 'Dodi Lukebakio',     nameCN: '盧科巴基奧',  pos: 'FWD', club: '本菲卡',       age: 28 },
+      { name: 'Matias Fernandez-Pardo', nameCN: '費爾南德斯-帕爾多', pos: 'FWD', club: '里爾', age: 20 },
+      { name: 'Diego Moreira',      nameCN: '迪亞戈·莫雷拉', pos: 'FWD', club: '史特拉斯堡', age: 21 },
+    ],
+  },
 
   // 🇨🇮 象牙海岸
   'CIV': { status: 'final', announcedAt: '2026-05-15', players: [], note: '名單已公布、待匯入球員' },

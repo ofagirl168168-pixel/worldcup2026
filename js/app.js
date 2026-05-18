@@ -3883,11 +3883,14 @@ if (document.readyState === 'loading') {
 }
 
 // 渲染世界盃 26 人大名單 section（只在世界盃賽事顯示）
-function _renderWcSquadSection(code) {
+//   keyPlayers: 來自 TEAMS[code].keyPlayers，匹配到的會在 26 人列表內加 ⭐
+function _renderWcSquadSection(code, keyPlayers) {
   // 只在世界盃 tab 顯示（英超 / 歐冠 沒有國家隊大名單概念）
   if (typeof _isClub === 'function' && _isClub()) return '';
   const squads = window.WC_SQUADS || {};
   const sq = squads[code];
+  // 把 keyPlayers 的 name 收成 Set 供 matching
+  const keySet = new Set((keyPlayers || []).map(k => String(k.name || '').trim()).filter(Boolean));
   if (!sq) {
     return `<div class="modal-section-title">🏆 世界盃 26 人大名單</div>
             <div class="wc-squad-empty">⏳ 此隊尚未公布最終 26 人名單（FIFA 截止日 6/1）</div>`;
@@ -3910,11 +3913,13 @@ function _renderWcSquadSection(code) {
   const POS_LBL = { GK: '🧤 守門員', DEF: '🛡️ 後衛', MID: '⚙️ 中場', FWD: '⚽ 前鋒' };
   const renderPlayer = (p) => {
     const initial = (p.name || '').charAt(0).toUpperCase() || '?';
+    const isKey = keySet.has(String(p.name || '').trim());
+    const star = isKey ? '<span class="wc-squad-pl-star" title="核心球員">⭐</span>' : '';
     const note = p.note ? `<span class="wc-squad-pl-note">${p.note}</span>` : '';
-    return `<div class="wc-squad-pl">
+    return `<div class="wc-squad-pl${isKey ? ' is-key' : ''}">
       <div class="wc-squad-pl-avatar wc-squad-pl-avatar--${p.pos}">${initial}</div>
       <div class="wc-squad-pl-info">
-        <div class="wc-squad-pl-name">${p.nameCN || p.name}${note}</div>
+        <div class="wc-squad-pl-name">${star}${p.nameCN || p.name}${note}</div>
         <div class="wc-squad-pl-meta">${p.name !== (p.nameCN || p.name) ? p.name + ' · ' : ''}${p.club || ''}${p.age ? ' · ' + p.age + ' 歲' : ''}</div>
       </div>
     </div>`;
@@ -3937,6 +3942,9 @@ function openTeamModal(code) {
   if (!t) return;
   const formDots = (t.recentForm||['W','D','W','W','D']).map(f => `<div class="form-dot ${f}">${f}</div>`).join('');
   const players = (t.keyPlayers||[]).map(p => `<div class="player-pill">⚽ ${p.name} <span style="color:var(--text-muted);font-size:11px">${p.pos}${p.club ? ' · '+p.club : ''}</span></div>`).join('');
+  // 如果有 WC 26 人完整名單 → 不顯示獨立的「關鍵球員」區塊（避免重複），改在 26 人列表內標 ⭐
+  const _wcSquad = (typeof _isClub === 'function' && !_isClub()) ? (window.WC_SQUADS || {})[code] : null;
+  const _hasFullSquad = _wcSquad && _wcSquad.players && _wcSquad.players.length > 0;
   const strengths = (t.strengths||[]).map(s => `<div class="strength-item">${s}</div>`).join('');
   const weaknesses = (t.weaknesses||[]).map(w => `<div class="weakness-item">${w}</div>`).join('');
 
@@ -3965,9 +3973,9 @@ function openTeamModal(code) {
         <div class="modal-badges">${badges}</div>
       </div>
     </div>
-    <div class="modal-section-title">關鍵球員</div>
-    <div class="player-list">${players}</div>
-    ${_renderWcSquadSection(code)}
+    ${_hasFullSquad ? '' : `<div class="modal-section-title">關鍵球員</div>
+    <div class="player-list">${players}</div>`}
+    ${_renderWcSquadSection(code, t.keyPlayers || [])}
     <div class="modal-section-title">球隊風格</div>
     <p style="font-size:14px;color:var(--text-secondary)">${t.style}</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">

@@ -713,6 +713,15 @@ img.flag-img {
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 8px;
 }
+.wc-squad-pl.is-key {
+  background: rgba(240,192,64,0.06);
+  border-color: rgba(240,192,64,0.3);
+}
+.wc-squad-pl-star {
+  font-size: 11px;
+  margin-right: 3px;
+  vertical-align: 1px;
+}
 .wc-squad-pl-avatar {
   width: 36px; height: 36px;
   border-radius: 50%;
