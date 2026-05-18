@@ -2836,7 +2836,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  /* z-index 必須 > .msim-fulltime-banner (z-index 90)、不然金邊「全場結束」會穿透 */
+  z-index: 200;
   pointer-events: none;
   overflow: hidden;
   animation: mt-result-bg-in 0.4s ease-out forwards;
