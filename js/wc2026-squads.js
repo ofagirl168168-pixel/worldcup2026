@@ -164,23 +164,165 @@ window.WC_SQUADS = {
     ],
   },
 
-  // 🇨🇮 象牙海岸
-  'CIV': { status: 'final', announcedAt: '2026-05-15', players: [], note: '名單已公布、待匯入球員' },
+  // 🇸🇪 瑞典：5/12 公布、Potter 帶隊、Isak + Gyökeres 雙箭頭
+  'SWE': {
+    status: 'final',
+    announcedAt: '2026-05-12',
+    note: 'Graham Potter 接替 Tomasson 帶隊；Isak + Gyökeres 雙箭頭；Kulusevski 因傷落選',
+    players: [
+      // 守門員
+      { name: 'Viktor Johansson',           nameCN: '約翰森',         pos: 'GK',  club: '斯托克城',    age: 27 },
+      { name: 'Kristoffer Nordfeldt',       nameCN: '諾德菲爾特',    pos: 'GK',  club: 'AIK',         age: 36 },
+      { name: 'Jacob Widell Zetterström',   nameCN: '茲特斯特倫',    pos: 'GK',  club: '德比郡',      age: 27 },
+      // 後衛
+      { name: 'Victor Lindelöf',  nameCN: '林德洛夫',      pos: 'DEF', club: '阿斯頓維拉',     age: 31, note: '隊長' },
+      { name: 'Hjalmar Ekdal',    nameCN: '埃克達爾',      pos: 'DEF', club: '伯恩利',         age: 27 },
+      { name: 'Isak Hien',        nameCN: '希恩',          pos: 'DEF', club: '亞特蘭大',       age: 27 },
+      { name: 'Carl Starfelt',    nameCN: '斯塔費爾特',    pos: 'DEF', club: '塞爾塔',         age: 31 },
+      { name: 'Gabriel Gudmundsson',nameCN: '古德孟松',    pos: 'DEF', club: '利茲聯',         age: 27 },
+      { name: 'Daniel Svensson',  nameCN: '斯文森',        pos: 'DEF', club: '多特蒙德',       age: 24 },
+      { name: 'Gustaf Lagerbielke',nameCN: '拉格比埃爾克', pos: 'DEF', club: '布拉加',         age: 26 },
+      { name: 'Elliot Stroud',    nameCN: '斯特勞德',      pos: 'DEF', club: 'Mjällby',        age: 23 },
+      { name: 'Emil Holm',        nameCN: '霍爾姆',        pos: 'DEF', club: '波隆那',         age: 25 },
+      { name: 'Eric Smith',       nameCN: '史密斯',        pos: 'DEF', club: '聖保利',         age: 28 },
+      // 中場
+      { name: 'Yasin Ayari',      nameCN: '阿亞里',        pos: 'MID', club: '布萊頓',         age: 22 },
+      { name: 'Lucas Bergvall',   nameCN: '貝里瓦爾',      pos: 'MID', club: '熱刺',           age: 20 },
+      { name: 'Jesper Karlström', nameCN: '卡爾斯特倫',    pos: 'MID', club: '烏迪內斯',       age: 30 },
+      { name: 'Ken Sema',         nameCN: '塞馬',          pos: 'MID', club: 'Pafos',          age: 32 },
+      { name: 'Mattias Svanberg', nameCN: '斯萬貝里',      pos: 'MID', club: '沃夫斯堡',       age: 26 },
+      { name: 'Besfort Zeneli',   nameCN: '澤內里',        pos: 'MID', club: '聯合聖吉爾',     age: 22 },
+      { name: 'Taha Ali',         nameCN: '塔哈·阿里',     pos: 'MID', club: '奧地利克拉根福', age: 24 },
+      // 前鋒
+      { name: 'Alexander Isak',   nameCN: '伊薩克',        pos: 'FWD', club: '利物浦',         age: 26 },
+      { name: 'Viktor Gyökeres',  nameCN: '約克雷斯',      pos: 'FWD', club: '兵工廠',         age: 27, note: '附加賽英雄' },
+      { name: 'Anthony Elanga',   nameCN: '埃蘭加',        pos: 'FWD', club: '紐卡索',         age: 24 },
+      { name: 'Benjamin Nygren',  nameCN: '尼格倫',        pos: 'FWD', club: '塞爾提克',       age: 24 },
+      { name: 'Gustaf Nilsson',   nameCN: '尼爾森',        pos: 'FWD', club: '聯合柏林',       age: 28 },
+      { name: 'Alexander Bernhardsson', nameCN: '伯恩哈德森', pos: 'FWD', club: '哥德堡',     age: 27 },
+    ],
+  },
 
-  // 🇹🇳 突尼西亞
-  'TUN': { status: 'final', announcedAt: '2026-05-15', players: [], note: '名單已公布、待匯入球員' },
+  // 🇧🇦 波士尼亞：5/11 公布、Barbarez 帶隊、40 歲 Dzeko 仍是攻擊核心
+  'BIH': {
+    status: 'final',
+    announcedAt: '2026-05-11',
+    note: '40 歲 Edin Džeko 帶傷入選、黃金世代最後一人（Pjanić 已退役）；部分球員資料待補',
+    players: [
+      // 守門員
+      { name: 'Nikola Vasilj',    nameCN: '瓦西利',        pos: 'GK',  club: '聖保利',         age: 29 },
+      // 前鋒
+      { name: 'Edin Džeko',       nameCN: '哲科',          pos: 'FWD', club: '沙爾克',         age: 40, note: '黃金世代' },
+    ],
+  },
 
-  // 🇭🇹 海地
-  'HAI': { status: 'final', announcedAt: '2026-05-14', players: [], note: '名單已公布、待匯入球員' },
+  // 🇳🇿 紐西蘭：5/14 公布、Chris Wood 隊長、Wood + Tommy Smith 首位 2 屆世界盃紐西蘭球員
+  'NZL': {
+    status: 'final',
+    announcedAt: '2026-05-14',
+    note: 'Chris Wood 隊長；Wood + Tommy Smith 創紐西蘭史上首位 2 度世界盃紀錄',
+    players: [
+      // 守門員
+      { name: 'Max Crocombe',     nameCN: '克羅孔貝',      pos: 'GK',  club: 'Millwall',       age: 32 },
+      { name: 'Alex Paulsen',     nameCN: '保森',          pos: 'GK',  club: '萊基亞格但斯克', age: 23 },
+      { name: 'Michael Woud',     nameCN: '伍德',          pos: 'GK',  club: '奧克蘭 FC',      age: 27 },
+      // 後衛
+      { name: 'Tyler Bindon',     nameCN: '賓登',          pos: 'DEF', club: '諾丁漢森林',     age: 21 },
+      { name: 'Michael Boxall',   nameCN: '波克索爾',      pos: 'DEF', club: '明尼蘇達聯',     age: 37 },
+      { name: 'Liberato Cacace',  nameCN: '卡卡塞',        pos: 'DEF', club: '雷克瑟姆',       age: 25 },
+      { name: 'Francis De Vries', nameCN: '德弗里斯',      pos: 'DEF', club: '奧克蘭 FC',      age: 31 },
+      { name: 'Callan Elliot',    nameCN: '艾略特',        pos: 'DEF', club: '奧克蘭 FC',      age: 26 },
+      { name: 'Tim Payne',        nameCN: '佩恩',          pos: 'DEF', club: '威靈頓鳳凰',     age: 31 },
+      { name: 'Nando Pijanker',   nameCN: '皮揚克',        pos: 'DEF', club: '奧克蘭 FC',      age: 24 },
+      { name: 'Tommy Smith',      nameCN: '史密斯',        pos: 'DEF', club: 'Braintree',      age: 35, note: '第 2 度世界盃' },
+      { name: 'Finn Surman',      nameCN: '塞曼',          pos: 'DEF', club: '波特蘭木材人',   age: 22 },
+      // 中場
+      { name: 'Lachlan Bayliss',  nameCN: '貝里斯',        pos: 'MID', club: 'Newcastle Jets', age: 22 },
+      { name: 'Joe Bell',         nameCN: '貝爾',          pos: 'MID', club: '維京',           age: 26 },
+      { name: 'Alex Rufer',       nameCN: '魯弗',          pos: 'MID', club: '威靈頓鳳凰',     age: 30 },
+      { name: 'Marko Stamenić',   nameCN: '斯塔梅尼奇',    pos: 'MID', club: '斯旺西',         age: 23 },
+      { name: 'Ryan Thomas',      nameCN: '湯瑪斯',        pos: 'MID', club: 'PEC 茲沃勒',     age: 30 },
+      // 前鋒
+      { name: 'Chris Wood',       nameCN: '伍德',          pos: 'FWD', club: '諾丁漢森林',     age: 34, note: '隊長 / 第 2 度世界盃' },
+      { name: 'Kosta Barbarouses',nameCN: '巴爾巴魯塞',    pos: 'FWD', club: '西悉尼漫遊者',   age: 35 },
+      { name: 'Matt Garbett',     nameCN: '加爾貝特',      pos: 'FWD', club: '彼得堡聯',       age: 23 },
+      { name: 'Eli Just',         nameCN: '賈斯特',        pos: 'FWD', club: '馬瑟韋爾',       age: 26 },
+      { name: 'Callum McCowatt',  nameCN: '麥考瓦特',      pos: 'FWD', club: '錫爾克堡',       age: 26 },
+      { name: 'Ben Old',          nameCN: '奧爾德',        pos: 'FWD', club: '聖埃蒂安',       age: 23 },
+      { name: 'Jesse Randall',    nameCN: '蘭德爾',        pos: 'FWD', club: '奧克蘭 FC',      age: 24 },
+      { name: 'Ben Waine',        nameCN: '韋恩',          pos: 'FWD', club: '威靈頓鳳凰',     age: 24 },
+    ],
+  },
 
-  // 🇳🇿 紐西蘭
-  'NZL': { status: 'final', announcedAt: '2026-05-13', players: [], note: '名單已公布、待匯入球員' },
+  // 🇨🇮 象牙海岸：5/15 公布、Fae 帶隊、Kessié 隊長
+  'CIV': {
+    status: 'final',
+    announcedAt: '2026-05-15',
+    note: 'Franck Kessié 隊長（破百出場）；Amad Diallo 首屆世界盃；部分球員資料待補',
+    players: [
+      { name: 'Franck Kessié',    nameCN: '凱西耶',        pos: 'MID', club: '阿哈利',         age: 29, note: '隊長' },
+      { name: 'Evan Ndicka',      nameCN: '恩迪卡',        pos: 'DEF', club: '羅馬',           age: 26 },
+      { name: 'Nicolas Pépé',     nameCN: '佩佩',          pos: 'FWD', club: '比利亞雷亞爾',   age: 30 },
+      { name: 'Wilfried Singo',   nameCN: '辛戈',          pos: 'DEF', club: '摩納哥',         age: 25 },
+      { name: 'Amad Diallo',      nameCN: '迪亞洛',        pos: 'FWD', club: '曼聯',           age: 23, note: '首屆世界盃' },
+      { name: 'Evan Guessand',    nameCN: '蓋桑',          pos: 'FWD', club: '水晶宮',         age: 24, note: '首屆世界盃' },
+      { name: 'Simon Adingra',    nameCN: '阿丁格拉',      pos: 'FWD', club: '摩納哥',         age: 24 },
+      { name: 'Ange-Yoan Bonny',  nameCN: '邦尼',          pos: 'FWD', club: '國際米蘭',       age: 22, note: '剛轉籍' },
+    ],
+  },
 
-  // 🇸🇪 瑞典
-  'SWE': { status: 'final', announcedAt: '2026-05-14', players: [], note: '名單已公布、待匯入球員' },
+  // 🇹🇳 突尼西亞：5/15 公布、Lamouchi 帶隊、Skhiri 隊長
+  'TUN': {
+    status: 'final',
+    announcedAt: '2026-05-15',
+    note: 'Ellyes Skhiri 隊長；老將 Msakni 落選引討論；部分球員資料待補',
+    players: [
+      // 守門員
+      { name: 'Aymen Dahmen',     nameCN: '達赫曼',        pos: 'GK',  club: 'CS Sfaxien',     age: 28 },
+      { name: 'Sabri Ben Hassen', nameCN: '本哈森',        pos: 'GK',  club: '蘇沙星辰',       age: 27 },
+      { name: 'Abdelmouhib Chamakh', nameCN: '查馬克',     pos: 'GK',  club: '非洲俱樂部',     age: 27 },
+      // 後衛
+      { name: 'Montassar Talbi',  nameCN: '塔爾比',        pos: 'DEF', club: '洛里昂',         age: 27 },
+      { name: 'Dylan Bronn',      nameCN: '布隆',          pos: 'DEF', club: '塞爾維特',       age: 30 },
+      { name: 'Omar Rekik',       nameCN: '雷基克',        pos: 'DEF', club: 'NK 馬里博爾',    age: 24 },
+      { name: 'Yan Valery',       nameCN: '瓦勒里',        pos: 'DEF', club: '伯爾尼年輕人',   age: 27 },
+      { name: 'Ali Abdi',         nameCN: '阿卜迪',        pos: 'DEF', club: '尼斯',           age: 32 },
+      // 中場
+      { name: 'Ellyes Skhiri',    nameCN: '斯基里',        pos: 'MID', club: '法蘭克福',       age: 31, note: '隊長' },
+      { name: 'Rani Khedira',     nameCN: '凱迪拉',        pos: 'MID', club: '聯合柏林',       age: 32 },
+      { name: 'Hannibal Mejbri',  nameCN: '梅伊布里',      pos: 'MID', club: '伯恩茅斯',       age: 23 },
+    ],
+  },
 
-  // 🇧🇦 波士尼亞
-  'BIH': { status: 'final', announcedAt: '2026-05-13', players: [], note: '名單已公布、待匯入球員' },
+  // 🇭🇹 海地：5/14 公布、Placide 隊長、僑民球員為主、平均 24 歲
+  'HAI': {
+    status: 'final',
+    announcedAt: '2026-05-14',
+    note: 'Placide 隊長；以歐美僑民球員為主、平均年齡 24 歲、史上第 2 度世界盃',
+    players: [
+      // 守門員
+      { name: 'Johny Placide',    nameCN: '普拉西德',      pos: 'GK',  club: 'Bastia',         age: 37, note: '隊長' },
+      { name: 'Alexandre Pierre', nameCN: '皮埃爾',        pos: 'GK',  club: 'Sochaux',        age: 27 },
+      { name: 'Josué Duverger',   nameCN: '杜韋熱',        pos: 'GK',  club: '科布倫茨',       age: 25 },
+      // 後衛
+      { name: 'Ricardo Adé',      nameCN: '阿德',          pos: 'DEF', club: 'LDU Quito',      age: 25 },
+      { name: 'Carlens Arcus',    nameCN: '阿庫斯',        pos: 'DEF', club: '昂熱',           age: 30 },
+      { name: 'Jean-Kévin Duverne',nameCN: '杜韋恩',       pos: 'DEF', club: '根特',           age: 28 },
+      { name: 'Hannes Delcroix',  nameCN: '德爾克羅',      pos: 'DEF', club: '盧加諾',         age: 27 },
+      { name: 'Duke Lacroix',     nameCN: '拉克魯瓦',      pos: 'DEF', club: '科羅拉多溫泉',   age: 30 },
+      // 中場
+      { name: 'Danley Jean Jacques', nameCN: '讓·雅克',    pos: 'MID', club: '費城聯',         age: 25 },
+      { name: 'Carl Sainté',      nameCN: '聖泰',          pos: 'MID', club: '艾爾帕索',       age: 23 },
+      { name: 'Jean-Ricner Bellegarde', nameCN: '貝萊加德', pos: 'MID', club: '狼隊',          age: 27 },
+      // 前鋒
+      { name: 'Duckens Nazon',    nameCN: '納松',          pos: 'FWD', club: '艾斯特格拉',     age: 31 },
+      { name: 'Frantzdy Pierrot', nameCN: '皮耶羅',        pos: 'FWD', club: '里澤體育',       age: 30 },
+      { name: 'Derrick Etienne Jr.', nameCN: '埃蒂安',     pos: 'FWD', club: '多倫多 FC',      age: 29 },
+      { name: 'Ruben Providence', nameCN: '普羅維登斯',    pos: 'FWD', club: '阿爾梅雷',       age: 24 },
+      { name: 'Wilson Isidor',    nameCN: '伊西多爾',      pos: 'FWD', club: '桑德蘭',         age: 25 },
+      { name: 'Lenny Joseph',     nameCN: '約瑟夫',        pos: 'FWD', club: '費倫茨瓦羅斯',   age: 24 },
+    ],
+  },
 
   // ───────── 預告公布日期（截至 2026-05-18）─────────
   // 巴西 5/18、德國 5/21、美國 5/26、荷蘭 5/27、埃及 5/29
