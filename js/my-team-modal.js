@@ -2742,19 +2742,24 @@
           <div class="mt-profile-meta">
             <div class="mt-profile-name">${escapeHtml(c.name || '?')}</div>
             ${c.nickname ? `<div class="mt-profile-nick">「${escapeHtml(c.nickname)}」</div>` : ''}
-            <div class="mt-profile-pos">${c.position}・Lv.${p.level}${p.bond ? ' ★'.repeat(p.bond) : ''}</div>
+            <div class="mt-profile-pos">${c.position}・Lv.${p.level}${p.bond ? ' ★'.repeat(p.bond) : ''}・<span class="mt-profile-cap">上限 ${_attrCapForPlayer(p, false)}</span></div>
             ${talentLabel ? `<div class="mt-profile-talent">${talentLabel}</div>` : ''}
           </div>
         </div>
 
         <div class="mt-profile-radar">
-          ${_radarBar('攻擊', p.current_attack)}
-          ${_radarBar('防守', p.current_defense)}
-          ${c.position === 'GK' ? _radarBar('守門', Math.min(99, p.current_defense + 12)) : ''}
-          ${_radarBar('速度', p.current_speed)}
-          ${_radarBar('中場', p.current_midfield)}
-          ${_radarBar('體力', p.current_stamina, '影響後半場耐疲勞度')}
-          ${_radarBar('氣場', p.current_aura)}
+          ${(() => {
+            const cap = _attrCapForPlayer(p, false);
+            return [
+              _radarBar('攻擊', p.current_attack, cap),
+              _radarBar('防守', p.current_defense, cap),
+              c.position === 'GK' ? _radarBar('守門', Math.min(cap, p.current_defense + 12), cap) : '',
+              _radarBar('速度', p.current_speed, cap),
+              _radarBar('中場', p.current_midfield, cap),
+              _radarBar('體力', p.current_stamina, cap, '影響後半場耐疲勞度'),
+              _radarBar('氣場', p.current_aura, cap),
+            ].join('');
+          })()}
         </div>
 
         <div class="mt-profile-lore">
@@ -2983,14 +2988,26 @@
     pitch.addEventListener('pointerdown', onDown);
   }
 
-  function _radarBar(label, val, tooltip) {
-    const pct = Math.min(100, Math.max(0, val));
-    const color = pct >= 85 ? '#f0c040' : pct >= 70 ? '#9b87f5' : pct >= 50 ? '#90caf9' : '#888';
+  function _radarBar(label, val, capOrTooltip, tooltip) {
+    // 向後相容：第 3 參數若是字串就當 tooltip、否則當 cap
+    let cap = null;
+    let tip = null;
+    if (typeof capOrTooltip === 'number') {
+      cap = capOrTooltip;
+      tip = tooltip;
+    } else {
+      tip = capOrTooltip;
+    }
+    const v = Math.max(0, val || 0);
+    const safeCap = cap && cap > 0 ? cap : 100;
+    // bar 寬度依「占 cap 多少」、滿了就 100%
+    const pct = Math.min(100, (v / safeCap) * 100);
+    const color = v >= 130 ? '#f0c040' : v >= 105 ? '#9b87f5' : v >= 80 ? '#90caf9' : '#888';
     return `
-      <div class="mt-radar-row"${tooltip ? ` title="${tooltip}"` : ''}>
+      <div class="mt-radar-row"${tip ? ` title="${tip}"` : ''}>
         <span class="mt-radar-label">${label}</span>
         <div class="mt-radar-bar"><div style="width:${pct}%;background:${color}"></div></div>
-        <span class="mt-radar-val">${val}</span>
+        <span class="mt-radar-val">${v}${cap ? `<span class="mt-radar-cap">/${cap}</span>` : ''}</span>
       </div>
     `;
   }
