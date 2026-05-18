@@ -3335,23 +3335,39 @@
         </div>`;
       }).join('');
 
-      // 加好友
+      // 加好友（送邀請、要對方接受）
       list.querySelectorAll('.mt-rank-friend-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           e.stopPropagation();
           const uid = btn.dataset.add;
           btn.disabled = true; btn.textContent = '…';
           try {
-            await window.DB.from('user_friend').insert({ user_id: me, friend_id: uid });
-            btn.textContent = '✓';
-            if (typeof showToast === 'function') showToast('✅ 已加為好友');
-          } catch (e) {
-            if (String(e.message || '').includes('duplicate')) {
+            const { data, error } = await window.DB.rpc('send_friend_request', { p_target: uid });
+            if (error) throw error;
+            const status = String(data || '');
+            if (status === 'sent') {
+              btn.textContent = '⏳';
+              btn.title = '待對方確認';
+              if (typeof showToast === 'function') showToast('📨 邀請已送出、等對方接受');
+            } else if (status === 'auto_accepted') {
               btn.textContent = '✓';
+              if (typeof showToast === 'function') showToast('🤝 對方先邀請了你、自動互加成功！');
+            } else if (status === 'already_pending') {
+              btn.textContent = '⏳';
+              btn.title = '待對方確認';
+              if (typeof showToast === 'function') showToast('⏳ 已送過邀請、等對方確認');
+            } else if (status === 'already_friend') {
+              btn.textContent = '✓';
+              if (typeof showToast === 'function') showToast('✓ 已是好友');
+            } else if (status === 'self') {
+              btn.disabled = false; btn.textContent = '＋';
+              if (typeof showToast === 'function') showToast('⚠️ 不能加自己');
             } else {
-              alert('加好友失敗：' + (e.message || e));
               btn.disabled = false; btn.textContent = '＋';
             }
+          } catch (e) {
+            alert('加好友失敗：' + (e.message || e));
+            btn.disabled = false; btn.textContent = '＋';
           }
         });
       });
@@ -3373,10 +3389,24 @@
     content.innerHTML = '<div class="mt-tab-todo"><div class="mt-tab-todo-icon">⏳</div>載入好友…</div>';
     const me = window.currentUser?.id;
     if (!me) { content.innerHTML = '請先登入'; return; }
-    const { data: friends, error } = await window.DB.from('user_friend')
-      .select('friend_id, added_at').eq('user_id', me).order('added_at', { ascending: false });
-    if (error) { content.innerHTML = '載入失敗：' + error.message; return; }
-    if (!friends || !friends.length) {
+
+    // 並行撈：（1）我送 / 收的 user_friend rows
+    // outgoing pending: 我送過去等對方接受 — user_id=me, status=pending
+    // incoming pending: 別人送來等我回應    — friend_id=me, status=pending
+    // accepted:         user_id=me, status=accepted
+    const [outRes, inRes, acceptedRes] = await Promise.all([
+      window.DB.from('user_friend').select('friend_id, added_at')
+        .eq('user_id', me).eq('status', 'pending').order('added_at', { ascending: false }),
+      window.DB.from('user_friend').select('user_id, added_at')
+        .eq('friend_id', me).eq('status', 'pending').order('added_at', { ascending: false }),
+      window.DB.from('user_friend').select('friend_id, added_at')
+        .eq('user_id', me).eq('status', 'accepted').order('added_at', { ascending: false }),
+    ]);
+    const outgoing  = outRes.data || [];
+    const incoming  = inRes.data  || [];
+    const accepted  = acceptedRes.data || [];
+
+    if (!outgoing.length && !incoming.length && !accepted.length) {
       content.innerHTML = `
         <div class="mt-tab-todo">
           <div class="mt-tab-todo-icon">👥</div>
@@ -3392,47 +3422,119 @@
       return;
     }
 
-    // 撈每個朋友的隊伍 snapshot
-    const fids = friends.map(f => f.friend_id);
+    // 一次撈所有相關 user 的隊伍 snapshot
+    const allUids = [
+      ...accepted.map(f => f.friend_id),
+      ...outgoing.map(f => f.friend_id),
+      ...incoming.map(f => f.user_id),
+    ];
     const { data: teams } = await window.DB.from('my_team_leaderboard')
-      .select('*').in('user_id', fids);
+      .select('*').in('user_id', allUids.length ? allUids : ['_none_']);
     const teamMap = {};
     (teams || []).forEach(t => { teamMap[t.user_id] = t; });
 
-    content.innerHTML = `
-      <div class="mt-friends-tab">
-        <div class="mt-quest-group-title">👥 好友列表 (${friends.length})</div>
-        <div class="mt-friends-list">
-          ${friends.map(f => {
-            const t = teamMap[f.friend_id];
-            if (!t) return '';
-            const crest = window.TeamCrests ? window.TeamCrests.getSvg(
-              t.team_crest || 'football', t.crest_primary, t.crest_accent) : '⚽';
-            return `<div class="mt-friend-row" data-uid="${f.friend_id}">
-              <div class="mt-rank-crest">${crest}</div>
-              <div class="mt-rank-info">
-                <div class="mt-rank-name">${escapeHtml(t.team_name || '')}</div>
-                <div class="mt-rank-meta">${escapeHtml(t.player_name)} · Tier ${t.current_tier || 1} · 積分 ${t.pvp_elo || '—'}</div>
-              </div>
-              <button class="mt-friend-remove" data-rm="${f.friend_id}" title="移除好友">×</button>
-            </div>`;
-          }).join('')}
+    const renderRow = (uid, mode) => {
+      const t = teamMap[uid] || { team_name: '(未建隊)', player_name: '?' };
+      const crest = (window.TeamCrests && t.team_crest) ? window.TeamCrests.getSvg(
+        t.team_crest || 'football', t.crest_primary, t.crest_accent) : '⚽';
+      let actions = '';
+      if (mode === 'accepted') {
+        actions = `<button class="mt-friend-remove" data-rm="${uid}" title="移除好友">×</button>`;
+      } else if (mode === 'outgoing') {
+        actions = `<span class="mt-friend-status mt-friend-status-pending">⏳ 待對方確認</span>
+                   <button class="mt-friend-cancel" data-cancel="${uid}" title="取消邀請">×</button>`;
+      } else if (mode === 'incoming') {
+        actions = `<button class="mt-friend-accept" data-accept="${uid}">✓ 接受</button>
+                   <button class="mt-friend-reject" data-reject="${uid}">× 拒絕</button>`;
+      }
+      return `<div class="mt-friend-row mt-friend-row-${mode}" data-uid="${uid}">
+        <div class="mt-rank-crest">${crest}</div>
+        <div class="mt-rank-info">
+          <div class="mt-rank-name">${escapeHtml(t.team_name || '')}</div>
+          <div class="mt-rank-meta">${escapeHtml(t.player_name || '?')} · Tier ${t.current_tier || 1}${t.pvp_elo ? '・積分 ' + t.pvp_elo : ''}</div>
         </div>
-      </div>
-    `;
+        ${actions}
+      </div>`;
+    };
 
+    const sections = [];
+    if (incoming.length) {
+      sections.push(`<div class="mt-friends-section">
+        <div class="mt-quest-group-title">📨 等你回應（${incoming.length}）</div>
+        <div class="mt-friends-list">
+          ${incoming.map(f => renderRow(f.user_id, 'incoming')).join('')}
+        </div>
+      </div>`);
+    }
+    sections.push(`<div class="mt-friends-section">
+      <div class="mt-quest-group-title">👥 好友列表（${accepted.length}）</div>
+      ${accepted.length
+        ? `<div class="mt-friends-list">${accepted.map(f => renderRow(f.friend_id, 'accepted')).join('')}</div>`
+        : '<div class="mt-friends-empty">還沒有好友、去排行榜加吧</div>'}
+    </div>`);
+    if (outgoing.length) {
+      sections.push(`<div class="mt-friends-section">
+        <div class="mt-quest-group-title">⏳ 待對方確認（${outgoing.length}）</div>
+        <div class="mt-friends-list">
+          ${outgoing.map(f => renderRow(f.friend_id, 'outgoing')).join('')}
+        </div>
+      </div>`);
+    }
+
+    content.innerHTML = `<div class="mt-friends-tab">${sections.join('')}</div>`;
+
+    // 點 row（除非點按鈕）→ 看陣容
     content.querySelectorAll('.mt-friend-row').forEach(row => {
       row.addEventListener('click', (e) => {
-        if (e.target.matches('.mt-friend-remove')) return;
+        if (e.target.closest('button')) return;
         _openOpponentTeamView(row.dataset.uid);
       });
     });
+    // 接受
+    content.querySelectorAll('.mt-friend-accept').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        btn.disabled = true;
+        try {
+          await window.DB.rpc('respond_friend_request', { p_from: btn.dataset.accept, p_accept: true });
+          if (typeof showToast === 'function') showToast('🤝 已接受好友邀請');
+          renderTab();
+        } catch (err) { alert('接受失敗：' + (err.message || err)); btn.disabled = false; }
+      });
+    });
+    // 拒絕
+    content.querySelectorAll('.mt-friend-reject').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        btn.disabled = true;
+        try {
+          await window.DB.rpc('respond_friend_request', { p_from: btn.dataset.reject, p_accept: false });
+          if (typeof showToast === 'function') showToast('已拒絕邀請');
+          renderTab();
+        } catch (err) { alert('拒絕失敗：' + (err.message || err)); btn.disabled = false; }
+      });
+    });
+    // 取消已送出的邀請
+    content.querySelectorAll('.mt-friend-cancel').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!confirm('取消這筆好友邀請？')) return;
+        try {
+          await window.DB.from('user_friend').delete()
+            .eq('user_id', me).eq('friend_id', btn.dataset.cancel).eq('status', 'pending');
+          renderTab();
+        } catch (err) { alert('取消失敗：' + (err.message || err)); }
+      });
+    });
+    // 移除好友（雙向刪除）
     content.querySelectorAll('.mt-friend-remove').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
         if (!confirm('移除好友？')) return;
         try {
-          await window.DB.from('user_friend').delete().eq('user_id', me).eq('friend_id', btn.dataset.rm);
+          const other = btn.dataset.rm;
+          await window.DB.from('user_friend').delete()
+            .or(`and(user_id.eq.${me},friend_id.eq.${other}),and(user_id.eq.${other},friend_id.eq.${me})`);
           renderTab();
         } catch (e) { alert('移除失敗：' + e.message); }
       });
