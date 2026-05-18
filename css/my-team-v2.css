@@ -3946,7 +3946,8 @@
 }
 .mt-home-name.rarity-SSR { color: #ffd866; }
 .mt-home-name.rarity-SR  { color: #c9b6ff; }
-.mt-home-name.rarity-R   { color: #fff; }
+.mt-home-name.rarity-R   { color: #9bc8ff; }   /* 淺藍 — 跟 portrait 藍光暈一致 */
+.mt-home-name.rarity-N   { color: #fff; }      /* 白色 — 基本款 */
 
 .mt-home-star {
   display: inline-block;
