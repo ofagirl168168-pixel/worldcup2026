@@ -1608,7 +1608,13 @@
   z-index: 20;
   pointer-events: none;
   white-space: nowrap;
-  animation: mt-pack-cta-blink 1.2s ease-in-out infinite;
+  /* 改用 drop-shadow（跟著文字實際形狀 alpha）+ 自訂 keyframes
+     避免 box-shadow 畫在元素 bounding box 的方框上 */
+  animation: mt-flip-prompt-glow 1.2s ease-in-out infinite;
+}
+@keyframes mt-flip-prompt-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(240,192,64,0.35)); }
+  50%      { filter: drop-shadow(0 0 12px rgba(240,192,64,0.85)); }
 }
 .mt-gacha-flip-prompt[hidden] { display: none !important; }
 .mt-gacha-flip-btn {
