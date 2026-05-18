@@ -1599,7 +1599,9 @@
 /* ── Stage 2.5：點擊翻牌（固定螢幕底部、不被卡擠掉）── */
 .mt-gacha-flip-prompt {
   position: fixed;
+  top: auto;            /* override 舊 mt-styles.css 的 top: calc(50% + 170px) */
   bottom: 28px; left: 0; right: 0;
+  transform: none;      /* override 舊 translateX(-50%) — 否則會把全寬元素整個推到螢幕左外 */
   display: flex; justify-content: center;
   z-index: 20;
   animation: mt-pack-cta-blink 1.2s ease-in-out infinite;

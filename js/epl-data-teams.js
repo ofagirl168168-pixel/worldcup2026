@@ -895,7 +895,7 @@ window.EPL_MATCHES = [
      {min:'38',player:'Merlin Rohl',side:'h'},
      {min:'59',player:'Brian Brobbey',side:'a'},
      {min:'81',player:'Enzo Le Fee',side:'a'},
-     {min:'85',player:'Wilson Isidor',side:'a'}
+     {min:'90+1',player:'Wilson Isidor',side:'a'}
    ]},
 
   // 里茲聯 vs 布萊頓 | 05/17 22:00 台灣時間 (05/17 15:00 BST)
