@@ -445,10 +445,10 @@
         const lastDate = localStorage.getItem('mt_arena_vote_date_v1');
         if (lastDate !== today && window.MyTeam && typeof window.MyTeam.triggerInstantGacha === 'function') {
           localStorage.setItem('mt_arena_vote_date_v1', today);
-          // 延遲 800ms 讓投票結果動畫先跑完
+          // 延遲 3000ms：讓使用者看一眼投票結果（百分比 bar、留言載入）再跳抽卡
           setTimeout(() => {
             window.MyTeam.triggerInstantGacha(1, 'arena_vote').catch(e => console.warn('[mt] instant gacha', e));
-          }, 800);
+          }, 3000);
         }
         // 任務：每次投票都算一次（不只首投）
         if (window.MyTeamBetaEnabled?.() && window.MyTeam) {
