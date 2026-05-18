@@ -3882,6 +3882,55 @@ if (document.readyState === 'loading') {
   _initArticleRouter();
 }
 
+// 渲染世界盃 26 人大名單 section（只在世界盃賽事顯示）
+function _renderWcSquadSection(code) {
+  // 只在世界盃 tab 顯示（英超 / 歐冠 沒有國家隊大名單概念）
+  if (typeof _isClub === 'function' && _isClub()) return '';
+  const squads = window.WC_SQUADS || {};
+  const sq = squads[code];
+  if (!sq) {
+    return `<div class="modal-section-title">🏆 世界盃 26 人大名單</div>
+            <div class="wc-squad-empty">⏳ 此隊尚未公布最終 26 人名單（FIFA 截止日 6/1）</div>`;
+  }
+  const statusBadge = sq.status === 'final'
+    ? `<span class="wc-squad-badge wc-squad-badge--final">✅ 最終 26（${sq.announcedAt}公布）</span>`
+    : sq.status === 'preliminary'
+    ? `<span class="wc-squad-badge wc-squad-badge--prelim">📝 初選 ${sq.totalCount || ''} 人</span>`
+    : `<span class="wc-squad-badge">⏳ 未公布</span>`;
+  if (!sq.players || !sq.players.length) {
+    return `<div class="modal-section-title">🏆 世界盃 26 人大名單 ${statusBadge}</div>
+            <div class="wc-squad-empty">${sq.note || '名單已公布、待匯入球員資料'}</div>`;
+  }
+  // 依位置分組
+  const groups = { GK: [], DEF: [], MID: [], FWD: [] };
+  for (const p of sq.players) {
+    const g = groups[p.pos] || groups.MID;
+    g.push(p);
+  }
+  const POS_LBL = { GK: '🧤 守門員', DEF: '🛡️ 後衛', MID: '⚙️ 中場', FWD: '⚽ 前鋒' };
+  const renderPlayer = (p) => {
+    const initial = (p.name || '').charAt(0).toUpperCase() || '?';
+    const note = p.note ? `<span class="wc-squad-pl-note">${p.note}</span>` : '';
+    return `<div class="wc-squad-pl">
+      <div class="wc-squad-pl-avatar wc-squad-pl-avatar--${p.pos}">${initial}</div>
+      <div class="wc-squad-pl-info">
+        <div class="wc-squad-pl-name">${p.nameCN || p.name}${note}</div>
+        <div class="wc-squad-pl-meta">${p.name !== (p.nameCN || p.name) ? p.name + ' · ' : ''}${p.club || ''}${p.age ? ' · ' + p.age + ' 歲' : ''}</div>
+      </div>
+    </div>`;
+  };
+  const groupsHtml = ['GK', 'DEF', 'MID', 'FWD'].filter(g => groups[g].length).map(g =>
+    `<div class="wc-squad-group">
+      <div class="wc-squad-group-title">${POS_LBL[g]} (${groups[g].length})</div>
+      <div class="wc-squad-group-list">${groups[g].map(renderPlayer).join('')}</div>
+    </div>`
+  ).join('');
+  const noteHtml = sq.note ? `<div class="wc-squad-note">📌 ${sq.note}</div>` : '';
+  return `<div class="modal-section-title">🏆 世界盃 26 人大名單 ${statusBadge}</div>
+          ${noteHtml}
+          <div class="wc-squad-wrap">${groupsHtml}</div>`;
+}
+
 function openTeamModal(code) {
   const _T = _teams();
   const t = _T[code];
@@ -3918,6 +3967,7 @@ function openTeamModal(code) {
     </div>
     <div class="modal-section-title">關鍵球員</div>
     <div class="player-list">${players}</div>
+    ${_renderWcSquadSection(code)}
     <div class="modal-section-title">球隊風格</div>
     <p style="font-size:14px;color:var(--text-secondary)">${t.style}</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
