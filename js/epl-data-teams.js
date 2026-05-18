@@ -892,7 +892,7 @@ window.EPL_MATCHES = [
   {id:'EPL-MW37-EVE-SUN', matchday:37, date:'2026-05-17', time:'22:00', home:'EVE', away:'SUN', stage:'league',
    status:'finished', score:{h:1,a:3}, halfTime:{h:1,a:0},
    goals:[
-     {min:'38',player:'Merlin Rohl',side:'h'},
+     {min:'43',player:'Merlin Rohl',side:'h'},
      {min:'59',player:'Brian Brobbey',side:'a'},
      {min:'81',player:'Enzo Le Fee',side:'a'},
      {min:'90+1',player:'Wilson Isidor',side:'a'}

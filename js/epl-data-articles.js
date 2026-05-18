@@ -3715,19 +3715,19 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>上半場：Rohl 先聲奪人</h3>
 
-<p><b>38 分鐘</b>，艾佛頓中場 <b>Merlin Rohl</b> 起腳射門，皮球經 Xhaka 折射後飛入球門，<b>1-0</b>。這是 Rohl 加盟太妃糖以來的首粒英超進球，古迪遜公園一片歡騰，歐戰似乎觸手可及。</p>
+<p><b>43 分鐘</b>，艾佛頓中場 <b>Merlin Rohl</b> 起腳射門，皮球經 Xhaka 折射後飛入球門，<b>1-0</b>。這是 Rohl 加盟太妃糖以來的首粒英超進球，古迪遜公園一片歡騰，歐戰似乎觸手可及。</p>
 
 <h3>下半場：桑德蘭三箭齊發</h3>
 
 <p>然而下半場的劇本完全屬於桑德蘭。<b>59 分鐘</b>，<b>Brian Brobbey</b> 抓住 O'Brien 的傳球失誤，擺脫 Tarkowski 的防守後大力抽射破門，<b>1-1</b>。</p>
 
-<p><b>81 分鐘</b>，<b>Enzo Le Fee</b> 門前混戰中將球捅入，Pickford 撲救不及，<b>1-2</b>。<b>85 分鐘</b>，Coleman 在後場盯人失位，<b>Wilson Isidor</b> 身後插上輕鬆推射空門，<b>1-3</b>——徹底殺死比賽。</p>
+<p><b>81 分鐘</b>，<b>Enzo Le Fee</b> 門前混戰中將球捅入，Pickford 撲救不及，<b>1-2</b>。<b>90+1 分鐘</b>，Coleman 在後場盯人失位，<b>Wilson Isidor</b> 身後插上輕鬆推射空門，<b>1-3</b>——徹底殺死比賽。</p>
 
 <h3>關鍵數據</h3>
 
 <p><b>Brian Brobbey</b>：1 球（59'），搶斷後獨闖破門，力量與速度的完美結合。<br>
 <b>Enzo Le Fee</b>：1 球（81'），關鍵時刻把握機會。<br>
-<b>Wilson Isidor</b>：1 球（85'），冷靜收割鎖定勝局。</p>
+<b>Wilson Isidor</b>：1 球（90+1'），冷靜收割鎖定勝局。</p>
 
 <h3>Soccer麥迪觀點</h3>
 
