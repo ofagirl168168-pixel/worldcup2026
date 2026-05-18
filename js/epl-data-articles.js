@@ -3706,7 +3706,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
     date: '2026-05-17',
     category: '賽後深度分析',
     tournament: 'epl',
-    summary: '英超第37輪——桑德蘭在古迪遜公園 3-1 逆轉艾佛頓，Brobbey、Le Fee、Isidor 下半場連入三球。艾佛頓的歐戰夢幾乎破碎，桑德蘭繼續衝擊歐戰名額。',
+    summary: '英超第37輪——桑德蘭在 Hill Dickinson Stadium 3-1 逆轉艾佛頓，Brobbey、Le Fee、Isidor 下半場連入三球。艾佛頓的歐戰夢幾乎破碎，桑德蘭繼續衝擊歐戰名額。',
     content: `<h2>艾佛頓 1-3 桑德蘭｜英超第37輪・5/17（日）22:00 台灣時間・Hill Dickinson Stadium</h2>
 
 <h3>比賽概述</h3>
@@ -3715,13 +3715,13 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>上半場：Rohl 先聲奪人</h3>
 
-<p><b>43 分鐘</b>，艾佛頓中場 <b>Merlin Rohl</b> 起腳射門，皮球經 Xhaka 折射後飛入球門，<b>1-0</b>。這是 Rohl 加盟太妃糖以來的首粒英超進球，古迪遜公園一片歡騰，歐戰似乎觸手可及。</p>
+<p><b>43 分鐘</b>，艾佛頓中場 <b>Merlin Rohl</b> 起腳射門，皮球經桑德蘭隊長 Xhaka 折射後飛入球門，<b>1-0</b>。這是 Rohl 加盟太妃糖以來的首粒英超進球，Hill Dickinson Stadium 一片歡騰，歐戰似乎觸手可及。</p>
 
 <h3>下半場：桑德蘭三箭齊發</h3>
 
 <p>然而下半場的劇本完全屬於桑德蘭。<b>59 分鐘</b>，<b>Brian Brobbey</b> 抓住 O'Brien 的傳球失誤，擺脫 Tarkowski 的防守後大力抽射破門，<b>1-1</b>。</p>
 
-<p><b>81 分鐘</b>，<b>Enzo Le Fee</b> 門前混戰中將球捅入，Pickford 撲救不及，<b>1-2</b>。<b>90+1 分鐘</b>，Coleman 在後場盯人失位，<b>Wilson Isidor</b> 身後插上輕鬆推射空門，<b>1-3</b>——徹底殺死比賽。</p>
+<p><b>81 分鐘</b>，<b>Enzo Le Fee</b> 門前混戰中將球捅入，Pickford 撲救不及，<b>1-2</b>。<b>90+1 分鐘</b>，艾佛頓後防鬆懈，<b>Wilson Isidor</b> 接替補上陣的 Habib Diarra 低平傳球輕鬆推射破門，<b>1-3</b>——徹底殺死比賽。</p>
 
 <h3>關鍵數據</h3>
 
@@ -3731,7 +3731,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>Soccer麥迪觀點</h3>
 
-<p>艾佛頓的歐戰夢想幾乎宣告破滅——除非最後一輪出現奇蹟般的結果配合。桑德蘭作為升班馬的表現令人刮目相看，Brobbey、Le Fee、Isidor 三叉戟在關鍵時刻展現了大心臟。這場敗仗暴露了艾佛頓後防老化的問題，Coleman 和 Tarkowski 的失誤直接導致失球。</p>`,
+<p>艾佛頓的歐戰夢想幾乎宣告破滅——除非最後一輪出現奇蹟般的結果配合。桑德蘭作為升班馬的表現令人刮目相看，Brobbey、Le Fee、Isidor 三叉戟在關鍵時刻展現了大心臟。這場敗仗暴露了艾佛頓後防的脆弱，下半場連失三球令人唏噓。</p>`,
     tags: ['賽後戰報', '艾佛頓', '桑德蘭', 'Brobbey', 'Le Fee', 'Isidor', 'Rohl', '第37輪']
   },
   {
