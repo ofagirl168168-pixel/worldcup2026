@@ -6152,17 +6152,10 @@
   }
 
   // 屬性 cap = Lv 硬上限 + 星等 × 5（跟 attr_hard_ceiling_for_level SQL 公式同步）
+  // 每 5 Lv 一區間、+5、尾數 4/9：1-5=99 / 6-10=104 / 11-15=109 / ... / 46-50=144
   function _attrCeilingForLv(lv) {
-    if (lv >= 50) return 145;
-    if (lv >= 45) return 140;
-    if (lv >= 40) return 135;
-    if (lv >= 35) return 130;
-    if (lv >= 30) return 125;
-    if (lv >= 25) return 120;
-    if (lv >= 20) return 115;
-    if (lv >= 15) return 110;
-    if (lv >= 10) return 105;
-    return 99;
+    const safeLv = Math.max(1, Math.min(50, lv || 1));
+    return 99 + Math.floor((safeLv - 1) / 5) * 5;
   }
   function _attrCapForPlayer(p, willLvUp) {
     const newLv = (p.level || 1) + (willLvUp ? 1 : 0);
