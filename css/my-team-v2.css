@@ -1596,14 +1596,18 @@
   50%      { transform: translateY(3px); }
 }
 
-/* ── Stage 2.5：點擊翻牌（固定螢幕底部、不被卡擠掉）── */
+/* ── Stage 2.5：點擊翻牌（顯示在卡片正下方）── */
 .mt-gacha-flip-prompt {
   position: fixed;
-  top: auto;            /* override 舊 mt-styles.css 的 top: calc(50% + 170px) */
-  bottom: 28px; left: 0; right: 0;
-  transform: none;      /* override 舊 translateX(-50%) — 否則會把全寬元素整個推到螢幕左外 */
+  top: calc(50% + 170px);   /* 卡片中心 ≈ 50% / 卡片底 ≈ +160px / 提示在卡底再 ~10px */
+  bottom: auto;              /* override 之前 v2 的 bottom: 28px */
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
   display: flex; justify-content: center;
   z-index: 20;
+  pointer-events: none;
+  white-space: nowrap;
   animation: mt-pack-cta-blink 1.2s ease-in-out infinite;
 }
 .mt-gacha-flip-prompt[hidden] { display: none !important; }
