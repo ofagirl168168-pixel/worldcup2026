@@ -184,19 +184,20 @@
     const kitShirt = opts.shirtColor || 'red';
     const kitPants = opts.pantsColor || 'blue';
     const kitShoes = opts.shoeColor || 'white';
-    // v3 = row 8 GK 撲球改用 slash-up（手舉過頭、像 halfslash 234）+ match-sim 旋轉成飛撲
-    const key = JSON.stringify(look) + '|F|v3|' + kitShirt + '|' + kitPants + '|' + kitShoes;
+    // v4 = 加 row 9 combat-idle-down（戰備站立、給比賽 tab 球門前對手用）
+    const key = JSON.stringify(look) + '|F|v4|' + kitShirt + '|' + kitPants + '|' + kitShoes;
     if (fullBodyCache.has(key)) return fullBodyCache.get(key);
 
     // 寬一點才裝得下 slash 揮腿、spellcast 舉手張開的手臂
     const FRAME_W = 48, FRAME_H = 64;
-    const FRAME_COLS = 3, FRAME_ROWS = 9;
+    const FRAME_COLS = 3, FRAME_ROWS = 10;
     // row 順序：0=walk-down, 1=walk-left, 2=walk-right, 3=walk-up,
     //          4=kick(slash-down), 5=cheer/stretch(spellcast-down),
     //          6=frustration(hurt 1-3), 7=tackle/slide(thrust-right 伸腿鏟球),
-    //          8=GK dive(slash-up frames 2-3-4、手舉過頭、近似 1h_halfslash)
-    // LPC y 行：walk=8/9/10/11、slash=12-15、spellcast=0-3、hurt=20、thrust=4-7
-    const ROW_TO_LPC_Y = [10*64, 9*64, 11*64, 8*64, 14*64, 2*64, 20*64, 7*64, 12*64];
+    //          8=GK dive(slash-up frames 2-3-4、手舉過頭、近似 1h_halfslash),
+    //          9=combat-idle-down（戰備站立、雙手抬胸前微晃）
+    // LPC y 行：walk=8/9/10/11、slash=12-15、spellcast=0-3、hurt=20、thrust=4-7、combat-idle=22-25
+    const ROW_TO_LPC_Y = [10*64, 9*64, 11*64, 8*64, 14*64, 2*64, 20*64, 7*64, 12*64, 22*64];
     const ROW_FRAMES = [
       [1, 4, 7],  // walk-down
       [1, 4, 7],
@@ -207,6 +208,7 @@
       [1, 2, 3],  // frustration：hurt 站不穩
       [3, 5, 7],  // tackle：thrust-right 伸腿撲擊
       [2, 3, 4],  // GK dive：slash-up 234（手舉肩→過頭頂→開始下揮、apex 過頭頂）
+      [0, 1, 0],  // combat-idle-down：2 幀循環、第 3 幀回 0（看起來像輕晃）
     ];
 
     const SX = 8, SY_OFF = 0;  // 寬 8-55、高 0-63 整個 frame、手臂 + 頂部頭髮都裝得下
@@ -236,6 +238,11 @@
     const ctx = cv.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
+    // 部分 LPC layer 是舊 21-row 版本（沒 climb 之後的 row、包括 combat-idle）
+    // 該 layer 在缺 row 上時 fallback 到 walk-down 站立幀（lpcY=10*64, lpcFrame=4）
+    // 這樣對手不會變光頭沒衣服、頂多 idle 上半身姿勢稍微不貼合 body
+    const FALLBACK_LPC_Y = 10 * 64;
+    const FALLBACK_LPC_FRAME = 4;
     for (let row = 0; row < FRAME_ROWS; row++) {
       const lpcY = ROW_TO_LPC_Y[row];
       const frames = ROW_FRAMES[row];
@@ -246,7 +253,13 @@
         const dx = col * FRAME_W;
         const dy = row * FRAME_H;
         for (const layer of [body, pants, shirt, shoes, head, wrinkles, eyes, eyebrows, beard, mustache, hair, headband]) {
-          if (layer) ctx.drawImage(layer, srcX, srcY, FRAME_W, FRAME_H, dx, dy, FRAME_W, FRAME_H);
+          if (!layer) continue;
+          let ux = srcX, uy = srcY;
+          if (uy + FRAME_H > layer.naturalHeight) {
+            uy = FALLBACK_LPC_Y + SY_OFF;
+            ux = FALLBACK_LPC_FRAME * 64 + SX;
+          }
+          ctx.drawImage(layer, ux, uy, FRAME_W, FRAME_H, dx, dy, FRAME_W, FRAME_H);
         }
       }
     }

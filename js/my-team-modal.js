@@ -1372,7 +1372,7 @@
       const injured = (w.player.injured_until && new Date(w.player.injured_until) > now)
         ? '<span class="mt-pitch-injury">🏥</span>' : '';
       const SCALE = w.scale;
-      const SHEET_ROWS = 9;  // walk×4 + kick + cheer + frustration + tackle + GK dive
+      const SHEET_ROWS = 10;  // walk×4 + kick + cheer + frustration + tackle + GK dive + combat-idle
       const SHEET_COLS = 3;
       const rarity = w.player.card?.rarity || 'R';
       const pos = w.player.card?.position || '';
@@ -5147,7 +5147,7 @@
     } catch (e) { console.warn('[my-team] opp render fail', e); }
 
     const SHEET_COLS = 3;
-    const SHEET_ROWS = 9;  // walk×4 + kick + cheer + frustration + tackle + GK dive
+    const SHEET_ROWS = 10;  // walk×4 + kick + cheer + frustration + tackle + GK dive + combat-idle
     const setupSprite = (el, sheetUrl) => {
       el.style.width = frameW + 'px';
       el.style.height = frameH + 'px';
@@ -5170,6 +5170,7 @@
     const ROW_CHEER  = 5;
     const ROW_HURT   = 6;
     const ROW_TACKLE = 7;
+    const ROW_COMBAT_IDLE = 9;
 
     // 動畫狀態
     let phase = 'run';     // 'run' | 'shoot' | 'ball-flight' | 'goal' | 'restart'
@@ -5283,12 +5284,13 @@
     _matchOppLoop = setInterval(() => {
       if (oppMode !== 'idle') return;
       if (!opp1El && !opp2El) return;
+      // combat-idle row 只有 2 個有效 frame (0/1)、第 3 幀回 0 形成輕晃
       oppIdlePhase = (oppIdlePhase + 1) % SHEET_COLS;
       const f1 = oppIdlePhase;
       const f2 = (oppIdlePhase + 1) % SHEET_COLS;  // 兩人錯開一幀、不同步看起來自然
-      if (opp1El) opp1El.style.backgroundPosition = `-${f1 * frameW}px -${ROW_WALK_DOWN * frameH}px`;
-      if (opp2El) opp2El.style.backgroundPosition = `-${f2 * frameW}px -${ROW_WALK_DOWN * frameH}px`;
-    }, 400);
+      if (opp1El) opp1El.style.backgroundPosition = `-${f1 * frameW}px -${ROW_COMBAT_IDLE * frameH}px`;
+      if (opp2El) opp2El.style.backgroundPosition = `-${f2 * frameW}px -${ROW_COMBAT_IDLE * frameH}px`;
+    }, 500);
     // 對外暴露給 tick() 用
     window.__mtMatchSetOppPose = setOppPose;
 
