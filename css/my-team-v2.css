@@ -8940,27 +8940,22 @@ button.mt-train-point-card:active { transform: translateY(0); }
   font-size: 9px; padding: 1px 4px; border-radius: 3px;
   font-weight: 800; letter-spacing: 0.5px;
 }
-.mt-bench-player.rarity-N   .mt-bench-rarity { background: #757d8a; color: #fff; }
-.mt-bench-player.rarity-R   .mt-bench-rarity { background: #43a047; color: #fff; }
-.mt-bench-player.rarity-SR  .mt-bench-rarity { background: #9b87f5; color: #fff; }
-.mt-bench-player.rarity-SSR .mt-bench-rarity { background: #f0c040; color: #2a1505; }
+/* rarity chip 用半透明、避免跟位置 chip (FWD/DEF/MID) 的飽和色互搶 */
+.mt-bench-player.rarity-N   .mt-bench-rarity { background: rgba(120,128,140,0.55); color: #fff; }
+.mt-bench-player.rarity-R   .mt-bench-rarity { background: rgba(64,156,255,0.55); color: #fff; }
+.mt-bench-player.rarity-SR  .mt-bench-rarity { background: rgba(155,135,245,0.65); color: #fff; }
+.mt-bench-player.rarity-SSR .mt-bench-rarity { background: rgba(240,192,64,0.85); color: #2a1505; }
 
-/* 補做：球員稀有度光暈金字塔 — N 灰階、R 綠光、SR 紫光、SSR 金光 */
-.mt-pitch-player.rarity-N .mt-pitch-player-portrait {
-  filter: saturate(0.55) brightness(0.9);
-}
+/* 球員稀有度光暈金字塔 — R 藍光、SR 紫光、SSR 金光（N 保持基本卡形式不弱化）*/
+/* 改用藍色避免跟綠色球場背景互搶 */
 .mt-pitch-player.rarity-R .mt-pitch-player-portrait {
-  filter: drop-shadow(0 0 4px rgba(76,175,80,0.55));
+  filter: drop-shadow(0 0 4px rgba(64,156,255,0.6));
 }
-.mt-bench-player.rarity-N img {
-  filter: saturate(0.55) brightness(0.9);
-}
-.mt-bench-player.rarity-N { border-color: rgba(120,128,140,0.4); border-style: dashed; }
-.mt-bench-player.rarity-R { border-color: rgba(76,175,80,0.55); }
+.mt-bench-player.rarity-R { border-color: rgba(64,156,255,0.55); }
 
-/* roster-slot 補 N / R 顏色 (原本只有 SR / SSR) */
-.mt-roster-slot-rarity.rarity-N { background: #757d8a; color: #fff; }
-.mt-roster-slot-rarity.rarity-R { background: #43a047; color: #fff; }
+/* roster-slot 補 N / R 顏色（半透明、跟 chip 一致）*/
+.mt-roster-slot-rarity.rarity-N { background: rgba(120,128,140,0.7); color: #fff; }
+.mt-roster-slot-rarity.rarity-R { background: rgba(64,156,255,0.7); color: #fff; }
 /* 板凳球員受傷標示 — 紅底全寬橫條（蓋在 portrait 下緣）*/
 .mt-bench-injury {
   position: absolute;
