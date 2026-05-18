@@ -223,7 +223,16 @@ async function checkTokenExpiry() {
 }
 
 (async () => {
-  // 平日跳過 IG 自動發（觀眾要在 IG 上看到 link sticker，但 API 不支援自動加 → 平日由人工發）
+  // ── 全面停用 IG 文章自動發 ──
+  //   2026-05-18 起：使用者反映 IG 限動數量過多，改成只發「早安球迷」+「開賽預告」、
+  //   文章本身不再上 IG。此 script 改成 no-op、TG 頻道仍由 post-telegram-channel.js 處理。
+  //   要恢復的話把這段 return 拿掉即可。
+  log('⏭️ IG 文章自動發已停用（只發早安球迷 + 開賽預告到 IG）');
+  log('   要恢復請編輯 scripts/post-ig-story.js 拿掉這個 early-exit');
+  return;
+
+  // ↓↓↓ 以下保留供未來恢復用、目前不會執行 ↓↓↓
+  // eslint-disable-next-line no-unreachable
   const dayCheck = isAutoPostDay();
   if (!dayCheck.auto) {
     log(`⏭️ ${dayCheck.reason}`);
