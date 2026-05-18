@@ -13,7 +13,6 @@
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
-const url = require('url');
 const igRender = require('./_ig-story-render.js');
 
 const ROOT = path.join(__dirname, '..');
@@ -78,27 +77,7 @@ async function sendTG(text) {
   return r.json();
 }
 
-// 找對應這場比賽的賽前分析文章（標題包含主客隊名 + 日期相符 + 還沒踢完）
-//   articles：articles-index.mjs 載入後的陣列
-function _findPrematchArticle(articles, homeName, awayName, matchDate) {
-  if (!articles || !homeName || !awayName) return null;
-  // 比賽日 ±1 天內、標題含「賽前分析」或「賽前」+ 雙方隊名
-  const dateOk = (ad) => {
-    if (!ad) return false;
-    const diffMs = new Date(matchDate).getTime() - new Date(ad).getTime();
-    const diffDay = Math.abs(diffMs / 86400000);
-    return diffDay <= 2;
-  };
-  return articles.find(a => {
-    if (!a.shareable) return false;
-    if (!dateOk(a.date)) return false;
-    const title = String(a.title || '');
-    if (!/賽前/.test(title)) return false;
-    return title.includes(homeName) && title.includes(awayName);
-  }) || null;
-}
-
-function buildMessage(m, teams, league, prematchArticle) {
+function buildMessage(m, teams, league) {
   const ht = teams[m.home] || {};
   const at = teams[m.away] || {};
   const homeName = ht.nameCN || ht.name || m.home;
@@ -106,16 +85,14 @@ function buildMessage(m, teams, league, prematchArticle) {
   const ko = kickoffMs(m);
   const minsLeft = Math.round((ko - Date.now()) / 60000);
   const tournament = ({ epl: '英超', ucl: '歐冠' })[league] || league.toUpperCase();
-  // 賽前分析 CTA：若找到對應文章、直接連到文章；否則連首頁
-  const previewUrl = prematchArticle
-    ? `${SITE_URL}/article/${encodeURIComponent(prematchArticle.id)}`
-    : `${SITE_URL}/`;
+  // 賽前分析 CTA：直接連到該場賽事頁（/m/<id> 會自動打開 openPredModal）
+  const matchUrl = `${SITE_URL}/m/${encodeURIComponent(m.id)}`;
   return `⚽ <b>${minsLeft} 分鐘後開賽</b>
 
 <b>${homeName} vs ${awayName}</b>
 🏆 ${tournament} · 📅 ${fmtKickoff(ko)}
 
-🔍 進網站查看完整賽前分析：${previewUrl}
+🔍 進網站查看完整賽前分析：${matchUrl}
 🎯 預測比分拿 +20 XP：${SITE_URL}/
 🥊 開挑戰賽房間下注：${SITE_URL}/
 
@@ -188,16 +165,6 @@ async function postIgPhase(state) {
   const eplTeams = eplWin.EPL_TEAMS || {};
   const uclTeams = uclTeamsWin.UCL_TEAMS || {};
 
-  // 載文章索引，給 CTA 對應的賽前分析文章用
-  let articles = [];
-  try {
-    const articlesPath = path.join(ROOT, 'data', 'articles-index.mjs');
-    const mod = await import(url.pathToFileURL(articlesPath).href);
-    articles = mod.default || [];
-  } catch (e) {
-    console.warn('[prematch] 無法載入 articles-index：', e.message);
-  }
-
   const now = Date.now();
   const candidates = [];
   const STARTED = new Set(['live', 'finished', 'ended', 'started']);
@@ -224,12 +191,7 @@ async function postIgPhase(state) {
   let sent = 0;
   for (const c of candidates) {
     try {
-      const ht = c.teams[c.m.home] || {};
-      const at = c.teams[c.m.away] || {};
-      const homeName = ht.nameCN || ht.name || c.m.home;
-      const awayName = at.nameCN || at.name || c.m.away;
-      const matchArticle = _findPrematchArticle(articles, homeName, awayName, c.m.date);
-      const text = buildMessage(c.m, c.teams, c.league, matchArticle);
+      const text = buildMessage(c.m, c.teams, c.league);
       const result = await sendTG(text);
       if (!result.ok) {
         console.error(`✗ ${c.m.id} TG:`, JSON.stringify(result));
