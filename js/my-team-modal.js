@@ -2740,7 +2740,7 @@
             <span class="mt-profile-rarity">${c.rarity || 'R'}</span>
           </div>
           <div class="mt-profile-meta">
-            <div class="mt-profile-name">${escapeHtml(c.name || '?')}</div>
+            <div class="mt-profile-name">${escapeHtml(c.name || '?')}${c.rarity === 'SSR' ? '<button class="mt-profile-ssr-showcase" data-act="ssr-showcase" title="SSR 專屬大圖">✨</button>' : ''}</div>
             ${c.nickname ? `<div class="mt-profile-nick">「${escapeHtml(c.nickname)}」</div>` : ''}
             <div class="mt-profile-pos">${c.position}・Lv.${p.level}${p.bond ? ' ★'.repeat(p.bond) : ''}・<span class="mt-profile-cap">上限 ${_attrCapForPlayer(p, false)}</span></div>
             ${talentLabel ? `<div class="mt-profile-talent">${talentLabel}</div>` : ''}
@@ -2794,6 +2794,13 @@
     overlay.querySelector('.mt-profile-close').addEventListener('click', () => {
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 200);
+    });
+
+    overlay.querySelector('[data-act="ssr-showcase"]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (typeof showToast === 'function') {
+        showToast('✨ SSR 專屬大圖製作中、之後抽到 SSR 會跳出豪華展示頁');
+      }
     });
 
     overlay.querySelector('[data-act="toggle-start"]').addEventListener('click', async () => {

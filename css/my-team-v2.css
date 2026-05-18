@@ -9061,6 +9061,26 @@ button.mt-train-point-card:active { transform: translateY(0); }
   border-radius: 4px;
   letter-spacing: 0.3px;
 }
+.mt-profile-ssr-showcase {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  margin-left: 8px;
+  padding: 0;
+  background: linear-gradient(135deg, #ffd96f 0%, #f0a020 100%);
+  border: 2px solid rgba(255,255,255,0.85);
+  border-radius: 50%;
+  color: #2a1505;
+  font-size: 14px;
+  cursor: pointer;
+  vertical-align: 2px;
+  box-shadow: 0 0 12px rgba(255,217,111,0.6), inset 0 1px 0 rgba(255,255,255,0.4);
+  animation: mt-ssr-showcase-pulse 2s ease-in-out infinite;
+}
+@keyframes mt-ssr-showcase-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(255,217,111,0.5), inset 0 1px 0 rgba(255,255,255,0.4); transform: scale(1); }
+  50%      { box-shadow: 0 0 18px rgba(255,217,111,0.9), inset 0 1px 0 rgba(255,255,255,0.4); transform: scale(1.08); }
+}
+.mt-profile-ssr-showcase:hover { filter: brightness(1.15); }
 
 .mt-profile-lore {
   background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px;
