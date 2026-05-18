@@ -122,6 +122,10 @@
           <i class="fas fa-trophy"></i>
           <span>挑戰賽</span>
         </button>
+        <button class="nav-btn nav-btn-admin" data-section="admin" id="nav-admin-btn" style="display:none">
+          <i class="fas fa-chart-line"></i>
+          <span>數據</span>
+        </button>
       </nav>
 
       <!-- 擂台連續天數 streak（沒 streak 時預設隱藏） -->
@@ -221,6 +225,7 @@
       <button class="nav-btn" data-section="focus"><i class="fas fa-newspaper"></i> 賽事解讀</button>
       <button class="nav-btn" data-section="arena"><i class="fas fa-gamepad"></i> 競技場</button>
       <button class="nav-btn" data-section="friend-room"><i class="fas fa-trophy"></i> 麥迪挑戰賽</button>
+      <button class="nav-btn nav-btn-admin" data-section="admin" id="mobile-nav-admin-btn" style="display:none"><i class="fas fa-chart-line"></i> 數據儀表板</button>
       <div class="mobile-nav-status" id="mobile-nav-status">
         <div class="mobile-nav-stat" id="mobile-nav-streak-stat" style="display:none"><span class="mobile-nav-stat-icon">🔥</span> <span id="mobile-nav-streak">0</span> 天</div>
         <div class="mobile-nav-stat"><span class="mobile-nav-stat-icon">⭐</span> <span id="mobile-nav-xp">0 XP</span></div>
@@ -619,6 +624,29 @@
       </div>
     </section>
 
+    <!-- ===== Admin 數據儀表板（只有 admin email 看得到）===== -->
+    <section id="section-admin" class="page-section">
+      <div class="page-hero">
+        <h1><i class="fas fa-chart-line"></i> 數據儀表板</h1>
+        <p>過去 14 天網站活動概覽（admin 限定）</p>
+      </div>
+      <div class="admin-toolbar">
+        <label>區間：
+          <select id="admin-days-select">
+            <option value="7">最近 7 天</option>
+            <option value="14" selected>最近 14 天</option>
+            <option value="30">最近 30 天</option>
+          </select>
+        </label>
+        <button id="admin-refresh-btn" class="btn-secondary">🔄 重新整理</button>
+      </div>
+      <div id="admin-summary-cards" class="admin-cards">
+        <div class="admin-loading">載入中…</div>
+      </div>
+      <div id="admin-table-wrap" class="admin-table-wrap"></div>
+      <div id="admin-top-lists" class="admin-top-lists"></div>
+    </section>
+
   </main>
 
   <!-- ========== 全域比賽預測彈窗（放在 main 外，避免被 section display:none 隱藏）========== -->
@@ -721,6 +749,7 @@
   <script src="js/data-matches.js?v=4"></script>
   <script src="js/data-articles.js?v=4"></script>
   <script src="js/wc2026-squads.js?v=1"></script>
+  <script src="js/admin-dashboard.js?v=1"></script>
   <!-- UCL 資料 -->
   <script src="js/ucl-data-teams.js?v=4"></script>
   <script src="js/ucl-data-matches.js?v=4"></script>

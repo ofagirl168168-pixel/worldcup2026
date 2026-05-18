@@ -8214,3 +8214,126 @@ body.has-imminent-banner .top-header {
   .tg-article-cta { padding: 12px 14px; }
   .tg-article-cta-btn { width: 100%; text-align: center; }
 }
+
+/* ── Admin 數據儀表板 ── */
+.admin-toolbar {
+  display: flex; align-items: center; gap: 12px;
+  margin: 16px 0 18px;
+  font-size: 13px;
+}
+.admin-toolbar select {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-primary);
+  border: 1px solid rgba(255,255,255,0.14);
+  padding: 6px 10px; border-radius: 8px;
+  font-size: 13px;
+}
+.admin-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px; margin-bottom: 24px;
+}
+.admin-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.admin-card-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+.admin-card-today {
+  font-size: 30px; font-weight: 800;
+  color: var(--accent);
+  line-height: 1.1;
+}
+.admin-card-meta {
+  font-size: 11px; color: var(--text-muted);
+  display: flex; align-items: center; gap: 8px;
+}
+.admin-card-delta {
+  font-weight: 800; padding: 0 6px; border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+}
+.admin-card-delta.is-up   { color: #4caf50; background: rgba(76,175,80,0.15); }
+.admin-card-delta.is-down { color: #ef5350; background: rgba(239,83,80,0.15); }
+.admin-card-total {
+  font-size: 11px; color: var(--text-muted);
+  border-top: 1px dashed rgba(255,255,255,0.10);
+  padding-top: 4px; margin-top: 2px;
+}
+.admin-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 24px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+}
+.admin-table {
+  width: 100%; min-width: 720px;
+  border-collapse: collapse; font-size: 12.5px;
+}
+.admin-table th, .admin-table td {
+  padding: 8px 10px; text-align: right;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.admin-table th {
+  background: rgba(255,255,255,0.06);
+  color: var(--text-secondary);
+  font-weight: 700;
+  position: sticky; top: 0;
+}
+.admin-table td:first-child, .admin-table th:first-child { text-align: left; }
+.admin-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+.admin-top-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px; margin-bottom: 40px;
+}
+.admin-top-col {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 14px;
+}
+.admin-top-title {
+  font-size: 13px; font-weight: 800; margin-bottom: 8px;
+}
+.admin-top-list {
+  padding-left: 0; margin: 0; list-style: none;
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 13px;
+}
+.admin-top-list li {
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 4px;
+}
+.admin-top-list code {
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.admin-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.03);
+  border: 1px dashed rgba(255,255,255,0.12);
+  border-radius: 8px;
+}
+.admin-empty code {
+  background: rgba(0,0,0,0.3);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+}
+.admin-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+}

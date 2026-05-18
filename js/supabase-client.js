@@ -131,6 +131,8 @@ function updateAuthUI() {
     userWidget.style.display = 'none';
     if (gemWidget) gemWidget.style.display = 'none';
   }
+  // admin nav 是否要顯示（限定白名單 email）
+  try { window.AdminDashboard?.updateNavVisibility?.(); } catch (e) {}
 }
 
 // ── 暱稱驗證 ─────────────────────────────────────────────
