@@ -2,6 +2,26 @@
 // Regenerate with: node scripts/build-articles-index.js
 export default [
   {
+    "id": "18",
+    "tournament": "wc",
+    "title": "倒數23天：E組前瞻——德國絕地重生、厄瓜多鐵壁、象牙海岸AFCON冠軍班底、庫拉索寫歷史",
+    "summary": "E組匯集四屆冠軍德國、南美鐵衛厄瓜多、非洲冠軍象牙海岸、史上最小參賽國庫拉索。Musiala+Wirtz雙核能否拯救德國？Caicedo+Páez的厄瓜多中場有多強？78歲Advocaat帶庫拉索寫歷史！",
+    "date": "2026-05-19",
+    "category": "小組分析",
+    "readTime": "8分鐘",
+    "shareable": true
+  },
+  {
+    "id": "epl-073",
+    "tournament": "epl",
+    "title": "【賽後戰報】兵工廠 1-0 伯恩利：Havertz 頭槌定江山，酋長球場離冠軍只差一步",
+    "summary": "英超第37輪——兵工廠在酋長球場以 1-0 擊敗已降級的伯恩利，Kai Havertz 36 分鐘頭槌建功。兵工廠積分升至 82 分、領先曼城 5 分，只要最後一輪客場擊敗水晶宮即可時隔 22 年重奪英超冠軍。",
+    "date": "2026-05-19",
+    "category": "賽後深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "17",
     "tournament": "wc",
     "title": "麥迪擂台第四週戰報：301 票！Messi 世界盃去不去引爆全站投票",
@@ -65,7 +85,7 @@ export default [
     "id": "epl-069",
     "tournament": "epl",
     "title": "【賽後戰報】艾佛頓 1-3 桑德蘭：黑貓三箭齊發粉碎太妃糖歐戰夢",
-    "summary": "英超第37輪——桑德蘭在古迪遜公園 3-1 逆轉艾佛頓，Brobbey、Le Fee、Isidor 下半場連入三球。艾佛頓的歐戰夢幾乎破碎，桑德蘭繼續衝擊歐戰名額。",
+    "summary": "英超第37輪——桑德蘭在 Hill Dickinson Stadium 3-1 逆轉艾佛頓，Brobbey、Le Fee、Isidor 下半場連入三球。艾佛頓的歐戰夢幾乎破碎，桑德蘭繼續衝擊歐戰名額。",
     "date": "2026-05-17",
     "category": "賽後深度分析",
     "readTime": null,
@@ -239,7 +259,7 @@ export default [
     "date": "2026-05-11",
     "category": "社群觀察",
     "readTime": "5分鐘",
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "epl-052",
@@ -249,7 +269,7 @@ export default [
     "date": "2026-05-11",
     "category": "賽後深度回顧",
     "readTime": null,
-    "shareable": true
+    "shareable": false
   },
   {
     "id": "13",

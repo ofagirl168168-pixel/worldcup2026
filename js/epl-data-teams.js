@@ -21,16 +21,16 @@ const EPL_TEAMS = {
     style:'高位壓迫，控球為主，邊路突破與定位球',
     strengths:['Arteta戰術體系成熟','Saka+Ødegaard創造力頂級','英超最穩固後防之一'],
     weaknesses:['關鍵戰偶有緊張','板凳深度不如曼城','Gyökeres體系磨合中'],
-    recentForm:['W','W','L','L','W'],
+    recentForm:['W','L','L','W','W'],
     history:'13次英格蘭頂級聯賽冠軍，2003/04不敗賽季傳奇',
     injuries:[
-      {name:'Bukayo Saka',pos:'右翼',status:'阿基里斯腱問題已復出，vs FUL（5/2）先發進球',returnDate:'可出場'},
-      {name:'Martin Ødegaard',pos:'攻擊中場',status:'膝傷（缺席 vs FUL 5/2），歐冠次回合替補上陣',returnDate:'需評估'},
-      {name:'Kai Havertz',pos:'前鋒',status:'肌肉傷勢（vs NEW 4/25），歐冠次回合（5/5）復出先發',returnDate:'可出場'},
-      {name:'Jurrien Timber',pos:'後衛',status:'腹股溝傷（3/14 起缺陣），接近復出',returnDate:'MW38 評估'},
-      {name:'Mikel Merino',pos:'中場',status:'已回草地訓練，目標賽季末復出',returnDate:'賽季末待定'},
+      {name:'Bukayo Saka',pos:'右翼',status:'vs BUR（5/19）先發出場，狀態良好',returnDate:'可出場'},
+      {name:'Martin Ødegaard',pos:'攻擊中場',status:'vs BUR（5/19）先發出場，膝傷已復出',returnDate:'可出場'},
+      {name:'Kai Havertz',pos:'前鋒',status:'vs BUR（5/19）先發並進球，狀態火熱',returnDate:'可出場'},
+      {name:'Jurrien Timber',pos:'後衛',status:'腹股溝傷接近復出，有望最後一輪回歸',returnDate:'MW38 評估'},
+      {name:'Mikel Merino',pos:'中場',status:'腳傷恢復中，目標賽季末復出',returnDate:'賽季末待定'},
       {name:'Ben White',pos:'右後衛',status:'膝傷（5/10 vs WHU），賽季報銷',returnDate:'賽季報銷'},
-      {name:'Noni Madueke',pos:'右翼',status:'膝傷（歐冠八強次回合退場）',returnDate:'評估中'}
+      {name:'Riccardo Calafiori',pos:'左後衛',status:'小傷需評估',returnDate:'最後一輪待定'}
     ]
   },
   'LIV': {
@@ -924,7 +924,11 @@ window.EPL_MATCHES = [
    ]},
 
   // 兵工廠 vs 伯恩利 | 05/19 03:00 台灣時間 (05/18 20:00 BST)
-  {id:'EPL-MW37-ARS-BUR', matchday:37, date:'2026-05-19', time:'03:00', home:'ARS', away:'BUR', stage:'league', status:'upcoming'},
+  {id:'EPL-MW37-ARS-BUR', matchday:37, date:'2026-05-19', time:'03:00', home:'ARS', away:'BUR', stage:'league',
+   status:'finished', score:{h:1,a:0}, halfTime:{h:1,a:0},
+   goals:[
+     {min:'36',player:'Kai Havertz',side:'h'}
+   ]},
 
   // 伯恩茅斯 vs 曼城 | 05/20 02:30 台灣時間 (05/19 19:30 BST，因足總盃決賽延期)
   {id:'EPL-MW37-BOU-MCI', matchday:37, date:'2026-05-20', time:'02:30', home:'BOU', away:'MCI', stage:'league', status:'upcoming'},

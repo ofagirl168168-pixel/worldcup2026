@@ -40,6 +40,77 @@ const ARTICLES = [
     tags: ['擂台戰報', '第四週', 'Messi', '英超冠軍', 'Foden', '利物浦', '世界盃名單']
   },
   {
+    id:18, cat:'小組分析', date:'2026-05-19', readTime:'8分鐘',
+    tournament:'wc2026',
+    title:'倒數23天：E組前瞻——德國絕地重生、厄瓜多鐵壁、象牙海岸AFCON冠軍班底、庫拉索寫歷史',
+    desc:'E組匯集四屆冠軍德國、南美鐵衛厄瓜多、非洲冠軍象牙海岸、史上最小參賽國庫拉索。Musiala+Wirtz雙核能否拯救德國？Caicedo+Páez的厄瓜多中場有多強？78歲Advocaat帶庫拉索寫歷史！',
+    body:`<h3>E組：德國的救贖之路 vs 三個不同層次的挑戰者</h3>
+
+<p>距離 2026 世界盃開幕僅剩 <b>23 天</b>。E 組的話題性極高：<b>德國</b>連續兩屆小組賽出局後尋求救贖、<b>厄瓜多</b>以南美資格賽第四名的身分帶著全隊史最強陣容登場、<b>象牙海岸</b>挾 2023 非洲盃冠軍氣勢重返世界盃、<b>庫拉索</b>則以 15 萬人口締造世界盃史上最小參賽國紀錄。</p>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">球隊</th><th style="padding:8px">FIFA 排名</th><th style="padding:8px">關鍵球員</th><th style="padding:8px">核心看點</th></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">🇩🇪 德國</td><td style="padding:8px">第 11</td><td style="padding:8px">Musiala、Wirtz、Kimmich</td><td style="padding:8px">連兩屆小組出局，Nagelsmann 必須終結魔咒</td></tr>
+<tr><td style="padding:8px">🇪🇨 厄瓜多</td><td style="padding:8px">第 24</td><td style="padding:8px">Caicedo、Páez、Hincapié</td><td style="padding:8px">南美資格賽防守最佳，16 歲天才 Páez 首戰</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">🇨🇮 象牙海岸</td><td style="padding:8px">第 34</td><td style="padding:8px">Kessié、Amad Diallo、Adingra</td><td style="padding:8px">2023 非洲盃冠軍班底，時隔 12 年重返世界盃</td></tr>
+<tr><td style="padding:8px">🇨🇼 庫拉索</td><td style="padding:8px">第 87</td><td style="padding:8px">Bacuna、Tahith Chong</td><td style="padding:8px">15 萬人口史上最小參賽國，78 歲 Advocaat 執教</td></tr>
+</table>
+
+<h3>🇩🇪 德國：四屆冠軍的救贖之戰</h3>
+
+<p>2018 衛冕冠軍小組墊底、2022 再度小組出局——<b>德國</b>已經連續兩屆在小組賽折戟，這是隊史前所未有的低谷。<b>Julian Nagelsmann</b> 在 2024 歐洲盃後接手重建，圍繞 <b>Jamal Musiala</b>（拜仁）與 <b>Florian Wirtz</b>（利物浦）打造了全新的技術流體系。</p>
+
+<p><b>Musiala</b> 的狀態是德國最大的變數——這位 23 歲的攻擊中場在去年夏天俱樂部世界盃中遭遇腿傷，雖已復出但腳踝仍有反應，Nagelsmann 對外表示「不擔心」，但最終名單（5/21 公布）前仍需觀察。若 Musiala + Wirtz 雙核健康上陣，德國的創造力將是 E 組乃至全屆最頂級的之一。</p>
+
+<p><b>Joshua Kimmich</b> 坐鎮中場兼右後衛、<b>Kai Havertz</b>（兵工廠）擔任正印前鋒——這位在英超剛用頭槌為兵工廠拿下關鍵勝利的前鋒，有望帶著火熱狀態進入國家隊。後防則由 <b>Antonio Rüdiger</b>（皇馬）領銜。</p>
+
+<h3>🇪🇨 厄瓜多：南美鐵壁的黑馬宣言</h3>
+
+<p><b>厄瓜多</b>在南美資格賽中以防守聞名——他們力壓哥倫比亞、烏拉圭和巴西拿下第四，防守數據是整個南美賽區最佳。主帥 <b>Sebastián Beccacece</b> 打造了一個紀律嚴明、防守為先的體系。</p>
+
+<p>中場核心 <b>Moisés Caicedo</b>（切爾西）是這支球隊的引擎——攔截、推進、分球無所不能。身旁的 19 歲新星 <b>Kendry Páez</b>（切爾西外借河床）則負責創造力輸出，這位年輕天才已經在南美資格賽和阿根廷聯賽證明了自己不是噱頭。</p>
+
+<p>後防由 <b>Willian Pacho</b>（PSG）和 <b>Piero Hincapié</b>（兵工廠）組成銅牆鐵壁，這對中衛組合在歐洲豪門的經驗讓厄瓜多的防線成色極高。前鋒 <b>Enner Valencia</b>（帕丘卡）是隊史射手王兼隊長，36 歲的他將迎來第三屆世界盃。</p>
+
+<h3>🇨🇮 象牙海岸：非洲冠軍的新征程</h3>
+
+<p><b>象牙海岸</b>在 2023 年非洲盃以主辦國身分奪冠後，順利在資格賽中以不敗戰績（8 勝 2 平、淨勝球 +25）出線，這是非洲區最佳成績。主帥 <b>Emerse Faé</b>（前國腳球員轉教練）延續了奪冠班底的戰術框架。</p>
+
+<p>隊長 <b>Franck Kessié</b> 擁有超過 100 頂國際賽出場，是中場的定海神針。<b>Amad Diallo</b>（曼聯）以其盤帶突破能力成為最令人期待的新面孔。<b>Simon Adingra</b>（布萊頓）則是邊路的爆破手。</p>
+
+<p>值得注意的是，2023 非洲盃功臣 <b>Sébastien Haller</b> 和 <b>Wilfried Zaha</b> 均未入選 26 人名單——Faé 教練選擇了年輕化和速度更快的鋒線組合，以適應世界盃的強度。<b>Yan Diomandé</b>（RB 萊比錫）是後防的新星，本季在德甲的表現引來多支豪門關注。</p>
+
+<h3>🇨🇼 庫拉索：15 萬人口的世界盃奇蹟</h3>
+
+<p><b>庫拉索</b>是本屆世界盃最動人的故事之一。這個加勒比小島人口不到 <b>15 萬</b>，面積僅 444 平方公里——他們是<b>世界盃史上最小的參賽國</b>（無論人口還是面積）。在傳奇教練 <b>Dick Advocaat</b>（78 歲，將成為世界盃史上最年長主帥）的帶領下，他們在資格賽中擊敗了牙買加和千里達及托巴哥。</p>
+
+<p>Advocaat 的執教經歷堪稱傳奇——他曾執教荷蘭、比利時、韓國、俄羅斯等國家隊以及 PSV、流浪者等豪門。今年二月曾因女兒重病辭職，但在繼任者 Fred Rutten 離任後重新回歸。</p>
+
+<p>隊長 <b>Leandro Bacuna</b> 和翼鋒 <b>Tahith Chong</b>（雪菲爾聯）是球隊的核心——Chong 曾在曼聯青訓成長，是庫拉索最具威脅的攻擊手段。球隊的特色是大量球員出生或成長於荷蘭，利用荷蘭的足球發展體系培養人才。</p>
+
+<h3>E組賽程與場地</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+<tr style="background:#1a1a2e;color:#fff"><th style="padding:8px">日期</th><th style="padding:8px">對戰</th><th style="padding:8px">場地</th><th style="padding:8px">台灣時間</th></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">6/14（六）</td><td style="padding:8px">德國 vs 庫拉索</td><td style="padding:8px">NRG Stadium・休士頓</td><td style="padding:8px">01:00</td></tr>
+<tr><td style="padding:8px">6/15（日）</td><td style="padding:8px">象牙海岸 vs 厄瓜多</td><td style="padding:8px">Lincoln Financial Field・費城</td><td style="padding:8px">07:00</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">6/20（五）</td><td style="padding:8px">德國 vs 象牙海岸</td><td style="padding:8px">BMO Field・多倫多</td><td style="padding:8px">04:00</td></tr>
+<tr><td style="padding:8px">6/21（六）</td><td style="padding:8px">厄瓜多 vs 庫拉索</td><td style="padding:8px">Arrowhead Stadium・堪薩斯城</td><td style="padding:8px">08:00</td></tr>
+<tr style="background:#f8f8f8"><td style="padding:8px">6/25（三）</td><td style="padding:8px">庫拉索 vs 象牙海岸</td><td style="padding:8px">Lincoln Financial Field・費城</td><td style="padding:8px">04:00</td></tr>
+<tr><td style="padding:8px">6/25（三）</td><td style="padding:8px">厄瓜多 vs 德國</td><td style="padding:8px">MetLife Stadium・紐澤西</td><td style="padding:8px">04:00</td></tr>
+</table>
+
+<h3>Soccer麥迪預測</h3>
+
+<p><b>1️⃣ 德國</b>——Musiala 健康就是冠軍級配置，Nagelsmann 不容許第三次小組出局。首戰對庫拉索必須大勝建立信心。</p>
+<p><b>2️⃣ 厄瓜多</b>——南美鐵壁不好惹，Caicedo + Páez 的中場能跟任何對手掰手腕。只要首戰不輸象牙海岸，出線機會極大。</p>
+<p><b>3️⃣ 象牙海岸</b>——非洲盃冠軍底蘊在，但 Haller 和 Zaha 缺席讓鋒線火力打折。第二輪對德國是生死戰。</p>
+<p><b>4️⃣ 庫拉索</b>——歷史已經寫下，每一分鐘都是紅利。但 78 歲的 Advocaat 絕對不會讓球隊只是來觀光的。</p>
+
+<p>E 組的劇本清晰：德國是最大熱門，但連兩屆翻車的心理陰影讓任何對手都看到了機會。厄瓜多的防守韌性和象牙海岸的非洲盃冠軍經驗都足以在世界盃賽場上製造意外。而庫拉索——15 萬人的島國站上世界盃舞台，這本身就是足球最美的故事。</p>`,
+    tags:['小組分析','E組','德國','厄瓜多','象牙海岸','庫拉索','世界盃','Musiala','Wirtz','Caicedo','Páez','Kessié','Advocaat']
+  },
+  {
     id:16, cat:'小組分析', date:'2026-05-13', readTime:'9分鐘',
     title:'倒數29天：C組前瞻——巴西傷兵滿營、摩洛哥黑馬再襲、海地52年後重返世界盃',
     desc:'C組是本屆公認的「死亡之組」：巴西失去 Militão 和 Rodrygo 卻仍是奪冠大熱；摩洛哥2022四強後再進化；蘇格蘭時隔28年回歸；海地書寫歷史。Ancelotti 的國際賽首秀從地獄組開始。',
