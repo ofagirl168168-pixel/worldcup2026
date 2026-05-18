@@ -184,8 +184,8 @@
     const kitShirt = opts.shirtColor || 'red';
     const kitPants = opts.pantsColor || 'blue';
     const kitShoes = opts.shoeColor || 'white';
-    // v4 = 加 row 9 combat-idle-down（戰備站立、給比賽 tab 球門前對手用）
-    const key = JSON.stringify(look) + '|F|v4|' + kitShirt + '|' + kitPants + '|' + kitShoes;
+    // v5 = combat-idle row y 從 22 (up 背面) 改 24 (down 正面)、frames 改 [0,0,0] 靜止
+    const key = JSON.stringify(look) + '|F|v5|' + kitShirt + '|' + kitPants + '|' + kitShoes;
     if (fullBodyCache.has(key)) return fullBodyCache.get(key);
 
     // 寬一點才裝得下 slash 揮腿、spellcast 舉手張開的手臂
@@ -195,9 +195,10 @@
     //          4=kick(slash-down), 5=cheer/stretch(spellcast-down),
     //          6=frustration(hurt 1-3), 7=tackle/slide(thrust-right 伸腿鏟球),
     //          8=GK dive(slash-up frames 2-3-4、手舉過頭、近似 1h_halfslash),
-    //          9=combat-idle-down（戰備站立、雙手抬胸前微晃）
-    // LPC y 行：walk=8/9/10/11、slash=12-15、spellcast=0-3、hurt=20、thrust=4-7、combat-idle=22-25
-    const ROW_TO_LPC_Y = [10*64, 9*64, 11*64, 8*64, 14*64, 2*64, 20*64, 7*64, 12*64, 22*64];
+    //          9=combat-idle-down（正面戰備站立、靜止單幀）
+    // LPC y 行：walk=8/9/10/11、slash=12-15、spellcast=0-3、hurt=20、thrust=4-7
+    //   combat-idle=22(up背面)/23(left)/24(down正面)/25(right)：要正面用 24
+    const ROW_TO_LPC_Y = [10*64, 9*64, 11*64, 8*64, 14*64, 2*64, 20*64, 7*64, 12*64, 24*64];
     const ROW_FRAMES = [
       [1, 4, 7],  // walk-down
       [1, 4, 7],
@@ -208,7 +209,7 @@
       [1, 2, 3],  // frustration：hurt 站不穩
       [3, 5, 7],  // tackle：thrust-right 伸腿撲擊
       [2, 3, 4],  // GK dive：slash-up 234（手舉肩→過頭頂→開始下揮、apex 過頭頂）
-      [0, 1, 0],  // combat-idle-down：2 幀循環、第 3 幀回 0（看起來像輕晃）
+      [0, 0, 0],  // combat-idle-down：靜止單幀（不晃）、3 col 都用 frame 0
     ];
 
     const SX = 8, SY_OFF = 0;  // 寬 8-55、高 0-63 整個 frame、手臂 + 頂部頭髮都裝得下

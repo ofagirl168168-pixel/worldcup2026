@@ -5255,42 +5255,30 @@
       goalkeeperEl.style.backgroundPosition = `-${f * frameW}px -${row * frameH}px`;
     }, 320);
 
-    // 對手球員：idle 站立小幅輕跳（walk-down 3 frame 交替、左右錯開）
-    // 主角踢球時改成 tackle 鏟球防守、進球後變懊惱姿勢
-    let oppMode = 'idle';   // 'idle' | 'tackle' | 'frustrated'
-    let oppIdlePhase = 0;
+    // 對手球員：idle 戰備站立（combat-idle-down 靜止單幀）
+    // 主角踢球時切 tackle 鏟球防守、進球後變懊惱姿勢
     const setOppPose = (mode) => {
-      oppMode = mode;
       if (mode === 'tackle') {
         // 鏟球姿勢：opp1 向左鏟、opp2 向右鏟（用 ROW_TACKLE + scaleX flip）
         if (opp1El) {
           opp1El.style.backgroundPosition = `-${1 * frameW}px -${ROW_TACKLE * frameH}px`;
-          opp1El.style.transform = 'scaleX(-1)';  // 朝左鏟
+          opp1El.style.transform = 'scaleX(-1)';
         }
         if (opp2El) {
           opp2El.style.backgroundPosition = `-${1 * frameW}px -${ROW_TACKLE * frameH}px`;
-          opp2El.style.transform = '';            // 朝右鏟
+          opp2El.style.transform = '';
         }
       } else if (mode === 'frustrated') {
-        // 進球後對手懊惱：HURT row 第 0 frame 抱頭 / 站不穩
         if (opp1El) { opp1El.style.backgroundPosition = `-${0 * frameW}px -${ROW_HURT * frameH}px`; opp1El.style.transform = ''; }
         if (opp2El) { opp2El.style.backgroundPosition = `-${0 * frameW}px -${ROW_HURT * frameH}px`; opp2El.style.transform = ''; }
       } else {
-        // idle：靠 setInterval 持續更新
-        if (opp1El) opp1El.style.transform = '';
-        if (opp2El) opp2El.style.transform = '';
+        // idle：combat-idle-down 靜止單幀（不晃）
+        if (opp1El) { opp1El.style.backgroundPosition = `-${0 * frameW}px -${ROW_COMBAT_IDLE * frameH}px`; opp1El.style.transform = ''; }
+        if (opp2El) { opp2El.style.backgroundPosition = `-${0 * frameW}px -${ROW_COMBAT_IDLE * frameH}px`; opp2El.style.transform = ''; }
       }
     };
-    _matchOppLoop = setInterval(() => {
-      if (oppMode !== 'idle') return;
-      if (!opp1El && !opp2El) return;
-      // combat-idle row 只有 2 個有效 frame (0/1)、第 3 幀回 0 形成輕晃
-      oppIdlePhase = (oppIdlePhase + 1) % SHEET_COLS;
-      const f1 = oppIdlePhase;
-      const f2 = (oppIdlePhase + 1) % SHEET_COLS;  // 兩人錯開一幀、不同步看起來自然
-      if (opp1El) opp1El.style.backgroundPosition = `-${f1 * frameW}px -${ROW_COMBAT_IDLE * frameH}px`;
-      if (opp2El) opp2El.style.backgroundPosition = `-${f2 * frameW}px -${ROW_COMBAT_IDLE * frameH}px`;
-    }, 500);
+    // 初始化：擺出 idle 姿勢
+    setOppPose('idle');
     // 對外暴露給 tick() 用
     window.__mtMatchSetOppPose = setOppPose;
 
