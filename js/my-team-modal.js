@@ -4766,24 +4766,29 @@
     const draws = prog?.draws || 0;
     const losses = prog?.losses || 0;
     const played = prog?.matches_played || 0;
+    const seasonNum = prog?.season_num || 1;
+
+    // 撈本賽季已打的比賽（依 matches_played 取最近 N 場 AI 對戰）
+    let pastMatches = [];
+    if (played > 0) {
+      const { data: hist } = await window.DB
+        .from('match_history')
+        .select('result, score_home, score_away, is_boss, played_at, opponent_data')
+        .eq('user_id', team.user_id)
+        .in('opponent_type', ['ai_npc', 'ai_real'])
+        .order('played_at', { ascending: false })
+        .limit(played);
+      pastMatches = (hist || []).reverse();   // 倒過來 = MD1 → MDplayed
+    }
     const tierAvg = { 1:40,2:50,3:60,4:70,5:75,6:80,7:85,8:88,9:92,10:95 }[tier];
     const realRatio = { 1:0,2:0,3:0,4:0.1,5:0.2,6:0.3,7:0.45,8:0.65,9:0.85,10:1.0 }[tier];
     const isBossLikely = realRatio >= 0.3;
     const pvpCount = team.pvp_today_count || 0;
     const pvpDisabled = pvpCount >= 5 || team.stamina < 1;
 
-    // 闖關地圖：10 關，當前在 played + 1（1-indexed）。已過 = played 個
+    // 賽程：當前下一場 = played + 1（1-indexed）
     const TOTAL_STAGES = 10;
     const currentStage = Math.min(played + 1, TOTAL_STAGES);
-    // 每關 Boss 機率：根據 Tier 配 + 第 5 / 10 關必 Boss
-    const stages = [];
-    for (let i = 1; i <= TOTAL_STAGES; i++) {
-      const isBossSlot = (i === 5 || i === 10);
-      const isPast = i <= played;
-      const isNow  = i === currentStage;
-      const isLocked = i > currentStage;
-      stages.push({ idx: i, isBossSlot, isPast, isNow, isLocked });
-    }
 
     // 主角：優先用隊長、其次 SSR > SR > R 先發
     const allPlayers = await window.MyTeam.fetchPlayers();
@@ -4941,85 +4946,80 @@
           ${lineupWarn ? `<div class="mt-match-current-warn">${lineupWarn}</div>` : ''}
         </div>
 
-        <!-- 闖關路線（可滾、自動聚焦當前關） -->
-        <div class="mt-match-path-wrap" id="mt-match-path-wrap" data-tier="${tier}">
-          <!-- 背景裝飾層：山丘 + 雲 + 光點（依 tier 用 CSS 變數變色）-->
-          <div class="mt-match-path-deco" aria-hidden="true">
-            <svg class="mt-match-path-deco-hills" viewBox="0 0 300 480" preserveAspectRatio="none">
-              <!-- 遠山 1（淺色）-->
-              <path d="M 0 380 L 40 320 L 90 360 L 140 310 L 200 350 L 250 305 L 300 345 L 300 480 L 0 480 Z"
-                    fill="var(--tier-ground-top, #6ec24a)" opacity="0.18"/>
-              <!-- 遠山 2（深色）-->
-              <path d="M 0 420 L 50 380 L 110 410 L 160 370 L 220 405 L 270 360 L 300 395 L 300 480 L 0 480 Z"
-                    fill="var(--tier-ground-bot, #3a7a25)" opacity="0.28"/>
-              <!-- 中段山 -->
-              <path d="M 0 240 L 35 200 L 80 230 L 130 188 L 180 220 L 230 175 L 280 215 L 300 200 L 300 280 L 0 280 Z"
-                    fill="var(--tier-ground-top, #6ec24a)" opacity="0.12"/>
-            </svg>
-            <!-- 飄浮粒子（高 tier 的星 / 光點）-->
-            <span class="mt-match-path-spark s1"></span>
-            <span class="mt-match-path-spark s2"></span>
-            <span class="mt-match-path-spark s3"></span>
-            <span class="mt-match-path-spark s4"></span>
-            <span class="mt-match-path-spark s5"></span>
-          </div>
-          <div class="mt-match-path">
-            <svg class="mt-match-path-line" viewBox="0 0 300 480" preserveAspectRatio="none" aria-hidden="true">
-              <defs>
-                <linearGradient id="mt-path-grad-${tier}" x1="0" y1="1" x2="0" y2="0">
-                  <stop offset="0%"  stop-color="var(--tier-accent, #ffd96f)" stop-opacity="0.3"/>
-                  <stop offset="50%" stop-color="var(--tier-accent, #ffd96f)" stop-opacity="0.65"/>
-                  <stop offset="100%" stop-color="var(--tier-accent, #ffd96f)" stop-opacity="0.9"/>
-                </linearGradient>
-              </defs>
-              <!-- 路徑底層粗描邊 -->
-              <path d="M 150 456
-                       C 240 456, 230 400, 70 400
-                       C 30 400, 30 345, 150 345
-                       C 270 345, 270 290, 70 290
-                       C 30 290, 30 240, 150 240
-                       C 270 240, 270 187, 70 187
-                       C 30 187, 30 134, 150 134
-                       C 270 134, 270 82, 150 82
-                       C 90 82, 60 43, 234 14"
-                fill="none"
-                stroke="rgba(0,0,0,0.35)"
-                stroke-width="8"
-                stroke-linecap="round"/>
-              <!-- 路徑主線（漸層、虛線）-->
-              <path d="M 150 456
-                       C 240 456, 230 400, 70 400
-                       C 30 400, 30 345, 150 345
-                       C 270 345, 270 290, 70 290
-                       C 30 290, 30 240, 150 240
-                       C 270 240, 270 187, 70 187
-                       C 30 187, 30 134, 150 134
-                       C 270 134, 270 82, 150 82
-                       C 90 82, 60 43, 234 14"
-                fill="none"
-                stroke="url(#mt-path-grad-${tier})"
-                stroke-width="5"
-                stroke-linecap="round"
-                stroke-dasharray="6,8"
-                class="mt-match-path-anim"/>
-            </svg>
-            <div class="mt-match-stages">
-              ${stages.map(s => {
-                const cls = [
-                  'mt-match-stage-node',
-                  s.isBossSlot ? 'is-boss' : '',
-                  s.isPast ? 'is-past' : '',
-                  s.isNow ? 'is-now' : '',
-                  s.isLocked ? 'is-locked' : '',
-                ].filter(Boolean).join(' ');
-                return `
-                  <button class="${cls}" data-stage="${s.idx}" ${s.isLocked ? 'disabled' : ''}>
-                    <span class="mt-match-stage-icon">${s.isBossSlot ? '👑' : (s.isPast ? '✓' : '⚽')}</span>
-                    <span class="mt-match-stage-num">${s.idx}</span>
-                  </button>
-                `;
-              }).join('')}
+        <!-- 賽季賽程表（10 場 fixture cards、過 = 顯示真實結果、未來 = ? mark）-->
+        <div class="mt-season-wrap" data-tier="${tier}">
+          <!-- 賽季進度 HUD：戰績 + 7 勝升甲組目標線 -->
+          <div class="mt-season-hud">
+            <div class="mt-season-record-line">
+              <span class="mt-season-record">
+                <span class="mt-rec-pill mt-rec-w">${wins} W</span>
+                <span class="mt-rec-pill mt-rec-d">${draws} D</span>
+                <span class="mt-rec-pill mt-rec-l">${losses} L</span>
+              </span>
+              <span class="mt-season-progress-text">${played}/10 場</span>
             </div>
+            <div class="mt-season-progress-bar">
+              <div class="mt-season-progress-fill" style="width:${(played / 10) * 100}%"></div>
+              <!-- 7 勝升級線標記 -->
+              <div class="mt-season-tick mt-season-tick-promote" style="left:70%" title="7 勝升 Tier"></div>
+              <!-- 3 勝降級線（≤3 降）— 標在 30% 警示 -->
+              <div class="mt-season-tick mt-season-tick-relegate" style="left:30%" title="≤3 勝降 Tier"></div>
+            </div>
+            <div class="mt-season-goal">
+              ${(() => {
+                if (wins >= 7) return `🏆 <b>已保底冠軍</b>，繼續贏到 ${10 - played} 場可衝更多獎勵`;
+                const remainGames = 10 - played;
+                const winsToPromote = 7 - wins;
+                if (winsToPromote <= remainGames) {
+                  return `⬆️ 距升 Tier 還差 <b>${winsToPromote}</b> 勝（剩 ${remainGames} 場）`;
+                }
+                if (losses >= 8) return `🔻 <b>已確定降 Tier</b>，下季再戰`;
+                const maxPossibleW = wins + remainGames;
+                if (maxPossibleW <= 3) return `🔻 <b>降 Tier 已定</b>（最多 ${maxPossibleW} 勝、≤3 勝降級）`;
+                return `📊 剩 ${remainGames} 場 — ${maxPossibleW < 7 ? '本季無望升 Tier、避免降 Tier 要 4+ 勝' : '繼續贏可衝升 Tier'}`;
+              })()}
+            </div>
+          </div>
+
+          <!-- Fixture cards：10 場一字排開（pixel-art ticket style）-->
+          <div class="mt-fixtures">
+            ${(() => {
+              const cards = [];
+              for (let i = 1; i <= 10; i++) {
+                const isBossSlot = (i === 5 || i === 10);
+                const isPast = i <= played;
+                const isNow = i === played + 1;
+                const isFuture = i > played + 1;
+                const match = isPast ? pastMatches[i - 1] : null;
+                const resultCls = match ? `is-${match.result.toLowerCase()}` : '';
+                const oppCrest = match
+                  ? renderOppCrest(match.opponent_data?.flag || '🏴', 22)
+                  : (isNow ? renderOppCrest(oppFlag, 22) : '<span class="mt-fix-opp-hidden">?</span>');
+                const oppNameLabel = match
+                  ? escapeHtml(match.opponent_data?.nameCN || match.opponent_data?.name || '對手')
+                  : (isNow ? escapeHtml(oppName) : '未知');
+                const scoreOrVs = match
+                  ? `<span class="mt-fix-score">${match.score_home}-${match.score_away}</span>`
+                  : '<span class="mt-fix-vs">VS</span>';
+                const resultBadge = match
+                  ? `<span class="mt-fix-badge mt-fix-badge-${match.result.toLowerCase()}">${({W:'W',D:'D',L:'L'})[match.result]}</span>`
+                  : isNow ? '<span class="mt-fix-badge mt-fix-badge-now">下一場</span>'
+                  : '<span class="mt-fix-badge mt-fix-badge-future">—</span>';
+                const bossTag = isBossSlot ? '<span class="mt-fix-boss-tag">👑 BOSS</span>' : '';
+                cards.push(`
+                  <div class="mt-fixture-card ${resultCls} ${isPast ? 'is-past' : ''} ${isNow ? 'is-now' : ''} ${isFuture ? 'is-future' : ''} ${isBossSlot ? 'is-boss-slot' : ''}">
+                    <div class="mt-fix-md">MD${i}${bossTag}</div>
+                    <div class="mt-fix-matchup">
+                      <span class="mt-fix-team-home">${escapeHtml(team.team_name || '我隊')}</span>
+                      ${scoreOrVs}
+                      <span class="mt-fix-team-away"><span class="mt-fix-opp-crest">${oppCrest}</span>${oppNameLabel}</span>
+                    </div>
+                    ${resultBadge}
+                  </div>
+                `);
+              }
+              return cards.join('');
+            })()}
           </div>
         </div>
 
@@ -5035,15 +5035,11 @@
     // 渲染主角 sprite（LPC walking）+ 守門員 + 兩名對手球員
     _renderMatchBanner(content, mascot, team, tier, played);
 
-    // 自動聚焦：進 tab 時把當前關卡 scroll 到可見區域中央
+    // 自動聚焦：捲動到當前 MD（下一場）的 fixture card
     requestAnimationFrame(() => {
-      const wrap = content.querySelector('#mt-match-path-wrap');
-      const nowNode = content.querySelector('.mt-match-stage-node.is-now');
-      if (wrap && nowNode) {
-        const wrapRect = wrap.getBoundingClientRect();
-        const nodeRect = nowNode.getBoundingClientRect();
-        const offset = nodeRect.top - wrapRect.top - wrap.clientHeight / 2 + nodeRect.height / 2;
-        wrap.scrollTo({ top: wrap.scrollTop + offset, behavior: 'smooth' });
+      const nowCard = content.querySelector('.mt-fixture-card.is-now');
+      if (nowCard) {
+        nowCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     });
 

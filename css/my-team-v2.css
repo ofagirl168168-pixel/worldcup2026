@@ -9142,3 +9142,245 @@ button.mt-train-point-card:active { transform: translateY(0); }
   padding: 2px 6px; border-radius: 4px;
   z-index: 2;
 }
+
+/* ─── 賽季賽程表（取代闖關地圖、像素遊戲風 fixtures） ─── */
+.mt-season-wrap {
+  padding: 12px 14px 18px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%);
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+/* HUD：戰績 + 進度條 + 目標 */
+.mt-season-hud {
+  padding: 10px 12px 12px;
+  background: rgba(0,0,0,0.4);
+  border: 2px solid rgba(240,192,64,0.55);
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  margin-bottom: 14px;
+  font-family: 'Press Start 2P', 'Noto Sans TC', sans-serif;
+}
+.mt-season-record-line {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.mt-season-record {
+  display: flex; gap: 6px;
+}
+.mt-rec-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  border: 1.5px solid;
+}
+.mt-rec-w { color: #b9e8b3; border-color: rgba(76,175,80,0.7);   background: rgba(76,175,80,0.18); }
+.mt-rec-d { color: #ffd54f; border-color: rgba(255,213,79,0.7);   background: rgba(255,213,79,0.15); }
+.mt-rec-l { color: #ef9a9a; border-color: rgba(239,83,80,0.7);    background: rgba(239,83,80,0.15); }
+.mt-season-progress-text {
+  font-size: 12px; font-weight: 700;
+  color: var(--text-secondary);
+}
+.mt-season-progress-bar {
+  position: relative;
+  height: 14px;
+  background: rgba(0,0,0,0.55);
+  border: 1.5px solid rgba(255,255,255,0.16);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.mt-season-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd96f 0%, #f0c040 100%);
+  box-shadow: 0 0 8px rgba(255,217,111,0.6);
+  transition: width 0.6s ease-out;
+}
+.mt-season-tick {
+  position: absolute;
+  top: -2px; bottom: -2px;
+  width: 2px;
+  pointer-events: none;
+}
+.mt-season-tick-promote {
+  background: #4caf50;
+  box-shadow: 0 0 4px #4caf50;
+}
+.mt-season-tick-promote::after {
+  content: '⬆';
+  position: absolute;
+  top: -12px; left: -4px;
+  font-size: 10px;
+  color: #4caf50;
+}
+.mt-season-tick-relegate {
+  background: #ef5350;
+  box-shadow: 0 0 4px #ef5350;
+}
+.mt-season-tick-relegate::after {
+  content: '⬇';
+  position: absolute;
+  bottom: -12px; left: -4px;
+  font-size: 10px;
+  color: #ef5350;
+}
+.mt-season-goal {
+  font-size: 12px;
+  color: var(--text-primary);
+  text-align: center;
+  padding: 4px 0 0;
+  line-height: 1.5;
+}
+.mt-season-goal b { color: #ffd96f; }
+
+/* Fixture cards：直立堆疊、每張像門票 */
+.mt-fixtures {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.mt-fixture-card {
+  position: relative;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(255,255,255,0.10);
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: 50px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.mt-fixture-card.is-past {
+  opacity: 0.85;
+}
+.mt-fixture-card.is-past.is-w {
+  background: linear-gradient(90deg, rgba(76,175,80,0.18) 0%, rgba(76,175,80,0.05) 100%);
+  border-color: rgba(76,175,80,0.55);
+}
+.mt-fixture-card.is-past.is-d {
+  background: linear-gradient(90deg, rgba(255,213,79,0.15) 0%, rgba(255,213,79,0.04) 100%);
+  border-color: rgba(255,213,79,0.45);
+}
+.mt-fixture-card.is-past.is-l {
+  background: linear-gradient(90deg, rgba(239,83,80,0.18) 0%, rgba(239,83,80,0.04) 100%);
+  border-color: rgba(239,83,80,0.55);
+}
+.mt-fixture-card.is-now {
+  background: linear-gradient(90deg, rgba(240,192,64,0.2) 0%, rgba(240,192,64,0.05) 100%);
+  border-color: #f0c040;
+  box-shadow: 0 0 0 1px rgba(240,192,64,0.5), 0 0 18px rgba(240,192,64,0.35);
+  animation: mt-fix-now-pulse 1.6s ease-in-out infinite;
+}
+@keyframes mt-fix-now-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(240,192,64,0.5), 0 0 12px rgba(240,192,64,0.25); }
+  50%      { box-shadow: 0 0 0 1px rgba(240,192,64,0.8), 0 0 22px rgba(240,192,64,0.55); }
+}
+.mt-fixture-card.is-future {
+  opacity: 0.45;
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.08);
+  border-style: dashed;
+}
+.mt-fixture-card.is-boss-slot {
+  border-color: rgba(255,107,107,0.55);
+}
+.mt-fixture-card.is-boss-slot.is-now {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 1px rgba(255,107,107,0.55), 0 0 18px rgba(255,107,107,0.4);
+}
+
+.mt-fix-md {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+}
+.mt-fix-boss-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 4px;
+  background: rgba(255,107,107,0.2);
+  color: #ff8a8a;
+  border-radius: 3px;
+  letter-spacing: 0.3px;
+}
+.mt-fix-matchup {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 700;
+  min-width: 0;
+  overflow: hidden;
+}
+.mt-fix-team-home, .mt-fix-team-away {
+  display: inline-flex; align-items: center; gap: 4px;
+  min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mt-fix-team-home { color: #6bd09e; }
+.mt-fix-team-away { color: #ef9a9a; }
+.mt-fix-opp-crest {
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 16px; line-height: 1; flex-shrink: 0;
+}
+.mt-fix-opp-crest img.mt-match-opp-crest-img {
+  width: 22px; height: 22px;
+}
+.mt-fix-opp-hidden {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  background: rgba(255,255,255,0.08);
+  border: 1.5px dashed rgba(255,255,255,0.25);
+  border-radius: 50%;
+  font-size: 12px; font-weight: 800;
+  color: var(--text-muted);
+}
+.mt-fix-score {
+  font-weight: 800;
+  font-size: 15px;
+  color: #fff;
+  padding: 0 6px;
+  font-family: ui-monospace, monospace;
+}
+.mt-fix-vs {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 0 4px;
+  letter-spacing: 1px;
+}
+.mt-fix-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  min-width: 50px;
+  text-align: center;
+  border: 1.5px solid transparent;
+}
+.mt-fix-badge-w { background: rgba(76,175,80,0.25); color: #b9e8b3; border-color: rgba(76,175,80,0.6); }
+.mt-fix-badge-d { background: rgba(255,213,79,0.22); color: #ffd54f; border-color: rgba(255,213,79,0.55); }
+.mt-fix-badge-l { background: rgba(239,83,80,0.25); color: #ef9a9a; border-color: rgba(239,83,80,0.6); }
+.mt-fix-badge-now {
+  background: rgba(240,192,64,0.25); color: #ffd96f; border-color: #f0c040;
+}
+.mt-fix-badge-future {
+  background: rgba(255,255,255,0.06); color: var(--text-muted);
+  border-color: rgba(255,255,255,0.1);
+}
+
+/* 手機窄寬：matchup 縮一點 + score 換行 */
+@media (max-width: 480px) {
+  .mt-fixture-card {
+    grid-template-columns: 44px 1fr auto;
+    padding: 7px 9px;
+    font-size: 12px;
+  }
+  .mt-fix-team-home, .mt-fix-team-away { font-size: 11.5px; }
+  .mt-fix-score { font-size: 14px; padding: 0 4px; }
+  .mt-fix-badge { font-size: 10px; min-width: 38px; padding: 3px 6px; }
+}
