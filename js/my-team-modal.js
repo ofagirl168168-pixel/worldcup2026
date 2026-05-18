@@ -5924,15 +5924,16 @@
               <thead><tr><th>達到等級</th><th>上限</th><th>+ 5★ 星等</th></tr></thead>
               <tbody>
                 <tr><td>Lv 1（起始）</td><td>99</td><td>124</td></tr>
-                <tr><td>Lv 6</td><td>104</td><td>129</td></tr>
-                <tr><td>Lv 11</td><td>109</td><td>134</td></tr>
-                <tr><td>Lv 16</td><td>114</td><td>139</td></tr>
-                <tr><td>Lv 21</td><td>119</td><td>144</td></tr>
-                <tr><td>Lv 26</td><td>124</td><td>149</td></tr>
-                <tr><td>Lv 31</td><td>129</td><td>154</td></tr>
-                <tr><td>Lv 36</td><td>134</td><td>159</td></tr>
-                <tr><td>Lv 41</td><td>139</td><td>164</td></tr>
-                <tr class="is-max"><td><b>Lv 46</b></td><td><b>144</b></td><td><b>169</b></td></tr>
+                <tr><td>Lv 5</td><td>104</td><td>129</td></tr>
+                <tr><td>Lv 10</td><td>109</td><td>134</td></tr>
+                <tr><td>Lv 15</td><td>114</td><td>139</td></tr>
+                <tr><td>Lv 20</td><td>119</td><td>144</td></tr>
+                <tr><td>Lv 25</td><td>124</td><td>149</td></tr>
+                <tr><td>Lv 30</td><td>129</td><td>154</td></tr>
+                <tr><td>Lv 35</td><td>134</td><td>159</td></tr>
+                <tr><td>Lv 40</td><td>139</td><td>164</td></tr>
+                <tr><td>Lv 45</td><td>144</td><td>169</td></tr>
+                <tr class="is-max"><td><b>Lv 50</b></td><td><b>149</b></td><td><b>174</b></td></tr>
               </tbody>
             </table>
             <div class="mt-train-info-note">
@@ -6152,10 +6153,11 @@
   }
 
   // 屬性 cap = Lv 硬上限 + 星等 × 5（跟 attr_hard_ceiling_for_level SQL 公式同步）
-  // 每 5 Lv 一區間、+5、尾數 4/9：1-5=99 / 6-10=104 / 11-15=109 / ... / 46-50=144
+  // milestone 在 Lv 5/10/15/.../50：
+  //   Lv 1-4=99（起始）/ 5-9=104 / 10-14=109 / ... / 45-49=144 / 50=149（滿級）
   function _attrCeilingForLv(lv) {
     const safeLv = Math.max(1, Math.min(50, lv || 1));
-    return 99 + Math.floor((safeLv - 1) / 5) * 5;
+    return 99 + Math.floor(safeLv / 5) * 5;
   }
   function _attrCapForPlayer(p, willLvUp) {
     const newLv = (p.level || 1) + (willLvUp ? 1 : 0);
