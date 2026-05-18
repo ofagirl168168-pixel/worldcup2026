@@ -26,7 +26,7 @@ SET search_path = public
 AS $$
 DECLARE
   v_email        TEXT;
-  v_admin_emails TEXT[] := ARRAY['ofagirl168168@gmail.com'];
+  v_admin_emails TEXT[] := ARRAY['ofagirl168168@gmail.com', 'timls61004@gmail.com', 'dick61004@gmail.com'];
   v_tw           TEXT := 'Asia/Taipei';
 BEGIN
   IF auth.uid() IS NULL THEN RAISE EXCEPTION 'NOT_LOGGED_IN'; END IF;
@@ -85,7 +85,7 @@ SET search_path = public
 AS $$
 DECLARE
   v_email        TEXT;
-  v_admin_emails TEXT[] := ARRAY['ofagirl168168@gmail.com'];
+  v_admin_emails TEXT[] := ARRAY['ofagirl168168@gmail.com', 'timls61004@gmail.com', 'dick61004@gmail.com'];
   v_tw           TEXT := 'Asia/Taipei';
   v_since        TIMESTAMPTZ;
   v_arenas       JSONB;

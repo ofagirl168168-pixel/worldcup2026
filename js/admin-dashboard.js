@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  const ADMIN_EMAILS = ['ofagirl168168@gmail.com'];
+  const ADMIN_EMAILS = ['ofagirl168168@gmail.com', 'timls61004@gmail.com', 'dick61004@gmail.com'];
 
   function _isAdmin() {
     try {
