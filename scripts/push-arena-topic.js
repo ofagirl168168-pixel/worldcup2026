@@ -76,6 +76,13 @@ function entryFor(state, id) {
 }
 
 async function postIgPhase(state) {
+  // ── 2026-05-18 起停用擂台題 IG 限動 ──
+  //   使用者反映 IG 限動數量過多、改成只發「早安球迷」+「開賽預告」。
+  //   TG 頻道照舊推擂台題、只是不再上 IG。要恢復把 return 拿掉即可。
+  console.log('⏭️ 擂台題 IG 限動已停用（只發早安球迷 + 開賽預告到 IG）');
+  return;
+
+  // eslint-disable-next-line no-unreachable
   if (!IG_USER_ID || !IG_TOKEN) { console.log('缺 IG token，跳過'); return; }
   // 過濾掉過期 entry：image 是 24h 前生的、可能對應已換題的擂台，貼上去是過期圖
   const now = Date.now();
