@@ -5919,20 +5919,20 @@
         <div class="mt-train-info-section">
           <div class="mt-train-info-q">📈 屬性能力值上限</div>
           <div class="mt-train-info-a">
-            訓練 1 次 → 球員 Lv +1（最高 Lv 50）。<b>等級越高、屬性能練得越高。</b>
+            訓練 1 次 → 球員 Lv +1（最高 Lv 50）。<b>每 5 等突破一次上限</b>、上限尾數固定 4 / 9。
             <table class="mt-lv-cap-table">
-              <thead><tr><th>Lv 區間</th><th>上限</th><th>+ 5★ 星等</th></tr></thead>
+              <thead><tr><th>達到等級</th><th>上限</th><th>+ 5★ 星等</th></tr></thead>
               <tbody>
-                <tr><td>1-9</td><td>99</td><td>124</td></tr>
-                <tr><td>10-14</td><td>105</td><td>130</td></tr>
-                <tr><td>15-19</td><td>110</td><td>135</td></tr>
-                <tr><td>20-24</td><td>115</td><td>140</td></tr>
-                <tr><td>25-29</td><td>120</td><td>145</td></tr>
-                <tr><td>30-34</td><td>125</td><td>150</td></tr>
-                <tr><td>35-39</td><td>130</td><td>155</td></tr>
-                <tr><td>40-44</td><td>135</td><td>160</td></tr>
-                <tr><td>45-49</td><td>140</td><td>165</td></tr>
-                <tr class="is-max"><td><b>50</b></td><td><b>145</b></td><td><b>170</b></td></tr>
+                <tr><td>Lv 1（起始）</td><td>99</td><td>124</td></tr>
+                <tr><td>Lv 6</td><td>104</td><td>129</td></tr>
+                <tr><td>Lv 11</td><td>109</td><td>134</td></tr>
+                <tr><td>Lv 16</td><td>114</td><td>139</td></tr>
+                <tr><td>Lv 21</td><td>119</td><td>144</td></tr>
+                <tr><td>Lv 26</td><td>124</td><td>149</td></tr>
+                <tr><td>Lv 31</td><td>129</td><td>154</td></tr>
+                <tr><td>Lv 36</td><td>134</td><td>159</td></tr>
+                <tr><td>Lv 41</td><td>139</td><td>164</td></tr>
+                <tr class="is-max"><td><b>Lv 46</b></td><td><b>144</b></td><td><b>169</b></td></tr>
               </tbody>
             </table>
             <div class="mt-train-info-note">
