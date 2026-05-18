@@ -4948,6 +4948,12 @@
 
         <!-- 賽季賽程表（10 場 fixture cards、過 = 顯示真實結果、未來 = ? mark）-->
         <div class="mt-season-wrap" data-tier="${tier}">
+          <!-- 聯賽標題（HUD 上方）-->
+          <div class="mt-season-title">
+            <span class="mt-season-title-trophy">🏆</span>
+            <span class="mt-season-title-text">${escapeHtml(tierName)}</span>
+            <span class="mt-season-title-tier">Tier ${tier}・賽季 ${seasonNum}</span>
+          </div>
           <!-- 賽季進度 HUD：戰績 + 7 勝升甲組目標線 -->
           <div class="mt-season-hud">
             <div class="mt-season-record-line">

@@ -9384,3 +9384,37 @@ button.mt-train-point-card:active { transform: translateY(0); }
   .mt-fix-score { font-size: 14px; padding: 0 4px; }
   .mt-fix-badge { font-size: 10px; min-width: 38px; padding: 3px 6px; }
 }
+
+/* 聯賽標題（賽季 HUD 上方）*/
+.mt-season-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: linear-gradient(180deg, rgba(240,192,64,0.15) 0%, rgba(240,192,64,0.03) 100%);
+  border-top: 2px solid rgba(240,192,64,0.55);
+  border-bottom: 2px solid rgba(240,192,64,0.55);
+}
+.mt-season-title-trophy {
+  font-size: 18px;
+  filter: drop-shadow(0 0 4px rgba(240,192,64,0.6));
+}
+.mt-season-title-text {
+  font-size: 16px;
+  font-weight: 900;
+  color: #ffd96f;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 6px rgba(255,217,111,0.4), 0 1px 0 rgba(0,0,0,0.6);
+}
+.mt-season-title-tier {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+@media (max-width: 480px) {
+  .mt-season-title-text { font-size: 14px; }
+  .mt-season-title-tier { font-size: 10px; }
+}
