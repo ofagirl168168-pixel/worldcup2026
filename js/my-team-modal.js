@@ -5255,11 +5255,13 @@
       goalkeeperEl.style.backgroundPosition = `-${f * frameW}px -${row * frameH}px`;
     }, 320);
 
-    // 對手球員：idle 戰備站立（combat-idle-down 靜止單幀）
+    // 對手球員：idle 戰備站立（combat-idle-down 2 幀 LPC 標準呼吸循環）
     // 主角踢球時切 tackle 鏟球防守、進球後變懊惱姿勢
+    let oppMode = 'idle';
+    let oppIdleFrame = 0;
     const setOppPose = (mode) => {
+      oppMode = mode;
       if (mode === 'tackle') {
-        // 鏟球姿勢：opp1 向左鏟、opp2 向右鏟（用 ROW_TACKLE + scaleX flip）
         if (opp1El) {
           opp1El.style.backgroundPosition = `-${1 * frameW}px -${ROW_TACKLE * frameH}px`;
           opp1El.style.transform = 'scaleX(-1)';
@@ -5272,14 +5274,23 @@
         if (opp1El) { opp1El.style.backgroundPosition = `-${0 * frameW}px -${ROW_HURT * frameH}px`; opp1El.style.transform = ''; }
         if (opp2El) { opp2El.style.backgroundPosition = `-${0 * frameW}px -${ROW_HURT * frameH}px`; opp2El.style.transform = ''; }
       } else {
-        // idle：combat-idle-down 靜止單幀（不晃）
-        if (opp1El) { opp1El.style.backgroundPosition = `-${0 * frameW}px -${ROW_COMBAT_IDLE * frameH}px`; opp1El.style.transform = ''; }
-        if (opp2El) { opp2El.style.backgroundPosition = `-${0 * frameW}px -${ROW_COMBAT_IDLE * frameH}px`; opp2El.style.transform = ''; }
+        // idle：先把 transform 清掉、實際 backgroundPosition 由下方 interval 切
+        if (opp1El) opp1El.style.transform = '';
+        if (opp2El) opp2El.style.transform = '';
       }
     };
+    // combat-idle 2 幀循環（col 0 = LPC frame 0 = 站立、col 1 = LPC frame 1 = 微抬腿）
+    _matchOppLoop = setInterval(() => {
+      if (oppMode !== 'idle') return;
+      if (!opp1El && !opp2El) return;
+      oppIdleFrame = 1 - oppIdleFrame;  // toggle 0/1
+      const f1 = oppIdleFrame;
+      const f2 = 1 - oppIdleFrame;       // 兩人對打、看起來自然
+      if (opp1El) opp1El.style.backgroundPosition = `-${f1 * frameW}px -${ROW_COMBAT_IDLE * frameH}px`;
+      if (opp2El) opp2El.style.backgroundPosition = `-${f2 * frameW}px -${ROW_COMBAT_IDLE * frameH}px`;
+    }, 380);
     // 初始化：擺出 idle 姿勢
     setOppPose('idle');
-    // 對外暴露給 tick() 用
     window.__mtMatchSetOppPose = setOppPose;
 
     tick();

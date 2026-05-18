@@ -184,8 +184,8 @@
     const kitShirt = opts.shirtColor || 'red';
     const kitPants = opts.pantsColor || 'blue';
     const kitShoes = opts.shoeColor || 'white';
-    // v5 = combat-idle row y 從 22 (up 背面) 改 24 (down 正面)、frames 改 [0,0,0] 靜止
-    const key = JSON.stringify(look) + '|F|v5|' + kitShirt + '|' + kitPants + '|' + kitShoes;
+    // v6 = combat-idle 2 幀 [0,1,1]（LPC 標準呼吸）+ 拿掉 CSS bob 上下飄動
+    const key = JSON.stringify(look) + '|F|v6|' + kitShirt + '|' + kitPants + '|' + kitShoes;
     if (fullBodyCache.has(key)) return fullBodyCache.get(key);
 
     // 寬一點才裝得下 slash 揮腿、spellcast 舉手張開的手臂
@@ -209,7 +209,7 @@
       [1, 2, 3],  // frustration：hurt 站不穩
       [3, 5, 7],  // tackle：thrust-right 伸腿撲擊
       [2, 3, 4],  // GK dive：slash-up 234（手舉肩→過頭頂→開始下揮、apex 過頭頂）
-      [0, 0, 0],  // combat-idle-down：靜止單幀（不晃）、3 col 都用 frame 0
+      [0, 1, 1],  // combat-idle-down：LPC 標準 2 幀（0=站立、1=微抬腿呼吸）、col 2 重複 col 1
     ];
 
     const SX = 8, SY_OFF = 0;  // 寬 8-55、高 0-63 整個 frame、手臂 + 頂部頭髮都裝得下

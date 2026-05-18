@@ -6878,14 +6878,10 @@
   filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
   z-index: 2;
   pointer-events: none;
-  animation: mt-match-opp-bob 2.4s ease-in-out infinite;
+  /* 拿掉 mt-match-opp-bob 上下飄動 — combat-idle 本身的 2 幀循環就是呼吸感、不需要再 translateY */
 }
 #mt-match-opp-1 { right: 64px; }
-#mt-match-opp-2 { right: 8px; animation-delay: -1.2s; }
-@keyframes mt-match-opp-bob {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-2px); }
-}
+#mt-match-opp-2 { right: 8px; }
 /* 對手隊徽 + 隊名（右上） */
 .mt-match-opp-label {
   position: absolute;
