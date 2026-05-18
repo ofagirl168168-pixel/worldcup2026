@@ -8936,8 +8936,31 @@ button.mt-train-point-card:active { transform: translateY(0); }
 }
 .mt-bench-rarity {
   position: absolute; top: 2px; right: 2px;
-  background: rgba(0,0,0,0.5); font-size: 9px; padding: 1px 4px; border-radius: 3px;
+  background: rgba(0,0,0,0.5); color: #fff;
+  font-size: 9px; padding: 1px 4px; border-radius: 3px;
+  font-weight: 800; letter-spacing: 0.5px;
 }
+.mt-bench-player.rarity-N   .mt-bench-rarity { background: #757d8a; color: #fff; }
+.mt-bench-player.rarity-R   .mt-bench-rarity { background: #43a047; color: #fff; }
+.mt-bench-player.rarity-SR  .mt-bench-rarity { background: #9b87f5; color: #fff; }
+.mt-bench-player.rarity-SSR .mt-bench-rarity { background: #f0c040; color: #2a1505; }
+
+/* 補做：球員稀有度光暈金字塔 — N 灰階、R 綠光、SR 紫光、SSR 金光 */
+.mt-pitch-player.rarity-N .mt-pitch-player-portrait {
+  filter: saturate(0.55) brightness(0.9);
+}
+.mt-pitch-player.rarity-R .mt-pitch-player-portrait {
+  filter: drop-shadow(0 0 4px rgba(76,175,80,0.55));
+}
+.mt-bench-player.rarity-N img {
+  filter: saturate(0.55) brightness(0.9);
+}
+.mt-bench-player.rarity-N { border-color: rgba(120,128,140,0.4); border-style: dashed; }
+.mt-bench-player.rarity-R { border-color: rgba(76,175,80,0.55); }
+
+/* roster-slot 補 N / R 顏色 (原本只有 SR / SSR) */
+.mt-roster-slot-rarity.rarity-N { background: #757d8a; color: #fff; }
+.mt-roster-slot-rarity.rarity-R { background: #43a047; color: #fff; }
 /* 板凳球員受傷標示 — 紅底全寬橫條（蓋在 portrait 下緣）*/
 .mt-bench-injury {
   position: absolute;
