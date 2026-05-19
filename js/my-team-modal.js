@@ -2996,13 +2996,15 @@
   // ── SSR 專屬展示頁（讀 img/ssr-showcase/_index.json 找對應圖、無圖時顯示未解鎖 placeholder）──
   let _ssrIndexCache = null;
   async function _fetchSsrIndex() {
-    if (_ssrIndexCache) return _ssrIndexCache;
+    // 只 cache 非空 mapping、避免初次部署/網路抖動拿到 {} 之後一直回 {}
+    if (_ssrIndexCache && Object.keys(_ssrIndexCache).length) return _ssrIndexCache;
     try {
-      const r = await fetch('img/ssr-showcase/_index.json?t=' + Date.now());
+      const r = await fetch('img/ssr-showcase/_index.json?t=' + Date.now(), { cache: 'no-store' });
       if (!r.ok) return {};
       const data = await r.json();
-      _ssrIndexCache = data.mapping || {};
-      return _ssrIndexCache;
+      const mapping = data.mapping || {};
+      if (Object.keys(mapping).length) _ssrIndexCache = mapping;
+      return mapping;
     } catch (e) { return {}; }
   }
 

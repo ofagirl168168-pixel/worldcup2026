@@ -374,6 +374,19 @@
     return new Promise(resolve => {
       let skipped = false;
       let resolved = false;
+      // 紀錄此批已開過 showcase 的 SSR card pkid、避免 flip-time 開過、cleanup 又補開
+      const _shownSsr = new Set();
+      const _maybeOpenSsrShowcase = async (c) => {
+        if (!c || c.rarity !== 'SSR' || c.is_duplicate) return;
+        const key = c.id || c.card_id || c.name;
+        if (_shownSsr.has(key)) return;
+        _shownSsr.add(key);
+        if (typeof window.MyTeam?.openSSRShowcase === 'function') {
+          // 卡片翻面動畫約 0.6s、等 0.45s 讓正面剛開始浮現再蓋上 showcase
+          await new Promise(r => setTimeout(r, 450));
+          await window.MyTeam.openSSRShowcase(c.card_id, c.look_data, c.name, c.nickname);
+        }
+      };
       const cleanup = () => {
         if (resolved) return;
         resolved = true;
@@ -382,12 +395,14 @@
         setTimeout(() => overlay.remove(), 350);
         // 標記「球員揭曉動畫已看過」→ 下次開 my-team 不會補播這批卡
         try { localStorage.setItem('mt_last_seen_players_at', new Date().toISOString()); } catch (e) {}
-        // 抽到 SSR → 依序跳專屬展示頁（每張間隔 300ms）
+        // Safety net：若某張 SSR 因為意外沒在 flip 時觸發、cleanup 補開（不重複）
         try {
           const ssrs = (cards || []).filter(c => c && c.rarity === 'SSR' && !c.is_duplicate);
-          if (ssrs.length && typeof window.MyTeam?.openSSRShowcase === 'function') {
+          const missed = ssrs.filter(c => !_shownSsr.has(c.id || c.card_id || c.name));
+          if (missed.length && typeof window.MyTeam?.openSSRShowcase === 'function') {
             setTimeout(async () => {
-              for (const sc of ssrs) {
+              for (const sc of missed) {
+                _shownSsr.add(sc.id || sc.card_id || sc.name);
                 await window.MyTeam.openSSRShowcase(sc.card_id, sc.look_data, sc.name, sc.nickname);
                 await new Promise(r => setTimeout(r, 300));
               }
@@ -603,6 +618,7 @@
             _animateCounts(el, c);
             flipPrompt.hidden = true;
             showCTAs();
+            _maybeOpenSsrShowcase(c);  // SSR → 翻面瞬間蓋上專屬大圖
           }
           return;
         }
@@ -616,6 +632,7 @@
           _emitParticles(el, c.rarity, false);
           _animateCounts(el, c);
           flipPrompt.hidden = true;
+          _maybeOpenSsrShowcase(c);  // SSR → 翻面瞬間蓋上專屬大圖
         } else {
           // 翻過了再點：滑走、露出下一張
           advanceStack();
@@ -702,6 +719,7 @@
         const flipAllBtn = overlay.querySelector('#mt-gacha-flip-all-btn');
         if (flipAllBtn) flipAllBtn.hidden = true;
         const cardEls = Array.from(overlay.querySelectorAll('.mt-gacha-card3d'));
+        const ssrToShow = [];
         for (let i = 0; i < cardEls.length; i++) {
           const cardEl = cardEls[i];
           const c = cards[i];
@@ -716,6 +734,8 @@
             } else {
               _animateCounts(cardEl, c);
             }
+            // 一鍵翻全部時、SSR 收集起來最後依序蓋上 showcase
+            if (c && c.rarity === 'SSR' && !c.is_duplicate) ssrToShow.push(c);
           }
           // 多抽：每張間隔連翻
           await _sleep(instant ? 0 : (c.rarity === 'SSR' ? 250 : 100));
@@ -723,6 +743,10 @@
         stackTopIdx = cards.length;
         allRevealed = true;
         await _sleep(instant ? 0 : 300);
+        // 一鍵翻全部 → 依序蓋上 SSR showcase
+        for (const sc of ssrToShow) {
+          await _maybeOpenSsrShowcase(sc);
+        }
         // 多抽 → 展示所有卡 grid；1 抽 → 直接 CTA
         if (cards.length > 1) {
           showAllRevealedGrid();
