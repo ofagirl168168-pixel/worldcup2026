@@ -3908,7 +3908,7 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <h3>關鍵數據</h3>
 
-<p><b>Luke Shaw</b>：1 球（5'），時隔三年半再度進球，Michael Carrick 賽後力薦他入選英格蘭世界盃名單。<br>
+<p><b>Luke Shaw</b>：1 球（5'），時隔逾三年再度進球，Michael Carrick 賽後力薦他入選英格蘭世界盃名單。<br>
 <b>Bruno Fernandes</b>：1 助攻（76'），追平英超單季 20 助攻紀錄（De Bruyne 2019/20、Henry 2002/03）。<br>
 <b>Matheus Cunha</b>：1 球（55'），爭議進球，PGMOL 承認不應判有效。<br>
 <b>Bryan Mbeumo</b>：1 球（76'），禁區內手球未被追究 + 門前搶點得分。<br>
