@@ -112,6 +112,16 @@ export default [
     "shareable": true
   },
   {
+    "id": "epl-074",
+    "tournament": "epl",
+    "title": "【賽後戰報】曼聯 3-2 諾丁漢森林：Fernandes 平助攻紀錄，PGMO 承認進球誤判",
+    "summary": "英超第37輪——曼聯在老特拉福德以 3-2 擊敗諾丁漢森林鎖定季軍。Shaw 閃電破門、Cunha 和 Mbeumo 下半場各進一球，Bruno Fernandes 追平英超單季 20 助攻紀錄。但 Cunha 進球涉及 Mbeumo 手球爭議，PGMO 賽後承認裁判判決有誤並向森林致歉。",
+    "date": "2026-05-17",
+    "category": "賽後深度分析",
+    "readTime": null,
+    "shareable": true
+  },
+  {
     "id": "epl-061",
     "tournament": "epl",
     "title": "【賽後回顧】阿斯頓維拉 4-2 利物浦：Watkins 梅開二度，維拉鎖定歐冠席位",
