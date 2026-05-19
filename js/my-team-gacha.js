@@ -382,6 +382,18 @@
         setTimeout(() => overlay.remove(), 350);
         // 標記「球員揭曉動畫已看過」→ 下次開 my-team 不會補播這批卡
         try { localStorage.setItem('mt_last_seen_players_at', new Date().toISOString()); } catch (e) {}
+        // 抽到 SSR → 依序跳專屬展示頁（每張間隔 300ms）
+        try {
+          const ssrs = (cards || []).filter(c => c && c.rarity === 'SSR' && !c.is_duplicate);
+          if (ssrs.length && typeof window.MyTeam?.openSSRShowcase === 'function') {
+            setTimeout(async () => {
+              for (const sc of ssrs) {
+                await window.MyTeam.openSSRShowcase(sc.card_id, sc.look_data, sc.name, sc.nickname);
+                await new Promise(r => setTimeout(r, 300));
+              }
+            }, 400);
+          }
+        } catch (e) { console.warn('[gacha] ssr showcase trigger', e); }
         resolve();
       };
 

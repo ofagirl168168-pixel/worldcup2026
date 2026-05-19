@@ -2798,9 +2798,7 @@
 
     overlay.querySelector('[data-act="ssr-showcase"]')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (typeof showToast === 'function') {
-        showToast('✨ SSR 專屬大圖製作中、之後抽到 SSR 會跳出豪華展示頁');
-      }
+      _openSSRShowcase(c.card_id, p.look_data || c.look_data, c.name, c.nickname);
     });
 
     overlay.querySelector('[data-act="toggle-start"]').addEventListener('click', async () => {
@@ -2993,6 +2991,100 @@
     };
 
     pitch.addEventListener('pointerdown', onDown);
+  }
+
+  // ── SSR 專屬展示頁（讀 img/ssr-showcase/_index.json 找對應圖、無圖時顯示未解鎖 placeholder）──
+  let _ssrIndexCache = null;
+  async function _fetchSsrIndex() {
+    if (_ssrIndexCache) return _ssrIndexCache;
+    try {
+      const r = await fetch('img/ssr-showcase/_index.json?t=' + Date.now());
+      if (!r.ok) return {};
+      const data = await r.json();
+      _ssrIndexCache = data.mapping || {};
+      return _ssrIndexCache;
+    } catch (e) { return {}; }
+  }
+
+  function _openSSRShowcase(cardId, lookData, name, nickname) {
+    return new Promise((resolve) => {
+      const overlay = document.createElement('div');
+      overlay.className = 'mt-ssr-showcase-overlay';
+      overlay.innerHTML = `
+        <div class="mt-ssr-showcase-card">
+          <button class="mt-ssr-showcase-close" type="button" aria-label="關閉">×</button>
+          <div class="mt-ssr-showcase-stage" id="mt-ssr-showcase-stage">
+            <div class="mt-ssr-showcase-loading">載入中…</div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      requestAnimationFrame(() => overlay.classList.add('open'));
+
+      let resolved = false;
+      const close = () => {
+        if (resolved) return;
+        resolved = true;
+        overlay.classList.remove('open');
+        setTimeout(() => { overlay.remove(); resolve(); }, 250);
+        document.removeEventListener('keydown', onEsc);
+      };
+      const onEsc = (e) => { if (e.key === 'Escape') close(); };
+      overlay.querySelector('.mt-ssr-showcase-close').addEventListener('click', close);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+      document.addEventListener('keydown', onEsc);
+
+      _renderSSRShowcaseContent(overlay, cardId, lookData, name, nickname);
+    });
+  }
+
+  async function _renderSSRShowcaseContent(overlay, cardId, lookData, name, nickname) {
+
+    const stage = overlay.querySelector('#mt-ssr-showcase-stage');
+    const mapping = await _fetchSsrIndex();
+    const imgFile = mapping[cardId];
+
+    if (imgFile) {
+      // 有 AI 圖：背景大圖 + 右下角 LPC sprite 疊在「角色」框上
+      const charId = `ssr-char-${Date.now()}`;
+      stage.innerHTML = `
+        <img class="mt-ssr-showcase-bg" src="img/ssr-showcase/${encodeURIComponent(imgFile)}" alt="${escapeHtml(name || '')}">
+        <div class="mt-ssr-showcase-char">
+          <canvas id="${charId}" class="mt-ssr-showcase-sprite"></canvas>
+        </div>
+      `;
+      // 把該 SSR 的 look_data 渲染成大像素 portrait 放右下
+      if (lookData && window.LpcRenderer) {
+        try {
+          const url = await window.LpcRenderer.portrait(lookData, { scale: 5 });
+          if (url) {
+            const canvas = document.getElementById(charId);
+            if (canvas) {
+              const ctx = canvas.getContext('2d');
+              const img = new Image();
+              img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.imageSmoothingEnabled = false;
+                ctx.drawImage(img, 0, 0);
+              };
+              img.src = url;
+            }
+          }
+        } catch (e) { console.warn('[ssr-showcase] sprite render', e); }
+      }
+    } else {
+      // 沒對應圖：顯示未解鎖 placeholder（剪影 + 「製作中」）
+      stage.innerHTML = `
+        <div class="mt-ssr-showcase-placeholder">
+          <div class="mt-ssr-showcase-ph-silhouette">👤</div>
+          <div class="mt-ssr-showcase-ph-name">${escapeHtml(name || '?')}</div>
+          ${nickname ? `<div class="mt-ssr-showcase-ph-nick">「${escapeHtml(nickname)}」</div>` : ''}
+          <div class="mt-ssr-showcase-ph-tag">✨ 專屬大圖製作中</div>
+          <div class="mt-ssr-showcase-ph-hint">敬請期待</div>
+        </div>
+      `;
+    }
   }
 
   function _radarBar(label, val, capOrTooltip, tooltip) {
@@ -6869,4 +6961,6 @@
 
   window.openMyTeamModal = open;
   window.closeMyTeamModal = close;
+  // 暴露給 gacha module 用：抽到 SSR 時自動跳展示頁
+  if (window.MyTeam) window.MyTeam.openSSRShowcase = _openSSRShowcase;
 })();

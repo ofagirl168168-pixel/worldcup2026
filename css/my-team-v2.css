@@ -9502,3 +9502,130 @@ button.mt-train-point-card:active { transform: translateY(0); }
   .mt-season-title-inner { font-size: 12px; }
   .mt-season-title-inner b { font-size: 13px; }
 }
+
+/* ─── SSR 專屬展示頁（讀 img/ssr-showcase/{file}.png + LPC sprite 疊「角色」框）─── */
+.mt-ssr-showcase-overlay {
+  position: fixed; inset: 0;
+  z-index: 13500;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.mt-ssr-showcase-overlay.open { opacity: 1; }
+.mt-ssr-showcase-card {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 96vh;
+  background: #0a0612;
+  border: 1px solid rgba(240,192,64,0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(240,192,64,0.25);
+}
+.mt-ssr-showcase-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 36px; height: 36px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.mt-ssr-showcase-close:hover { background: rgba(0,0,0,0.9); }
+.mt-ssr-showcase-stage {
+  position: relative;
+  width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(180deg, #0a0612 0%, #050308 100%);
+}
+.mt-ssr-showcase-bg {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+.mt-ssr-showcase-loading {
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* 「角色」框內的 LPC sprite — 疊在 AI 圖右下角 */
+.mt-ssr-showcase-char {
+  position: absolute;
+  /* 用百分比讓不同尺寸 AI 圖都能對齊；如果有偏差使用者可調 */
+  right: 5%;
+  bottom: 6%;
+  width: 22%;
+  aspect-ratio: 1 / 1.2;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+  filter: drop-shadow(0 0 12px rgba(240,192,64,0.6));
+  animation: mt-ssr-sprite-pulse 2.4s ease-in-out infinite;
+}
+@keyframes mt-ssr-sprite-pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(240,192,64,0.4)); }
+  50%      { filter: drop-shadow(0 0 18px rgba(240,192,64,0.85)); }
+}
+.mt-ssr-showcase-sprite {
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+}
+
+/* 未解鎖 placeholder（沒對應 AI 圖時）*/
+.mt-ssr-showcase-placeholder {
+  padding: 80px 30px;
+  text-align: center;
+  color: #fff;
+  width: 100%;
+}
+.mt-ssr-showcase-ph-silhouette {
+  font-size: 100px;
+  opacity: 0.3;
+  filter: blur(2px);
+  margin-bottom: 14px;
+}
+.mt-ssr-showcase-ph-name {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffd96f;
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
+  text-shadow: 0 0 12px rgba(255,217,111,0.4);
+}
+.mt-ssr-showcase-ph-nick {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  font-style: italic;
+}
+.mt-ssr-showcase-ph-tag {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(240,192,64,0.18);
+  border: 1.5px solid rgba(240,192,64,0.5);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffd96f;
+  margin-bottom: 10px;
+}
+.mt-ssr-showcase-ph-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+@media (max-width: 480px) {
+  .mt-ssr-showcase-card { max-width: 100%; border-radius: 0; max-height: 100vh; }
+}

@@ -1,0 +1,9 @@
+{
+  "_comment": "SSR 卡 ID → 圖檔名 對應；AI 生圖完只要丟到本資料夾、加 1 行即可。檔名隨意（png / jpg / webp 都可）。",
+  "_template_example": {
+    "ssr-meihsi-01": "messi-finalv3.png",
+    "ssr-halandeng-01": "haaland_aiv2.jpg"
+  },
+  "mapping": {
+  }
+}
