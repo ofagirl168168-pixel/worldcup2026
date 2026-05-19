@@ -3875,16 +3875,16 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
   },
   {
     id: 'epl-074',
-    title: '【賽後戰報】曼聯 3-2 諾丁漢森林：Fernandes 平助攻紀錄，PGMO 承認進球誤判',
+    title: '【賽後戰報】曼聯 3-2 諾丁漢森林：Fernandes 平助攻紀錄，PGMOL 承認進球誤判',
     date: '2026-05-17',
     category: '賽後深度分析',
     tournament: 'epl',
-    summary: '英超第37輪——曼聯在老特拉福德以 3-2 擊敗諾丁漢森林鎖定季軍。Shaw 閃電破門、Cunha 和 Mbeumo 下半場各進一球，Bruno Fernandes 追平英超單季 20 助攻紀錄。但 Cunha 進球涉及 Mbeumo 手球爭議，PGMO 賽後承認裁判判決有誤並向森林致歉。',
+    summary: '英超第37輪——曼聯在老特拉福德以 3-2 擊敗諾丁漢森林鎖定季軍。Shaw 閃電破門、Cunha 和 Mbeumo 下半場各進一球，Bruno Fernandes 追平英超單季 20 助攻紀錄。但 Cunha 進球涉及 Mbeumo 手球爭議，PGMOL 賽後承認裁判判決有誤並向森林致歉。',
     content: `<h2>曼聯 3-2 諾丁漢森林｜英超第37輪・5/17（日）19:30 台灣時間・老特拉福德</h2>
 
 <h3>比賽概述</h3>
 
-<p>曼聯在老特拉福德以 <b>3-2</b> 擊敗諾丁漢森林，提前一輪鎖定英超季軍。<b>Bruno Fernandes</b> 送出關鍵助攻，追平 Kevin De Bruyne 和 Thierry Henry 保持的英超單季 <b>20 次助攻</b>紀錄。然而這場勝利因一個爭議進球蒙上陰影——PGMO 賽後承認 <b>Matheus Cunha</b> 的進球不應被判有效。</p>
+<p>曼聯在老特拉福德以 <b>3-2</b> 擊敗諾丁漢森林，提前一輪鎖定英超季軍。<b>Bruno Fernandes</b> 送出關鍵助攻，追平 Kevin De Bruyne 和 Thierry Henry 保持的英超單季 <b>20 次助攻</b>紀錄。然而這場勝利因一個爭議進球蒙上陰影——PGMOL 賽後承認 <b>Matheus Cunha</b> 的進球不應被判有效。</p>
 
 <h3>上半場：Shaw 閃電開張</h3>
 
@@ -3902,23 +3902,23 @@ Michael Carrick 的球隊從第一分鐘就暴露了問題。缺少了停賽的 
 
 <p><b>78 分鐘</b>，森林沒有放棄。<b>Morgan Gibbs-White</b> 在禁區邊緣收球後一腳精彩的低射破門，<b>3-2</b>。最後 12 分鐘森林全力搶攻但無力扳平。</p>
 
-<h3>賽後：PGMO 承認判決有誤</h3>
+<h3>賽後：PGMOL 承認判決有誤</h3>
 
-<p>比賽結束後，PGMO 主管 <b>Howard Webb</b> 主動聯繫諾丁漢森林俱樂部，承認 Cunha 的進球應被取消——Mbeumo 在傳球前確實以手臂觸球，Salisbury 不應在回看後仍維持原判。PGMO 正式向森林道歉。這一誤判終結了森林英超 <b>8 場不敗</b>的連勝紀錄，引發球迷與媒體的強烈不滿。</p>
+<p>比賽結束後，PGMOL 主管 <b>Howard Webb</b> 主動聯繫諾丁漢森林俱樂部，承認 Cunha 的進球應被取消——Mbeumo 在傳球前確實以手臂觸球，Salisbury 不應在回看後仍維持原判。PGMOL 正式向森林道歉。這一誤判終結了森林英超 <b>8 場不敗</b>的連勝紀錄，引發球迷與媒體的強烈不滿。</p>
 
 <h3>關鍵數據</h3>
 
 <p><b>Luke Shaw</b>：1 球（5'），時隔三年半再度進球，Michael Carrick 賽後力薦他入選英格蘭世界盃名單。<br>
 <b>Bruno Fernandes</b>：1 助攻（76'），追平英超單季 20 助攻紀錄（De Bruyne 2019/20、Henry 2002/03）。<br>
-<b>Matheus Cunha</b>：1 球（55'），爭議進球，PGMO 承認不應判有效。<br>
+<b>Matheus Cunha</b>：1 球（55'），爭議進球，PGMOL 承認不應判有效。<br>
 <b>Bryan Mbeumo</b>：1 球（76'），禁區內手球未被追究 + 門前搶點得分。<br>
 <b>Morgan Gibbs-White</b>：1 球（78'），精彩遠射為森林挽回顏面。<br>
 <b>Morato</b>：1 球（53'），個人英超首球。</p>
 
 <h3>Soccer麥迪觀點</h3>
 
-<p>曼聯鎖定季軍、Fernandes 寫入歷史——這場比賽本該是一個完美的賽季收官故事。但 PGMO 的賽後道歉讓一切變了味。裁判 Salisbury 在 VAR 已建議推翻的情況下仍堅持原判，這不只是「爭議」而是系統性失敗。對森林而言，8 場不敗被一個不該存在的進球終結，這種痛無法用一封道歉信彌補。英超的 VAR 機制在本季再次成為眾矢之的——如果連場邊回看都無法糾正明顯的手球，那 VAR 存在的意義是什麼？</p>`,
-    tags: ['賽後戰報', '曼聯', '諾丁漢森林', 'Fernandes', 'Shaw', 'Cunha', 'Mbeumo', 'Gibbs-White', 'PGMO', 'VAR爭議', '第37輪']
+<p>曼聯鎖定季軍、Fernandes 寫入歷史——這場比賽本該是一個完美的賽季收官故事。但 PGMOL 的賽後道歉讓一切變了味。裁判 Salisbury 在 VAR 已建議推翻的情況下仍堅持原判，這不只是「爭議」而是系統性失敗。對森林而言，8 場不敗被一個不該存在的進球終結，這種痛無法用一封道歉信彌補。英超的 VAR 機制在本季再次成為眾矢之的——如果連場邊回看都無法糾正明顯的手球，那 VAR 存在的意義是什麼？</p>`,
+    tags: ['賽後戰報', '曼聯', '諾丁漢森林', 'Fernandes', 'Shaw', 'Cunha', 'Mbeumo', 'Gibbs-White', 'PGMOL', 'VAR爭議', '第37輪']
   }
 ];
 

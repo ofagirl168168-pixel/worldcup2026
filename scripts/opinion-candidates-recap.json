@@ -2,14 +2,14 @@
   {
     "id": "op-20260519-b",
     "type": "trending",
-    "q": "PGMO 承認曼聯 vs 森林進球誤判並道歉！VAR 系統還有存在的必要嗎？",
+    "q": "PGMOL 承認曼聯 vs 森林進球誤判並道歉！VAR 系統還有存在的必要嗎？",
     "opts": [
       "VAR 必須保留！問題出在裁判不聽 VAR 建議，不是系統本身 -- 加強執行力就好",
       "VAR 已經失敗了！連場邊回看都判錯，不如恢復人為裁判的權威",
       "保留 VAR 但需要大改革！裁判應該強制聽從 VAR 建議，不能再自行推翻",
       "道歉有什麼用？應該重賽或扣分！Forest 8 場不敗被錯誤判決終結太不公平"
     ],
-    "context": "曼聯 3-2 諾丁漢森林（5/17），Matheus Cunha 的第二球涉及 Bryan Mbeumo 手球。VAR 建議裁判 Michael Salisbury 到場邊回看，但 Salisbury 仍判進球有效。PGMO 主管 Howard Webb 賽後主動聯繫 Forest 承認判決有誤並正式道歉。這個錯誤進球終結了 Forest 英超 8 場不敗紀錄。Gary Neville 等名嘴猛烈抨擊，稱這是「VAR 時代最不可思議的誤判之一」。",
+    "context": "曼聯 3-2 諾丁漢森林（5/17），Matheus Cunha 的第二球涉及 Bryan Mbeumo 手球。VAR 建議裁判 Michael Salisbury 到場邊回看，但 Salisbury 仍判進球有效。PGMOL 主管 Howard Webb 賽後主動聯繫 Forest 承認判決有誤並正式道歉。這個錯誤進球終結了 Forest 英超 8 場不敗紀錄。Gary Neville 等名嘴猛烈抨擊，稱這是「VAR 時代最不可思議的誤判之一」。",
     "seed_comments": {
       "0": [
         "VAR 有建議啊 是裁判不聽 這鍋不該 VAR 背",
